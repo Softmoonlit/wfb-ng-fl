@@ -1,0 +1,58 @@
+.vscode/
+temp
+tests/logs
+
+# Python 缓存与虚拟环境
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+env/
+
+# 打包产物
+build/
+dist/
+deb_dist/
+*.egg-info/
+wfb_ng-*.tar.gz
+
+# Make 构建产物
+src/*.o
+src/*.rx_test.o
+src/*.tx_gate_test.o
+*~
+
+# 可执行文件与测试二进制
+/wfb_rx
+/wfb_tx
+/wfb_tx_cmd
+/wfb_tun
+/wfb_token_scheduler
+/wfb_rtsp
+/wfb_keygen
+/kcp_small_sender
+/kcp_small_receiver
+/fec_test
+/libsodium_test
+/token_scheduler_test
+/token_control_packet_test
+/token_control_filter_test
+/rx_token_ipc_test
+/rx_token_listener_test
+/token_authorization_test
+/token_authorization_ipc_test
+/tx_authorization_integration_test
+/tx_data_source_gate_test
+/tx_token_gate_test
+/uftp
+/uftpd
+
+# Twisted 临时目录
+_trial_temp/
+_trial_temp-*/
+
+# 生成的密钥与配置
+/gs.key
+/drone.key
+/wfb_ng/conf/site.cfg
