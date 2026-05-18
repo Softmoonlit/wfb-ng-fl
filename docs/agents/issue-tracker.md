@@ -1,20 +1,22 @@
-# 问题追踪器：本地 Markdown
+# 问题追踪器：GitHub
 
-本仓库的问题和 PRD 存放在 `.scratch/` 目录下的 Markdown 文件中。
+本仓库的问题和 PRD 使用 GitHub Issues 管理。相关读写操作统一通过 `gh` CLI 执行。
 
 ## 约定
 
-- 每个功能一个目录：`.scratch/<feature-slug>/`
-- PRD 文件路径：`.scratch/<feature-slug>/PRD.md`
-- 实现问题路径：`.scratch/<feature-slug>/issues/<NN>-<slug>.md`，编号从 `01` 开始
-- 分流状态记录在问题文件顶部附近的 `Status:` 行中，取值见 `triage-labels.md`
-- 评论和讨论历史追加在文件底部的 `## Comments` 小节下
-- 当问题被标记为 `ready-for-agent` 时，正文至少应包含 `## What to build`、`## Agent brief`、`## Acceptance criteria`、`## Blocked by` 四个小节；`## Out of scope` 按需添加
+- 创建问题：`gh issue create --title "..." --body "..."`
+- 读取问题：`gh issue view <编号> --comments`
+- 列出问题：使用 `gh issue list`，按需要附加 `--label`、`--state` 等过滤条件
+- 评论问题：`gh issue comment <编号> --body "..."`
+- 增删标签：`gh issue edit <编号> --add-label "..."` / `--remove-label "..."`
+- 关闭问题：`gh issue close <编号> --comment "..."`
+
+在仓库克隆目录内执行时，`gh` 会根据 `git remote -v` 自动推断当前仓库。
 
 ## 当技能说“发布到问题追踪器”时
 
-在 `.scratch/<feature-slug>/` 下创建新文件；如果目录不存在，则一并创建。
+创建一个 GitHub issue。
 
 ## 当技能说“获取相关工单”时
 
-直接读取对应路径的文件；用户通常会提供文件路径或问题编号。
+运行 `gh issue view <编号> --comments` 读取问题正文、标签和评论历史。

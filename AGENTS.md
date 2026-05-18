@@ -19,7 +19,7 @@
 
 ### Issue tracker
 
-问题和 PRD 存放在仓库内的本地 Markdown 文件中，按 `.scratch/<feature>/` 约定组织。详见 `docs/agents/issue-tracker.md`。
+问题和 PRD 使用 GitHub Issues 管理，相关操作通过 `gh` CLI 执行。详见 `docs/agents/issue-tracker.md`。
 
 ### Triage labels
 
