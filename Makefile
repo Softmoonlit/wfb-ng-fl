@@ -72,6 +72,12 @@ tx_token_gate_test: src/tx_token_gate_test.cpp src/tx_token_gate.o src/token_aut
 token_authorization_ipc_test: src/token_authorization_ipc_test.cpp src/token_authorization_ipc.cpp src/token_event_ipc.cpp src/wifibroadcast.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
+token_namespace_bridge_test: src/token_namespace_bridge_test.cpp src/token_namespace_bridge.cpp src/token_authorization_ipc.cpp src/token_event_ipc.cpp src/wifibroadcast.cpp
+	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
+
+wfb_token_namespace_bridge: src/main_token_namespace_bridge.o src/token_namespace_bridge.o src/token_authorization_ipc.o src/token_event_ipc.o src/wifibroadcast.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
 tx_authorization_integration_test: src/tx_authorization_integration_test.cpp src/token_authorization_ipc.cpp src/tx_token_gate.cpp src/token_authorization.cpp src/token_scheduler.cpp src/wifibroadcast.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
@@ -128,7 +134,7 @@ baseline_split_test:
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_txrx.TXRXTestCase wfb_ng.tests.test_txrx.KeyDerivationTestCase
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_tuntap.TUNTAPTestCase
 
-test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_test token_authorization_test tx_token_gate_test token_authorization_ipc_test tx_authorization_integration_test tx_data_source_gate_test token_control_filter_test rx_token_ipc_test rx_token_listener_test baseline_split_test
+test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test token_control_filter_test rx_token_ipc_test rx_token_listener_test baseline_split_test
 	./fec_test
 	./libsodium_test
 	./token_scheduler_test
@@ -136,6 +142,7 @@ test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_
 	./token_authorization_test
 	./tx_token_gate_test
 	./token_authorization_ipc_test
+	./token_namespace_bridge_test
 	./tx_authorization_integration_test
 	./tx_data_source_gate_test
 	./token_control_filter_test
@@ -168,7 +175,7 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test token_control_packet_test token_control_filter_test rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
+	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test token_control_packet_test token_control_filter_test rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
 
 deb_docker:  /opt/qemu/bin
 	@if ! [ -d /opt/qemu ]; then echo "Docker cross build requires patched QEMU!\nApply ./scripts/qemu/qemu.patch to qemu-7.2.0 and build it:\n  ./configure --prefix=/opt/qemu --static --disable-system && make && sudo make install"; exit 1; fi

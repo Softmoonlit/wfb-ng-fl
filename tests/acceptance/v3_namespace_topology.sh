@@ -16,6 +16,7 @@ CLIENT2_DIR="$LOG_DIR/client2"
 SERVER_TUN_LOG="$SERVER_DIR/wfb_tun.log"
 CLIENT1_TUN_LOG="$CLIENT1_DIR/wfb_tun.log"
 CLIENT2_TUN_LOG="$CLIENT2_DIR/wfb_tun.log"
+TOKEN_BRIDGE_LOG="$LOG_DIR/token_namespace_bridge.log"
 
 SERVER_NS="${SERVER_NS:-v3-server}"
 CLIENT1_NS="${CLIENT1_NS:-v3-client1}"
@@ -49,6 +50,11 @@ CLIENT1_TUN_PEER_PORT="${CLIENT1_TUN_PEER_PORT:-5700}"
 CLIENT2_TUN_LISTEN_PORT="${CLIENT2_TUN_LISTEN_PORT:-5800}"
 CLIENT2_TUN_PEER_PORT="${CLIENT2_TUN_PEER_PORT:-5700}"
 
+TOKEN_READY_BASE="${TOKEN_READY_BASE:-wfb-scheduler}"
+SERVER_TOKEN_GRANT_BASE="${SERVER_TOKEN_GRANT_BASE:-wfb-v3-bridge-grant}"
+CLIENT1_TOKEN_GRANT_BASE="${CLIENT1_TOKEN_GRANT_BASE:-wfb-v3-client1-grant}"
+CLIENT2_TOKEN_GRANT_BASE="${CLIENT2_TOKEN_GRANT_BASE:-wfb-v3-client2-grant}"
+
 STARTUP_WAIT_SEC="${STARTUP_WAIT_SEC:-1}"
 
 PIDS=()
@@ -58,6 +64,7 @@ CLEANUP_VERIFIED="否"
 SERVER_TUN_PID=""
 CLIENT1_TUN_PID=""
 CLIENT2_TUN_PID=""
+TOKEN_BRIDGE_PID=""
 
 log_info() { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass() { echo "[PASS] $(date '+%H:%M:%S') $1"; }
@@ -101,12 +108,21 @@ render_result() {
 - server: $SERVER_TUN_LOG
 - client1: $CLIENT1_TUN_LOG
 - client2: $CLIENT2_TUN_LOG
+- token bridge: $TOKEN_BRIDGE_LOG
+
+## 控制桥
+
+- server ready 入口: $TOKEN_READY_BASE
+- server grant 入口: $SERVER_TOKEN_GRANT_BASE
+- node 1 -> client grant 入口: $CLIENT1_NS / $CLIENT1_TOKEN_GRANT_BASE
+- node 2 -> client grant 入口: $CLIENT2_NS / $CLIENT2_TOKEN_GRANT_BASE
 
 ## 当前切片范围
 
 - 已拉起并验证三 namespace 基础管理链路
 - 已在三 namespace 内启动 \`wfb_tun\` 并创建 TUN/IP 接口
-- 当前不要求完成跨 namespace 的 \`ready/grant/gate\` 闭环
+- 已启动并停止测试专用跨 namespace 控制桥
+- 当前不要求完成跨 namespace 的真实数据路径闭环
 EOF
 }
 
@@ -162,20 +178,21 @@ require_executable() {
     fi
 }
 
-build_wfb_tun() {
-    if [ -x "$PROJECT_ROOT/wfb_tun" ]; then
-        echo "wfb_tun 已存在，跳过构建" >"$BUILD_LOG"
-        log_pass "wfb_tun 已存在"
+build_acceptance_binaries() {
+    if [ -x "$PROJECT_ROOT/wfb_tun" ] && [ -x "$PROJECT_ROOT/wfb_token_namespace_bridge" ]; then
+        echo "acceptance 二进制已存在，跳过构建" >"$BUILD_LOG"
+        log_pass "acceptance 二进制已存在"
         return
     fi
 
     require_command make
-    log_info "构建 wfb_tun"
-    if ! make wfb_tun >"$BUILD_LOG" 2>&1; then
-        fail_exit "构建 wfb_tun 失败，查看日志: $BUILD_LOG"
+    log_info "构建 v3 acceptance 所需二进制"
+    if ! make wfb_tun wfb_token_namespace_bridge >"$BUILD_LOG" 2>&1; then
+        fail_exit "构建 v3 acceptance 二进制失败，查看日志: $BUILD_LOG"
     fi
     require_executable "$PROJECT_ROOT/wfb_tun"
-    log_pass "wfb_tun 构建成功"
+    require_executable "$PROJECT_ROOT/wfb_token_namespace_bridge"
+    log_pass "v3 acceptance 二进制构建成功"
 }
 
 create_namespace() {
@@ -264,6 +281,27 @@ start_wfb_tun() {
     fi
 }
 
+start_token_namespace_bridge() {
+    local pid
+
+    log_info "启动测试专用跨 namespace 控制桥"
+    "$PROJECT_ROOT/wfb_token_namespace_bridge" \
+        -S "$SERVER_NS" \
+        -r "$TOKEN_READY_BASE" \
+        -g "$SERVER_TOKEN_GRANT_BASE" \
+        -n "1:$CLIENT1_NS:$CLIENT1_TOKEN_GRANT_BASE" \
+        -n "2:$CLIENT2_NS:$CLIENT2_TOKEN_GRANT_BASE" >"$TOKEN_BRIDGE_LOG" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    TOKEN_BRIDGE_PID="$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        fail_exit "测试专用控制桥启动失败，查看日志: $TOKEN_BRIDGE_LOG"
+    fi
+    log_pass "测试专用跨 namespace 控制桥已启动"
+}
+
 assert_process_alive() {
     local pid="$1"
     local name="$2"
@@ -304,7 +342,7 @@ main() {
     require_command ping
     require_command grep
 
-    build_wfb_tun
+    build_acceptance_binaries
 
     log_info "清理旧的 v3 namespace 骨架资源"
     cleanup
@@ -325,6 +363,8 @@ main() {
     assert_interface_address "$SERVER_NS" "$SERVER_CLIENT2_SERVER_IF" "$SERVER_CLIENT2_ADDR"
     assert_interface_address "$CLIENT2_NS" "$CLIENT2_MGMT_IF" "$CLIENT2_MGMT_ADDR"
     log_pass "三 namespace 点对点管理链路创建完成"
+
+    start_token_namespace_bridge
 
     start_wfb_tun "$SERVER_NS" "$SERVER_TUN_NAME" "$SERVER_TUN_ADDR" "$SERVER_TUN_LISTEN_PORT" "$SERVER_TUN_PEER_PORT" "$SERVER_TUN_LOG" SERVER_TUN_PID
     start_wfb_tun "$CLIENT1_NS" "$CLIENT1_TUN_NAME" "$CLIENT1_TUN_ADDR" "$CLIENT1_TUN_LISTEN_PORT" "$CLIENT1_TUN_PEER_PORT" "$CLIENT1_TUN_LOG" CLIENT1_TUN_PID
@@ -347,6 +387,7 @@ main() {
     assert_process_alive "$SERVER_TUN_PID" "server wfb_tun"
     assert_process_alive "$CLIENT1_TUN_PID" "client1 wfb_tun"
     assert_process_alive "$CLIENT2_TUN_PID" "client2 wfb_tun"
+    assert_process_alive "$TOKEN_BRIDGE_PID" "token namespace bridge"
 
     verify_management_ping "$CLIENT1_NS" "$SERVER_CLIENT1_IP" "client1 到 server 点对点链路连通性"
     verify_management_ping "$CLIENT2_NS" "$SERVER_CLIENT2_IP" "client2 到 server 点对点链路连通性"
