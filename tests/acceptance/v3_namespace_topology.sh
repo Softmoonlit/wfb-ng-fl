@@ -79,8 +79,8 @@ CLIENT1_UPLINK_RX_DEBUG_PORT="${CLIENT1_UPLINK_RX_DEBUG_PORT:-41011}"
 CLIENT2_UPLINK_RX_DEBUG_PORT="${CLIENT2_UPLINK_RX_DEBUG_PORT:-41012}"
 UPLINK_TRANSFER_PORT="${UPLINK_TRANSFER_PORT:-5903}"
 UPLINK_STREAM_SECONDS="${UPLINK_STREAM_SECONDS:-8}"
-UPLINK_COLLECT_TIMEOUT_SEC="${UPLINK_COLLECT_TIMEOUT_SEC:-14}"
-CLIENT_JOIN_GAP_SEC="${CLIENT_JOIN_GAP_SEC:-2}"
+UPLINK_COLLECT_TIMEOUT_SEC="${UPLINK_COLLECT_TIMEOUT_SEC:-18}"
+CLIENT_JOIN_GAP_SEC="${CLIENT_JOIN_GAP_SEC:-0.2}"
 CLIENT1_UPLINK_MARKER="${CLIENT1_UPLINK_MARKER:-CLIENT1_UPLINK}"
 CLIENT2_UPLINK_MARKER="${CLIENT2_UPLINK_MARKER:-CLIENT2_UPLINK}"
 
@@ -164,15 +164,22 @@ render_result() {
 
 - client1: $CLIENT1_TUN_IP -> $SERVER_TUN_IP:$UPLINK_TRANSFER_PORT
 - client2: $CLIENT2_TUN_IP -> $SERVER_TUN_IP:$UPLINK_TRANSFER_PORT
+- client2 动态加入延迟: ${CLIENT_JOIN_GAP_SEC}s
 - token_duration_ms: $TOKEN_DURATION_MS
 - token_guard_ms: $TOKEN_GUARD_MS
+
+## issue #4 验收点
+
+- 运行中动态加入: 已验证 client2 后续上行就绪声明进入 [$CLIENT1_NODE_ID,$CLIENT2_NODE_ID] 活跃队列，并在移除旧静默节点前自然轮到 grant
+- 粗粒度移除后自愈重入: 已验证 client1 被 remove 后通过后续上行就绪声明以 [$CLIENT2_NODE_ID,$CLIENT1_NODE_ID] 重入并再次获得 grant
+- 日志验证来源: $TOKEN_SCHEDULER_LOG
 
 ## 当前切片范围
 
 - 已拉起并验证三 namespace 基础管理链路
 - 已在三 namespace 内启动 \`wfb_tun\` 并创建 TUN/IP 接口
 - 已启动测试专用跨 namespace 控制桥与 Token scheduler
-- 已验证两个 client 顺序声明、进入活跃队列并按 Token Passing 轮换获得上行机会
+- 已验证运行中动态加入、粗粒度移除后自愈重入，以及两个 client 按 Token Passing 轮换获得上行机会
 - 已在 server TUN/IP 侧观察两个 client 的真实上行 marker
 EOF
 }
@@ -480,14 +487,17 @@ start_udp_uplink_stream() {
     local marker="$2"
     local logfile="$3"
     local pid_var="$4"
+    local start_delay="${5:-0}"
     local pid
 
     log_info "在 $namespace 产生真实 TUN/IP 上行流量"
-    ip netns exec "$namespace" bash -lc '
+    setsid ip netns exec "$namespace" bash -lc '
         marker="$1"
         target_ip="$2"
         target_port="$3"
         duration="$4"
+        start_delay="$5"
+        sleep "$start_delay"
         end=$((SECONDS + duration))
         seq_no=0
         while [ "$SECONDS" -lt "$end" ]; do
@@ -495,7 +505,7 @@ start_udp_uplink_stream() {
             seq_no=$((seq_no + 1))
             sleep 0.1
         done
-    ' _ "$marker" "$SERVER_TUN_IP" "$UPLINK_TRANSFER_PORT" "$UPLINK_STREAM_SECONDS" >"$logfile" 2>&1 &
+    ' _ "$marker" "$SERVER_TUN_IP" "$UPLINK_TRANSFER_PORT" "$UPLINK_STREAM_SECONDS" "$start_delay" >"$logfile" 2>&1 &
     pid=$!
     PIDS+=("$pid")
     printf -v "$pid_var" '%s' "$pid"
@@ -563,12 +573,12 @@ count_grants_for_node() {
 }
 
 assert_scheduler_rotated_two_clients() {
-    local grants=()
     local line
     local grant_node
-    local i
-    local seen_client1="否"
-    local seen_client2="否"
+    local previous_node=""
+    local alternating_streak=0
+    local streak_seen_client1="否"
+    local streak_seen_client2="否"
 
     while IFS= read -r line; do
         if [[ "$line" =~ ^grant\ seq=.*node_id=([0-9]+).*active_queue=\[([0-9]+),([0-9]+)\] ]]; then
@@ -576,32 +586,79 @@ assert_scheduler_rotated_two_clients() {
                 continue
             fi
             grant_node="${BASH_REMATCH[1]}"
-            grants+=("$grant_node")
+            if [ -n "$previous_node" ] && [ "$grant_node" = "$previous_node" ]; then
+                alternating_streak=1
+                streak_seen_client1="否"
+                streak_seen_client2="否"
+            else
+                alternating_streak=$((alternating_streak + 1))
+            fi
+
             if [ "$grant_node" = "$CLIENT1_NODE_ID" ]; then
-                seen_client1="是"
+                streak_seen_client1="是"
             fi
             if [ "$grant_node" = "$CLIENT2_NODE_ID" ]; then
-                seen_client2="是"
+                streak_seen_client2="是"
             fi
-        fi
-        if [ "${#grants[@]}" -ge 4 ]; then
-            break
+
+            if [ "$alternating_streak" -ge 4 ] && [ "$streak_seen_client1" = "是" ] && [ "$streak_seen_client2" = "是" ]; then
+                log_pass "双客户端按 Token Passing 轮换获得 grant"
+                return 0
+            fi
+
+            previous_node="$grant_node"
         fi
     done < "$TOKEN_SCHEDULER_LOG"
 
-    if [ "${#grants[@]}" -lt 2 ]; then
-        fail_exit "未观察到双客户端活跃队列下的 grant 轮换"
-    fi
-    if [ "$seen_client1" != "是" ] || [ "$seen_client2" != "是" ]; then
-        fail_exit "双客户端活跃队列下 grant 未覆盖两个 client"
-    fi
-    for ((i = 1; i < ${#grants[@]}; i++)); do
-        if [ "${grants[$i]}" = "${grants[$((i - 1))]}" ]; then
-            fail_exit "双客户端活跃队列下 grant 未按轮换顺序交替"
-        fi
-    done
+    fail_exit "未观察到稳定的双客户端 grant 交替窗口"
+}
 
-    log_pass "双客户端按 Token Passing 轮换获得 grant"
+assert_dynamic_join_grant() {
+    local line
+    local dynamic_join_seen="否"
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^join/rejoin\ node_id=$CLIENT2_NODE_ID\ active_queue=\[$CLIENT1_NODE_ID,$CLIENT2_NODE_ID\] ]]; then
+            dynamic_join_seen="是"
+            continue
+        fi
+
+        if [ "$dynamic_join_seen" = "是" ] && [[ "$line" =~ ^remove\ node_id= ]]; then
+            break
+        fi
+
+        if [ "$dynamic_join_seen" = "是" ] && [[ "$line" =~ ^grant\ seq=.*node_id=$CLIENT2_NODE_ID.*active_queue=\[$CLIENT1_NODE_ID,$CLIENT2_NODE_ID\] ]]; then
+            log_pass "运行中新 client 在双客户端活跃队列中自然轮到 grant"
+            return 0
+        fi
+    done < "$TOKEN_SCHEDULER_LOG"
+
+    fail_exit "未观察到运行中新 client 在双客户端活跃队列中自然轮到 grant"
+}
+
+assert_self_healing_rejoin() {
+    local line
+    local removal_seen="否"
+    local rejoin_seen="否"
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^remove\ node_id=$CLIENT1_NODE_ID\  ]]; then
+            removal_seen="是"
+            continue
+        fi
+
+        if [ "$removal_seen" = "是" ] && [[ "$line" =~ ^join/rejoin\ node_id=$CLIENT1_NODE_ID\ active_queue=\[$CLIENT2_NODE_ID,$CLIENT1_NODE_ID\] ]]; then
+            rejoin_seen="是"
+            continue
+        fi
+
+        if [ "$rejoin_seen" = "是" ] && [[ "$line" =~ ^grant\ seq=.*node_id=$CLIENT1_NODE_ID.*active_queue=\[$CLIENT2_NODE_ID,$CLIENT1_NODE_ID\] ]]; then
+            log_pass "静默 client 粗粒度移除后通过上行就绪声明自愈重入并再次获得 grant"
+            return 0
+        fi
+    done < "$TOKEN_SCHEDULER_LOG"
+
+    fail_exit "未观察到静默 client 移除后的自愈重入 grant"
 }
 
 extract_token_auth_line() {
@@ -663,6 +720,7 @@ main() {
     require_command grep
     require_command nc
     require_command timeout
+    require_command setsid
 
     build_acceptance_binaries
 
@@ -725,11 +783,21 @@ main() {
     verify_management_ping "$CLIENT2_NS" "$SERVER_CLIENT2_IP" "client2 到 server 点对点链路连通性"
 
     start_udp_uplink_collector
+    start_udp_uplink_stream "$CLIENT2_NS" "$CLIENT2_UPLINK_MARKER" "$CLIENT2_UPLINK_TRAFFIC_LOG" CLIENT2_TRAFFIC_PID "$CLIENT_JOIN_GAP_SEC"
     start_udp_uplink_stream "$CLIENT1_NS" "$CLIENT1_UPLINK_MARKER" "$CLIENT1_UPLINK_TRAFFIC_LOG" CLIENT1_TRAFFIC_PID
     wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "join/rejoin node_id=$CLIENT1_NODE_ID active_queue=[$CLIENT1_NODE_ID]" "client1 上行就绪声明进入活跃队列"
-    sleep "$CLIENT_JOIN_GAP_SEC"
-    start_udp_uplink_stream "$CLIENT2_NS" "$CLIENT2_UPLINK_MARKER" "$CLIENT2_UPLINK_TRAFFIC_LOG" CLIENT2_TRAFFIC_PID
     wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "join/rejoin node_id=$CLIENT2_NODE_ID active_queue=[$CLIENT1_NODE_ID,$CLIENT2_NODE_ID]" "client2 顺序上行就绪声明进入活跃队列"
+    sleep 2
+    assert_dynamic_join_grant
+
+    log_info "停止 client1 上行流量以触发静默移除"
+    kill -TERM "-$CLIENT1_TRAFFIC_PID" 2>/dev/null || kill "$CLIENT1_TRAFFIC_PID" 2>/dev/null || true
+    wait "$CLIENT1_TRAFFIC_PID" 2>/dev/null || true
+    wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "remove node_id=$CLIENT1_NODE_ID " "client1 静默后被粗粒度移除"
+    start_udp_uplink_stream "$CLIENT1_NS" "$CLIENT1_UPLINK_MARKER" "$CLIENT1_UPLINK_TRAFFIC_LOG" CLIENT1_TRAFFIC_PID
+    wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "join/rejoin node_id=$CLIENT1_NODE_ID active_queue=[$CLIENT2_NODE_ID,$CLIENT1_NODE_ID]" "client1 后续上行就绪声明自愈重入"
+    assert_self_healing_rejoin
+
     wait "$CLIENT1_TRAFFIC_PID" 2>/dev/null || true
     wait "$CLIENT2_TRAFFIC_PID" 2>/dev/null || true
     sleep 1

@@ -419,7 +419,7 @@ TEST_CASE("run_token_scheduler 粗粒度移除静默节点并允许其重声明�
         stop_requested,
         [&](uint32_t duration) {
             now_ms += duration;
-            if (now_ms >= 1095)
+            if (now_ms >= 1130)
             {
                 stop_requested.store(true);
             }
@@ -435,9 +435,9 @@ TEST_CASE("run_token_scheduler 粗粒度移除静默节点并允许其重声明�
                 ready_nodes.push_back(1);
                 ready_nodes.push_back(2);
             }
-            else if (poll_calls == 7)
+            else if (poll_calls == 8)
             {
-                ready_nodes.push_back(1);
+                ready_nodes.push_back(2);
             }
             return ready_nodes;
         });
@@ -445,12 +445,72 @@ TEST_CASE("run_token_scheduler 粗粒度移除静默节点并允许其重声明�
     REQUIRE(rc == 0);
 
     string text = output.str();
+    const size_t remove_pos = text.find("remove node_id=2 silence_ms=");
+    const size_t rejoin_pos = text.find("join/rejoin node_id=2 active_queue=[1,2]", remove_pos);
+    const size_t rejoin_grant_pos = text.find("node_id=2 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10 active_queue=[1,2]", rejoin_pos);
+
     REQUIRE(text.find("grant seq=0 node_id=1 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10") != string::npos);
     REQUIRE(text.find("grant seq=1 node_id=2 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10") != string::npos);
     REQUIRE(text.find("join/rejoin node_id=1 active_queue=[1] cursor=0 cursor_node_id=1") != string::npos);
-    REQUIRE(text.find("remove node_id=1 silence_ms=") != string::npos);
-    REQUIRE(text.find("grant seq=3 node_id=2 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10") != string::npos);
-    REQUIRE(text.find("grant seq=4 node_id=1 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10") != string::npos);
+    REQUIRE(remove_pos != string::npos);
+    REQUIRE(rejoin_pos != string::npos);
+    REQUIRE(rejoin_grant_pos != string::npos);
+    REQUIRE(remove_pos < rejoin_pos);
+    REQUIRE(rejoin_pos < rejoin_grant_pos);
+}
+
+TEST_CASE("run_token_scheduler 运行中动态加入的新节点在移除旧静默节点前自然轮到")
+{
+    TokenSchedulerConfig config;
+    config.node_ids = {1, 2};
+    config.duration_ms = 10;
+    config.guard_interval_ms = 5;
+
+    atomic_bool stop_requested(false);
+    ostringstream output;
+    size_t poll_calls = 0;
+    uint64_t now_ms = 1000;
+
+    int rc = run_token_scheduler(
+        config,
+        output,
+        stop_requested,
+        [&](uint32_t duration) {
+            now_ms += duration;
+            if (now_ms >= 1060)
+            {
+                stop_requested.store(true);
+            }
+        },
+        [&]() {
+            return now_ms;
+        },
+        [&]() {
+            poll_calls += 1;
+            vector<uint8_t> ready_nodes;
+            if (poll_calls == 1)
+            {
+                ready_nodes.push_back(1);
+            }
+            else if (poll_calls == 3)
+            {
+                ready_nodes.push_back(2);
+            }
+            return ready_nodes;
+        });
+
+    REQUIRE(rc == 0);
+
+    string text = output.str();
+    const size_t join_pos = text.find("join/rejoin node_id=2 active_queue=[1,2]");
+    const size_t grant_pos = text.find("grant seq=3 node_id=2 duration_ms=10 guard_interval_ms=5 window_end_offset_ms=10 active_queue=[1,2]");
+    const size_t remove_pos = text.find("remove node_id=1 silence_ms=");
+
+    REQUIRE(join_pos != string::npos);
+    REQUIRE(grant_pos != string::npos);
+    REQUIRE(remove_pos != string::npos);
+    REQUIRE(join_pos < grant_pos);
+    REQUIRE(grant_pos < remove_pos);
 }
 
 TEST_CASE("TokenGrantDispatcher 按 grant node_id 发送到对应 socket")

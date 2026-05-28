@@ -372,7 +372,9 @@ bool TokenScheduler::next_grant(TokenGrant *grant, uint64_t now_ms)
     return true;
 }
 
-void TokenScheduler::collect_silent_node_removals(uint64_t now_ms, vector<SilentNodeRemoval> *removed_nodes)
+void TokenScheduler::collect_silent_node_removals(uint64_t now_ms,
+                                                  vector<SilentNodeRemoval> *removed_nodes,
+                                                  uint8_t protected_node_id)
 {
     if (removed_nodes == NULL)
     {
@@ -384,6 +386,12 @@ void TokenScheduler::collect_silent_node_removals(uint64_t now_ms, vector<Silent
     for (size_t index = 0; index < active_node_ids.size();)
     {
         uint8_t node_id = active_node_ids[index];
+        if (node_id == protected_node_id)
+        {
+            index += 1;
+            continue;
+        }
+
         NodeActivityState &activity = node_activity[node_id];
         uint64_t silence_ms = 0;
         if (activity.last_activity_ms > 0 && now_ms > activity.last_activity_ms)
@@ -553,25 +561,6 @@ int run_token_scheduler(const TokenSchedulerConfig &config,
             scheduler.observe_uplink_data(observed_uplink_nodes[i], now_ms);
         }
 
-        vector<TokenScheduler::SilentNodeRemoval> removed_nodes;
-        scheduler.collect_silent_node_removals(now_ms, &removed_nodes);
-        for (size_t i = 0; i < removed_nodes.size(); ++i)
-        {
-            out << "evict node_id=" << static_cast<unsigned>(removed_nodes[i].node_id)
-                << " silence_ms=" << removed_nodes[i].silence_ms
-                << " consecutive_silent_grants=" << removed_nodes[i].consecutive_silent_grants
-                << scheduler.describe_active_state()
-                << '\n';
-            out.flush();
-
-            out << "remove node_id=" << static_cast<unsigned>(removed_nodes[i].node_id)
-                << " silence_ms=" << removed_nodes[i].silence_ms
-                << " consecutive_silent_grants=" << removed_nodes[i].consecutive_silent_grants
-                << scheduler.describe_active_state()
-                << '\n';
-            out.flush();
-        }
-
         TokenGrant grant = {};
         if (!scheduler.next_grant(&grant, now_ms))
         {
@@ -590,6 +579,25 @@ int run_token_scheduler(const TokenSchedulerConfig &config,
 
         if (dispatcher) {
             dispatcher->send_grant(grant, get_time_ms());
+        }
+
+        vector<TokenScheduler::SilentNodeRemoval> removed_nodes;
+        scheduler.collect_silent_node_removals(now_ms, &removed_nodes, grant.node_id);
+        for (size_t i = 0; i < removed_nodes.size(); ++i)
+        {
+            out << "evict node_id=" << static_cast<unsigned>(removed_nodes[i].node_id)
+                << " silence_ms=" << removed_nodes[i].silence_ms
+                << " consecutive_silent_grants=" << removed_nodes[i].consecutive_silent_grants
+                << scheduler.describe_active_state()
+                << '\n';
+            out.flush();
+
+            out << "remove node_id=" << static_cast<unsigned>(removed_nodes[i].node_id)
+                << " silence_ms=" << removed_nodes[i].silence_ms
+                << " consecutive_silent_grants=" << removed_nodes[i].consecutive_silent_grants
+                << scheduler.describe_active_state()
+                << '\n';
+            out.flush();
         }
 
         sleep_ms(grant.duration_ms);
