@@ -22,10 +22,33 @@ CLIENT1_TX_LOG="$CLIENT1_DIR/wfb_tx.log"
 CLIENT2_TX_LOG="$CLIENT2_DIR/wfb_tx.log"
 CLIENT1_UPLINK_RX_LOG="$CLIENT1_DIR/uplink_rx.log"
 CLIENT2_UPLINK_RX_LOG="$CLIENT2_DIR/uplink_rx.log"
+CLIENT1_DOWNLINK_RX_LOG="$CLIENT1_DIR/downlink_rx.log"
+CLIENT2_DOWNLINK_RX_LOG="$CLIENT2_DIR/downlink_rx.log"
+CLIENT1_DOWNLINK_TX_LOG="$CLIENT1_DIR/downlink_tx.log"
+CLIENT2_DOWNLINK_TX_LOG="$CLIENT2_DIR/downlink_tx.log"
 CLIENT1_UPLINK_TRAFFIC_LOG="$CLIENT1_DIR/uplink_traffic.log"
 CLIENT2_UPLINK_TRAFFIC_LOG="$CLIENT2_DIR/uplink_traffic.log"
 UPLINK_SERVER_LOG="$SERVER_DIR/uplink_server.log"
 UPLINK_RECEIVED_FILE="$SERVER_DIR/uplink_received.txt"
+PING_SERVER_TO_CLIENT1_LOG="$CLIENT1_DIR/ping_server_to_client.log"
+PING_SERVER_TO_CLIENT2_LOG="$CLIENT2_DIR/ping_server_to_client.log"
+TCP_SUMMARY="$LOG_DIR/tcp_summary.tsv"
+CLIENT1_TCP_UPLINK_SOURCE_FILE="$CLIENT1_DIR/tcp_uplink_source.bin"
+CLIENT1_TCP_UPLINK_RECEIVED_FILE="$SERVER_DIR/client1_tcp_uplink_received.bin"
+CLIENT1_TCP_DOWNLINK_SOURCE_FILE="$SERVER_DIR/client1_tcp_downlink_source.bin"
+CLIENT1_TCP_DOWNLINK_RECEIVED_FILE="$CLIENT1_DIR/tcp_downlink_received.bin"
+CLIENT2_TCP_UPLINK_SOURCE_FILE="$CLIENT2_DIR/tcp_uplink_source.bin"
+CLIENT2_TCP_UPLINK_RECEIVED_FILE="$SERVER_DIR/client2_tcp_uplink_received.bin"
+CLIENT2_TCP_DOWNLINK_SOURCE_FILE="$SERVER_DIR/client2_tcp_downlink_source.bin"
+CLIENT2_TCP_DOWNLINK_RECEIVED_FILE="$CLIENT2_DIR/tcp_downlink_received.bin"
+CLIENT1_TCP_UPLINK_SERVER_LOG="$SERVER_DIR/client1_tcp_uplink_server.log"
+CLIENT1_TCP_UPLINK_CLIENT_LOG="$CLIENT1_DIR/tcp_uplink_client.log"
+CLIENT1_TCP_DOWNLINK_SERVER_LOG="$SERVER_DIR/client1_tcp_downlink_server.log"
+CLIENT1_TCP_DOWNLINK_CLIENT_LOG="$CLIENT1_DIR/tcp_downlink_client.log"
+CLIENT2_TCP_UPLINK_SERVER_LOG="$SERVER_DIR/client2_tcp_uplink_server.log"
+CLIENT2_TCP_UPLINK_CLIENT_LOG="$CLIENT2_DIR/tcp_uplink_client.log"
+CLIENT2_TCP_DOWNLINK_SERVER_LOG="$SERVER_DIR/client2_tcp_downlink_server.log"
+CLIENT2_TCP_DOWNLINK_CLIENT_LOG="$CLIENT2_DIR/tcp_downlink_client.log"
 
 SERVER_NS="${SERVER_NS:-v3-server}"
 CLIENT1_NS="${CLIENT1_NS:-v3-client1}"
@@ -77,12 +100,21 @@ TOKEN_DURATION_MS="${TOKEN_DURATION_MS:-500}"
 TOKEN_GUARD_MS="${TOKEN_GUARD_MS:-100}"
 CLIENT1_UPLINK_RX_DEBUG_PORT="${CLIENT1_UPLINK_RX_DEBUG_PORT:-41011}"
 CLIENT2_UPLINK_RX_DEBUG_PORT="${CLIENT2_UPLINK_RX_DEBUG_PORT:-41012}"
+CLIENT1_DOWNLINK_RX_DEBUG_PORT="${CLIENT1_DOWNLINK_RX_DEBUG_PORT:-42011}"
+CLIENT2_DOWNLINK_RX_DEBUG_PORT="${CLIENT2_DOWNLINK_RX_DEBUG_PORT:-42012}"
 UPLINK_TRANSFER_PORT="${UPLINK_TRANSFER_PORT:-5903}"
 UPLINK_STREAM_SECONDS="${UPLINK_STREAM_SECONDS:-8}"
 UPLINK_COLLECT_TIMEOUT_SEC="${UPLINK_COLLECT_TIMEOUT_SEC:-18}"
 CLIENT_JOIN_GAP_SEC="${CLIENT_JOIN_GAP_SEC:-0.2}"
 CLIENT1_UPLINK_MARKER="${CLIENT1_UPLINK_MARKER:-CLIENT1_UPLINK}"
 CLIENT2_UPLINK_MARKER="${CLIENT2_UPLINK_MARKER:-CLIENT2_UPLINK}"
+PING_TIMEOUT_SEC="${PING_TIMEOUT_SEC:-20}"
+TCP_TRANSFER_TIMEOUT_SEC="${TCP_TRANSFER_TIMEOUT_SEC:-30}"
+TCP_SOURCE_FILE_SIZE="${TCP_SOURCE_FILE_SIZE:-4096}"
+CLIENT1_TCP_UPLINK_PORT="${CLIENT1_TCP_UPLINK_PORT:-5904}"
+CLIENT1_TCP_DOWNLINK_PORT="${CLIENT1_TCP_DOWNLINK_PORT:-5905}"
+CLIENT2_TCP_UPLINK_PORT="${CLIENT2_TCP_UPLINK_PORT:-5906}"
+CLIENT2_TCP_DOWNLINK_PORT="${CLIENT2_TCP_DOWNLINK_PORT:-5907}"
 
 STARTUP_WAIT_SEC="${STARTUP_WAIT_SEC:-1}"
 
@@ -99,6 +131,9 @@ CLIENT1_TX_PID=""
 CLIENT2_TX_PID=""
 CLIENT1_UPLINK_RX_PID=""
 CLIENT2_UPLINK_RX_PID=""
+CLIENT1_DOWNLINK_RX_PID=""
+CLIENT2_DOWNLINK_RX_PID=""
+SERVER_DOWNLINK_TX_PID=""
 UPLINK_COLLECTOR_PID=""
 CLIENT1_TRAFFIC_PID=""
 CLIENT2_TRAFFIC_PID=""
@@ -115,7 +150,7 @@ render_result() {
     local status="$1"
     mkdir -p "$LOG_DIR"
     cat > "$RESULT_MD" <<EOF
-# 第三版三 namespace 多客户端轮换上行验收结果
+# 第三版多客户端真实 TUN/IP 主线验收结果
 
 - 结果: $status
 - 原因: ${FAIL_REASON:-无}
@@ -151,7 +186,12 @@ render_result() {
 - client2 tx: $CLIENT2_TX_LOG
 - client1 uplink rx: $CLIENT1_UPLINK_RX_LOG
 - client2 uplink rx: $CLIENT2_UPLINK_RX_LOG
+- client1 downlink rx: $CLIENT1_DOWNLINK_RX_LOG
+- client2 downlink rx: $CLIENT2_DOWNLINK_RX_LOG
+- client1 downlink tx: $CLIENT1_DOWNLINK_TX_LOG
+- client2 downlink tx: $CLIENT2_DOWNLINK_TX_LOG
 - server uplink received: $UPLINK_RECEIVED_FILE
+- tcp summary: $TCP_SUMMARY
 
 ## 控制桥
 
@@ -174,13 +214,28 @@ render_result() {
 - 粗粒度移除后自愈重入: 已验证 client1 被 remove 后通过后续上行就绪声明以 [$CLIENT2_NODE_ID,$CLIENT1_NODE_ID] 重入并再次获得 grant
 - 日志验证来源: $TOKEN_SCHEDULER_LOG
 
-## 当前切片范围
+## issue #5 主线验收点
 
-- 已拉起并验证三 namespace 基础管理链路
-- 已在三 namespace 内启动 \`wfb_tun\` 并创建 TUN/IP 接口
-- 已启动测试专用跨 namespace 控制桥与 Token scheduler
-- 已验证运行中动态加入、粗粒度移除后自愈重入，以及两个 client 按 Token Passing 轮换获得上行机会
-- 已在 server TUN/IP 侧观察两个 client 的真实上行 marker
+- Server -> client1 ping: $PING_SERVER_TO_CLIENT1_LOG
+- Server -> client2 ping: $PING_SERVER_TO_CLIENT2_LOG
+- client1 -> Server TCP 小文件: $CLIENT1_TCP_UPLINK_SOURCE_FILE -> $CLIENT1_TCP_UPLINK_RECEIVED_FILE
+- Server -> client1 TCP 小文件: $CLIENT1_TCP_DOWNLINK_SOURCE_FILE -> $CLIENT1_TCP_DOWNLINK_RECEIVED_FILE
+- client2 -> Server TCP 小文件: $CLIENT2_TCP_UPLINK_SOURCE_FILE -> $CLIENT2_TCP_UPLINK_RECEIVED_FILE
+- Server -> client2 TCP 小文件: $CLIENT2_TCP_DOWNLINK_SOURCE_FILE -> $CLIENT2_TCP_DOWNLINK_RECEIVED_FILE
+- TCP 校验摘要: $TCP_SUMMARY
+
+## 当前 v3 覆盖范围
+
+- 已覆盖: 三 namespace 基础管理链路
+- 已覆盖: 三 namespace 内 \`wfb_tun\` TUN/IP 接口创建
+- 已覆盖: 测试专用跨 namespace 控制桥与 Token scheduler
+- 已覆盖: 运行中动态加入、粗粒度移除后自愈重入、双 client Token Passing 轮换上行
+- 已覆盖: server TUN/IP 侧观察两个 client 的真实上行 marker
+- 已覆盖: Server -> 每个 Client 的 TUN/IP ping
+- 已覆盖: 每个 Client -> Server 与 Server -> 每个 Client 的 TCP 小文件传输和 sha256 内容一致性
+- 未覆盖: 真实 update 文件
+- 未覆盖: 大文件传输
+- 未覆盖: UFTP 下行
 EOF
 }
 
@@ -466,6 +521,71 @@ start_client_tx() {
     fi
 }
 
+start_downlink_rx_for_client() {
+    local client_name="$1"
+    local client_mgmt_ip="$2"
+    local client_tun_listen_port="$3"
+    local node_id="$4"
+    local debug_port="$5"
+    local logfile="$6"
+    local pid_var="$7"
+    local pid
+
+    log_info "在 $SERVER_NS 启动 $client_name 下行 wfb_rx"
+    ip netns exec "$SERVER_NS" "$PROJECT_ROOT/wfb_rx" \
+        -a "$debug_port" \
+        -K "$PROJECT_ROOT/drone.key" \
+        -c "$client_mgmt_ip" \
+        -u "$client_tun_listen_port" \
+        -N "$node_id" \
+        -i "$LINK_ID" \
+        -e "$EPOCH" \
+        -R 524288 \
+        -s 524288 >"$logfile" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        fail_exit "$client_name 下行 wfb_rx 启动失败，查看日志: $logfile"
+    fi
+}
+
+start_server_downlink_tx() {
+    local client_name="$1"
+    local debug_port="$2"
+    local logfile="$3"
+    local pid
+
+    log_info "在 $SERVER_NS 启动指向 $client_name 的下行 wfb_tx"
+    ip netns exec "$SERVER_NS" "$PROJECT_ROOT/wfb_tx" \
+        -K "$PROJECT_ROOT/gs.key" \
+        -u "$SERVER_TUN_PEER_PORT" \
+        -D "$debug_port" \
+        -i "$LINK_ID" \
+        -e "$EPOCH" \
+        -R 524288 \
+        -s 524288 \
+        "$client_name-downlink" >"$logfile" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    SERVER_DOWNLINK_TX_PID="$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        fail_exit "$client_name 下行 wfb_tx 启动失败，查看日志: $logfile"
+    fi
+}
+
+stop_server_downlink_tx() {
+    if [ -n "$SERVER_DOWNLINK_TX_PID" ]; then
+        kill "$SERVER_DOWNLINK_TX_PID" 2>/dev/null || true
+        wait "$SERVER_DOWNLINK_TX_PID" 2>/dev/null || true
+        SERVER_DOWNLINK_TX_PID=""
+    fi
+}
+
 start_udp_uplink_collector() {
     local pid
 
@@ -565,6 +685,96 @@ wait_for_file_contains() {
     done
 
     fail_exit "$title 未在 server TUN 侧观测到: $path"
+}
+
+run_tun_ping() {
+    local namespace="$1"
+    local source_ip="$2"
+    local target_ip="$3"
+    local logfile="$4"
+    local title="$5"
+
+    log_info "执行 $title"
+    if ! ip netns exec "$namespace" timeout "$PING_TIMEOUT_SEC" ping -I "$source_ip" -c 3 "$target_ip" >"$logfile" 2>&1; then
+        fail_exit "$title 失败，查看日志: $logfile"
+    fi
+    log_pass "$title 成功"
+}
+
+file_sha256() {
+    local path="$1"
+    if [ ! -f "$path" ]; then
+        return 1
+    fi
+    sha256sum "$path" | cut -d' ' -f1
+}
+
+run_tcp_transfer() {
+    local title="$1"
+    local listen_namespace="$2"
+    local listen_ip="$3"
+    local send_namespace="$4"
+    local send_ip="$5"
+    local port="$6"
+    local source_file="$7"
+    local received_file="$8"
+    local listen_log="$9"
+    local send_log="${10}"
+    local listen_pid
+
+    log_info "执行 $title"
+    ip netns exec "$listen_namespace" timeout "$TCP_TRANSFER_TIMEOUT_SEC" \
+        nc -l -N "$listen_ip" "$port" >"$received_file" 2>"$listen_log" &
+    listen_pid=$!
+    PIDS+=("$listen_pid")
+
+    sleep 1
+
+    if ! ip netns exec "$send_namespace" timeout "$TCP_TRANSFER_TIMEOUT_SEC" \
+        nc -N -s "$send_ip" "$listen_ip" "$port" <"$source_file" >/dev/null 2>"$send_log"; then
+        wait "$listen_pid" 2>/dev/null || true
+        return 1
+    fi
+
+    if ! wait "$listen_pid"; then
+        return 1
+    fi
+
+    return 0
+}
+
+verify_tcp_small_file_transfer() {
+    local title="$1"
+    local listen_namespace="$2"
+    local listen_ip="$3"
+    local send_namespace="$4"
+    local send_ip="$5"
+    local port="$6"
+    local source_file="$7"
+    local received_file="$8"
+    local listen_log="$9"
+    local send_log="${10}"
+    local source_sha256
+    local received_sha256
+
+    dd if=/dev/urandom of="$source_file" bs="$TCP_SOURCE_FILE_SIZE" count=1 status=none
+    source_sha256="$(file_sha256 "$source_file")"
+
+    if ! run_tcp_transfer "$title" "$listen_namespace" "$listen_ip" "$send_namespace" "$send_ip" "$port" "$source_file" "$received_file" "$listen_log" "$send_log"; then
+        fail_exit "$title 失败，查看日志: $listen_log / $send_log"
+    fi
+
+    if [ ! -f "$received_file" ]; then
+        fail_exit "$title 未生成接收文件: $received_file"
+    fi
+
+    received_sha256="$(file_sha256 "$received_file")"
+    if [ "$source_sha256" != "$received_sha256" ]; then
+        fail_exit "$title 内容校验失败: $source_sha256 != $received_sha256"
+    fi
+
+    printf "%s\t%s\t%s\t%s\n" "$title" "$source_file" "$received_file" "$source_sha256" >>"$TCP_SUMMARY"
+    log_pass "$title 成功且内容一致"
 }
 
 count_grants_for_node() {
@@ -721,6 +931,10 @@ main() {
     require_command nc
     require_command timeout
     require_command setsid
+    require_command dd
+    require_command sha256sum
+
+    printf "title\tsource\treceived\tsha256\n" >"$TCP_SUMMARY"
 
     build_acceptance_binaries
 
@@ -754,6 +968,8 @@ main() {
     start_client_uplink_rx "$CLIENT2_NS" "$CLIENT2_UPLINK_RX_DEBUG_PORT" "$SERVER_CLIENT2_IP" "$CLIENT2_UPLINK_RX_LOG" CLIENT2_UPLINK_RX_PID
     start_client_tx "$CLIENT1_NS" "$CLIENT1_NODE_ID" "$CLIENT1_TX_INPUT_PORT" "$CLIENT1_UPLINK_RX_DEBUG_PORT" "$CLIENT1_TX_LOG" CLIENT1_TX_PID
     start_client_tx "$CLIENT2_NS" "$CLIENT2_NODE_ID" "$CLIENT2_TX_INPUT_PORT" "$CLIENT2_UPLINK_RX_DEBUG_PORT" "$CLIENT2_TX_LOG" CLIENT2_TX_PID
+    start_downlink_rx_for_client "client1" "$CLIENT1_MGMT_IP" "$CLIENT1_TUN_LISTEN_PORT" "$CLIENT1_NODE_ID" "$CLIENT1_DOWNLINK_RX_DEBUG_PORT" "$CLIENT1_DOWNLINK_RX_LOG" CLIENT1_DOWNLINK_RX_PID
+    start_downlink_rx_for_client "client2" "$CLIENT2_MGMT_IP" "$CLIENT2_TUN_LISTEN_PORT" "$CLIENT2_NODE_ID" "$CLIENT2_DOWNLINK_RX_DEBUG_PORT" "$CLIENT2_DOWNLINK_RX_LOG" CLIENT2_DOWNLINK_RX_PID
 
     if ! wait_for_interface "$SERVER_NS" "$SERVER_TUN_NAME"; then
         fail_exit "server TUN 未按预期创建"
@@ -778,6 +994,8 @@ main() {
     assert_process_alive "$CLIENT2_UPLINK_RX_PID" "client2 uplink rx"
     assert_process_alive "$CLIENT1_TX_PID" "client1 tx"
     assert_process_alive "$CLIENT2_TX_PID" "client2 tx"
+    assert_process_alive "$CLIENT1_DOWNLINK_RX_PID" "client1 downlink rx"
+    assert_process_alive "$CLIENT2_DOWNLINK_RX_PID" "client2 downlink rx"
 
     verify_management_ping "$CLIENT1_NS" "$SERVER_CLIENT1_IP" "client1 到 server 点对点链路连通性"
     verify_management_ping "$CLIENT2_NS" "$SERVER_CLIENT2_IP" "client2 到 server 点对点链路连通性"
@@ -814,6 +1032,42 @@ main() {
     assert_client_authorized_progress "$CLIENT1_TX_LOG" "client1"
     assert_client_authorized_progress "$CLIENT2_TX_LOG" "client2"
 
+    start_server_downlink_tx "client1" "$CLIENT1_DOWNLINK_RX_DEBUG_PORT" "$CLIENT1_DOWNLINK_TX_LOG"
+    run_tun_ping "$SERVER_NS" "$SERVER_TUN_IP" "$CLIENT1_TUN_IP" "$PING_SERVER_TO_CLIENT1_LOG" "Server -> client1 TUN/IP ping"
+    verify_tcp_small_file_transfer \
+        "client1 -> Server TCP 小文件传输" \
+        "$SERVER_NS" "$SERVER_TUN_IP" \
+        "$CLIENT1_NS" "$CLIENT1_TUN_IP" \
+        "$CLIENT1_TCP_UPLINK_PORT" \
+        "$CLIENT1_TCP_UPLINK_SOURCE_FILE" "$CLIENT1_TCP_UPLINK_RECEIVED_FILE" \
+        "$CLIENT1_TCP_UPLINK_SERVER_LOG" "$CLIENT1_TCP_UPLINK_CLIENT_LOG"
+    verify_tcp_small_file_transfer \
+        "Server -> client1 TCP 小文件传输" \
+        "$CLIENT1_NS" "$CLIENT1_TUN_IP" \
+        "$SERVER_NS" "$SERVER_TUN_IP" \
+        "$CLIENT1_TCP_DOWNLINK_PORT" \
+        "$CLIENT1_TCP_DOWNLINK_SOURCE_FILE" "$CLIENT1_TCP_DOWNLINK_RECEIVED_FILE" \
+        "$CLIENT1_TCP_DOWNLINK_CLIENT_LOG" "$CLIENT1_TCP_DOWNLINK_SERVER_LOG"
+    stop_server_downlink_tx
+
+    start_server_downlink_tx "client2" "$CLIENT2_DOWNLINK_RX_DEBUG_PORT" "$CLIENT2_DOWNLINK_TX_LOG"
+    run_tun_ping "$SERVER_NS" "$SERVER_TUN_IP" "$CLIENT2_TUN_IP" "$PING_SERVER_TO_CLIENT2_LOG" "Server -> client2 TUN/IP ping"
+    verify_tcp_small_file_transfer \
+        "client2 -> Server TCP 小文件传输" \
+        "$SERVER_NS" "$SERVER_TUN_IP" \
+        "$CLIENT2_NS" "$CLIENT2_TUN_IP" \
+        "$CLIENT2_TCP_UPLINK_PORT" \
+        "$CLIENT2_TCP_UPLINK_SOURCE_FILE" "$CLIENT2_TCP_UPLINK_RECEIVED_FILE" \
+        "$CLIENT2_TCP_UPLINK_SERVER_LOG" "$CLIENT2_TCP_UPLINK_CLIENT_LOG"
+    verify_tcp_small_file_transfer \
+        "Server -> client2 TCP 小文件传输" \
+        "$CLIENT2_NS" "$CLIENT2_TUN_IP" \
+        "$SERVER_NS" "$SERVER_TUN_IP" \
+        "$CLIENT2_TCP_DOWNLINK_PORT" \
+        "$CLIENT2_TCP_DOWNLINK_SOURCE_FILE" "$CLIENT2_TCP_DOWNLINK_RECEIVED_FILE" \
+        "$CLIENT2_TCP_DOWNLINK_CLIENT_LOG" "$CLIENT2_TCP_DOWNLINK_SERVER_LOG"
+    stop_server_downlink_tx
+
     cleanup
     if ! verify_cleanup; then
         fail_exit "namespace 清理校验失败"
@@ -821,7 +1075,7 @@ main() {
     CLEANUP_VERIFIED="是"
 
     render_result "PASS"
-    log_pass "第三版三 namespace 多客户端轮换上行 acceptance 通过"
+    log_pass "第三版多客户端真实 TUN/IP 主线 acceptance 通过"
 }
 
 main "$@"
