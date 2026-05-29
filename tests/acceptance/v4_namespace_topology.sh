@@ -43,6 +43,19 @@ CLIENT1_UFTP_TEMP_DIR="$CLIENT1_DIR/uftp_tmp"
 CLIENT2_UFTP_TEMP_DIR="$CLIENT2_DIR/uftp_tmp"
 CLIENT1_UFTP_PAYLOAD_FILE="$CLIENT1_UFTP_DEST_DIR/uftp_payload.bin"
 CLIENT2_UFTP_PAYLOAD_FILE="$CLIENT2_UFTP_DEST_DIR/uftp_payload.bin"
+CLIENT1_TCP_UPDATE_FILE="$CLIENT1_DIR/tcp_update.bin"
+CLIENT2_TCP_UPDATE_FILE="$CLIENT2_DIR/tcp_update.bin"
+SERVER_CLIENT1_TCP_UPDATE_FILE="$SERVER_DIR/client1_tcp_update.bin"
+SERVER_CLIENT2_TCP_UPDATE_FILE="$SERVER_DIR/client2_tcp_update.bin"
+CLIENT1_TCP_UPDATE_RECEIVER_LOG="$SERVER_DIR/client1_tcp_update_receiver.log"
+CLIENT2_TCP_UPDATE_RECEIVER_LOG="$SERVER_DIR/client2_tcp_update_receiver.log"
+CLIENT1_TCP_UPDATE_RECEIVER_STATUS="$SERVER_DIR/client1_tcp_update_receiver.status"
+CLIENT2_TCP_UPDATE_RECEIVER_STATUS="$SERVER_DIR/client2_tcp_update_receiver.status"
+CLIENT1_TCP_UPDATE_CLIENT_LOG="$CLIENT1_DIR/tcp_update_client.log"
+CLIENT2_TCP_UPDATE_CLIENT_LOG="$CLIENT2_DIR/tcp_update_client.log"
+CLIENT1_TCP_UPDATE_CLIENT_STATUS="$CLIENT1_DIR/tcp_update_client.status"
+CLIENT2_TCP_UPDATE_CLIENT_STATUS="$CLIENT2_DIR/tcp_update_client.status"
+TCP_UPDATE_CLIENTS_GATE="$LOG_DIR/tcp_update_clients.go"
 
 SERVER_NS="${SERVER_NS:-v4-server}"
 CLIENT1_NS="${CLIENT1_NS:-v4-client1}"
@@ -95,6 +108,14 @@ UFTP_TRANSFER_TIMEOUT_SEC="${UFTP_TRANSFER_TIMEOUT_SEC:-40}"
 UFTP_SOURCE_SHA256="未生成"
 CLIENT1_UFTP_SHA256="未收到"
 CLIENT2_UFTP_SHA256="未收到"
+TCP_CLIENT1_PORT="${TCP_CLIENT1_PORT:-15001}"
+TCP_CLIENT2_PORT="${TCP_CLIENT2_PORT:-15002}"
+TCP_UPDATE_PAYLOAD_SIZE="${TCP_UPDATE_PAYLOAD_SIZE:-262144}"
+TCP_UPDATE_TIMEOUT_SEC="${TCP_UPDATE_TIMEOUT_SEC:-30}"
+CLIENT1_TCP_UPDATE_SOURCE_SHA256="未生成"
+CLIENT2_TCP_UPDATE_SOURCE_SHA256="未生成"
+CLIENT1_TCP_UPDATE_RECEIVED_SHA256="未收到"
+CLIENT2_TCP_UPDATE_RECEIVED_SHA256="未收到"
 
 RESOLVED_UFTP_BIN=""
 RESOLVED_UFTPD_BIN=""
@@ -118,6 +139,10 @@ CLIENT1_UFTP_RESPONSE_RELAY_PID=""
 CLIENT2_UFTP_RESPONSE_RELAY_PID=""
 CLIENT1_DOWNLINK_PROBE_PID=""
 CLIENT2_DOWNLINK_PROBE_PID=""
+CLIENT1_TCP_UPDATE_RECEIVER_PID=""
+CLIENT2_TCP_UPDATE_RECEIVER_PID=""
+CLIENT1_TCP_UPDATE_CLIENT_PID=""
+CLIENT2_TCP_UPDATE_CLIENT_PID=""
 
 log_info() { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass() { echo "[PASS] $(date '+%H:%M:%S') $1"; }
@@ -205,6 +230,24 @@ render_result() {
 - client1 UFTPD 日志: $CLIENT1_UFTPD_LOG
 - client2 UFTPD 日志: $CLIENT2_UFTPD_LOG
 
+## TCP Per-Client 上行 Update Payload
+
+- TCP update payload size: $TCP_UPDATE_PAYLOAD_SIZE bytes
+- client1 TCP port: $TCP_CLIENT1_PORT
+- client2 TCP port: $TCP_CLIENT2_PORT
+- client1 TCP update source: $CLIENT1_TCP_UPDATE_FILE
+- client1 TCP update source sha256: $CLIENT1_TCP_UPDATE_SOURCE_SHA256
+- client1 TCP update received: $SERVER_CLIENT1_TCP_UPDATE_FILE
+- client1 TCP update received sha256: $CLIENT1_TCP_UPDATE_RECEIVED_SHA256
+- client2 TCP update source: $CLIENT2_TCP_UPDATE_FILE
+- client2 TCP update source sha256: $CLIENT2_TCP_UPDATE_SOURCE_SHA256
+- client2 TCP update received: $SERVER_CLIENT2_TCP_UPDATE_FILE
+- client2 TCP update received sha256: $CLIENT2_TCP_UPDATE_RECEIVED_SHA256
+- client1 TCP receiver 日志: $CLIENT1_TCP_UPDATE_RECEIVER_LOG
+- client2 TCP receiver 日志: $CLIENT2_TCP_UPDATE_RECEIVER_LOG
+- client1 TCP upload 日志: $CLIENT1_TCP_UPDATE_CLIENT_LOG
+- client2 TCP upload 日志: $CLIENT2_TCP_UPDATE_CLIENT_LOG
+
 ## 关键日志
 
 - server wfb_tun: $SERVER_TUN_LOG
@@ -221,6 +264,10 @@ render_result() {
 - server UFTP: $UFTP_SERVER_LOG
 - client1 UFTPD: $CLIENT1_UFTPD_LOG
 - client2 UFTPD: $CLIENT2_UFTPD_LOG
+- client1 TCP update receiver: $CLIENT1_TCP_UPDATE_RECEIVER_LOG
+- client2 TCP update receiver: $CLIENT2_TCP_UPDATE_RECEIVER_LOG
+- client1 TCP update client: $CLIENT1_TCP_UPDATE_CLIENT_LOG
+- client2 TCP update client: $CLIENT2_TCP_UPDATE_CLIENT_LOG
 - build: $BUILD_LOG
 
 ## 当前 v4 覆盖范围
@@ -235,11 +282,14 @@ render_result() {
 - 已覆盖: UFTP 共享下行 payload
 - 已覆盖: UFTP public/private multicast /32 路由显式指向 TUN 接口
 - 已覆盖: client1/client2 UFTP payload sha256 完成屏障
+- 已覆盖: TCP per-client 上行 update payload
+- 已覆盖: server 同时监听两个独立 TCP 端口，client1/client2 并发上传 update payload
+- 已覆盖: server 端 TCP update payload sha256 校验
 - 已覆盖: 成功与失败路径的 namespace 和后台进程清理
 
 ## 当前 v4 未覆盖范围
 
-- 未覆盖: TCP per-client 上行 update payload
+- 未覆盖: ready 标记、真实训练 update、上行注册协议
 EOF
 }
 
@@ -914,6 +964,181 @@ verify_uftp_payloads() {
     log_pass "client1/client2 UFTP payload sha256 均匹配 server 源文件"
 }
 
+generate_tcp_update_payload() {
+    local path="$1"
+    local label="$2"
+
+    log_info "生成 $label TCP update payload: $TCP_UPDATE_PAYLOAD_SIZE bytes"
+    python3 -u - "$path" "$TCP_UPDATE_PAYLOAD_SIZE" "$label" <<'PY'
+import sys
+
+path = sys.argv[1]
+size = int(sys.argv[2])
+label = sys.argv[3].encode("utf-8")
+pattern = b"wfb-ng-v4-tcp-update-" + label + b"\n"
+
+with open(path, "wb") as fh:
+    remaining = size
+    while remaining > 0:
+        chunk = pattern[:remaining] if remaining < len(pattern) else pattern
+        fh.write(chunk)
+        remaining -= len(chunk)
+PY
+}
+
+generate_tcp_update_payloads() {
+    generate_tcp_update_payload "$CLIENT1_TCP_UPDATE_FILE" client1
+    generate_tcp_update_payload "$CLIENT2_TCP_UPDATE_FILE" client2
+    CLIENT1_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT1_TCP_UPDATE_FILE")"
+    CLIENT2_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT2_TCP_UPDATE_FILE")"
+}
+
+start_tcp_update_receiver() {
+    local port="$1"
+    local output_file="$2"
+    local logfile="$3"
+    local status_file="$4"
+    local pid_var="$5"
+    local pid
+
+    rm -f "$output_file" "$status_file"
+    log_info "在 $SERVER_NS 启动 TCP update receiver: $port"
+    ip netns exec "$SERVER_NS" python3 -u - \
+        "${SERVER_TUN_ADDR%%/*}" "$port" "$output_file" "$status_file" "$TCP_UPDATE_TIMEOUT_SEC" <<'PY' > "$logfile" 2>&1 &
+import socket
+import sys
+
+bind_ip = sys.argv[1]
+port = int(sys.argv[2])
+output_file = sys.argv[3]
+status_file = sys.argv[4]
+timeout = float(sys.argv[5])
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((bind_ip, port))
+    server.listen(1)
+    server.settimeout(timeout)
+    print(f"tcp update receiver listening on {bind_ip}:{port}", flush=True)
+    conn, addr = server.accept()
+    print(f"tcp update receiver accepted {addr[0]}:{addr[1]}", flush=True)
+    with conn:
+        with open(output_file, "wb") as fh:
+            while True:
+                chunk = conn.recv(65536)
+                if not chunk:
+                    break
+                fh.write(chunk)
+
+with open(status_file, "w", encoding="utf-8") as fh:
+    fh.write("PASS\n")
+
+print(f"tcp update receiver wrote {output_file}", flush=True)
+PY
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "server TCP update receiver 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
+start_tcp_update_upload() {
+    local namespace="$1"
+    local source_file="$2"
+    local port="$3"
+    local logfile="$4"
+    local status_file="$5"
+    local pid_var="$6"
+    local pid
+
+    rm -f "$status_file"
+    log_info "在 $namespace 启动 TCP update upload: $port"
+    ip netns exec "$namespace" python3 -u - \
+        "${SERVER_TUN_ADDR%%/*}" "$port" "$source_file" "$status_file" "$TCP_UPDATE_TIMEOUT_SEC" "$TCP_UPDATE_CLIENTS_GATE" <<'PY' > "$logfile" 2>&1 &
+import os
+import socket
+import sys
+import time
+
+server_ip = sys.argv[1]
+port = int(sys.argv[2])
+source_file = sys.argv[3]
+status_file = sys.argv[4]
+timeout = float(sys.argv[5])
+gate_file = sys.argv[6]
+deadline = time.time() + timeout
+
+while not os.path.exists(gate_file):
+    if time.time() >= deadline:
+        raise TimeoutError(f"timed out waiting for upload gate {gate_file}")
+    time.sleep(0.05)
+
+with socket.create_connection((server_ip, port), timeout=timeout) as sock:
+    with open(source_file, "rb") as fh:
+        while True:
+            chunk = fh.read(65536)
+            if not chunk:
+                break
+            sock.sendall(chunk)
+
+with open(status_file, "w", encoding="utf-8") as fh:
+    fh.write("PASS\n")
+
+print(f"tcp update upload sent {source_file} to {server_ip}:{port}", flush=True)
+PY
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+}
+
+wait_for_pid_success() {
+    local pid="$1"
+    local title="$2"
+
+    if ! wait "$pid"; then
+        set_fail_reason "$title 失败"
+        return 1
+    fi
+
+    log_pass "$title 成功"
+}
+
+run_tcp_per_client_update_payload() {
+    log_info "UFTP 下行完成屏障已成立，开始 TCP per-client 上行 update payload"
+    rm -f "$TCP_UPDATE_CLIENTS_GATE"
+    generate_tcp_update_payloads
+
+    start_tcp_update_receiver "$TCP_CLIENT1_PORT" "$SERVER_CLIENT1_TCP_UPDATE_FILE" "$CLIENT1_TCP_UPDATE_RECEIVER_LOG" "$CLIENT1_TCP_UPDATE_RECEIVER_STATUS" CLIENT1_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_receiver "$TCP_CLIENT2_PORT" "$SERVER_CLIENT2_TCP_UPDATE_FILE" "$CLIENT2_TCP_UPDATE_RECEIVER_LOG" "$CLIENT2_TCP_UPDATE_RECEIVER_STATUS" CLIENT2_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_upload "$CLIENT1_NS" "$CLIENT1_TCP_UPDATE_FILE" "$TCP_CLIENT1_PORT" "$CLIENT1_TCP_UPDATE_CLIENT_LOG" "$CLIENT1_TCP_UPDATE_CLIENT_STATUS" CLIENT1_TCP_UPDATE_CLIENT_PID
+    start_tcp_update_upload "$CLIENT2_NS" "$CLIENT2_TCP_UPDATE_FILE" "$TCP_CLIENT2_PORT" "$CLIENT2_TCP_UPDATE_CLIENT_LOG" "$CLIENT2_TCP_UPDATE_CLIENT_STATUS" CLIENT2_TCP_UPDATE_CLIENT_PID
+
+    : > "$TCP_UPDATE_CLIENTS_GATE"
+
+    wait_for_pid_success "$CLIENT1_TCP_UPDATE_CLIENT_PID" "client1 TCP update upload"
+    wait_for_pid_success "$CLIENT2_TCP_UPDATE_CLIENT_PID" "client2 TCP update upload"
+    wait_for_pid_success "$CLIENT1_TCP_UPDATE_RECEIVER_PID" "server client1 TCP update receiver"
+    wait_for_pid_success "$CLIENT2_TCP_UPDATE_RECEIVER_PID" "server client2 TCP update receiver"
+
+    CLIENT1_TCP_UPDATE_RECEIVED_SHA256="$(sha256_of_file "$SERVER_CLIENT1_TCP_UPDATE_FILE")"
+    CLIENT2_TCP_UPDATE_RECEIVED_SHA256="$(sha256_of_file "$SERVER_CLIENT2_TCP_UPDATE_FILE")"
+
+    if [ "$CLIENT1_TCP_UPDATE_RECEIVED_SHA256" != "$CLIENT1_TCP_UPDATE_SOURCE_SHA256" ]; then
+        set_fail_reason "client1 TCP update payload sha256 不匹配"
+        return 1
+    fi
+    if [ "$CLIENT2_TCP_UPDATE_RECEIVED_SHA256" != "$CLIENT2_TCP_UPDATE_SOURCE_SHA256" ]; then
+        set_fail_reason "client2 TCP update payload sha256 不匹配"
+        return 1
+    fi
+
+    log_pass "client1/client2 TCP update payload sha256 均匹配各自源文件"
+}
+
 run_uftp_shared_downlink_payload() {
     add_uftp_multicast_routes
     generate_uftp_payload
@@ -1009,6 +1234,7 @@ main() {
     wait_for_file_contains "$CLIENT1_DOWNLINK_PROBE_FILE" "V4_SHARED_DOWNLINK_CLIENT1" "client1 通过共享下行路径收到基础探针"
     wait_for_file_contains "$CLIENT2_DOWNLINK_PROBE_FILE" "V4_SHARED_DOWNLINK_CLIENT2" "client2 通过共享下行路径收到基础探针"
     run_uftp_shared_downlink_payload
+    run_tcp_per_client_update_payload
 }
 
 main "$@"

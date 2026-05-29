@@ -31,6 +31,7 @@ class V4AcceptanceTestCase(unittest.TestCase):
             'UFTP_BIN': UFTP_BIN,
             'UFTPD_BIN': UFTPD_BIN,
             'UFTP_PAYLOAD_SIZE': '65536',
+            'TCP_UPDATE_PAYLOAD_SIZE': '32768',
         })
         return env
 
@@ -83,6 +84,14 @@ class V4AcceptanceTestCase(unittest.TestCase):
             self.assertIn('- UFTP source sha256:', content)
             self.assertIn('- client1 UFTP sha256:', content)
             self.assertIn('- client2 UFTP sha256:', content)
+            self.assertIn('- 已覆盖: TCP per-client 上行 update payload', content)
+            self.assertIn('- TCP update payload size: 32768 bytes', content)
+            self.assertIn('- client1 TCP update source sha256:', content)
+            self.assertIn('- client1 TCP update received sha256:', content)
+            self.assertIn('- client2 TCP update source sha256:', content)
+            self.assertIn('- client2 TCP update received sha256:', content)
+            self.assertIn('- 未覆盖: ready 标记、真实训练 update、上行注册协议', content)
+            self.assertNotIn('- 未覆盖: TCP per-client 上行 update payload', content)
 
             client1_probe = os.path.join(log_dir, 'client1', 'downlink_probe_received.log')
             client2_probe = os.path.join(log_dir, 'client2', 'downlink_probe_received.log')
@@ -107,6 +116,18 @@ class V4AcceptanceTestCase(unittest.TestCase):
             self.assertTrue(os.path.exists(client2_payload))
             self.assertEqual(self.file_sha256(server_payload), self.file_sha256(client1_payload))
             self.assertEqual(self.file_sha256(server_payload), self.file_sha256(client2_payload))
+
+            client1_update = os.path.join(log_dir, 'client1', 'tcp_update.bin')
+            client2_update = os.path.join(log_dir, 'client2', 'tcp_update.bin')
+            server_client1_update = os.path.join(log_dir, 'server', 'client1_tcp_update.bin')
+            server_client2_update = os.path.join(log_dir, 'server', 'client2_tcp_update.bin')
+
+            self.assertTrue(os.path.exists(client1_update))
+            self.assertTrue(os.path.exists(client2_update))
+            self.assertTrue(os.path.exists(server_client1_update))
+            self.assertTrue(os.path.exists(server_client2_update))
+            self.assertEqual(self.file_sha256(client1_update), self.file_sha256(server_client1_update))
+            self.assertEqual(self.file_sha256(client2_update), self.file_sha256(server_client2_update))
         finally:
             self.assert_namespaces_cleaned(env)
             shutil.rmtree(log_dir, ignore_errors=True)
