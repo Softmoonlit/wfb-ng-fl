@@ -20,10 +20,29 @@ SHARED_DOWNLINK_TX_LOG="$SERVER_DIR/shared_downlink_tx.log"
 SHARED_DOWNLINK_FANOUT_LOG="$SERVER_DIR/shared_downlink_fanout.log"
 CLIENT1_DOWNLINK_RX_LOG="$CLIENT1_DIR/downlink_rx.log"
 CLIENT2_DOWNLINK_RX_LOG="$CLIENT2_DIR/downlink_rx.log"
+CLIENT1_UPLINK_RELAY_LOG="$CLIENT1_DIR/uftp_uplink_relay.log"
+CLIENT2_UPLINK_RELAY_LOG="$CLIENT2_DIR/uftp_uplink_relay.log"
+CLIENT1_UFTP_RESPONSE_RELAY_LOG="$CLIENT1_DIR/uftp_response_relay.log"
+CLIENT2_UFTP_RESPONSE_RELAY_LOG="$CLIENT2_DIR/uftp_response_relay.log"
 CLIENT1_DOWNLINK_PROBE_LISTENER_LOG="$CLIENT1_DIR/downlink_probe_listener.log"
 CLIENT2_DOWNLINK_PROBE_LISTENER_LOG="$CLIENT2_DIR/downlink_probe_listener.log"
 CLIENT1_DOWNLINK_PROBE_FILE="$CLIENT1_DIR/downlink_probe_received.log"
 CLIENT2_DOWNLINK_PROBE_FILE="$CLIENT2_DIR/downlink_probe_received.log"
+UFTP_PAYLOAD_FILE="$SERVER_DIR/uftp_payload.bin"
+UFTP_SERVER_LOG="$SERVER_DIR/uftp.log"
+UFTP_SERVER_STATUS="$SERVER_DIR/uftp.status"
+CLIENT1_UFTPD_LOG="$CLIENT1_DIR/uftpd.log"
+CLIENT2_UFTPD_LOG="$CLIENT2_DIR/uftpd.log"
+CLIENT1_UFTPD_PIDFILE="$CLIENT1_DIR/uftpd.pid"
+CLIENT2_UFTPD_PIDFILE="$CLIENT2_DIR/uftpd.pid"
+CLIENT1_UFTPD_STATUS="$CLIENT1_DIR/uftpd.status"
+CLIENT2_UFTPD_STATUS="$CLIENT2_DIR/uftpd.status"
+CLIENT1_UFTP_DEST_DIR="$CLIENT1_DIR/uftp_dest"
+CLIENT2_UFTP_DEST_DIR="$CLIENT2_DIR/uftp_dest"
+CLIENT1_UFTP_TEMP_DIR="$CLIENT1_DIR/uftp_tmp"
+CLIENT2_UFTP_TEMP_DIR="$CLIENT2_DIR/uftp_tmp"
+CLIENT1_UFTP_PAYLOAD_FILE="$CLIENT1_UFTP_DEST_DIR/uftp_payload.bin"
+CLIENT2_UFTP_PAYLOAD_FILE="$CLIENT2_UFTP_DEST_DIR/uftp_payload.bin"
 
 SERVER_NS="${SERVER_NS:-v4-server}"
 CLIENT1_NS="${CLIENT1_NS:-v4-client1}"
@@ -66,6 +85,19 @@ CLIENT1_DOWNLINK_RX_DEBUG_PORT="${CLIENT1_DOWNLINK_RX_DEBUG_PORT:-6911}"
 CLIENT2_DOWNLINK_RX_DEBUG_PORT="${CLIENT2_DOWNLINK_RX_DEBUG_PORT:-6912}"
 DOWNLINK_PROBE_PORT="${DOWNLINK_PROBE_PORT:-6920}"
 DOWNLINK_PROBE_TIMEOUT_SEC="${DOWNLINK_PROBE_TIMEOUT_SEC:-15}"
+UFTP_PUBLIC_MULTICAST_ADDR="${UFTP_PUBLIC_MULTICAST_ADDR:-230.4.4.1}"
+UFTP_PRIVATE_MULTICAST_ADDR="${UFTP_PRIVATE_MULTICAST_ADDR:-230.5.5.8}"
+UFTP_PORT="${UFTP_PORT:-1044}"
+UFTP_SOURCE_PORT="${UFTP_SOURCE_PORT:-1045}"
+UFTP_RESPONSE_PROXY_PORT="${UFTP_RESPONSE_PROXY_PORT:-5602}"
+UFTP_PAYLOAD_SIZE="${UFTP_PAYLOAD_SIZE:-1048576}"
+UFTP_TRANSFER_TIMEOUT_SEC="${UFTP_TRANSFER_TIMEOUT_SEC:-40}"
+UFTP_SOURCE_SHA256="未生成"
+CLIENT1_UFTP_SHA256="未收到"
+CLIENT2_UFTP_SHA256="未收到"
+
+RESOLVED_UFTP_BIN=""
+RESOLVED_UFTPD_BIN=""
 
 STARTUP_WAIT_SEC="${STARTUP_WAIT_SEC:-1}"
 
@@ -80,6 +112,10 @@ SHARED_DOWNLINK_TX_PID=""
 SHARED_DOWNLINK_FANOUT_PID=""
 CLIENT1_DOWNLINK_RX_PID=""
 CLIENT2_DOWNLINK_RX_PID=""
+CLIENT1_UPLINK_RELAY_PID=""
+CLIENT2_UPLINK_RELAY_PID=""
+CLIENT1_UFTP_RESPONSE_RELAY_PID=""
+CLIENT2_UFTP_RESPONSE_RELAY_PID=""
 CLIENT1_DOWNLINK_PROBE_PID=""
 CLIENT2_DOWNLINK_PROBE_PID=""
 
@@ -88,7 +124,14 @@ log_pass() { echo "[PASS] $(date '+%H:%M:%S') $1"; }
 log_fail() { echo "[FAIL] $(date '+%H:%M:%S') $1" >&2; }
 
 prepare_log_dir() {
-    mkdir -p "$SERVER_DIR" "$CLIENT1_DIR" "$CLIENT2_DIR"
+    mkdir -p \
+        "$SERVER_DIR" \
+        "$CLIENT1_DIR" \
+        "$CLIENT2_DIR" \
+        "$CLIENT1_UFTP_DEST_DIR" \
+        "$CLIENT2_UFTP_DEST_DIR" \
+        "$CLIENT1_UFTP_TEMP_DIR" \
+        "$CLIENT2_UFTP_TEMP_DIR"
 }
 
 set_fail_reason() {
@@ -136,9 +179,31 @@ render_result() {
 - fan-out 日志: $SHARED_DOWNLINK_FANOUT_LOG
 - fan-out 输入: server namespace 127.0.0.1:$SHARED_DOWNLINK_TX_DEBUG_PORT
 - fan-out 输出: $CLIENT1_MGMT_IP:$CLIENT1_DOWNLINK_RX_DEBUG_PORT, $CLIENT2_MGMT_IP:$CLIENT2_DOWNLINK_RX_DEBUG_PORT
+- UFTP 回程 relay: client TUN UDP -> server wfb_tun UDP，仅用于 UFTP control responses
 - client1 probe: $CLIENT1_DOWNLINK_PROBE_FILE
 - client2 probe: $CLIENT2_DOWNLINK_PROBE_FILE
 - 说明: fan-out 为测试专用，不代表生产传输组件
+
+## UFTP 共享下行 Payload
+
+- UFTP_BIN: ${RESOLVED_UFTP_BIN:-未解析}
+- UFTPD_BIN: ${RESOLVED_UFTPD_BIN:-未解析}
+- UFTP public multicast: $UFTP_PUBLIC_MULTICAST_ADDR/32 via TUN
+- UFTP private multicast: $UFTP_PRIVATE_MULTICAST_ADDR/32 via TUN
+- UFTP port: $UFTP_PORT
+- UFTP source port: $UFTP_SOURCE_PORT
+- UFTP response proxy port: $UFTP_RESPONSE_PROXY_PORT
+- UFTP payload size: $UFTP_PAYLOAD_SIZE bytes
+- UFTP source payload: $UFTP_PAYLOAD_FILE
+- UFTP source sha256: $UFTP_SOURCE_SHA256
+- client1 UFTP payload: $CLIENT1_UFTP_PAYLOAD_FILE
+- client1 UFTP sha256: $CLIENT1_UFTP_SHA256
+- client2 UFTP payload: $CLIENT2_UFTP_PAYLOAD_FILE
+- client2 UFTP sha256: $CLIENT2_UFTP_SHA256
+- server UFTP 日志: $UFTP_SERVER_LOG
+- server UFTP 状态: $UFTP_SERVER_STATUS
+- client1 UFTPD 日志: $CLIENT1_UFTPD_LOG
+- client2 UFTPD 日志: $CLIENT2_UFTPD_LOG
 
 ## 关键日志
 
@@ -149,6 +214,13 @@ render_result() {
 - shared downlink fan-out: $SHARED_DOWNLINK_FANOUT_LOG
 - client1 downlink rx: $CLIENT1_DOWNLINK_RX_LOG
 - client2 downlink rx: $CLIENT2_DOWNLINK_RX_LOG
+- client1 UFTP uplink relay: $CLIENT1_UPLINK_RELAY_LOG
+- client2 UFTP uplink relay: $CLIENT2_UPLINK_RELAY_LOG
+- client1 UFTP response relay: $CLIENT1_UFTP_RESPONSE_RELAY_LOG
+- client2 UFTP response relay: $CLIENT2_UFTP_RESPONSE_RELAY_LOG
+- server UFTP: $UFTP_SERVER_LOG
+- client1 UFTPD: $CLIENT1_UFTPD_LOG
+- client2 UFTPD: $CLIENT2_UFTPD_LOG
 - build: $BUILD_LOG
 
 ## 当前 v4 覆盖范围
@@ -160,11 +232,13 @@ render_result() {
 - 已覆盖: shared downlink sender 与测试专用 fan-out
 - 已覆盖: client1/client2 各自 downlink receiver 接入各自 TUN/IP 路径
 - 已覆盖: client1/client2 通过共享下行路径收到基础探针流量
+- 已覆盖: UFTP 共享下行 payload
+- 已覆盖: UFTP public/private multicast /32 路由显式指向 TUN 接口
+- 已覆盖: client1/client2 UFTP payload sha256 完成屏障
 - 已覆盖: 成功与失败路径的 namespace 和后台进程清理
 
 ## 当前 v4 未覆盖范围
 
-- 未覆盖: UFTP 共享下行 payload
 - 未覆盖: TCP per-client 上行 update payload
 EOF
 }
@@ -179,6 +253,12 @@ cleanup_processes() {
         wait "$pid" 2>/dev/null || true
     done
     PIDS=()
+    if [ -f "$CLIENT1_UFTPD_PIDFILE" ]; then
+        kill "$(cat "$CLIENT1_UFTPD_PIDFILE")" 2>/dev/null || true
+    fi
+    if [ -f "$CLIENT2_UFTPD_PIDFILE" ]; then
+        kill "$(cat "$CLIENT2_UFTPD_PIDFILE")" 2>/dev/null || true
+    fi
 }
 
 delete_namespace_if_exists() {
@@ -258,6 +338,36 @@ require_executable() {
         set_fail_reason "缺少可执行文件: $path"
         return 1
     fi
+}
+
+require_uftp_binary() {
+    local env_name="$1"
+    local binary_name="$2"
+    local resolved
+
+    if [ -n "${!env_name:-}" ]; then
+        if [ ! -x "${!env_name}" ]; then
+            set_fail_reason "缺少 UFTP 可执行文件: ${!env_name}。请从 SourceForge 下载 UFTP 源码后手动编译 uftp/uftpd，并通过 UFTP_BIN 和 UFTPD_BIN 指定路径。"
+            return 1
+        fi
+        resolved="${!env_name}"
+    else
+        if ! resolved="$(command -v "$binary_name" 2>/dev/null)"; then
+            set_fail_reason "缺少 UFTP 可执行文件: $binary_name。请从 SourceForge 下载 UFTP 源码后手动编译 uftp/uftpd，并通过 UFTP_BIN 和 UFTPD_BIN 指定路径，或将二进制加入 PATH。"
+            return 1
+        fi
+    fi
+
+    if [ "$env_name" = "UFTP_BIN" ]; then
+        RESOLVED_UFTP_BIN="$resolved"
+    else
+        RESOLVED_UFTPD_BIN="$resolved"
+    fi
+}
+
+require_uftp_binaries() {
+    require_uftp_binary UFTP_BIN uftp
+    require_uftp_binary UFTPD_BIN uftpd
 }
 
 build_acceptance_binaries() {
@@ -419,6 +529,32 @@ wait_for_file_contains() {
     return 1
 }
 
+wait_for_file() {
+    local path="$1"
+    local title="$2"
+    local tries="$3"
+    local i
+
+    for ((i = 0; i < tries; i++)); do
+        if [ -f "$path" ]; then
+            log_pass "$title"
+            return 0
+        fi
+        sleep 0.25
+    done
+
+    set_fail_reason "$title 未出现: $path"
+    return 1
+}
+
+sha256_of_file() {
+    local path="$1"
+    local output
+
+    output="$(sha256sum "$path")"
+    printf '%s\n' "${output%% *}"
+}
+
 verify_management_ping() {
     local namespace="$1"
     local target_ip="$2"
@@ -530,6 +666,93 @@ start_shared_downlink_sender() {
     fi
 }
 
+start_uftp_uplink_relay_for_client() {
+    local namespace="$1"
+    local listen_port="$2"
+    local server_ip="$3"
+    local logfile="$4"
+    local pid_var="$5"
+    local pid
+
+    log_info "在 $namespace 启动测试专用 UFTP 回程 relay"
+    ip netns exec "$namespace" python3 -u - \
+        "$listen_port" "$server_ip" "$SERVER_TUN_LISTEN_PORT" <<'PY' > "$logfile" 2>&1 &
+import socket
+import sys
+
+listen_port = int(sys.argv[1])
+server_ip = sys.argv[2]
+server_port = int(sys.argv[3])
+
+rx_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+rx_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+rx_sock.bind(("127.0.0.1", listen_port))
+
+tx_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+count = 0
+
+print(f"uplink relay listening on 127.0.0.1:{listen_port} -> {server_ip}:{server_port}", flush=True)
+
+while True:
+    data, _ = rx_sock.recvfrom(65535)
+    count += 1
+    tx_sock.sendto(data, (server_ip, server_port))
+    print(f"uplink relay forwarded datagram={count} bytes={len(data)}", flush=True)
+PY
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "$namespace 的 UFTP 回程 relay 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
+start_uftp_response_relay_for_client() {
+    local namespace="$1"
+    local server_tun_ip="$2"
+    local logfile="$3"
+    local pid_var="$4"
+    local pid
+
+    log_info "在 $namespace 启动测试专用 UFTP response relay"
+    ip netns exec "$namespace" python3 -u - \
+        "$UFTP_RESPONSE_PROXY_PORT" "$server_tun_ip" "$UFTP_SOURCE_PORT" <<'PY' > "$logfile" 2>&1 &
+import socket
+import sys
+
+listen_port = int(sys.argv[1])
+server_tun_ip = sys.argv[2]
+server_port = int(sys.argv[3])
+
+rx_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+rx_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+rx_sock.bind(("127.0.0.1", listen_port))
+
+tx_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+count = 0
+
+print(f"response relay listening on 127.0.0.1:{listen_port} -> {server_tun_ip}:{server_port}", flush=True)
+
+while True:
+    data, addr = rx_sock.recvfrom(65535)
+    count += 1
+    tx_sock.sendto(data, (server_tun_ip, server_port))
+    print(f"response relay forwarded datagram={count} bytes={len(data)} from={addr[0]}:{addr[1]}", flush=True)
+PY
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "$namespace 的 UFTP response relay 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
 start_tun_probe_listener() {
     local namespace="$1"
     local bind_ip="$2"
@@ -592,6 +815,118 @@ sock.sendto(b"V4_SHARED_DOWNLINK_CLIENT2", (client2_ip, port))
 PY
 }
 
+add_uftp_multicast_routes() {
+    log_info "显式添加 UFTP multicast /32 路由到各 namespace TUN 接口"
+    ip -n "$SERVER_NS" route replace "$UFTP_PUBLIC_MULTICAST_ADDR/32" dev "$SERVER_TUN_NAME"
+    ip -n "$SERVER_NS" route replace "$UFTP_PRIVATE_MULTICAST_ADDR/32" dev "$SERVER_TUN_NAME"
+    ip -n "$CLIENT1_NS" route replace "$UFTP_PUBLIC_MULTICAST_ADDR/32" dev "$CLIENT1_TUN_NAME"
+    ip -n "$CLIENT1_NS" route replace "$UFTP_PRIVATE_MULTICAST_ADDR/32" dev "$CLIENT1_TUN_NAME"
+    ip -n "$CLIENT2_NS" route replace "$UFTP_PUBLIC_MULTICAST_ADDR/32" dev "$CLIENT2_TUN_NAME"
+    ip -n "$CLIENT2_NS" route replace "$UFTP_PRIVATE_MULTICAST_ADDR/32" dev "$CLIENT2_TUN_NAME"
+}
+
+generate_uftp_payload() {
+    log_info "生成 UFTP 下行测试 payload: $UFTP_PAYLOAD_SIZE bytes"
+    python3 -u - "$UFTP_PAYLOAD_FILE" "$UFTP_PAYLOAD_SIZE" <<'PY'
+import os
+import sys
+
+path = sys.argv[1]
+size = int(sys.argv[2])
+pattern = b"wfb-ng-v4-uftp-payload\n"
+
+with open(path, "wb") as fh:
+    remaining = size
+    while remaining > 0:
+        chunk = pattern[:remaining] if remaining < len(pattern) else pattern
+        fh.write(chunk)
+        remaining -= len(chunk)
+PY
+    UFTP_SOURCE_SHA256="$(sha256_of_file "$UFTP_PAYLOAD_FILE")"
+}
+
+start_uftpd_for_client() {
+    local namespace="$1"
+    local bind_ip="$2"
+    local dest_dir="$3"
+    local temp_dir="$4"
+    local logfile="$5"
+    local status_file="$6"
+    local pidfile="$7"
+
+    rm -f "$pidfile" "$status_file"
+    log_info "在 $namespace 启动 UFTPD client"
+    ip netns exec "$namespace" "$RESOLVED_UFTPD_BIN" \
+        -I "$bind_ip" \
+        -M "$UFTP_PUBLIC_MULTICAST_ADDR" \
+        -p "$UFTP_PORT" \
+        -D "$dest_dir" \
+        -T "$temp_dir" \
+        -L "$logfile" \
+        -F "$status_file" \
+        -P "$pidfile"
+
+    if ! wait_for_file "$pidfile" "$namespace UFTPD pidfile 创建完成" 20; then
+        return 1
+    fi
+
+    if ! kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+        set_fail_reason "$namespace 的 UFTPD 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
+run_uftp_server() {
+    log_info "在 $SERVER_NS 通过 TUN 接口发送 UFTP payload"
+    if ! timeout "${UFTP_TRANSFER_TIMEOUT_SEC}s" ip netns exec "$SERVER_NS" "$RESOLVED_UFTP_BIN" \
+        -I "${SERVER_TUN_ADDR%%/*}" \
+        -M "$UFTP_PUBLIC_MULTICAST_ADDR" \
+        -P "$UFTP_PRIVATE_MULTICAST_ADDR" \
+        -p "$UFTP_PORT" \
+        -u "$UFTP_SOURCE_PORT" \
+        -Y none \
+        -R 50000 \
+        -L "$UFTP_SERVER_LOG" \
+        -S "$UFTP_SERVER_STATUS" \
+        -D "uftp_payload.bin" \
+        "$UFTP_PAYLOAD_FILE"; then
+        set_fail_reason "UFTP server 发送失败，查看日志: $UFTP_SERVER_LOG"
+        return 1
+    fi
+}
+
+verify_uftp_payloads() {
+    wait_for_file "$CLIENT1_UFTP_PAYLOAD_FILE" "client1 收到 UFTP payload" "$((UFTP_TRANSFER_TIMEOUT_SEC * 4))"
+    wait_for_file "$CLIENT2_UFTP_PAYLOAD_FILE" "client2 收到 UFTP payload" "$((UFTP_TRANSFER_TIMEOUT_SEC * 4))"
+
+    CLIENT1_UFTP_SHA256="$(sha256_of_file "$CLIENT1_UFTP_PAYLOAD_FILE")"
+    CLIENT2_UFTP_SHA256="$(sha256_of_file "$CLIENT2_UFTP_PAYLOAD_FILE")"
+
+    if [ "$CLIENT1_UFTP_SHA256" != "$UFTP_SOURCE_SHA256" ]; then
+        set_fail_reason "client1 UFTP payload sha256 不匹配"
+        return 1
+    fi
+    if [ "$CLIENT2_UFTP_SHA256" != "$UFTP_SOURCE_SHA256" ]; then
+        set_fail_reason "client2 UFTP payload sha256 不匹配"
+        return 1
+    fi
+
+    log_pass "client1/client2 UFTP payload sha256 均匹配 server 源文件"
+}
+
+run_uftp_shared_downlink_payload() {
+    add_uftp_multicast_routes
+    generate_uftp_payload
+    start_uftp_uplink_relay_for_client "$CLIENT1_NS" "$CLIENT1_TUN_PEER_PORT" "$SERVER_CLIENT1_IP" "$CLIENT1_UPLINK_RELAY_LOG" CLIENT1_UPLINK_RELAY_PID
+    start_uftp_uplink_relay_for_client "$CLIENT2_NS" "$CLIENT2_TUN_PEER_PORT" "$SERVER_CLIENT2_IP" "$CLIENT2_UPLINK_RELAY_LOG" CLIENT2_UPLINK_RELAY_PID
+    start_uftp_response_relay_for_client "$CLIENT1_NS" "${SERVER_TUN_ADDR%%/*}" "$CLIENT1_UFTP_RESPONSE_RELAY_LOG" CLIENT1_UFTP_RESPONSE_RELAY_PID
+    start_uftp_response_relay_for_client "$CLIENT2_NS" "${SERVER_TUN_ADDR%%/*}" "$CLIENT2_UFTP_RESPONSE_RELAY_LOG" CLIENT2_UFTP_RESPONSE_RELAY_PID
+    start_uftpd_for_client "$CLIENT1_NS" "${CLIENT1_TUN_ADDR%%/*}" "$CLIENT1_UFTP_DEST_DIR" "$CLIENT1_UFTP_TEMP_DIR" "$CLIENT1_UFTPD_LOG" "$CLIENT1_UFTPD_STATUS" "$CLIENT1_UFTPD_PIDFILE"
+    start_uftpd_for_client "$CLIENT2_NS" "${CLIENT2_TUN_ADDR%%/*}" "$CLIENT2_UFTP_DEST_DIR" "$CLIENT2_UFTP_TEMP_DIR" "$CLIENT2_UFTPD_LOG" "$CLIENT2_UFTPD_STATUS" "$CLIENT2_UFTPD_PIDFILE"
+    run_uftp_server
+    verify_uftp_payloads
+}
+
 main() {
     prepare_log_dir
     require_root
@@ -600,6 +935,10 @@ main() {
     require_command grep
     require_command make
     require_command python3
+    require_command sha256sum
+    require_command timeout
+
+    require_uftp_binaries
 
     build_acceptance_binaries
 
@@ -669,6 +1008,7 @@ main() {
     send_shared_downlink_probes
     wait_for_file_contains "$CLIENT1_DOWNLINK_PROBE_FILE" "V4_SHARED_DOWNLINK_CLIENT1" "client1 通过共享下行路径收到基础探针"
     wait_for_file_contains "$CLIENT2_DOWNLINK_PROBE_FILE" "V4_SHARED_DOWNLINK_CLIENT2" "client2 通过共享下行路径收到基础探针"
+    run_uftp_shared_downlink_payload
 }
 
 main "$@"
