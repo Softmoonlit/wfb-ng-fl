@@ -69,6 +69,23 @@ class V4AcceptanceTestCase(unittest.TestCase):
             self.assertIn(env['CLIENT1_NS'], content)
             self.assertIn(env['CLIENT2_NS'], content)
             self.assertIn('- cleanup_verified: 是', content)
+            self.assertIn('- shared downlink sender: 1', content)
+            self.assertIn('- 已覆盖: shared downlink sender 与测试专用 fan-out', content)
+            self.assertIn('- 说明: fan-out 为测试专用，不代表生产传输组件', content)
+
+            client1_probe = os.path.join(log_dir, 'client1', 'downlink_probe_received.log')
+            client2_probe = os.path.join(log_dir, 'client2', 'downlink_probe_received.log')
+
+            self.assertTrue(os.path.exists(client1_probe))
+            self.assertTrue(os.path.exists(client2_probe))
+
+            with open(client1_probe, 'r') as fh:
+                client1_content = fh.read()
+            with open(client2_probe, 'r') as fh:
+                client2_content = fh.read()
+
+            self.assertIn('V4_SHARED_DOWNLINK_CLIENT1', client1_content)
+            self.assertIn('V4_SHARED_DOWNLINK_CLIENT2', client2_content)
         finally:
             self.assert_namespaces_cleaned(env)
             shutil.rmtree(log_dir, ignore_errors=True)
