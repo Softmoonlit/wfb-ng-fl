@@ -1,6 +1,9 @@
 .vscode/
 temp
 tests/logs
+.agents/
+.kilo/
+.omp/
 
 # Python 缓存与虚拟环境
 __pycache__/
@@ -57,3 +60,4 @@ _trial_temp-*/
 /gs.key
 /drone.key
 /wfb_ng/conf/site.cfg
+skills-lock.json
