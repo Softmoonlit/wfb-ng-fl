@@ -32,6 +32,34 @@ KCP_SOURCE_FILE="${KCP_SOURCE_FILE:-$LOG_DIR/kcp_small_source.bin}"
 KCP_RECEIVED_FILE="${KCP_RECEIVED_FILE:-$LOG_DIR/kcp_small_received.bin}"
 KCP_SOURCE_SHA256=""
 KCP_RECEIVED_SHA256=""
+DUAL_LONG_RUN_SAMPLES_TSV="$LOG_DIR/dual_long_run_samples.tsv"
+TOKEN_LONGRUN_DURATION_SEC="${TOKEN_LONGRUN_DURATION_SEC:-180}"
+TOKEN_LONGRUN_PROBE_INTERVAL_SEC="${TOKEN_LONGRUN_PROBE_INTERVAL_SEC:-1}"
+TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC="${TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC:-15}"
+TOKEN_LONGRUN_MIN_GRANTS="${TOKEN_LONGRUN_MIN_GRANTS:-60}"
+TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS="${TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS:-10}"
+TOKEN_LONGRUN_MAX_IDLE_SEC="${TOKEN_LONGRUN_MAX_IDLE_SEC:-45}"
+TOKEN_LONGRUN_MAX_REMOVE_COUNT="${TOKEN_LONGRUN_MAX_REMOVE_COUNT:-0}"
+TOKEN_LONGRUN_MAX_EVICT_COUNT="${TOKEN_LONGRUN_MAX_EVICT_COUNT:-0}"
+TOKEN_LONGRUN_MAX_REJOIN_COUNT="${TOKEN_LONGRUN_MAX_REJOIN_COUNT:-0}"
+LONGRUN_TARGET_DURATION_SEC=""
+LONGRUN_ACTUAL_DURATION_SEC=""
+LONGRUN_TOTAL_GRANTS=""
+LONGRUN_CLIENT1_GRANTS=""
+LONGRUN_CLIENT2_GRANTS=""
+LONGRUN_GUARD_COUNT=""
+LONGRUN_CLIENT1_AUTHORIZED=""
+LONGRUN_CLIENT2_AUTHORIZED=""
+LONGRUN_SERVER_DATA_PACKETS=""
+LONGRUN_CLIENT1_REJOINS=""
+LONGRUN_CLIENT2_REJOINS=""
+LONGRUN_REMOVE_COUNT=""
+LONGRUN_EVICT_COUNT=""
+LONGRUN_MAX_IDLE_OBSERVED_SEC=""
+LONGRUN_CLIENT1_PROBE_FAILURES=""
+LONGRUN_CLIENT2_PROBE_FAILURES=""
+LONGRUN_SAMPLE_COUNT=""
+LONGRUN_RESULT_REASON=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,7 +74,7 @@ while [[ $# -gt 0 ]]; do
         --help|-h)
             cat <<'HELP_EOF'
 用法:
-  sudo bash tests/real_hardware/test_token_gated_uplink.sh [--scenario all|baseline|no-token|single|expiry|dual|kcp-small] [--analyze-only]
+  sudo bash tests/real_hardware/test_token_gated_uplink.sh [--scenario all|baseline|no-token|single|expiry|dual|dual-long-run|kcp-small] [--analyze-only]
 
 环境变量钩子:
   TOKEN_SERVER_START_CMD         服务端启动命令
@@ -57,6 +85,12 @@ while [[ $# -gt 0 ]]; do
   TOKEN_POST_EXPIRY_PROBE_CMD    过期后再次探测命令
   TOKEN_CLIENT1_PROBE_CMD        双客户端下客户端1探测命令
   TOKEN_CLIENT2_PROBE_CMD        双客户端下客户端2探测命令
+  TOKEN_LONGRUN_DURATION_SEC     双客户端长稳主场景运行时长，默认 180 秒
+  TOKEN_LONGRUN_PROBE_INTERVAL_SEC 双客户端长稳主场景探测周期，默认 1 秒
+  TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC 双客户端长稳主场景采样周期，默认 15 秒
+  TOKEN_LONGRUN_MIN_GRANTS       双客户端长稳主场景最小总 grant 数，默认 60
+  TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS 双客户端长稳主场景每客户端最小 authorized_sends，默认 10
+  TOKEN_LONGRUN_MAX_IDLE_SEC     双客户端长稳主场景允许的最长无推进窗口，默认 45 秒
   KCP_RECEIVER_CMD               KCP 小文件接收命令
   KCP_SENDER_CMD                 KCP 小文件发送命令，可引用 $KCP_SOURCE_FILE
   KCP_SOURCE_FILE                自动生成的小文件路径
@@ -116,6 +150,16 @@ kcp_small_file_size=$KCP_SMALL_FILE_SIZE
 kcp_transfer_timeout=$KCP_TRANSFER_TIMEOUT
 kcp_source_file=$KCP_SOURCE_FILE
 kcp_received_file=$KCP_RECEIVED_FILE
+dual_long_run_samples_tsv=$DUAL_LONG_RUN_SAMPLES_TSV
+token_longrun_duration_sec=$TOKEN_LONGRUN_DURATION_SEC
+token_longrun_probe_interval_sec=$TOKEN_LONGRUN_PROBE_INTERVAL_SEC
+token_longrun_sample_interval_sec=$TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC
+token_longrun_min_grants=$TOKEN_LONGRUN_MIN_GRANTS
+token_longrun_min_authorized_sends=$TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS
+token_longrun_max_idle_sec=$TOKEN_LONGRUN_MAX_IDLE_SEC
+token_longrun_max_remove_count=$TOKEN_LONGRUN_MAX_REMOVE_COUNT
+token_longrun_max_evict_count=$TOKEN_LONGRUN_MAX_EVICT_COUNT
+token_longrun_max_rejoin_count=$TOKEN_LONGRUN_MAX_REJOIN_COUNT
 CTX_EOF
 }
 
@@ -150,14 +194,39 @@ render_markdown_results() {
         fi
         echo
         echo "## 日志文件"
-        for f in scheduler.log server.log client1.log client2.log probe.log probe_post_expiry.log client1_probe.log client2_probe.log kcp_sender.log kcp_receiver.log; do
+        for f in scheduler.log server.log client1.log client2.log probe.log probe_post_expiry.log client1_probe.log client2_probe.log kcp_sender.log kcp_receiver.log dual_long_run_samples.tsv; do
             if [ -f "$LOG_DIR/$f" ]; then
                 echo "- $f"
             fi
         done
+        if [ -n "$LONGRUN_RESULT_REASON" ]; then
+            echo
+            echo "## dual-long-run 摘要"
+            echo
+            echo "- 目标时长: ${LONGRUN_TARGET_DURATION_SEC:-未记录} 秒"
+            echo "- 实际时长: ${LONGRUN_ACTUAL_DURATION_SEC:-未记录} 秒"
+            echo "- 采样点数: ${LONGRUN_SAMPLE_COUNT:-未记录}"
+            echo "- 总 grant 数: ${LONGRUN_TOTAL_GRANTS:-未记录}"
+            echo "- client1 grant 数: ${LONGRUN_CLIENT1_GRANTS:-未记录}"
+            echo "- client2 grant 数: ${LONGRUN_CLIENT2_GRANTS:-未记录}"
+            echo "- guard 数: ${LONGRUN_GUARD_COUNT:-未记录}"
+            echo "- client1 authorized_sends: ${LONGRUN_CLIENT1_AUTHORIZED:-未记录}"
+            echo "- client2 authorized_sends: ${LONGRUN_CLIENT2_AUTHORIZED:-未记录}"
+            echo "- server 数据包计数: ${LONGRUN_SERVER_DATA_PACKETS:-未记录}"
+            echo "- client1 额外 rejoin 次数: ${LONGRUN_CLIENT1_REJOINS:-未记录}"
+            echo "- client2 额外 rejoin 次数: ${LONGRUN_CLIENT2_REJOINS:-未记录}"
+            echo "- remove 次数: ${LONGRUN_REMOVE_COUNT:-未记录}"
+            echo "- evict 次数: ${LONGRUN_EVICT_COUNT:-未记录}"
+            echo "- 观测到的最长无推进窗口: ${LONGRUN_MAX_IDLE_OBSERVED_SEC:-未记录} 秒"
+            echo "- client1 探测命令失败次数: ${LONGRUN_CLIENT1_PROBE_FAILURES:-未记录}"
+            echo "- client2 探测命令失败次数: ${LONGRUN_CLIENT2_PROBE_FAILURES:-未记录}"
+            echo "- 采样文件: $DUAL_LONG_RUN_SAMPLES_TSV"
+            echo "- 自动结论: $LONGRUN_RESULT_REASON"
+        fi
         echo
         echo "## 说明"
         echo "- wfb_token_scheduler 可通过 -s <base_socket> 向 wfb_tx 的 <base_socket>.token socket 下发本机 Token 授权事件；dual 可用 -s node:base_socket,node:base_socket。"
+        echo "- dual-long-run 用于 v5 real-hardware 双客户端 Token-gated 上行长稳主场景；按 180 秒、总 grant>=60、每客户端 authorized_sends>=10、连续无推进窗口<=45 秒、remove/evict/额外 rejoin=0 的固定口径自动汇总。"
         echo "- KCP 小文件场景用于验证 Token 门控通过后的 KCP 层小文件闭环；40MB 和 10 节点压力测试不阻塞本阶段。"
         if [ -n "$KCP_SOURCE_SHA256$KCP_RECEIVED_SHA256" ]; then
             echo "- KCP 源文件 SHA256: ${KCP_SOURCE_SHA256:-未生成}"
@@ -226,6 +295,53 @@ count_scheduler_grants() {
         return
     fi
     grep -c '^grant seq=' "$logfile" 2>/dev/null || echo 0
+}
+
+count_grants_for_node() {
+    local logfile="$1"
+    local node_id="$2"
+    if [ ! -f "$logfile" ]; then
+        echo 0
+        return
+    fi
+    grep -Ec "^grant seq=.* node_id=$node_id " "$logfile" 2>/dev/null || echo 0
+}
+
+count_guard_events() {
+    local logfile="$1"
+    if [ ! -f "$logfile" ]; then
+        echo 0
+        return
+    fi
+    grep -Ec '^guard seq=' "$logfile" 2>/dev/null || echo 0
+}
+
+count_join_rejoin_for_node() {
+    local logfile="$1"
+    local node_id="$2"
+    if [ ! -f "$logfile" ]; then
+        echo 0
+        return
+    fi
+    grep -Ec "^join/rejoin node_id=$node_id " "$logfile" 2>/dev/null || echo 0
+}
+
+count_evict_events() {
+    local logfile="$1"
+    if [ ! -f "$logfile" ]; then
+        echo 0
+        return
+    fi
+    grep -Ec '^evict node_id=' "$logfile" 2>/dev/null || echo 0
+}
+
+count_remove_events() {
+    local logfile="$1"
+    if [ ! -f "$logfile" ]; then
+        echo 0
+        return
+    fi
+    grep -Ec '^remove node_id=' "$logfile" 2>/dev/null || echo 0
 }
 
 latest_token_filter_line() {
@@ -333,6 +449,34 @@ append_analysis() {
             echo "client2_token_filter=$(latest_token_filter_line "$LOG_DIR/client2.log")"
             echo "client2_token_auth=$(latest_token_auth_line "$LOG_DIR/client2.log")"
         fi
+    } >> "$TOKEN_CONTEXT_FILE"
+}
+
+append_dual_long_run_analysis() {
+    if [ -z "$LONGRUN_RESULT_REASON" ]; then
+        return
+    fi
+
+    {
+        echo "dual_long_run_target_duration_sec=${LONGRUN_TARGET_DURATION_SEC:-}"
+        echo "dual_long_run_actual_duration_sec=${LONGRUN_ACTUAL_DURATION_SEC:-}"
+        echo "dual_long_run_sample_count=${LONGRUN_SAMPLE_COUNT:-}"
+        echo "dual_long_run_total_grants=${LONGRUN_TOTAL_GRANTS:-}"
+        echo "dual_long_run_client1_grants=${LONGRUN_CLIENT1_GRANTS:-}"
+        echo "dual_long_run_client2_grants=${LONGRUN_CLIENT2_GRANTS:-}"
+        echo "dual_long_run_guard_count=${LONGRUN_GUARD_COUNT:-}"
+        echo "dual_long_run_client1_authorized=${LONGRUN_CLIENT1_AUTHORIZED:-}"
+        echo "dual_long_run_client2_authorized=${LONGRUN_CLIENT2_AUTHORIZED:-}"
+        echo "dual_long_run_server_data_packets=${LONGRUN_SERVER_DATA_PACKETS:-}"
+        echo "dual_long_run_client1_rejoins=${LONGRUN_CLIENT1_REJOINS:-}"
+        echo "dual_long_run_client2_rejoins=${LONGRUN_CLIENT2_REJOINS:-}"
+        echo "dual_long_run_remove_count=${LONGRUN_REMOVE_COUNT:-}"
+        echo "dual_long_run_evict_count=${LONGRUN_EVICT_COUNT:-}"
+        echo "dual_long_run_max_idle_observed_sec=${LONGRUN_MAX_IDLE_OBSERVED_SEC:-}"
+        echo "dual_long_run_client1_probe_failures=${LONGRUN_CLIENT1_PROBE_FAILURES:-}"
+        echo "dual_long_run_client2_probe_failures=${LONGRUN_CLIENT2_PROBE_FAILURES:-}"
+        echo "dual_long_run_samples_tsv=$DUAL_LONG_RUN_SAMPLES_TSV"
+        echo "dual_long_run_result=${LONGRUN_RESULT_REASON:-}"
     } >> "$TOKEN_CONTEXT_FILE"
 }
 
@@ -549,6 +693,229 @@ run_dual() {
     fi
 }
 
+
+run_dual_long_run() {
+    local scenario="dual-long-run"
+    if ! require_cmd TOKEN_SERVER_START_CMD || ! require_cmd TOKEN_CLIENT1_START_CMD || ! require_cmd TOKEN_CLIENT2_START_CMD || ! require_cmd TOKEN_SCHEDULER_CMD || ! require_cmd TOKEN_CLIENT1_PROBE_CMD || ! require_cmd TOKEN_CLIENT2_PROBE_CMD; then
+        record_result "$scenario" "SKIP" "缺少 TOKEN_SERVER_START_CMD / TOKEN_CLIENT1_START_CMD / TOKEN_CLIENT2_START_CMD / TOKEN_SCHEDULER_CMD / TOKEN_CLIENT1_PROBE_CMD / TOKEN_CLIENT2_PROBE_CMD"
+        return
+    fi
+
+    reset_runtime
+    : > "$DUAL_LONG_RUN_SAMPLES_TSV"
+    printf 'elapsed_sec\tgrants_total\tgrants_client1\tgrants_client2\tguard_count\tclient1_authorized\tclient1_denied\tclient2_authorized\tclient2_denied\tserver_data_packets\tclient1_join_rejoin\tclient2_join_rejoin\tevict_count\tremove_count\tclient1_probe_rc\tclient2_probe_rc\tprogress\n' > "$DUAL_LONG_RUN_SAMPLES_TSV"
+
+    run_bg "服务端" "$TOKEN_SERVER_START_CMD" "$LOG_DIR/server.log" || {
+        record_result "$scenario" "FAIL" "服务端启动失败"
+        return
+    }
+    run_bg "客户端1" "$TOKEN_CLIENT1_START_CMD" "$LOG_DIR/client1.log" || {
+        record_result "$scenario" "FAIL" "客户端1启动失败"
+        return
+    }
+    run_bg "客户端2" "$TOKEN_CLIENT2_START_CMD" "$LOG_DIR/client2.log" || {
+        record_result "$scenario" "FAIL" "客户端2启动失败"
+        return
+    }
+    run_bg "调度器" "$TOKEN_SCHEDULER_CMD" "$LOG_DIR/scheduler.log" || {
+        record_result "$scenario" "FAIL" "调度器启动失败"
+        return
+    }
+    sleep "$TOKEN_SCHEDULER_WARMUP"
+
+    local start_ts
+    local end_ts
+    local now_ts
+    local next_sample_ts
+    local actual_duration
+    local sample_count=0
+    local client1_probe_failures=0
+    local client2_probe_failures=0
+    local max_idle_observed_sec=0
+    local last_progress_ts
+    local previous_grants_total=0
+    local previous_client1_authorized=0
+    local previous_client2_authorized=0
+    local previous_server_data=0
+    local grants_total=0
+    local grants_client1=0
+    local grants_client2=0
+    local guard_count=0
+    local client1_authorized=0
+    local client1_denied=0
+    local client2_authorized=0
+    local client2_denied=0
+    local server_data_packets=0
+    local client1_join_rejoin=0
+    local client2_join_rejoin=0
+    local evict_count=0
+    local remove_count=0
+    local progress="NO"
+    local client1_probe_rc=0
+    local client2_probe_rc=0
+    local process_name=""
+    local process_pid=""
+
+    start_ts="$(date +%s)"
+    end_ts=$((start_ts + TOKEN_LONGRUN_DURATION_SEC))
+    next_sample_ts=$((start_ts + TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC))
+    last_progress_ts="$start_ts"
+
+    while :; do
+        now_ts="$(date +%s)"
+        if [ "$now_ts" -ge "$end_ts" ]; then
+            break
+        fi
+
+        for process_name in "服务端:${PIDS[0]}" "客户端1:${PIDS[1]}" "客户端2:${PIDS[2]}" "调度器:${PIDS[3]}"; do
+            process_pid="${process_name#*:}"
+            if ! kill -0 "$process_pid" 2>/dev/null; then
+                process_name="${process_name%%:*}"
+                LONGRUN_RESULT_REASON="$process_name 在 dual-long-run 期间提前退出"
+                record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+                return
+            fi
+        done
+
+        if run_probe "dual-long-run-client1" "$TOKEN_CLIENT1_PROBE_CMD" "$LOG_DIR/client1_probe.log"; then
+            client1_probe_rc=0
+        else
+            client1_probe_rc=1
+            client1_probe_failures=$((client1_probe_failures + 1))
+        fi
+
+        if run_probe "dual-long-run-client2" "$TOKEN_CLIENT2_PROBE_CMD" "$LOG_DIR/client2_probe.log"; then
+            client2_probe_rc=0
+        else
+            client2_probe_rc=1
+            client2_probe_failures=$((client2_probe_failures + 1))
+        fi
+
+        sleep "$TOKEN_LONGRUN_PROBE_INTERVAL_SEC"
+        now_ts="$(date +%s)"
+        if [ "$now_ts" -lt "$next_sample_ts" ] && [ "$now_ts" -lt "$end_ts" ]; then
+            continue
+        fi
+
+        grants_total="$(count_scheduler_grants "$LOG_DIR/scheduler.log")"
+        grants_client1="$(count_grants_for_node "$LOG_DIR/scheduler.log" 1)"
+        grants_client2="$(count_grants_for_node "$LOG_DIR/scheduler.log" 2)"
+        guard_count="$(count_guard_events "$LOG_DIR/scheduler.log")"
+        client1_authorized="$(extract_token_auth_field "$LOG_DIR/client1.log" authorized_sends)"
+        client1_denied="$(extract_token_auth_field "$LOG_DIR/client1.log" denied_sends)"
+        client2_authorized="$(extract_token_auth_field "$LOG_DIR/client2.log" authorized_sends)"
+        client2_denied="$(extract_token_auth_field "$LOG_DIR/client2.log" denied_sends)"
+        server_data_packets="$(extract_server_data_packets "$LOG_DIR/server.log")"
+        client1_join_rejoin="$(count_join_rejoin_for_node "$LOG_DIR/scheduler.log" 1)"
+        client2_join_rejoin="$(count_join_rejoin_for_node "$LOG_DIR/scheduler.log" 2)"
+        evict_count="$(count_evict_events "$LOG_DIR/scheduler.log")"
+        remove_count="$(count_remove_events "$LOG_DIR/scheduler.log")"
+        progress="NO"
+        if [ "$grants_total" -gt "$previous_grants_total" ] || [ "$client1_authorized" -gt "$previous_client1_authorized" ] || [ "$client2_authorized" -gt "$previous_client2_authorized" ] || [ "$server_data_packets" -gt "$previous_server_data" ]; then
+            progress="YES"
+            last_progress_ts="$now_ts"
+        fi
+
+        local idle_sec=$((now_ts - last_progress_ts))
+        if [ "$idle_sec" -gt "$max_idle_observed_sec" ]; then
+            max_idle_observed_sec="$idle_sec"
+        fi
+
+        printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "$((now_ts - start_ts))" \
+            "$grants_total" \
+            "$grants_client1" \
+            "$grants_client2" \
+            "$guard_count" \
+            "$client1_authorized" \
+            "$client1_denied" \
+            "$client2_authorized" \
+            "$client2_denied" \
+            "$server_data_packets" \
+            "$client1_join_rejoin" \
+            "$client2_join_rejoin" \
+            "$evict_count" \
+            "$remove_count" \
+            "$client1_probe_rc" \
+            "$client2_probe_rc" \
+            "$progress" >> "$DUAL_LONG_RUN_SAMPLES_TSV"
+        sample_count=$((sample_count + 1))
+
+        previous_grants_total="$grants_total"
+        previous_client1_authorized="$client1_authorized"
+        previous_client2_authorized="$client2_authorized"
+        previous_server_data="$server_data_packets"
+        next_sample_ts=$((next_sample_ts + TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC))
+    done
+
+    actual_duration=$(( $(date +%s) - start_ts ))
+    grants_total="$(count_scheduler_grants "$LOG_DIR/scheduler.log")"
+    grants_client1="$(count_grants_for_node "$LOG_DIR/scheduler.log" 1)"
+    grants_client2="$(count_grants_for_node "$LOG_DIR/scheduler.log" 2)"
+    guard_count="$(count_guard_events "$LOG_DIR/scheduler.log")"
+    client1_authorized="$(extract_token_auth_field "$LOG_DIR/client1.log" authorized_sends)"
+    client1_denied="$(extract_token_auth_field "$LOG_DIR/client1.log" denied_sends)"
+    client2_authorized="$(extract_token_auth_field "$LOG_DIR/client2.log" authorized_sends)"
+    client2_denied="$(extract_token_auth_field "$LOG_DIR/client2.log" denied_sends)"
+    server_data_packets="$(extract_server_data_packets "$LOG_DIR/server.log")"
+    client1_join_rejoin="$(count_join_rejoin_for_node "$LOG_DIR/scheduler.log" 1)"
+    client2_join_rejoin="$(count_join_rejoin_for_node "$LOG_DIR/scheduler.log" 2)"
+    evict_count="$(count_evict_events "$LOG_DIR/scheduler.log")"
+    remove_count="$(count_remove_events "$LOG_DIR/scheduler.log")"
+
+    LONGRUN_TARGET_DURATION_SEC="$TOKEN_LONGRUN_DURATION_SEC"
+    LONGRUN_ACTUAL_DURATION_SEC="$actual_duration"
+    LONGRUN_TOTAL_GRANTS="$grants_total"
+    LONGRUN_CLIENT1_GRANTS="$grants_client1"
+    LONGRUN_CLIENT2_GRANTS="$grants_client2"
+    LONGRUN_GUARD_COUNT="$guard_count"
+    LONGRUN_CLIENT1_AUTHORIZED="$client1_authorized"
+    LONGRUN_CLIENT2_AUTHORIZED="$client2_authorized"
+    LONGRUN_SERVER_DATA_PACKETS="$server_data_packets"
+    LONGRUN_CLIENT1_REJOINS="$(( client1_join_rejoin > 0 ? client1_join_rejoin - 1 : 0 ))"
+    LONGRUN_CLIENT2_REJOINS="$(( client2_join_rejoin > 0 ? client2_join_rejoin - 1 : 0 ))"
+    LONGRUN_REMOVE_COUNT="$remove_count"
+    LONGRUN_EVICT_COUNT="$evict_count"
+    LONGRUN_MAX_IDLE_OBSERVED_SEC="$max_idle_observed_sec"
+    LONGRUN_CLIENT1_PROBE_FAILURES="$client1_probe_failures"
+    LONGRUN_CLIENT2_PROBE_FAILURES="$client2_probe_failures"
+    LONGRUN_SAMPLE_COUNT="$sample_count"
+
+    if [ "$actual_duration" -lt "$TOKEN_LONGRUN_DURATION_SEC" ]; then
+        LONGRUN_RESULT_REASON="实际运行仅 ${actual_duration} 秒，未达到 ${TOKEN_LONGRUN_DURATION_SEC} 秒"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$grants_total" -lt "$TOKEN_LONGRUN_MIN_GRANTS" ]; then
+        LONGRUN_RESULT_REASON="grant 总数仅 $grants_total，低于最小门槛 $TOKEN_LONGRUN_MIN_GRANTS"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$grants_client1" -le 0 ] || [ "$grants_client2" -le 0 ]; then
+        LONGRUN_RESULT_REASON="未观察到两个 client 都拿到 grant (client1=$grants_client1 client2=$grants_client2)"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$guard_count" -le 0 ]; then
+        LONGRUN_RESULT_REASON="未观察到 guard 留痕，无法确认窗口持续推进"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$client1_authorized" -lt "$TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS" ] || [ "$client2_authorized" -lt "$TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS" ]; then
+        LONGRUN_RESULT_REASON="authorized_sends 未达最小门槛 (client1=$client1_authorized client2=$client2_authorized，门槛=$TOKEN_LONGRUN_MIN_AUTHORIZED_SENDS)"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$server_data_packets" -le 0 ]; then
+        LONGRUN_RESULT_REASON="server 未记录到上行数据包，无法证明长稳上行真实推进"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$LONGRUN_CLIENT1_REJOINS" -gt "$TOKEN_LONGRUN_MAX_REJOIN_COUNT" ] || [ "$LONGRUN_CLIENT2_REJOINS" -gt "$TOKEN_LONGRUN_MAX_REJOIN_COUNT" ]; then
+        LONGRUN_RESULT_REASON="出现超门槛 rejoin 抖动 (client1=$LONGRUN_CLIENT1_REJOINS client2=$LONGRUN_CLIENT2_REJOINS，门槛=$TOKEN_LONGRUN_MAX_REJOIN_COUNT)"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$remove_count" -gt "$TOKEN_LONGRUN_MAX_REMOVE_COUNT" ]; then
+        LONGRUN_RESULT_REASON="remove 次数 $remove_count 超出门槛 $TOKEN_LONGRUN_MAX_REMOVE_COUNT"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$evict_count" -gt "$TOKEN_LONGRUN_MAX_EVICT_COUNT" ]; then
+        LONGRUN_RESULT_REASON="evict 次数 $evict_count 超出门槛 $TOKEN_LONGRUN_MAX_EVICT_COUNT"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    elif [ "$max_idle_observed_sec" -gt "$TOKEN_LONGRUN_MAX_IDLE_SEC" ]; then
+        LONGRUN_RESULT_REASON="最长无推进窗口 ${max_idle_observed_sec} 秒，超出门槛 $TOKEN_LONGRUN_MAX_IDLE_SEC 秒"
+        record_result "$scenario" "FAIL" "$LONGRUN_RESULT_REASON"
+    else
+        LONGRUN_RESULT_REASON="双客户端长稳场景满足固定口径 (duration=${actual_duration}s grants=$grants_total guard=$guard_count client1_auth=$client1_authorized client2_auth=$client2_authorized server_data=$server_data_packets max_idle=${max_idle_observed_sec}s remove=$remove_count evict=$evict_count rejoin1=$LONGRUN_CLIENT1_REJOINS rejoin2=$LONGRUN_CLIENT2_REJOINS)"
+        record_result "$scenario" "PASS" "$LONGRUN_RESULT_REASON"
+    fi
+}
 run_kcp_small() {
     local scenario="kcp-small"
     if ! require_cmd TOKEN_SERVER_START_CMD || ! require_cmd TOKEN_CLIENT1_START_CMD || ! require_cmd TOKEN_SCHEDULER_CMD || ! require_cmd KCP_RECEIVER_CMD || ! require_cmd KCP_SENDER_CMD; then
@@ -644,6 +1011,9 @@ run_selected_scenarios() {
         dual)
             run_dual
             ;;
+        dual-long-run)
+            run_dual_long_run
+            ;;
         kcp-small)
             run_kcp_small
             ;;
@@ -677,6 +1047,7 @@ main() {
     fi
 
     append_analysis
+    append_dual_long_run_analysis
     render_markdown_results
 
     echo "========================================"

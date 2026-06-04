@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --help|-h)
-            echo "用法: sudo bash tests/real_hardware/one_click_test.sh [--token [--token-scenario single|dual|expiry|all]]"
+            echo "用法: sudo bash tests/real_hardware/one_click_test.sh [--token [--token-scenario single|dual|dual-long-run|expiry|all]]"
             exit 0
             ;;
         *)

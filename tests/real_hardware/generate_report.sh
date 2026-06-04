@@ -152,6 +152,7 @@ EOF
     echo "  - token_results.md: Token 验收摘要" >> "$LOG_DIR/summary.txt"
     echo "  - token_results.tsv: Token 验收原始结果" >> "$LOG_DIR/summary.txt"
     echo "  - token_context.txt: Token 验收上下文与自动分析摘录" >> "$LOG_DIR/summary.txt"
+    echo "  - dual_long_run_samples.tsv: 双客户端长稳主场景采样留痕" >> "$LOG_DIR/summary.txt"
     echo "  - capture.pcap: 网络抓包（如启用）" >> "$LOG_DIR/summary.txt"
     
     log_pass "摘要文件已生成: $LOG_DIR/summary.txt"
