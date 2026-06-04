@@ -573,6 +573,14 @@ render_result() {
 - 若自动判定为 PASS，但样本中出现接近门槛的平台期，仍需人工说明其上下文。
 - 若启用了抓包，请将 capture.pcap 与摘要结论一起归档到 issue / tracking issue。
 
+## 正式归档要求
+
+- 原始产物层至少保留 `downlink_results.md`、`downlink_context.txt`、`downlink_samples.tsv`、`metrics.json`、`summary.txt` 与关键日志/抓包。
+- 正式结论层必须回填到 issue / tracking issue，不能只把日志目录留在本地。
+- Issue 回填最小字段：运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 `v5` 基线证据、是否需要重跑。
+- tracking issue 未按固定模板回填正式结论前不得关闭。
+
+
 ## 关键产物
 
 - $DOWNLINK_CONTEXT_FILE

@@ -224,6 +224,12 @@ render_markdown_results() {
             echo "- 自动结论: $LONGRUN_RESULT_REASON"
         fi
         echo
+        echo "## 正式归档要求"
+        echo "- 原始产物层至少保留: token_results.md、token_context.txt、dual_long_run_samples.tsv、scheduler.log、server.log、client1.log、client2.log。"
+        echo "- 正式结论层必须回填到 issue / tracking issue，不能只把日志留在本地目录。"
+        echo "- Issue 回填最小字段: 运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 v5 基线证据、是否需要重跑。"
+        echo "- tracking issue 未按固定模板回填正式结论前不得关闭。"
+        echo
         echo "## 说明"
         echo "- wfb_token_scheduler 可通过 -s <base_socket> 向 wfb_tx 的 <base_socket>.token socket 下发本机 Token 授权事件；dual 可用 -s node:base_socket,node:base_socket。"
         echo "- dual-long-run 用于 v5 real-hardware 双客户端 Token-gated 上行长稳主场景；按 180 秒、总 grant>=60、每客户端 authorized_sends>=10、连续无推进窗口<=45 秒、remove/evict/额外 rejoin=0 的固定口径自动汇总。"

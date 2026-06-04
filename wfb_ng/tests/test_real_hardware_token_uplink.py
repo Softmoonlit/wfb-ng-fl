@@ -192,6 +192,8 @@ class DualLongRunScriptTestCase(unittest.TestCase):
             self.assertIn('## dual-long-run 摘要', result_text)
             self.assertIn('- 目标时长: 3 秒', result_text)
             self.assertIn('- 采样文件: {path}'.format(path=samples_file), result_text)
+            self.assertIn('## 正式归档要求', result_text)
+            self.assertIn('tracking issue 未按固定模板回填正式结论前不得关闭', result_text)
             self.assertIn('dual_long_run_total_grants=', context_text)
             self.assertIn('dual_long_run_result=双客户端长稳场景满足固定口径', context_text)
             self.assertIn('elapsed_sec\tgrants_total', samples_text)

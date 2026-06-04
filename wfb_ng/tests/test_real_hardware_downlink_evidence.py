@@ -203,6 +203,10 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('共享下行/分发证据: N/A（single 场景）', summary_text)
             self.assertIn('--- 需要人工判读 ---', summary_text)
             self.assertIn('downlink_samples.tsv', summary_text)
+            self.assertIn('--- Issue 回填最小字段 ---', summary_text)
+            self.assertIn('是否可作为正式 v5 基线证据', summary_text)
+            self.assertIn('## 正式归档要求', result_text)
+            self.assertIn('tracking issue 未按固定模板回填正式结论前不得关闭', result_text)
 
             payload_file = os.path.join(log_dir, 'downlink_payload.bin')
             self.assertEqual(self.file_sha256(payload_file), self.file_sha256(received_file))
@@ -235,6 +239,7 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('receiver_count=2', context_text)
             self.assertIn('shared_distribution_confirmed=yes', context_text)
             self.assertIn('共享下行/分发证据: PASS', summary_text)
+            self.assertIn('--- Issue 回填最小字段 ---', summary_text)
 
             payload_file = os.path.join(log_dir, 'downlink_payload.bin')
             expected_sha = self.file_sha256(payload_file)
@@ -271,5 +276,7 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('result_reason=连续无推进窗口超过 1 秒', context_text)
             self.assertIn('"stall_events": 1', metrics_text)
             self.assertIn('自动结论: FAIL', summary_text)
+            self.assertIn('--- Issue 回填最小字段 ---', summary_text)
+            self.assertIn('## 正式归档要求', result_text)
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)

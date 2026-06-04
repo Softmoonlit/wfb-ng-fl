@@ -157,6 +157,16 @@ $token_line
 - 结合 uftp_server.log、client1/2 uftpd.log 与底层 server/client 日志，解释时延抬升、重传增加、恢复变慢。
 - 若启用了 capture.pcap，请将抓包与本摘要、人工判读结论一起归档到 issue / tracking issue。
 
+--- Issue 回填最小字段 ---
+- 运行场景与前置条件
+- 原始产物层引用（日志目录、关键附件、自动摘要文件）
+- 运行时长与关键事件计数
+- 关键异常与风险信号
+- 是否可作为正式 v5 基线证据
+- 是否需要重跑
+- tracking issue 未按固定模板回填正式结论前不得关闭
+
+
 --- 归档产物 ---
 - $DOWNLINK_CONTEXT_FILE
 - $sample_file

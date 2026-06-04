@@ -8,6 +8,8 @@
 - [通用环境准备](#通用环境准备)
 - [v1-mainline 真实硬件 monitor 主线验收](#v1-mainline-真实硬件-monitor-主线验收)
 - [Token-gated split-process 测试](#token-gated-split-process-测试)
+- [v5 下行补充证据场景](#v5-下行补充证据场景)
+- [`v5` 正式证据包与双层归档](#v5-正式证据包与双层归档)
 - [跨机器 KCP 小文件上传测试](#跨机器-kcp-小文件上传测试)
 - [参考资料](#参考资料)
 
@@ -504,6 +506,103 @@ LOG_DIR=tests/logs/<已有目录> \
 - 即使自动结论为 PASS，也要检查样本文件是否出现接近门槛的平台期
 - 结合 `uftp_server.log`、接收端日志与底层 `server/client` 日志，解释时延抬升、重传增加、恢复变慢
 - 若启用了 `capture.pcap`，将抓包与摘要、人工判读结论一起归档到 issue / tracking issue
+
+## `v5` 正式证据包与双层归档
+
+> 适用范围：issue #13，以及后续 `v5` tracking issue 收口。该章节固定 `v5` real-hardware 线的正式证据包结构、人工判读模板与归档规则。
+
+### 什么时候需要形成正式证据包
+
+- 完成双客户端 Token-gated 上行 `dual-long-run` 主场景后
+- 完成下行补充证据场景（`single` 或 `shared`）后
+- 准备把本轮 real-hardware 结果回填到对应 GitHub issue / tracking issue 时
+
+### 双层归档结构
+
+#### 1. 原始产物层
+
+原始产物层保留在约定日志目录，不进入仓库版本历史。至少需要保留：
+
+- **上行主场景**：`token_results.md`、`token_context.txt`、`dual_long_run_samples.tsv`、`scheduler.log`、`server.log`、`client1.log`、`client2.log`
+- **下行补充场景**：`downlink_results.md`、`downlink_context.txt`、`downlink_samples.tsv`、`metrics.json`、`summary.txt`、`uftp_server.log`、接收端日志、关键底层日志
+- **可选但推荐**：`capture.pcap`、`pcap_capture.log`、现场截图、网卡模式/信道留痕、执行命令快照
+
+要求：
+
+- 原始产物层必须能回溯到本次运行的固定口径与自动结论
+- 可以放在本地日志目录、共享存储或等价附件位置，但 issue 中必须给出可定位引用
+- 不允许只在聊天或口头说明中留痕
+
+#### 2. 正式结论层
+
+正式结论层回填到对应 GitHub issue / tracking issue，用于 `v6` 前后对照。最小回填单元不是“日志目录已存在”，而是一份**人工判读后的正式结论**。
+
+正式结论层必须至少包含以下字段：
+
+- 运行场景与前置条件
+- 原始产物层引用（日志目录、关键附件、自动摘要文件）
+- 运行时长与关键事件计数
+- 关键异常与风险信号
+- 是否可作为正式 `v5` 基线证据
+- 是否需要重跑
+
+### 固定人工判读模板
+
+回填 issue / tracking issue 时，使用以下 Markdown 模板：
+
+```md
+## v5 real-hardware 正式证据结论
+
+- 运行批次：<日期 / 执行人 / 机器标识>
+- 对应 issue：<#11 主场景 / #12 补充场景 / tracking issue>
+- 结论状态：PASS / FAIL / 需重跑
+
+### 运行场景与前置条件
+- 上行主场景：dual-long-run / 未运行
+- 下行补充场景：single / shared / 未运行
+- 无线拓扑与网卡：<server/client 网卡、是否跨机、信道、monitor 模式留痕>
+- 固定口径：<时长、采样周期、关键门槛、payload 大小、receiver_count>
+- 关键启动命令或配置偏差：<若与 TEST_GUIDE 默认口径不同，必须写明>
+
+### 原始产物层引用
+- 上行日志目录：<路径或附件链接>
+- 下行日志目录：<路径或附件链接>
+- 自动摘要文件：<token_results.md / summary.txt / metrics.json / 其他>
+- 关键附件：<capture.pcap / 截图 / 外部存储链接 / 无>
+
+### 运行时长与关键事件计数
+- dual-long-run：<实际时长、总 grant、client1/2 authorized_sends、最大无推进窗口、remove/evict/额外 rejoin>
+- downlink：<传输耗时、retries、stall_events、最大无推进窗口、receiver_count、shared 分发结论>
+- 文件完整性：<SHA256 是否一致>
+
+### 关键异常与风险信号
+- 时延抬升：<无 / 有，现象与上下文>
+- 重传增加：<无 / 有，现象与上下文>
+- 丢包或传输停滞：<无 / 有，现象与上下文>
+- 控制面抖动：<无 / 有，join/rejoin/remove/evict 解释>
+- 恢复能力变化：<无 / 有，现象与上下文>
+- 无法解释的异常：<无 / 有，若有必须阻断基线结论>
+
+### 人工判读结论
+- 是否可作为正式 `v5` 基线证据：是 / 否
+- 是否需要重跑：否 / 是（触发原因与重跑建议）
+- 对 `v6` 的风险提示：<若无则写“无新增风险”>
+```
+
+### tracking issue 关闭前置条件
+
+只有同时满足以下条件，`v5` tracking issue 才能关闭：
+
+- `dual-long-run` 主场景和下行补充场景都已有可定位的原始产物层引用
+- 对应 issue / tracking issue 已按上面的固定模板回填正式结论层
+- 正式结论明确写出“可作为正式 `v5` 基线证据”或“需要重跑”
+- 若存在抓包、外部日志目录或共享存储链接，issue 中已附上可追溯引用
+
+反例：
+
+- 只有本地日志目录，没有 issue 回填
+- 只有自动摘要，没有人工判读结论
+- 只有“看起来没问题”的口头描述，没有固定字段和证据引用
 
 ---
 
