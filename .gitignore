@@ -53,8 +53,7 @@ src/*.tx_gate_test.o
 /uftpd
 
 # Twisted 临时目录
-_trial_temp/
-_trial_temp-*/
+_trial*/
 
 # 生成的密钥与配置
 /gs.key

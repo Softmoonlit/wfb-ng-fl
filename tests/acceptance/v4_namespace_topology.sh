@@ -56,6 +56,25 @@ CLIENT2_TCP_UPDATE_CLIENT_LOG="$CLIENT2_DIR/tcp_update_client.log"
 CLIENT1_TCP_UPDATE_CLIENT_STATUS="$CLIENT1_DIR/tcp_update_client.status"
 CLIENT2_TCP_UPDATE_CLIENT_STATUS="$CLIENT2_DIR/tcp_update_client.status"
 TCP_UPDATE_CLIENTS_GATE="$LOG_DIR/tcp_update_clients.go"
+TOKEN_BRIDGE_LOG="$LOG_DIR/token_namespace_bridge.log"
+TOKEN_SCHEDULER_LOG="$LOG_DIR/token_scheduler.log"
+CLIENT1_TOKEN_UPLINK_RX_LOG="$CLIENT1_DIR/token_gated_uplink_rx.log"
+CLIENT2_TOKEN_UPLINK_RX_LOG="$CLIENT2_DIR/token_gated_uplink_rx.log"
+CLIENT1_TOKEN_TX_LOG="$CLIENT1_DIR/token_gated_wfb_tx.log"
+CLIENT2_TOKEN_TX_LOG="$CLIENT2_DIR/token_gated_wfb_tx.log"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE="$CLIENT1_DIR/token_gated_tcp_update.bin"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE="$CLIENT2_DIR/token_gated_tcp_update.bin"
+SERVER_CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE="$SERVER_DIR/client1_token_gated_tcp_update.bin"
+SERVER_CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE="$SERVER_DIR/client2_token_gated_tcp_update.bin"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG="$SERVER_DIR/client1_token_gated_tcp_update_receiver.log"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG="$SERVER_DIR/client2_token_gated_tcp_update_receiver.log"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_STATUS="$SERVER_DIR/client1_token_gated_tcp_update_receiver.status"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_STATUS="$SERVER_DIR/client2_token_gated_tcp_update_receiver.status"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG="$CLIENT1_DIR/token_gated_tcp_update_client.log"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG="$CLIENT2_DIR/token_gated_tcp_update_client.log"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_STATUS="$CLIENT1_DIR/token_gated_tcp_update_client.status"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_STATUS="$CLIENT2_DIR/token_gated_tcp_update_client.status"
+TOKEN_GATED_TCP_UPDATE_CLIENTS_GATE="$LOG_DIR/token_gated_tcp_update_clients.go"
 
 SERVER_NS="${SERVER_NS:-v4-server}"
 CLIENT1_NS="${CLIENT1_NS:-v4-client1}"
@@ -112,6 +131,25 @@ TCP_CLIENT1_PORT="${TCP_CLIENT1_PORT:-15001}"
 TCP_CLIENT2_PORT="${TCP_CLIENT2_PORT:-15002}"
 TCP_UPDATE_PAYLOAD_SIZE="${TCP_UPDATE_PAYLOAD_SIZE:-262144}"
 TCP_UPDATE_TIMEOUT_SEC="${TCP_UPDATE_TIMEOUT_SEC:-30}"
+TOKEN_READY_BASE="${TOKEN_READY_BASE:-wfb-scheduler}"
+SERVER_TOKEN_GRANT_BASE="${SERVER_TOKEN_GRANT_BASE:-wfb-v4-token-grant}"
+CLIENT1_TOKEN_GRANT_BASE="${CLIENT1_TOKEN_GRANT_BASE:-$CLIENT1_TUN_PEER_PORT}"
+CLIENT2_TOKEN_GRANT_BASE="${CLIENT2_TOKEN_GRANT_BASE:-$CLIENT2_TUN_PEER_PORT}"
+TOKEN_DURATION_MS="${TOKEN_DURATION_MS:-500}"
+TOKEN_GUARD_MS="${TOKEN_GUARD_MS:-100}"
+CLIENT1_TOKEN_UPLINK_RX_DEBUG_PORT="${CLIENT1_TOKEN_UPLINK_RX_DEBUG_PORT:-6931}"
+CLIENT2_TOKEN_UPLINK_RX_DEBUG_PORT="${CLIENT2_TOKEN_UPLINK_RX_DEBUG_PORT:-6932}"
+TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE="${TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE:-1048576}"
+TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC="${TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC:-60}"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256="未生成"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256="未生成"
+CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256="未收到"
+CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256="未收到"
+CLIENT1_TOKEN_GATED_GRANT_COUNT="0"
+CLIENT2_TOKEN_GATED_GRANT_COUNT="0"
+CLIENT1_TOKEN_GATED_AUTHORIZED_SENDS="0"
+CLIENT2_TOKEN_GATED_AUTHORIZED_SENDS="0"
+TOKEN_GATED_REMOVE_COUNT="0"
 CLIENT1_TCP_UPDATE_SOURCE_SHA256="未生成"
 CLIENT2_TCP_UPDATE_SOURCE_SHA256="未生成"
 CLIENT1_TCP_UPDATE_RECEIVED_SHA256="未收到"
@@ -143,6 +181,16 @@ CLIENT1_TCP_UPDATE_RECEIVER_PID=""
 CLIENT2_TCP_UPDATE_RECEIVER_PID=""
 CLIENT1_TCP_UPDATE_CLIENT_PID=""
 CLIENT2_TCP_UPDATE_CLIENT_PID=""
+TOKEN_BRIDGE_PID=""
+TOKEN_SCHEDULER_PID=""
+CLIENT1_TOKEN_UPLINK_RX_PID=""
+CLIENT2_TOKEN_UPLINK_RX_PID=""
+CLIENT1_TOKEN_TX_PID=""
+CLIENT2_TOKEN_TX_PID=""
+CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID=""
+CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID=""
+CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_PID=""
+CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_PID=""
 
 log_info() { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass() { echo "[PASS] $(date '+%H:%M:%S') $1"; }
@@ -248,6 +296,39 @@ render_result() {
 - client1 TCP upload 日志: $CLIENT1_TCP_UPDATE_CLIENT_LOG
 - client2 TCP upload 日志: $CLIENT2_TCP_UPDATE_CLIENT_LOG
 
+## Token-gated 最小受压双客户端上行回归
+
+- Token-gated TCP update payload size: $TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE bytes
+- token_duration_ms: $TOKEN_DURATION_MS
+- token_guard_ms: $TOKEN_GUARD_MS
+- token ready 入口: $TOKEN_READY_BASE
+- token grant 入口: $SERVER_TOKEN_GRANT_BASE
+- client1 token grant 入口: $CLIENT1_NS / $CLIENT1_TOKEN_GRANT_BASE
+- client2 token grant 入口: $CLIENT2_NS / $CLIENT2_TOKEN_GRANT_BASE
+- client1 token-gated source: $CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE
+- client1 token-gated source sha256: $CLIENT1_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256
+- client1 token-gated received: $SERVER_CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE
+- client1 token-gated received sha256: $CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256
+- client2 token-gated source: $CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE
+- client2 token-gated source sha256: $CLIENT2_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256
+- client2 token-gated received: $SERVER_CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE
+- client2 token-gated received sha256: $CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256
+- client1 token-gated grant count: $CLIENT1_TOKEN_GATED_GRANT_COUNT
+- client2 token-gated grant count: $CLIENT2_TOKEN_GATED_GRANT_COUNT
+- client1 token-gated authorized sends: $CLIENT1_TOKEN_GATED_AUTHORIZED_SENDS
+- client2 token-gated authorized sends: $CLIENT2_TOKEN_GATED_AUTHORIZED_SENDS
+- token-gated remove count: $TOKEN_GATED_REMOVE_COUNT
+- token bridge 日志: $TOKEN_BRIDGE_LOG
+- token scheduler 日志: $TOKEN_SCHEDULER_LOG
+- client1 token uplink rx 日志: $CLIENT1_TOKEN_UPLINK_RX_LOG
+- client2 token uplink rx 日志: $CLIENT2_TOKEN_UPLINK_RX_LOG
+- client1 token wfb_tx 日志: $CLIENT1_TOKEN_TX_LOG
+- client2 token wfb_tx 日志: $CLIENT2_TOKEN_TX_LOG
+- client1 token-gated TCP receiver 日志: $CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG
+- client2 token-gated TCP receiver 日志: $CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG
+- client1 token-gated TCP upload 日志: $CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG
+- client2 token-gated TCP upload 日志: $CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG
+
 ## 关键日志
 
 - server wfb_tun: $SERVER_TUN_LOG
@@ -268,6 +349,16 @@ render_result() {
 - client2 TCP update receiver: $CLIENT2_TCP_UPDATE_RECEIVER_LOG
 - client1 TCP update client: $CLIENT1_TCP_UPDATE_CLIENT_LOG
 - client2 TCP update client: $CLIENT2_TCP_UPDATE_CLIENT_LOG
+- token bridge: $TOKEN_BRIDGE_LOG
+- token scheduler: $TOKEN_SCHEDULER_LOG
+- client1 token uplink rx: $CLIENT1_TOKEN_UPLINK_RX_LOG
+- client2 token uplink rx: $CLIENT2_TOKEN_UPLINK_RX_LOG
+- client1 token wfb_tx: $CLIENT1_TOKEN_TX_LOG
+- client2 token wfb_tx: $CLIENT2_TOKEN_TX_LOG
+- client1 token-gated TCP update receiver: $CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG
+- client2 token-gated TCP update receiver: $CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG
+- client1 token-gated TCP update client: $CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG
+- client2 token-gated TCP update client: $CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG
 - build: $BUILD_LOG
 
 ## 当前 v4 覆盖范围
@@ -285,6 +376,8 @@ render_result() {
 - 已覆盖: TCP per-client 上行 update payload
 - 已覆盖: server 同时监听两个独立 TCP 端口，client1/client2 并发上传 update payload
 - 已覆盖: server 端 TCP update payload sha256 校验
+- 已覆盖: Token-gated 双客户端最小受压 TCP per-client 上行回归
+- 已覆盖: grant 持续推进、双 client 实际获得授权发送机会、无 remove 抖动的自动判定
 - 已覆盖: 成功与失败路径的 namespace 和后台进程清理
 
 ## 当前 v4 未覆盖范围
@@ -425,6 +518,8 @@ build_acceptance_binaries() {
         wfb_tun
         wfb_tx
         wfb_rx
+        wfb_token_namespace_bridge
+        wfb_token_scheduler
         wfb_keygen
     )
     local binary
@@ -442,7 +537,7 @@ build_acceptance_binaries() {
         log_pass "v4 acceptance 二进制已存在"
     else
         log_info "构建 v4 acceptance 所需二进制"
-        if ! make wfb_tun wfb_tx wfb_rx wfb_keygen > "$BUILD_LOG" 2>&1; then
+        if ! make wfb_tun wfb_tx wfb_rx wfb_token_namespace_bridge wfb_token_scheduler wfb_keygen > "$BUILD_LOG" 2>&1; then
             set_fail_reason "构建 v4 acceptance 二进制失败，查看日志: $BUILD_LOG"
             return 1
         fi
@@ -616,6 +711,271 @@ verify_management_ping() {
         return 1
     fi
     log_pass "$title 成功"
+}
+
+wait_for_log_pattern() {
+    local logfile="$1"
+    local pattern="$2"
+    local title="$3"
+    local tries="${4:-60}"
+    local i
+
+    for ((i = 0; i < tries; i++)); do
+        if [ -f "$logfile" ] && grep -Fq "$pattern" "$logfile"; then
+            log_pass "$title"
+            return 0
+        fi
+        sleep 0.25
+    done
+
+    set_fail_reason "$title 未在日志中出现: $logfile"
+    return 1
+}
+
+stop_pid_if_running() {
+    local pid_var="$1"
+    local pid="${!pid_var:-}"
+
+    if [ -n "$pid" ]; then
+        kill "$pid" 2>/dev/null || true
+        wait "$pid" 2>/dev/null || true
+        printf -v "$pid_var" '%s' ""
+    fi
+}
+
+start_token_namespace_bridge() {
+    local pid
+
+    log_info "启动测试专用跨 namespace Token 控制桥"
+    "$PROJECT_ROOT/wfb_token_namespace_bridge" \
+        -S "$SERVER_NS" \
+        -r "$TOKEN_READY_BASE" \
+        -g "$SERVER_TOKEN_GRANT_BASE" \
+        -n "$CLIENT1_NODE_ID:$CLIENT1_NS:$CLIENT1_TOKEN_GRANT_BASE" \
+        -n "$CLIENT2_NODE_ID:$CLIENT2_NS:$CLIENT2_TOKEN_GRANT_BASE" > "$TOKEN_BRIDGE_LOG" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    TOKEN_BRIDGE_PID="$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "测试专用 Token 控制桥启动失败，查看日志: $TOKEN_BRIDGE_LOG"
+        return 1
+    fi
+}
+
+start_token_scheduler() {
+    local pid
+
+    log_info "在 $SERVER_NS 启动 Token scheduler"
+    ip netns exec "$SERVER_NS" "$PROJECT_ROOT/wfb_token_scheduler" \
+        -n "$CLIENT1_NODE_ID,$CLIENT2_NODE_ID" \
+        -d "$TOKEN_DURATION_MS" \
+        -g "$TOKEN_GUARD_MS" \
+        -s "$SERVER_TOKEN_GRANT_BASE" > "$TOKEN_SCHEDULER_LOG" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    TOKEN_SCHEDULER_PID="$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "Token scheduler 启动失败，查看日志: $TOKEN_SCHEDULER_LOG"
+        return 1
+    fi
+}
+
+start_client_token_uplink_rx() {
+    local namespace="$1"
+    local debug_port="$2"
+    local server_mgmt_ip="$3"
+    local logfile="$4"
+    local pid_var="$5"
+    local pid
+
+    log_info "在 $namespace 启动 token-gated uplink wfb_rx"
+    ip netns exec "$namespace" "$PROJECT_ROOT/wfb_rx" \
+        -a "$debug_port" \
+        -K "$PROJECT_ROOT/gs.key" \
+        -c "$server_mgmt_ip" \
+        -u "$SERVER_TUN_LISTEN_PORT" \
+        -N 0 \
+        -i "$LINK_ID" \
+        -e "$EPOCH" \
+        -R 524288 \
+        -s 524288 > "$logfile" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "$namespace 的 token-gated uplink wfb_rx 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
+start_client_token_tx() {
+    local namespace="$1"
+    local node_id="$2"
+    local input_port="$3"
+    local debug_port="$4"
+    local logfile="$5"
+    local pid_var="$6"
+    local pid
+
+    log_info "在 $namespace 启动 token-gated wfb_tx"
+    ip netns exec "$namespace" "$PROJECT_ROOT/wfb_tx" \
+        -g \
+        -q "$node_id" \
+        -K "$PROJECT_ROOT/drone.key" \
+        -u "$input_port" \
+        -D "$debug_port" \
+        -i "$LINK_ID" \
+        -e "$EPOCH" \
+        -R 524288 \
+        -s 524288 \
+        "$namespace-token-uplink" > "$logfile" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pid_var" '%s' "$pid"
+
+    sleep "$STARTUP_WAIT_SEC"
+    if ! kill -0 "$pid" 2>/dev/null; then
+        set_fail_reason "$namespace 的 token-gated wfb_tx 启动失败，查看日志: $logfile"
+        return 1
+    fi
+}
+
+count_grants_for_node() {
+    local node_id="$1"
+    grep -Ec "^grant seq=.* node_id=$node_id " "$TOKEN_SCHEDULER_LOG" 2>/dev/null || true
+}
+
+count_join_rejoin_for_node() {
+    local node_id="$1"
+    grep -Ec "^join/rejoin node_id=$node_id " "$TOKEN_SCHEDULER_LOG" 2>/dev/null || true
+}
+
+count_remove_events() {
+    grep -Ec '^remove node_id=' "$TOKEN_SCHEDULER_LOG" 2>/dev/null || true
+}
+
+extract_token_auth_line() {
+    local logfile="$1"
+    if [ ! -f "$logfile" ]; then
+        return
+    fi
+    grep 'TOKEN_AUTH' "$logfile" 2>/dev/null | tail -1 || true
+}
+
+extract_token_auth_field() {
+    local logfile="$1"
+    local field="$2"
+    local line
+
+    line="$(extract_token_auth_line "$logfile")"
+    if [[ ! "$line" =~ TOKEN_AUTH[[:space:]]+([0-9]+):([0-9]+):([0-9]+):([0-9]+) ]]; then
+        echo 0
+        return
+    fi
+
+    case "$field" in
+        accepted_events) echo "${BASH_REMATCH[1]}" ;;
+        rejected_events) echo "${BASH_REMATCH[2]}" ;;
+        authorized_sends) echo "${BASH_REMATCH[3]}" ;;
+        denied_sends) echo "${BASH_REMATCH[4]}" ;;
+        *) echo 0 ;;
+    esac
+}
+
+assert_client_authorized_progress() {
+    local logfile="$1"
+    local title="$2"
+    local authorized_sends
+
+    authorized_sends="$(extract_token_auth_field "$logfile" authorized_sends)"
+    if [ "$authorized_sends" -le 0 ]; then
+        set_fail_reason "$title 未产生授权发送进展，查看日志: $logfile"
+        return 1
+    fi
+
+    log_pass "$title 产生授权发送进展"
+}
+
+assert_scheduler_rotated_two_clients() {
+    local line
+    local grant_node
+    local previous_node=""
+    local alternating_streak=0
+    local streak_seen_client1="否"
+    local streak_seen_client2="否"
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^grant\ seq=.*node_id=([0-9]+).*active_queue=\[([0-9]+),([0-9]+)\] ]]; then
+            if [ "${BASH_REMATCH[2]}" = "${BASH_REMATCH[3]}" ]; then
+                continue
+            fi
+
+            grant_node="${BASH_REMATCH[1]}"
+            if [ -n "$previous_node" ] && [ "$grant_node" = "$previous_node" ]; then
+                alternating_streak=1
+                streak_seen_client1="否"
+                streak_seen_client2="否"
+            else
+                alternating_streak=$((alternating_streak + 1))
+            fi
+
+            if [ "$grant_node" = "$CLIENT1_NODE_ID" ]; then
+                streak_seen_client1="是"
+            fi
+            if [ "$grant_node" = "$CLIENT2_NODE_ID" ]; then
+                streak_seen_client2="是"
+            fi
+
+            if [ "$alternating_streak" -ge 4 ] && [ "$streak_seen_client1" = "是" ] && [ "$streak_seen_client2" = "是" ]; then
+                log_pass "最小受压场景下双客户端按 Token Passing 轮换获得 grant"
+                return 0
+            fi
+
+            previous_node="$grant_node"
+        fi
+    done < "$TOKEN_SCHEDULER_LOG"
+
+    set_fail_reason "未观察到最小受压场景下稳定的双客户端 grant 交替窗口"
+    return 1
+}
+
+assert_token_gated_minimal_pressure_signals() {
+    CLIENT1_TOKEN_GATED_GRANT_COUNT="$(count_grants_for_node "$CLIENT1_NODE_ID")"
+    CLIENT2_TOKEN_GATED_GRANT_COUNT="$(count_grants_for_node "$CLIENT2_NODE_ID")"
+    CLIENT1_TOKEN_GATED_AUTHORIZED_SENDS="$(extract_token_auth_field "$CLIENT1_TOKEN_TX_LOG" authorized_sends)"
+    CLIENT2_TOKEN_GATED_AUTHORIZED_SENDS="$(extract_token_auth_field "$CLIENT2_TOKEN_TX_LOG" authorized_sends)"
+    TOKEN_GATED_REMOVE_COUNT="$(count_remove_events)"
+
+    if [ "$CLIENT1_TOKEN_GATED_GRANT_COUNT" -le 0 ]; then
+        set_fail_reason "最小受压场景未观察到 client1 grant 留痕"
+        return 1
+    fi
+    if [ "$CLIENT2_TOKEN_GATED_GRANT_COUNT" -le 0 ]; then
+        set_fail_reason "最小受压场景未观察到 client2 grant 留痕"
+        return 1
+    fi
+    if [ "$TOKEN_GATED_REMOVE_COUNT" -ne 0 ]; then
+        set_fail_reason "最小受压场景出现 remove 抖动，查看日志: $TOKEN_SCHEDULER_LOG"
+        return 1
+    fi
+    if [ "$(count_join_rejoin_for_node "$CLIENT1_NODE_ID")" -le 0 ]; then
+        set_fail_reason "最小受压场景未观察到 client1 join/rejoin 留痕"
+        return 1
+    fi
+    if [ "$(count_join_rejoin_for_node "$CLIENT2_NODE_ID")" -le 0 ]; then
+        set_fail_reason "最小受压场景未观察到 client2 join/rejoin 留痕"
+        return 1
+    fi
+
+    assert_scheduler_rotated_two_clients || return 1
+    assert_client_authorized_progress "$CLIENT1_TOKEN_TX_LOG" "client1 token-gated wfb_tx" || return 1
+    assert_client_authorized_progress "$CLIENT2_TOKEN_TX_LOG" "client2 token-gated wfb_tx" || return 1
 }
 
 start_downlink_rx_for_client() {
@@ -967,9 +1327,10 @@ verify_uftp_payloads() {
 generate_tcp_update_payload() {
     local path="$1"
     local label="$2"
+    local payload_size="$3"
 
-    log_info "生成 $label TCP update payload: $TCP_UPDATE_PAYLOAD_SIZE bytes"
-    python3 -u - "$path" "$TCP_UPDATE_PAYLOAD_SIZE" "$label" <<'PY'
+    log_info "生成 $label TCP update payload: $payload_size bytes"
+    python3 -u - "$path" "$payload_size" "$label" <<'PY'
 import sys
 
 path = sys.argv[1]
@@ -987,10 +1348,17 @@ PY
 }
 
 generate_tcp_update_payloads() {
-    generate_tcp_update_payload "$CLIENT1_TCP_UPDATE_FILE" client1
-    generate_tcp_update_payload "$CLIENT2_TCP_UPDATE_FILE" client2
+    generate_tcp_update_payload "$CLIENT1_TCP_UPDATE_FILE" client1 "$TCP_UPDATE_PAYLOAD_SIZE"
+    generate_tcp_update_payload "$CLIENT2_TCP_UPDATE_FILE" client2 "$TCP_UPDATE_PAYLOAD_SIZE"
     CLIENT1_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT1_TCP_UPDATE_FILE")"
     CLIENT2_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT2_TCP_UPDATE_FILE")"
+}
+
+generate_token_gated_tcp_update_payloads() {
+    generate_tcp_update_payload "$CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE" token-gated-client1 "$TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE"
+    generate_tcp_update_payload "$CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE" token-gated-client2 "$TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE"
+    CLIENT1_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE")"
+    CLIENT2_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256="$(sha256_of_file "$CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE")"
 }
 
 start_tcp_update_receiver() {
@@ -998,13 +1366,15 @@ start_tcp_update_receiver() {
     local output_file="$2"
     local logfile="$3"
     local status_file="$4"
-    local pid_var="$5"
+    local timeout_sec="$5"
+    local title="$6"
+    local pid_var="$7"
     local pid
 
     rm -f "$output_file" "$status_file"
-    log_info "在 $SERVER_NS 启动 TCP update receiver: $port"
+    log_info "在 $SERVER_NS 启动$title receiver: $port"
     ip netns exec "$SERVER_NS" python3 -u - \
-        "${SERVER_TUN_ADDR%%/*}" "$port" "$output_file" "$status_file" "$TCP_UPDATE_TIMEOUT_SEC" <<'PY' > "$logfile" 2>&1 &
+        "${SERVER_TUN_ADDR%%/*}" "$port" "$output_file" "$status_file" "$timeout_sec" <<'PY' > "$logfile" 2>&1 &
 import socket
 import sys
 
@@ -1041,7 +1411,7 @@ PY
 
     sleep "$STARTUP_WAIT_SEC"
     if ! kill -0 "$pid" 2>/dev/null; then
-        set_fail_reason "server TCP update receiver 启动失败，查看日志: $logfile"
+        set_fail_reason "$title receiver 启动失败，查看日志: $logfile"
         return 1
     fi
 }
@@ -1052,13 +1422,16 @@ start_tcp_update_upload() {
     local port="$3"
     local logfile="$4"
     local status_file="$5"
-    local pid_var="$6"
+    local timeout_sec="$6"
+    local gate_file="$7"
+    local title="$8"
+    local pid_var="$9"
     local pid
 
     rm -f "$status_file"
-    log_info "在 $namespace 启动 TCP update upload: $port"
+    log_info "在 $namespace 启动$title upload: $port"
     ip netns exec "$namespace" python3 -u - \
-        "${SERVER_TUN_ADDR%%/*}" "$port" "$source_file" "$status_file" "$TCP_UPDATE_TIMEOUT_SEC" "$TCP_UPDATE_CLIENTS_GATE" <<'PY' > "$logfile" 2>&1 &
+        "${SERVER_TUN_ADDR%%/*}" "$port" "$source_file" "$status_file" "$timeout_sec" "$gate_file" <<'PY' > "$logfile" 2>&1 &
 import os
 import socket
 import sys
@@ -1112,10 +1485,10 @@ run_tcp_per_client_update_payload() {
     rm -f "$TCP_UPDATE_CLIENTS_GATE"
     generate_tcp_update_payloads
 
-    start_tcp_update_receiver "$TCP_CLIENT1_PORT" "$SERVER_CLIENT1_TCP_UPDATE_FILE" "$CLIENT1_TCP_UPDATE_RECEIVER_LOG" "$CLIENT1_TCP_UPDATE_RECEIVER_STATUS" CLIENT1_TCP_UPDATE_RECEIVER_PID
-    start_tcp_update_receiver "$TCP_CLIENT2_PORT" "$SERVER_CLIENT2_TCP_UPDATE_FILE" "$CLIENT2_TCP_UPDATE_RECEIVER_LOG" "$CLIENT2_TCP_UPDATE_RECEIVER_STATUS" CLIENT2_TCP_UPDATE_RECEIVER_PID
-    start_tcp_update_upload "$CLIENT1_NS" "$CLIENT1_TCP_UPDATE_FILE" "$TCP_CLIENT1_PORT" "$CLIENT1_TCP_UPDATE_CLIENT_LOG" "$CLIENT1_TCP_UPDATE_CLIENT_STATUS" CLIENT1_TCP_UPDATE_CLIENT_PID
-    start_tcp_update_upload "$CLIENT2_NS" "$CLIENT2_TCP_UPDATE_FILE" "$TCP_CLIENT2_PORT" "$CLIENT2_TCP_UPDATE_CLIENT_LOG" "$CLIENT2_TCP_UPDATE_CLIENT_STATUS" CLIENT2_TCP_UPDATE_CLIENT_PID
+    start_tcp_update_receiver "$TCP_CLIENT1_PORT" "$SERVER_CLIENT1_TCP_UPDATE_FILE" "$CLIENT1_TCP_UPDATE_RECEIVER_LOG" "$CLIENT1_TCP_UPDATE_RECEIVER_STATUS" "$TCP_UPDATE_TIMEOUT_SEC" "client1 TCP update" CLIENT1_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_receiver "$TCP_CLIENT2_PORT" "$SERVER_CLIENT2_TCP_UPDATE_FILE" "$CLIENT2_TCP_UPDATE_RECEIVER_LOG" "$CLIENT2_TCP_UPDATE_RECEIVER_STATUS" "$TCP_UPDATE_TIMEOUT_SEC" "client2 TCP update" CLIENT2_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_upload "$CLIENT1_NS" "$CLIENT1_TCP_UPDATE_FILE" "$TCP_CLIENT1_PORT" "$CLIENT1_TCP_UPDATE_CLIENT_LOG" "$CLIENT1_TCP_UPDATE_CLIENT_STATUS" "$TCP_UPDATE_TIMEOUT_SEC" "$TCP_UPDATE_CLIENTS_GATE" "client1 TCP update" CLIENT1_TCP_UPDATE_CLIENT_PID
+    start_tcp_update_upload "$CLIENT2_NS" "$CLIENT2_TCP_UPDATE_FILE" "$TCP_CLIENT2_PORT" "$CLIENT2_TCP_UPDATE_CLIENT_LOG" "$CLIENT2_TCP_UPDATE_CLIENT_STATUS" "$TCP_UPDATE_TIMEOUT_SEC" "$TCP_UPDATE_CLIENTS_GATE" "client2 TCP update" CLIENT2_TCP_UPDATE_CLIENT_PID
 
     : > "$TCP_UPDATE_CLIENTS_GATE"
 
@@ -1137,6 +1510,58 @@ run_tcp_per_client_update_payload() {
     fi
 
     log_pass "client1/client2 TCP update payload sha256 均匹配各自源文件"
+}
+
+run_token_gated_minimal_pressure_uplink() {
+    log_info "切换到 token-gated 最小受压双客户端上行回归"
+    stop_pid_if_running CLIENT1_UPLINK_RELAY_PID
+    stop_pid_if_running CLIENT2_UPLINK_RELAY_PID
+
+    rm -f "$TOKEN_GATED_TCP_UPDATE_CLIENTS_GATE"
+    generate_token_gated_tcp_update_payloads
+    start_token_namespace_bridge
+    start_token_scheduler
+    start_client_token_uplink_rx "$CLIENT1_NS" "$CLIENT1_TOKEN_UPLINK_RX_DEBUG_PORT" "$SERVER_CLIENT1_IP" "$CLIENT1_TOKEN_UPLINK_RX_LOG" CLIENT1_TOKEN_UPLINK_RX_PID
+    start_client_token_uplink_rx "$CLIENT2_NS" "$CLIENT2_TOKEN_UPLINK_RX_DEBUG_PORT" "$SERVER_CLIENT2_IP" "$CLIENT2_TOKEN_UPLINK_RX_LOG" CLIENT2_TOKEN_UPLINK_RX_PID
+    start_client_token_tx "$CLIENT1_NS" "$CLIENT1_NODE_ID" "$CLIENT1_TUN_PEER_PORT" "$CLIENT1_TOKEN_UPLINK_RX_DEBUG_PORT" "$CLIENT1_TOKEN_TX_LOG" CLIENT1_TOKEN_TX_PID
+    start_client_token_tx "$CLIENT2_NS" "$CLIENT2_NODE_ID" "$CLIENT2_TUN_PEER_PORT" "$CLIENT2_TOKEN_UPLINK_RX_DEBUG_PORT" "$CLIENT2_TOKEN_TX_LOG" CLIENT2_TOKEN_TX_PID
+
+    assert_process_alive "$TOKEN_BRIDGE_PID" "token bridge"
+    assert_process_alive "$TOKEN_SCHEDULER_PID" "token scheduler"
+    assert_process_alive "$CLIENT1_TOKEN_UPLINK_RX_PID" "client1 token uplink rx"
+    assert_process_alive "$CLIENT2_TOKEN_UPLINK_RX_PID" "client2 token uplink rx"
+    assert_process_alive "$CLIENT1_TOKEN_TX_PID" "client1 token wfb_tx"
+    assert_process_alive "$CLIENT2_TOKEN_TX_PID" "client2 token wfb_tx"
+
+    start_tcp_update_receiver "$TCP_CLIENT1_PORT" "$SERVER_CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE" "$CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG" "$CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_STATUS" "$TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC" "client1 token-gated TCP update" CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_receiver "$TCP_CLIENT2_PORT" "$SERVER_CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE" "$CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_LOG" "$CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_STATUS" "$TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC" "client2 token-gated TCP update" CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID
+    start_tcp_update_upload "$CLIENT1_NS" "$CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE" "$TCP_CLIENT1_PORT" "$CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG" "$CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_STATUS" "$TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC" "$TOKEN_GATED_TCP_UPDATE_CLIENTS_GATE" "client1 token-gated TCP update" CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_PID
+    start_tcp_update_upload "$CLIENT2_NS" "$CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE" "$TCP_CLIENT2_PORT" "$CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_LOG" "$CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_STATUS" "$TOKEN_GATED_TCP_UPDATE_TIMEOUT_SEC" "$TOKEN_GATED_TCP_UPDATE_CLIENTS_GATE" "client2 token-gated TCP update" CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_PID
+
+    : > "$TOKEN_GATED_TCP_UPDATE_CLIENTS_GATE"
+
+    wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "join/rejoin node_id=$CLIENT1_NODE_ID " "最小受压场景观察到 client1 进入活跃队列"
+    wait_for_log_pattern "$TOKEN_SCHEDULER_LOG" "join/rejoin node_id=$CLIENT2_NODE_ID " "最小受压场景观察到 client2 进入活跃队列"
+
+    wait_for_pid_success "$CLIENT1_TOKEN_GATED_TCP_UPDATE_CLIENT_PID" "client1 token-gated TCP update upload"
+    wait_for_pid_success "$CLIENT2_TOKEN_GATED_TCP_UPDATE_CLIENT_PID" "client2 token-gated TCP update upload"
+    wait_for_pid_success "$CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID" "server client1 token-gated TCP update receiver"
+    wait_for_pid_success "$CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVER_PID" "server client2 token-gated TCP update receiver"
+
+    CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256="$(sha256_of_file "$SERVER_CLIENT1_TOKEN_GATED_TCP_UPDATE_FILE")"
+    CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256="$(sha256_of_file "$SERVER_CLIENT2_TOKEN_GATED_TCP_UPDATE_FILE")"
+
+    if [ "$CLIENT1_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256" != "$CLIENT1_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256" ]; then
+        set_fail_reason "client1 token-gated TCP update payload sha256 不匹配"
+        return 1
+    fi
+    if [ "$CLIENT2_TOKEN_GATED_TCP_UPDATE_RECEIVED_SHA256" != "$CLIENT2_TOKEN_GATED_TCP_UPDATE_SOURCE_SHA256" ]; then
+        set_fail_reason "client2 token-gated TCP update payload sha256 不匹配"
+        return 1
+    fi
+
+    assert_token_gated_minimal_pressure_signals
+    log_pass "token-gated 最小受压双客户端上行回归通过"
 }
 
 run_uftp_shared_downlink_payload() {
@@ -1235,6 +1660,7 @@ main() {
     wait_for_file_contains "$CLIENT2_DOWNLINK_PROBE_FILE" "V4_SHARED_DOWNLINK_CLIENT2" "client2 通过共享下行路径收到基础探针"
     run_uftp_shared_downlink_payload
     run_tcp_per_client_update_payload
+    run_token_gated_minimal_pressure_uplink
 }
 
 main "$@"

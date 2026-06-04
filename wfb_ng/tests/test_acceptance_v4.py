@@ -32,6 +32,7 @@ class V4AcceptanceTestCase(unittest.TestCase):
             'UFTPD_BIN': UFTPD_BIN,
             'UFTP_PAYLOAD_SIZE': '65536',
             'TCP_UPDATE_PAYLOAD_SIZE': '32768',
+            'TOKEN_GATED_TCP_UPDATE_PAYLOAD_SIZE': '1048576',
         })
         return env
 
@@ -90,6 +91,13 @@ class V4AcceptanceTestCase(unittest.TestCase):
             self.assertIn('- client1 TCP update received sha256:', content)
             self.assertIn('- client2 TCP update source sha256:', content)
             self.assertIn('- client2 TCP update received sha256:', content)
+            self.assertIn('- Token-gated TCP update payload size: 1048576 bytes', content)
+            self.assertIn('- client1 token-gated grant count:', content)
+            self.assertIn('- client2 token-gated grant count:', content)
+            self.assertIn('- client1 token-gated authorized sends:', content)
+            self.assertIn('- client2 token-gated authorized sends:', content)
+            self.assertIn('- token-gated remove count: 0', content)
+            self.assertIn('- 已覆盖: Token-gated 双客户端最小受压 TCP per-client 上行回归', content)
             self.assertIn('- 未覆盖: ready 标记、真实训练 update、上行注册协议', content)
             self.assertNotIn('- 未覆盖: TCP per-client 上行 update payload', content)
 
@@ -128,6 +136,17 @@ class V4AcceptanceTestCase(unittest.TestCase):
             self.assertTrue(os.path.exists(server_client2_update))
             self.assertEqual(self.file_sha256(client1_update), self.file_sha256(server_client1_update))
             self.assertEqual(self.file_sha256(client2_update), self.file_sha256(server_client2_update))
+            client1_token_gated_update = os.path.join(log_dir, 'client1', 'token_gated_tcp_update.bin')
+            client2_token_gated_update = os.path.join(log_dir, 'client2', 'token_gated_tcp_update.bin')
+            server_client1_token_gated_update = os.path.join(log_dir, 'server', 'client1_token_gated_tcp_update.bin')
+            server_client2_token_gated_update = os.path.join(log_dir, 'server', 'client2_token_gated_tcp_update.bin')
+
+            self.assertTrue(os.path.exists(client1_token_gated_update))
+            self.assertTrue(os.path.exists(client2_token_gated_update))
+            self.assertTrue(os.path.exists(server_client1_token_gated_update))
+            self.assertTrue(os.path.exists(server_client2_token_gated_update))
+            self.assertEqual(self.file_sha256(client1_token_gated_update), self.file_sha256(server_client1_token_gated_update))
+            self.assertEqual(self.file_sha256(client2_token_gated_update), self.file_sha256(server_client2_token_gated_update))
         finally:
             self.assert_namespaces_cleaned(env)
             shutil.rmtree(log_dir, ignore_errors=True)
