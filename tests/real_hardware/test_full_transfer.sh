@@ -1,289 +1,675 @@
 #!/bin/bash
 # tests/real_hardware/test_full_transfer.sh
-# 完整传输测试脚本 - 40MB 模型文件端到端传输测试
-#
-# 用途：验证系统在真实硬件环境下能稳定传输 40MB 联邦学习模型
-#
-# 使用方法:
-#   sudo ./tests/real_hardware/test_full_transfer.sh
-#
-# 环境变量:
-#   WIFI_IFACE        - 服务端 WiFi 网卡接口名称（默认: wlan0）
-#   WIFI_IFACE_CLIENT - 客户端 WiFi 网卡接口名称（默认: wlan1，如果未设置则使用 WIFI_IFACE）
-#
-# 依赖:
-#   - 测试配置文件: tests/config/test_config.sh
-#   - 测试数据文件: tests/test_data/model_40mb.bin
-#   - UFTP 工具: uftp, uftpd
-#   - wfb_core 二进制文件
-#
-# 日志输出:
-#   - 服务器日志: $LOG_DIR/server_transfer.log
-#   - 客户端日志: $LOG_DIR/client_transfer.log
-#   - UFTP 服务器日志: $LOG_DIR/uftp_server.log
-#   - UFTP 客户端日志: $LOG_DIR/uftp_client.log
-#   - 抓包文件: $LOG_DIR/capture.pcap（可选）
+# v5 real-hardware 下行补充证据脚本
 
-set -e
+set -euo pipefail
 
-# ============================================
-# 配置区
-# ============================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# 加载测试配置
 if [ -f "$PROJECT_ROOT/tests/config/test_config.sh" ]; then
+    # shellcheck disable=SC1091
     source "$PROJECT_ROOT/tests/config/test_config.sh"
 else
-    echo "错误: 找不到测试配置文件 tests/config/test_config.sh"
-    exit 1
+    WIFI_IFACE="${WIFI_IFACE:-wlxbcec23372588}"
+    WIFI_IFACE_CLIENT="${WIFI_IFACE_CLIENT:-wlxfca386b38672}"
+    CHANNEL="${CHANNEL:-157}"
+    MCS="${MCS:-0}"
+    NODE_ID="${NODE_ID:-1}"
 fi
 
-# 客户端网卡接口（如果未设置，则使用服务端网卡或默认值）
-if [ -z "$WIFI_IFACE_CLIENT" ]; then
-    WIFI_IFACE_CLIENT="${WIFI_IFACE:-wlan1}"
+SCENARIO="single"
+ANALYZE_ONLY=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --scenario)
+            SCENARIO="$2"
+            shift 2
+            ;;
+        --analyze-only)
+            ANALYZE_ONLY=true
+            shift
+            ;;
+        --help|-h)
+            cat <<'HELP_EOF'
+用法:
+  sudo bash tests/real_hardware/test_full_transfer.sh [--scenario single|shared] [--analyze-only]
+
+说明:
+  - single: 固定的大文件下行完整性补充证据场景
+  - shared: 在 single 基础上增加第二个接收端，补齐共享下行/分发相关证据
+  - --analyze-only: 不重新执行传输，只对现有 LOG_DIR 产物补采指标与摘要
+
+常用环境变量:
+  LOG_DIR                              日志目录
+  DOWNLINK_PAYLOAD_SIZE                自动生成 payload 大小，默认 41943040 字节
+  DOWNLINK_TRANSFER_TIMEOUT_SEC        最大等待时长，默认 180 秒
+  DOWNLINK_SAMPLE_INTERVAL_SEC         采样周期，默认 5 秒
+  DOWNLINK_MAX_IDLE_SEC                最大连续无推进窗口，默认 45 秒
+  DOWNLINK_RECEIVER_COUNT              接收端数量；single 默认为 1，shared 默认为 2
+  DOWNLINK_PAYLOAD_FILE                源 payload 路径，默认 $LOG_DIR/downlink_payload.bin
+  DOWNLINK_UFTP_SEND_CMD               自定义发送命令；未设置时使用 uftp
+  DOWNLINK_CLIENT1_RECEIVE_CMD         自定义 client1 接收命令；未设置时使用 uftpd
+  DOWNLINK_CLIENT2_RECEIVE_CMD         自定义 client2 接收命令；shared 场景可选覆盖
+  DOWNLINK_SERVER_TUN_CMD              可选：启动 server TUN 进程
+  DOWNLINK_CLIENT1_TUN_CMD             可选：启动 client1 TUN 进程
+  DOWNLINK_CLIENT2_TUN_CMD             可选：启动 client2 TUN 进程（shared）
+  DOWNLINK_SERVER_TX_CMD               可选：启动 server wfb_tx
+  DOWNLINK_SERVER_RX_CMD               可选：启动 server wfb_rx
+  DOWNLINK_CLIENT1_TX_CMD              可选：启动 client1 wfb_tx
+  DOWNLINK_CLIENT1_RX_CMD              可选：启动 client1 wfb_rx
+  DOWNLINK_CLIENT2_TX_CMD              可选：启动 client2 wfb_tx（shared）
+  DOWNLINK_CLIENT2_RX_CMD              可选：启动 client2 wfb_rx（shared）
+  PCAP_CAPTURE_CMD                     可选：抓包命令；未设置时如本机存在 tcpdump，则对服务端网卡抓包
+HELP_EOF
+            exit 0
+            ;;
+        *)
+            echo "未知参数: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+LOG_DIR="${LOG_DIR:-$PROJECT_ROOT/tests/logs/downlink_$(date +%Y%m%d_%H%M%S)}"
+DOWNLINK_RESULTS_MD="$LOG_DIR/downlink_results.md"
+DOWNLINK_CONTEXT_FILE="$LOG_DIR/downlink_context.txt"
+DOWNLINK_SAMPLES_TSV="$LOG_DIR/downlink_samples.tsv"
+
+DOWNLINK_PAYLOAD_SIZE="${DOWNLINK_PAYLOAD_SIZE:-41943040}"
+DOWNLINK_TRANSFER_TIMEOUT_SEC="${DOWNLINK_TRANSFER_TIMEOUT_SEC:-180}"
+DOWNLINK_SAMPLE_INTERVAL_SEC="${DOWNLINK_SAMPLE_INTERVAL_SEC:-5}"
+DOWNLINK_MAX_IDLE_SEC="${DOWNLINK_MAX_IDLE_SEC:-45}"
+STARTUP_WAIT_SEC="${STARTUP_WAIT_SEC:-3}"
+DOWNLINK_UFTP_RATE_KBPS="${DOWNLINK_UFTP_RATE_KBPS:-50000}"
+
+DOWNLINK_SERVER_TUN_IP="${DOWNLINK_SERVER_TUN_IP:-10.23.0.1}"
+DOWNLINK_CLIENT1_TUN_IP="${DOWNLINK_CLIENT1_TUN_IP:-10.23.0.2}"
+DOWNLINK_CLIENT2_TUN_IP="${DOWNLINK_CLIENT2_TUN_IP:-10.23.0.3}"
+
+DOWNLINK_UFTP_PUBLIC_MULTICAST_ADDR="${DOWNLINK_UFTP_PUBLIC_MULTICAST_ADDR:-230.4.4.1}"
+DOWNLINK_UFTP_PRIVATE_MULTICAST_ADDR="${DOWNLINK_UFTP_PRIVATE_MULTICAST_ADDR:-230.5.5.8}"
+DOWNLINK_UFTP_PORT="${DOWNLINK_UFTP_PORT:-1044}"
+DOWNLINK_UFTP_SOURCE_PORT="${DOWNLINK_UFTP_SOURCE_PORT:-1045}"
+
+DOWNLINK_PAYLOAD_FILE="${DOWNLINK_PAYLOAD_FILE:-$LOG_DIR/downlink_payload.bin}"
+DOWNLINK_CLIENT1_DEST_DIR="${DOWNLINK_CLIENT1_DEST_DIR:-$LOG_DIR/client1/received}"
+DOWNLINK_CLIENT2_DEST_DIR="${DOWNLINK_CLIENT2_DEST_DIR:-$LOG_DIR/client2/received}"
+DOWNLINK_CLIENT1_TEMP_DIR="${DOWNLINK_CLIENT1_TEMP_DIR:-$LOG_DIR/client1/tmp}"
+DOWNLINK_CLIENT2_TEMP_DIR="${DOWNLINK_CLIENT2_TEMP_DIR:-$LOG_DIR/client2/tmp}"
+DOWNLINK_CLIENT1_RECEIVED_FILE="${DOWNLINK_CLIENT1_RECEIVED_FILE:-$DOWNLINK_CLIENT1_DEST_DIR/downlink_payload.bin}"
+DOWNLINK_CLIENT2_RECEIVED_FILE="${DOWNLINK_CLIENT2_RECEIVED_FILE:-$DOWNLINK_CLIENT2_DEST_DIR/downlink_payload.bin}"
+
+UFTP_SERVER_LOG="${UFTP_SERVER_LOG:-$LOG_DIR/uftp_server.log}"
+UFTP_SERVER_STATUS="${UFTP_SERVER_STATUS:-$LOG_DIR/uftp_server.status}"
+CLIENT1_UFTPD_LOG="${CLIENT1_UFTPD_LOG:-$LOG_DIR/client1/uftpd.log}"
+CLIENT2_UFTPD_LOG="${CLIENT2_UFTPD_LOG:-$LOG_DIR/client2/uftpd.log}"
+CLIENT1_UFTPD_STATUS="${CLIENT1_UFTPD_STATUS:-$LOG_DIR/client1/uftpd.status}"
+CLIENT2_UFTPD_STATUS="${CLIENT2_UFTPD_STATUS:-$LOG_DIR/client2/uftpd.status}"
+CLIENT1_UFTPD_PIDFILE="${CLIENT1_UFTPD_PIDFILE:-$LOG_DIR/client1/uftpd.pid}"
+CLIENT2_UFTPD_PIDFILE="${CLIENT2_UFTPD_PIDFILE:-$LOG_DIR/client2/uftpd.pid}"
+
+DOWNLINK_SERVER_LOG="${DOWNLINK_SERVER_LOG:-$LOG_DIR/server.log}"
+DOWNLINK_CLIENT1_LOG="${DOWNLINK_CLIENT1_LOG:-$LOG_DIR/client1.log}"
+DOWNLINK_CLIENT2_LOG="${DOWNLINK_CLIENT2_LOG:-$LOG_DIR/client2.log}"
+PCAP_CAPTURE_LOG="${PCAP_CAPTURE_LOG:-$LOG_DIR/pcap_capture.log}"
+CAPTURE_PCAP_FILE="${CAPTURE_PCAP_FILE:-$LOG_DIR/capture.pcap}"
+
+DOWNLINK_SERVER_TUN_CMD="${DOWNLINK_SERVER_TUN_CMD:-}"
+DOWNLINK_CLIENT1_TUN_CMD="${DOWNLINK_CLIENT1_TUN_CMD:-}"
+DOWNLINK_CLIENT2_TUN_CMD="${DOWNLINK_CLIENT2_TUN_CMD:-}"
+DOWNLINK_SERVER_TX_CMD="${DOWNLINK_SERVER_TX_CMD:-}"
+DOWNLINK_SERVER_RX_CMD="${DOWNLINK_SERVER_RX_CMD:-}"
+DOWNLINK_CLIENT1_TX_CMD="${DOWNLINK_CLIENT1_TX_CMD:-}"
+DOWNLINK_CLIENT1_RX_CMD="${DOWNLINK_CLIENT1_RX_CMD:-}"
+DOWNLINK_CLIENT2_TX_CMD="${DOWNLINK_CLIENT2_TX_CMD:-}"
+DOWNLINK_CLIENT2_RX_CMD="${DOWNLINK_CLIENT2_RX_CMD:-}"
+DOWNLINK_UFTP_SEND_CMD="${DOWNLINK_UFTP_SEND_CMD:-}"
+DOWNLINK_CLIENT1_RECEIVE_CMD="${DOWNLINK_CLIENT1_RECEIVE_CMD:-}"
+DOWNLINK_CLIENT2_RECEIVE_CMD="${DOWNLINK_CLIENT2_RECEIVE_CMD:-}"
+PCAP_CAPTURE_CMD="${PCAP_CAPTURE_CMD:-}"
+SERVER_WIFI_IFACE="${SERVER_WIFI_IFACE:-${WIFI_IFACE:-}}"
+
+if [ "$SCENARIO" = "shared" ]; then
+    DOWNLINK_RECEIVER_COUNT="${DOWNLINK_RECEIVER_COUNT:-2}"
+else
+    DOWNLINK_RECEIVER_COUNT="${DOWNLINK_RECEIVER_COUNT:-1}"
 fi
 
-# ============================================
-# 辅助函数
-# ============================================
+PIDS=()
+RESULT_STATUS="FAIL"
+RESULT_REASON="未执行"
+DOWNLINK_SOURCE_SHA256="未生成"
+CLIENT1_RECEIVED_SHA256="未收到"
+CLIENT2_RECEIVED_SHA256="未收到"
+SHARED_DISTRIBUTION_CONFIRMED="not_applicable"
+SAMPLE_COUNT=0
+MAX_IDLE_OBSERVED_SEC=0
+STALL_EVENTS=0
+ANALYSIS_CHAIN_COMPLETED="no"
+TRANSFER_SENDER_PID=""
+
 log_info()  { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass()  { echo "[PASS] $(date '+%H:%M:%S') $1"; }
 log_fail()  { echo "[FAIL] $(date '+%H:%M:%S') $1" >&2; }
 log_warn()  { echo "[WARN] $(date '+%H:%M:%S') $1" >&2; }
 
-# ============================================
-# 清理机制
-# ============================================
 cleanup() {
-    log_info "清理测试进程..."
-    
-    # 终止所有后台进程
-    if [ -n "$SERVER_PID" ]; then
-        kill "$SERVER_PID" 2>/dev/null || true
-        wait "$SERVER_PID" 2>/dev/null || true
-    fi
-    if [ -n "$CLIENT_PID" ]; then
-        kill "$CLIENT_PID" 2>/dev/null || true
-        wait "$CLIENT_PID" 2>/dev/null || true
-    fi
-    if [ -n "$UFTP_SERVER_PID" ]; then
-        kill "$UFTP_SERVER_PID" 2>/dev/null || true
-        wait "$UFTP_SERVER_PID" 2>/dev/null || true
-    fi
-    if [ -n "$UFTP_CLIENT_PID" ]; then
-        kill "$UFTP_CLIENT_PID" 2>/dev/null || true
-        wait "$UFTP_CLIENT_PID" 2>/dev/null || true
-    fi
-    if [ -n "$TCPDUMP_PID" ]; then
-        kill "$TCPDUMP_PID" 2>/dev/null || true
-        wait "$TCPDUMP_PID" 2>/dev/null || true
-    fi
-    
-    log_pass "清理完成"
+    local pid
+    for pid in "${PIDS[@]:-}"; do
+        kill "$pid" 2>/dev/null || true
+    done
+    wait "${PIDS[@]:-}" 2>/dev/null || true
 }
-
-# 设置清理陷阱
 trap cleanup EXIT
 
-# ============================================
-# 传输完成检测
-# ============================================
-wait_for_transfer_complete() {
-    local timeout=$TEST_TIMEOUT
-    local elapsed=0
-    local check_interval=1
-    
-    log_info "等待传输完成（最长 ${timeout}s）..."
-    
-    while [ $elapsed -lt $timeout ]; do
-        # 检查 UFTP 服务器日志中的传输完成标记
-        if grep -q "传输完成\|Transfer complete\|File transfer complete" "$LOG_DIR/uftp_server.log" 2>/dev/null; then
-            log_pass "传输完成！耗时: ${elapsed}s"
-            return 0
-        fi
-        
-        # 检查是否有错误
-        if grep -q "传输失败\|Transfer failed\|ERROR" "$LOG_DIR/uftp_server.log" 2>/dev/null; then
-            log_fail "传输失败，请查看日志: $LOG_DIR/uftp_server.log"
+prepare_log_dir() {
+    mkdir -p "$LOG_DIR" "$DOWNLINK_CLIENT1_DEST_DIR" "$DOWNLINK_CLIENT1_TEMP_DIR"
+    if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+        mkdir -p "$DOWNLINK_CLIENT2_DEST_DIR" "$DOWNLINK_CLIENT2_TEMP_DIR"
+    fi
+}
+export LOG_DIR
+export DOWNLINK_PAYLOAD_SIZE DOWNLINK_TRANSFER_TIMEOUT_SEC DOWNLINK_SAMPLE_INTERVAL_SEC DOWNLINK_MAX_IDLE_SEC
+export DOWNLINK_SERVER_TUN_IP DOWNLINK_CLIENT1_TUN_IP DOWNLINK_CLIENT2_TUN_IP
+export DOWNLINK_UFTP_PUBLIC_MULTICAST_ADDR DOWNLINK_UFTP_PRIVATE_MULTICAST_ADDR DOWNLINK_UFTP_PORT DOWNLINK_UFTP_SOURCE_PORT
+export DOWNLINK_PAYLOAD_FILE DOWNLINK_CLIENT1_DEST_DIR DOWNLINK_CLIENT2_DEST_DIR DOWNLINK_CLIENT1_TEMP_DIR DOWNLINK_CLIENT2_TEMP_DIR
+export DOWNLINK_CLIENT1_RECEIVED_FILE DOWNLINK_CLIENT2_RECEIVED_FILE
+export UFTP_SERVER_LOG UFTP_SERVER_STATUS CLIENT1_UFTPD_LOG CLIENT2_UFTPD_LOG CLIENT1_UFTPD_STATUS CLIENT2_UFTPD_STATUS
+export CLIENT1_UFTPD_PIDFILE CLIENT2_UFTPD_PIDFILE DOWNLINK_SERVER_LOG DOWNLINK_CLIENT1_LOG DOWNLINK_CLIENT2_LOG
+export DOWNLINK_RESULTS_MD DOWNLINK_CONTEXT_FILE DOWNLINK_SAMPLES_TSV CAPTURE_PCAP_FILE PCAP_CAPTURE_LOG
+export SCENARIO DOWNLINK_RECEIVER_COUNT
+
+file_sha256() {
+    local path="$1"
+    if [ ! -f "$path" ]; then
+        return 1
+    fi
+    sha256sum "$path" | cut -d' ' -f1
+}
+
+file_size() {
+    local path="$1"
+    if [ ! -f "$path" ]; then
+        echo 0
+        return
+    fi
+    stat -c %s "$path" 2>/dev/null || echo 0
+}
+
+ensure_payload_file() {
+    if [ -f "$DOWNLINK_PAYLOAD_FILE" ]; then
+        DOWNLINK_SOURCE_SHA256="$(file_sha256 "$DOWNLINK_PAYLOAD_FILE")"
+        return
+    fi
+
+    log_info "生成下行补充证据 payload: $DOWNLINK_PAYLOAD_FILE (${DOWNLINK_PAYLOAD_SIZE} bytes)"
+    PAYLOAD_PATH="$DOWNLINK_PAYLOAD_FILE" PAYLOAD_SIZE="$DOWNLINK_PAYLOAD_SIZE" python3 - <<'PY'
+import os
+path = os.environ['PAYLOAD_PATH']
+size = int(os.environ['PAYLOAD_SIZE'])
+os.makedirs(os.path.dirname(path), exist_ok=True)
+pattern = b'WFB-V5-DOWNLINK-EVIDENCE\n'
+with open(path, 'wb') as fh:
+    remaining = size
+    while remaining > 0:
+        chunk = pattern[:remaining] if remaining < len(pattern) else pattern
+        fh.write(chunk)
+        remaining -= len(chunk)
+PY
+    DOWNLINK_SOURCE_SHA256="$(file_sha256 "$DOWNLINK_PAYLOAD_FILE")"
+}
+
+run_bg() {
+    local name="$1"
+    local cmd="$2"
+    local logfile="$3"
+    local pidvar="$4"
+    local pid
+
+    log_info "启动 $name"
+    bash -lc "$cmd" >"$logfile" 2>&1 &
+    pid=$!
+    PIDS+=("$pid")
+    printf -v "$pidvar" '%s' "$pid"
+}
+
+resolve_uftp_binary() {
+    local env_name="$1"
+    local fallback="$2"
+    local resolved=""
+
+    if [ -n "${!env_name:-}" ]; then
+        resolved="${!env_name}"
+        if [ ! -x "$resolved" ]; then
+            log_fail "指定的 UFTP 可执行文件不可执行: $resolved"
             return 1
         fi
-        
-        # 打印进度（每 10 秒）
-        if [ $((elapsed % 10)) -eq 0 ] && [ $elapsed -gt 0 ]; then
-            log_info "传输进行中... (${elapsed}s / ${timeout}s)"
+    else
+        if ! resolved="$(command -v "$fallback" 2>/dev/null)"; then
+            log_fail "缺少命令: $fallback"
+            return 1
         fi
-        
-        sleep $check_interval
-        elapsed=$((elapsed + check_interval))
+    fi
+
+    printf '%s\n' "$resolved"
+}
+
+build_default_client_receive_cmd() {
+    local bind_ip="$1"
+    local dest_dir="$2"
+    local temp_dir="$3"
+    local logfile="$4"
+    local status_file="$5"
+    local pidfile="$6"
+
+    printf '%q -I %q -M %q -p %q -D %q -T %q -L %q -F %q -P %q' \
+        "$RESOLVED_UFTPD_BIN" \
+        "$bind_ip" \
+        "$DOWNLINK_UFTP_PUBLIC_MULTICAST_ADDR" \
+        "$DOWNLINK_UFTP_PORT" \
+        "$dest_dir" \
+        "$temp_dir" \
+        "$logfile" \
+        "$status_file" \
+        "$pidfile"
+}
+
+build_default_uftp_send_cmd() {
+    printf 'timeout %qs %q -I %q -M %q -P %q -p %q -u %q -Y none -R %q -L %q -S %q -D %q %q' \
+        "$DOWNLINK_TRANSFER_TIMEOUT_SEC" \
+        "$RESOLVED_UFTP_BIN" \
+        "$DOWNLINK_SERVER_TUN_IP" \
+        "$DOWNLINK_UFTP_PUBLIC_MULTICAST_ADDR" \
+        "$DOWNLINK_UFTP_PRIVATE_MULTICAST_ADDR" \
+        "$DOWNLINK_UFTP_PORT" \
+        "$DOWNLINK_UFTP_SOURCE_PORT" \
+        "$DOWNLINK_UFTP_RATE_KBPS" \
+        "$UFTP_SERVER_LOG" \
+        "$UFTP_SERVER_STATUS" \
+        "downlink_payload.bin" \
+        "$DOWNLINK_PAYLOAD_FILE"
+}
+
+start_optional_processes() {
+    local started=0
+
+    if [ -n "$DOWNLINK_SERVER_TUN_CMD" ]; then
+        run_bg "server_tun" "$DOWNLINK_SERVER_TUN_CMD" "$LOG_DIR/server_tun.log" SERVER_TUN_PID
+        started=1
+    fi
+    if [ -n "$DOWNLINK_CLIENT1_TUN_CMD" ]; then
+        run_bg "client1_tun" "$DOWNLINK_CLIENT1_TUN_CMD" "$LOG_DIR/client1_tun.log" CLIENT1_TUN_PID
+        started=1
+    fi
+    if [ -n "$DOWNLINK_SERVER_RX_CMD" ]; then
+        run_bg "server_rx" "$DOWNLINK_SERVER_RX_CMD" "$DOWNLINK_SERVER_LOG" SERVER_RX_PID
+        started=1
+    fi
+    if [ -n "$DOWNLINK_SERVER_TX_CMD" ]; then
+        run_bg "server_tx" "$DOWNLINK_SERVER_TX_CMD" "$LOG_DIR/server_tx.log" SERVER_TX_PID
+        started=1
+    fi
+    if [ -n "$DOWNLINK_CLIENT1_RX_CMD" ]; then
+        run_bg "client1_rx" "$DOWNLINK_CLIENT1_RX_CMD" "$DOWNLINK_CLIENT1_LOG" CLIENT1_RX_PID
+        started=1
+    fi
+    if [ -n "$DOWNLINK_CLIENT1_TX_CMD" ]; then
+        run_bg "client1_tx" "$DOWNLINK_CLIENT1_TX_CMD" "$LOG_DIR/client1_tx.log" CLIENT1_TX_PID
+        started=1
+    fi
+
+    if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+        if [ -n "$DOWNLINK_CLIENT2_TUN_CMD" ]; then
+            run_bg "client2_tun" "$DOWNLINK_CLIENT2_TUN_CMD" "$LOG_DIR/client2_tun.log" CLIENT2_TUN_PID
+            started=1
+        fi
+        if [ -n "$DOWNLINK_CLIENT2_RX_CMD" ]; then
+            run_bg "client2_rx" "$DOWNLINK_CLIENT2_RX_CMD" "$DOWNLINK_CLIENT2_LOG" CLIENT2_RX_PID
+            started=1
+        fi
+        if [ -n "$DOWNLINK_CLIENT2_TX_CMD" ]; then
+            run_bg "client2_tx" "$DOWNLINK_CLIENT2_TX_CMD" "$LOG_DIR/client2_tx.log" CLIENT2_TX_PID
+            started=1
+        fi
+    fi
+
+    if [ "$started" -eq 1 ]; then
+        sleep "$STARTUP_WAIT_SEC"
+    fi
+}
+
+start_capture_if_needed() {
+    if [ -n "$PCAP_CAPTURE_CMD" ]; then
+        run_bg "pcap_capture" "$PCAP_CAPTURE_CMD" "$PCAP_CAPTURE_LOG" PCAP_PID
+        return
+    fi
+
+    if [ -n "$SERVER_WIFI_IFACE" ] && command -v tcpdump >/dev/null 2>&1; then
+        run_bg "pcap_capture" "tcpdump -i \"$SERVER_WIFI_IFACE\" -w \"$CAPTURE_PCAP_FILE\"" "$PCAP_CAPTURE_LOG" PCAP_PID
+    fi
+}
+
+start_receivers() {
+    local client1_cmd="$DOWNLINK_CLIENT1_RECEIVE_CMD"
+    local client2_cmd="$DOWNLINK_CLIENT2_RECEIVE_CMD"
+
+    if [ -z "$client1_cmd" ]; then
+        client1_cmd="$(build_default_client_receive_cmd "$DOWNLINK_CLIENT1_TUN_IP" "$DOWNLINK_CLIENT1_DEST_DIR" "$DOWNLINK_CLIENT1_TEMP_DIR" "$CLIENT1_UFTPD_LOG" "$CLIENT1_UFTPD_STATUS" "$CLIENT1_UFTPD_PIDFILE")"
+    fi
+    run_bg "client1_uftpd" "$client1_cmd" "$CLIENT1_UFTPD_LOG" CLIENT1_UFTPD_PID
+
+    if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+        if [ -z "$client2_cmd" ]; then
+            client2_cmd="$(build_default_client_receive_cmd "$DOWNLINK_CLIENT2_TUN_IP" "$DOWNLINK_CLIENT2_DEST_DIR" "$DOWNLINK_CLIENT2_TEMP_DIR" "$CLIENT2_UFTPD_LOG" "$CLIENT2_UFTPD_STATUS" "$CLIENT2_UFTPD_PIDFILE")"
+        fi
+        run_bg "client2_uftpd" "$client2_cmd" "$CLIENT2_UFTPD_LOG" CLIENT2_UFTPD_PID
+    fi
+
+    sleep 1
+}
+
+start_sender() {
+    local send_cmd="$DOWNLINK_UFTP_SEND_CMD"
+
+    if [ -z "$send_cmd" ]; then
+        send_cmd="$(build_default_uftp_send_cmd)"
+    fi
+
+    run_bg "uftp_sender" "$send_cmd" "$UFTP_SERVER_LOG" TRANSFER_SENDER_PID
+}
+
+payloads_complete() {
+    local client1_bytes client2_bytes
+    client1_bytes="$(file_size "$DOWNLINK_CLIENT1_RECEIVED_FILE")"
+    if [ "$client1_bytes" -lt "$DOWNLINK_PAYLOAD_SIZE" ]; then
+        return 1
+    fi
+
+    if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+        client2_bytes="$(file_size "$DOWNLINK_CLIENT2_RECEIVED_FILE")"
+        if [ "$client2_bytes" -lt "$DOWNLINK_PAYLOAD_SIZE" ]; then
+            return 1
+        fi
+    fi
+
+    return 0
+}
+
+monitor_transfer_progress() {
+    local start_epoch now elapsed client1_bytes client2_bytes last_client1 last_client2 last_progress_epoch progressed idle_sec in_stall
+
+    last_client1=-1
+    last_client2=-1
+    in_stall=0
+    start_epoch="$(date +%s)"
+    last_progress_epoch="$start_epoch"
+
+    cat > "$DOWNLINK_SAMPLES_TSV" <<'EOF'
+elapsed_sec	client1_bytes	client2_bytes	progressed	idle_sec
+EOF
+
+    while true; do
+        now="$(date +%s)"
+        elapsed=$((now - start_epoch))
+        client1_bytes="$(file_size "$DOWNLINK_CLIENT1_RECEIVED_FILE")"
+        client2_bytes=0
+        if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+            client2_bytes="$(file_size "$DOWNLINK_CLIENT2_RECEIVED_FILE")"
+        fi
+
+        progressed="NO"
+        if [ "$client1_bytes" -ne "$last_client1" ] || [ "$client2_bytes" -ne "$last_client2" ]; then
+            progressed="YES"
+            last_progress_epoch="$now"
+            in_stall=0
+        fi
+
+        idle_sec=$((now - last_progress_epoch))
+        if [ "$idle_sec" -gt "$MAX_IDLE_OBSERVED_SEC" ]; then
+            MAX_IDLE_OBSERVED_SEC="$idle_sec"
+        fi
+
+        if [ "$idle_sec" -ge "$DOWNLINK_MAX_IDLE_SEC" ] && [ "$progressed" = "NO" ] && [ "$in_stall" -eq 0 ]; then
+            STALL_EVENTS=$((STALL_EVENTS + 1))
+            in_stall=1
+        fi
+
+        echo -e "${elapsed}\t${client1_bytes}\t${client2_bytes}\t${progressed}\t${idle_sec}" >> "$DOWNLINK_SAMPLES_TSV"
+        SAMPLE_COUNT=$((SAMPLE_COUNT + 1))
+
+        if payloads_complete; then
+            return 0
+        fi
+
+        if [ "$idle_sec" -gt "$DOWNLINK_MAX_IDLE_SEC" ]; then
+            RESULT_REASON="连续无推进窗口超过 ${DOWNLINK_MAX_IDLE_SEC} 秒"
+            return 1
+        fi
+
+        if [ "$elapsed" -ge "$DOWNLINK_TRANSFER_TIMEOUT_SEC" ]; then
+            RESULT_REASON="下行补充场景在 ${DOWNLINK_TRANSFER_TIMEOUT_SEC} 秒内未完成"
+            return 1
+        fi
+
+        last_client1="$client1_bytes"
+        last_client2="$client2_bytes"
+        sleep "$DOWNLINK_SAMPLE_INTERVAL_SEC"
     done
-    
-    log_fail "传输超时（${timeout}s），请查看日志: $LOG_DIR/uftp_server.log"
-    return 1
 }
 
-# ============================================
-# 完整传输测试
-# ============================================
-test_full_transfer() {
-    log_info "[Test 3] 40MB 完整传输测试..."
-    
-    # 1. 检查测试数据文件
-    if [ ! -f "$TEST_MODEL" ]; then
-        log_fail "测试数据文件不存在: $TEST_MODEL"
-        log_info "请运行以下命令生成测试数据："
-        log_info "  dd if=/dev/urandom of=$TEST_MODEL bs=1M count=40"
+verify_received_payloads() {
+    if [ ! -f "$DOWNLINK_CLIENT1_RECEIVED_FILE" ]; then
+        RESULT_REASON="client1 未生成接收文件"
         return 1
     fi
-    
-    # 2. 检查 UFTP 工具
-    if ! command -v uftp &>/dev/null; then
-        log_fail "未找到 uftp 命令，请安装 UFTP 工具"
-        log_info "安装方法: sudo apt-get install uftp"
+
+    CLIENT1_RECEIVED_SHA256="$(file_sha256 "$DOWNLINK_CLIENT1_RECEIVED_FILE")"
+    if [ "$DOWNLINK_SOURCE_SHA256" != "$CLIENT1_RECEIVED_SHA256" ]; then
+        RESULT_REASON="client1 接收文件校验和不匹配"
         return 1
     fi
-    
-    if ! command -v uftpd &>/dev/null; then
-        log_fail "未找到 uftpd 命令，请安装 UFTP 工具"
-        log_info "安装方法: sudo apt-get install uftp"
-        return 1
-    fi
-    
-    # 3. 检查 wfb_core 二进制文件
-    if [ ! -f "$PROJECT_ROOT/wfb_core" ]; then
-        log_fail "未找到 wfb_core 二进制文件: $PROJECT_ROOT/wfb_core"
-        log_info "请先编译项目: make"
-        return 1
-    fi
-    
-    # 4. 启动抓包（可选，用于事后分析）
-    if command -v tcpdump &>/dev/null; then
-        log_info "启动抓包..."
-        tcpdump -i "$WIFI_IFACE" -w "$LOG_DIR/capture.pcap" 2>/dev/null &
-        TCPDUMP_PID=$!
-        sleep 1
+
+    if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
+        if [ ! -f "$DOWNLINK_CLIENT2_RECEIVED_FILE" ]; then
+            RESULT_REASON="client2 未生成接收文件"
+            return 1
+        fi
+
+        CLIENT2_RECEIVED_SHA256="$(file_sha256 "$DOWNLINK_CLIENT2_RECEIVED_FILE")"
+        if [ "$DOWNLINK_SOURCE_SHA256" != "$CLIENT2_RECEIVED_SHA256" ]; then
+            RESULT_REASON="client2 接收文件校验和不匹配"
+            return 1
+        fi
+        SHARED_DISTRIBUTION_CONFIRMED="yes"
     else
-        log_warn "未找到 tcpdump，跳过抓包"
-    fi
-    
-    # 5. 启动 wfb_core 服务器
-    log_info "启动 wfb_core 服务器（网卡: $WIFI_IFACE）..."
-    "$PROJECT_ROOT/wfb_core" --mode server \
-        -i "$WIFI_IFACE" -c "$CHANNEL" -m "$MCS" --tun wfb0 \
-        --fec-n "$FEC_N" --fec-k "$FEC_K" \
-        2>&1 | tee "$LOG_DIR/server_transfer.log" &
-    SERVER_PID=$!
-    sleep 2
-
-    # 验证服务器启动
-    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
-        log_fail "服务器启动失败，请查看日志: $LOG_DIR/server_transfer.log"
-        return 1
+        SHARED_DISTRIBUTION_CONFIRMED="not_applicable"
     fi
 
-    # 6. 启动 wfb_core 客户端
-    log_info "启动 wfb_core 客户端（网卡: $WIFI_IFACE_CLIENT）..."
-    "$PROJECT_ROOT/wfb_core" --mode client \
-        -i "$WIFI_IFACE_CLIENT" -c "$CHANNEL" -m "$MCS" --tun wfb1 --node-id "$NODE_ID" \
-        --fec-n "$FEC_N" --fec-k "$FEC_K" \
-        2>&1 | tee "$LOG_DIR/client_transfer.log" &
-    CLIENT_PID=$!
-    sleep 2
+    return 0
+}
 
-    # 验证客户端启动
-    if ! kill -0 "$CLIENT_PID" 2>/dev/null; then
-        log_fail "客户端启动失败，请查看日志: $LOG_DIR/client_transfer.log"
-        return 1
+shared_distribution_status() {
+    if [ "$DOWNLINK_RECEIVER_COUNT" -lt 2 ]; then
+        echo "N/A"
+        return
     fi
-    
-    # 启动 UFTP 服务器 - 传输 tests/test_data/model_40mb.bin 文件
-    log_info "启动 UFTP 服务器..."
-    log_info "  文件: $TEST_MODEL"
-    log_info "  速率: ${UFTP_RATE}kbps"
-    log_info "  组播: $UFTP_GROUP:$UFTP_PORT"
-    
-    # uftp 参数说明：
-    # -R 7200: 传输速率 7200kbps
-    # -g 224.1.1.1: 组播地址
-    # -p 1042: 组播端口
-    # -T: 显示时间戳
-    # -r 5: 重传次数
-    uftp -R $UFTP_RATE -g $UFTP_GROUP -p $UFTP_PORT \
-        -T 10 -r $UFTP_RETRIES "$TEST_MODEL" \
-        2>&1 | tee "$LOG_DIR/uftp_server.log" &
-    UFTP_SERVER_PID=$!
-    sleep 2
-    
-    # 验证 UFTP 服务器启动
-    if ! kill -0 "$UFTP_SERVER_PID" 2>/dev/null; then
-        log_fail "UFTP 服务器启动失败，请查看日志: $LOG_DIR/uftp_server.log"
-        return 1
-    fi
-    
-    # 8. 启动 UFTP 客户端
-    log_info "启动 UFTP 客户端..."
-    # 创建接收目录
-    mkdir -p "$LOG_DIR/received"
 
-    # uftpd 参数说明：
-    # -p 1042: 监听端口
-    # -M 224.1.1.1: 组播地址
-    # -D: 接收文件保存目录
-    # -d: 前台运行（非守护进程模式）
-    uftpd -d -p $UFTP_PORT -M $UFTP_GROUP -D "$LOG_DIR/received" \
-        2>&1 | tee "$LOG_DIR/uftp_client.log" &
-    UFTP_CLIENT_PID=$!
-    sleep 2
-    
-    # 验证 UFTP 客户端启动
-    if ! kill -0 "$UFTP_CLIENT_PID" 2>/dev/null; then
-        log_fail "UFTP 客户端启动失败，请查看日志: $LOG_DIR/uftp_client.log"
-        return 1
-    fi
-    
-    # 9. 等待传输完成
-    if wait_for_transfer_complete; then
-        log_pass "[Test 3] 40MB 完整传输测试通过"
-        return 0
+    if [ "$SHARED_DISTRIBUTION_CONFIRMED" = "yes" ]; then
+        echo "PASS"
     else
-        log_fail "[Test 3] 40MB 完整传输测试失败"
-        log_info "调试建议："
-        log_info "  1. 检查网卡是否在正确的 Monitor 模式: iwconfig $WIFI_IFACE"
-        log_info "  2. 检查服务器和客户端是否使用相同的信道: iw dev $WIFI_IFACE info"
-        log_info "  3. 检查 UFTP 日志: cat $LOG_DIR/uftp_server.log"
-        log_info "  4. 检查 wfb_core 日志: cat $LOG_DIR/server_transfer.log"
-        log_info "  5. 使用 Wireshark 分析抓包文件: wireshark $LOG_DIR/capture.pcap"
-        return 1
+        echo "FAIL"
     fi
 }
 
-# ============================================
-# 主流程
-# ============================================
-main() {
-    echo "========================================"
-    echo "  40MB 完整传输测试"
-    echo "========================================"
-    echo ""
-    
-    # 打印配置摘要
-    print_config
-    echo ""
-    
-    # 创建日志目录
-    prepare_log_dir
-    
-    # 执行测试
-    if test_full_transfer; then
-        echo ""
-        log_pass "测试完成。日志目录: $LOG_DIR"
+render_context() {
+    cat > "$DOWNLINK_CONTEXT_FILE" <<EOF
+scenario=$SCENARIO
+analyze_only=$ANALYZE_ONLY
+log_dir=$LOG_DIR
+receiver_count=$DOWNLINK_RECEIVER_COUNT
+payload_size_bytes=$DOWNLINK_PAYLOAD_SIZE
+payload_file=$DOWNLINK_PAYLOAD_FILE
+client1_received_file=$DOWNLINK_CLIENT1_RECEIVED_FILE
+client2_received_file=$DOWNLINK_CLIENT2_RECEIVED_FILE
+source_sha256=$DOWNLINK_SOURCE_SHA256
+client1_sha256=$CLIENT1_RECEIVED_SHA256
+client2_sha256=$CLIENT2_RECEIVED_SHA256
+sample_file=$DOWNLINK_SAMPLES_TSV
+sample_count=$SAMPLE_COUNT
+max_idle_threshold_sec=$DOWNLINK_MAX_IDLE_SEC
+max_idle_observed_sec=$MAX_IDLE_OBSERVED_SEC
+stall_events=$STALL_EVENTS
+result_status=$RESULT_STATUS
+result_reason=$RESULT_REASON
+shared_distribution_expected=$([ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ] && echo yes || echo no)
+shared_distribution_confirmed=$SHARED_DISTRIBUTION_CONFIRMED
+uftp_server_log=$UFTP_SERVER_LOG
+client1_uftpd_log=$CLIENT1_UFTPD_LOG
+client2_uftpd_log=$CLIENT2_UFTPD_LOG
+pcap_file=$CAPTURE_PCAP_FILE
+pcap_log=$PCAP_CAPTURE_LOG
+analysis_chain_completed=$ANALYSIS_CHAIN_COMPLETED
+EOF
+}
+
+render_result() {
+    local shared_status
+    shared_status="$(shared_distribution_status)"
+
+    cat > "$DOWNLINK_RESULTS_MD" <<EOF
+# v5 real-hardware 下行补充证据结果
+
+- 结果: $RESULT_STATUS
+- 场景: $SCENARIO
+- 原因: $RESULT_REASON
+- 日志目录: $LOG_DIR
+- payload size: $DOWNLINK_PAYLOAD_SIZE bytes
+- receiver_count: $DOWNLINK_RECEIVER_COUNT
+- source sha256: $DOWNLINK_SOURCE_SHA256
+- client1 sha256: $CLIENT1_RECEIVED_SHA256
+- client2 sha256: $CLIENT2_RECEIVED_SHA256
+- 共享下行/分发证据: $shared_status
+- 样本文件: $DOWNLINK_SAMPLES_TSV
+- 样本数: $SAMPLE_COUNT
+- 最大连续无推进窗口: ${MAX_IDLE_OBSERVED_SEC} 秒
+- stall_events: $STALL_EVENTS
+
+## 与双客户端上行 long-run 的分工
+
+- 本场景用于大文件下行完整性、共享下行/分发补充证据，以及下行负载下可见堵塞现象采样。
+- 双客户端 Token-gated 上行 long-run 仍是 real-hardware 主场景；本场景不替代其长稳结论。
+
+## 自动判定覆盖
+
+- 大文件下行完整性：以源文件与接收文件 SHA256 一致为准。
+- 共享下行/分发证据：仅在 shared 场景下要求两个接收端都收到同一 payload。
+- 可见堵塞采样：记录 downlink_samples.tsv，用连续无推进窗口替代内部队列观测。
+
+## 人工判读关注点
+
+- 结合 downlink_samples.tsv、uftp_server.log 与接收端日志，判断时延抬升、重传增加、恢复变慢是否显著恶化。
+- 若自动判定为 PASS，但样本中出现接近门槛的平台期，仍需人工说明其上下文。
+- 若启用了抓包，请将 capture.pcap 与摘要结论一起归档到 issue / tracking issue。
+
+## 关键产物
+
+- $DOWNLINK_CONTEXT_FILE
+- $DOWNLINK_SAMPLES_TSV
+- $UFTP_SERVER_LOG
+- $CLIENT1_UFTPD_LOG
+- $CLIENT2_UFTPD_LOG
+EOF
+}
+
+run_analysis_chain() {
+    export LOG_DIR DOWNLINK_CONTEXT_FILE DOWNLINK_SAMPLES_TSV UFTP_SERVER_LOG CLIENT1_UFTPD_LOG CLIENT2_UFTPD_LOG
+    export DOWNLINK_SERVER_LOG DOWNLINK_CLIENT1_LOG DOWNLINK_CLIENT2_LOG CAPTURE_PCAP_FILE
+
+    # shellcheck disable=SC1091
+    source "$SCRIPT_DIR/collect_metrics.sh"
+    collect_all_metrics
+
+    # shellcheck disable=SC1091
+    source "$SCRIPT_DIR/generate_report.sh"
+    generate_report
+}
+
+finalize() {
+    render_context
+    render_result
+
+    if run_analysis_chain; then
+        ANALYSIS_CHAIN_COMPLETED="yes"
+        render_context
+        render_result
+    else
+        ANALYSIS_CHAIN_COMPLETED="no"
+        if [ "$RESULT_STATUS" = "PASS" ]; then
+            RESULT_STATUS="FAIL"
+            RESULT_REASON="指标采集或摘要生成失败"
+        fi
+        render_context
+        render_result
+    fi
+
+    if [ "$RESULT_STATUS" = "PASS" ]; then
+        log_pass "下行补充证据完成。日志目录: $LOG_DIR"
         exit 0
-    else
-        echo ""
-        log_fail "测试失败。日志目录: $LOG_DIR"
-        exit 1
     fi
+
+    log_fail "下行补充证据失败。日志目录: $LOG_DIR"
+    exit 1
+}
+
+main() {
+    prepare_log_dir
+
+    if [ "$DOWNLINK_RECEIVER_COUNT" -lt 1 ] || [ "$DOWNLINK_RECEIVER_COUNT" -gt 2 ]; then
+        RESULT_REASON="DOWNLINK_RECEIVER_COUNT 仅支持 1 或 2"
+        finalize
+    fi
+
+    if [ "$ANALYZE_ONLY" = true ]; then
+        if [ -f "$DOWNLINK_CONTEXT_FILE" ]; then
+            RESULT_STATUS="$(awk -F= '/^result_status=/{print substr($0, index($0, "=")+1)}' "$DOWNLINK_CONTEXT_FILE" | tail -1)"
+            RESULT_REASON="$(awk -F= '/^result_reason=/{print substr($0, index($0, "=")+1)}' "$DOWNLINK_CONTEXT_FILE" | tail -1)"
+        else
+            RESULT_STATUS="FAIL"
+            RESULT_REASON="--analyze-only 缺少现有 downlink_context.txt"
+        fi
+        finalize
+    fi
+
+    if [ -z "$DOWNLINK_UFTP_SEND_CMD" ] || [ -z "$DOWNLINK_CLIENT1_RECEIVE_CMD" ] || { [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ] && [ -z "$DOWNLINK_CLIENT2_RECEIVE_CMD" ]; }; then
+        RESOLVED_UFTP_BIN="$(resolve_uftp_binary UFTP_BIN uftp)"
+        RESOLVED_UFTPD_BIN="$(resolve_uftp_binary UFTPD_BIN uftpd)"
+    else
+        RESOLVED_UFTP_BIN="custom"
+        RESOLVED_UFTPD_BIN="custom"
+    fi
+
+    ensure_payload_file
+    start_optional_processes
+    start_capture_if_needed
+    start_receivers
+    start_sender
+
+    if monitor_transfer_progress && wait "$TRANSFER_SENDER_PID" && verify_received_payloads; then
+        RESULT_STATUS="PASS"
+        RESULT_REASON="大文件下行与补充证据满足固定口径"
+    else
+        local primary_reason="${RESULT_REASON:-}"
+        if [ -z "$primary_reason" ] || [ "$primary_reason" = "未执行" ]; then
+            primary_reason="下行补充证据执行失败"
+        fi
+        verify_received_payloads || true
+        RESULT_REASON="$primary_reason"
+        RESULT_STATUS="FAIL"
+    fi
+
+    finalize
 }
 
 main "$@"

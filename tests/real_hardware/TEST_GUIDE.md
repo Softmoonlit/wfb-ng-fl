@@ -422,6 +422,91 @@ sudo bash tests/real_hardware/one_click_test.sh --token --token-scenario dual-lo
 
 ---
 
+## v5 下行补充证据场景
+
+> 适用范围：issue #12。该入口用于 `v5` real-hardware 线的**下行补充证据**，不是双客户端 Token-gated 上行 long-run 主场景的替代品。
+
+统一脚本：
+
+- `tests/real_hardware/test_full_transfer.sh`
+
+### 与上行 long-run 主场景的分工
+
+- **双客户端 Token-gated 上行 long-run**：负责 `v5` real-hardware 主场景，关注长期推进、轮换稳定性、控制面持续可用性与停滞风险
+- **下行补充证据场景**：负责大文件下行完整性、共享下行/分发相关证据，以及下行负载下的可见堵塞现象采样
+- 下行场景的自动产物用于形成正式证据包；最终是否构成正式 `v5` 迁移证据，仍需人工按固定模板判读
+
+### 场景形态
+
+脚本支持两种固定口径：
+
+1. `single`：单接收端大文件下行完整性补充证据
+2. `shared`：在 `single` 基础上增加第二个接收端，补齐共享下行/分发相关证据
+
+默认运行 `single`；显式传 `--scenario shared` 时启用第二个接收端。
+
+### 自动产物
+
+脚本执行完成后，会在 `LOG_DIR` 下生成至少以下产物：
+
+- `downlink_results.md`：本次下行补充证据自动结论
+- `downlink_context.txt`：机器可读的固定口径与关键结果
+- `downlink_samples.tsv`：按固定周期采样的推进留痕
+- `metrics.json`：自动指标汇总
+- `summary.txt`：自动摘要报告
+
+其中 `downlink_samples.tsv` 用于替代内部队列观测，关注：
+
+- 传输耗时抬升
+- 重传增加
+- 连续无推进窗口（停滞）
+- 长时间运行后恢复速度变差
+
+### 运行方式
+
+#### 1. 直接执行补充证据场景
+
+```bash
+sudo bash tests/real_hardware/test_full_transfer.sh --scenario single
+sudo bash tests/real_hardware/test_full_transfer.sh --scenario shared
+```
+
+#### 2. 对既有日志目录补采摘要
+
+如果本次只需要对既有 `LOG_DIR` 中的日志重新生成指标和摘要，可使用：
+
+```bash
+LOG_DIR=tests/logs/<已有目录> \
+  bash tests/real_hardware/test_full_transfer.sh --analyze-only
+```
+
+### 常用环境变量钩子
+
+- `DOWNLINK_PAYLOAD_SIZE`：自动生成 payload 大小，默认 `41943040` 字节
+- `DOWNLINK_TRANSFER_TIMEOUT_SEC`：传输完成总超时
+- `DOWNLINK_SAMPLE_INTERVAL_SEC`：采样周期
+- `DOWNLINK_MAX_IDLE_SEC`：允许的最大连续无推进窗口
+- `DOWNLINK_UFTP_SEND_CMD`：自定义发送命令；未设置时脚本尝试使用 `uftp`
+- `DOWNLINK_CLIENT1_RECEIVE_CMD` / `DOWNLINK_CLIENT2_RECEIVE_CMD`：自定义接收命令；未设置时脚本尝试使用 `uftpd`
+- `DOWNLINK_SERVER_TUN_CMD`、`DOWNLINK_CLIENT1_TUN_CMD`、`DOWNLINK_CLIENT2_TUN_CMD`：需要由脚本一并拉起 split-process/TUN 路径时使用
+- `DOWNLINK_SERVER_TX_CMD` / `DOWNLINK_SERVER_RX_CMD` / `DOWNLINK_CLIENT{1,2}_TX_CMD` / `DOWNLINK_CLIENT{1,2}_RX_CMD`：需要脚本一并拉起底层 `wfb_tx` / `wfb_rx` 时使用
+- `PCAP_CAPTURE_CMD`：自定义抓包命令；若未设置且本机存在 `tcpdump`，脚本会尝试对服务端网卡抓包
+
+### 自动判定关注点
+
+- 源 payload 与接收 payload 的 SHA256 一致
+- `shared` 场景下两个接收端都收到同一份 payload
+- `downlink_samples.tsv` 中没有超过门槛的连续无推进窗口
+- 自动摘要已落盘到 `metrics.json` 与 `summary.txt`
+
+### 人工判读关注点
+
+- 即使自动结论为 PASS，也要检查样本文件是否出现接近门槛的平台期
+- 结合 `uftp_server.log`、接收端日志与底层 `server/client` 日志，解释时延抬升、重传增加、恢复变慢
+- 若启用了 `capture.pcap`，将抓包与摘要、人工判读结论一起归档到 issue / tracking issue
+
+---
+
 ## 跨机器 KCP 小文件上传测试
 
 > 适用场景：server 与 client 分布在不同机器上，需要跨机器完成 `kcp-small` 的单客户端文件上传闭环。
