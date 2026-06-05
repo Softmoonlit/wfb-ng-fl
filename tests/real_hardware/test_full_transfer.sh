@@ -198,6 +198,38 @@ file_size() {
     stat -c %s "$path" 2>/dev/null || echo 0
 }
 
+
+dir_tree_size() {
+    local dir="$1"
+    local total=0
+    local path size
+
+    if [ ! -d "$dir" ]; then
+        echo 0
+        return
+    fi
+
+    while IFS= read -r -d '' path; do
+        size="$(stat -c %s "$path" 2>/dev/null || echo 0)"
+        total=$((total + size))
+    done < <(find "$dir" -type f -print0 2>/dev/null)
+
+    echo "$total"
+}
+
+receiver_progress_size() {
+    local received_file="$1"
+    local temp_dir="$2"
+    local final_size
+
+    final_size="$(file_size "$received_file")"
+    if [ "$final_size" -gt 0 ]; then
+        echo "$final_size"
+        return
+    fi
+
+    dir_tree_size "$temp_dir"
+}
 ensure_payload_file() {
     if [ -f "$DOWNLINK_PAYLOAD_FILE" ]; then
         DOWNLINK_SOURCE_SHA256="$(file_sha256 "$DOWNLINK_PAYLOAD_FILE")"
@@ -413,10 +445,10 @@ EOF
     while true; do
         now="$(date +%s)"
         elapsed=$((now - start_epoch))
-        client1_bytes="$(file_size "$DOWNLINK_CLIENT1_RECEIVED_FILE")"
+        client1_bytes="$(receiver_progress_size "$DOWNLINK_CLIENT1_RECEIVED_FILE" "$DOWNLINK_CLIENT1_TEMP_DIR")"
         client2_bytes=0
         if [ "$DOWNLINK_RECEIVER_COUNT" -ge 2 ]; then
-            client2_bytes="$(file_size "$DOWNLINK_CLIENT2_RECEIVED_FILE")"
+            client2_bytes="$(receiver_progress_size "$DOWNLINK_CLIENT2_RECEIVED_FILE" "$DOWNLINK_CLIENT2_TEMP_DIR")"
         fi
 
         progressed="NO"
@@ -575,9 +607,9 @@ render_result() {
 
 ## 正式归档要求
 
-- 原始产物层至少保留 `downlink_results.md`、`downlink_context.txt`、`downlink_samples.tsv`、`metrics.json`、`summary.txt` 与关键日志/抓包。
+- 原始产物层至少保留 \`downlink_results.md\`、\`downlink_context.txt\`、\`downlink_samples.tsv\`、\`metrics.json\`、\`summary.txt\` 与关键日志/抓包。
 - 正式结论层必须回填到 issue / tracking issue，不能只把日志目录留在本地。
-- Issue 回填最小字段：运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 `v5` 基线证据、是否需要重跑。
+- Issue 回填最小字段：运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 \`v5\` 基线证据、是否需要重跑。
 - tracking issue 未按固定模板回填正式结论前不得关闭。
 
 

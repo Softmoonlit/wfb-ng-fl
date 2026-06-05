@@ -14,6 +14,8 @@
 
 它不是 CI 硬 gate，也不是 `v6` 的实现设计文档。
 
+如需现场执行顺序、成功跑数命令、已知失败模式与避坑建议，请同时阅读：`tests/real_hardware/真实硬件正式跑数复盘与避坑手册.md`。
+
 ---
 
 ## 1. `v5` real-hardware 基线定义
@@ -106,14 +108,31 @@ sudo iw dev <iface> set channel 157 HT40+
 
 ## 3. 执行前准备
 
-建议在每次正式跑数前先清理残留进程：
+建议在每次正式跑数前先执行固定入口脚本，先校正环境，再复检：
 
 ```bash
-sudo pkill -9 -f "wfb_tx" || true
-sudo pkill -9 -f "wfb_rx" || true
-sudo pkill -9 -f "wfb_token_scheduler" || true
-sudo pkill -9 -f "uftpd" || true
-sudo pkill -9 -f "uftp" || true
+sudo bash tests/real_hardware/preflight_checklist.sh --apply
+```
+
+仅做现场检查、不修改系统状态时：
+
+```bash
+bash tests/real_hardware/preflight_checklist.sh --check-only
+```
+
+如果仍需要手工清理，优先使用更窄的进程名匹配，避免 `pkill -9 -f ...` 误杀编排链路或系统常驻 `uftpd`：
+
+```bash
+sudo pkill -x wfb_tx || true
+sudo pkill -x wfb_rx || true
+sudo pkill -x wfb_tun || true
+sudo pkill -x wfb_token_scheduler || true
+sudo pkill -x uftp || true
+# uftpd 先通过 ps 确认来源，再决定是否结束
+
+sudo ip link del rhsrvtun || true
+sudo ip link del rhc1tun || true
+sudo ip link del rhc2tun || true
 ```
 
 若采用跨机部署，还应确认：
@@ -121,6 +140,7 @@ sudo pkill -9 -f "uftp" || true
 - 调度器与对应 `wfb_tx` 在同一台机器上
 - 远端启动命令已封装为 `ssh ...` 或等价方式
 - 日志目录、抓包、截图能被回收
+
 
 ---
 

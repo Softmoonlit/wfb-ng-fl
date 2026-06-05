@@ -300,7 +300,7 @@ count_scheduler_grants() {
         echo 0
         return
     fi
-    grep -c '^grant seq=' "$logfile" 2>/dev/null || echo 0
+    grep -c '^grant seq=' "$logfile" 2>/dev/null || true
 }
 
 count_grants_for_node() {
@@ -310,7 +310,7 @@ count_grants_for_node() {
         echo 0
         return
     fi
-    grep -Ec "^grant seq=.* node_id=$node_id " "$logfile" 2>/dev/null || echo 0
+    grep -Ec "^grant seq=.* node_id=$node_id " "$logfile" 2>/dev/null || true
 }
 
 count_guard_events() {
@@ -319,7 +319,7 @@ count_guard_events() {
         echo 0
         return
     fi
-    grep -Ec '^guard seq=' "$logfile" 2>/dev/null || echo 0
+    grep -Ec '^guard seq=' "$logfile" 2>/dev/null || true
 }
 
 count_join_rejoin_for_node() {
@@ -329,7 +329,7 @@ count_join_rejoin_for_node() {
         echo 0
         return
     fi
-    grep -Ec "^join/rejoin node_id=$node_id " "$logfile" 2>/dev/null || echo 0
+    grep -Ec "^join/rejoin node_id=$node_id " "$logfile" 2>/dev/null || true
 }
 
 count_evict_events() {
@@ -338,7 +338,7 @@ count_evict_events() {
         echo 0
         return
     fi
-    grep -Ec '^evict node_id=' "$logfile" 2>/dev/null || echo 0
+    grep -Ec '^evict node_id=' "$logfile" 2>/dev/null || true
 }
 
 count_remove_events() {
@@ -347,7 +347,7 @@ count_remove_events() {
         echo 0
         return
     fi
-    grep -Ec '^remove node_id=' "$logfile" 2>/dev/null || echo 0
+    grep -Ec '^remove node_id=' "$logfile" 2>/dev/null || true
 }
 
 latest_token_filter_line() {
@@ -395,16 +395,13 @@ extract_token_auth_field() {
 
 extract_server_data_packets() {
     local logfile="$1"
-    local max_count=0
+    local total_count=0
     while IFS= read -r line; do
         if [[ "$line" =~ PKT[[:space:]]+([0-9]+):([0-9]+):([0-9]+):([0-9]+):([0-9]+) ]]; then
-            local val="${BASH_REMATCH[5]}"
-            if [ "$val" -gt "$max_count" ]; then
-                max_count="$val"
-            fi
+            total_count=$((total_count + BASH_REMATCH[5]))
         fi
     done < "$logfile"
-    echo "$max_count"
+    echo "$total_count"
 }
 
 file_sha256() {
