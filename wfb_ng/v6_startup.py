@@ -156,6 +156,38 @@ def _resolve_tun_summary(settings, profile_name):
 
     raise V6StartupConfigError('%s 缺少 tunnel 服务配置' % profile_name)
 
+def _has_legacy_keypair_material(settings, profile_name):
+    profile_section = _require_section(settings, profile_name)
+    streams = _require_attr(profile_section, 'streams', profile_name)
+    if not isinstance(streams, list):
+        raise V6StartupConfigError('%s.streams 必须是列表' % profile_name)
+
+    for stream in streams:
+        merged = {}
+        for base_profile in stream.get('profiles', []):
+            merged.update(_section_values(_require_section(settings, base_profile)))
+        merged.update(stream)
+
+        keypair = merged.get('keypair')
+        if isinstance(keypair, str) and keypair.strip():
+            return True
+
+    return False
+
+
+def _validate_link_security_mode(settings, profile_name, link_security_mode):
+    if link_security_mode == 'legacy_encrypted':
+        if not _has_legacy_keypair_material(settings, profile_name):
+            raise V6StartupConfigError('%s 在 legacy_encrypted 缺少旧 keypair' % profile_name)
+        return
+
+    if link_security_mode == 'trusted_plaintext':
+        if _has_legacy_keypair_material(settings, profile_name):
+            raise V6StartupConfigError('%s 在 trusted_plaintext 下禁止旧 keypair' % profile_name)
+        return
+
+    raise V6StartupConfigError('%s.link_security_mode 必须是 trusted_plaintext 或 legacy_encrypted' % profile_name)
+
 
 def _resolve_known_clients(section, context):
     value = _require_attr(section, 'known_clients', context)
@@ -264,6 +296,7 @@ def resolve_v6_startup_config(settings, profile_name, radio_interfaces=None, rol
     uplink_stream = _require_positive_int(profile_section, 'uplink_stream', profile_name, allow_zero=True)
     downlink_stream = _require_positive_int(profile_section, 'downlink_stream', profile_name, allow_zero=True)
     link_security_mode = _require_attr(profile_section, 'link_security_mode', profile_name)
+    _validate_link_security_mode(settings, profile_name, link_security_mode)
 
     summary = {
         'profile': profile_name,
@@ -298,6 +331,11 @@ def resolve_v6_startup_configs(settings, profile_names, radio_interfaces=None, r
     for summary in summaries[1:]:
         if summary['common']['role'] != role:
             raise V6StartupConfigError('同一实例的所有 profile 必须解析为同一 role')
+
+    link_security_mode = summaries[0]['common']['link_security_mode']
+    for summary in summaries[1:]:
+        if summary['common']['link_security_mode'] != link_security_mode:
+            raise V6StartupConfigError('同一实例的所有 profile 必须解析为同一 link_security_mode')
 
     return {
         'role': role,

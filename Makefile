@@ -106,6 +106,16 @@ rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.cpp src/rx.hpp src
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.rx_test.o src/token_event_ipc.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.rx_test.o src/token_authorization_ipc.cpp
 	$(CXX) $(_CFLAGS) -o $@ src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/token_control_packet.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+plaintext_txrx_test: src/plaintext_txrx_test.cpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/token_control_packet.cpp src/token_event_ipc.cpp src/token_authorization_ipc.cpp src/token_authorization.cpp src/tx_token_gate.cpp
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.plaintext_test.o src/radiotap.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.plaintext_test.o src/zfex.c
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.plaintext_test.o src/wifibroadcast.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_control_packet.plaintext_test.o src/token_control_packet.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.plaintext_test.o src/token_event_ipc.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.plaintext_test.o src/token_authorization_ipc.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization.plaintext_test.o src/token_authorization.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/tx_token_gate.plaintext_test.o src/tx_token_gate.cpp
+	$(CXX) $(_CFLAGS) -o $@ src/plaintext_txrx_test.cpp src/radiotap.plaintext_test.o src/zfex.plaintext_test.o src/wifibroadcast.plaintext_test.o src/token_control_packet.plaintext_test.o src/token_event_ipc.plaintext_test.o src/token_authorization_ipc.plaintext_test.o src/token_authorization.plaintext_test.o src/tx_token_gate.plaintext_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 wfb_keygen: src/keygen.o
 	$(CC) -o $@ $^ $(_LDFLAGS)
@@ -134,7 +144,7 @@ baseline_split_test:
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_txrx.TXRXTestCase wfb_ng.tests.test_txrx.KeyDerivationTestCase
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_tuntap.TUNTAPTestCase
 
-test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test token_control_filter_test rx_token_ipc_test rx_token_listener_test baseline_split_test
+test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test token_control_filter_test rx_token_ipc_test rx_token_listener_test plaintext_txrx_test baseline_split_test
 	./fec_test
 	./libsodium_test
 	./token_scheduler_test
@@ -148,6 +158,7 @@ test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_
 	./token_control_filter_test
 	./rx_token_ipc_test
 	./rx_token_listener_test
+	./plaintext_txrx_test
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests
 
 rpm:  all_bin wfb_rtsp $(ENV)

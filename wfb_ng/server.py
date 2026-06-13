@@ -334,14 +334,13 @@ def main():
         log.theLogPublisher._startLogging(obs.emit, False)
 
     if startup_summary is not None:
-        link_security_modes = sorted(set(profile_summary['common']['link_security_mode']
-                                         for profile_summary in startup_summary['profiles']))
+        link_security_mode = startup_summary['profiles'][0]['common']['link_security_mode']
         risk_markers = []
-        if 'trusted_plaintext' in link_security_modes:
+        if link_security_mode == 'trusted_plaintext':
             risk_markers.append('受信任环境/无链路机密性')
         log.msg('V6 startup role=%s link_security_mode=%s profiles=%s%s' %
                 (startup_summary['role'],
-                 ','.join(link_security_modes),
+                 link_security_mode,
                  ' '.join(profiles),
                  '' if not risk_markers else ' risk=%s' % ','.join(risk_markers)))
         log.msg('V6 startup summary: %s' % (format_v6_startup_summary(startup_summary),))

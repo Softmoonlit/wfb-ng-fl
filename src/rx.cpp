@@ -268,15 +268,26 @@ void Receiver::loop_iter(void)
 }
 
 
-Aggregator::Aggregator(const string &keypair, uint64_t epoch, uint32_t channel_id, uint8_t local_node_id) : \
+Aggregator::Aggregator(const string &keypair, uint64_t epoch, uint32_t channel_id, uint8_t local_node_id,
+                       bool trusted_plaintext, int plaintext_fec_k, int plaintext_fec_n) : \
     count_p_all(0), count_b_all(0), count_p_dec_err(0), count_p_session(0), count_p_data(0), count_p_fec_recovered(0),
     count_p_lost(0), count_p_bad(0), count_p_override(0), count_p_outgoing(0), count_b_outgoing(0),
     token_filter_counters{},
     fec_p(NULL), fec_k(-1), fec_n(-1), seq(0), rx_ring{}, rx_ring_front(0), rx_ring_alloc(0),
-    last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id)
+    last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext)
 {
     memset(session_key, '\0', sizeof(session_key));
     memset(session_hash, '\0', sizeof(session_hash));
+
+    if (trusted_plaintext)
+    {
+        if (!(plaintext_fec_k >= 1 && plaintext_fec_n >= 1 && plaintext_fec_k <= plaintext_fec_n && plaintext_fec_n < 256))
+        {
+            throw runtime_error("trusted_plaintext requires valid plaintext FEC k/n");
+        }
+        init_fec(plaintext_fec_k, plaintext_fec_n);
+        return;
+    }
 
     FILE *fp;
     if((fp = fopen(keypair.c_str(), "r")) == NULL)
@@ -601,7 +612,7 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     switch(buf[0])
     {
     case WFB_PACKET_DATA:
-        if(size < sizeof(wblock_hdr_t) + crypto_aead_chacha20poly1305_ABYTES + sizeof(wpacket_hdr_t))
+        if(size < sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + (trusted_plaintext ? 0 : crypto_aead_chacha20poly1305_ABYTES))
         {
             WFB_ERR("Short packet (fec header)\n");
             count_p_bad += 1;
@@ -610,6 +621,13 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
         break;
 
     case WFB_PACKET_SESSION:
+        if (trusted_plaintext)
+        {
+            WFB_ERR("Unexpected session packet in trusted_plaintext\n");
+            count_p_bad += 1;
+            return;
+        }
+
         new_session_data = (wsession_data_t*)session_tmp;
 
         if(size < sizeof(wsession_hdr_t) + sizeof(wsession_data_t) + crypto_box_MACBYTES || \
@@ -627,13 +645,11 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
                               ((wsession_hdr_t*)buf)->session_nonce,
                               sizeof(((wsession_hdr_t*)buf)->session_nonce)) != 0)
         {
-            // Should newer happened
             assert(0);
         }
 
         if (memcmp(session_hash, new_session_hash, sizeof(session_hash)) == 0)
         {
-            // Session is equal to current so we can ignore it
             count_p_session += 1;
             return;
         }
@@ -648,8 +664,6 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
             count_p_dec_err += 1;
             return;
         }
-
-        //new_session_tags_size = size - (sizeof(wsession_hdr_t) + sizeof(wsession_data_t) + crypto_box_MACBYTES);
 
         if (be64toh(new_session_data->epoch) < epoch)
         {
@@ -688,10 +702,6 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
 
         count_p_session += 1;
 
-        // Ignore RSSI (and per-card rx counters) for session packets to simplify calculation
-        // of lost packets because session packets doesn't have any serial number and it is
-        // too hard to calculate number of unique session packets
-
         if (memcmp(session_key, new_session_data->session_key, sizeof(session_key)) != 0)
         {
             epoch = be64toh(new_session_data->epoch);
@@ -708,9 +718,7 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
             IPC_MSG_SEND();
         }
 
-        // Cache already processed session
         memcpy(session_hash, new_session_hash, sizeof(session_hash));
-
         return;
 
     case WFB_PACKET_TOKEN_CONTROL:
@@ -752,12 +760,17 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     unsigned long long decrypted_len;
     wblock_hdr_t *block_hdr = (wblock_hdr_t*)buf;
 
-    if (crypto_aead_chacha20poly1305_decrypt(decrypted, &decrypted_len,
-                                             NULL,
-                                             buf + sizeof(wblock_hdr_t), size - sizeof(wblock_hdr_t),
-                                             buf,
-                                             sizeof(wblock_hdr_t),
-                                             (uint8_t*)(&(block_hdr->data_nonce)), session_key) != 0)
+    if (trusted_plaintext)
+    {
+        decrypted_len = size - sizeof(wblock_hdr_t);
+        memcpy(decrypted, buf + sizeof(wblock_hdr_t), decrypted_len);
+    }
+    else if (crypto_aead_chacha20poly1305_decrypt(decrypted, &decrypted_len,
+                                                  NULL,
+                                                  buf + sizeof(wblock_hdr_t), size - sizeof(wblock_hdr_t),
+                                                  buf,
+                                                  sizeof(wblock_hdr_t),
+                                                  (uint8_t*)(&(block_hdr->data_nonce)), session_key) != 0)
     {
         WFB_ERR("Unable to decrypt packet #0x%" PRIx64 "\n", be64toh(block_hdr->data_nonce));
         count_p_dec_err += 1;
@@ -974,8 +987,9 @@ void Aggregator::apply_fec(int ring_idx)
     assert(rc == ZFEX_SC_OK);
 }
 
-AggregatorUDPv4::AggregatorUDPv4(const std::string &client_addr, int client_port, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size, uint8_t local_node_id) : \
-    Aggregator(keypair, epoch, channel_id, local_node_id)
+AggregatorUDPv4::AggregatorUDPv4(const std::string &client_addr, int client_port, const std::string &keypair, uint64_t epoch, uint32_t channel_id,
+                                 int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext, int plaintext_fec_k, int plaintext_fec_n) : \
+    Aggregator(keypair, epoch, channel_id, local_node_id, trusted_plaintext, plaintext_fec_k, plaintext_fec_n)
 {
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) throw std::runtime_error(string_format("Error opening socket: %s", strerror(errno)));
@@ -1005,8 +1019,9 @@ void AggregatorUDPv4::send_to_socket(const uint8_t *payload, uint16_t packet_siz
     sendto(sockfd, payload, packet_size, MSG_DONTWAIT, (sockaddr*)&saddr, sizeof(saddr));
 }
 
-AggregatorUNIX::AggregatorUNIX(const std::string &socket_path, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size, uint8_t local_node_id) : \
-    Aggregator(keypair, epoch, channel_id, local_node_id)
+AggregatorUNIX::AggregatorUNIX(const std::string &socket_path, const std::string &keypair, uint64_t epoch, uint32_t channel_id,
+                               int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext, int plaintext_fec_k, int plaintext_fec_n) : \
+    Aggregator(keypair, epoch, channel_id, local_node_id, trusted_plaintext, plaintext_fec_k, plaintext_fec_n)
 {
     sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (sockfd < 0) throw std::runtime_error(string_format("Error opening socket: %s", strerror(errno)));
@@ -1157,18 +1172,25 @@ void network_loop(int srv_port, unique_ptr<BaseAggregator> &agg, int log_interva
                 {
                     continue;
                 }
-                agg->process_packet(buf, rsize - sizeof(wrxfwd_t),
-                                    fwd_hdr.wlan_idx, fwd_hdr.antenna,
-                                    fwd_hdr.rssi, fwd_hdr.noise, ntohs(fwd_hdr.freq),
-                                    fwd_hdr.mcs_index, fwd_hdr.bandwidth, &sockaddr);
+
+                rsize -= sizeof(wrxfwd_t);
+
+                agg->process_packet(buf,
+                                    rsize,
+                                    fwd_hdr.wlan_idx,
+                                    fwd_hdr.antenna,
+                                    fwd_hdr.rssi,
+                                    fwd_hdr.noise,
+                                    ntohs(fwd_hdr.freq),
+                                    fwd_hdr.mcs_index,
+                                    fwd_hdr.bandwidth,
+                                    &sockaddr);
             }
-            if(errno != EWOULDBLOCK) throw runtime_error(string_format("Error receiving packet: %s", strerror(errno)));
         }
     }
 }
 
 #ifndef __WFB_RX_SHARED_LIBRARY__
-
 int main(int argc, char* const *argv)
 {
     int opt;
@@ -1183,11 +1205,13 @@ int main(int argc, char* const *argv)
     int rcv_buf = 0;
     int snd_buf = 0;
     uint8_t local_node_id = 0;
+    int plaintext_fec_k = -1;
+    int plaintext_fec_n = -1;
 
     string keypair = "rx.key";
     string unix_socket = "";
 
-    while ((opt = getopt(argc, argv, "K:N:fa:c:u:U:p:l:i:e:R:s:")) != -1) {
+    while ((opt = getopt(argc, argv, "K:N:fa:c:u:U:p:l:i:e:R:s:k:n:")) != -1) {
         switch (opt) {
         case 'K':
             keypair = optarg;
@@ -1228,6 +1252,12 @@ int main(int argc, char* const *argv)
         case 's':
             snd_buf = atoi(optarg);
             break;
+        case 'k':
+            plaintext_fec_k = atoi(optarg);
+            break;
+        case 'n':
+            plaintext_fec_n = atoi(optarg);
+            break;
         case 'l':
             log_interval = atoi(optarg);
             break;
@@ -1240,12 +1270,12 @@ int main(int argc, char* const *argv)
         default: /* '?' */
         show_usage:
             WFB_INFO("Local RX: %s [-K rx_key] [-N local_node_id] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-p radio_port]\n"
-                     "             [-R rcv_buf] [-s snd_buf] [-l log_interval] [-e epoch] [-i link_id] interface1 [interface2] ...\n", argv[0]);
+                     "             [-R rcv_buf] [-s snd_buf] [-l log_interval] [-e epoch] [-i link_id] [-k fec_k] [-n fec_n] interface1 [interface2] ...\n", argv[0]);
             WFB_INFO("RX forwarder: %s -f [-c client_addr] [-u client_port] [-p radio_port]  [-R rcv_buf] [-s snd_buf]\n"
                      "                    [-i link_id] interface1 [interface2] ...\n", argv[0]);
             WFB_INFO("RX aggregator: %s -a server_port [-K rx_key] [-N local_node_id] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-R rcv_buf]\n"
-                     "                                 [-s snd_buf] [-l log_interval] [-p radio_port] [-e epoch] [-i link_id]\n", argv[0]);
-            WFB_INFO("Default: K='%s', local_node_id=%u, connect=%s:%d, link_id=0x%06x, radio_port=%u, epoch=%" PRIu64 ", log_interval=%d, rcv_buf=system_default, snd_buf=system_default\n", keypair.c_str(), local_node_id, client_addr.c_str(), client_port, link_id, radio_port, epoch, log_interval);
+                     "                                 [-s snd_buf] [-l log_interval] [-p radio_port] [-e epoch] [-i link_id] [-k fec_k] [-n fec_n]\n", argv[0]);
+            WFB_INFO("Default: K='%s', local_node_id=%u, connect=%s:%d, link_id=0x%06x, radio_port=%u, epoch=%" PRIu64 ", log_interval=%d, rcv_buf=system_default, snd_buf=system_default, plaintext_fec=%d/%d\n", keypair.c_str(), local_node_id, client_addr.c_str(), client_port, link_id, radio_port, epoch, log_interval, plaintext_fec_k, plaintext_fec_n);
             WFB_INFO("WFB-ng version %s, FEC: %s\n", WFB_VERSION, zfex_opt);
             WFB_INFO("WFB-ng home page: <http://wfb-ng.org>\n");
             exit(1);
@@ -1276,6 +1306,12 @@ int main(int argc, char* const *argv)
     try
     {
         uint32_t channel_id = (link_id << 8) + radio_port;
+        const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
+
+        if (trusted_plaintext && (plaintext_fec_k < 1 || plaintext_fec_n < 1))
+        {
+            throw runtime_error("trusted_plaintext requires -k/-n for rx");
+        }
 
         // WiFi interface(s) are required for all modes except aggregator
         if(rx_mode == AGGREGATOR)
@@ -1296,13 +1332,15 @@ int main(int argc, char* const *argv)
         case AGGREGATOR:
             if(unix_socket.length() > 0)
             {
-                agg = unique_ptr<AggregatorUNIX>(new AggregatorUNIX(unix_socket, keypair, epoch, channel_id, snd_buf, local_node_id));
+                agg = unique_ptr<AggregatorUNIX>(new AggregatorUNIX(unix_socket, keypair, epoch, channel_id, snd_buf, local_node_id,
+                                                                    trusted_plaintext, plaintext_fec_k, plaintext_fec_n));
                 token_event_listener = unique_ptr<TokenEventDatagramListener>(new TokenEventDatagramListener(unix_socket));
                 static_cast<Aggregator*>(agg.get())->set_token_control_listener(token_event_listener.get());
             }
             else
             {
-                agg = unique_ptr<AggregatorUDPv4>(new AggregatorUDPv4(client_addr, client_port, keypair, epoch, channel_id, snd_buf, local_node_id));
+                agg = unique_ptr<AggregatorUDPv4>(new AggregatorUDPv4(client_addr, client_port, keypair, epoch, channel_id, snd_buf, local_node_id,
+                                                                      trusted_plaintext, plaintext_fec_k, plaintext_fec_n));
             }
             break;
 

@@ -51,13 +51,15 @@ using namespace std;
 #include "token_authorization_ipc.hpp"
 #include "tx_token_gate.hpp"
 
-Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, vector<tags_item_t> &tags) : \
+Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
+                         vector<tags_item_t> &tags, bool trusted_plaintext) : \
     fec_p(NULL), fec_k(-1), fec_n(-1),
     block_idx(0), fragment_idx(0),
     max_packet_size(0),
     epoch(epoch),
     channel_id(channel_id),
     fec_delay(fec_delay),
+    trusted_plaintext(trusted_plaintext),
     tx_secretkey{},
     rx_publickey{},
     session_key{},
@@ -66,22 +68,25 @@ Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, ui
     tags(tags)
 {
 
-    FILE *fp;
-    if ((fp = fopen(keypair.c_str(), "r")) == NULL)
+    if (!trusted_plaintext)
     {
-        throw runtime_error(string_format("Unable to open %s: %s", keypair.c_str(), strerror(errno)));
-    }
-    if (fread(tx_secretkey, crypto_box_SECRETKEYBYTES, 1, fp) != 1)
-    {
+        FILE *fp;
+        if ((fp = fopen(keypair.c_str(), "r")) == NULL)
+        {
+            throw runtime_error(string_format("Unable to open %s: %s", keypair.c_str(), strerror(errno)));
+        }
+        if (fread(tx_secretkey, crypto_box_SECRETKEYBYTES, 1, fp) != 1)
+        {
+            fclose(fp);
+            throw runtime_error(string_format("Unable to read tx secret key: %s", strerror(errno)));
+        }
+        if (fread(rx_publickey, crypto_box_PUBLICKEYBYTES, 1, fp) != 1)
+        {
+            fclose(fp);
+            throw runtime_error(string_format("Unable to read rx public key: %s", strerror(errno)));
+        }
         fclose(fp);
-        throw runtime_error(string_format("Unable to read tx secret key: %s", strerror(errno)));
     }
-    if (fread(rx_publickey, crypto_box_PUBLICKEYBYTES, 1, fp) != 1)
-    {
-        fclose(fp);
-        throw runtime_error(string_format("Unable to read rx public key: %s", strerror(errno)));
-    }
-    fclose(fp);
 
     init_session(k, n);
 }
@@ -142,6 +147,12 @@ void Transmitter::init_session(int k, int n)
     block_idx = 0;
     fragment_idx = 0;
 
+    if (trusted_plaintext)
+    {
+        session_packet_size = 0;
+        return;
+    }
+
     // init session key
     randombytes_buf(session_key, sizeof(session_key));
 
@@ -193,13 +204,15 @@ void Transmitter::init_session(int k, int n)
 
     session_packet_size = sizeof(wsession_hdr_t) + session_data_size + crypto_box_MACBYTES;
     assert(session_packet_size <= MAX_SESSION_PACKET_SIZE);
+    assert(session_packet_size <= MAX_SESSION_PACKET_SIZE);
 }
 
 
 RawSocketTransmitter::RawSocketTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                            vector<tags_item_t> &tags, const vector<string> &wlans, radiotap_header_t &radiotap_header,
-                                           uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, uint32_t inject_retries, uint32_t inject_retry_delay) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags),
+                                           uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, uint32_t inject_retries, uint32_t inject_retry_delay,
+                                           bool trusted_plaintext) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, trusted_plaintext),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),
@@ -624,17 +637,25 @@ void RemoteTransmitter::dump_stats(uint64_t ts, uint32_t &injected_packets, uint
 
 void Transmitter::send_block_fragment(size_t packet_size)
 {
-    uint8_t ciphertext[MAX_FORWARDER_PACKET_SIZE];
-    wblock_hdr_t *block_hdr = (wblock_hdr_t*)ciphertext;
-    long long unsigned int ciphertext_len;
+    uint8_t packet[MAX_FORWARDER_PACKET_SIZE];
+    wblock_hdr_t *block_hdr = (wblock_hdr_t*)packet;
 
     assert(packet_size <= MAX_FEC_PAYLOAD);
 
     block_hdr->packet_type = WFB_PACKET_DATA;
     block_hdr->data_nonce = htobe64(((block_idx & BLOCK_IDX_MASK) << 8) + fragment_idx);
 
+    if (trusted_plaintext)
+    {
+        memcpy(packet + sizeof(wblock_hdr_t), block[fragment_idx], packet_size);
+        inject_packet(packet, sizeof(wblock_hdr_t) + packet_size);
+        return;
+    }
+
+    long long unsigned int ciphertext_len;
+
     // encrypted payload
-    if (crypto_aead_chacha20poly1305_encrypt(ciphertext + sizeof(wblock_hdr_t), &ciphertext_len,
+    if (crypto_aead_chacha20poly1305_encrypt(packet + sizeof(wblock_hdr_t), &ciphertext_len,
                                              block[fragment_idx], packet_size,
                                              (uint8_t*)block_hdr, sizeof(wblock_hdr_t),
                                              NULL, (uint8_t*)(&(block_hdr->data_nonce)), session_key) < 0)
@@ -642,11 +663,16 @@ void Transmitter::send_block_fragment(size_t packet_size)
         throw runtime_error("Unable to encrypt packet!");
     }
 
-    inject_packet(ciphertext, sizeof(wblock_hdr_t) + ciphertext_len);
+    inject_packet(packet, sizeof(wblock_hdr_t) + ciphertext_len);
 }
 
 void Transmitter::send_session_key(void)
 {
+    if (trusted_plaintext)
+    {
+        return;
+    }
+
     WFB_DBG("Announce session key\n");
     inject_packet((uint8_t*)session_packet, session_packet_size);
 }
@@ -714,8 +740,8 @@ bool Transmitter::send_packet(const uint8_t *buf, size_t size, uint8_t flags)
     fragment_idx = 0;
     max_packet_size = 0;
 
-    // Generate new session key after MAX_BLOCK_IDX blocks
-    if (block_idx > MAX_BLOCK_IDX)
+    // 受信任明文模式不滚动 session，只保留 block nonce 递增语义
+    if (!trusted_plaintext && block_idx > MAX_BLOCK_IDX)
     {
         init_session(fec_k, fec_n);
         for(int i = 0; i < fec_n - fec_k + 1; i++)
@@ -1637,17 +1663,18 @@ void local_loop_udp(int argc, char* const* argv, int optind, int rcv_buf, int lo
         IPC_MSG_SEND();
     }
 
+    const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     if (debug_port)
     {
         WFB_INFO("Using %zu ports from %d for wlan emulation\n", wlans.size(), debug_port);
         t = unique_ptr<UdpTransmitter>(new UdpTransmitter(k, n, keypair, "127.0.0.1", debug_port, epoch, channel_id,
-                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size));
+                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size, trusted_plaintext));
     }
     else
     {
         t = unique_ptr<RawSocketTransmitter>(new RawSocketTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                       wlans, radiotap_header, frame_type, use_qdisc, fwmark,
-                                                                      inject_retries, inject_retry_delay));
+                                                                      inject_retries, inject_retry_delay, trusted_plaintext));
     }
 
     TokenAuthorizationState authorization_state;
@@ -1704,17 +1731,18 @@ void local_loop_unix(int argc, char* const* argv, int optind, int rcv_buf, int l
     IPC_MSG("%" PRIu64 "\tLISTEN_UNIX_END\n", get_time_ms());
     IPC_MSG_SEND();
 
+    const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     if (debug_port)
     {
         WFB_INFO("Using %zu ports from %d for wlan emulation\n", wlans.size(), debug_port);
         t = unique_ptr<UdpTransmitter>(new UdpTransmitter(k, n, keypair, "127.0.0.1", debug_port, epoch, channel_id,
-                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size));
+                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size, trusted_plaintext));
     }
     else
     {
         t = unique_ptr<RawSocketTransmitter>(new RawSocketTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                       wlans, radiotap_header, frame_type, use_qdisc, fwmark,
-                                                                      inject_retries, inject_retry_delay));
+                                                                      inject_retries, inject_retry_delay, trusted_plaintext));
     }
 
     if (token_gate_enabled) {
@@ -1803,9 +1831,10 @@ void distributor_loop(int argc, char* const* argv, int optind, int rcv_buf, int 
     }
 
     vector<tags_item_t> tags;
+    const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     unique_ptr<Transmitter> t = unique_ptr<RemoteTransmitter>(new RemoteTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                                     remote_hosts, radiotap_header, frame_type, use_qdisc,
-                                                                                    fwmark, snd_buf_size));
+                                                                                    fwmark, snd_buf_size, trusted_plaintext));
 
     int control_fd = open_control_fd(control_port);
     data_source(t, rx_fd, control_fd, fec_timeout, mirror, log_interval);
@@ -1865,9 +1894,10 @@ void distributor_loop_unix(int argc, char* const* argv, int optind, int rcv_buf,
     IPC_MSG_SEND();
 
     vector<tags_item_t> tags;
+    const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     unique_ptr<Transmitter> t = unique_ptr<RemoteTransmitter>(new RemoteTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                                     remote_hosts, radiotap_header, frame_type, use_qdisc,
-                                                                                    fwmark, snd_buf_size));
+                                                                                    fwmark, snd_buf_size, trusted_plaintext));
 
     int control_fd = open_control_fd(control_port);
     data_source(t, rx_fd, control_fd, fec_timeout, mirror, log_interval);

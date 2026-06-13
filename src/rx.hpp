@@ -201,7 +201,8 @@ typedef std::unordered_map<rxAntennaKey, rxAntennaItem> rx_antenna_stat_t;
 class Aggregator : public BaseAggregator
 {
 public:
-    Aggregator(const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint8_t local_node_id = 0);
+    Aggregator(const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint8_t local_node_id = 0,
+               bool trusted_plaintext = false, int plaintext_fec_k = -1, int plaintext_fec_n = -1);
     virtual ~Aggregator();
     virtual void process_packet(const uint8_t *buf, size_t size, uint8_t wlan_idx, const uint8_t *antenna,
                                 const int8_t *rssi, const int8_t *noise, uint16_t freq, uint8_t mcs_index,
@@ -276,8 +277,9 @@ private:
     uint64_t epoch; // current epoch
     const uint32_t channel_id; // (link_id << 8) + port_number
     const uint8_t local_node_id;
+    const bool trusted_plaintext;
 
-    // rx->tx keypair
+    // rx->tx keypair；trusted_plaintext 下仅保留成员布局，不读取旧 key 文件
     uint8_t rx_secretkey[crypto_box_SECRETKEYBYTES];
     uint8_t tx_publickey[crypto_box_PUBLICKEYBYTES];
     uint8_t session_key[crypto_aead_chacha20poly1305_KEYBYTES];
@@ -292,7 +294,8 @@ private:
 class AggregatorUDPv4 : public Aggregator
 {
 public:
-    AggregatorUDPv4(const std::string &client_addr, int client_port, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size, uint8_t local_node_id = 0);
+    AggregatorUDPv4(const std::string &client_addr, int client_port, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size,
+                    uint8_t local_node_id = 0, bool trusted_plaintext = false, int plaintext_fec_k = -1, int plaintext_fec_n = -1);
     virtual ~AggregatorUDPv4();
 
 protected:
@@ -310,7 +313,8 @@ private:
 class AggregatorUNIX : public Aggregator
 {
 public:
-    AggregatorUNIX(const std::string &unix_socket, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size, uint8_t local_node_id = 0);
+    AggregatorUNIX(const std::string &unix_socket, const std::string &keypair, uint64_t epoch, uint32_t channel_id, int snd_buf_size,
+                   uint8_t local_node_id = 0, bool trusted_plaintext = false, int plaintext_fec_k = -1, int plaintext_fec_n = -1);
     virtual ~AggregatorUNIX();
 
 protected:

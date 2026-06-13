@@ -193,6 +193,7 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
 #define WFB_TOKEN_CONTROL_MAGIC 0x544b
 #define WFB_TOKEN_CONTROL_VERSION 0x1
 
+
 // FEC types
 #define WFB_FEC_VDM_RS  0x1  //Reed-Solomon on Vandermonde matrix
 
@@ -200,6 +201,8 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
 #define WFB_PACKET_FEC_ONLY 0x1
 
 #define SESSION_KEY_ANNOUNCE_MSEC 1000
+// trusted_plaintext 运行时用该哨兵旁路旧 keypair 文件依赖
+#define WFB_TRUSTED_PLAINTEXT_KEYPAIR "__trusted_plaintext__"
 #define RX_ANT_MAX  4
 
 // Header for forwarding raw packets from RX host to Aggregator in UDP packets
