@@ -7,7 +7,7 @@ USE_PROCD=1
 
 WFB_CFG="/etc/wifibroadcast.cfg"
 WFB_INIT="/usr/sbin/wfb-ng.sh"
-WFB_SERVER="/usr/bin/wfb-server --profiles gs --cluster manual"
+WFB_SERVER="/usr/bin/wfb-server --role server --profiles gs --cluster manual"
 
 start_service() {
         # start cluster node

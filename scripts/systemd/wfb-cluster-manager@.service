@@ -5,7 +5,7 @@ ReloadPropagatedFrom=wfb-cluster.service
 
 [Service]
 Type=simple
-ExecStart=/bin/bash -c "exec /usr/bin/wfb-server --profiles $(echo %i | tr : ' ') --cluster manual"
+ExecStart=/bin/bash -c "exec /usr/bin/wfb-server ${WFB_ROLE:+--role ${WFB_ROLE}} --profiles $(echo %i | tr : ' ') --cluster manual"
 TimeoutStopSec=5s
 KillMode=mixed
 Restart=on-failure

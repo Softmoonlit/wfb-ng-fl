@@ -59,6 +59,8 @@ setup(
                                            'scripts/systemd/wfb-cluster-manager@.service',
                                            'scripts/systemd/rtsp@.service']),
                   ('/etc/default', ['scripts/default/wifibroadcast',
+                                    'scripts/default/wifibroadcast.drone',
+                                    'scripts/default/wifibroadcast.gs',
                                     'scripts/default/wifibroadcast.drone_bind',
                                     'scripts/default/wifibroadcast.gs_bind']),
                   ('/etc/sysctl.d', ['scripts/sysctl/98-wifibroadcast.conf']),

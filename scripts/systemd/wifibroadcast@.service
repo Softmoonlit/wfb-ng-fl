@@ -9,7 +9,7 @@ Type=notify
 EnvironmentFile=/etc/default/wifibroadcast
 # per-profile environment
 EnvironmentFile=-/etc/default/wifibroadcast.%i
-ExecStart=/bin/bash -c "exec /usr/bin/wfb-server --profiles $(echo %i | tr : ' ') --wlans ${WFB_NICS}"
+ExecStart=/bin/bash -c "exec /usr/bin/wfb-server ${WFB_ROLE:+--role ${WFB_ROLE}} --profiles $(echo %i | tr : ' ') --wlans ${WFB_NICS}"
 KillMode=mixed
 TimeoutStopSec=5s
 Restart=on-failure

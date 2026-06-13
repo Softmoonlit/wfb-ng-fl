@@ -37,6 +37,7 @@ from .protocols import AntStatsAndSelector, RFTempMeter, SSHClientProtocol, MsgP
 from .services import parse_services, init_udp_direct_tx, init_udp_direct_rx, init_mavlink, init_tunnel, init_udp_proxy, hash_link_domain, bandwidth_map
 from .cluster import parse_cluster_services, gen_cluster_scripts
 from .conf import settings, cfg_files
+from .v6_startup import V6StartupConfigError, format_v6_startup_summary, resolve_v6_startup_configs, should_use_v6_startup_path
 
 
 # Log format is gzipped sequence of int32 strings
@@ -285,6 +286,7 @@ def main():
 
     parser.add_argument('--version', action='version', version=version_msg % settings)
     parser.add_argument('--profiles', type=str, required=True, nargs='+', metavar='profile', help='Use service profile(s)')
+    parser.add_argument('--role', type=str, choices=('server', 'client'), help='Explicit v6 role override')
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--cluster', type=str, choices=('ssh', 'manual'), help='Distributed mode')
@@ -303,6 +305,17 @@ def main():
     if args.gen_bind_yaml:
         print(gen_bind_yaml(args.profiles))
         return
+    startup_summary = None
+    if should_use_v6_startup_path(settings, profiles, args.role, os.environ):
+        requested_wlans = None if args.cluster else args.wlans
+        try:
+            startup_summary = resolve_v6_startup_configs(settings,
+                                                         profiles,
+                                                         requested_wlans,
+                                                         role_override=args.role,
+                                                         env=os.environ)
+        except V6StartupConfigError as e:
+            parser.error(str(e))
 
     set_log_level(LogLevel.DEBUG if settings.common.debug else LogLevel.INFO)
     log.msg = _log_msg
@@ -320,6 +333,18 @@ def main():
         obs = ConsoleObserver()
         log.theLogPublisher._startLogging(obs.emit, False)
 
+    if startup_summary is not None:
+        link_security_modes = sorted(set(profile_summary['common']['link_security_mode']
+                                         for profile_summary in startup_summary['profiles']))
+        risk_markers = []
+        if 'trusted_plaintext' in link_security_modes:
+            risk_markers.append('受信任环境/无链路机密性')
+        log.msg('V6 startup role=%s link_security_mode=%s profiles=%s%s' %
+                (startup_summary['role'],
+                 ','.join(link_security_modes),
+                 ' '.join(profiles),
+                 '' if not risk_markers else ' risk=%s' % ','.join(risk_markers)))
+        log.msg('V6 startup summary: %s' % (format_v6_startup_summary(startup_summary),))
     log.msg(description)
 
     uname = os.uname()
