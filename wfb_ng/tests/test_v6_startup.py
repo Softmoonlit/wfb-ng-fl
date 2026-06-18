@@ -434,6 +434,7 @@ class V6StartupConfigTestCase(unittest.TestCase):
 
     def test_services_trusted_plaintext_uses_runtime_sentinel_and_rx_fec_args(self):
         module_names = [
+            'wfb_ng',
             'twisted',
             'twisted.python',
             'twisted.python.log',
@@ -454,7 +455,13 @@ class V6StartupConfigTestCase(unittest.TestCase):
         original_modules = {name: sys.modules.get(name) for name in module_names}
         self.addCleanup(self._restore_modules, original_modules)
 
+        package = types.ModuleType('wfb_ng')
+        package.__path__ = [os.path.join(PROJECT_ROOT, 'wfb_ng')]
+        sys.modules['wfb_ng'] = package
+
         for name in module_names:
+            if name == 'wfb_ng':
+                continue
             sys.modules[name] = MagicMock()
 
         import importlib
@@ -478,6 +485,12 @@ class V6StartupConfigTestCase(unittest.TestCase):
             self.assertEqual('__trusted_plaintext__', services.resolve_runtime_keypair(cfg))
             self.assertEqual(' -k 4 -n 6', services.build_plaintext_rx_fec_args(cfg))
 
+            server_cfg = types.SimpleNamespace(
+                node_id=9,
+                known_clients=[1, 2],
+            )
+            self.assertEqual(['-N', '9', '-m', '1,2'], services.build_rx_role_args(server_cfg))
+
             legacy_cfg = types.SimpleNamespace(
                 link_security_mode='legacy_encrypted',
                 keypair='gs.key',
@@ -486,6 +499,7 @@ class V6StartupConfigTestCase(unittest.TestCase):
             )
             self.assertEqual('/conf/gs.key', services.resolve_runtime_keypair(legacy_cfg))
             self.assertEqual('', services.build_plaintext_rx_fec_args(legacy_cfg))
+            self.assertEqual([], services.build_rx_role_args(types.SimpleNamespace(node_id=0, known_clients=[])))
         finally:
             services.settings = original_settings
 

@@ -53,6 +53,82 @@ extern "C"
 
 using namespace std;
 
+const char *ready_decision_reason(ReadyDecision decision)
+{
+    switch (decision)
+    {
+    case ReadyDecision::ignore_invalid_source:
+        return "invalid_source";
+    case ReadyDecision::ignore_wrong_ingress_or_link_domain:
+        return "wrong_ingress_or_link_domain";
+    case ReadyDecision::ignore_unknown_client:
+        return "unknown_client";
+    case ReadyDecision::accept:
+    default:
+        return "accept";
+    }
+}
+
+void log_ready_rejection(const ControlEnvelopeView &envelope,
+                        ReadyDecision decision,
+                        uint8_t local_node_id,
+                        const char *ingress_label)
+{
+    if (decision == ReadyDecision::accept)
+    {
+        return;
+    }
+
+    WFB_ERR("READY_REJECT reason=%s source_node=%u ingress=%s server_node_id=%u target_node=%u control_type=%u\n",
+            ready_decision_reason(decision),
+            static_cast<unsigned>(envelope.source_node),
+            ingress_label,
+            static_cast<unsigned>(local_node_id),
+            static_cast<unsigned>(envelope.target_node),
+            static_cast<unsigned>(envelope.control_type));
+}
+
+set<uint8_t> parse_known_client_node_ids(const string &value)
+{
+    if (value.empty())
+    {
+        throw runtime_error("known_client_node_ids cannot be empty");
+    }
+
+    set<uint8_t> node_ids;
+    size_t start = 0;
+    while (start <= value.size())
+    {
+        size_t end = value.find(',', start);
+        string item = value.substr(start, end == string::npos ? string::npos : end - start);
+        if (item.empty())
+        {
+            throw runtime_error("known_client_node_ids contains empty item");
+        }
+
+        char *tail = NULL;
+        errno = 0;
+        unsigned long parsed = strtoul(item.c_str(), &tail, 10);
+        if (errno != 0 || tail == item.c_str() || *tail != '\0' || parsed == 0 || parsed > 255)
+        {
+            throw runtime_error(string_format("Invalid known_client_node_id: %s", item.c_str()));
+        }
+
+        if (!node_ids.insert(static_cast<uint8_t>(parsed)).second)
+        {
+            throw runtime_error(string_format("Duplicate known_client_node_id: %s", item.c_str()));
+        }
+
+        if (end == string::npos)
+        {
+            break;
+        }
+        start = end + 1;
+    }
+
+    return node_ids;
+}
+
 
 Receiver::Receiver(const char *wlan, int wlan_idx, uint32_t channel_id, BaseAggregator *agg, int rcv_buf_size) : wlan_idx(wlan_idx), agg(agg)
 {
@@ -760,15 +836,18 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
         }
         else if (envelope.control_type == WFB_CONTROL_TYPE_READY)
         {
-            // First version ready handling
-            bool is_valid_ingress = true; // Placeholder?
-            bool is_known_client = true; // Placeholder?
+            bool is_valid_ingress = true; // 当前入口已按链路域分流；后续多入口时再细化
+            bool is_known_client = known_client_node_ids_.count(envelope.source_node) != 0;
             ReadyDecision decision = filter_ready(envelope, is_valid_ingress, is_known_client, &ready_filter_counters_);
             if (decision != ReadyDecision::accept)
             {
+                log_ready_rejection(envelope, decision, local_node_id, "rx_control");
                 return;
             }
-            // Add to active queue or something? For now just log or pass to listener.
+            if (token_control_listener_ != NULL)
+            {
+                token_control_listener_->on_token_control(envelope);
+            }
         }
         return;
     }
@@ -1233,8 +1312,9 @@ int main(int argc, char* const *argv)
 
     string keypair = "rx.key";
     string unix_socket = "";
+    set<uint8_t> known_client_node_ids;
 
-    while ((opt = getopt(argc, argv, "K:N:fa:c:u:U:p:l:i:e:R:s:k:n:")) != -1) {
+    while ((opt = getopt(argc, argv, "K:N:m:fa:c:u:U:p:l:i:e:R:s:k:n:")) != -1) {
         switch (opt) {
         case 'K':
             keypair = optarg;
@@ -1250,6 +1330,9 @@ int main(int argc, char* const *argv)
             local_node_id = static_cast<uint8_t>(parsed_node_id);
             break;
         }
+        case 'm':
+            known_client_node_ids = parse_known_client_node_ids(optarg);
+            break;
         case 'f':
             rx_mode = FORWARDER;
             break;
@@ -1292,11 +1375,11 @@ int main(int argc, char* const *argv)
             break;
         default: /* '?' */
         show_usage:
-            WFB_INFO("Local RX: %s [-K rx_key] [-N local_node_id] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-p radio_port]\n"
+            WFB_INFO("Local RX: %s [-K rx_key] [-N local_node_id] [-m known_client_node_ids] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-p radio_port]\n"
                      "             [-R rcv_buf] [-s snd_buf] [-l log_interval] [-e epoch] [-i link_id] [-k fec_k] [-n fec_n] interface1 [interface2] ...\n", argv[0]);
             WFB_INFO("RX forwarder: %s -f [-c client_addr] [-u client_port] [-p radio_port]  [-R rcv_buf] [-s snd_buf]\n"
                      "                    [-i link_id] interface1 [interface2] ...\n", argv[0]);
-            WFB_INFO("RX aggregator: %s -a server_port [-K rx_key] [-N local_node_id] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-R rcv_buf]\n"
+            WFB_INFO("RX aggregator: %s -a server_port [-K rx_key] [-N local_node_id] [-m known_client_node_ids] { [-c client_addr] [-u client_port] | [-U unix_socket] } [-R rcv_buf]\n"
                      "                                 [-s snd_buf] [-l log_interval] [-p radio_port] [-e epoch] [-i link_id] [-k fec_k] [-n fec_n]\n", argv[0]);
             WFB_INFO("Default: K='%s', local_node_id=%u, connect=%s:%d, link_id=0x%06x, radio_port=%u, epoch=%" PRIu64 ", log_interval=%d, rcv_buf=system_default, snd_buf=system_default, plaintext_fec=%d/%d\n", keypair.c_str(), local_node_id, client_addr.c_str(), client_port, link_id, radio_port, epoch, log_interval, plaintext_fec_k, plaintext_fec_n);
             WFB_INFO("WFB-ng version %s, FEC: %s\n", WFB_VERSION, zfex_opt);
@@ -1373,6 +1456,10 @@ int main(int argc, char* const *argv)
 
         default:
             throw runtime_error(string_format("Unknown rx_mode=%d", rx_mode));
+        }
+        if (rx_mode != FORWARDER && !known_client_node_ids.empty())
+        {
+            static_cast<Aggregator*>(agg.get())->set_known_client_node_ids(known_client_node_ids);
         }
 
         if(rx_mode == AGGREGATOR)

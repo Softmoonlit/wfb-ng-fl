@@ -65,6 +65,18 @@ def build_plaintext_rx_fec_args(cfg):
         return ''
     return ' -k %d -n %d' % (cfg.fec_k, cfg.fec_n)
 
+def build_rx_role_args(cfg):
+    args = []
+    node_id = getattr(cfg, 'node_id', None)
+    if isinstance(node_id, int) and node_id > 0:
+        args.extend(['-N', str(node_id)])
+
+    known_clients = getattr(cfg, 'known_clients', None)
+    if known_clients:
+        args.extend(['-m', ','.join(str(node_id) for node_id in known_clients)])
+
+    return args
+
 
 def parse_services(profile_name, udp_port_allocator):
     res = []
@@ -185,7 +197,7 @@ def init_udp_direct_rx(service_name, cfg, wlans, link_id, ant_sel_f, is_cluster,
                 rcv_buf_size=settings.common.tx_rcv_buf_size,
                 snd_buf_size=settings.common.rx_snd_buf_size,
                 log_interval=settings.common.log_interval,
-                link_id=link_id)).split() + (wlans if not is_cluster else [])
+                link_id=link_id)).split() + build_rx_role_args(cfg) + (wlans if not is_cluster else [])
 
     df = RXProtocol(ant_sel_f, cmd, '%s rx' % (service_name,)).start()
 
@@ -270,7 +282,7 @@ def init_mavlink(service_name, cfg, wlans, link_id, ant_sel_f, is_cluster, rx_on
                    rcv_buf_size=settings.common.tx_rcv_buf_size,
                    snd_buf_size=settings.common.rx_snd_buf_size,
                    log_interval=settings.common.log_interval,
-                   link_id=link_id)).split() + (wlans if not is_cluster else [])
+                   link_id=link_id)).split() + build_rx_role_args(cfg) + (wlans if not is_cluster else [])
 
     tx_socket_path = '%s-tx-%s' % (service_name, os.urandom(4).hex())
     cmd_tx = ('%(cmd)s%(cluster)s -f %(frame_type)s -p %(stream)d -U %(unix_socket)s -K %(key)s -B %(bw)d '\
@@ -385,7 +397,7 @@ def init_tunnel(service_name, cfg, wlans, link_id, ant_sel_f, is_cluster, rx_onl
                    rcv_buf_size=settings.common.tx_rcv_buf_size,
                    snd_buf_size=settings.common.rx_snd_buf_size,
                    log_interval=settings.common.log_interval,
-                   link_id=link_id)).split() + (wlans if not is_cluster else [])
+                   link_id=link_id)).split() + build_rx_role_args(cfg) + (wlans if not is_cluster else [])
 
     tx_socket_path = '%s-tx-%s' % (service_name, os.urandom(4).hex())
     cmd_tx = ('%(cmd)s%(cluster)s -f %(frame_type)s -p %(stream)d -U %(unix_socket)s -K %(key)s -B %(bw)d -G %(gi)s '\
@@ -505,7 +517,7 @@ def init_udp_proxy(service_name, cfg, wlans, link_id, ant_sel_f, is_cluster, rx_
                        rcv_buf_size=settings.common.tx_rcv_buf_size,
                        snd_buf_size=settings.common.rx_snd_buf_size,
                        log_interval=settings.common.log_interval,
-                       link_id=link_id)).split() + (wlans if not is_cluster else [])
+                       link_id=link_id)).split() + build_rx_role_args(cfg) + (wlans if not is_cluster else [])
 
         log.msg('%s RX: %s' % (service_name, ' '.join(cmd_rx)))
         dl.append(RXProtocol(ant_sel_f, cmd_rx, '%s rx' % (service_name,)).start())

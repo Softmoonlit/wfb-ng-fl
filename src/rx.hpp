@@ -55,22 +55,35 @@ public:
 class TokenEventDatagramListener : public TokenControlListener
 {
 public:
-    explicit TokenEventDatagramListener(const std::string &socket_path) : sender_(make_token_authorization_socket_name(socket_path)), last_send_succeeded_(false) {}
+    explicit TokenEventDatagramListener(const std::string &socket_path,
+                                        const std::string &ready_socket_base = kDefaultTokenReadySocketBase)
+        : grant_sender_(make_token_authorization_socket_name(socket_path)),
+          ready_sender_(make_token_ready_socket_name(ready_socket_base)),
+          last_send_succeeded_(false) {}
 
     virtual void on_token_control(const ControlEnvelopeView &packet)
     {
         TokenAuthorizationEvent event = {};
-        event.node_id = packet.target_node;
         event.sequence = packet.sequence;
         event.duration_ms = packet.grant_duration_ms;
         event.expires_at_ms = packet.grant_expires_at_ms;
-        last_send_succeeded_ = sender_.send(event);
+
+        if (packet.control_type == WFB_CONTROL_TYPE_READY)
+        {
+            event.node_id = packet.source_node;
+            last_send_succeeded_ = ready_sender_.send_event(event);
+            return;
+        }
+
+        event.node_id = packet.target_node;
+        last_send_succeeded_ = grant_sender_.send(event);
     }
 
     bool last_send_succeeded(void) const { return last_send_succeeded_; }
 
 private:
-    TokenEventDatagramSender sender_;
+    TokenEventDatagramSender grant_sender_;
+    TokenAuthorizationDatagramSender ready_sender_;
     bool last_send_succeeded_;
 };
 typedef enum {
@@ -211,6 +224,7 @@ public:
     // Packet loss listener for immediate notifications
     void set_packet_loss_listener(PacketLossListener* listener) { packet_loss_listener_ = listener; }
     void set_token_control_listener(TokenControlListener* listener) { token_control_listener_ = listener; }
+    void set_known_client_node_ids(const std::set<uint8_t> &node_ids) { known_client_node_ids_ = node_ids; }
 
     // Make stats public for android userspace receiver
     void clear_stats(void)
@@ -288,6 +302,7 @@ private:
     PacketLossListener* packet_loss_listener_ = nullptr;
     TokenControlListener* token_control_listener_ = nullptr;
     GrantFilterState grant_filter_state_ = {};
+    std::set<uint8_t> known_client_node_ids_;
 };
 
 

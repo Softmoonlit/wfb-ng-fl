@@ -5,9 +5,12 @@
 
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <unistd.h>
 
 #include <string>
 #include <vector>
+#include <set>
+#include <functional>
 
 #include "rx.hpp"
 #include "token_event_ipc.hpp"
@@ -34,6 +37,18 @@ TestGrantPacket make_token_packet(uint8_t node_id,
     packet.hdr.target_node = node_id;
     packet.hdr.sequence = htobe64(sequence);
     packet.payload.duration_ms = htobe32(duration_ms);
+    return packet;
+}
+wcontrol_envelope_hdr_t make_ready_packet(uint8_t source_node)
+{
+    wcontrol_envelope_hdr_t packet = {};
+    packet.packet_type = WFB_PACKET_CONTROL;
+    packet.magic = htobe16(WFB_CONTROL_MAGIC);
+    packet.version = WFB_CONTROL_VERSION;
+    packet.control_type = WFB_CONTROL_TYPE_READY;
+    packet.source_node = source_node;
+    packet.target_node = 0;
+    packet.sequence = htobe64(0);
     return packet;
 }
 
@@ -113,7 +128,55 @@ std::string make_socket_path()
     return std::string(path);
 }
 
+class ScopedFd {
+public:
+    explicit ScopedFd(int fd = -1) : fd_(fd) {}
+
+    ~ScopedFd()
+    {
+        if (fd_ >= 0)
+        {
+            close(fd_);
+        }
+    }
+
+    int get() const { return fd_; }
+
+private:
+    int fd_;
+};
+
+std::string capture_stderr_for_test(const std::function<void()> &fn)
+{
+    int pipe_fds[2] = {-1, -1};
+    REQUIRE(pipe(pipe_fds) == 0);
+
+    ScopedFd read_end(pipe_fds[0]);
+    ScopedFd write_end(pipe_fds[1]);
+    ScopedFd stderr_guard(dup(STDERR_FILENO));
+    REQUIRE(stderr_guard.get() >= 0);
+
+    fflush(stderr);
+    REQUIRE(dup2(write_end.get(), STDERR_FILENO) >= 0);
+
+    fn();
+
+    fflush(stderr);
+    REQUIRE(dup2(stderr_guard.get(), STDERR_FILENO) >= 0);
+    close(pipe_fds[1]);
+
+    std::string captured;
+    char buffer[256] = {};
+    ssize_t received = 0;
+    while ((received = read(read_end.get(), buffer, sizeof(buffer))) > 0)
+    {
+        captured.append(buffer, static_cast<size_t>(received));
+    }
+
+    return captured;
 }
+}
+
 
 TEST_CASE("Aggregator 只向 listener 转发合法 Token")
 {
@@ -176,6 +239,71 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
         REQUIRE(event.expires_at_ms >= 180);
         REQUIRE(agg.grant_filter_counters_.received == 1);
         REQUIRE(agg.grant_filter_counters_.accepted == 1);
+    }
+
+    SECTION("静态已知 client 的 READY 转发到 ready socket")
+    {
+        const std::string base_socket_path = make_socket_path();
+        const std::string ready_socket_base = make_socket_path();
+        const std::string ready_socket_path = make_token_ready_socket_name(ready_socket_base);
+        TokenAuthorizationDatagramReceiver receiver(ready_socket_path);
+        TokenEventDatagramListener ipc_listener(base_socket_path, ready_socket_base);
+        agg.set_token_control_listener(&ipc_listener);
+        agg.set_known_client_node_ids(std::set<uint8_t>{7});
+
+        wcontrol_envelope_hdr_t packet = make_ready_packet(7);
+        agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
+                           sizeof(packet),
+                           0,
+                           antenna,
+                           rssi,
+                           noise,
+                           0,
+                           0,
+                           20,
+                           nullptr);
+
+        TokenAuthorizationEvent event = {};
+        REQUIRE(receiver.recv_event(&event));
+        REQUIRE(event.node_id == 7);
+        REQUIRE(event.sequence == 0);
+        REQUIRE(event.duration_ms == 0);
+        REQUIRE(event.expires_at_ms == 0);
+        REQUIRE(agg.ready_filter_counters_.received == 1);
+        REQUIRE(agg.ready_filter_counters_.accepted == 1);
+    }
+
+    SECTION("未知 client 的 READY 被拒收并记录最小排障日志")
+    {
+        const std::string base_socket_path = make_socket_path();
+        const std::string ready_socket_base = make_socket_path();
+        const std::string ready_socket_path = make_token_ready_socket_name(ready_socket_base);
+        TokenAuthorizationDatagramReceiver receiver(ready_socket_path);
+        TokenEventDatagramListener ipc_listener(base_socket_path, ready_socket_base);
+        agg.set_token_control_listener(&ipc_listener);
+        agg.set_known_client_node_ids(std::set<uint8_t>{7});
+
+        wcontrol_envelope_hdr_t packet = make_ready_packet(8);
+        const std::string captured = capture_stderr_for_test([&]() {
+            agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
+                               sizeof(packet),
+                               0,
+                               antenna,
+                               rssi,
+                               noise,
+                               0,
+                               0,
+                               20,
+                               nullptr);
+        });
+
+        TokenAuthorizationEvent event = {};
+        REQUIRE_FALSE(receiver.recv_event(&event));
+        REQUIRE(agg.ready_filter_counters_.received == 1);
+        REQUIRE(agg.ready_filter_counters_.rejected.unknown_client == 1);
+        REQUIRE(captured.find("READY_REJECT reason=unknown_client") != std::string::npos);
+        REQUIRE(captured.find("source_node=8") != std::string::npos);
+        REQUIRE(captured.find("server_node_id=7") != std::string::npos);
     }
 
     SECTION("合法 Token 发送到派生的授权 socket")

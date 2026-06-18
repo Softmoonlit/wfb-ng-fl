@@ -144,7 +144,7 @@ def init_wlans(max_bw, wlans):
 
 
 @defer.inlineCallbacks
-def init(profiles, wlans, cluster_mode):
+def init(profiles, wlans, cluster_mode, startup_summary=None):
     type_map = dict(udp_direct_rx=init_udp_direct_rx,
                     udp_direct_tx=init_udp_direct_tx,
                     mavlink=init_mavlink,
@@ -158,6 +158,11 @@ def init(profiles, wlans, cluster_mode):
         raise Exception('Connection to %s closed, aborting' % (node,))
 
     rx_only_wlan_ids = set()
+
+    profile_summaries = {}
+    if startup_summary is not None:
+        profile_summaries = dict((summary['profile'], summary) for summary in startup_summary.get('profiles', []))
+
 
     if is_cluster:
         services, cluster_nodes = parse_cluster_services(profiles)
@@ -262,11 +267,14 @@ def init(profiles, wlans, cluster_mode):
             p_f = MsgPackAPIFactory(ant_sel_f.ui_sessions, is_cluster, cli_title)
             sockets.append(reactor.listenTCP(profile_cfg.stats_port, p_f))
 
-        if profile_cfg.api_port:
-            p_f = JSONAPIFactory(ant_sel_f.ui_sessions, is_cluster, profile, wlans)
-            sockets.append(reactor.listenTCP(profile_cfg.api_port, p_f))
-
+        profile_summary = profile_summaries.get(profile)
         for service_name, service_type, srv_cfg in service_list:
+            if profile_summary is not None:
+                srv_cfg.node_id = profile_summary['common']['node_id']
+                if profile_summary['common']['role'] == 'server':
+                    srv_cfg.known_clients = list(profile_summary['server']['known_clients'])
+                elif hasattr(srv_cfg, 'known_clients'):
+                    delattr(srv_cfg, 'known_clients')
             log.msg('Starting %s/%s@%s' % (profile, service_name, profile_cfg.link_domain))
             dl.append(defer.maybeDeferred(type_map[service_type], service_name, srv_cfg,
                                           srv_cfg.udp_peers_auto if is_cluster else wlans,
@@ -359,7 +367,7 @@ def main():
 
     log.msg('Using config files:\n%s' % ('\n'.join(cfg_files),))
 
-    reactor.callWhenRunning(lambda: defer.maybeDeferred(init, profiles, wlans, cluster_mode)\
+    reactor.callWhenRunning(lambda: defer.maybeDeferred(init, profiles, wlans, cluster_mode, startup_summary)
                             .addErrback(abort_on_crash))
     reactor.run()
 
