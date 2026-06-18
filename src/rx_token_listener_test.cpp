@@ -12,22 +12,28 @@
 #include "rx.hpp"
 #include "token_event_ipc.hpp"
 #include "wifibroadcast.hpp"
+#include "control_envelope.hpp"
 
 namespace {
 
-wtoken_control_hdr_t make_token_packet(uint8_t node_id,
-                                       uint64_t sequence,
-                                       uint32_t duration_ms)
+struct TestGrantPacket {
+    wcontrol_envelope_hdr_t hdr;
+    wcontrol_grant_payload_t payload;
+} __attribute__((packed));
+
+TestGrantPacket make_token_packet(uint8_t node_id,
+                                  uint64_t sequence,
+                                  uint32_t duration_ms)
 {
-    wtoken_control_hdr_t packet = {};
-    packet.packet_type = WFB_PACKET_TOKEN_CONTROL;
-    packet.magic = htobe16(WFB_TOKEN_CONTROL_MAGIC);
-    packet.version = WFB_TOKEN_CONTROL_VERSION;
-    packet.flags = 0;
-    packet.node_id = node_id;
-    packet.reserved = 0;
-    packet.sequence = htobe64(sequence);
-    packet.duration_ms = htobe32(duration_ms);
+    TestGrantPacket packet = {};
+    packet.hdr.packet_type = WFB_PACKET_CONTROL;
+    packet.hdr.magic = htobe16(WFB_CONTROL_MAGIC);
+    packet.hdr.version = WFB_CONTROL_VERSION;
+    packet.hdr.control_type = WFB_CONTROL_TYPE_GRANT;
+    packet.hdr.source_node = 1;
+    packet.hdr.target_node = node_id;
+    packet.hdr.sequence = htobe64(sequence);
+    packet.payload.duration_ms = htobe32(duration_ms);
     return packet;
 }
 
@@ -51,9 +57,9 @@ std::string write_temp_keypair_file()
 }
 
 struct RecordingTokenControlListener : public TokenControlListener {
-    std::vector<TokenControlPacketView> packets;
+    std::vector<ControlEnvelopeView> packets;
 
-    void on_token_control(const TokenControlPacketView &packet) override
+    void on_token_control(const ControlEnvelopeView &packet) override
     {
         packets.push_back(packet);
     }
@@ -124,7 +130,7 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
 
     SECTION("本节点新 Token 触发 listener")
     {
-        wtoken_control_hdr_t packet = make_token_packet(7, 42, 100);
+        TestGrantPacket packet = make_token_packet(7, 42, 100);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
                            sizeof(packet),
                            0,
@@ -137,10 +143,10 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
                            nullptr);
 
         REQUIRE(listener.packets.size() == 1);
-        REQUIRE(listener.packets[0].node_id == 7);
+        REQUIRE(listener.packets[0].target_node == 7);
         REQUIRE(listener.packets[0].sequence == 42);
-        REQUIRE(agg.token_filter_counters.received == 1);
-        REQUIRE(agg.token_filter_counters.accepted == 1);
+        REQUIRE(agg.grant_filter_counters_.received == 1);
+        REQUIRE(agg.grant_filter_counters_.accepted == 1);
     }
 
     SECTION("合法 Token 通过 Unix datagram 发送授权事件")
@@ -148,10 +154,10 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
         const std::string base_socket_path = make_socket_path();
         const std::string auth_socket_path = make_token_authorization_socket_name(base_socket_path);
         ScopedUnixDatagramReceiver receiver(auth_socket_path);
-        TokenEventDatagramListener listener(base_socket_path);
-        agg.set_token_control_listener(&listener);
+        TokenEventDatagramListener ipc_listener(base_socket_path);
+        agg.set_token_control_listener(&ipc_listener);
 
-        wtoken_control_hdr_t packet = make_token_packet(7, 52, 180);
+        TestGrantPacket packet = make_token_packet(7, 52, 180);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
                            sizeof(packet),
                            0,
@@ -168,8 +174,8 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
         REQUIRE(event.sequence == 52);
         REQUIRE(event.duration_ms == 180);
         REQUIRE(event.expires_at_ms >= 180);
-        REQUIRE(agg.token_filter_counters.received == 1);
-        REQUIRE(agg.token_filter_counters.accepted == 1);
+        REQUIRE(agg.grant_filter_counters_.received == 1);
+        REQUIRE(agg.grant_filter_counters_.accepted == 1);
     }
 
     SECTION("合法 Token 发送到派生的授权 socket")
@@ -177,10 +183,10 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
         const std::string base_socket_path = make_socket_path();
         const std::string auth_socket_path = make_token_authorization_socket_name(base_socket_path);
         ScopedUnixDatagramReceiver receiver(auth_socket_path);
-        TokenEventDatagramListener listener(base_socket_path);
-        agg.set_token_control_listener(&listener);
+        TokenEventDatagramListener ipc_listener(base_socket_path);
+        agg.set_token_control_listener(&ipc_listener);
 
-        wtoken_control_hdr_t packet = make_token_packet(7, 60, 200);
+        TestGrantPacket packet = make_token_packet(7, 60, 200);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
                            sizeof(packet),
                            0,
@@ -196,13 +202,13 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
         REQUIRE(event.node_id == 7);
         REQUIRE(event.sequence == 60);
         REQUIRE(event.duration_ms == 200);
-        REQUIRE(agg.token_filter_counters.received == 1);
-        REQUIRE(agg.token_filter_counters.accepted == 1);
+        REQUIRE(agg.grant_filter_counters_.received == 1);
+        REQUIRE(agg.grant_filter_counters_.accepted == 1);
     }
 
     SECTION("其他节点 Token 不触发 listener")
     {
-        wtoken_control_hdr_t packet = make_token_packet(8, 42, 100);
+        TestGrantPacket packet = make_token_packet(8, 42, 100);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&packet),
                            sizeof(packet),
                            0,
@@ -215,13 +221,13 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
                            nullptr);
 
         REQUIRE(listener.packets.empty());
-        REQUIRE(agg.token_filter_counters.received == 1);
-        REQUIRE(agg.token_filter_counters.ignored_wrong_node == 1);
+        REQUIRE(agg.grant_filter_counters_.received == 1);
+        REQUIRE(agg.grant_filter_counters_.ignored_wrong_target == 1);
     }
 
     SECTION("重复 sequence Token 不触发 listener")
     {
-        wtoken_control_hdr_t first = make_token_packet(7, 42, 100);
+        TestGrantPacket first = make_token_packet(7, 42, 100);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&first),
                            sizeof(first),
                            0,
@@ -233,7 +239,7 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
                            20,
                            nullptr);
 
-        wtoken_control_hdr_t duplicate = make_token_packet(7, 42, 100);
+        TestGrantPacket duplicate = make_token_packet(7, 42, 100);
         agg.process_packet(reinterpret_cast<const uint8_t *>(&duplicate),
                            sizeof(duplicate),
                            0,
@@ -246,9 +252,9 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
                            nullptr);
 
         REQUIRE(listener.packets.size() == 1);
-        REQUIRE(agg.token_filter_counters.received == 2);
-        REQUIRE(agg.token_filter_counters.accepted == 1);
-        REQUIRE(agg.token_filter_counters.ignored_duplicate_sequence == 1);
+        REQUIRE(agg.grant_filter_counters_.received == 2);
+        REQUIRE(agg.grant_filter_counters_.accepted == 1);
+        REQUIRE(agg.grant_filter_counters_.ignored_duplicate_sequence == 1);
     }
 
     unlink(keypair_path.c_str());

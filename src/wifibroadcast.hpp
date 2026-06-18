@@ -188,10 +188,14 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
 // packet types
 #define WFB_PACKET_DATA    0x1
 #define WFB_PACKET_SESSION 0x2
-#define WFB_PACKET_TOKEN_CONTROL 0x3
+#define WFB_PACKET_CONTROL 0x3
 
-#define WFB_TOKEN_CONTROL_MAGIC 0x544b
-#define WFB_TOKEN_CONTROL_VERSION 0x1
+#define WFB_CONTROL_MAGIC 0x544b
+#define WFB_CONTROL_VERSION 0x1
+
+// control types
+#define WFB_CONTROL_TYPE_GRANT 0x1
+#define WFB_CONTROL_TYPE_READY 0x2
 
 
 // FEC types
@@ -249,12 +253,16 @@ typedef struct {
     uint8_t packet_type;
     uint16_t magic;
     uint8_t version;
-    uint8_t flags;
-    uint8_t node_id;
-    uint16_t reserved;
+    uint8_t control_type;
+    uint8_t source_node;
+    uint8_t target_node;
+    uint8_t reserved;
     uint64_t sequence;
+} __attribute__ ((packed)) wcontrol_envelope_hdr_t;
+
+typedef struct {
     uint32_t duration_ms;
-} __attribute__ ((packed)) wtoken_control_hdr_t;
+} __attribute__ ((packed)) wcontrol_grant_payload_t;
 
 typedef struct {
     uint8_t packet_type;

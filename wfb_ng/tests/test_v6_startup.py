@@ -6,6 +6,9 @@ import os
 import types
 import unittest
 
+import sys
+
+from unittest.mock import MagicMock
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 MODULE_PATH = os.path.join(PROJECT_ROOT, 'wfb_ng', 'v6_startup.py')
@@ -428,21 +431,36 @@ class V6StartupConfigTestCase(unittest.TestCase):
 
 
 
+
     def test_services_trusted_plaintext_uses_runtime_sentinel_and_rx_fec_args(self):
-        import sys
-        from unittest.mock import MagicMock
-        sys.modules['twisted'] = MagicMock()
-        sys.modules['twisted.python'] = MagicMock()
-        sys.modules['twisted.python.log'] = MagicMock()
-        sys.modules['twisted.python.failure'] = MagicMock()
-        sys.modules['twisted.internet'] = MagicMock()
-        sys.modules['twisted.internet.serialport'] = MagicMock()
-        sys.modules['twisted.internet.protocol'] = MagicMock()
-        sys.modules['twisted.internet.endpoints'] = MagicMock()
-        services_path = os.path.join(PROJECT_ROOT, 'wfb_ng', 'services.py')
-        spec = importlib.util.spec_from_file_location('services_under_test', services_path)
-        services = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(services)
+        module_names = [
+            'twisted',
+            'twisted.python',
+            'twisted.python.log',
+            'twisted.python.failure',
+            'twisted.internet',
+            'twisted.internet.serialport',
+            'twisted.internet.protocol',
+            'twisted.internet.endpoints',
+            'twisted.protocols',
+            'twisted.protocols.basic',
+            'wfb_ng.protocols',
+            'wfb_ng.proxy',
+            'wfb_ng.mavlink_protocol',
+            'wfb_ng.tuntap',
+            'wfb_ng.config_parser',
+            'wfb_ng.conf',
+        ]
+        original_modules = {name: sys.modules.get(name) for name in module_names}
+        self.addCleanup(self._restore_modules, original_modules)
+
+        for name in module_names:
+            sys.modules[name] = MagicMock()
+
+        import importlib
+
+        sys.modules.pop('wfb_ng.services', None)
+        services = importlib.import_module('wfb_ng.services')
 
         original_settings = services.settings
         try:
@@ -470,5 +488,13 @@ class V6StartupConfigTestCase(unittest.TestCase):
             self.assertEqual('', services.build_plaintext_rx_fec_args(legacy_cfg))
         finally:
             services.settings = original_settings
+
+    def _restore_modules(self, original_modules):
+        for name, module in original_modules.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
+
 if __name__ == '__main__':
     unittest.main()

@@ -473,8 +473,8 @@ RawSocketTransmitter::~RawSocketTransmitter()
 
 RemoteTransmitter::RemoteTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                      vector<tags_item_t> &tags, const vector<pair<string, vector<uint16_t>>> &remote_hosts, radiotap_header_t &radiotap_header,
-                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags),
+                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, bool trusted_plaintext) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, trusted_plaintext),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),

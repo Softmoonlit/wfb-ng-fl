@@ -33,7 +33,7 @@
 
 #include "wifibroadcast.hpp"
 #include "zfex.h"
-#include "token_control_packet.hpp"
+#include "control_envelope.hpp"
 #include "token_event_ipc.hpp"
 #include "token_authorization_ipc.hpp"
 
@@ -49,7 +49,7 @@ class TokenControlListener
 {
 public:
     virtual ~TokenControlListener() = default;
-    virtual void on_token_control(const TokenControlPacketView &packet) = 0;
+    virtual void on_token_control(const ControlEnvelopeView &packet) = 0;
 };
 
 class TokenEventDatagramListener : public TokenControlListener
@@ -57,13 +57,13 @@ class TokenEventDatagramListener : public TokenControlListener
 public:
     explicit TokenEventDatagramListener(const std::string &socket_path) : sender_(make_token_authorization_socket_name(socket_path)), last_send_succeeded_(false) {}
 
-    virtual void on_token_control(const TokenControlPacketView &packet)
+    virtual void on_token_control(const ControlEnvelopeView &packet)
     {
         TokenAuthorizationEvent event = {};
-        event.node_id = packet.node_id;
+        event.node_id = packet.target_node;
         event.sequence = packet.sequence;
-        event.duration_ms = packet.duration_ms;
-        event.expires_at_ms = packet.expires_at_ms;
+        event.duration_ms = packet.grant_duration_ms;
+        event.expires_at_ms = packet.grant_expires_at_ms;
         last_send_succeeded_ = sender_.send(event);
     }
 
@@ -73,7 +73,6 @@ private:
     TokenEventDatagramSender sender_;
     bool last_send_succeeded_;
 };
-
 typedef enum {
     LOCAL,
     FORWARDER,
@@ -244,7 +243,8 @@ public:
     uint32_t count_p_override;
     uint32_t count_p_outgoing;
     uint32_t count_b_outgoing;
-    TokenControlFilterCounters token_filter_counters;
+    GrantFilterCounters grant_filter_counters_;
+    ReadyFilterCounters ready_filter_counters_;
 
 protected:
     virtual void send_to_socket(const uint8_t *payload, uint16_t packet_size) = 0;
@@ -287,7 +287,7 @@ private:
     // Packet loss listener for immediate notifications
     PacketLossListener* packet_loss_listener_ = nullptr;
     TokenControlListener* token_control_listener_ = nullptr;
-    TokenControlFilterState token_filter_state_ = {};
+    GrantFilterState grant_filter_state_ = {};
 };
 
 

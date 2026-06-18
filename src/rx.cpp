@@ -49,7 +49,7 @@ extern "C"
 
 #include "wifibroadcast.hpp"
 #include "rx.hpp"
-#include "token_control_packet.hpp"
+#include "control_envelope.hpp"
 
 using namespace std;
 
@@ -272,7 +272,8 @@ Aggregator::Aggregator(const string &keypair, uint64_t epoch, uint32_t channel_i
                        bool trusted_plaintext, int plaintext_fec_k, int plaintext_fec_n) : \
     count_p_all(0), count_b_all(0), count_p_dec_err(0), count_p_session(0), count_p_data(0), count_p_fec_recovered(0),
     count_p_lost(0), count_p_bad(0), count_p_override(0), count_p_outgoing(0), count_b_outgoing(0),
-    token_filter_counters{},
+    grant_filter_counters_{},
+    ready_filter_counters_{},
     fec_p(NULL), fec_k(-1), fec_n(-1), seq(0), rx_ring{}, rx_ring_front(0), rx_ring_alloc(0),
     last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext)
 {
@@ -519,13 +520,20 @@ void Aggregator::dump_stats(void)
             count_p_fec_recovered, count_p_lost,         // fec recovering
             count_p_bad,                                 // internal errors
             count_p_outgoing, count_b_outgoing);         // outgoing
-    IPC_MSG("%" PRIu64 "\tTOKEN_FILTER\t%u:%u:%u:%u:%u:%u\n", ts,
-            token_filter_counters.received,
-            token_filter_counters.accepted,
-            token_filter_counters.ignored_wrong_node,
-            token_filter_counters.ignored_duplicate_sequence,
-            token_filter_counters.ignored_stale_sequence,
-            token_filter_counters.ignored_expired);
+    IPC_MSG("%" PRIu64 "\tGRANT_FILTER\t%u:%u:%u:%u:%u:%u:%u\n", ts,
+            grant_filter_counters_.received,
+            grant_filter_counters_.accepted,
+            grant_filter_counters_.ignored_invalid_source,
+            grant_filter_counters_.ignored_wrong_target,
+            grant_filter_counters_.ignored_duplicate_sequence,
+            grant_filter_counters_.ignored_stale_sequence,
+            grant_filter_counters_.ignored_expired);
+    IPC_MSG("%" PRIu64 "\tREADY_FILTER\t%u:%u:%u:%u:%u\n", ts,
+            ready_filter_counters_.received,
+            ready_filter_counters_.accepted,
+            ready_filter_counters_.rejected.invalid_source,
+            ready_filter_counters_.rejected.wrong_ingress_or_link_domain,
+            ready_filter_counters_.rejected.unknown_client);
     IPC_MSG_SEND();
 
     if(count_p_override)
@@ -721,31 +729,46 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
         memcpy(session_hash, new_session_hash, sizeof(session_hash));
         return;
 
-    case WFB_PACKET_TOKEN_CONTROL:
+    case WFB_PACKET_CONTROL:
     {
-        TokenControlPacketView packet = {};
+        ControlEnvelopeView envelope = {};
         uint64_t now_ms = get_time_ms();
-        TokenControlParseStatus status = parse_token_control_packet(buf, size, now_ms, &packet);
-        if (status != TokenControlParseStatus::ok)
+        ControlEnvelopeParseStatus status = parse_control_envelope(buf, size, now_ms, &envelope);
+        if (status != ControlEnvelopeParseStatus::ok)
         {
-            WFB_ERR("Invalid token control packet\n");
+            WFB_ERR("Invalid control envelope\n");
             count_p_bad += 1;
             return;
         }
 
-        TokenControlDecision decision = filter_token_control_packet(packet,
-                                                                    local_node_id,
-                                                                    now_ms,
-                                                                    &token_filter_state_,
-                                                                    &token_filter_counters);
-        if (decision != TokenControlDecision::accept)
+        if (envelope.control_type == WFB_CONTROL_TYPE_GRANT)
         {
-            return;
+            GrantDecision decision = filter_grant(envelope,
+                                                  true, // is_valid_source
+                                                  local_node_id,
+                                                  now_ms,
+                                                  &grant_filter_state_,
+                                                  &grant_filter_counters_);
+            if (decision != GrantDecision::accept)
+            {
+                return;
+            }
+            if (token_control_listener_ != NULL)
+            {
+                token_control_listener_->on_token_control(envelope);
+            }
         }
-
-        if (token_control_listener_ != NULL)
+        else if (envelope.control_type == WFB_CONTROL_TYPE_READY)
         {
-            token_control_listener_->on_token_control(packet);
+            // First version ready handling
+            bool is_valid_ingress = true; // Placeholder?
+            bool is_known_client = true; // Placeholder?
+            ReadyDecision decision = filter_ready(envelope, is_valid_ingress, is_known_client, &ready_filter_counters_);
+            if (decision != ReadyDecision::accept)
+            {
+                return;
+            }
+            // Add to active queue or something? For now just log or pass to listener.
         }
         return;
     }

@@ -48,7 +48,7 @@ src/%.o: src/%.c src/*.h
 src/%.o: src/%.cpp src/*.hpp src/*.h
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
 
-wfb_rx: src/rx.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/token_control_packet.o src/token_event_ipc.o src/token_authorization_ipc.o
+wfb_rx: src/rx.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_event_ipc.o src/token_authorization_ipc.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
 
 wfb_tx: src/tx.o src/zfex.o src/wifibroadcast.o src/token_authorization.o src/token_authorization_ipc.o src/tx_token_gate.o
@@ -91,31 +91,24 @@ tx_data_source_gate_test: src/tx_data_source_gate_test.cpp src/radiotap.c src/zf
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/tx_token_gate.tx_gate_test.o src/tx_token_gate.cpp
 	$(CXX) $(_CFLAGS) -o $@ src/tx_data_source_gate_test.cpp src/radiotap.tx_gate_test.o src/zfex.tx_gate_test.o src/wifibroadcast.tx_gate_test.o src/token_authorization.tx_gate_test.o src/token_authorization_ipc.tx_gate_test.o src/token_event_ipc.tx_gate_test.o src/tx_token_gate.tx_gate_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
-token_control_filter_test: src/token_control_filter_test.cpp src/token_control_packet.cpp
+: src/.cpp src/control_envelope.cpp
+	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
+
+control_envelope_test: src/control_envelope_test.cpp src/control_envelope.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
 rx_token_ipc_test: src/rx_token_ipc_test.cpp src/token_event_ipc.cpp src/wifibroadcast.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
-rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.cpp src/rx.hpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/token_control_packet.cpp src/token_event_ipc.cpp src/token_authorization_ipc.cpp
+rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.cpp src/rx.hpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/control_envelope.cpp src/token_event_ipc.cpp src/token_authorization_ipc.cpp
 	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.rx_test.o src/radiotap.c
 	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.rx_test.o src/zfex.c
 	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.rx_test.o src/rx.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.rx_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_control_packet.rx_test.o src/token_control_packet.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/control_envelope.rx_test.o src/control_envelope.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.rx_test.o src/token_event_ipc.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.rx_test.o src/token_authorization_ipc.cpp
-	$(CXX) $(_CFLAGS) -o $@ src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/token_control_packet.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
-plaintext_txrx_test: src/plaintext_txrx_test.cpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/token_control_packet.cpp src/token_event_ipc.cpp src/token_authorization_ipc.cpp src/token_authorization.cpp src/tx_token_gate.cpp
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.plaintext_test.o src/radiotap.c
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.plaintext_test.o src/zfex.c
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.plaintext_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_control_packet.plaintext_test.o src/token_control_packet.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.plaintext_test.o src/token_event_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.plaintext_test.o src/token_authorization_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization.plaintext_test.o src/token_authorization.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/tx_token_gate.plaintext_test.o src/tx_token_gate.cpp
-	$(CXX) $(_CFLAGS) -o $@ src/plaintext_txrx_test.cpp src/radiotap.plaintext_test.o src/zfex.plaintext_test.o src/wifibroadcast.plaintext_test.o src/token_control_packet.plaintext_test.o src/token_event_ipc.plaintext_test.o src/token_authorization_ipc.plaintext_test.o src/token_authorization.plaintext_test.o src/tx_token_gate.plaintext_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+	$(CXX) $(_CFLAGS) -o $@ src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 wfb_keygen: src/keygen.o
 	$(CC) -o $@ $^ $(_LDFLAGS)
@@ -144,21 +137,19 @@ baseline_split_test:
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_txrx.TXRXTestCase wfb_ng.tests.test_txrx.KeyDerivationTestCase
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_tuntap.TUNTAPTestCase
 
-test: all_bin fec_test libsodium_test token_scheduler_test token_control_packet_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test token_control_filter_test rx_token_ipc_test rx_token_listener_test plaintext_txrx_test baseline_split_test
+test: all_bin fec_test libsodium_test token_scheduler_test control_envelope_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test  rx_token_ipc_test rx_token_listener_test baseline_split_test
 	./fec_test
 	./libsodium_test
 	./token_scheduler_test
-	./token_control_packet_test
+	./control_envelope_test
 	./token_authorization_test
 	./tx_token_gate_test
 	./token_authorization_ipc_test
 	./token_namespace_bridge_test
 	./tx_authorization_integration_test
 	./tx_data_source_gate_test
-	./token_control_filter_test
 	./rx_token_ipc_test
 	./rx_token_listener_test
-	./plaintext_txrx_test
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests
 
 rpm:  all_bin wfb_rtsp $(ENV)
@@ -186,7 +177,7 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test token_control_packet_test token_control_filter_test rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
+	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test control_envelope_test  rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
 
 deb_docker:  /opt/qemu/bin
 	@if ! [ -d /opt/qemu ]; then echo "Docker cross build requires patched QEMU!\nApply ./scripts/qemu/qemu.patch to qemu-7.2.0 and build it:\n  ./configure --prefix=/opt/qemu --static --disable-system && make && sudo make install"; exit 1; fi

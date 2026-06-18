@@ -71,8 +71,7 @@ private:
 
 class RecordingTransmitter : public Transmitter {
 public:
-    RecordingTransmitter() : Transmitter(1, 1, "gs.key", 1, 1, 0, empty_tags()) {}
-
+    RecordingTransmitter() : Transmitter(1, 1, WFB_TRUSTED_PLAINTEXT_KEYPAIR, 1, 1, 0, empty_tags(), true) {}
     void select_output(int idx) override
     {
         selected_outputs.push_back(idx);
