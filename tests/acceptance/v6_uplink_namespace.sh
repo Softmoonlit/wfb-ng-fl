@@ -22,6 +22,9 @@ CLIENT1_LOG="$CLIENT1_DIR/wfb_v6_uplink.log"
 CLIENT2_LOG="$CLIENT2_DIR/wfb_v6_uplink.log"
 CLIENT1_PING_LOG="$CLIENT1_DIR/ping.log"
 CLIENT2_PING_LOG="$CLIENT2_DIR/ping.log"
+CLIENT1_QUEUE_SUMMARY_JSON="$CLIENT1_DIR/uplink_queue_summary.json"
+CLIENT2_QUEUE_SUMMARY_JSON="$CLIENT2_DIR/uplink_queue_summary.json"
+RUN_SUMMARY_JSON="$LOG_DIR/v6_uplink_issue22_summary.json"
 
 SERVER_TUN_NAME="${SERVER_TUN_NAME:-v6us0}"
 CLIENT1_TUN_NAME="${CLIENT1_TUN_NAME:-v6uc1}"
@@ -59,6 +62,12 @@ GUARD_INTERVAL_MS="${GUARD_INTERVAL_MS:-20}"
 PING_COUNT="${PING_COUNT:-5}"
 PING_DEADLINE_SEC="${PING_DEADLINE_SEC:-15}"
 STARTUP_WAIT_SEC="${STARTUP_WAIT_SEC:-1}"
+CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES="${CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES:-64}"
+CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES="${CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES:-32}"
+CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT="${CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT:-8}"
+CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES="${CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES:-4096}"
+CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES="${CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES:-2048}"
+CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT="${CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT:-1}"
 
 FAIL_REASON=""
 CLEANUP_VERIFIED="否"
@@ -71,6 +80,18 @@ CLIENT1_GRANTS="0"
 CLIENT2_GRANTS="0"
 CLIENT1_AUTHORIZED_SENDS="0"
 CLIENT2_AUTHORIZED_SENDS="0"
+CLIENT1_TUN_READ_PAUSE_TOTAL="0"
+CLIENT1_TUN_READ_RESUME_TOTAL="0"
+CLIENT1_TUN_READ_PAUSE_BYTES_TOTAL="0"
+CLIENT1_TUN_READ_PAUSE_PACKETS_TOTAL="0"
+CLIENT2_TUN_READ_PAUSE_TOTAL="0"
+CLIENT2_TUN_READ_RESUME_TOTAL="0"
+CLIENT2_TUN_READ_PAUSE_BYTES_TOTAL="0"
+CLIENT2_TUN_READ_PAUSE_PACKETS_TOTAL="0"
+RUN_TUN_READ_PAUSE_TOTAL="0"
+RUN_TUN_READ_RESUME_TOTAL="0"
+RUN_TUN_READ_PAUSE_BYTES_TOTAL="0"
+RUN_TUN_READ_PAUSE_PACKETS_TOTAL="0"
 
 log_info() { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass() { echo "[PASS] $(date '+%H:%M:%S') $1"; }
@@ -140,15 +161,31 @@ render_result() {
 - client2 log: $CLIENT2_LOG
 - client1 ping log: $CLIENT1_PING_LOG
 - client2 ping log: $CLIENT2_PING_LOG
+- client1 queue summary: $CLIENT1_QUEUE_SUMMARY_JSON
+- client2 queue summary: $CLIENT2_QUEUE_SUMMARY_JSON
+- run 2A summary: $RUN_SUMMARY_JSON
 - client1 ready accepts: $CLIENT1_READY_ACCEPTS
 - client2 ready accepts: $CLIENT2_READY_ACCEPTS
 - client1 grants: $CLIENT1_GRANTS
 - client2 grants: $CLIENT2_GRANTS
 - client1 authorized sends: $CLIENT1_AUTHORIZED_SENDS
 - client2 authorized sends: $CLIENT2_AUTHORIZED_SENDS
+- client1 tun_read_pause_total: $CLIENT1_TUN_READ_PAUSE_TOTAL
+- client1 tun_read_resume_total: $CLIENT1_TUN_READ_RESUME_TOTAL
+- client1 queued_bytes_threshold pauses: $CLIENT1_TUN_READ_PAUSE_BYTES_TOTAL
+- client1 queued_packets_limit pauses: $CLIENT1_TUN_READ_PAUSE_PACKETS_TOTAL
+- client2 tun_read_pause_total: $CLIENT2_TUN_READ_PAUSE_TOTAL
+- client2 tun_read_resume_total: $CLIENT2_TUN_READ_RESUME_TOTAL
+- client2 queued_bytes_threshold pauses: $CLIENT2_TUN_READ_PAUSE_BYTES_TOTAL
+- client2 queued_packets_limit pauses: $CLIENT2_TUN_READ_PAUSE_PACKETS_TOTAL
+- run tun_read_pause_total: $RUN_TUN_READ_PAUSE_TOTAL
+- run tun_read_resume_total: $RUN_TUN_READ_RESUME_TOTAL
+- run queued_bytes_threshold pauses: $RUN_TUN_READ_PAUSE_BYTES_TOTAL
+- run queued_packets_limit pauses: $RUN_TUN_READ_PAUSE_PACKETS_TOTAL
 - 已覆盖: trusted_plaintext client TUN -> 空口 -> server TUN 首条新底座上行路径
 - 已覆盖: 双客户端 READY/GRANT 持续推进与独立 TCP/IP 会话语义（以并发 ping 往返证明）
-- 未覆盖: issue #22 队列/反压、issue #23 RX 溢出、issue #24 反馈窗口正式验收
+- 已覆盖: issue #22 固定容量用户态队列、双阈值水位与 TUN 反压 2A 摘要
+- 未覆盖: issue #23 RX 溢出、issue #24 反馈窗口正式验收
 EOF
 }
 
@@ -248,6 +285,10 @@ start_client() {
     local air_target_ip="$6"
     local logfile="$7"
     local pid_var="$8"
+    local pause_threshold_bytes="$9"
+    local resume_threshold_bytes="${10}"
+    local queue_packets_limit="${11}"
+    local queue_summary_file="${12}"
 
     log_info "启动 $ns 新底座守护进程"
     ip netns exec "$ns" "$PROJECT_ROOT/wfb_v6_uplink" \
@@ -258,7 +299,11 @@ start_client() {
         --link-id "$LINK_ID" \
         --stream "$STREAM_ID" \
         --air-listen-port "$listen_port" \
-        --air-target "$air_target_ip:$SERVER_AIR_PORT" >"$logfile" 2>&1 &
+        --air-target "$air_target_ip:$SERVER_AIR_PORT" \
+        --uplink-pause-threshold-bytes "$pause_threshold_bytes" \
+        --uplink-resume-threshold-bytes "$resume_threshold_bytes" \
+        --uplink-queue-packets-limit "$queue_packets_limit" \
+        --queue-summary-file "$queue_summary_file" >"$logfile" 2>&1 &
     printf -v "$pid_var" '%s' "$!"
     sleep "$STARTUP_WAIT_SEC"
     if ! kill -0 "${!pid_var}" 2>/dev/null; then
@@ -284,6 +329,64 @@ run_dual_ping() {
     fi
 }
 
+collect_queue_backpressure_metrics() {
+    if ! eval "$(python3 - "$CLIENT1_QUEUE_SUMMARY_JSON" "$CLIENT2_QUEUE_SUMMARY_JSON" "$RUN_SUMMARY_JSON" <<'PY'
+import json
+import shlex
+import sys
+
+client1_path, client2_path, run_summary_path = sys.argv[1:4]
+
+with open(client1_path, 'r') as fh:
+    client1 = json.load(fh)
+with open(client2_path, 'r') as fh:
+    client2 = json.load(fh)
+
+run_summary = {
+    'run_kind': 'namespace',
+    'link_security_mode': 'trusted_plaintext',
+    'scenario_id': 'v6_uplink_namespace_issue22',
+    'feedback_window_covered': False,
+    'tun_read_pause_total': client1['tun_read_pause_total'] + client2['tun_read_pause_total'],
+    'tun_read_resume_total': client1['tun_read_resume_total'] + client2['tun_read_resume_total'],
+    'tun_read_pause_total_by_reason': {
+        'queued_bytes_threshold': client1['tun_read_pause_total_by_reason']['queued_bytes_threshold'] + client2['tun_read_pause_total_by_reason']['queued_bytes_threshold'],
+        'queued_packets_limit': client1['tun_read_pause_total_by_reason']['queued_packets_limit'] + client2['tun_read_pause_total_by_reason']['queued_packets_limit'],
+    },
+    'clients': {
+        'client1': client1,
+        'client2': client2,
+    },
+}
+
+with open(run_summary_path, 'w') as fh:
+    json.dump(run_summary, fh, indent=2, sort_keys=True)
+    fh.write('\n')
+
+values = {
+    'CLIENT1_TUN_READ_PAUSE_TOTAL': client1['tun_read_pause_total'],
+    'CLIENT1_TUN_READ_RESUME_TOTAL': client1['tun_read_resume_total'],
+    'CLIENT1_TUN_READ_PAUSE_BYTES_TOTAL': client1['tun_read_pause_total_by_reason']['queued_bytes_threshold'],
+    'CLIENT1_TUN_READ_PAUSE_PACKETS_TOTAL': client1['tun_read_pause_total_by_reason']['queued_packets_limit'],
+    'CLIENT2_TUN_READ_PAUSE_TOTAL': client2['tun_read_pause_total'],
+    'CLIENT2_TUN_READ_RESUME_TOTAL': client2['tun_read_resume_total'],
+    'CLIENT2_TUN_READ_PAUSE_BYTES_TOTAL': client2['tun_read_pause_total_by_reason']['queued_bytes_threshold'],
+    'CLIENT2_TUN_READ_PAUSE_PACKETS_TOTAL': client2['tun_read_pause_total_by_reason']['queued_packets_limit'],
+    'RUN_TUN_READ_PAUSE_TOTAL': run_summary['tun_read_pause_total'],
+    'RUN_TUN_READ_RESUME_TOTAL': run_summary['tun_read_resume_total'],
+    'RUN_TUN_READ_PAUSE_BYTES_TOTAL': run_summary['tun_read_pause_total_by_reason']['queued_bytes_threshold'],
+    'RUN_TUN_READ_PAUSE_PACKETS_TOTAL': run_summary['tun_read_pause_total_by_reason']['queued_packets_limit'],
+}
+
+for key, value in values.items():
+    print(f"{key}={shlex.quote(str(value))}")
+PY
+)"; then
+        set_fail_reason "解析 issue #22 queue summary 失败"
+        return 1
+    fi
+}
+
 collect_metrics() {
     CLIENT1_READY_ACCEPTS="$(grep -c '^ready_accept node_id='"$CLIENT1_NODE_ID" "$SERVER_LOG" 2>/dev/null || true)"
     CLIENT2_READY_ACCEPTS="$(grep -c '^ready_accept node_id='"$CLIENT2_NODE_ID" "$SERVER_LOG" 2>/dev/null || true)"
@@ -293,6 +396,7 @@ collect_metrics() {
     CLIENT2_AUTHORIZED_SENDS="$(grep 'TOKEN_AUTH' "$CLIENT2_LOG" 2>/dev/null | tail -1 | awk -F'[:	]' '{print $5}' || true)"
     CLIENT1_AUTHORIZED_SENDS="${CLIENT1_AUTHORIZED_SENDS:-0}"
     CLIENT2_AUTHORIZED_SENDS="${CLIENT2_AUTHORIZED_SENDS:-0}"
+    collect_queue_backpressure_metrics
 }
 
 assert_metrics() {
@@ -320,6 +424,26 @@ assert_metrics() {
         set_fail_reason "client2 未产生授权发送"
         return 1
     fi
+    if [ "$RUN_TUN_READ_PAUSE_TOTAL" -le 0 ]; then
+        set_fail_reason "issue #22 未观察到 TUN 停读"
+        return 1
+    fi
+    if [ "$RUN_TUN_READ_RESUME_TOTAL" -le 0 ]; then
+        set_fail_reason "issue #22 未观察到 TUN 恢复读"
+        return 1
+    fi
+    if [ "$CLIENT1_TUN_READ_PAUSE_BYTES_TOTAL" -le 0 ]; then
+        set_fail_reason "client1 未触发 queued_bytes_threshold 停读"
+        return 1
+    fi
+    if [ "$CLIENT2_TUN_READ_PAUSE_PACKETS_TOTAL" -le 0 ]; then
+        set_fail_reason "client2 未触发 queued_packets_limit 停读"
+        return 1
+    fi
+    if [ ! -f "$RUN_SUMMARY_JSON" ]; then
+        set_fail_reason "缺少 issue #22 统一结构化摘要"
+        return 1
+    fi
 }
 
 main() {
@@ -336,8 +460,8 @@ main() {
     attach_veth_pair "$SERVER_NS" "$SERVER_CLIENT2_IF" "$SERVER_CLIENT2_ADDR" "$CLIENT2_NS" "$CLIENT2_MGMT_IF" "$CLIENT2_MGMT_ADDR"
 
     start_server
-    start_client "$CLIENT1_NS" "$CLIENT1_TUN_NAME" "$CLIENT1_TUN_ADDR" "$CLIENT1_NODE_ID" "$CLIENT1_AIR_PORT" "$SERVER_CLIENT1_IP" "$CLIENT1_LOG" CLIENT1_PID
-    start_client "$CLIENT2_NS" "$CLIENT2_TUN_NAME" "$CLIENT2_TUN_ADDR" "$CLIENT2_NODE_ID" "$CLIENT2_AIR_PORT" "$SERVER_CLIENT2_IP" "$CLIENT2_LOG" CLIENT2_PID
+    start_client "$CLIENT1_NS" "$CLIENT1_TUN_NAME" "$CLIENT1_TUN_ADDR" "$CLIENT1_NODE_ID" "$CLIENT1_AIR_PORT" "$SERVER_CLIENT1_IP" "$CLIENT1_LOG" CLIENT1_PID "$CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES" "$CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES" "$CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT" "$CLIENT1_QUEUE_SUMMARY_JSON"
+    start_client "$CLIENT2_NS" "$CLIENT2_TUN_NAME" "$CLIENT2_TUN_ADDR" "$CLIENT2_NODE_ID" "$CLIENT2_AIR_PORT" "$SERVER_CLIENT2_IP" "$CLIENT2_LOG" CLIENT2_PID "$CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES" "$CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES" "$CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT" "$CLIENT2_QUEUE_SUMMARY_JSON"
 
     wait_for_interface "$SERVER_NS" "$SERVER_TUN_NAME"
     wait_for_interface "$CLIENT1_NS" "$CLIENT1_TUN_NAME"

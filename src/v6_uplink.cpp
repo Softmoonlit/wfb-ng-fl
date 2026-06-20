@@ -32,6 +32,7 @@
 #include "token_authorization.hpp"
 #include "token_scheduler.hpp"
 #include "wifibroadcast.hpp"
+#include "v6_uplink_queue.hpp"
 
 using namespace std;
 
@@ -53,11 +54,6 @@ struct AirReadyState {
     Phase phase = UNDECLARED;
 };
 
-struct PendingPacket {
-    bool valid = false;
-    size_t size = 0;
-    uint8_t bytes[MAX_PAYLOAD_SIZE] = {};
-};
 
 struct AirTransmitter {
     int sockfd = -1;
@@ -222,6 +218,10 @@ struct Config {
     int air_target_port = 0;
     uint32_t grant_duration_ms = 100;
     uint32_t guard_interval_ms = 10;
+    uint32_t uplink_pause_threshold_bytes = 131072;
+    uint32_t uplink_resume_threshold_bytes = 65536;
+    uint32_t uplink_queue_packets_limit = 64;
+    string queue_summary_file;
     vector<ClientTarget> client_targets;
     vector<uint8_t> known_clients;
 };
@@ -366,7 +366,9 @@ void print_usage(const char *progname)
     fprintf(stderr,
             "Usage:\n"
             "  %s --role client --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
-            "     --air-listen-port PORT --air-target HOST:PORT [--epoch E] [--fec-k K --fec-n N]\n"
+            "     --air-listen-port PORT --air-target HOST:PORT [--uplink-pause-threshold-bytes BYTES] \\\n"
+            "     [--uplink-resume-threshold-bytes BYTES] [--uplink-queue-packets-limit N] [--queue-summary-file PATH] \\\n"
+            "     [--epoch E] [--fec-k K --fec-n N]\n"
             "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
             "     --air-listen-port PORT --known-clients N1,N2 --client-target N:IP:HOST:PORT [--client-target ...] \\\n"
             "     [--grant-duration-ms MS] [--guard-interval-ms MS] [--epoch E] [--fec-k K --fec-n N]\n",
@@ -397,12 +399,16 @@ Config parse_args(int argc, char **argv)
         {"client-target", required_argument, 0, 'x'},
         {"grant-duration-ms", required_argument, 0, 'd'},
         {"guard-interval-ms", required_argument, 0, 'g'},
+        {"uplink-pause-threshold-bytes", required_argument, 0, 'b'},
+        {"uplink-resume-threshold-bytes", required_argument, 0, 'j'},
+        {"uplink-queue-packets-limit", required_argument, 0, 'z'},
+        {"queue-summary-file", required_argument, 0, 'y'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0},
     };
 
     int opt = 0;
-    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:h", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:b:j:z:y:h", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -469,6 +475,18 @@ Config parse_args(int argc, char **argv)
         case 'g':
             config.guard_interval_ms = parse_u32(optarg, "guard_interval_ms", true);
             break;
+        case 'b':
+            config.uplink_pause_threshold_bytes = parse_u32(optarg, "uplink_pause_threshold_bytes");
+            break;
+        case 'j':
+            config.uplink_resume_threshold_bytes = parse_u32(optarg, "uplink_resume_threshold_bytes");
+            break;
+        case 'z':
+            config.uplink_queue_packets_limit = parse_u32(optarg, "uplink_queue_packets_limit");
+            break;
+        case 'y':
+            config.queue_summary_file = optarg;
+            break;
         case 'h':
             print_usage(argv[0]);
             exit(0);
@@ -508,6 +526,14 @@ Config parse_args(int argc, char **argv)
         if (config.air_target_host.empty() || config.air_target_port <= 0)
         {
             throw invalid_argument("client 需要 air-target");
+        }
+        if (config.uplink_pause_threshold_bytes < config.uplink_resume_threshold_bytes)
+        {
+            throw invalid_argument("uplink pause 阈值不能小于 resume 阈值");
+        }
+        if (config.uplink_queue_packets_limit == 0)
+        {
+            throw invalid_argument("uplink_queue_packets_limit 必须大于 0");
         }
     }
     else
@@ -752,6 +778,49 @@ void apply_grant_seen(uint64_t now_ms, AirReadyState *ready_state)
     }
 }
 
+void sync_queue_summary_or_throw(const FixedCapacityTunReadQueue &queue,
+                                 const string &summary_file,
+                                 uint8_t node_id)
+{
+    if (!queue.write_summary_file(summary_file, node_id))
+    {
+        throw runtime_error("写入 uplink queue summary 失败: " + summary_file);
+    }
+}
+
+void maybe_log_tun_read_transition(uint8_t node_id,
+                                   bool before_enabled,
+                                   TunReadPauseReason before_reason,
+                                   const FixedCapacityTunReadQueue &queue)
+{
+    if (before_enabled == queue.tun_read_enabled() && before_reason == queue.current_pause_reason())
+    {
+        return;
+    }
+
+    if (!queue.tun_read_enabled())
+    {
+        IPC_MSG("tun_read_pause node_id=%u reason=%s queued_bytes=%zu queued_packets=%zu pause_threshold_bytes=%u resume_threshold_bytes=%u queued_packets_limit=%zu pause_total=%" PRIu64 "\n",
+                static_cast<unsigned>(node_id),
+                tun_read_pause_reason_name(queue.current_pause_reason()),
+                queue.queued_bytes(),
+                queue.queued_packets(),
+                queue.pause_threshold_bytes(),
+                queue.resume_threshold_bytes(),
+                queue.queued_packets_limit(),
+                queue.counters().tun_read_pause_total);
+    }
+    else
+    {
+        IPC_MSG("tun_read_resume node_id=%u queued_bytes=%zu queued_packets=%zu resume_total=%" PRIu64 "\n",
+                static_cast<unsigned>(node_id),
+                queue.queued_bytes(),
+                queue.queued_packets(),
+                queue.counters().tun_read_resume_total);
+    }
+    IPC_MSG_SEND();
+}
+
 void pump_air_rx(int air_fd, Aggregator &aggregator)
 {
     uint8_t buffer[sizeof(wrxfwd_t) + MAX_FORWARDER_PACKET_SIZE] = {};
@@ -836,17 +905,21 @@ void run_client(const Config &config)
 
     AirReadyState ready_state = {};
     ready_state.node_id = config.node_id;
-    PendingPacket pending_packet = {};
+    FixedCapacityTunReadQueue uplink_queue(config.uplink_pause_threshold_bytes,
+                                           config.uplink_resume_threshold_bytes,
+                                           config.uplink_queue_packets_limit);
+    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
 
     uint64_t log_send_ts = get_time_ms();
     pollfd fds[2] = {};
     fds[0].fd = tun_fd;
-    fds[0].events = POLLIN;
     fds[1].fd = air_fd;
     fds[1].events = POLLIN;
 
     for (;;)
     {
+        fds[0].events = uplink_queue.tun_read_enabled() ? POLLIN : 0;
+
         uint64_t now_ms = get_time_ms();
         int timeout_ms = static_cast<int>(max<int64_t>(0, static_cast<int64_t>(log_send_ts - now_ms)));
         int rc = poll(fds, 2, timeout_ms);
@@ -870,6 +943,7 @@ void run_client(const Config &config)
                     authorization_state.counters().authorized_sends,
                     authorization_state.counters().denied_sends);
             IPC_MSG_SEND();
+            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
             log_send_ts = now_ms + config.log_interval;
         }
 
@@ -878,13 +952,23 @@ void run_client(const Config &config)
             pump_air_rx(air_fd, downlink_aggregator);
         }
 
-        if (!pending_packet.valid && rc > 0 && (fds[0].revents & POLLIN))
+        if (rc > 0 && (fds[0].revents & POLLIN))
         {
-            const ssize_t nread = read(tun_fd, pending_packet.bytes, sizeof(pending_packet.bytes));
+            uint8_t tun_packet[MAX_PAYLOAD_SIZE] = {};
+            const ssize_t nread = read(tun_fd, tun_packet, sizeof(tun_packet));
             if (nread > 0)
             {
-                pending_packet.valid = true;
-                pending_packet.size = static_cast<size_t>(nread);
+                const bool before_enabled = uplink_queue.tun_read_enabled();
+                const TunReadPauseReason before_reason = uplink_queue.current_pause_reason();
+                if (!uplink_queue.push(tun_packet, static_cast<size_t>(nread)))
+                {
+                    throw runtime_error("uplink queue 入队失败");
+                }
+                maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, uplink_queue);
+                if (before_enabled != uplink_queue.tun_read_enabled() || before_reason != uplink_queue.current_pause_reason())
+                {
+                    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+                }
             }
             else if (nread < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
             {
@@ -892,7 +976,8 @@ void run_client(const Config &config)
             }
         }
 
-        if (!pending_packet.valid)
+        const QueuedTunPacket *pending_packet = uplink_queue.front();
+        if (pending_packet == NULL)
         {
             continue;
         }
@@ -904,11 +989,21 @@ void run_client(const Config &config)
             continue;
         }
 
-        uplink.send_data(pending_packet.bytes, pending_packet.size);
+        uplink.send_data(pending_packet->bytes, pending_packet->size);
         authorization_state.counters().authorized_sends += 1;
         apply_grant_seen(now_ms, &ready_state);
-        pending_packet.valid = false;
-        pending_packet.size = 0;
+
+        const bool before_enabled = uplink_queue.tun_read_enabled();
+        const TunReadPauseReason before_reason = uplink_queue.current_pause_reason();
+        if (!uplink_queue.pop_front())
+        {
+            throw runtime_error("uplink queue 出队失败");
+        }
+        maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, uplink_queue);
+        if (before_enabled != uplink_queue.tun_read_enabled() || before_reason != uplink_queue.current_pause_reason())
+        {
+            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+        }
     }
 }
 
