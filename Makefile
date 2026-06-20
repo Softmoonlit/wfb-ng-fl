@@ -37,7 +37,7 @@ $(ENV):
 	$(PYTHON) -m venv --clear $(ENV)
 	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) -m pip install --upgrade pip setuptools $(STDEB)
 
-all_bin: wfb_rx wfb_tx wfb_keygen wfb_tx_cmd wfb_tun wfb_token_scheduler
+all_bin: wfb_rx wfb_tx wfb_keygen wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_v6_uplink
 
 gs.key: wfb_keygen
 	@if ! [ -f gs.key ]; then ./wfb_keygen; fi
@@ -122,6 +122,14 @@ wfb_tun: src/wfb_tun.o
 wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_authorization_ipc.o src/wifibroadcast.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
+wfb_v6_uplink: src/v6_uplink.o src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.rx_test.o src/radiotap.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.rx_test.o src/zfex.c
+	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.rx_test.o src/rx.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.rx_test.o src/wifibroadcast.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/control_envelope.rx_test.o src/control_envelope.cpp
+	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
+
 kcp_tools: kcp_small_sender kcp_small_receiver
 
 kcp_small_sender: src/kcp_small_sender.o src/ikcp.o
@@ -177,7 +185,7 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test control_envelope_test  rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
+	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test control_envelope_test  rx_token_listener_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test src/*.rx_test.o src/*.rx_gate_test.o
 
 deb_docker:  /opt/qemu/bin
 	@if ! [ -d /opt/qemu ]; then echo "Docker cross build requires patched QEMU!\nApply ./scripts/qemu/qemu.patch to qemu-7.2.0 and build it:\n  ./configure --prefix=/opt/qemu --static --disable-system && make && sudo make install"; exit 1; fi
