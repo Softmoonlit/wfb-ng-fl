@@ -51,6 +51,19 @@ wcontrol_envelope_hdr_t make_ready_packet(uint8_t source_node)
     packet.sequence = htobe64(0);
     return packet;
 }
+std::vector<uint8_t> make_data_packet(uint64_t block_idx, uint8_t fragment_idx, uint8_t payload_byte = 0x42)
+{
+    std::vector<uint8_t> packet(sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + 1, 0);
+    wblock_hdr_t *block_hdr = reinterpret_cast<wblock_hdr_t *>(packet.data());
+    block_hdr->packet_type = WFB_PACKET_DATA;
+    block_hdr->data_nonce = htobe64((block_idx << 8) | fragment_idx);
+
+    wpacket_hdr_t *packet_hdr = reinterpret_cast<wpacket_hdr_t *>(packet.data() + sizeof(wblock_hdr_t));
+    packet_hdr->flags = 0;
+    packet_hdr->packet_size = htobe16(1);
+    packet[sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t)] = payload_byte;
+    return packet;
+}
 
 std::string write_temp_keypair_file()
 {
@@ -146,23 +159,23 @@ private:
     int fd_;
 };
 
-std::string capture_stderr_for_test(const std::function<void()> &fn)
+std::string capture_fd_for_test(const std::function<void()> &fn, int target_fd)
 {
     int pipe_fds[2] = {-1, -1};
     REQUIRE(pipe(pipe_fds) == 0);
 
     ScopedFd read_end(pipe_fds[0]);
     ScopedFd write_end(pipe_fds[1]);
-    ScopedFd stderr_guard(dup(STDERR_FILENO));
-    REQUIRE(stderr_guard.get() >= 0);
+    ScopedFd target_guard(dup(target_fd));
+    REQUIRE(target_guard.get() >= 0);
 
-    fflush(stderr);
-    REQUIRE(dup2(write_end.get(), STDERR_FILENO) >= 0);
+    fflush(target_fd == STDERR_FILENO ? stderr : stdout);
+    REQUIRE(dup2(write_end.get(), target_fd) >= 0);
 
     fn();
 
-    fflush(stderr);
-    REQUIRE(dup2(stderr_guard.get(), STDERR_FILENO) >= 0);
+    fflush(target_fd == STDERR_FILENO ? stderr : stdout);
+    REQUIRE(dup2(target_guard.get(), target_fd) >= 0);
     close(pipe_fds[1]);
 
     std::string captured;
@@ -174,6 +187,16 @@ std::string capture_stderr_for_test(const std::function<void()> &fn)
     }
 
     return captured;
+}
+
+std::string capture_stderr_for_test(const std::function<void()> &fn)
+{
+    return capture_fd_for_test(fn, STDERR_FILENO);
+}
+
+std::string capture_stdout_for_test(const std::function<void()> &fn)
+{
+    return capture_fd_for_test(fn, STDOUT_FILENO);
 }
 }
 
@@ -386,6 +409,72 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
     }
 
     unlink(keypair_path.c_str());
+}
+
+TEST_CASE("RX 重组溢出不会阻塞控制面优先通路")
+{
+    REQUIRE(sodium_init() >= 0);
+
+    const std::string socket_path = make_socket_path();
+    AggregatorUNIX agg(socket_path, WFB_TRUSTED_PLAINTEXT_KEYPAIR, 0, 0, 0, 7, true, 2, 2);
+    agg.set_known_client_node_ids(std::set<uint8_t>{7});
+
+    const std::string base_socket_path = make_socket_path();
+    const std::string ready_socket_base = make_socket_path();
+    const std::string ready_socket_path = make_token_ready_socket_name(ready_socket_base);
+    TokenAuthorizationDatagramReceiver receiver(ready_socket_path);
+    TokenEventDatagramListener ipc_listener(base_socket_path, ready_socket_base);
+    agg.set_token_control_listener(&ipc_listener);
+
+    const uint8_t antenna[RX_ANT_MAX] = {0xff, 0xff, 0xff, 0xff};
+    const int8_t rssi[RX_ANT_MAX] = {0, 0, 0, 0};
+    const int8_t noise[RX_ANT_MAX] = {0, 0, 0, 0};
+
+    const std::string captured = capture_stderr_for_test([&]() {
+        for (uint64_t block_idx = 1; block_idx <= RX_RING_SIZE + 1; ++block_idx)
+        {
+            const std::vector<uint8_t> packet = make_data_packet(block_idx, 1, static_cast<uint8_t>(block_idx));
+            agg.process_packet(packet.data(),
+                               packet.size(),
+                               0,
+                               antenna,
+                               rssi,
+                               noise,
+                               0,
+                               0,
+                               20,
+                               nullptr);
+        }
+    });
+
+    REQUIRE(agg.count_p_override == 1);
+    REQUIRE(agg.reassembly_overflow_evict_total() == 1);
+    REQUIRE(agg.unfinished_block_limit() == RX_RING_SIZE);
+    REQUIRE(captured.find("REASSEMBLY_OVERFLOW_EVICT") != std::string::npos);
+    REQUIRE(captured.find("unfinished_block_limit=40") != std::string::npos);
+
+    const std::string stats = capture_stdout_for_test([&]() {
+        agg.dump_stats();
+    });
+    REQUIRE(stats.find("\tREASSEMBLY\t1:40\n") != std::string::npos);
+
+    const wcontrol_envelope_hdr_t ready_packet = make_ready_packet(7);
+    agg.process_packet(reinterpret_cast<const uint8_t *>(&ready_packet),
+                       sizeof(ready_packet),
+                       0,
+                       antenna,
+                       rssi,
+                       noise,
+                       0,
+                       0,
+                       20,
+                       nullptr);
+
+    TokenAuthorizationEvent event = {};
+    REQUIRE(receiver.recv_event(&event));
+    REQUIRE(event.node_id == 7);
+    REQUIRE(agg.ready_filter_counters_.accepted == 1);
+    REQUIRE(agg.reassembly_overflow_evict_total() == 1);
 }
 
 int main(int argc, char *argv[])

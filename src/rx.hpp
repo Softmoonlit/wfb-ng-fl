@@ -225,6 +225,8 @@ public:
     void set_packet_loss_listener(PacketLossListener* listener) { packet_loss_listener_ = listener; }
     void set_token_control_listener(TokenControlListener* listener) { token_control_listener_ = listener; }
     void set_known_client_node_ids(const std::set<uint8_t> &node_ids) { known_client_node_ids_ = node_ids; }
+    uint64_t reassembly_overflow_evict_total(void) const { return reassembly_overflow_evict_total_; }
+    uint32_t unfinished_block_limit(void) const { return RX_RING_SIZE; }
 
     // Make stats public for android userspace receiver
     void clear_stats(void)
@@ -302,6 +304,7 @@ private:
     PacketLossListener* packet_loss_listener_ = nullptr;
     TokenControlListener* token_control_listener_ = nullptr;
     GrantFilterState grant_filter_state_ = {};
+    uint64_t reassembly_overflow_evict_total_ = 0;
     std::set<uint8_t> known_client_node_ids_;
 };
 

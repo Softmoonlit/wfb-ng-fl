@@ -351,7 +351,7 @@ Aggregator::Aggregator(const string &keypair, uint64_t epoch, uint32_t channel_i
     grant_filter_counters_{},
     ready_filter_counters_{},
     fec_p(NULL), fec_k(-1), fec_n(-1), seq(0), rx_ring{}, rx_ring_front(0), rx_ring_alloc(0),
-    last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext)
+    last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext), reassembly_overflow_evict_total_(0)
 {
     memset(session_key, '\0', sizeof(session_key));
     memset(session_hash, '\0', sizeof(session_hash));
@@ -526,6 +526,15 @@ int Aggregator::rx_ring_push(void)
     */
 
     WFB_DBG("AGG: Override block 0x%" PRIx64 " flush %d fragments\n", rx_ring[rx_ring_front].block_idx, rx_ring[rx_ring_front].has_fragments);
+    const uint64_t evicted_block_idx = rx_ring[rx_ring_front].block_idx;
+    const unsigned evicted_has_fragments = rx_ring[rx_ring_front].has_fragments > 0 ? 1U : 0U;
+    reassembly_overflow_evict_total_ += 1;
+    WFB_ERR("REASSEMBLY_OVERFLOW_EVICT evicted_block_idx=0x%" PRIx64 " evicted_has_fragments=%u unfinished_blocks=%d unfinished_block_limit=%u total=%" PRIu64 "\n",
+            evicted_block_idx,
+            evicted_has_fragments,
+            rx_ring_alloc,
+            unfinished_block_limit(),
+            reassembly_overflow_evict_total_);
 
     count_p_override += 1;
 
@@ -610,11 +619,17 @@ void Aggregator::dump_stats(void)
             ready_filter_counters_.rejected.invalid_source,
             ready_filter_counters_.rejected.wrong_ingress_or_link_domain,
             ready_filter_counters_.rejected.unknown_client);
+    IPC_MSG("%" PRIu64 "\tREASSEMBLY\t%" PRIu64 ":%u\n", ts,
+            reassembly_overflow_evict_total_,
+            unfinished_block_limit());
     IPC_MSG_SEND();
 
     if(count_p_override)
     {
-        WFB_ERR("%u block overrides\n", count_p_override);
+        WFB_ERR("REASSEMBLY_OVERFLOW_SUMMARY interval_evict=%u total=%" PRIu64 " unfinished_block_limit=%u\n",
+                count_p_override,
+                reassembly_overflow_evict_total_,
+                unfinished_block_limit());
     }
 
     if(count_p_lost)
