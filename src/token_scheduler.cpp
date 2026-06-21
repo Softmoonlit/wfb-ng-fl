@@ -362,14 +362,18 @@ bool TokenScheduler::next_grant(TokenGrant *grant, uint64_t now_ms)
     }
 
     grant->node_id = node_id;
-    grant->sequence = sequence;
+    grant->sequence = allocate_sequence();
     grant->duration_ms = duration_ms;
     grant->guard_interval_ms = guard_interval_ms;
 
-    sequence += 1;
     next_index = (next_index + 1) % active_node_ids.size();
-
     return true;
+}
+uint64_t TokenScheduler::allocate_sequence()
+{
+    const uint64_t allocated = sequence;
+    sequence += 1;
+    return allocated;
 }
 
 void TokenScheduler::collect_silent_node_removals(uint64_t now_ms,

@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -54,6 +55,23 @@ struct AirReadyState {
     Phase phase = UNDECLARED;
 };
 
+struct FeedbackWindowState {
+    bool enabled = false;
+    bool active = false;
+    uint32_t period_ms = 0;
+    uint32_t duration_ms = 0;
+    uint64_t next_open_at_ms = 0;
+    uint64_t next_grant_at_ms = 0;
+    uint64_t window_end_at_ms = 0;
+    size_t next_client_index = 0;
+    uint8_t current_node_id = 0;
+    uint64_t current_grant_sequence = 0;
+    uint64_t current_slot_expires_at_ms = 0;
+    bool current_slot_hit_recorded = false;
+    uint64_t open_count = 0;
+    uint64_t close_count = 0;
+    map<uint8_t, uint64_t> slot_hit_total_by_node;
+};
 
 struct AirTransmitter {
     int sockfd = -1;
@@ -187,6 +205,7 @@ private:
 struct ClientTarget {
     uint8_t node_id = 0;
     uint32_t tun_ipv4 = 0;
+    uint32_t host_ipv4 = 0;
     string host;
     int port = 0;
     unique_ptr<AirTransmitter> transmitter;
@@ -218,9 +237,14 @@ struct Config {
     int air_target_port = 0;
     uint32_t grant_duration_ms = 100;
     uint32_t guard_interval_ms = 10;
+    uint32_t feedback_window_period_ms = 0;
+    uint32_t feedback_window_duration_ms = 0;
     uint32_t uplink_pause_threshold_bytes = 131072;
     uint32_t uplink_resume_threshold_bytes = 65536;
     uint32_t uplink_queue_packets_limit = 64;
+    uint32_t downlink_pause_threshold_bytes = 131072;
+    uint32_t downlink_resume_threshold_bytes = 65536;
+    uint32_t downlink_queue_packets_limit = 64;
     string queue_summary_file;
     vector<ClientTarget> client_targets;
     vector<uint8_t> known_clients;
@@ -298,6 +322,44 @@ uint32_t parse_ipv4(const string &value, const char *name)
     }
     return ntohl(addr.s_addr);
 }
+bool is_ipv4_multicast(uint32_t ipv4)
+{
+    return (ipv4 & 0xf0000000u) == 0xe0000000u;
+}
+
+bool is_ipv4_limited_broadcast(uint32_t ipv4)
+{
+    return ipv4 == 0xffffffffu;
+}
+
+bool parse_ipv4_endpoints(const uint8_t *buf, size_t size, uint32_t *src_ipv4, uint32_t *dest_ipv4)
+{
+    if (size < 20)
+    {
+        return false;
+    }
+
+    const uint8_t version = buf[0] >> 4;
+    const uint8_t ihl = (buf[0] & 0x0f) * 4;
+    if (version != 4 || ihl < 20 || size < ihl)
+    {
+        return false;
+    }
+
+    uint32_t src = 0;
+    uint32_t dest = 0;
+    memcpy(&src, buf + 12, sizeof(src));
+    memcpy(&dest, buf + 16, sizeof(dest));
+    if (src_ipv4 != NULL)
+    {
+        *src_ipv4 = ntohl(src);
+    }
+    if (dest_ipv4 != NULL)
+    {
+        *dest_ipv4 = ntohl(dest);
+    }
+    return true;
+}
 
 vector<uint8_t> parse_known_clients(const string &value)
 {
@@ -357,6 +419,7 @@ ClientTarget parse_client_target(const string &value)
     target.node_id = parse_node_id(fields[0], "client_target.node_id");
     target.tun_ipv4 = parse_ipv4(fields[1], "client_target.tun_ip");
     target.host = fields[2];
+    target.host_ipv4 = parse_ipv4(fields[2], "client_target.host");
     target.port = static_cast<int>(parse_u32(fields[3], "client_target.port"));
     return target;
 }
@@ -371,7 +434,10 @@ void print_usage(const char *progname)
             "     [--epoch E] [--fec-k K --fec-n N]\n"
             "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
             "     --air-listen-port PORT --known-clients N1,N2 --client-target N:IP:HOST:PORT [--client-target ...] \\\n"
-            "     [--grant-duration-ms MS] [--guard-interval-ms MS] [--epoch E] [--fec-k K --fec-n N]\n",
+            "     [--grant-duration-ms MS] [--guard-interval-ms MS] [--feedback-window-period-ms MS] \\\n"
+            "     [--feedback-window-duration-ms MS] [--downlink-pause-threshold-bytes BYTES] \\\n"
+            "     [--downlink-resume-threshold-bytes BYTES] [--downlink-queue-packets-limit N] [--queue-summary-file PATH] \\\n"
+            "     [--epoch E] [--fec-k K --fec-n N]\n",
             progname,
             progname);
 }
@@ -399,16 +465,21 @@ Config parse_args(int argc, char **argv)
         {"client-target", required_argument, 0, 'x'},
         {"grant-duration-ms", required_argument, 0, 'd'},
         {"guard-interval-ms", required_argument, 0, 'g'},
+        {"feedback-window-period-ms", required_argument, 0, 'f'},
+        {"feedback-window-duration-ms", required_argument, 0, 'F'},
         {"uplink-pause-threshold-bytes", required_argument, 0, 'b'},
         {"uplink-resume-threshold-bytes", required_argument, 0, 'j'},
         {"uplink-queue-packets-limit", required_argument, 0, 'z'},
+        {"downlink-pause-threshold-bytes", required_argument, 0, 'B'},
+        {"downlink-resume-threshold-bytes", required_argument, 0, 'J'},
+        {"downlink-queue-packets-limit", required_argument, 0, 'Z'},
         {"queue-summary-file", required_argument, 0, 'y'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0},
     };
 
     int opt = 0;
-    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:b:j:z:y:h", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:f:F:b:j:z:B:J:Z:y:h", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -475,6 +546,12 @@ Config parse_args(int argc, char **argv)
         case 'g':
             config.guard_interval_ms = parse_u32(optarg, "guard_interval_ms", true);
             break;
+        case 'f':
+            config.feedback_window_period_ms = parse_u32(optarg, "feedback_window_period_ms");
+            break;
+        case 'F':
+            config.feedback_window_duration_ms = parse_u32(optarg, "feedback_window_duration_ms");
+            break;
         case 'b':
             config.uplink_pause_threshold_bytes = parse_u32(optarg, "uplink_pause_threshold_bytes");
             break;
@@ -483,6 +560,15 @@ Config parse_args(int argc, char **argv)
             break;
         case 'z':
             config.uplink_queue_packets_limit = parse_u32(optarg, "uplink_queue_packets_limit");
+            break;
+        case 'B':
+            config.downlink_pause_threshold_bytes = parse_u32(optarg, "downlink_pause_threshold_bytes");
+            break;
+        case 'J':
+            config.downlink_resume_threshold_bytes = parse_u32(optarg, "downlink_resume_threshold_bytes");
+            break;
+        case 'Z':
+            config.downlink_queue_packets_limit = parse_u32(optarg, "downlink_queue_packets_limit");
             break;
         case 'y':
             config.queue_summary_file = optarg;
@@ -545,6 +631,26 @@ Config parse_args(int argc, char **argv)
         if (config.client_targets.empty())
         {
             throw invalid_argument("server 至少需要一个 client-target");
+        }
+        const bool feedback_window_enabled = config.feedback_window_period_ms > 0 || config.feedback_window_duration_ms > 0;
+        if (feedback_window_enabled)
+        {
+            if (config.feedback_window_period_ms == 0 || config.feedback_window_duration_ms == 0)
+            {
+                throw invalid_argument("feedback_window_period_ms 与 feedback_window_duration_ms 必须同时配置");
+            }
+            if (config.feedback_window_duration_ms >= config.feedback_window_period_ms)
+            {
+                throw invalid_argument("feedback_window_duration_ms 必须小于 feedback_window_period_ms");
+            }
+        }
+        if (config.downlink_pause_threshold_bytes < config.downlink_resume_threshold_bytes)
+        {
+            throw invalid_argument("downlink pause 阈值不能小于 resume 阈值");
+        }
+        if (config.downlink_queue_packets_limit == 0)
+        {
+            throw invalid_argument("downlink_queue_packets_limit 必须大于 0");
         }
 
         set<uint8_t> expected(config.known_clients.begin(), config.known_clients.end());
@@ -613,27 +719,14 @@ int open_tun(const string &dev_name, const string &dev_addr)
 
 bool parse_ipv4_destination(const uint8_t *buf, size_t size, uint32_t *dest_ipv4)
 {
-    if (size < 20)
-    {
-        return false;
-    }
-
-    const uint8_t version = buf[0] >> 4;
-    const uint8_t ihl = (buf[0] & 0x0f) * 4;
-    if (version != 4 || ihl < 20 || size < ihl)
-    {
-        return false;
-    }
-
-    uint32_t addr = 0;
-    memcpy(&addr, buf + 16, sizeof(addr));
-    *dest_ipv4 = ntohl(addr);
-    return true;
+    return parse_ipv4_endpoints(buf, size, NULL, dest_ipv4);
 }
 
 class TunWriterAggregator : public Aggregator
 {
 public:
+    typedef function<void(const uint8_t *, uint16_t)> PayloadObserver;
+
     TunWriterAggregator(int tun_fd,
                         const string &keypair,
                         uint64_t epoch,
@@ -645,9 +738,19 @@ public:
     {
     }
 
+    void set_payload_observer(const PayloadObserver &observer)
+    {
+        payload_observer_ = observer;
+    }
+
 protected:
     void send_to_socket(const uint8_t *payload, uint16_t packet_size) override
     {
+        if (payload_observer_)
+        {
+            payload_observer_(payload, packet_size);
+        }
+
         const ssize_t written = write(tun_fd_, payload, packet_size);
         if (written != static_cast<ssize_t>(packet_size))
         {
@@ -657,6 +760,7 @@ protected:
 
 private:
     int tun_fd_;
+    PayloadObserver payload_observer_;
 };
 
 class ClientGrantListener : public TokenControlListener
@@ -780,11 +884,12 @@ void apply_grant_seen(uint64_t now_ms, AirReadyState *ready_state)
 
 void sync_queue_summary_or_throw(const FixedCapacityTunReadQueue &queue,
                                  const string &summary_file,
+                                 const char *role,
                                  uint8_t node_id)
 {
-    if (!queue.write_summary_file(summary_file, node_id))
+    if (!queue.write_summary_file(summary_file, role, node_id))
     {
-        throw runtime_error("写入 uplink queue summary 失败: " + summary_file);
+        throw runtime_error(string("写入 ") + role + " queue summary 失败: " + summary_file);
     }
 }
 
@@ -884,6 +989,167 @@ ClientTarget *find_target_by_tun_ip(vector<ClientTarget> &targets, uint32_t tun_
     }
     return nullptr;
 }
+void send_payload_to_target(ClientTarget &target, const uint8_t *packet, size_t packet_size)
+{
+    if (target.transmitter)
+    {
+        target.transmitter->send_data(packet, packet_size);
+    }
+}
+
+void send_downlink_payload(vector<ClientTarget> &targets,
+                           const uint8_t *packet,
+                           size_t packet_size,
+                           uint32_t dest_ipv4)
+{
+    if (is_ipv4_multicast(dest_ipv4) || is_ipv4_limited_broadcast(dest_ipv4))
+    {
+        for (size_t i = 0; i < targets.size(); ++i)
+        {
+            send_payload_to_target(targets[i], packet, packet_size);
+        }
+        return;
+    }
+
+    ClientTarget *target = find_target_by_tun_ip(targets, dest_ipv4);
+    if (target != NULL)
+    {
+        send_payload_to_target(*target, packet, packet_size);
+    }
+}
+
+void open_feedback_window(FeedbackWindowState *state,
+                          uint64_t now_ms,
+                          size_t known_clients_count)
+{
+    if (state == NULL || !state->enabled)
+    {
+        return;
+    }
+
+    state->active = true;
+    state->next_client_index = 0;
+    state->next_grant_at_ms = now_ms;
+    state->window_end_at_ms = now_ms;
+    state->current_node_id = 0;
+    state->current_grant_sequence = 0;
+    state->current_slot_expires_at_ms = 0;
+    state->current_slot_hit_recorded = false;
+    state->open_count += 1;
+    IPC_MSG("feedback_window_open count=%" PRIu64 " period_ms=%u duration_ms=%u known_clients=%zu\n",
+            state->open_count,
+            state->period_ms,
+            state->duration_ms,
+            known_clients_count);
+    IPC_MSG_SEND();
+}
+
+void close_feedback_window(FeedbackWindowState *state,
+                           uint64_t now_ms)
+{
+    if (state == NULL || !state->active)
+    {
+        return;
+    }
+
+    state->active = false;
+    state->next_open_at_ms = now_ms + state->period_ms;
+    state->current_node_id = 0;
+    state->current_grant_sequence = 0;
+    state->current_slot_expires_at_ms = 0;
+    state->current_slot_hit_recorded = false;
+    state->close_count += 1;
+    IPC_MSG("feedback_window_close count=%" PRIu64 " next_open_at_ms=%" PRIu64 "\n",
+            state->close_count,
+            state->next_open_at_ms);
+    IPC_MSG_SEND();
+}
+
+void maybe_record_feedback_uplink_hit(FeedbackWindowState *state,
+                                      TokenScheduler *scheduler,
+                                      vector<ClientTarget> &targets,
+                                      const uint8_t *payload,
+                                      uint16_t packet_size)
+{
+    uint32_t source_ipv4 = 0;
+    if (!parse_ipv4_endpoints(payload, packet_size, &source_ipv4, NULL))
+    {
+        return;
+    }
+
+    ClientTarget *target = find_target_by_tun_ip(targets, source_ipv4);
+    if (target == NULL)
+    {
+        return;
+    }
+
+    const uint64_t now_ms = get_time_ms();
+    if (scheduler != NULL)
+    {
+        scheduler->observe_uplink_data(target->node_id, now_ms);
+    }
+    if (state == NULL || !state->active)
+    {
+        return;
+    }
+    if (state->current_node_id != target->node_id || state->current_slot_hit_recorded)
+    {
+        return;
+    }
+    if (state->current_slot_expires_at_ms > 0 && now_ms > state->current_slot_expires_at_ms)
+    {
+        return;
+    }
+
+    state->current_slot_hit_recorded = true;
+    uint64_t &total = state->slot_hit_total_by_node[target->node_id];
+    total += 1;
+    IPC_MSG("feedback_uplink_hit node_id=%u sequence=%" PRIu64 " total=%" PRIu64 "\n",
+            static_cast<unsigned>(target->node_id),
+            state->current_grant_sequence,
+            total);
+    IPC_MSG_SEND();
+}
+
+bool maybe_send_feedback_grant(FeedbackWindowState *state,
+                               TokenScheduler *scheduler,
+                               const Config &config,
+                               vector<ClientTarget> &targets,
+                               uint64_t now_ms)
+{
+    if (state == NULL || scheduler == NULL || !state->active || now_ms < state->next_grant_at_ms)
+    {
+        return false;
+    }
+    if (state->next_client_index >= config.known_clients.size())
+    {
+        close_feedback_window(state, now_ms);
+        return false;
+    }
+
+    const uint8_t node_id = config.known_clients[state->next_client_index];
+    ClientTarget *target = find_target_by_node_id(targets, node_id);
+    const uint64_t sequence = scheduler->allocate_sequence();
+    state->current_node_id = node_id;
+    state->current_grant_sequence = sequence;
+    state->current_slot_expires_at_ms = now_ms + state->duration_ms;
+    state->current_slot_hit_recorded = false;
+    state->window_end_at_ms = now_ms + state->duration_ms + config.guard_interval_ms;
+    if (target != NULL && target->transmitter)
+    {
+        target->transmitter->send_grant(config.node_id, node_id, sequence, state->duration_ms);
+    }
+    IPC_MSG("grant seq=%" PRIu64 " node_id=%u duration_ms=%u kind=feedback slot=%zu/%zu\n",
+            sequence,
+            static_cast<unsigned>(node_id),
+            state->duration_ms,
+            state->next_client_index + 1,
+            config.known_clients.size());
+    IPC_MSG_SEND();
+    state->next_client_index += 1;
+    state->next_grant_at_ms = now_ms + state->duration_ms + config.guard_interval_ms;
+    return true;
+}
 
 void run_client(const Config &config)
 {
@@ -908,7 +1174,7 @@ void run_client(const Config &config)
     FixedCapacityTunReadQueue uplink_queue(config.uplink_pause_threshold_bytes,
                                            config.uplink_resume_threshold_bytes,
                                            config.uplink_queue_packets_limit);
-    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
 
     uint64_t log_send_ts = get_time_ms();
     pollfd fds[2] = {};
@@ -943,7 +1209,7 @@ void run_client(const Config &config)
                     authorization_state.counters().authorized_sends,
                     authorization_state.counters().denied_sends);
             IPC_MSG_SEND();
-            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
             log_send_ts = now_ms + config.log_interval;
         }
 
@@ -967,7 +1233,7 @@ void run_client(const Config &config)
                 maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, uplink_queue);
                 if (before_enabled != uplink_queue.tun_read_enabled() || before_reason != uplink_queue.current_pause_reason())
                 {
-                    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+                    sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
                 }
             }
             else if (nread < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
@@ -1002,7 +1268,7 @@ void run_client(const Config &config)
         maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, uplink_queue);
         if (before_enabled != uplink_queue.tun_read_enabled() || before_reason != uplink_queue.current_pause_reason())
         {
-            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, config.node_id);
+            sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
         }
     }
 }
@@ -1037,18 +1303,47 @@ void run_server(Config config)
                                                                       config.snd_buf));
     }
 
+    FeedbackWindowState feedback_state = {};
+    feedback_state.enabled = config.feedback_window_period_ms > 0 && config.feedback_window_duration_ms > 0;
+    feedback_state.period_ms = config.feedback_window_period_ms;
+    feedback_state.duration_ms = config.feedback_window_duration_ms;
+    if (feedback_state.enabled)
+    {
+        feedback_state.next_open_at_ms = get_time_ms() + feedback_state.period_ms;
+    }
+
+    FixedCapacityTunReadQueue downlink_queue(config.downlink_pause_threshold_bytes,
+                                             config.downlink_resume_threshold_bytes,
+                                             config.downlink_queue_packets_limit);
+    sync_queue_summary_or_throw(downlink_queue, config.queue_summary_file, "server", config.node_id);
+    uplink_aggregator.set_payload_observer([&](const uint8_t *payload, uint16_t packet_size) {
+        maybe_record_feedback_uplink_hit(&feedback_state, &scheduler, config.client_targets, payload, packet_size);
+    });
+
     uint64_t log_send_ts = get_time_ms();
     uint64_t next_grant_at_ms = get_time_ms();
     pollfd fds[2] = {};
     fds[0].fd = tun_fd;
-    fds[0].events = POLLIN;
     fds[1].fd = air_fd;
     fds[1].events = POLLIN;
 
     for (;;)
     {
+        fds[0].events = downlink_queue.tun_read_enabled() ? POLLIN : 0;
+
         uint64_t now_ms = get_time_ms();
         uint64_t next_wakeup = min(log_send_ts, next_grant_at_ms);
+        if (feedback_state.enabled)
+        {
+            if (feedback_state.active)
+            {
+                next_wakeup = min(next_wakeup, feedback_state.next_grant_at_ms);
+            }
+            else
+            {
+                next_wakeup = min(next_wakeup, feedback_state.next_open_at_ms);
+            }
+        }
         int timeout_ms = static_cast<int>(next_wakeup > now_ms ? next_wakeup - now_ms : 0);
         int rc = poll(fds, 2, timeout_ms);
         if (rc < 0)
@@ -1064,6 +1359,7 @@ void run_server(Config config)
         if (now_ms >= log_send_ts)
         {
             uplink_aggregator.dump_stats();
+            sync_queue_summary_or_throw(downlink_queue, config.queue_summary_file, "server", config.node_id);
             log_send_ts = now_ms + config.log_interval;
         }
 
@@ -1078,19 +1374,54 @@ void run_server(Config config)
             const ssize_t nread = read(tun_fd, packet, sizeof(packet));
             if (nread > 0)
             {
-                uint32_t dest_ipv4 = 0;
-                if (parse_ipv4_destination(packet, static_cast<size_t>(nread), &dest_ipv4))
+                const bool before_enabled = downlink_queue.tun_read_enabled();
+                const TunReadPauseReason before_reason = downlink_queue.current_pause_reason();
+                if (!downlink_queue.push(packet, static_cast<size_t>(nread)))
                 {
-                    ClientTarget *target = find_target_by_tun_ip(config.client_targets, dest_ipv4);
-                    if (target != nullptr && target->transmitter)
-                    {
-                        target->transmitter->send_data(packet, static_cast<size_t>(nread));
-                    }
+                    throw runtime_error("downlink queue 入队失败");
+                }
+                maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, downlink_queue);
+                if (before_enabled != downlink_queue.tun_read_enabled() || before_reason != downlink_queue.current_pause_reason())
+                {
+                    sync_queue_summary_or_throw(downlink_queue, config.queue_summary_file, "server", config.node_id);
                 }
             }
             else if (nread < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
             {
                 throw runtime_error(string("读取 server TUN 失败: ") + strerror(errno));
+            }
+        }
+
+        now_ms = get_time_ms();
+        if (feedback_state.enabled && !feedback_state.active && now_ms >= feedback_state.next_open_at_ms)
+        {
+            open_feedback_window(&feedback_state, now_ms, config.known_clients.size());
+        }
+        if (feedback_state.active)
+        {
+            maybe_send_feedback_grant(&feedback_state, &scheduler, config, config.client_targets, now_ms);
+            continue;
+        }
+
+        const QueuedTunPacket *pending_packet = downlink_queue.front();
+        if (pending_packet != NULL)
+        {
+            uint32_t dest_ipv4 = 0;
+            if (parse_ipv4_destination(pending_packet->bytes, pending_packet->size, &dest_ipv4))
+            {
+                send_downlink_payload(config.client_targets, pending_packet->bytes, pending_packet->size, dest_ipv4);
+            }
+
+            const bool before_enabled = downlink_queue.tun_read_enabled();
+            const TunReadPauseReason before_reason = downlink_queue.current_pause_reason();
+            if (!downlink_queue.pop_front())
+            {
+                throw runtime_error("downlink queue 出队失败");
+            }
+            maybe_log_tun_read_transition(config.node_id, before_enabled, before_reason, downlink_queue);
+            if (before_enabled != downlink_queue.tun_read_enabled() || before_reason != downlink_queue.current_pause_reason())
+            {
+                sync_queue_summary_or_throw(downlink_queue, config.queue_summary_file, "server", config.node_id);
             }
         }
 
@@ -1108,13 +1439,13 @@ void run_server(Config config)
         }
 
         ClientTarget *target = find_target_by_node_id(config.client_targets, grant.node_id);
-        if (target != nullptr && target->transmitter)
+        if (target != NULL && target->transmitter)
         {
             target->transmitter->send_grant(config.node_id,
                                             grant.node_id,
                                             grant.sequence,
                                             grant.duration_ms);
-            IPC_MSG("grant seq=%" PRIu64 " node_id=%u duration_ms=%u%s\n",
+            IPC_MSG("grant seq=%" PRIu64 " node_id=%u duration_ms=%u kind=normal%s\n",
                     grant.sequence,
                     static_cast<unsigned>(grant.node_id),
                     grant.duration_ms,

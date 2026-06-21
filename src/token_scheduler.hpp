@@ -54,6 +54,7 @@ public:
     void observe_uplink_data(uint8_t node_id, uint64_t now_ms);
     bool next_grant(TokenGrant *grant);
     bool next_grant(TokenGrant *grant, uint64_t now_ms);
+    uint64_t allocate_sequence();
     void collect_silent_node_removals(uint64_t now_ms,
                                       std::vector<SilentNodeRemoval> *removed_nodes,
                                       uint8_t protected_node_id = 0);

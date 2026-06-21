@@ -147,11 +147,15 @@ public:
         return true;
     }
 
-    bool write_summary_file(const std::string &path, uint8_t node_id) const
+    bool write_summary_file(const std::string &path, const char *role, uint8_t node_id) const
     {
         if (path.empty())
         {
             return true;
+        }
+        if (role == NULL || role[0] == '\0')
+        {
+            return false;
         }
 
         const std::string tmp_path = path + ".tmp";
@@ -163,9 +167,14 @@ public:
 
         const int written = fprintf(fp,
                                     "{\n"
-                                    "  \"role\": \"client\",\n"
+                                    "  \"role\": \"%s\",\n"
                                     "  \"link_security_mode\": \"trusted_plaintext\",\n"
                                     "  \"node_id\": %u,\n"
+                                    "  \"queued_bytes\": %zu,\n"
+                                    "  \"queued_packets\": %zu,\n"
+                                    "  \"queued_packets_limit\": %zu,\n"
+                                    "  \"pause_threshold_bytes\": %u,\n"
+                                    "  \"resume_threshold_bytes\": %u,\n"
                                     "  \"tun_read_paused\": %s,\n"
                                     "  \"current_pause_reason\": \"%s\",\n"
                                     "  \"tun_read_pause_total\": %" PRIu64 ",\n"
@@ -175,7 +184,13 @@ public:
                                     "    \"queued_packets_limit\": %" PRIu64 "\n"
                                     "  }\n"
                                     "}\n",
+                                    role,
                                     static_cast<unsigned>(node_id),
+                                    queued_bytes_,
+                                    count_,
+                                    slots_.size(),
+                                    pause_threshold_bytes_,
+                                    resume_threshold_bytes_,
                                     tun_read_paused_ ? "true" : "false",
                                     tun_read_pause_reason_name(current_pause_reason_),
                                     counters_.tun_read_pause_total,
@@ -188,6 +203,11 @@ public:
             remove(tmp_path.c_str());
         }
         return ok;
+    }
+
+    bool write_summary_file(const std::string &path, uint8_t node_id) const
+    {
+        return write_summary_file(path, "client", node_id);
     }
 
 private:
