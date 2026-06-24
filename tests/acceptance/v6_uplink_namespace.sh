@@ -24,7 +24,8 @@ CLIENT1_PING_LOG="$CLIENT1_DIR/ping.log"
 CLIENT2_PING_LOG="$CLIENT2_DIR/ping.log"
 CLIENT1_QUEUE_SUMMARY_JSON="$CLIENT1_DIR/uplink_queue_summary.json"
 CLIENT2_QUEUE_SUMMARY_JSON="$CLIENT2_DIR/uplink_queue_summary.json"
-RUN_SUMMARY_JSON="$LOG_DIR/v6_uplink_issue23_summary.json"
+RUN_SUMMARY_JSON="$LOG_DIR/formal_2a_summary.json"
+FORMAL_CONCLUSION_MD="$LOG_DIR/formal_conclusion.md"
 
 SERVER_TUN_NAME="${SERVER_TUN_NAME:-v6us0}"
 CLIENT1_TUN_NAME="${CLIENT1_TUN_NAME:-v6uc1}"
@@ -130,6 +131,7 @@ cleanup() {
     fi
 
     render_result "$([ "$rc" -eq 0 ] && echo PASS || echo FAIL)"
+    render_formal_conclusion "$([ "$rc" -eq 0 ] && echo PASS || echo FAIL)"
     exit "$rc"
 }
 trap cleanup EXIT
@@ -167,6 +169,7 @@ render_result() {
 - client1 queue summary: $CLIENT1_QUEUE_SUMMARY_JSON
 - client2 queue summary: $CLIENT2_QUEUE_SUMMARY_JSON
 - run 2A summary: $RUN_SUMMARY_JSON
+- formal conclusion: $FORMAL_CONCLUSION_MD
 - client1 ready accepts: $CLIENT1_READY_ACCEPTS
 - client2 ready accepts: $CLIENT2_READY_ACCEPTS
 - client1 grants: $CLIENT1_GRANTS
@@ -191,6 +194,60 @@ render_result() {
 - 已覆盖: 双客户端 READY/GRANT 持续推进与独立 TCP/IP 会话语义（以并发 ping 往返证明）
 - 已覆盖: issue #22 固定容量用户态队列、双阈值水位与 TUN 反压 2A 摘要
 - 已覆盖: issue #23 统一结构化摘要已接入 RX 重组窗口字段（当前 namespace 场景不主动触发溢出）
+EOF
+}
+
+render_formal_conclusion() {
+    local status="$1"
+    local evidence_ok="否"
+    local rerun_required="是"
+    if [ "$status" = "PASS" ]; then
+        evidence_ok="是"
+        rerun_required="否"
+    fi
+
+    cat > "$FORMAL_CONCLUSION_MD" <<EOF
+## v6 namespace 正式验收结论
+
+- 运行批次：$(basename "$LOG_DIR")
+- 对应 issue：#25
+- 结论状态：$status
+
+### 运行场景与前置条件
+- run_kind: namespace
+- link_security_mode: trusted_plaintext
+- scenario_id: v6_namespace_uplink_backpressure_reassembly
+- feedback_window_covered: false
+- 执行入口: tests/acceptance/v6_uplink_namespace.sh
+
+### 原始产物层引用
+- 日志目录: $LOG_DIR
+- 统一 2A 摘要: $RUN_SUMMARY_JSON
+- 结论文件: $RESULT_MD
+- 2B 证据: $SERVER_LOG, $CLIENT1_LOG, $CLIENT2_LOG, $CLIENT1_QUEUE_SUMMARY_JSON, $CLIENT2_QUEUE_SUMMARY_JSON, $CLIENT1_PING_LOG, $CLIENT2_PING_LOG
+
+### 运行时长与关键事件计数
+- client1 ready accepts: $CLIENT1_READY_ACCEPTS
+- client2 ready accepts: $CLIENT2_READY_ACCEPTS
+- client1 grants: $CLIENT1_GRANTS
+- client2 grants: $CLIENT2_GRANTS
+- client1 authorized sends: $CLIENT1_AUTHORIZED_SENDS
+- client2 authorized sends: $CLIENT2_AUTHORIZED_SENDS
+- tun_read_pause_total: $RUN_TUN_READ_PAUSE_TOTAL
+- tun_read_resume_total: $RUN_TUN_READ_RESUME_TOTAL
+- queued_bytes_threshold pauses: $RUN_TUN_READ_PAUSE_BYTES_TOTAL
+- queued_packets_limit pauses: $RUN_TUN_READ_PAUSE_PACKETS_TOTAL
+- reassembly_overflow_evict: $RUN_REASSEMBLY_OVERFLOW_EVICT
+- unfinished_block_limit: $RUN_UNFINISHED_BLOCK_LIMIT
+
+### 关键异常与风险信号
+- 结果原因: ${FAIL_REASON:-无}
+- 当前 namespace 场景不主动制造 RX 重组溢出；`reassembly_overflow_evict=0` 仍可为预期。
+- 2B 细节仍保留在原始日志与 queue summary 中，不混入统一 2A 摘要。
+
+### 结论
+- 可作为 issue #25 namespace 正式证据: $evidence_ok
+- 是否需要重跑: $rerun_required
 EOF
 }
 
@@ -337,15 +394,29 @@ run_dual_ping() {
 }
 
 collect_queue_backpressure_metrics() {
-    if ! eval "$(python3 - "$CLIENT1_QUEUE_SUMMARY_JSON" "$CLIENT2_QUEUE_SUMMARY_JSON" "$RUN_SUMMARY_JSON" "$SERVER_LOG" "$CLIENT1_LOG" "$CLIENT2_LOG" <<'PY'
-import json
-import re
+    if ! eval "$(PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - "$CLIENT1_QUEUE_SUMMARY_JSON" "$CLIENT2_QUEUE_SUMMARY_JSON" "$RUN_SUMMARY_JSON" "$SERVER_LOG" "$CLIENT1_LOG" "$CLIENT2_LOG" <<'PY'
 import shlex
 import sys
 
+from wfb_ng.tests.v6_formal_summary import (
+    SCENARIO_V6_NAMESPACE_UPLINK,
+    build_summary,
+    write_summary,
+)
+
 client1_path, client2_path, run_summary_path, server_log_path, client1_log_path, client2_log_path = sys.argv[1:7]
 
+
+def load_json(path):
+    import json
+
+    with open(path, 'r') as fh:
+        return json.load(fh)
+
+
 def parse_last_reassembly(path):
+    import re
+
     total = None
     limit = None
     with open(path, 'r') as fh:
@@ -361,11 +432,9 @@ def parse_last_reassembly(path):
         'unfinished_block_limit': limit,
     }
 
-with open(client1_path, 'r') as fh:
-    client1 = json.load(fh)
-with open(client2_path, 'r') as fh:
-    client2 = json.load(fh)
 
+client1 = load_json(client1_path)
+client2 = load_json(client2_path)
 rx_reassembly = {
     'server': parse_last_reassembly(server_log_path),
     'client1': parse_last_reassembly(client1_log_path),
@@ -375,29 +444,18 @@ unfinished_limits = {entry['unfinished_block_limit'] for entry in rx_reassembly.
 if len(unfinished_limits) != 1:
     raise SystemExit('inconsistent unfinished_block_limit: %r' % sorted(unfinished_limits))
 
-run_summary = {
-    'run_kind': 'namespace',
-    'link_security_mode': 'trusted_plaintext',
-    'scenario_id': 'v6_uplink_namespace_issue23',
-    'feedback_window_covered': False,
-    'tun_read_pause_total': client1['tun_read_pause_total'] + client2['tun_read_pause_total'],
-    'tun_read_resume_total': client1['tun_read_resume_total'] + client2['tun_read_resume_total'],
-    'tun_read_pause_total_by_reason': {
+run_summary = build_summary(
+    SCENARIO_V6_NAMESPACE_UPLINK,
+    tun_read_pause_total=client1['tun_read_pause_total'] + client2['tun_read_pause_total'],
+    tun_read_resume_total=client1['tun_read_resume_total'] + client2['tun_read_resume_total'],
+    tun_read_pause_total_by_reason={
         'queued_bytes_threshold': client1['tun_read_pause_total_by_reason']['queued_bytes_threshold'] + client2['tun_read_pause_total_by_reason']['queued_bytes_threshold'],
         'queued_packets_limit': client1['tun_read_pause_total_by_reason']['queued_packets_limit'] + client2['tun_read_pause_total_by_reason']['queued_packets_limit'],
     },
-    'reassembly_overflow_evict': sum(entry['reassembly_overflow_evict'] for entry in rx_reassembly.values()),
-    'unfinished_block_limit': unfinished_limits.pop(),
-    'rx_reassembly': rx_reassembly,
-    'clients': {
-        'client1': client1,
-        'client2': client2,
-    },
-}
-
-with open(run_summary_path, 'w') as fh:
-    json.dump(run_summary, fh, indent=2, sort_keys=True)
-    fh.write('\n')
+    reassembly_overflow_evict=sum(entry['reassembly_overflow_evict'] for entry in rx_reassembly.values()),
+    unfinished_block_limit=unfinished_limits.pop(),
+)
+write_summary(run_summary_path, run_summary)
 
 values = {
     'CLIENT1_TUN_READ_PAUSE_TOTAL': client1['tun_read_pause_total'],
@@ -417,7 +475,7 @@ values = {
 }
 
 for key, value in values.items():
-    print(f"{key}={shlex.quote(str(value))}")
+    print(f'{key}={shlex.quote(str(value))}')
 PY
 )"; then
         set_fail_reason "解析 v6 namespace 统一结构化摘要失败"
@@ -479,7 +537,7 @@ assert_metrics() {
         return 1
     fi
     if [ ! -f "$RUN_SUMMARY_JSON" ]; then
-        set_fail_reason "缺少 issue #23 统一结构化摘要"
+        set_fail_reason "缺少统一 2A 摘要"
         return 1
     fi
     if [ "$RUN_UNFINISHED_BLOCK_LIMIT" -le 0 ]; then

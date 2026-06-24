@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import os
 import shutil
 import subprocess
@@ -9,6 +8,14 @@ import tempfile
 import time
 
 from twisted.trial import unittest
+
+from wfb_ng.tests.v6_formal_summary import (
+    CONCLUSION_FILENAME,
+    SCENARIO_V6_NAMESPACE_UPLINK,
+    SUMMARY_FILENAME,
+    allowed_fields_for,
+    load_summary,
+)
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -42,15 +49,18 @@ class V6UplinkNamespaceTestCase(unittest.TestCase):
                 text=True,
             )
             result_md = os.path.join(log_dir, 'result.md')
-            summary_json = os.path.join(log_dir, 'v6_uplink_issue23_summary.json')
+            summary_json = os.path.join(log_dir, SUMMARY_FILENAME)
+            conclusion_md = os.path.join(log_dir, CONCLUSION_FILENAME)
             self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(summary_json))
+            self.assertTrue(os.path.exists(conclusion_md))
 
             with open(result_md, 'r') as fh:
                 content = fh.read()
-            with open(summary_json, 'r') as fh:
-                summary = json.load(fh)
+            with open(conclusion_md, 'r') as fh:
+                conclusion = fh.read()
+            summary = load_summary(summary_json)
 
             self.assertIn('- 结果: PASS', content)
             self.assertIn('- cleanup_verified: 是', content)
@@ -65,16 +75,19 @@ class V6UplinkNamespaceTestCase(unittest.TestCase):
             self.assertRegex(content, r'- run unfinished_block_limit: [1-9][0-9]*')
             self.assertEqual('namespace', summary['run_kind'])
             self.assertEqual('trusted_plaintext', summary['link_security_mode'])
-            self.assertEqual('v6_uplink_namespace_issue23', summary['scenario_id'])
+            self.assertEqual(SCENARIO_V6_NAMESPACE_UPLINK, summary['scenario_id'])
             self.assertFalse(summary['feedback_window_covered'])
+            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_NAMESPACE_UPLINK)), set(summary.keys()))
             self.assertGreater(summary['tun_read_pause_total'], 0)
             self.assertGreater(summary['tun_read_resume_total'], 0)
             self.assertGreater(summary['tun_read_pause_total_by_reason']['queued_bytes_threshold'], 0)
             self.assertGreater(summary['tun_read_pause_total_by_reason']['queued_packets_limit'], 0)
             self.assertIn('reassembly_overflow_evict', summary)
             self.assertGreater(summary['unfinished_block_limit'], 0)
-            self.assertIn('rx_reassembly', summary)
-            self.assertEqual(summary['unfinished_block_limit'], summary['rx_reassembly']['server']['unfinished_block_limit'])
+            self.assertNotIn('rx_reassembly', summary)
+            self.assertNotIn('clients', summary)
+            self.assertIn('- 对应 issue：#25', conclusion)
+            self.assertIn('- 统一 2A 摘要: %s' % summary_json, conclusion)
         finally:
             subprocess.run(['ip', 'netns', 'delete', env['SERVER_NS']], capture_output=True)
             subprocess.run(['ip', 'netns', 'delete', env['CLIENT1_NS']], capture_output=True)

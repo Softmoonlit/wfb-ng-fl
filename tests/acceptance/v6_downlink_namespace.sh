@@ -8,7 +8,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 LOG_DIR="${LOG_DIR:-$PROJECT_ROOT/tests/logs/v6_downlink_namespace_$(date +%Y%m%d_%H%M%S)}"
 RESULT_MD="$LOG_DIR/result.md"
 BUILD_LOG="$LOG_DIR/build.log"
-RUN_SUMMARY_JSON="$LOG_DIR/v6_issue24_summary.json"
+RUN_SUMMARY_JSON="$LOG_DIR/formal_2a_summary.json"
+FORMAL_CONCLUSION_MD="$LOG_DIR/formal_conclusion.md"
 
 SERVER_NS="${SERVER_NS:-v6d-server}"
 CLIENT1_NS="${CLIENT1_NS:-v6d-client1}"
@@ -140,6 +141,7 @@ render_result() {
 - 原因: ${FAIL_REASON:-无}
 - cleanup_verified: $CLEANUP_VERIFIED
 - summary_json: $RUN_SUMMARY_JSON
+- formal_conclusion: $FORMAL_CONCLUSION_MD
 - server log: $SERVER_LOG
 - client1 log: $CLIENT1_LOG
 - client2 log: $CLIENT2_LOG
@@ -171,6 +173,61 @@ render_result() {
 EOF
 }
 
+render_formal_conclusion() {
+    local evidence_ok="否"
+    local rerun_required="是"
+    if [ "$RESULT_STATUS" = "PASS" ]; then
+        evidence_ok="是"
+        rerun_required="否"
+    fi
+
+    cat > "$FORMAL_CONCLUSION_MD" <<EOF
+## v6 namespace 正式验收结论
+
+- 运行批次：$(basename "$LOG_DIR")
+- 对应 issue：#25
+- 结论状态：$RESULT_STATUS
+
+### 运行场景与前置条件
+- run_kind: namespace
+- link_security_mode: trusted_plaintext
+- scenario_id: v6_namespace_downlink_shared_uftp_feedback
+- feedback_window_covered: true
+- 执行入口: tests/acceptance/v6_downlink_namespace.sh
+
+### 原始产物层引用
+- 日志目录: $LOG_DIR
+- 统一 2A 摘要: $RUN_SUMMARY_JSON
+- 结论文件: $RESULT_MD
+- 2B 证据: $SERVER_LOG, $CLIENT1_LOG, $CLIENT2_LOG, $SERVER_QUEUE_SUMMARY_JSON, $CLIENT1_QUEUE_SUMMARY_JSON, $CLIENT2_QUEUE_SUMMARY_JSON, $UFTP_SERVER_LOG, $CLIENT1_UFTPD_LOG, $CLIENT2_UFTPD_LOG
+
+### 运行时长与关键事件计数
+- grant_sent_total: $RUN_GRANT_SENT_TOTAL
+- ready_accepted_total: $RUN_READY_ACCEPTED_TOTAL
+- ready_rejected.invalid_source: $RUN_READY_REJECTED_INVALID_SOURCE
+- ready_rejected.wrong_ingress_or_link_domain: $RUN_READY_REJECTED_WRONG_INGRESS_OR_LINK_DOMAIN
+- ready_rejected.unknown_client: $RUN_READY_REJECTED_UNKNOWN_CLIENT
+- feedback_window_open_count: $RUN_FEEDBACK_WINDOW_OPEN_COUNT
+- feedback_window_close_count: $RUN_FEEDBACK_WINDOW_CLOSE_COUNT
+- feedback_uplink_hit_total: $RUN_FEEDBACK_HIT_TOTAL
+- tun_read_pause_total: $RUN_SERVER_TUN_READ_PAUSE_TOTAL
+- tun_read_resume_total: $RUN_SERVER_TUN_READ_RESUME_TOTAL
+- queued_bytes_threshold pauses: $RUN_SERVER_TUN_READ_PAUSE_BYTES_TOTAL
+- queued_packets_limit pauses: $RUN_SERVER_TUN_READ_PAUSE_PACKETS_TOTAL
+- reassembly_overflow_evict: $RUN_REASSEMBLY_OVERFLOW_EVICT
+- unfinished_block_limit: $RUN_UNFINISHED_BLOCK_LIMIT
+
+### 关键异常与风险信号
+- 结果原因: ${FAIL_REASON:-无}
+- client1/client2 UFTP SHA256: $CLIENT1_UFTP_SHA256 / $CLIENT2_UFTP_SHA256
+- 2B 细节仍保留在 server/client 原始日志、queue summary 与 UFTP 状态文件中，不混入统一 2A 摘要。
+
+### 结论
+- 可作为 issue #25 namespace 正式证据: $evidence_ok
+- 是否需要重跑: $rerun_required
+EOF
+}
+
 cleanup() {
     for pid in "$SERVER_PID" "$CLIENT1_PID" "$CLIENT2_PID"; do
         if [ -n "$pid" ]; then
@@ -194,6 +251,7 @@ cleanup() {
         CLEANUP_VERIFIED="是"
     fi
     render_result
+    render_formal_conclusion
 }
 trap cleanup EXIT
 
@@ -462,16 +520,25 @@ verify_uftp_payloads() {
 }
 
 collect_metrics() {
-    if ! eval "$(python3 - "$SERVER_QUEUE_SUMMARY_JSON" "$SERVER_LOG" "$CLIENT1_LOG" "$CLIENT2_LOG" "$RUN_SUMMARY_JSON" <<'PY'
-import json
+    if ! eval "$(PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 - "$SERVER_QUEUE_SUMMARY_JSON" "$SERVER_LOG" "$CLIENT1_LOG" "$CLIENT2_LOG" "$RUN_SUMMARY_JSON" <<'PY'
 import re
 import shlex
 import sys
 
+from wfb_ng.tests.v6_formal_summary import (
+    SCENARIO_V6_NAMESPACE_DOWNLINK,
+    build_summary,
+    write_summary,
+)
+
 server_queue_path, server_log_path, client1_log_path, client2_log_path, run_summary_path = sys.argv[1:6]
 
-with open(server_queue_path, 'r') as fh:
-    server_queue = json.load(fh)
+
+def load_json(path):
+    import json
+
+    with open(path, 'r') as fh:
+        return json.load(fh)
 
 
 def parse_last_ready_filter(path):
@@ -509,6 +576,8 @@ def parse_last_reassembly(path):
         raise SystemExit('missing REASSEMBLY stats in %s' % path)
     return {'reassembly_overflow_evict': total, 'unfinished_block_limit': limit}
 
+
+server_queue = load_json(server_queue_path)
 ready_filter = parse_last_ready_filter(server_log_path)
 rx_reassembly = {
     'server': parse_last_reassembly(server_log_path),
@@ -535,32 +604,26 @@ with open(server_log_path, 'r') as fh:
         if match:
             feedback_hits[match.group(1)] = int(match.group(3))
 
-summary = {
-    'run_kind': 'namespace',
-    'link_security_mode': 'trusted_plaintext',
-    'scenario_id': 'v6_downlink_namespace_issue24',
-    'feedback_window_covered': True,
-    'grant_sent_total': grant_sent_total,
-    'ready_accepted_total': ready_filter['accepted'],
-    'ready_rejected_total_by_reason': {
+summary = build_summary(
+    SCENARIO_V6_NAMESPACE_DOWNLINK,
+    grant_sent_total=grant_sent_total,
+    ready_accepted_total=ready_filter['accepted'],
+    ready_rejected_total_by_reason={
         'invalid_source': ready_filter['invalid_source'],
         'wrong_ingress_or_link_domain': ready_filter['wrong_ingress_or_link_domain'],
         'unknown_client': ready_filter['unknown_client'],
     },
-    'feedback_window_open_count': feedback_window_open_count,
-    'feedback_window_close_count': feedback_window_close_count,
-    'feedback_uplink_hit_total_by_node': feedback_hits,
-    'feedback_uplink_hit_total': sum(feedback_hits.values()),
-    'tun_read_pause_total': server_queue['tun_read_pause_total'],
-    'tun_read_resume_total': server_queue['tun_read_resume_total'],
-    'tun_read_pause_total_by_reason': server_queue['tun_read_pause_total_by_reason'],
-    'reassembly_overflow_evict': sum(entry['reassembly_overflow_evict'] for entry in rx_reassembly.values()),
-    'unfinished_block_limit': unfinished_limits.pop(),
-}
-
-with open(run_summary_path, 'w') as fh:
-    json.dump(summary, fh, indent=2, sort_keys=True)
-    fh.write('\n')
+    feedback_window_open_count=feedback_window_open_count,
+    feedback_window_close_count=feedback_window_close_count,
+    feedback_uplink_hit_total_by_node=feedback_hits,
+    feedback_uplink_hit_total=sum(feedback_hits.values()),
+    tun_read_pause_total=server_queue['tun_read_pause_total'],
+    tun_read_resume_total=server_queue['tun_read_resume_total'],
+    tun_read_pause_total_by_reason=server_queue['tun_read_pause_total_by_reason'],
+    reassembly_overflow_evict=sum(entry['reassembly_overflow_evict'] for entry in rx_reassembly.values()),
+    unfinished_block_limit=unfinished_limits.pop(),
+)
+write_summary(run_summary_path, summary)
 
 values = {
     'RUN_GRANT_SENT_TOTAL': summary['grant_sent_total'],

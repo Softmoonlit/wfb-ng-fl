@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import os
 import shutil
 import subprocess
@@ -9,6 +8,14 @@ import tempfile
 import time
 
 from twisted.trial import unittest
+
+from wfb_ng.tests.v6_formal_summary import (
+    CONCLUSION_FILENAME,
+    SCENARIO_V6_NAMESPACE_DOWNLINK,
+    SUMMARY_FILENAME,
+    allowed_fields_for,
+    load_summary,
+)
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -32,8 +39,8 @@ class V6DownlinkNamespaceTestCase(unittest.TestCase):
             'SERVER_NS': 'v6d-server-%s' % suffix,
             'CLIENT1_NS': 'v6d-client1-%s' % suffix,
             'CLIENT2_NS': 'v6d-client2-%s' % suffix,
-            'STARTUP_WAIT_SEC': '0.5',
-            'POST_TRANSFER_WAIT_SEC': '1',
+            'STARTUP_WAIT_SEC': '1',
+            'POST_TRANSFER_WAIT_SEC': '2',
             'UFTP_BIN': UFTP_BIN,
             'UFTPD_BIN': UFTPD_BIN,
             'UFTP_PAYLOAD_SIZE': '131072',
@@ -53,15 +60,18 @@ class V6DownlinkNamespaceTestCase(unittest.TestCase):
                 text=True,
             )
             result_md = os.path.join(log_dir, 'result.md')
-            summary_json = os.path.join(log_dir, 'v6_issue24_summary.json')
+            summary_json = os.path.join(log_dir, SUMMARY_FILENAME)
+            conclusion_md = os.path.join(log_dir, CONCLUSION_FILENAME)
             self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(summary_json))
+            self.assertTrue(os.path.exists(conclusion_md))
 
             with open(result_md, 'r') as fh:
                 content = fh.read()
-            with open(summary_json, 'r') as fh:
-                summary = json.load(fh)
+            with open(conclusion_md, 'r') as fh:
+                conclusion = fh.read()
+            summary = load_summary(summary_json)
 
             self.assertIn('- 结果: PASS', content)
             self.assertIn('- cleanup_verified: 是', content)
@@ -78,8 +88,9 @@ class V6DownlinkNamespaceTestCase(unittest.TestCase):
 
             self.assertEqual('namespace', summary['run_kind'])
             self.assertEqual('trusted_plaintext', summary['link_security_mode'])
-            self.assertEqual('v6_downlink_namespace_issue24', summary['scenario_id'])
+            self.assertEqual(SCENARIO_V6_NAMESPACE_DOWNLINK, summary['scenario_id'])
             self.assertTrue(summary['feedback_window_covered'])
+            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_NAMESPACE_DOWNLINK)), set(summary.keys()))
             self.assertGreater(summary['grant_sent_total'], 0)
             self.assertGreater(summary['ready_accepted_total'], 0)
             self.assertEqual(
@@ -99,6 +110,8 @@ class V6DownlinkNamespaceTestCase(unittest.TestCase):
             self.assertNotIn('clients', summary)
             self.assertNotIn('tun_read_paused', summary)
             self.assertNotIn('current_pause_reason', summary)
+            self.assertIn('- 对应 issue：#25', conclusion)
+            self.assertIn('- 统一 2A 摘要: %s' % summary_json, conclusion)
 
             server_payload = os.path.join(log_dir, 'server', 'uftp_payload.bin')
             client1_payload = os.path.join(log_dir, 'client1', 'uftp_dest', 'uftp_payload.bin')
