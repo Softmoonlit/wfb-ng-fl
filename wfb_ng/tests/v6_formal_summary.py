@@ -4,12 +4,16 @@ import json
 from typing import Any, Dict, Iterable, Mapping
 
 RUN_KIND_NAMESPACE = 'namespace'
+RUN_KIND_REAL_HARDWARE = 'real_hardware'
 LINK_SECURITY_MODE_TRUSTED_PLAINTEXT = 'trusted_plaintext'
 SUMMARY_FILENAME = 'formal_2a_summary.json'
 CONCLUSION_FILENAME = 'formal_conclusion.md'
 
 SCENARIO_V6_NAMESPACE_UPLINK = 'v6_namespace_uplink_backpressure_reassembly'
 SCENARIO_V6_NAMESPACE_DOWNLINK = 'v6_namespace_downlink_shared_uftp_feedback'
+SCENARIO_V6_REAL_HARDWARE_UPLINK = 'v6_real_hardware_uplink_dual_long_run'
+SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SINGLE = 'v6_real_hardware_downlink_single_uftp'
+SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SHARED = 'v6_real_hardware_downlink_shared_uftp_feedback'
 
 READY_REJECTION_REASONS = (
     'invalid_source',
@@ -22,41 +26,77 @@ PAUSE_REASONS = (
     'queued_packets_limit',
 )
 
+UPLINK_2A_FIELDS = (
+    'run_kind',
+    'link_security_mode',
+    'scenario_id',
+    'feedback_window_covered',
+    'tun_read_pause_total',
+    'tun_read_resume_total',
+    'tun_read_pause_total_by_reason',
+    'reassembly_overflow_evict',
+    'unfinished_block_limit',
+)
+
+DOWNLINK_FEEDBACK_2A_FIELDS = (
+    'run_kind',
+    'link_security_mode',
+    'scenario_id',
+    'feedback_window_covered',
+    'grant_sent_total',
+    'ready_accepted_total',
+    'ready_rejected_total_by_reason',
+    'feedback_window_open_count',
+    'feedback_window_close_count',
+    'feedback_uplink_hit_total_by_node',
+    'feedback_uplink_hit_total',
+    'tun_read_pause_total',
+    'tun_read_resume_total',
+    'tun_read_pause_total_by_reason',
+    'reassembly_overflow_evict',
+    'unfinished_block_limit',
+)
+
+DOWNLINK_NO_FEEDBACK_2A_FIELDS = (
+    'run_kind',
+    'link_security_mode',
+    'scenario_id',
+    'feedback_window_covered',
+    'grant_sent_total',
+    'ready_accepted_total',
+    'ready_rejected_total_by_reason',
+    'tun_read_pause_total',
+    'tun_read_resume_total',
+    'tun_read_pause_total_by_reason',
+    'reassembly_overflow_evict',
+    'unfinished_block_limit',
+)
+
 SCENARIO_DEFINITIONS = {
     SCENARIO_V6_NAMESPACE_UPLINK: {
+        'run_kind': RUN_KIND_NAMESPACE,
         'feedback_window_covered': False,
-        'allowed_fields': (
-            'run_kind',
-            'link_security_mode',
-            'scenario_id',
-            'feedback_window_covered',
-            'tun_read_pause_total',
-            'tun_read_resume_total',
-            'tun_read_pause_total_by_reason',
-            'reassembly_overflow_evict',
-            'unfinished_block_limit',
-        ),
+        'allowed_fields': UPLINK_2A_FIELDS,
     },
     SCENARIO_V6_NAMESPACE_DOWNLINK: {
+        'run_kind': RUN_KIND_NAMESPACE,
         'feedback_window_covered': True,
-        'allowed_fields': (
-            'run_kind',
-            'link_security_mode',
-            'scenario_id',
-            'feedback_window_covered',
-            'grant_sent_total',
-            'ready_accepted_total',
-            'ready_rejected_total_by_reason',
-            'feedback_window_open_count',
-            'feedback_window_close_count',
-            'feedback_uplink_hit_total_by_node',
-            'feedback_uplink_hit_total',
-            'tun_read_pause_total',
-            'tun_read_resume_total',
-            'tun_read_pause_total_by_reason',
-            'reassembly_overflow_evict',
-            'unfinished_block_limit',
-        ),
+        'allowed_fields': DOWNLINK_FEEDBACK_2A_FIELDS,
+    },
+    SCENARIO_V6_REAL_HARDWARE_UPLINK: {
+        'run_kind': RUN_KIND_REAL_HARDWARE,
+        'feedback_window_covered': False,
+        'allowed_fields': UPLINK_2A_FIELDS,
+    },
+    SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SINGLE: {
+        'run_kind': RUN_KIND_REAL_HARDWARE,
+        'feedback_window_covered': False,
+        'allowed_fields': DOWNLINK_NO_FEEDBACK_2A_FIELDS,
+    },
+    SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SHARED: {
+        'run_kind': RUN_KIND_REAL_HARDWARE,
+        'feedback_window_covered': True,
+        'allowed_fields': DOWNLINK_FEEDBACK_2A_FIELDS,
     },
 }
 
@@ -103,15 +143,15 @@ def allowed_fields_for(scenario_id: str):
 
 
 def _validate_summary(summary: Mapping[str, Any]) -> None:
-    _ensure(summary.get('run_kind') == RUN_KIND_NAMESPACE, 'run_kind 必须为 namespace')
+    scenario_id = summary.get('scenario_id')
+    _ensure(isinstance(scenario_id, str) and scenario_id in SCENARIO_DEFINITIONS, 'scenario_id 不在受控枚举内')
+    scenario_definition = SCENARIO_DEFINITIONS[scenario_id]
+
+    _ensure(summary.get('run_kind') == scenario_definition['run_kind'], 'run_kind 与 scenario_id 不匹配')
     _ensure(
         summary.get('link_security_mode') == LINK_SECURITY_MODE_TRUSTED_PLAINTEXT,
         'link_security_mode 必须为 trusted_plaintext',
     )
-
-    scenario_id = summary.get('scenario_id')
-    _ensure(isinstance(scenario_id, str) and scenario_id in SCENARIO_DEFINITIONS, 'scenario_id 不在受控枚举内')
-    scenario_definition = SCENARIO_DEFINITIONS[scenario_id]
 
     _ensure(
         summary.get('feedback_window_covered') == scenario_definition['feedback_window_covered'],
@@ -149,11 +189,12 @@ def _validate_summary(summary: Mapping[str, Any]) -> None:
 
 def build_summary(scenario_id: str, **fields: Any) -> Dict[str, Any]:
     _ensure(scenario_id in SCENARIO_DEFINITIONS, 'scenario_id 不在受控枚举内')
+    scenario_definition = SCENARIO_DEFINITIONS[scenario_id]
     summary = {
-        'run_kind': RUN_KIND_NAMESPACE,
+        'run_kind': scenario_definition['run_kind'],
         'link_security_mode': LINK_SECURITY_MODE_TRUSTED_PLAINTEXT,
         'scenario_id': scenario_id,
-        'feedback_window_covered': SCENARIO_DEFINITIONS[scenario_id]['feedback_window_covered'],
+        'feedback_window_covered': scenario_definition['feedback_window_covered'],
     }
     summary.update(fields)
     _validate_summary(summary)

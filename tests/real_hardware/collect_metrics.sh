@@ -147,6 +147,13 @@ collect_downlink_metrics() {
     DOWNLINK_CLIENT2_SHA256="$(context_value client2_sha256 '')"
     DOWNLINK_SHARED_CONFIRMED="$(context_value shared_distribution_confirmed no)"
     DOWNLINK_MAX_IDLE_THRESHOLD_SEC="$(context_value max_idle_threshold_sec 0)"
+    if [ "$DOWNLINK_SCENARIO" = "shared" ]; then
+        DOWNLINK_SCENARIO_ID="v6_real_hardware_downlink_shared_uftp_feedback"
+        DOWNLINK_FEEDBACK_WINDOW_COVERED=true
+    else
+        DOWNLINK_SCENARIO_ID="v6_real_hardware_downlink_single_uftp"
+        DOWNLINK_FEEDBACK_WINDOW_COVERED=false
+    fi
     DOWNLINK_RESULT_STATUS="$(context_value result_status unknown)"
     DOWNLINK_RESULT_REASON="$(context_value result_reason 未知)"
 
@@ -196,6 +203,13 @@ generate_metrics_json() {
     cat > "$LOG_DIR/metrics.json" <<EOF
 {
   "timestamp": "$(date -Iseconds)",
+  "formal_2a": {
+    "run_kind": "real_hardware",
+    "link_security_mode": "trusted_plaintext",
+    "scenario_id": "${DOWNLINK_SCENARIO_ID:-v6_real_hardware_downlink_single_uftp}",
+    "feedback_window_covered": ${DOWNLINK_FEEDBACK_WINDOW_COVERED:-false},
+    "summary_file": "${RUN_SUMMARY_JSON:-$LOG_DIR/formal_2a_summary.json}"
+  },
   "test_config": {
     "wifi_iface": "${WIFI_IFACE:-}",
     "channel": ${CHANNEL:-0},

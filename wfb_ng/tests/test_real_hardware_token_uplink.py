@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import shutil
 import stat
@@ -10,6 +11,10 @@ import tempfile
 import textwrap
 
 from twisted.trial import unittest
+from wfb_ng.tests.v6_formal_summary import (
+    SCENARIO_V6_REAL_HARDWARE_UPLINK,
+    allowed_fields_for,
+)
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -176,10 +181,12 @@ class DualLongRunScriptTestCase(unittest.TestCase):
             result_md = os.path.join(log_dir, 'token_results.md')
             context_file = os.path.join(log_dir, 'token_context.txt')
             samples_file = os.path.join(log_dir, 'dual_long_run_samples.tsv')
+            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
 
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(context_file))
             self.assertTrue(os.path.exists(samples_file))
+            self.assertTrue(os.path.exists(formal_summary_file))
 
             with open(result_md, 'r') as fh:
                 result_text = fh.read()
@@ -187,6 +194,8 @@ class DualLongRunScriptTestCase(unittest.TestCase):
                 context_text = fh.read()
             with open(samples_file, 'r') as fh:
                 samples_text = fh.read()
+            with open(formal_summary_file, 'r') as fh:
+                formal_summary = json.load(fh)
 
             self.assertIn('| dual-long-run | PASS |', result_text)
             self.assertIn('## dual-long-run 摘要', result_text)
@@ -194,10 +203,18 @@ class DualLongRunScriptTestCase(unittest.TestCase):
             self.assertIn('- 采样文件: {path}'.format(path=samples_file), result_text)
             self.assertIn('## 正式归档要求', result_text)
             self.assertIn('tracking issue 未按固定模板回填正式结论前不得关闭', result_text)
+            self.assertIn('formal_2a_summary=', context_text)
+            self.assertIn('link_security_mode=trusted_plaintext', context_text)
+            self.assertIn('- 统一 2A 摘要: {path}'.format(path=formal_summary_file), result_text)
             self.assertIn('dual_long_run_total_grants=', context_text)
             self.assertIn('dual_long_run_result=双客户端长稳场景满足固定口径', context_text)
             self.assertIn('elapsed_sec\tgrants_total', samples_text)
             self.assertIn('\tYES', samples_text)
+            self.assertEqual('real_hardware', formal_summary['run_kind'])
+            self.assertEqual('trusted_plaintext', formal_summary['link_security_mode'])
+            self.assertEqual(SCENARIO_V6_REAL_HARDWARE_UPLINK, formal_summary['scenario_id'])
+            self.assertFalse(formal_summary['feedback_window_covered'])
+            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_REAL_HARDWARE_UPLINK)), set(formal_summary.keys()))
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -208,9 +225,11 @@ class DualLongRunScriptTestCase(unittest.TestCase):
 
             result_md = os.path.join(log_dir, 'token_results.md')
             context_file = os.path.join(log_dir, 'token_context.txt')
+            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
 
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(context_file))
+            self.assertTrue(os.path.exists(formal_summary_file))
 
             with open(result_md, 'r') as fh:
                 result_text = fh.read()

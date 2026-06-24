@@ -16,6 +16,7 @@ LOG_DIR="${LOG_DIR:-$PROJECT_ROOT/tests/logs}"
 DOWNLINK_CONTEXT_FILE="${DOWNLINK_CONTEXT_FILE:-$LOG_DIR/downlink_context.txt}"
 METRICS_FILE="$LOG_DIR/metrics.json"
 SUMMARY_FILE="$LOG_DIR/summary.txt"
+RUN_SUMMARY_JSON="${RUN_SUMMARY_JSON:-$LOG_DIR/formal_2a_summary.json}"
 
 log_info()  { echo "[INFO] $(date '+%H:%M:%S') $1"; }
 log_pass()  { echo "[PASS] $(date '+%H:%M:%S') $1"; }
@@ -95,7 +96,7 @@ shared_distribution_summary() {
 
 generate_summary_file() {
     local scenario result_status result_reason receiver_count payload_size source_sha client1_sha client2_sha
-    local transfer_duration retries max_idle stall_events warning_count error_count anomaly_count token_line shared_summary sample_file
+    local transfer_duration retries max_idle stall_events warning_count error_count anomaly_count token_line shared_summary sample_file formal_summary
 
     scenario="$(context_value scenario unknown)"
     result_status="$(context_value result_status unknown)"
@@ -106,6 +107,7 @@ generate_summary_file() {
     client1_sha="$(context_value client1_sha256 未收到)"
     client2_sha="$(context_value client2_sha256 未收到)"
     sample_file="$(context_value sample_file "$LOG_DIR/downlink_samples.tsv")"
+    formal_summary="$(context_value formal_2a_summary "$RUN_SUMMARY_JSON")"
 
     transfer_duration="$(json_number transfer_duration_s)"
     retries="$(json_number retries)"
@@ -127,7 +129,7 @@ generate_summary_file() {
 
     cat > "$SUMMARY_FILE" <<EOF
 ========================================
-    v5 real-hardware 迁移证据摘要
+    v6 real-hardware 迁移证据摘要
 ========================================
 生成时间: $(date)
 日志目录: $LOG_DIR
@@ -151,6 +153,7 @@ source sha256: $source_sha
 client1 sha256: $client1_sha
 client2 sha256: $client2_sha
 $token_line
+统一 2A 摘要: $formal_summary
 
 --- 需要人工判读 ---
 - 对照 $sample_file，确认平台期是否接近或超过门槛。
@@ -162,7 +165,7 @@ $token_line
 - 原始产物层引用（日志目录、关键附件、自动摘要文件）
 - 运行时长与关键事件计数
 - 关键异常与风险信号
-- 是否可作为正式 v5 基线证据
+- 是否可作为正式 v6 real-hardware 证据
 - 是否需要重跑
 - tracking issue 未按固定模板回填正式结论前不得关闭
 
@@ -172,6 +175,7 @@ $token_line
 - $sample_file
 - $LOG_DIR/metrics.json
 - $LOG_DIR/downlink_results.md
+- $formal_summary
 - $LOG_DIR/uftp_server.log
 - $LOG_DIR/client1/uftpd.log
 - $LOG_DIR/client2/uftpd.log
@@ -194,7 +198,7 @@ print_terminal_summary() {
 
     echo ""
     echo "========================================"
-    echo "       v5 real-hardware 摘要"
+    echo "       v6 real-hardware 摘要"
     echo "========================================"
     echo "场景: $scenario"
     echo "自动结论: $result_status"
@@ -204,6 +208,7 @@ print_terminal_summary() {
     echo "最大无推进窗口: $max_idle"
     echo "stall_events: $stall_events"
     echo "日志目录: $LOG_DIR"
+    echo "统一 2A 摘要: $(context_value formal_2a_summary "$RUN_SUMMARY_JSON")"
     echo "========================================"
 }
 

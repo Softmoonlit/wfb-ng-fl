@@ -26,6 +26,7 @@ TOKEN_PROBE_TIMEOUT="${TOKEN_PROBE_TIMEOUT:-15}"
 TOKEN_RESULTS_TSV="$LOG_DIR/token_results.tsv"
 TOKEN_RESULTS_MD="$LOG_DIR/token_results.md"
 TOKEN_CONTEXT_FILE="$LOG_DIR/token_context.txt"
+RUN_SUMMARY_JSON="${RUN_SUMMARY_JSON:-$LOG_DIR/formal_2a_summary.json}"
 KCP_SMALL_FILE_SIZE="${KCP_SMALL_FILE_SIZE:-65536}"
 KCP_TRANSFER_TIMEOUT="${KCP_TRANSFER_TIMEOUT:-30}"
 KCP_SOURCE_FILE="${KCP_SOURCE_FILE:-$LOG_DIR/kcp_small_source.bin}"
@@ -33,6 +34,9 @@ KCP_RECEIVED_FILE="${KCP_RECEIVED_FILE:-$LOG_DIR/kcp_small_received.bin}"
 KCP_SOURCE_SHA256=""
 KCP_RECEIVED_SHA256=""
 DUAL_LONG_RUN_SAMPLES_TSV="$LOG_DIR/dual_long_run_samples.tsv"
+TOKEN_CLIENT1_QUEUE_SUMMARY_JSON="${TOKEN_CLIENT1_QUEUE_SUMMARY_JSON:-$LOG_DIR/client1_queue_summary.json}"
+TOKEN_CLIENT2_QUEUE_SUMMARY_JSON="${TOKEN_CLIENT2_QUEUE_SUMMARY_JSON:-$LOG_DIR/client2_queue_summary.json}"
+TOKEN_SERVER_QUEUE_SUMMARY_JSON="${TOKEN_SERVER_QUEUE_SUMMARY_JSON:-$LOG_DIR/server_queue_summary.json}"
 TOKEN_LONGRUN_DURATION_SEC="${TOKEN_LONGRUN_DURATION_SEC:-180}"
 TOKEN_LONGRUN_PROBE_INTERVAL_SEC="${TOKEN_LONGRUN_PROBE_INTERVAL_SEC:-1}"
 TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC="${TOKEN_LONGRUN_SAMPLE_INTERVAL_SEC:-15}"
@@ -138,6 +142,8 @@ prepare_log_dir() {
 log_dir=$LOG_DIR
 scenario=$SCENARIO
 analyze_only=$ANALYZE_ONLY
+formal_2a_summary=$RUN_SUMMARY_JSON
+link_security_mode=trusted_plaintext
 wifi_iface=${WIFI_IFACE:-}
 channel=${CHANNEL:-}
 mcs=${MCS:-}
@@ -160,6 +166,9 @@ token_longrun_max_idle_sec=$TOKEN_LONGRUN_MAX_IDLE_SEC
 token_longrun_max_remove_count=$TOKEN_LONGRUN_MAX_REMOVE_COUNT
 token_longrun_max_evict_count=$TOKEN_LONGRUN_MAX_EVICT_COUNT
 token_longrun_max_rejoin_count=$TOKEN_LONGRUN_MAX_REJOIN_COUNT
+client1_queue_summary=$TOKEN_CLIENT1_QUEUE_SUMMARY_JSON
+client2_queue_summary=$TOKEN_CLIENT2_QUEUE_SUMMARY_JSON
+server_queue_summary=$TOKEN_SERVER_QUEUE_SUMMARY_JSON
 CTX_EOF
 }
 
@@ -182,6 +191,7 @@ render_markdown_results() {
         echo
         echo "- 生成时间: $(date)"
         echo "- 日志目录: $LOG_DIR"
+        echo "- 统一 2A 摘要: $RUN_SUMMARY_JSON"
         echo
         echo "| 场景 | 结果 | 说明 |"
         echo "| --- | --- | --- |"
@@ -199,6 +209,9 @@ render_markdown_results() {
                 echo "- $f"
             fi
         done
+        if [ -f "$RUN_SUMMARY_JSON" ]; then
+            echo "- formal_2a_summary.json"
+        fi
         if [ -n "$LONGRUN_RESULT_REASON" ]; then
             echo
             echo "## dual-long-run 摘要"
@@ -222,17 +235,18 @@ render_markdown_results() {
             echo "- client2 探测命令失败次数: ${LONGRUN_CLIENT2_PROBE_FAILURES:-未记录}"
             echo "- 采样文件: $DUAL_LONG_RUN_SAMPLES_TSV"
             echo "- 自动结论: $LONGRUN_RESULT_REASON"
+            echo "- 统一 2A 摘要: $RUN_SUMMARY_JSON"
         fi
         echo
         echo "## 正式归档要求"
-        echo "- 原始产物层至少保留: token_results.md、token_context.txt、dual_long_run_samples.tsv、scheduler.log、server.log、client1.log、client2.log。"
+        echo "- 原始产物层至少保留: token_results.md、token_context.txt、dual_long_run_samples.tsv、formal_2a_summary.json、scheduler.log、server.log、client1.log、client2.log。"
         echo "- 正式结论层必须回填到 issue / tracking issue，不能只把日志留在本地目录。"
-        echo "- Issue 回填最小字段: 运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 v5 基线证据、是否需要重跑。"
+        echo "- Issue 回填最小字段: 运行场景与前置条件、原始产物层引用、统一 2A 摘要、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 v6 real-hardware 证据、是否需要重跑。"
         echo "- tracking issue 未按固定模板回填正式结论前不得关闭。"
         echo
         echo "## 说明"
         echo "- wfb_token_scheduler 可通过 -s <base_socket> 向 wfb_tx 的 <base_socket>.token socket 下发本机 Token 授权事件；dual 可用 -s node:base_socket,node:base_socket。"
-        echo "- dual-long-run 用于 v5 real-hardware 双客户端 Token-gated 上行长稳主场景；按 180 秒、总 grant>=60、每客户端 authorized_sends>=10、连续无推进窗口<=45 秒、remove/evict/额外 rejoin=0 的固定口径自动汇总。"
+        echo "- dual-long-run 用于 v6 real-hardware 双客户端上行长稳场景；按 180 秒、总 grant>=60、每客户端 authorized_sends>=10、连续无推进窗口<=45 秒、remove/evict/额外 rejoin=0 的固定口径自动汇总，并生成统一 2A 摘要。"
         echo "- KCP 小文件场景用于验证 Token 门控通过后的 KCP 层小文件闭环；40MB 和 10 节点压力测试不阻塞本阶段。"
         if [ -n "$KCP_SOURCE_SHA256$KCP_RECEIVED_SHA256" ]; then
             echo "- KCP 源文件 SHA256: ${KCP_SOURCE_SHA256:-未生成}"
@@ -481,6 +495,26 @@ append_dual_long_run_analysis() {
         echo "dual_long_run_samples_tsv=$DUAL_LONG_RUN_SAMPLES_TSV"
         echo "dual_long_run_result=${LONGRUN_RESULT_REASON:-}"
     } >> "$TOKEN_CONTEXT_FILE"
+}
+
+generate_formal_2a_summary() {
+    if [ "$SCENARIO" != "dual-long-run" ] && [ "$SCENARIO" != "all" ]; then
+        return 0
+    fi
+    if [ -z "$LONGRUN_RESULT_REASON" ]; then
+        return 0
+    fi
+
+    PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 "$SCRIPT_DIR/v6_formal_2a_summary.py" \
+        --mode uplink \
+        --scenario dual-long-run \
+        --output "$RUN_SUMMARY_JSON" \
+        --queue-summary "$TOKEN_CLIENT1_QUEUE_SUMMARY_JSON" \
+        --queue-summary "$TOKEN_CLIENT2_QUEUE_SUMMARY_JSON" \
+        --queue-summary "$TOKEN_SERVER_QUEUE_SUMMARY_JSON" \
+        --reassembly-log "$LOG_DIR/server.log" \
+        --reassembly-log "$LOG_DIR/client1.log" \
+        --reassembly-log "$LOG_DIR/client2.log" >/dev/null
 }
 
 run_baseline() {
@@ -1051,6 +1085,7 @@ main() {
 
     append_analysis
     append_dual_long_run_analysis
+    generate_formal_2a_summary
     render_markdown_results
 
     echo "========================================"

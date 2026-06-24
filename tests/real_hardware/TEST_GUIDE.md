@@ -1,16 +1,17 @@
-# v5 real-hardware 测试指南
+# v6 real-hardware 测试指南
 
-本文档只服务于 `v5` 阶段的 real-hardware 迁移基线，不再覆盖旧的 `v1` monitor 主线、通用 Token 教学场景或跨机器 KCP 小文件试验。
+本文档服务于 `v6` real-hardware 正式证据链，保留 `v5` 冻结的真实硬件资产，但采集、归档与自动摘要必须接入统一 `2A` 口径；不再覆盖旧的 `v1` monitor 主线、通用 Token 教学场景或跨机器 KCP 小文件试验。
 
 对应约束以以下文档为准：
 
 - `docs/后续版本路线图.md`
 - `docs/v5迁移基线规划.md`
+- `docs/v6第一版正式验收标准细则.md`
 
-`v5` real-hardware 的职责只有两件事：
+`v6` real-hardware 的职责只有两件事：
 
-1. 形成 **双客户端 Token-gated 上行长稳主场景** 的正式迁移证据
-2. 形成 **下行补充证据场景** 的正式迁移证据
+1. 形成 **双客户端上行长稳主场景** 的正式迁移证据，并生成 `run_kind=real_hardware` 的统一 `2A` 摘要
+2. 形成 **下行补充证据场景** 的正式迁移证据，并稳定区分 `single` / `shared`、`link_security_mode` 与反馈窗口覆盖情况
 
 它不是 CI 硬 gate，也不是 `v6` 的实现设计文档。
 
@@ -199,6 +200,7 @@ sudo env \
 - `server.log`
 - `client1.log`
 - `client2.log`
+- `formal_2a_summary.json`
 
 ### 自动判定关注点
 
@@ -274,13 +276,14 @@ LOG_DIR=<已有日志目录> \
 - `uftp_server.log`
 - 接收端日志
 - 关键底层日志
+- `formal_2a_summary.json`
 
 ### 自动判定关注点
 
 - 源 payload 与接收 payload 的 SHA256 一致
 - `shared` 场景下多个接收端收到相同 payload
 - `downlink_samples.tsv` 中无超过门槛的连续无推进窗口
-- 自动摘要已正确落盘到 `metrics.json` 与 `summary.txt`
+- 自动摘要已正确落盘到 `metrics.json`、`summary.txt` 与 `formal_2a_summary.json`
 
 ### 人工判读关注点
 
@@ -298,8 +301,8 @@ LOG_DIR=<已有日志目录> \
 
 最少保留：
 
-- 上行主场景：`token_results.md`、`token_context.txt`、`dual_long_run_samples.tsv`、`scheduler.log`、`server.log`、`client1.log`、`client2.log`
-- 下行补充场景：`downlink_results.md`、`downlink_context.txt`、`downlink_samples.tsv`、`metrics.json`、`summary.txt`、`uftp_server.log`、接收端日志、关键底层日志
+- 上行主场景：`token_results.md`、`token_context.txt`、`dual_long_run_samples.tsv`、`formal_2a_summary.json`、`scheduler.log`、`server.log`、`client1.log`、`client2.log`
+- 下行补充场景：`downlink_results.md`、`downlink_context.txt`、`downlink_samples.tsv`、`metrics.json`、`summary.txt`、`formal_2a_summary.json`、`uftp_server.log`、接收端日志、关键底层日志
 - 可选但推荐：`capture.pcap`、`pcap_capture.log`、现场截图、网卡模式/信道留痕、命令快照
 
 ### 正式结论层
@@ -310,16 +313,17 @@ LOG_DIR=<已有日志目录> \
 
 - 运行场景与前置条件
 - 原始产物层引用
+- 统一 `2A` 摘要引用与 `run_kind` / `link_security_mode` / `scenario_id` / `feedback_window_covered` 元数据
 - 运行时长与关键事件计数
 - 关键异常与风险信号
-- 是否可作为正式 `v5` 基线证据
+- 是否可作为正式 `v6` real-hardware 证据
 - 是否需要重跑
-- 对 `v6` 的风险提示
+- 对后续新底座跑数的风险提示
 
 ### 固定回填模板
 
 ```md
-## v5 real-hardware 正式证据结论
+## v6 real-hardware 正式证据结论
 
 - 运行批次：<日期 / 执行人 / 机器标识>
 - 对应 issue：<#11 主场景 / #12 补充场景 / tracking issue>
@@ -335,8 +339,14 @@ LOG_DIR=<已有日志目录> \
 ### 原始产物层引用
 - 上行日志目录：<路径或附件链接>
 - 下行日志目录：<路径或附件链接>
-- 自动摘要文件：<token_results.md / summary.txt / metrics.json / 其他>
+- 自动摘要文件：<formal_2a_summary.json / token_results.md / summary.txt / metrics.json>
 - 关键附件：<capture.pcap / 截图 / 外部存储链接 / 无>
+
+### 统一 2A 摘要元数据
+- run_kind: real_hardware
+- link_security_mode: trusted_plaintext
+- scenario_id: <v6_real_hardware_uplink_dual_long_run / v6_real_hardware_downlink_single_uftp / v6_real_hardware_downlink_shared_uftp_feedback>
+- feedback_window_covered: true / false
 
 ### 运行时长与关键事件计数
 - dual-long-run：<实际时长、总 grant、client1/2 authorized_sends、最大无推进窗口、remove/evict/额外 rejoin>
@@ -352,9 +362,9 @@ LOG_DIR=<已有日志目录> \
 - 无法解释的异常：<无 / 有，若有必须阻断基线结论>
 
 ### 人工判读结论
-- 是否可作为正式 `v5` 基线证据：是 / 否
+- 是否可作为正式 `v6` real-hardware 证据：是 / 否
 - 是否需要重跑：否 / 是（触发原因与重跑建议）
-- 对 `v6` 的风险提示：<若无则写“无新增风险”>
+- 对后续新底座跑数的风险提示：<若无则写“无新增风险”>
 ```
 
 ### tracking issue 关闭前置条件
@@ -383,4 +393,4 @@ LOG_DIR=<已有日志目录> \
 - 跨机器 KCP 小文件上传试验
 - `v6` 的内部实现设计、线程模型、公式或调参细节
 
-如果确需使用这些旧入口，请直接查看对应脚本的 `--help` 或历史提交，不要继续把它们堆回 `v5` real-hardware 指南。
+如果确需使用这些旧入口，请直接查看对应脚本的 `--help` 或历史提交，不要继续把它们堆回 `v6` real-hardware 指南。

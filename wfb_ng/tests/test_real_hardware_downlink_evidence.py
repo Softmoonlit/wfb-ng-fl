@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
+import json
 import os
 import shutil
 import stat
@@ -11,6 +12,11 @@ import tempfile
 import textwrap
 
 from twisted.trial import unittest
+from wfb_ng.tests.v6_formal_summary import (
+    SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SHARED,
+    SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SINGLE,
+    allowed_fields_for,
+)
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -165,9 +171,10 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             samples_file = os.path.join(log_dir, 'downlink_samples.tsv')
             metrics_file = os.path.join(log_dir, 'metrics.json')
             summary_file = os.path.join(log_dir, 'summary.txt')
+            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
             received_file = os.path.join(log_dir, 'client1', 'received', 'downlink_payload.bin')
 
-            for path in (result_md, context_file, samples_file, metrics_file, summary_file, received_file):
+            for path in (result_md, context_file, samples_file, metrics_file, summary_file, formal_summary_file, received_file):
                 self.assertTrue(os.path.exists(path), msg='missing {}'.format(path))
 
             with open(result_md, 'r') as fh:
@@ -180,6 +187,8 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
                 metrics_text = fh.read()
             with open(summary_file, 'r') as fh:
                 summary_text = fh.read()
+            with open(formal_summary_file, 'r') as fh:
+                formal_summary = json.load(fh)
 
             self.assertIn('- 结果: PASS', result_text)
             self.assertIn('- 场景: single', result_text)
@@ -190,6 +199,8 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('receiver_count=1', context_text)
             self.assertIn('shared_distribution_confirmed=not_applicable', context_text)
             self.assertIn('result_status=PASS', context_text)
+            self.assertIn('formal_2a_summary=', context_text)
+            self.assertIn('link_security_mode=trusted_plaintext', context_text)
 
             self.assertIn('elapsed_sec\tclient1_bytes\tclient2_bytes\tprogressed\tidle_sec', samples_text)
             self.assertIn('\tYES\t', samples_text)
@@ -198,15 +209,22 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('"shared_distribution_confirmed": false', metrics_text)
             self.assertIn('"stall_events": 0', metrics_text)
             self.assertIn('"retries": 2', metrics_text)
+            self.assertIn('"run_kind": "real_hardware"', metrics_text)
+            self.assertIn('"scenario_id": "v6_real_hardware_downlink_single_uftp"', metrics_text)
 
             self.assertIn('--- 自动摘要 ---', summary_text)
             self.assertIn('共享下行/分发证据: N/A（single 场景）', summary_text)
             self.assertIn('--- 需要人工判读 ---', summary_text)
             self.assertIn('downlink_samples.tsv', summary_text)
             self.assertIn('--- Issue 回填最小字段 ---', summary_text)
-            self.assertIn('是否可作为正式 v5 基线证据', summary_text)
+            self.assertIn('是否可作为正式 v6 real-hardware 证据', summary_text)
             self.assertIn('## 正式归档要求', result_text)
             self.assertIn('tracking issue 未按固定模板回填正式结论前不得关闭', result_text)
+            self.assertEqual('real_hardware', formal_summary['run_kind'])
+            self.assertEqual('trusted_plaintext', formal_summary['link_security_mode'])
+            self.assertEqual(SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SINGLE, formal_summary['scenario_id'])
+            self.assertFalse(formal_summary['feedback_window_covered'])
+            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SINGLE)), set(formal_summary.keys()))
 
             payload_file = os.path.join(log_dir, 'downlink_payload.bin')
             self.assertEqual(self.file_sha256(payload_file), self.file_sha256(received_file))
@@ -221,10 +239,11 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             result_md = os.path.join(log_dir, 'downlink_results.md')
             context_file = os.path.join(log_dir, 'downlink_context.txt')
             summary_file = os.path.join(log_dir, 'summary.txt')
+            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
             client1_file = os.path.join(log_dir, 'client1', 'received', 'downlink_payload.bin')
             client2_file = os.path.join(log_dir, 'client2', 'received', 'downlink_payload.bin')
 
-            for path in (result_md, context_file, summary_file, client1_file, client2_file):
+            for path in (result_md, context_file, summary_file, formal_summary_file, client1_file, client2_file):
                 self.assertTrue(os.path.exists(path), msg='missing {}'.format(path))
 
             with open(result_md, 'r') as fh:
@@ -233,6 +252,8 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
                 context_text = fh.read()
             with open(summary_file, 'r') as fh:
                 summary_text = fh.read()
+            with open(formal_summary_file, 'r') as fh:
+                formal_summary = json.load(fh)
 
             self.assertIn('- 场景: shared', result_text)
             self.assertIn('- 共享下行/分发证据: PASS', result_text)
@@ -240,6 +261,9 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             self.assertIn('shared_distribution_confirmed=yes', context_text)
             self.assertIn('共享下行/分发证据: PASS', summary_text)
             self.assertIn('--- Issue 回填最小字段 ---', summary_text)
+            self.assertEqual(SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SHARED, formal_summary['scenario_id'])
+            self.assertTrue(formal_summary['feedback_window_covered'])
+            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_REAL_HARDWARE_DOWNLINK_SHARED)), set(formal_summary.keys()))
 
             payload_file = os.path.join(log_dir, 'downlink_payload.bin')
             expected_sha = self.file_sha256(payload_file)
@@ -257,8 +281,9 @@ class DownlinkEvidenceScriptTestCase(unittest.TestCase):
             context_file = os.path.join(log_dir, 'downlink_context.txt')
             metrics_file = os.path.join(log_dir, 'metrics.json')
             summary_file = os.path.join(log_dir, 'summary.txt')
+            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
 
-            for path in (result_md, context_file, metrics_file, summary_file):
+            for path in (result_md, context_file, metrics_file, summary_file, formal_summary_file):
                 self.assertTrue(os.path.exists(path), msg='missing {}'.format(path))
 
             with open(result_md, 'r') as fh:

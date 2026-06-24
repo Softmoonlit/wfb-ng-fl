@@ -76,6 +76,7 @@ LOG_DIR="${LOG_DIR:-$PROJECT_ROOT/tests/logs/downlink_$(date +%Y%m%d_%H%M%S)}"
 DOWNLINK_RESULTS_MD="$LOG_DIR/downlink_results.md"
 DOWNLINK_CONTEXT_FILE="$LOG_DIR/downlink_context.txt"
 DOWNLINK_SAMPLES_TSV="$LOG_DIR/downlink_samples.tsv"
+RUN_SUMMARY_JSON="${RUN_SUMMARY_JSON:-$LOG_DIR/formal_2a_summary.json}"
 
 DOWNLINK_PAYLOAD_SIZE="${DOWNLINK_PAYLOAD_SIZE:-41943040}"
 DOWNLINK_TRANSFER_TIMEOUT_SEC="${DOWNLINK_TRANSFER_TIMEOUT_SEC:-180}"
@@ -115,6 +116,9 @@ DOWNLINK_CLIENT1_LOG="${DOWNLINK_CLIENT1_LOG:-$LOG_DIR/client1.log}"
 DOWNLINK_CLIENT2_LOG="${DOWNLINK_CLIENT2_LOG:-$LOG_DIR/client2.log}"
 PCAP_CAPTURE_LOG="${PCAP_CAPTURE_LOG:-$LOG_DIR/pcap_capture.log}"
 CAPTURE_PCAP_FILE="${CAPTURE_PCAP_FILE:-$LOG_DIR/capture.pcap}"
+DOWNLINK_SERVER_QUEUE_SUMMARY_JSON="${DOWNLINK_SERVER_QUEUE_SUMMARY_JSON:-$LOG_DIR/server_queue_summary.json}"
+DOWNLINK_CLIENT1_QUEUE_SUMMARY_JSON="${DOWNLINK_CLIENT1_QUEUE_SUMMARY_JSON:-$LOG_DIR/client1_queue_summary.json}"
+DOWNLINK_CLIENT2_QUEUE_SUMMARY_JSON="${DOWNLINK_CLIENT2_QUEUE_SUMMARY_JSON:-$LOG_DIR/client2_queue_summary.json}"
 
 DOWNLINK_SERVER_TUN_CMD="${DOWNLINK_SERVER_TUN_CMD:-}"
 DOWNLINK_CLIENT1_TUN_CMD="${DOWNLINK_CLIENT1_TUN_CMD:-}"
@@ -178,8 +182,8 @@ export DOWNLINK_PAYLOAD_FILE DOWNLINK_CLIENT1_DEST_DIR DOWNLINK_CLIENT2_DEST_DIR
 export DOWNLINK_CLIENT1_RECEIVED_FILE DOWNLINK_CLIENT2_RECEIVED_FILE
 export UFTP_SERVER_LOG UFTP_SERVER_STATUS CLIENT1_UFTPD_LOG CLIENT2_UFTPD_LOG CLIENT1_UFTPD_STATUS CLIENT2_UFTPD_STATUS
 export CLIENT1_UFTPD_PIDFILE CLIENT2_UFTPD_PIDFILE DOWNLINK_SERVER_LOG DOWNLINK_CLIENT1_LOG DOWNLINK_CLIENT2_LOG
-export DOWNLINK_RESULTS_MD DOWNLINK_CONTEXT_FILE DOWNLINK_SAMPLES_TSV CAPTURE_PCAP_FILE PCAP_CAPTURE_LOG
-export SCENARIO DOWNLINK_RECEIVER_COUNT
+export DOWNLINK_RESULTS_MD DOWNLINK_CONTEXT_FILE DOWNLINK_SAMPLES_TSV CAPTURE_PCAP_FILE PCAP_CAPTURE_LOG RUN_SUMMARY_JSON
+export SCENARIO DOWNLINK_RECEIVER_COUNT DOWNLINK_SERVER_QUEUE_SUMMARY_JSON DOWNLINK_CLIENT1_QUEUE_SUMMARY_JSON DOWNLINK_CLIENT2_QUEUE_SUMMARY_JSON
 
 file_sha256() {
     local path="$1"
@@ -563,6 +567,8 @@ client2_uftpd_log=$CLIENT2_UFTPD_LOG
 pcap_file=$CAPTURE_PCAP_FILE
 pcap_log=$PCAP_CAPTURE_LOG
 analysis_chain_completed=$ANALYSIS_CHAIN_COMPLETED
+formal_2a_summary=$RUN_SUMMARY_JSON
+link_security_mode=trusted_plaintext
 EOF
 }
 
@@ -587,6 +593,7 @@ render_result() {
 - 样本数: $SAMPLE_COUNT
 - 最大连续无推进窗口: ${MAX_IDLE_OBSERVED_SEC} 秒
 - stall_events: $STALL_EVENTS
+- 统一 2A 摘要: $RUN_SUMMARY_JSON
 
 ## 与双客户端上行 long-run 的分工
 
@@ -598,6 +605,7 @@ render_result() {
 - 大文件下行完整性：以源文件与接收文件 SHA256 一致为准。
 - 共享下行/分发证据：仅在 shared 场景下要求两个接收端都收到同一 payload。
 - 可见堵塞采样：记录 downlink_samples.tsv，用连续无推进窗口替代内部队列观测。
+- v6 正式 2A 摘要：生成 formal_2a_summary.json，携带 run_kind、link_security_mode、scenario_id 与 feedback_window_covered，并只保留 2A 字段。
 
 ## 人工判读关注点
 
@@ -607,9 +615,9 @@ render_result() {
 
 ## 正式归档要求
 
-- 原始产物层至少保留 \`downlink_results.md\`、\`downlink_context.txt\`、\`downlink_samples.tsv\`、\`metrics.json\`、\`summary.txt\` 与关键日志/抓包。
+- 原始产物层至少保留 \`downlink_results.md\`、\`downlink_context.txt\`、\`downlink_samples.tsv\`、\`metrics.json\`、\`summary.txt\`、\`formal_2a_summary.json\` 与关键日志/抓包。
 - 正式结论层必须回填到 issue / tracking issue，不能只把日志目录留在本地。
-- Issue 回填最小字段：运行场景与前置条件、原始产物层引用、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 \`v5\` 基线证据、是否需要重跑。
+- Issue 回填最小字段：运行场景与前置条件、原始产物层引用、统一 2A 摘要、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 \`v6\` real-hardware 证据、是否需要重跑。
 - tracking issue 未按固定模板回填正式结论前不得关闭。
 
 
@@ -620,16 +628,30 @@ render_result() {
 - $UFTP_SERVER_LOG
 - $CLIENT1_UFTPD_LOG
 - $CLIENT2_UFTPD_LOG
+- $RUN_SUMMARY_JSON
 EOF
 }
 
 run_analysis_chain() {
     export LOG_DIR DOWNLINK_CONTEXT_FILE DOWNLINK_SAMPLES_TSV UFTP_SERVER_LOG CLIENT1_UFTPD_LOG CLIENT2_UFTPD_LOG
     export DOWNLINK_SERVER_LOG DOWNLINK_CLIENT1_LOG DOWNLINK_CLIENT2_LOG CAPTURE_PCAP_FILE
+    export RUN_SUMMARY_JSON DOWNLINK_SERVER_QUEUE_SUMMARY_JSON DOWNLINK_CLIENT1_QUEUE_SUMMARY_JSON DOWNLINK_CLIENT2_QUEUE_SUMMARY_JSON
 
     # shellcheck disable=SC1091
     source "$SCRIPT_DIR/collect_metrics.sh"
     collect_all_metrics
+
+    PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 "$SCRIPT_DIR/v6_formal_2a_summary.py" \
+        --mode downlink \
+        --scenario "$SCENARIO" \
+        --output "$RUN_SUMMARY_JSON" \
+        --server-log "$DOWNLINK_SERVER_LOG" \
+        --queue-summary "$DOWNLINK_SERVER_QUEUE_SUMMARY_JSON" \
+        --queue-summary "$DOWNLINK_CLIENT1_QUEUE_SUMMARY_JSON" \
+        --queue-summary "$DOWNLINK_CLIENT2_QUEUE_SUMMARY_JSON" \
+        --reassembly-log "$DOWNLINK_SERVER_LOG" \
+        --reassembly-log "$DOWNLINK_CLIENT1_LOG" \
+        --reassembly-log "$DOWNLINK_CLIENT2_LOG" >/dev/null
 
     # shellcheck disable=SC1091
     source "$SCRIPT_DIR/generate_report.sh"
