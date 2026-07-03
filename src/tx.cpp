@@ -52,13 +52,14 @@ using namespace std;
 #include "tx_token_gate.hpp"
 
 Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
-                         vector<tags_item_t> &tags, bool trusted_plaintext) : \
+                         vector<tags_item_t> &tags, uint8_t local_node_id, bool trusted_plaintext) : \
     fec_p(NULL), fec_k(-1), fec_n(-1),
     block_idx(0), fragment_idx(0),
     max_packet_size(0),
     epoch(epoch),
     channel_id(channel_id),
     fec_delay(fec_delay),
+    local_node_id(local_node_id),
     trusted_plaintext(trusted_plaintext),
     tx_secretkey{},
     rx_publickey{},
@@ -211,8 +212,8 @@ void Transmitter::init_session(int k, int n)
 RawSocketTransmitter::RawSocketTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                            vector<tags_item_t> &tags, const vector<string> &wlans, radiotap_header_t &radiotap_header,
                                            uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, uint32_t inject_retries, uint32_t inject_retry_delay,
-                                           bool trusted_plaintext) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, trusted_plaintext),
+                                           uint8_t local_node_id, bool trusted_plaintext) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),
@@ -473,8 +474,8 @@ RawSocketTransmitter::~RawSocketTransmitter()
 
 RemoteTransmitter::RemoteTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                      vector<tags_item_t> &tags, const vector<pair<string, vector<uint16_t>>> &remote_hosts, radiotap_header_t &radiotap_header,
-                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, bool trusted_plaintext) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, trusted_plaintext),
+                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),
@@ -643,7 +644,7 @@ void Transmitter::send_block_fragment(size_t packet_size)
     assert(packet_size <= MAX_FEC_PAYLOAD);
 
     block_hdr->packet_type = WFB_PACKET_DATA;
-    block_hdr->data_nonce = htobe64(((block_idx & BLOCK_IDX_MASK) << 8) + fragment_idx);
+    block_hdr->data_nonce = htobe64(make_data_nonce(local_node_id, block_idx, fragment_idx));
 
     if (trusted_plaintext)
     {
@@ -741,7 +742,7 @@ bool Transmitter::send_packet(const uint8_t *buf, size_t size, uint8_t flags)
     max_packet_size = 0;
 
     // 受信任明文模式不滚动 session，只保留 block nonce 递增语义
-    if (!trusted_plaintext && block_idx > MAX_BLOCK_IDX)
+    if (!trusted_plaintext && block_idx > MAX_SOURCE_LOCAL_BLOCK_IDX)
     {
         init_session(fec_k, fec_n);
         for(int i = 0; i < fec_n - fec_k + 1; i++)
@@ -1668,13 +1669,14 @@ void local_loop_udp(int argc, char* const* argv, int optind, int rcv_buf, int lo
     {
         WFB_INFO("Using %zu ports from %d for wlan emulation\n", wlans.size(), debug_port);
         t = unique_ptr<UdpTransmitter>(new UdpTransmitter(k, n, keypair, "127.0.0.1", debug_port, epoch, channel_id,
-                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size, trusted_plaintext));
+                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size,
+                                                          local_node_id, trusted_plaintext));
     }
     else
     {
         t = unique_ptr<RawSocketTransmitter>(new RawSocketTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                       wlans, radiotap_header, frame_type, use_qdisc, fwmark,
-                                                                      inject_retries, inject_retry_delay, trusted_plaintext));
+                                                                      inject_retries, inject_retry_delay, local_node_id, trusted_plaintext));
     }
 
     TokenAuthorizationState authorization_state;
@@ -1736,13 +1738,14 @@ void local_loop_unix(int argc, char* const* argv, int optind, int rcv_buf, int l
     {
         WFB_INFO("Using %zu ports from %d for wlan emulation\n", wlans.size(), debug_port);
         t = unique_ptr<UdpTransmitter>(new UdpTransmitter(k, n, keypair, "127.0.0.1", debug_port, epoch, channel_id,
-                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size, trusted_plaintext));
+                                                          fec_delay, tags, use_qdisc, fwmark, snd_buf_size,
+                                                          local_node_id, trusted_plaintext));
     }
     else
     {
         t = unique_ptr<RawSocketTransmitter>(new RawSocketTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                       wlans, radiotap_header, frame_type, use_qdisc, fwmark,
-                                                                      inject_retries, inject_retry_delay, trusted_plaintext));
+                                                                      inject_retries, inject_retry_delay, local_node_id, trusted_plaintext));
     }
 
     if (token_gate_enabled) {
@@ -1768,7 +1771,7 @@ void distributor_loop(int argc, char* const* argv, int optind, int rcv_buf, int 
                       int udp_port, int k, int n, const string &keypair, int fec_timeout,
                       uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, bool use_qdisc, uint32_t fwmark,
                       radiotap_header_t &radiotap_header, uint8_t frame_type, int control_port, bool mirror,
-                      int snd_buf_size)
+                      int snd_buf_size, uint8_t local_node_id)
 {
     vector<int> rx_fd;
     vector<pair<string, vector<uint16_t>>> remote_hosts;
@@ -1834,7 +1837,7 @@ void distributor_loop(int argc, char* const* argv, int optind, int rcv_buf, int 
     const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     unique_ptr<Transmitter> t = unique_ptr<RemoteTransmitter>(new RemoteTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                                     remote_hosts, radiotap_header, frame_type, use_qdisc,
-                                                                                    fwmark, snd_buf_size, trusted_plaintext));
+                                                                                    fwmark, snd_buf_size, local_node_id, trusted_plaintext));
 
     int control_fd = open_control_fd(control_port);
     data_source(t, rx_fd, control_fd, fec_timeout, mirror, log_interval);
@@ -1845,7 +1848,7 @@ void distributor_loop_unix(int argc, char* const* argv, int optind, int rcv_buf,
                            const char* unix_socket, int k, int n, const string &keypair, int fec_timeout,
                            uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, bool use_qdisc, uint32_t fwmark,
                            radiotap_header_t &radiotap_header, uint8_t frame_type, int control_port, bool mirror,
-                           int snd_buf_size)
+                           int snd_buf_size, uint8_t local_node_id)
 {
     vector<int> rx_fd;
     vector<pair<string, vector<uint16_t>>> remote_hosts;
@@ -1897,7 +1900,7 @@ void distributor_loop_unix(int argc, char* const* argv, int optind, int rcv_buf,
     const bool trusted_plaintext = (keypair == WFB_TRUSTED_PLAINTEXT_KEYPAIR);
     unique_ptr<Transmitter> t = unique_ptr<RemoteTransmitter>(new RemoteTransmitter(k, n, keypair, epoch, channel_id, fec_delay, tags,
                                                                                     remote_hosts, radiotap_header, frame_type, use_qdisc,
-                                                                                    fwmark, snd_buf_size, trusted_plaintext));
+                                                                                    fwmark, snd_buf_size, local_node_id, trusted_plaintext));
 
     int control_fd = open_control_fd(control_port);
     data_source(t, rx_fd, control_fd, fec_timeout, mirror, log_interval);
@@ -2165,7 +2168,7 @@ int main(int argc, char * const *argv)
                                       unix_socket, k, n, keypair, fec_timeout,
                                       epoch, channel_id, fec_delay, use_qdisc, fwmark,
                                       radiotap_header, frame_type, control_port, mirror,
-                                      snd_buf);
+                                      snd_buf, local_node_id);
             }
             else
             {
@@ -2173,7 +2176,7 @@ int main(int argc, char * const *argv)
                                  udp_port, k, n, keypair, fec_timeout,
                                  epoch, channel_id, fec_delay, use_qdisc, fwmark,
                                  radiotap_header, frame_type, control_port, mirror,
-                                 snd_buf);
+                                 snd_buf, local_node_id);
             }
             break;
 

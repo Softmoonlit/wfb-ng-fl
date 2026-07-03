@@ -118,7 +118,6 @@ private:
     struct sockaddr_in saddr;
 };
 
-
 typedef struct {
     uint64_t block_idx;
     uint8_t** fragments;
@@ -129,6 +128,15 @@ typedef struct {
 
 
 #define RX_RING_SIZE 40
+
+typedef struct {
+    uint8_t source_node;
+    uint32_t seq;
+    rx_ring_item_t rx_ring[RX_RING_SIZE];
+    int rx_ring_front;
+    int rx_ring_alloc;
+    uint64_t last_known_block;
+} rx_source_state_t;
 
 static inline int modN(int x, int base)
 {
@@ -271,12 +279,16 @@ private:
 
     void init_fec(int k, int n);
     void deinit_fec(void);
-    void send_packet(int ring_idx, int fragment_idx);
-    void apply_fec(int ring_idx);
+    void init_source_state(rx_source_state_t *state, uint8_t source_node);
+    void deinit_source_state(rx_source_state_t *state);
+    void clear_source_states(void);
+    rx_source_state_t *get_source_state(uint8_t source_node, bool create_if_missing);
+    void send_packet(rx_source_state_t *state, int ring_idx, int fragment_idx);
+    void apply_fec(rx_source_state_t *state, int ring_idx);
     void log_rssi(const sockaddr_in *sockaddr, uint8_t wlan_idx, const uint8_t *ant, const int8_t *rssi,
                   const int8_t *noise, uint16_t freq, uint8_t mcs_index, uint8_t bandwidth);
-    int get_block_ring_idx(uint64_t block_idx);
-    int rx_ring_push(void);
+    int get_block_ring_idx(rx_source_state_t *state, uint64_t block_idx);
+    int rx_ring_push(rx_source_state_t *state);
     // cppcheck-suppress unusedPrivateFunction
     static int get_tag(const void *buf, size_t size, uint8_t tag_id, void *value, size_t value_size);
 
@@ -285,11 +297,7 @@ private:
     int fec_n;  // RS total number of fragments in block
     uint8_t session_hash[crypto_generichash_BYTES];
 
-    uint32_t seq;
-    rx_ring_item_t rx_ring[RX_RING_SIZE];
-    int rx_ring_front; // current packet
-    int rx_ring_alloc; // number of allocated entries
-    uint64_t last_known_block;  //id of last known block
+    rx_source_state_t *source_states_[256];
     uint64_t epoch; // current epoch
     const uint32_t channel_id; // (link_id << 8) + port_number
     const uint8_t local_node_id;

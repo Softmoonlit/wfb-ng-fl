@@ -167,7 +167,7 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
  radiotap_header:
    ieee_80211_header:
      1. Data packet:
-        wblock_hdr_t   { packet_type = 1, nonce = (block_idx << 8) + fragment_idx }
+        wblock_hdr_t   { packet_type = 1, nonce = (source_node << 56) | (source_local_block_idx << 8) | fragment_idx }
           wpacket_hdr_t  { flags, packet_size }  #
             data                                 #
                                                  +-- encrypted and authenticated by session key
@@ -179,11 +179,35 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
                             optional TLV list }      # -- encrypted and signed using rx and tx keys
  */
 
-// data nonce:  56bit block_idx + 8bit fragment_idx
+// data nonce: bits 63..56 = source_node, bits 55..8 = source_local_block_idx, bits 7..0 = fragment_idx
 // session nonce: crypto_box_NONCEBYTES of random bytes
 
-#define BLOCK_IDX_MASK ((1LLU << 56) - 1)
-#define MAX_BLOCK_IDX ((1LLU << 55) - 1)
+#define DATA_NONCE_SOURCE_NODE_SHIFT 56
+#define DATA_NONCE_SOURCE_LOCAL_BLOCK_SHIFT 8
+#define DATA_NONCE_SOURCE_LOCAL_BLOCK_MASK ((1LLU << 48) - 1)
+#define MAX_SOURCE_LOCAL_BLOCK_IDX DATA_NONCE_SOURCE_LOCAL_BLOCK_MASK
+
+static inline uint64_t make_data_nonce(uint8_t source_node, uint64_t source_local_block_idx, uint8_t fragment_idx)
+{
+    return ((uint64_t)source_node << DATA_NONCE_SOURCE_NODE_SHIFT) |
+           ((source_local_block_idx & DATA_NONCE_SOURCE_LOCAL_BLOCK_MASK) << DATA_NONCE_SOURCE_LOCAL_BLOCK_SHIFT) |
+           fragment_idx;
+}
+
+static inline uint8_t data_nonce_source_node(uint64_t data_nonce)
+{
+    return (uint8_t)(data_nonce >> DATA_NONCE_SOURCE_NODE_SHIFT);
+}
+
+static inline uint64_t data_nonce_source_local_block_idx(uint64_t data_nonce)
+{
+    return (data_nonce >> DATA_NONCE_SOURCE_LOCAL_BLOCK_SHIFT) & DATA_NONCE_SOURCE_LOCAL_BLOCK_MASK;
+}
+
+static inline uint8_t data_nonce_fragment_idx(uint64_t data_nonce)
+{
+    return (uint8_t)(data_nonce & 0xff);
+}
 
 // packet types
 #define WFB_PACKET_DATA    0x1
@@ -266,7 +290,7 @@ typedef struct {
 
 typedef struct {
     uint8_t packet_type;
-    uint64_t data_nonce;  // big endian, data_nonce = (block_idx << 8) + fragment_idx
+    uint64_t data_nonce;  // big endian, data_nonce = (source_node << 56) | (source_local_block_idx << 8) | fragment_idx
 }  __attribute__ ((packed)) wblock_hdr_t;
 
 // Plain data packet after FEC decode

@@ -15,7 +15,7 @@ v6 数据面不在普通数据帧中新增 NODE_ID 目标字段，也不把 `sou
 - client 不监听上行方向链路域，因此不会把其他 client 的上行数据面帧写入本机 TUN
 - server 监听上行方向链路域，仍需通过 IP/TCP 会话或控制面观测区分具体 client
 - server 下行方向仍是一发多收，非目标 IP 流量由客户端 IP/TCP/UFTP 栈处理
-- 普通数据面帧既不携带正式的 `target_node` 字段，也不携带正式的 `source_node` 字段；若实现内部需要记录来源或观测信息，应停留在实现/日志层，不升格为数据面正式协议头字段
+- 普通数据面帧既不携带正式的 `target_node` 字段，也不新增独立的正式 `source_node` 头字段；但在 shared uplink 多 sender 场景下，普通数据分片必须在既有 `data_nonce` 中提供 sender namespace，使 server 能在进入 unfinished-block 重组窗口前判定发送者，而不把该实现边界升格为新的独立数据面头模型
 - 普通数据面不复用 control envelope，而是继续保持独立的数据承载头模型，围绕 session / `channel_id` / `FEC` block / payload 组织；控制面与数据面只在更低层共享空口承载、方向链路域过滤与 packet type 分流
 - stream 数值使用配置项表达，例如 `downlink_stream` 与 `uplink_stream`；ADR 不锁死为 `0/1`
 - server 发出的 `GRANT`、阶段控制等显式控制帧走下行方向链路域；反向控制窗口本身不要求单独控制帧类型，而是由 server 在该方向链路域内通过短 `GRANT` 调度实现

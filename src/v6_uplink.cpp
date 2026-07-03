@@ -81,8 +81,9 @@ struct AirTransmitter {
     uint64_t block_idx = 0;
     uint32_t channel_id = 0;
     uint16_t ieee80211_seq = 0;
-
-    AirTransmitter(const string &host, int port, int snd_buf)
+    uint8_t source_node = 0;
+    AirTransmitter(const string &host, int port, int snd_buf, uint8_t source_node)
+        : source_node(source_node)
     {
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0)
@@ -104,8 +105,8 @@ struct AirTransmitter {
         saddr.sin_port = htons((unsigned short)port);
     }
 
-    AirTransmitter(const vector<string> &interfaces, uint32_t channel_id)
-        : channel_id(channel_id)
+    AirTransmitter(const vector<string> &interfaces, uint32_t channel_id, uint8_t source_node)
+        : channel_id(channel_id), source_node(source_node)
     {
         if (interfaces.empty())
         {
@@ -147,7 +148,8 @@ struct AirTransmitter {
         }
 
         uint8_t packet[sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + MAX_PAYLOAD_SIZE] = {};
-        const uint64_t nonce = (block_idx++ << 8);
+        const uint64_t nonce = make_data_nonce(source_node, block_idx, 0);
+        block_idx += 1;
         wblock_hdr_t *block_hdr = reinterpret_cast<wblock_hdr_t *>(packet);
         block_hdr->packet_type = WFB_PACKET_DATA;
         block_hdr->data_nonce = htobe64(nonce);
@@ -1320,11 +1322,11 @@ void run_client(const Config &config)
     unique_ptr<AirTransmitter> uplink;
     if (raw_air_mode)
     {
-        uplink.reset(new AirTransmitter(config.air_interfaces, channel_id));
+        uplink.reset(new AirTransmitter(config.air_interfaces, channel_id, config.node_id));
     }
     else
     {
-        uplink.reset(new AirTransmitter(config.air_target_host, config.air_target_port, config.snd_buf));
+        uplink.reset(new AirTransmitter(config.air_target_host, config.air_target_port, config.snd_buf, config.node_id));
     }
 
     TokenAuthorizationState authorization_state;
@@ -1526,12 +1528,13 @@ void run_server(Config config)
         config.client_targets,
         raw_air_mode,
         [&]() {
-            return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces, channel_id));
+            return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces, channel_id, config.node_id));
         },
         [&](const ClientTarget &target) {
             return shared_ptr<AirTransmitter>(new AirTransmitter(target.host,
                                                                 target.port,
-                                                                config.snd_buf));
+                                                                config.snd_buf,
+                                                                config.node_id));
         });
 
     FeedbackWindowState feedback_state = {};

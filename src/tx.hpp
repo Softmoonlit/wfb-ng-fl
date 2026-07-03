@@ -76,8 +76,8 @@ typedef enum {
 class Transmitter
 {
 public:
-    Transmitter(int k, int n, const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, std::vector<tags_item_t> &tags,
-                bool trusted_plaintext = false);
+    Transmitter(int k, int n, const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
+                std::vector<tags_item_t> &tags, uint8_t local_node_id, bool trusted_plaintext = false);
     virtual ~Transmitter();
     bool send_packet(const uint8_t *buf, size_t size, uint8_t flags);
     void send_session_key(void);
@@ -100,13 +100,14 @@ private:
     fec_t* fec_p;
     int fec_k;  // RS number of primary fragments in block
     int fec_n;  // RS total number of fragments in block
-    uint64_t block_idx; // (block_idx << 8) + fragment_idx = nonce (64bit)
+    uint64_t block_idx; // source_local_block_idx
     uint8_t fragment_idx;
     uint8_t** block;
     size_t max_packet_size;
     const uint64_t epoch; // Packets from old epoch will be discarded
     const uint32_t channel_id; // (link_id << 8) + port_number
     const uint32_t fec_delay; // fec packet delay [us]
+    const uint8_t local_node_id;
     const bool trusted_plaintext;
 
     // tx->rx keypair；trusted_plaintext 下仅保留内存布局，不参与实际加密
@@ -189,7 +190,7 @@ public:
     RawSocketTransmitter(int k, int n, const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, std::vector<tags_item_t> &tags,
                          const std::vector<std::string> &wlans, radiotap_header_t &radiotap_header,
                          uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, uint32_t inject_retries, uint32_t inject_retry_delay,
-                         bool trusted_plaintext = false);
+                         uint8_t local_node_id, bool trusted_plaintext = false);
     virtual ~RawSocketTransmitter();
 
     virtual void select_output(int idx)
@@ -237,8 +238,8 @@ class UdpTransmitter : public Transmitter
 public:
     UdpTransmitter(int k, int n, const std::string &keypair, const std::string &client_addr, int base_port, uint64_t epoch, uint32_t channel_id,
                    uint32_t fec_delay, std::vector<tags_item_t> &tags, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size,
-                   bool trusted_plaintext = false): \
-        Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, trusted_plaintext), radiotap_header({}), base_port(base_port), use_qdisc(use_qdisc), fwmark_base(fwmark_base)
+                   uint8_t local_node_id, bool trusted_plaintext = false): \
+        Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext), radiotap_header({}), base_port(base_port), use_qdisc(use_qdisc), fwmark_base(fwmark_base)
     {
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0) throw std::runtime_error(string_format("Error opening socket: %s", strerror(errno)));
@@ -343,7 +344,7 @@ class RemoteTransmitter : public Transmitter
 public:
     RemoteTransmitter(int k, int n, const std::string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay, std::vector<tags_item_t> &tags,
                       const std::vector<std::pair<std::string, std::vector<uint16_t>>> &remote_hosts, radiotap_header_t &radiotap_header,
-                      uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, bool trusted_plaintext = false);
+                      uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext = false);
     virtual ~RemoteTransmitter()
     {
         close(sockfd);

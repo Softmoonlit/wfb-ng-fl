@@ -51,12 +51,16 @@ wcontrol_envelope_hdr_t make_ready_packet(uint8_t source_node)
     packet.sequence = htobe64(0);
     return packet;
 }
-std::vector<uint8_t> make_data_packet(uint64_t block_idx, uint8_t fragment_idx, uint8_t payload_byte = 0x42)
+std::vector<uint8_t> make_data_packet(uint8_t source_node,
+                                      uint64_t source_local_block_idx,
+                                      uint8_t fragment_idx,
+                                      uint8_t payload_byte = 0x42)
 {
     std::vector<uint8_t> packet(sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + 1, 0);
     wblock_hdr_t *block_hdr = reinterpret_cast<wblock_hdr_t *>(packet.data());
     block_hdr->packet_type = WFB_PACKET_DATA;
-    block_hdr->data_nonce = htobe64((block_idx << 8) | fragment_idx);
+    const uint64_t data_nonce = make_data_nonce(source_node, source_local_block_idx, fragment_idx);
+    block_hdr->data_nonce = htobe64(data_nonce);
 
     wpacket_hdr_t *packet_hdr = reinterpret_cast<wpacket_hdr_t *>(packet.data() + sizeof(wblock_hdr_t));
     packet_hdr->flags = 0;
@@ -90,6 +94,23 @@ struct RecordingTokenControlListener : public TokenControlListener {
     void on_token_control(const ControlEnvelopeView &packet) override
     {
         packets.push_back(packet);
+    }
+};
+
+class RecordingPayloadAggregator : public Aggregator {
+public:
+    RecordingPayloadAggregator(uint8_t local_node_id, const std::set<uint8_t> &known_clients)
+        : Aggregator(WFB_TRUSTED_PLAINTEXT_KEYPAIR, 0, 0, local_node_id, true, 1, 1)
+    {
+        set_known_client_node_ids(known_clients);
+    }
+
+    std::vector<std::vector<uint8_t>> delivered_payloads;
+
+protected:
+    void send_to_socket(const uint8_t *payload, uint16_t packet_size) override
+    {
+        delivered_payloads.emplace_back(payload, payload + packet_size);
     }
 };
 
@@ -411,6 +432,90 @@ TEST_CASE("Aggregator 只向 listener 转发合法 Token")
     unlink(keypair_path.c_str());
 }
 
+TEST_CASE("shared uplink 未知 sender 在进入普通重组前被白名单拒收")
+{
+    REQUIRE(sodium_init() >= 0);
+
+    RecordingPayloadAggregator agg(7, std::set<uint8_t>{7, 8});
+    const uint8_t antenna[RX_ANT_MAX] = {0xff, 0xff, 0xff, 0xff};
+    const int8_t rssi[RX_ANT_MAX] = {0, 0, 0, 0};
+    const int8_t noise[RX_ANT_MAX] = {0, 0, 0, 0};
+    const std::vector<uint8_t> unknown_packet = make_data_packet(9, 0, 0, 0x90);
+
+    const std::string captured = capture_stderr_for_test([&]() {
+        agg.process_packet(unknown_packet.data(),
+                           unknown_packet.size(),
+                           0,
+                           antenna,
+                           rssi,
+                           noise,
+                           0,
+                           0,
+                           20,
+                           nullptr);
+    });
+
+    REQUIRE(agg.delivered_payloads.empty());
+    REQUIRE(agg.count_p_outgoing == 0);
+    REQUIRE(captured.find("DATA_REJECT reason=unknown_client") != std::string::npos);
+    REQUIRE(captured.find("source_node=9") != std::string::npos);
+    REQUIRE(captured.find("server_node_id=7") != std::string::npos);
+
+    const std::vector<uint8_t> known_packet = make_data_packet(7, 0, 0, 0x70);
+    agg.process_packet(known_packet.data(),
+                       known_packet.size(),
+                       0,
+                       antenna,
+                       rssi,
+                       noise,
+                       0,
+                       0,
+                       20,
+                       nullptr);
+
+    REQUIRE(agg.delivered_payloads.size() == 1);
+    REQUIRE(agg.delivered_payloads[0] == std::vector<uint8_t>{0x70});
+    REQUIRE(agg.count_p_outgoing == 1);
+}
+
+TEST_CASE("shared uplink 按 source_node 隔离相同 local block idx 的重组命名空间")
+{
+    REQUIRE(sodium_init() >= 0);
+
+    RecordingPayloadAggregator agg(7, std::set<uint8_t>{7, 8});
+    const uint8_t antenna[RX_ANT_MAX] = {0xff, 0xff, 0xff, 0xff};
+    const int8_t rssi[RX_ANT_MAX] = {0, 0, 0, 0};
+    const int8_t noise[RX_ANT_MAX] = {0, 0, 0, 0};
+
+    const std::vector<uint8_t> higher_source_packet = make_data_packet(8, 0, 0, 0x80);
+    const std::vector<uint8_t> lower_source_packet = make_data_packet(7, 0, 0, 0x70);
+
+    agg.process_packet(higher_source_packet.data(),
+                       higher_source_packet.size(),
+                       0,
+                       antenna,
+                       rssi,
+                       noise,
+                       0,
+                       0,
+                       20,
+                       nullptr);
+    agg.process_packet(lower_source_packet.data(),
+                       lower_source_packet.size(),
+                       0,
+                       antenna,
+                       rssi,
+                       noise,
+                       0,
+                       0,
+                       20,
+                       nullptr);
+
+    REQUIRE(agg.delivered_payloads.size() == 2);
+    REQUIRE(agg.delivered_payloads[0] == std::vector<uint8_t>{0x80});
+    REQUIRE(agg.delivered_payloads[1] == std::vector<uint8_t>{0x70});
+    REQUIRE(agg.count_p_outgoing == 2);
+}
 TEST_CASE("RX 重组溢出不会阻塞控制面优先通路")
 {
     REQUIRE(sodium_init() >= 0);
@@ -433,7 +538,7 @@ TEST_CASE("RX 重组溢出不会阻塞控制面优先通路")
     const std::string captured = capture_stderr_for_test([&]() {
         for (uint64_t block_idx = 1; block_idx <= RX_RING_SIZE + 1; ++block_idx)
         {
-            const std::vector<uint8_t> packet = make_data_packet(block_idx, 1, static_cast<uint8_t>(block_idx));
+            const std::vector<uint8_t> packet = make_data_packet(7, block_idx, 1, static_cast<uint8_t>(block_idx));
             agg.process_packet(packet.data(),
                                packet.size(),
                                0,

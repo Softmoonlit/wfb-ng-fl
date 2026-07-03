@@ -88,6 +88,18 @@ void log_ready_rejection(const ControlEnvelopeView &envelope,
             static_cast<unsigned>(envelope.control_type));
 }
 
+void log_data_rejection(const char *reason,
+                       uint8_t source_node,
+                       uint64_t source_local_block_idx,
+                       uint8_t local_node_id)
+{
+    WFB_ERR("DATA_REJECT reason=%s source_node=%u source_local_block_idx=0x%" PRIx64 " server_node_id=%u\n",
+            reason,
+            static_cast<unsigned>(source_node),
+            source_local_block_idx,
+            static_cast<unsigned>(local_node_id));
+}
+
 set<uint8_t> parse_known_client_node_ids(const string &value)
 {
     if (value.empty())
@@ -350,8 +362,7 @@ Aggregator::Aggregator(const string &keypair, uint64_t epoch, uint32_t channel_i
     count_p_lost(0), count_p_bad(0), count_p_override(0), count_p_outgoing(0), count_b_outgoing(0),
     grant_filter_counters_{},
     ready_filter_counters_{},
-    fec_p(NULL), fec_k(-1), fec_n(-1), seq(0), rx_ring{}, rx_ring_front(0), rx_ring_alloc(0),
-    last_known_block((uint64_t)-1), epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext), reassembly_overflow_evict_total_(0)
+    fec_p(NULL), fec_k(-1), fec_n(-1), session_hash{}, source_states_{}, epoch(epoch), channel_id(channel_id), local_node_id(local_node_id), trusted_plaintext(trusted_plaintext), reassembly_overflow_evict_total_(0)
 {
     memset(session_key, '\0', sizeof(session_key));
     memset(session_hash, '\0', sizeof(session_hash));
@@ -407,48 +418,93 @@ void Aggregator::init_fec(int k, int n)
     zfex_status_code_t rc = fec_new(fec_k, fec_n, &fec_p);
     assert(rc == ZFEX_SC_OK);
 
-    rx_ring_front = 0;
-    rx_ring_alloc = 0;
-    last_known_block = (uint64_t)-1;
-    seq = 0;
-
-    for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
-    {
-        rx_ring[ring_idx].block_idx = 0;
-        rx_ring[ring_idx].fragment_to_send_idx = 0;
-        rx_ring[ring_idx].has_fragments = 0;
-        rx_ring[ring_idx].fragments = new uint8_t*[fec_n];
-        for(int i=0; i < fec_n; i++)
-        {
-            int _rc = posix_memalign((void**)&rx_ring[ring_idx].fragments[i], ZFEX_SIMD_ALIGNMENT, ZFEX_ROUND_UP_SIMD(MAX_FEC_PAYLOAD));
-            assert(_rc == 0);
-        }
-        rx_ring[ring_idx].fragment_map = new size_t[fec_n];
-        memset(rx_ring[ring_idx].fragment_map, '\0', fec_n * sizeof(size_t));
-    }
+    memset(source_states_, '\0', sizeof(source_states_));
 }
 
 void Aggregator::deinit_fec(void)
 {
     assert(fec_p != NULL);
 
-    for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
-    {
-        delete[] rx_ring[ring_idx].fragment_map;
-        rx_ring[ring_idx].fragment_map = NULL;
-        for(int i=0; i < fec_n; i++)
-        {
-            free(rx_ring[ring_idx].fragments[i]);
-        }
-        delete[] rx_ring[ring_idx].fragments;
-        rx_ring[ring_idx].fragments = NULL;
-    }
+    clear_source_states();
 
     zfex_status_code_t rc = fec_free(fec_p);
     assert(rc == ZFEX_SC_OK);
     fec_p = NULL;
     fec_k = -1;
     fec_n = -1;
+}
+
+void Aggregator::init_source_state(rx_source_state_t *state, uint8_t source_node)
+{
+    assert(state != NULL);
+    assert(source_node != 0);
+
+    memset(state, '\0', sizeof(*state));
+    state->source_node = source_node;
+    state->last_known_block = (uint64_t)-1;
+
+    for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
+    {
+        state->rx_ring[ring_idx].block_idx = 0;
+        state->rx_ring[ring_idx].fragment_to_send_idx = 0;
+        state->rx_ring[ring_idx].has_fragments = 0;
+        state->rx_ring[ring_idx].fragments = new uint8_t*[fec_n];
+        for(int i=0; i < fec_n; i++)
+        {
+            int rc = posix_memalign((void**)&state->rx_ring[ring_idx].fragments[i], ZFEX_SIMD_ALIGNMENT, ZFEX_ROUND_UP_SIMD(MAX_FEC_PAYLOAD));
+            assert(rc == 0);
+        }
+        state->rx_ring[ring_idx].fragment_map = new size_t[fec_n];
+        memset(state->rx_ring[ring_idx].fragment_map, '\0', fec_n * sizeof(size_t));
+    }
+}
+
+void Aggregator::deinit_source_state(rx_source_state_t *state)
+{
+    assert(state != NULL);
+
+    for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
+    {
+        delete[] state->rx_ring[ring_idx].fragment_map;
+        state->rx_ring[ring_idx].fragment_map = NULL;
+        for(int i=0; i < fec_n; i++)
+        {
+            free(state->rx_ring[ring_idx].fragments[i]);
+        }
+        delete[] state->rx_ring[ring_idx].fragments;
+        state->rx_ring[ring_idx].fragments = NULL;
+    }
+}
+
+void Aggregator::clear_source_states(void)
+{
+    for(size_t i = 0; i < 256; i++)
+    {
+        if (source_states_[i] == NULL)
+        {
+            continue;
+        }
+        deinit_source_state(source_states_[i]);
+        delete source_states_[i];
+        source_states_[i] = NULL;
+    }
+}
+
+rx_source_state_t *Aggregator::get_source_state(uint8_t source_node, bool create_if_missing)
+{
+    if (source_node == 0)
+    {
+        return NULL;
+    }
+
+    rx_source_state_t *state = source_states_[source_node];
+    if (state == NULL && create_if_missing)
+    {
+        state = new rx_source_state_t();
+        init_source_state(state, source_node);
+        source_states_[source_node] = state;
+    }
+    return state;
 }
 
 
@@ -508,78 +564,75 @@ Forwarder::~Forwarder()
     close(sockfd);
 }
 
-int Aggregator::rx_ring_push(void)
+int Aggregator::rx_ring_push(rx_source_state_t *state)
 {
-    if(rx_ring_alloc < RX_RING_SIZE)
+    assert(state != NULL);
+
+    if(state->rx_ring_alloc < RX_RING_SIZE)
     {
-        int idx = modN(rx_ring_front + rx_ring_alloc, RX_RING_SIZE);
-        rx_ring_alloc += 1;
+        int idx = modN(state->rx_ring_front + state->rx_ring_alloc, RX_RING_SIZE);
+        state->rx_ring_alloc += 1;
         return idx;
     }
 
-    /*
-      Ring overflow. This means that there are more unfinished blocks than ring size
-      Possible solutions:
-      1. Increase ring size. Do this if you have large variance of packet travel time throught WiFi card or network stack.
-         Some cards can do this due to packet reordering inside, diffent chipset and/or firmware or your RX hosts have different CPU power.
-      2. Reduce packet injection speed or try to unify RX hardware.
-    */
-
-    WFB_DBG("AGG: Override block 0x%" PRIx64 " flush %d fragments\n", rx_ring[rx_ring_front].block_idx, rx_ring[rx_ring_front].has_fragments);
-    const uint64_t evicted_block_idx = rx_ring[rx_ring_front].block_idx;
-    const unsigned evicted_has_fragments = rx_ring[rx_ring_front].has_fragments > 0 ? 1U : 0U;
+    WFB_DBG("AGG: Override source=%u block 0x%" PRIx64 " flush %d fragments\n",
+            static_cast<unsigned>(state->source_node),
+            state->rx_ring[state->rx_ring_front].block_idx,
+            state->rx_ring[state->rx_ring_front].has_fragments);
+    const uint64_t evicted_block_idx = state->rx_ring[state->rx_ring_front].block_idx;
+    const unsigned evicted_has_fragments = state->rx_ring[state->rx_ring_front].has_fragments > 0 ? 1U : 0U;
     reassembly_overflow_evict_total_ += 1;
-    WFB_ERR("REASSEMBLY_OVERFLOW_EVICT evicted_block_idx=0x%" PRIx64 " evicted_has_fragments=%u unfinished_blocks=%d unfinished_block_limit=%u total=%" PRIu64 "\n",
+    WFB_ERR("REASSEMBLY_OVERFLOW_EVICT source_node=%u evicted_block_idx=0x%" PRIx64 " evicted_has_fragments=%u unfinished_blocks=%d unfinished_block_limit=%u total=%" PRIu64 "\n",
+            static_cast<unsigned>(state->source_node),
             evicted_block_idx,
             evicted_has_fragments,
-            rx_ring_alloc,
+            state->rx_ring_alloc,
             unfinished_block_limit(),
             reassembly_overflow_evict_total_);
 
     count_p_override += 1;
 
-    for(int f_idx=rx_ring[rx_ring_front].fragment_to_send_idx; f_idx < fec_k; f_idx++)
+    for(int f_idx=state->rx_ring[state->rx_ring_front].fragment_to_send_idx; f_idx < fec_k; f_idx++)
     {
-        if(rx_ring[rx_ring_front].fragment_map[f_idx])
+        if(state->rx_ring[state->rx_ring_front].fragment_map[f_idx])
         {
-            send_packet(rx_ring_front, f_idx);
+            send_packet(state, state->rx_ring_front, f_idx);
         }
     }
 
-    // override last item in ring
-    int ring_idx = rx_ring_front;
-    rx_ring_front = modN(rx_ring_front + 1, RX_RING_SIZE);
+    int ring_idx = state->rx_ring_front;
+    state->rx_ring_front = modN(state->rx_ring_front + 1, RX_RING_SIZE);
     return ring_idx;
 }
 
 
-int Aggregator::get_block_ring_idx(uint64_t block_idx)
+int Aggregator::get_block_ring_idx(rx_source_state_t *state, uint64_t block_idx)
 {
-    // check if block is already in the ring
-    for(int i = rx_ring_front, c = rx_ring_alloc; c > 0; i = modN(i + 1, RX_RING_SIZE), c--)
+    assert(state != NULL);
+
+    for(int i = state->rx_ring_front, c = state->rx_ring_alloc; c > 0; i = modN(i + 1, RX_RING_SIZE), c--)
     {
-        if (rx_ring[i].block_idx == block_idx) return i;
+        if (state->rx_ring[i].block_idx == block_idx) return i;
     }
 
-    // check if block is already known and not in the ring then it is already processed
-    if (last_known_block != (uint64_t)-1 && block_idx <= last_known_block)
+    if (state->last_known_block != (uint64_t)-1 && block_idx <= state->last_known_block)
     {
         return -1;
     }
 
-    int new_blocks = (int)min(last_known_block != (uint64_t)-1 ? block_idx - last_known_block : 1, (uint64_t)RX_RING_SIZE);
+    int new_blocks = (int)min(state->last_known_block != (uint64_t)-1 ? block_idx - state->last_known_block : 1, (uint64_t)RX_RING_SIZE);
     assert (new_blocks > 0);
 
-    last_known_block = block_idx;
+    state->last_known_block = block_idx;
     int ring_idx = -1;
 
     for(int i = 0; i < new_blocks; i++)
     {
-        ring_idx = rx_ring_push();
-        rx_ring[ring_idx].block_idx = block_idx + i + 1 - new_blocks;
-        rx_ring[ring_idx].fragment_to_send_idx = 0;
-        rx_ring[ring_idx].has_fragments = 0;
-        memset(rx_ring[ring_idx].fragment_map, '\0', fec_n * sizeof(size_t));
+        ring_idx = rx_ring_push(state);
+        state->rx_ring[ring_idx].block_idx = block_idx + i + 1 - new_blocks;
+        state->rx_ring[ring_idx].fragment_to_send_idx = 0;
+        state->rx_ring[ring_idx].has_fragments = 0;
+        memset(state->rx_ring[ring_idx].fragment_map, '\0', fec_n * sizeof(size_t));
     }
     return ring_idx;
 }
@@ -900,16 +953,23 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     assert(decrypted_len >= sizeof(wpacket_hdr_t));
     assert(decrypted_len <= MAX_FEC_PAYLOAD);
 
-    uint64_t block_idx = be64toh(block_hdr->data_nonce) >> 8;
-    uint8_t fragment_idx = (uint8_t)(be64toh(block_hdr->data_nonce) & 0xff);
+    const uint64_t data_nonce = be64toh(block_hdr->data_nonce);
+    const uint8_t source_node = data_nonce_source_node(data_nonce);
+    const uint64_t block_idx = data_nonce_source_local_block_idx(data_nonce);
+    const uint8_t fragment_idx = data_nonce_fragment_idx(data_nonce);
 
-    count_p_uniq.insert(be64toh(block_hdr->data_nonce));
+    count_p_uniq.insert(data_nonce);
 
-    // Should never happend due to generating new session key on tx side
-    if (block_idx > MAX_BLOCK_IDX)
+    if (source_node == 0)
     {
-        WFB_ERR("block_idx overflow\n");
+        log_data_rejection("invalid_source_node", source_node, block_idx, local_node_id);
         count_p_bad += 1;
+        return;
+    }
+
+    if (!known_client_node_ids_.empty() && known_client_node_ids_.count(source_node) == 0)
+    {
+        log_data_rejection("unknown_client", source_node, block_idx, local_node_id);
         return;
     }
 
@@ -920,14 +980,15 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
         return;
     }
 
-    int ring_idx = get_block_ring_idx(block_idx);
+    rx_source_state_t *state = get_source_state(source_node, true);
+    assert(state != NULL);
 
-    //ignore already processed blocks
+    int ring_idx = get_block_ring_idx(state, block_idx);
+
     if (ring_idx < 0) return;
 
-    rx_ring_item_t *p = &rx_ring[ring_idx];
+    rx_ring_item_t *p = &state->rx_ring[ring_idx];
 
-    //ignore already processed fragments
     if (p->fragment_map[fragment_idx]) return;
 
     memset(p->fragments[fragment_idx], '\0', MAX_FEC_PAYLOAD);
@@ -936,64 +997,52 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     p->fragment_map[fragment_idx] = decrypted_len;
     p->has_fragments += 1;
 
-    // Check if we use current (oldest) block
-    // then we can optimize and don't wait for all K fragments
-    // and send packets if there are no gaps in fragments from the beginning of this block
-    if(ring_idx == rx_ring_front)
+    if(ring_idx == state->rx_ring_front)
     {
-        // check if there are any packets without gaps
-        // and send them immediately
         while(p->fragment_to_send_idx < fec_k && p->fragment_map[p->fragment_to_send_idx])
         {
-            send_packet(ring_idx, p->fragment_to_send_idx);
+            send_packet(state, ring_idx, p->fragment_to_send_idx);
             p->fragment_to_send_idx += 1;
         }
 
-        // remove block if all K elements (without gaps) were sent
         if(p->fragment_to_send_idx == fec_k)
         {
-            rx_ring_front = modN(rx_ring_front + 1, RX_RING_SIZE);
-            rx_ring_alloc -= 1;
-            assert(rx_ring_alloc >= 0);
+            state->rx_ring_front = modN(state->rx_ring_front + 1, RX_RING_SIZE);
+            state->rx_ring_alloc -= 1;
+            assert(state->rx_ring_alloc >= 0);
             return;
         }
     }
 
-    // Check that this block has K elements (with gaps) and can be recovered via FEC
     if(p->fragment_to_send_idx < fec_k && p->has_fragments == fec_k)
     {
-        // send all queued packets in all unfinished blocks before current
-        // and then remove that blocks
-        int nrm = modN(ring_idx - rx_ring_front, RX_RING_SIZE);
+        int nrm = modN(ring_idx - state->rx_ring_front, RX_RING_SIZE);
 
         while(nrm > 0)
         {
-            for(int f_idx=rx_ring[rx_ring_front].fragment_to_send_idx; f_idx < fec_k; f_idx++)
+            for(int f_idx=state->rx_ring[state->rx_ring_front].fragment_to_send_idx; f_idx < fec_k; f_idx++)
             {
-                if(rx_ring[rx_ring_front].fragment_map[f_idx])
+                if(state->rx_ring[state->rx_ring_front].fragment_map[f_idx])
                 {
-                    send_packet(rx_ring_front, f_idx);
+                    send_packet(state, state->rx_ring_front, f_idx);
                 }
             }
-            rx_ring_front = modN(rx_ring_front + 1, RX_RING_SIZE);
-            rx_ring_alloc -= 1;
+            state->rx_ring_front = modN(state->rx_ring_front + 1, RX_RING_SIZE);
+            state->rx_ring_alloc -= 1;
             nrm -= 1;
         }
 
-        assert(rx_ring_alloc > 0);
-        assert(ring_idx == rx_ring_front);
+        assert(state->rx_ring_alloc > 0);
+        assert(ring_idx == state->rx_ring_front);
 
-        // Search for missed data fragments and apply FEC only if needed
         for(int f_idx=p->fragment_to_send_idx; f_idx < fec_k; f_idx++)
         {
             if(! p->fragment_map[f_idx])
             {
                 uint32_t fec_count = 0;
 
-                //Recover missed fragments using FEC
-                apply_fec(ring_idx);
+                apply_fec(state, ring_idx);
 
-                // Count total number of recovered fragments
                 for(; f_idx < fec_k; f_idx++)
                 {
                     if(! p->fragment_map[f_idx])
@@ -1013,43 +1062,43 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
 
         while(p->fragment_to_send_idx < fec_k)
         {
-            send_packet(ring_idx, p->fragment_to_send_idx);
+            send_packet(state, ring_idx, p->fragment_to_send_idx);
             p->fragment_to_send_idx += 1;
         }
 
-        // remove block
-        rx_ring_front = modN(rx_ring_front + 1, RX_RING_SIZE);
-        rx_ring_alloc -= 1;
-        assert(rx_ring_alloc >= 0);
+        state->rx_ring_front = modN(state->rx_ring_front + 1, RX_RING_SIZE);
+        state->rx_ring_alloc -= 1;
+        assert(state->rx_ring_alloc >= 0);
     }
 }
 
-void Aggregator::send_packet(int ring_idx, int fragment_idx)
+void Aggregator::send_packet(rx_source_state_t *state, int ring_idx, int fragment_idx)
 {
-    wpacket_hdr_t* packet_hdr = (wpacket_hdr_t*)(rx_ring[ring_idx].fragments[fragment_idx]);
-    uint8_t *payload = (rx_ring[ring_idx].fragments[fragment_idx]) + sizeof(wpacket_hdr_t);
+    assert(state != NULL);
+
+    wpacket_hdr_t* packet_hdr = (wpacket_hdr_t*)(state->rx_ring[ring_idx].fragments[fragment_idx]);
+    uint8_t *payload = (state->rx_ring[ring_idx].fragments[fragment_idx]) + sizeof(wpacket_hdr_t);
     uint8_t flags = packet_hdr->flags;
     uint16_t packet_size = be16toh(packet_hdr->packet_size);
-    uint32_t packet_seq = rx_ring[ring_idx].block_idx * fec_k + fragment_idx;
+    uint32_t packet_seq = (uint32_t)(state->rx_ring[ring_idx].block_idx * fec_k + fragment_idx);
 
-    if (packet_seq > seq + 1 && seq > 0)
+    if (packet_seq > state->seq + 1 && state->seq > 0)
     {
-        uint32_t lost_count = packet_seq - seq - 1;
+        uint32_t lost_count = packet_seq - state->seq - 1;
         ANDROID_IPC_MSG("PKT_LOST\t%d", lost_count);
         count_p_lost += lost_count;
 
-        // Immediate packet loss notification
         if (packet_loss_listener_ != NULL)
         {
-            packet_loss_listener_->on_packet_loss(lost_count, seq, packet_seq);
+            packet_loss_listener_->on_packet_loss(lost_count, state->seq, packet_seq);
         }
     }
 
-    seq = packet_seq;
+    state->seq = packet_seq;
 
     if(packet_size > MAX_PAYLOAD_SIZE)
     {
-        WFB_ERR("Corrupted packet %u\n", seq);
+        WFB_ERR("Corrupted packet %u\n", state->seq);
         count_p_bad += 1;
     }
     else if(!(flags & WFB_PACKET_FEC_ONLY))
@@ -1060,8 +1109,9 @@ void Aggregator::send_packet(int ring_idx, int fragment_idx)
     }
 }
 
-void Aggregator::apply_fec(int ring_idx)
+void Aggregator::apply_fec(rx_source_state_t *state, int ring_idx)
 {
+    assert(state != NULL);
     assert(fec_k >= 1);
     assert(fec_n >= 1);
     assert(fec_k <= fec_n);
@@ -1076,23 +1126,22 @@ void Aggregator::apply_fec(int ring_idx)
 
     for(int i=0; i < fec_k; i++)
     {
-        if(rx_ring[ring_idx].fragment_map[i])
+        if(state->rx_ring[ring_idx].fragment_map[i])
         {
-            in_blocks[i] = rx_ring[ring_idx].fragments[i];
+            in_blocks[i] = state->rx_ring[ring_idx].fragments[i];
             index[i] = i;
         }
         else
         {
-            while(j < fec_n && ! rx_ring[ring_idx].fragment_map[j])
+            while(j < fec_n && ! state->rx_ring[ring_idx].fragment_map[j])
             {
                 j++;
             }
 
             assert(j < fec_n);
-            // FEC packets always have max size between packets in block
-            max_packet_size = max(max_packet_size, rx_ring[ring_idx].fragment_map[j]);
-            in_blocks[i] = rx_ring[ring_idx].fragments[j];
-            out_blocks[ob_idx++] = rx_ring[ring_idx].fragments[i];
+            max_packet_size = max(max_packet_size, state->rx_ring[ring_idx].fragment_map[j]);
+            in_blocks[i] = state->rx_ring[ring_idx].fragments[j];
+            out_blocks[ob_idx++] = state->rx_ring[ring_idx].fragments[i];
             index[i] = j++;
         }
     }

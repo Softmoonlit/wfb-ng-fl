@@ -71,7 +71,9 @@ private:
 
 class RecordingTransmitter : public Transmitter {
 public:
-    RecordingTransmitter() : Transmitter(1, 1, WFB_TRUSTED_PLAINTEXT_KEYPAIR, 1, 1, 0, empty_tags(), true) {}
+    explicit RecordingTransmitter(uint8_t local_node_id = 0)
+        : Transmitter(1, 1, WFB_TRUSTED_PLAINTEXT_KEYPAIR, 1, 1, 0, empty_tags(), local_node_id, true) {}
+
     void select_output(int idx) override
     {
         selected_outputs.push_back(idx);
@@ -157,6 +159,23 @@ void send_authorization_event(const std::string &socket_name, const TokenAuthori
     ScopedAbstractDatagramSender sender(socket_name);
     sender.send_event(event);
 }
+
+uint64_t packet_data_nonce(const std::vector<uint8_t> &packet)
+{
+    REQUIRE(packet.size() >= sizeof(wblock_hdr_t));
+    const wblock_hdr_t *block_hdr = reinterpret_cast<const wblock_hdr_t *>(packet.data());
+    return be64toh(block_hdr->data_nonce);
+}
+
+std::vector<uint8_t> packet_payload(const std::vector<uint8_t> &packet)
+{
+    REQUIRE(packet.size() >= sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t));
+    const wpacket_hdr_t *packet_hdr = reinterpret_cast<const wpacket_hdr_t *>(packet.data() + sizeof(wblock_hdr_t));
+    const uint16_t payload_size = be16toh(packet_hdr->packet_size);
+    REQUIRE(packet.size() == sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + payload_size);
+    return std::vector<uint8_t>(packet.begin() + sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t), packet.end());
+}
+
 
 }
 
@@ -333,6 +352,37 @@ TEST_CASE("process_data_packet 在授权事件到达后调用发送注入")
     REQUIRE(auth_state.counters().denied_sends == 0);
 }
 
+TEST_CASE("process_data_packet 在授权发送时产出的 data_nonce 包含 sender namespace")
+{
+    std::unique_ptr<Transmitter> transmitter(new RecordingTransmitter(7));
+    TokenAuthorizationState auth_state;
+    const std::vector<uint8_t> first_payload = {0x55, 0x66, 0x77};
+    const std::vector<uint8_t> second_payload = {0x21, 0x22};
+
+    TokenAuthorizationEvent event = {};
+    event.node_id = 7;
+    event.sequence = 42;
+    event.duration_ms = 400;
+    event.expires_at_ms = 2000;
+    auth_state.apply_event(event);
+
+    REQUIRE(process_data_packet(*transmitter, first_payload.data(), first_payload.size(), 1000, &auth_state));
+    REQUIRE(process_data_packet(*transmitter, second_payload.data(), second_payload.size(), 1001, &auth_state));
+
+    RecordingTransmitter *recording = static_cast<RecordingTransmitter *>(transmitter.get());
+    REQUIRE(recording->inject_count() == 2);
+
+    const uint64_t first_nonce = packet_data_nonce(recording->injected_payloads[0]);
+    const uint64_t second_nonce = packet_data_nonce(recording->injected_payloads[1]);
+    REQUIRE(packet_payload(recording->injected_payloads[0]) == first_payload);
+    REQUIRE(packet_payload(recording->injected_payloads[1]) == second_payload);
+    REQUIRE(data_nonce_source_node(first_nonce) == 7);
+    REQUIRE(data_nonce_source_local_block_idx(first_nonce) == 0);
+    REQUIRE(data_nonce_fragment_idx(first_nonce) == 0);
+    REQUIRE(data_nonce_source_node(second_nonce) == 7);
+    REQUIRE(data_nonce_source_local_block_idx(second_nonce) == 1);
+    REQUIRE(data_nonce_fragment_idx(second_nonce) == 0);
+}
 TEST_CASE("process_data_packet 在授权过期后停止发送注入")
 {
     std::unique_ptr<Transmitter> transmitter(new RecordingTransmitter());
