@@ -8,6 +8,7 @@
 #include <getopt.h>
 #include <inttypes.h>
 #include <linux/if.h>
+#include <linux/if_packet.h>
 #include <linux/if_tun.h>
 #include <netinet/in.h>
 #include <stdint.h>
@@ -76,7 +77,10 @@ struct FeedbackWindowState {
 struct AirTransmitter {
     int sockfd = -1;
     sockaddr_in saddr = {};
+    vector<int> raw_sockfds;
     uint64_t block_idx = 0;
+    uint32_t channel_id = 0;
+    uint16_t ieee80211_seq = 0;
 
     AirTransmitter(const string &host, int port, int snd_buf)
     {
@@ -100,45 +104,39 @@ struct AirTransmitter {
         saddr.sin_port = htons((unsigned short)port);
     }
 
+    AirTransmitter(const vector<string> &interfaces, uint32_t channel_id)
+        : channel_id(channel_id)
+    {
+        if (interfaces.empty())
+        {
+            throw runtime_error("raw air 模式至少需要一个无线接口");
+        }
+        for (size_t i = 0; i < interfaces.size(); ++i)
+        {
+            raw_sockfds.push_back(open_raw_socket(interfaces[i]));
+        }
+    }
+
     ~AirTransmitter()
     {
         if (sockfd >= 0)
         {
             close(sockfd);
         }
+        for (size_t i = 0; i < raw_sockfds.size(); ++i)
+        {
+            close(raw_sockfds[i]);
+        }
     }
 
     void send_air_datagram(const uint8_t *packet, size_t packet_size)
     {
-        uint8_t buffer[sizeof(wrxfwd_t) + MAX_FORWARDER_PACKET_SIZE] = {};
-        if (packet_size > MAX_FORWARDER_PACKET_SIZE)
+        if (!raw_sockfds.empty())
         {
-            throw runtime_error("空口报文过大");
+            send_raw_air_datagram(packet, packet_size);
+            return;
         }
-
-        wrxfwd_t *header = reinterpret_cast<wrxfwd_t *>(buffer);
-        memset(header->antenna, 0xff, sizeof(header->antenna));
-        memset(header->rssi, SCHAR_MIN, sizeof(header->rssi));
-        memset(header->noise, SCHAR_MAX, sizeof(header->noise));
-        header->wlan_idx = 0;
-        header->mcs_index = 1;
-        header->bandwidth = 20;
-        header->freq = htons(4321);
-        header->antenna[0] = 0;
-        header->rssi[0] = -42;
-        header->noise[0] = -70;
-        memcpy(buffer + sizeof(wrxfwd_t), packet, packet_size);
-
-        const ssize_t sent = sendto(sockfd,
-                                    buffer,
-                                    sizeof(wrxfwd_t) + packet_size,
-                                    MSG_DONTWAIT,
-                                    reinterpret_cast<const sockaddr *>(&saddr),
-                                    sizeof(saddr));
-        if (sent != static_cast<ssize_t>(sizeof(wrxfwd_t) + packet_size))
-        {
-            throw runtime_error(string("发送空口报文失败: ") + strerror(errno));
-        }
+        send_udp_air_datagram(packet, packet_size);
     }
 
     void send_data(const uint8_t *payload, size_t payload_size)
@@ -198,6 +196,106 @@ struct AirTransmitter {
     }
 
 private:
+    static int open_raw_socket(const string &interface)
+    {
+        int fd = socket(PF_PACKET, SOCK_RAW, 0);
+        if (fd < 0)
+        {
+            throw runtime_error(string("创建 raw air socket 失败: ") + strerror(errno));
+        }
+
+        const int optval = 1;
+        if (setsockopt(fd, SOL_PACKET, PACKET_QDISC_BYPASS, (const void *)&optval, sizeof(optval)) != 0)
+        {
+            close(fd);
+            throw runtime_error(string("设置 PACKET_QDISC_BYPASS 失败: ") + strerror(errno));
+        }
+
+        struct ifreq ifr = {};
+        strncpy(ifr.ifr_name, interface.c_str(), sizeof(ifr.ifr_name) - 1);
+        if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0)
+        {
+            close(fd);
+            throw runtime_error(string("获取无线接口索引失败: ") + interface + ": " + strerror(errno));
+        }
+
+        struct sockaddr_ll sll = {};
+        sll.sll_family = AF_PACKET;
+        sll.sll_ifindex = ifr.ifr_ifindex;
+        sll.sll_protocol = 0;
+        if (::bind(fd, reinterpret_cast<struct sockaddr *>(&sll), sizeof(sll)) < 0)
+        {
+            close(fd);
+            throw runtime_error(string("绑定 raw air socket 失败: ") + interface + ": " + strerror(errno));
+        }
+        return fd;
+    }
+
+    void send_udp_air_datagram(const uint8_t *packet, size_t packet_size)
+    {
+        uint8_t buffer[sizeof(wrxfwd_t) + MAX_FORWARDER_PACKET_SIZE] = {};
+        if (packet_size > MAX_FORWARDER_PACKET_SIZE)
+        {
+            throw runtime_error("空口报文过大");
+        }
+
+        wrxfwd_t *header = reinterpret_cast<wrxfwd_t *>(buffer);
+        memset(header->antenna, 0xff, sizeof(header->antenna));
+        memset(header->rssi, SCHAR_MIN, sizeof(header->rssi));
+        memset(header->noise, SCHAR_MAX, sizeof(header->noise));
+        header->wlan_idx = 0;
+        header->mcs_index = 1;
+        header->bandwidth = 20;
+        header->freq = htons(4321);
+        header->antenna[0] = 0;
+        header->rssi[0] = -42;
+        header->noise[0] = -70;
+        memcpy(buffer + sizeof(wrxfwd_t), packet, packet_size);
+
+        const ssize_t sent = sendto(sockfd,
+                                    buffer,
+                                    sizeof(wrxfwd_t) + packet_size,
+                                    MSG_DONTWAIT,
+                                    reinterpret_cast<const sockaddr *>(&saddr),
+                                    sizeof(saddr));
+        if (sent != static_cast<ssize_t>(sizeof(wrxfwd_t) + packet_size))
+        {
+            throw runtime_error(string("发送空口 UDP 报文失败: ") + strerror(errno));
+        }
+    }
+
+    void send_raw_air_datagram(const uint8_t *packet, size_t packet_size)
+    {
+        if (packet_size > MAX_FORWARDER_PACKET_SIZE)
+        {
+            throw runtime_error("空口报文过大");
+        }
+
+        uint8_t ieee_hdr[sizeof(ieee80211_header)] = {};
+        memcpy(ieee_hdr, ieee80211_header, sizeof(ieee_hdr));
+        const uint32_t channel_id_be = htobe32(channel_id);
+        memcpy(ieee_hdr + SRC_MAC_THIRD_BYTE, &channel_id_be, sizeof(channel_id_be));
+        memcpy(ieee_hdr + DST_MAC_THIRD_BYTE, &channel_id_be, sizeof(channel_id_be));
+        ieee_hdr[FRAME_SEQ_LB] = ieee80211_seq & 0xff;
+        ieee_hdr[FRAME_SEQ_HB] = (ieee80211_seq >> 8) & 0xff;
+        ieee80211_seq += 16;
+
+        uint8_t buffer[sizeof(radiotap_header_ht) + sizeof(ieee80211_header) + MAX_FORWARDER_PACKET_SIZE] = {};
+        memcpy(buffer, radiotap_header_ht, sizeof(radiotap_header_ht));
+        memcpy(buffer + sizeof(radiotap_header_ht), ieee_hdr, sizeof(ieee_hdr));
+        memcpy(buffer + sizeof(radiotap_header_ht) + sizeof(ieee_hdr), packet, packet_size);
+        const size_t frame_size = sizeof(radiotap_header_ht) + sizeof(ieee_hdr) + packet_size;
+
+        for (size_t i = 0; i < raw_sockfds.size(); ++i)
+        {
+            const ssize_t sent = send(raw_sockfds[i], buffer, frame_size, 0);
+            if (sent != static_cast<ssize_t>(frame_size))
+            {
+                throw runtime_error(string("发送 raw air 报文失败: ") + strerror(errno));
+            }
+        }
+    }
+
     AirTransmitter(const AirTransmitter &) = delete;
     AirTransmitter &operator=(const AirTransmitter &) = delete;
 };
@@ -208,7 +306,7 @@ struct ClientTarget {
     uint32_t host_ipv4 = 0;
     string host;
     int port = 0;
-    unique_ptr<AirTransmitter> transmitter;
+    shared_ptr<AirTransmitter> transmitter;
 
     ClientTarget() = default;
     ClientTarget(ClientTarget &&) = default;
@@ -218,6 +316,30 @@ private:
     ClientTarget(const ClientTarget &) = delete;
     ClientTarget &operator=(const ClientTarget &) = delete;
 };
+
+typedef function<shared_ptr<AirTransmitter>()> RawAirTransmitterFactory;
+typedef function<shared_ptr<AirTransmitter>(const ClientTarget &)> UdpAirTransmitterFactory;
+
+void initialize_client_target_transmitters(vector<ClientTarget> &targets,
+                                          bool raw_air_mode,
+                                          const RawAirTransmitterFactory &raw_factory,
+                                          const UdpAirTransmitterFactory &udp_factory)
+{
+    if (raw_air_mode)
+    {
+        shared_ptr<AirTransmitter> shared_raw_transmitter = raw_factory();
+        for (size_t i = 0; i < targets.size(); ++i)
+        {
+            targets[i].transmitter = shared_raw_transmitter;
+        }
+        return;
+    }
+
+    for (size_t i = 0; i < targets.size(); ++i)
+    {
+        targets[i].transmitter = udp_factory(targets[i]);
+    }
+}
 
 struct Config {
     string role;
@@ -235,6 +357,7 @@ struct Config {
     int air_listen_port = 0;
     string air_target_host;
     int air_target_port = 0;
+    vector<string> air_interfaces;
     uint32_t grant_duration_ms = 100;
     uint32_t guard_interval_ms = 10;
     uint32_t feedback_window_period_ms = 0;
@@ -424,20 +547,47 @@ ClientTarget parse_client_target(const string &value)
     return target;
 }
 
+vector<string> parse_air_interfaces(const string &value)
+{
+    if (value.empty())
+    {
+        throw invalid_argument("air_interface 不能为空");
+    }
+
+    vector<string> interfaces;
+    size_t start = 0;
+    while (start <= value.size())
+    {
+        size_t end = value.find(',', start);
+        string item = value.substr(start, end == string::npos ? string::npos : end - start);
+        if (item.empty())
+        {
+            throw invalid_argument("air_interface 存在空项");
+        }
+        interfaces.push_back(item);
+        if (end == string::npos)
+        {
+            break;
+        }
+        start = end + 1;
+    }
+    return interfaces;
+}
+
 void print_usage(const char *progname)
 {
     fprintf(stderr,
             "Usage:\n"
             "  %s --role client --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
-            "     --air-listen-port PORT --air-target HOST:PORT [--uplink-pause-threshold-bytes BYTES] \\\n"
-            "     [--uplink-resume-threshold-bytes BYTES] [--uplink-queue-packets-limit N] [--queue-summary-file PATH] \\\n"
-            "     [--epoch E] [--fec-k K --fec-n N]\n"
+            "     { --air-listen-port PORT --air-target HOST:PORT | --air-interface IFACE[,IFACE...] } \\\n"
+            "     [--uplink-pause-threshold-bytes BYTES] [--uplink-resume-threshold-bytes BYTES] \\\n"
+            "     [--uplink-queue-packets-limit N] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
             "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
-            "     --air-listen-port PORT --known-clients N1,N2 --client-target N:IP:HOST:PORT [--client-target ...] \\\n"
-            "     [--grant-duration-ms MS] [--guard-interval-ms MS] [--feedback-window-period-ms MS] \\\n"
-            "     [--feedback-window-duration-ms MS] [--downlink-pause-threshold-bytes BYTES] \\\n"
-            "     [--downlink-resume-threshold-bytes BYTES] [--downlink-queue-packets-limit N] [--queue-summary-file PATH] \\\n"
-            "     [--epoch E] [--fec-k K --fec-n N]\n",
+            "     { --air-listen-port PORT | --air-interface IFACE[,IFACE...] } --known-clients N1,N2 \\\n"
+            "     --client-target N:IP:HOST:PORT [--client-target ...] [--grant-duration-ms MS] \\\n"
+            "     [--guard-interval-ms MS] [--feedback-window-period-ms MS] [--feedback-window-duration-ms MS] \\\n"
+            "     [--downlink-pause-threshold-bytes BYTES] [--downlink-resume-threshold-bytes BYTES] \\\n"
+            "     [--downlink-queue-packets-limit N] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
             progname,
             progname);
 }
@@ -474,12 +624,13 @@ Config parse_args(int argc, char **argv)
         {"downlink-resume-threshold-bytes", required_argument, 0, 'J'},
         {"downlink-queue-packets-limit", required_argument, 0, 'Z'},
         {"queue-summary-file", required_argument, 0, 'y'},
+        {"air-interface", required_argument, 0, 'W'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0},
     };
 
     int opt = 0;
-    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:f:F:b:j:z:B:J:Z:y:h", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:f:F:b:j:z:B:J:Z:y:W:h", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -573,6 +724,12 @@ Config parse_args(int argc, char **argv)
         case 'y':
             config.queue_summary_file = optarg;
             break;
+        case 'W':
+        {
+            vector<string> interfaces = parse_air_interfaces(optarg);
+            config.air_interfaces.insert(config.air_interfaces.end(), interfaces.begin(), interfaces.end());
+            break;
+        }
         case 'h':
             print_usage(argv[0]);
             exit(0);
@@ -602,16 +759,17 @@ Config parse_args(int argc, char **argv)
     {
         throw invalid_argument("当前最小实现只支持 trusted_plaintext FEC 1/1");
     }
-    if (config.air_listen_port <= 0)
+    const bool raw_air_mode = !config.air_interfaces.empty();
+    if (!raw_air_mode && config.air_listen_port <= 0)
     {
         throw invalid_argument("air-listen-port 必填");
     }
 
     if (config.role == "client")
     {
-        if (config.air_target_host.empty() || config.air_target_port <= 0)
+        if (!raw_air_mode && (config.air_target_host.empty() || config.air_target_port <= 0))
         {
-            throw invalid_argument("client 需要 air-target");
+            throw invalid_argument("client 需要 air-target 或 air-interface");
         }
         if (config.uplink_pause_threshold_bytes < config.uplink_resume_threshold_bytes)
         {
@@ -1155,10 +1313,20 @@ void run_client(const Config &config)
 {
     const uint32_t channel_id = (config.link_id << 8) + config.stream;
     const string keypair = WFB_TRUSTED_PLAINTEXT_KEYPAIR;
+    const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
-    const int air_fd = open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
+    const int air_fd = raw_air_mode ? -1 : open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
 
-    AirTransmitter uplink(config.air_target_host, config.air_target_port, config.snd_buf);
+    unique_ptr<AirTransmitter> uplink;
+    if (raw_air_mode)
+    {
+        uplink.reset(new AirTransmitter(config.air_interfaces, channel_id));
+    }
+    else
+    {
+        uplink.reset(new AirTransmitter(config.air_target_host, config.air_target_port, config.snd_buf));
+    }
+
     TokenAuthorizationState authorization_state;
     ClientGrantListener grant_listener(authorization_state);
     TunWriterAggregator downlink_aggregator(tun_fd,
@@ -1169,6 +1337,28 @@ void run_client(const Config &config)
                                             true);
     downlink_aggregator.set_token_control_listener(&grant_listener);
 
+    vector<unique_ptr<Receiver>> raw_receivers;
+    vector<pollfd> fds(1 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    fds[0].fd = tun_fd;
+    if (raw_air_mode)
+    {
+        for (size_t i = 0; i < config.air_interfaces.size(); ++i)
+        {
+            raw_receivers.push_back(unique_ptr<Receiver>(new Receiver(config.air_interfaces[i].c_str(),
+                                                                      static_cast<int>(i),
+                                                                      channel_id,
+                                                                      &downlink_aggregator,
+                                                                      config.rcv_buf)));
+            fds[1 + i].fd = raw_receivers[i]->getfd();
+            fds[1 + i].events = POLLIN;
+        }
+    }
+    else
+    {
+        fds[1].fd = air_fd;
+        fds[1].events = POLLIN;
+    }
+
     AirReadyState ready_state = {};
     ready_state.node_id = config.node_id;
     FixedCapacityTunReadQueue uplink_queue(config.uplink_pause_threshold_bytes,
@@ -1177,10 +1367,6 @@ void run_client(const Config &config)
     sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
 
     uint64_t log_send_ts = get_time_ms();
-    pollfd fds[2] = {};
-    fds[0].fd = tun_fd;
-    fds[1].fd = air_fd;
-    fds[1].events = POLLIN;
 
     for (;;)
     {
@@ -1188,7 +1374,7 @@ void run_client(const Config &config)
 
         uint64_t now_ms = get_time_ms();
         int timeout_ms = static_cast<int>(max<int64_t>(0, static_cast<int64_t>(log_send_ts - now_ms)));
-        int rc = poll(fds, 2, timeout_ms);
+        int rc = poll(fds.data(), fds.size(), timeout_ms);
         if (rc < 0)
         {
             if (errno == EINTR || errno == EAGAIN)
@@ -1213,9 +1399,26 @@ void run_client(const Config &config)
             log_send_ts = now_ms + config.log_interval;
         }
 
-        if (rc > 0 && (fds[1].revents & POLLIN))
+        if (rc > 0)
         {
-            pump_air_rx(air_fd, downlink_aggregator);
+            if (raw_air_mode)
+            {
+                for (size_t i = 0; i < raw_receivers.size(); ++i)
+                {
+                    if (fds[1 + i].revents & (POLLERR | POLLNVAL))
+                    {
+                        throw runtime_error("raw air client socket error");
+                    }
+                    if (fds[1 + i].revents & POLLIN)
+                    {
+                        raw_receivers[i]->loop_iter();
+                    }
+                }
+            }
+            else if (fds[1].revents & POLLIN)
+            {
+                pump_air_rx(air_fd, downlink_aggregator);
+            }
         }
 
         if (rc > 0 && (fds[0].revents & POLLIN))
@@ -1251,11 +1454,11 @@ void run_client(const Config &config)
         if (!authorization_state.is_authorized(now_ms))
         {
             authorization_state.counters().denied_sends += 1;
-            maybe_send_ready(uplink, now_ms, &ready_state);
+            maybe_send_ready(*uplink, now_ms, &ready_state);
             continue;
         }
 
-        uplink.send_data(pending_packet->bytes, pending_packet->size);
+        uplink->send_data(pending_packet->bytes, pending_packet->size);
         authorization_state.counters().authorized_sends += 1;
         apply_grant_seen(now_ms, &ready_state);
 
@@ -1277,8 +1480,9 @@ void run_server(Config config)
 {
     const uint32_t channel_id = (config.link_id << 8) + config.stream;
     const string keypair = WFB_TRUSTED_PLAINTEXT_KEYPAIR;
+    const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
-    const int air_fd = open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
+    const int air_fd = raw_air_mode ? -1 : open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
 
     TokenSchedulerConfig scheduler_config = {};
     scheduler_config.node_ids = config.known_clients;
@@ -1296,12 +1500,39 @@ void run_server(Config config)
     uplink_aggregator.set_token_control_listener(&ready_listener);
     uplink_aggregator.set_known_client_node_ids(set<uint8_t>(config.known_clients.begin(), config.known_clients.end()));
 
-    for (size_t i = 0; i < config.client_targets.size(); ++i)
+    vector<unique_ptr<Receiver>> raw_receivers;
+    vector<pollfd> fds(1 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    fds[0].fd = tun_fd;
+    if (raw_air_mode)
     {
-        config.client_targets[i].transmitter.reset(new AirTransmitter(config.client_targets[i].host,
-                                                                      config.client_targets[i].port,
-                                                                      config.snd_buf));
+        for (size_t i = 0; i < config.air_interfaces.size(); ++i)
+        {
+            raw_receivers.push_back(unique_ptr<Receiver>(new Receiver(config.air_interfaces[i].c_str(),
+                                                                      static_cast<int>(i),
+                                                                      channel_id,
+                                                                      &uplink_aggregator,
+                                                                      config.rcv_buf)));
+            fds[1 + i].fd = raw_receivers[i]->getfd();
+            fds[1 + i].events = POLLIN;
+        }
     }
+    else
+    {
+        fds[1].fd = air_fd;
+        fds[1].events = POLLIN;
+    }
+
+    initialize_client_target_transmitters(
+        config.client_targets,
+        raw_air_mode,
+        [&]() {
+            return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces, channel_id));
+        },
+        [&](const ClientTarget &target) {
+            return shared_ptr<AirTransmitter>(new AirTransmitter(target.host,
+                                                                target.port,
+                                                                config.snd_buf));
+        });
 
     FeedbackWindowState feedback_state = {};
     feedback_state.enabled = config.feedback_window_period_ms > 0 && config.feedback_window_duration_ms > 0;
@@ -1322,10 +1553,6 @@ void run_server(Config config)
 
     uint64_t log_send_ts = get_time_ms();
     uint64_t next_grant_at_ms = get_time_ms();
-    pollfd fds[2] = {};
-    fds[0].fd = tun_fd;
-    fds[1].fd = air_fd;
-    fds[1].events = POLLIN;
 
     for (;;)
     {
@@ -1345,7 +1572,7 @@ void run_server(Config config)
             }
         }
         int timeout_ms = static_cast<int>(next_wakeup > now_ms ? next_wakeup - now_ms : 0);
-        int rc = poll(fds, 2, timeout_ms);
+        int rc = poll(fds.data(), fds.size(), timeout_ms);
         if (rc < 0)
         {
             if (errno == EINTR || errno == EAGAIN)
@@ -1363,9 +1590,26 @@ void run_server(Config config)
             log_send_ts = now_ms + config.log_interval;
         }
 
-        if (rc > 0 && (fds[1].revents & POLLIN))
+        if (rc > 0)
         {
-            pump_air_rx(air_fd, uplink_aggregator);
+            if (raw_air_mode)
+            {
+                for (size_t i = 0; i < raw_receivers.size(); ++i)
+                {
+                    if (fds[1 + i].revents & (POLLERR | POLLNVAL))
+                    {
+                        throw runtime_error("raw air server socket error");
+                    }
+                    if (fds[1 + i].revents & POLLIN)
+                    {
+                        raw_receivers[i]->loop_iter();
+                    }
+                }
+            }
+            else if (fds[1].revents & POLLIN)
+            {
+                pump_air_rx(air_fd, uplink_aggregator);
+            }
         }
 
         if (rc > 0 && (fds[0].revents & POLLIN))
@@ -1458,6 +1702,7 @@ void run_server(Config config)
 
 } // namespace
 
+#ifndef __WFB_V6_UPLINK_TEST__
 int main(int argc, char **argv)
 {
     if (sodium_init() < 0)
@@ -1492,3 +1737,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+#endif

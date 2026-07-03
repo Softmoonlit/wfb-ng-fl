@@ -1,6 +1,6 @@
 #!/bin/bash
 # tests/real_hardware/test_token_gated_uplink.sh
-# Token-gated split-process 真实硬件验收骨架
+# 旧 split-process Token-gated 真实硬件诊断骨架；不得作为 issue #27 v6 trusted_plaintext 正式证据入口。
 
 set -euo pipefail
 
@@ -27,6 +27,8 @@ TOKEN_RESULTS_TSV="$LOG_DIR/token_results.tsv"
 TOKEN_RESULTS_MD="$LOG_DIR/token_results.md"
 TOKEN_CONTEXT_FILE="$LOG_DIR/token_context.txt"
 RUN_SUMMARY_JSON="${RUN_SUMMARY_JSON:-$LOG_DIR/formal_2a_summary.json}"
+V6_FORMAL_REFUSAL="该脚本是旧 split-process Token 骨架，依赖 TOKEN_*_CMD/wfb_rx/wfb_tx/wfb_token_scheduler，不允许作为 issue #27 v6 trusted_plaintext 正式证据入口。"
+V6_FORMAL_NEXT_ENTRY="正式重跑入口必须直接启动 wfb_v6_uplink --role server/client，并由新脚本生成 formal_2a_summary.json、上下文与结果文件。"
 KCP_SMALL_FILE_SIZE="${KCP_SMALL_FILE_SIZE:-65536}"
 KCP_TRANSFER_TIMEOUT="${KCP_TRANSFER_TIMEOUT:-30}"
 KCP_SOURCE_FILE="${KCP_SOURCE_FILE:-$LOG_DIR/kcp_small_source.bin}"
@@ -78,13 +80,18 @@ while [[ $# -gt 0 ]]; do
         --help|-h)
             cat <<'HELP_EOF'
 用法:
-  sudo bash tests/real_hardware/test_token_gated_uplink.sh [--scenario all|baseline|no-token|single|expiry|dual|dual-long-run|kcp-small] [--analyze-only]
+  ALLOW_LEGACY_SPLIT_PROCESS_UPLINK=1 bash tests/real_hardware/test_token_gated_uplink.sh [--scenario all|baseline|no-token|single|expiry|dual|dual-long-run|kcp-small] [--analyze-only]
+
+保护逻辑:
+  默认直接失败退出：该脚本是旧 split-process Token 骨架，不允许作为 issue #27 v6 trusted_plaintext 正式证据入口。
+  如仅需旧 Issue 16 诊断，必须显式设置 ALLOW_LEGACY_SPLIT_PROCESS_UPLINK=1。
+  即便进入旧诊断模式，本脚本也不会生成 formal_2a_summary.json，输出不得回填为 v6 正式证据。
 
 环境变量钩子:
-  TOKEN_SERVER_START_CMD         服务端启动命令
-  TOKEN_CLIENT1_START_CMD        客户端1启动命令
-  TOKEN_CLIENT2_START_CMD        客户端2启动命令（双客户端场景）
-  TOKEN_SCHEDULER_CMD            调度器启动命令
+  TOKEN_SERVER_START_CMD         旧 split-process 服务端启动命令
+  TOKEN_CLIENT1_START_CMD        旧 split-process 客户端1启动命令
+  TOKEN_CLIENT2_START_CMD        旧 split-process 客户端2启动命令（双客户端场景）
+  TOKEN_SCHEDULER_CMD            旧 wfb_token_scheduler 调度器启动命令
   TOKEN_PROBE_CMD                单客户端探测命令
   TOKEN_POST_EXPIRY_PROBE_CMD    过期后再次探测命令
   TOKEN_CLIENT1_PROBE_CMD        双客户端下客户端1探测命令
@@ -103,7 +110,7 @@ while [[ $# -gt 0 ]]; do
   KCP_TRANSFER_TIMEOUT           KCP sender 超时，默认 30 秒
 
 说明:
-  该脚本优先解决 Issue 16 的“真实硬件验收编排与留痕”问题。
+  该脚本只保留为旧 split-process 诊断工具；正式 v6 real-hardware 上行证据必须使用 wfb_v6_uplink --role server/client。
   当前仓库内的 wfb_token_scheduler 可通过 -s <base_socket> 向 wfb_tx 的 <base_socket>.token socket 下发本机 Token 授权事件；
   dual 场景可使用 -s node:base_socket,node:base_socket 按 node_id 下发到不同客户端。
 HELP_EOF
@@ -142,8 +149,9 @@ prepare_log_dir() {
 log_dir=$LOG_DIR
 scenario=$SCENARIO
 analyze_only=$ANALYZE_ONLY
-formal_2a_summary=$RUN_SUMMARY_JSON
-link_security_mode=trusted_plaintext
+formal_2a_summary=disabled_legacy_split_process
+link_security_mode=legacy_split_process_not_v6_formal_trusted_plaintext
+v6_formal_evidence_allowed=false
 wifi_iface=${WIFI_IFACE:-}
 channel=${CHANNEL:-}
 mcs=${MCS:-}
@@ -187,11 +195,11 @@ record_result() {
 
 render_markdown_results() {
     {
-        echo "# Token-gated split-process 验收结果"
+        echo "# Token-gated split-process 旧诊断结果"
         echo
         echo "- 生成时间: $(date)"
         echo "- 日志目录: $LOG_DIR"
-        echo "- 统一 2A 摘要: $RUN_SUMMARY_JSON"
+        echo "- 统一 2A 摘要: 已禁用（旧 split-process 不能作为 v6 正式证据）"
         echo
         echo "| 场景 | 结果 | 说明 |"
         echo "| --- | --- | --- |"
@@ -210,7 +218,7 @@ render_markdown_results() {
             fi
         done
         if [ -f "$RUN_SUMMARY_JSON" ]; then
-            echo "- formal_2a_summary.json"
+            echo "- 检测到旧 formal_2a_summary.json：本次脚本不会生成或认可该文件为 v6 正式证据"
         fi
         if [ -n "$LONGRUN_RESULT_REASON" ]; then
             echo
@@ -235,24 +243,24 @@ render_markdown_results() {
             echo "- client2 探测命令失败次数: ${LONGRUN_CLIENT2_PROBE_FAILURES:-未记录}"
             echo "- 采样文件: $DUAL_LONG_RUN_SAMPLES_TSV"
             echo "- 自动结论: $LONGRUN_RESULT_REASON"
-            echo "- 统一 2A 摘要: $RUN_SUMMARY_JSON"
+            echo "- 统一 2A 摘要: 已禁用（旧 split-process 不能作为 v6 正式证据）"
         fi
         echo
-        echo "## 正式归档要求"
-        echo "- 原始产物层至少保留: token_results.md、token_context.txt、dual_long_run_samples.tsv、formal_2a_summary.json、scheduler.log、server.log、client1.log、client2.log。"
-        echo "- 正式结论层必须回填到 issue / tracking issue，不能只把日志留在本地目录。"
-        echo "- Issue 回填最小字段: 运行场景与前置条件、原始产物层引用、统一 2A 摘要、运行时长与关键事件计数、关键异常与风险信号、是否可作为正式 v6 real-hardware 证据、是否需要重跑。"
-        echo "- tracking issue 未按固定模板回填正式结论前不得关闭。"
+        echo "## 保护逻辑"
+        echo "- $V6_FORMAL_REFUSAL"
+        echo "- $V6_FORMAL_NEXT_ENTRY"
+        echo "- 本脚本只可在 ALLOW_LEGACY_SPLIT_PROCESS_UPLINK=1 时作为旧 Issue 16 诊断工具运行。"
+        echo "- 原始产物不得回填为 issue #27 的 v6 trusted_plaintext 正式证据；需要正式证据时必须新增/使用新底座 real-hardware 脚本。"
         echo
         echo "## 说明"
         echo "- wfb_token_scheduler 可通过 -s <base_socket> 向 wfb_tx 的 <base_socket>.token socket 下发本机 Token 授权事件；dual 可用 -s node:base_socket,node:base_socket。"
-        echo "- dual-long-run 用于 v6 real-hardware 双客户端上行长稳场景；按 180 秒、总 grant>=60、每客户端 authorized_sends>=10、连续无推进窗口<=45 秒、remove/evict/额外 rejoin=0 的固定口径自动汇总，并生成统一 2A 摘要。"
-        echo "- KCP 小文件场景用于验证 Token 门控通过后的 KCP 层小文件闭环；40MB 和 10 节点压力测试不阻塞本阶段。"
+        echo "- dual-long-run 仅保留旧 split-process 长稳诊断口径，不再生成统一 2A 摘要。"
+        echo "- KCP 小文件场景仅验证旧 Token 门控通过后的 KCP 层小文件闭环；40MB 和 10 节点压力测试不阻塞本阶段。"
         if [ -n "$KCP_SOURCE_SHA256$KCP_RECEIVED_SHA256" ]; then
             echo "- KCP 源文件 SHA256: ${KCP_SOURCE_SHA256:-未生成}"
             echo "- KCP 接收文件 SHA256: ${KCP_RECEIVED_SHA256:-未生成}"
         fi
-        echo "- 若需要在真实硬件上完成闭环，请通过 TOKEN_*_CMD 和 KCP_*_CMD 环境变量接入你的实际启动命令。"
+        echo "- 若需要 v6 正式真实硬件闭环，请使用直接启动 wfb_v6_uplink --role server/client 的新入口。"
     } > "$TOKEN_RESULTS_MD"
 }
 
@@ -498,23 +506,8 @@ append_dual_long_run_analysis() {
 }
 
 generate_formal_2a_summary() {
-    if [ "$SCENARIO" != "dual-long-run" ] && [ "$SCENARIO" != "all" ]; then
-        return 0
-    fi
-    if [ -z "$LONGRUN_RESULT_REASON" ]; then
-        return 0
-    fi
-
-    PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 "$SCRIPT_DIR/v6_formal_2a_summary.py" \
-        --mode uplink \
-        --scenario dual-long-run \
-        --output "$RUN_SUMMARY_JSON" \
-        --queue-summary "$TOKEN_CLIENT1_QUEUE_SUMMARY_JSON" \
-        --queue-summary "$TOKEN_CLIENT2_QUEUE_SUMMARY_JSON" \
-        --queue-summary "$TOKEN_SERVER_QUEUE_SUMMARY_JSON" \
-        --reassembly-log "$LOG_DIR/server.log" \
-        --reassembly-log "$LOG_DIR/client1.log" \
-        --reassembly-log "$LOG_DIR/client2.log" >/dev/null
+    log_warn "跳过 formal_2a_summary.json：$V6_FORMAL_REFUSAL"
+    return 0
 }
 
 run_baseline() {
@@ -1072,11 +1065,24 @@ analyze_only() {
     fi
 }
 
+refuse_v6_formal_entry() {
+    if [ "${ALLOW_LEGACY_SPLIT_PROCESS_UPLINK:-0}" = "1" ]; then
+        log_warn "$V6_FORMAL_REFUSAL"
+        log_warn "已进入旧 split-process 诊断模式；本脚本不会生成 formal_2a_summary.json，输出不得作为 v6 正式证据。"
+        return 0
+    fi
+
+    log_fail "$V6_FORMAL_REFUSAL"
+    log_fail "$V6_FORMAL_NEXT_ENTRY"
+    log_fail "如仅需旧 Issue 16 split-process 诊断，请显式设置 ALLOW_LEGACY_SPLIT_PROCESS_UPLINK=1。"
+    exit 2
+}
+
 main() {
+    refuse_v6_formal_entry
     prepare_log_dir
     log_info "日志目录: $LOG_DIR"
     log_info "场景: $SCENARIO"
-
     if [ "$ANALYZE_ONLY" = true ]; then
         analyze_only
     else

@@ -158,6 +158,7 @@ class DualLongRunScriptTestCase(unittest.TestCase):
             'TOKEN_LONGRUN_MAX_REMOVE_COUNT': '0',
             'TOKEN_LONGRUN_MAX_EVICT_COUNT': '0',
             'TOKEN_LONGRUN_MAX_REJOIN_COUNT': '0',
+            'ALLOW_LEGACY_SPLIT_PROCESS_UPLINK': '1',
         })
 
         try:
@@ -186,7 +187,6 @@ class DualLongRunScriptTestCase(unittest.TestCase):
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(context_file))
             self.assertTrue(os.path.exists(samples_file))
-            self.assertTrue(os.path.exists(formal_summary_file))
 
             with open(result_md, 'r') as fh:
                 result_text = fh.read()
@@ -194,27 +194,22 @@ class DualLongRunScriptTestCase(unittest.TestCase):
                 context_text = fh.read()
             with open(samples_file, 'r') as fh:
                 samples_text = fh.read()
-            with open(formal_summary_file, 'r') as fh:
-                formal_summary = json.load(fh)
 
             self.assertIn('| dual-long-run | PASS |', result_text)
             self.assertIn('## dual-long-run 摘要', result_text)
             self.assertIn('- 目标时长: 3 秒', result_text)
-            self.assertIn('- 采样文件: {path}'.format(path=samples_file), result_text)
-            self.assertIn('## 正式归档要求', result_text)
-            self.assertIn('tracking issue 未按固定模板回填正式结论前不得关闭', result_text)
+            self.assertIn('## 保护逻辑', result_text)
+            self.assertIn('不得回填为 issue #27 的 v6 trusted_plaintext 正式证据', result_text)
+            self.assertIn('统一 2A 摘要: 已禁用', result_text)
             self.assertIn('formal_2a_summary=', context_text)
-            self.assertIn('link_security_mode=trusted_plaintext', context_text)
-            self.assertIn('- 统一 2A 摘要: {path}'.format(path=formal_summary_file), result_text)
+            self.assertIn('formal_2a_summary=disabled_legacy_split_process', context_text)
+            self.assertIn('link_security_mode=legacy_split_process_not_v6_formal_trusted_plaintext', context_text)
+            self.assertIn('v6_formal_evidence_allowed=false', context_text)
+            self.assertFalse(os.path.exists(formal_summary_file))
             self.assertIn('dual_long_run_total_grants=', context_text)
             self.assertIn('dual_long_run_result=双客户端长稳场景满足固定口径', context_text)
             self.assertIn('elapsed_sec\tgrants_total', samples_text)
             self.assertIn('\tYES', samples_text)
-            self.assertEqual('real_hardware', formal_summary['run_kind'])
-            self.assertEqual('trusted_plaintext', formal_summary['link_security_mode'])
-            self.assertEqual(SCENARIO_V6_REAL_HARDWARE_UPLINK, formal_summary['scenario_id'])
-            self.assertFalse(formal_summary['feedback_window_covered'])
-            self.assertEqual(set(allowed_fields_for(SCENARIO_V6_REAL_HARDWARE_UPLINK)), set(formal_summary.keys()))
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -225,11 +220,9 @@ class DualLongRunScriptTestCase(unittest.TestCase):
 
             result_md = os.path.join(log_dir, 'token_results.md')
             context_file = os.path.join(log_dir, 'token_context.txt')
-            formal_summary_file = os.path.join(log_dir, 'formal_2a_summary.json')
 
             self.assertTrue(os.path.exists(result_md))
             self.assertTrue(os.path.exists(context_file))
-            self.assertTrue(os.path.exists(formal_summary_file))
 
             with open(result_md, 'r') as fh:
                 result_text = fh.read()
