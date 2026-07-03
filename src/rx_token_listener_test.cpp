@@ -516,6 +516,60 @@ TEST_CASE("shared uplink 按 source_node 隔离相同 local block idx 的重组�
     REQUIRE(agg.delivered_payloads[1] == std::vector<uint8_t>{0x70});
     REQUIRE(agg.count_p_outgoing == 2);
 }
+
+TEST_CASE("shared uplink packet loss 诊断包含 sender 上下文")
+{
+    REQUIRE(sodium_init() >= 0);
+
+    RecordingPayloadAggregator agg(7, std::set<uint8_t>{7, 8});
+    const uint8_t antenna[RX_ANT_MAX] = {0xff, 0xff, 0xff, 0xff};
+    const int8_t rssi[RX_ANT_MAX] = {0, 0, 0, 0};
+    const int8_t noise[RX_ANT_MAX] = {0, 0, 0, 0};
+
+    const std::string captured = capture_stderr_for_test([&]() {
+        const std::vector<uint8_t> source8_first = make_data_packet(8, 1, 0, 0x81);
+        const std::vector<uint8_t> source7_first = make_data_packet(7, 1, 0, 0x71);
+        const std::vector<uint8_t> source8_gap = make_data_packet(8, 3, 0, 0x83);
+
+        agg.process_packet(source8_first.data(),
+                           source8_first.size(),
+                           0,
+                           antenna,
+                           rssi,
+                           noise,
+                           0,
+                           0,
+                           20,
+                           nullptr);
+        agg.process_packet(source7_first.data(),
+                           source7_first.size(),
+                           0,
+                           antenna,
+                           rssi,
+                           noise,
+                           0,
+                           0,
+                           20,
+                           nullptr);
+        agg.process_packet(source8_gap.data(),
+                           source8_gap.size(),
+                           0,
+                           antenna,
+                           rssi,
+                           noise,
+                           0,
+                           0,
+                           20,
+                           nullptr);
+    });
+
+    REQUIRE(agg.count_p_lost == 1);
+    REQUIRE(captured.find("PACKET_LOSS") != std::string::npos);
+    REQUIRE(captured.find("source_node=8") != std::string::npos);
+    REQUIRE(captured.find("previous_seq=1") != std::string::npos);
+    REQUIRE(captured.find("current_seq=3") != std::string::npos);
+    REQUIRE(captured.find("lost_count=1") != std::string::npos);
+}
 TEST_CASE("RX 重组溢出不会阻塞控制面优先通路")
 {
     REQUIRE(sodium_init() >= 0);

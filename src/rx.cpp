@@ -1088,6 +1088,11 @@ void Aggregator::send_packet(rx_source_state_t *state, int ring_idx, int fragmen
         ANDROID_IPC_MSG("PKT_LOST\t%d", lost_count);
         count_p_lost += lost_count;
 
+        WFB_ERR("PACKET_LOSS source_node=%u previous_seq=%" PRIu32 " current_seq=%" PRIu32 " lost_count=%" PRIu32 "\n",
+                static_cast<unsigned>(state->source_node),
+                state->seq,
+                packet_seq,
+                lost_count);
         if (packet_loss_listener_ != NULL)
         {
             packet_loss_listener_->on_packet_loss(lost_count, state->seq, packet_seq);
