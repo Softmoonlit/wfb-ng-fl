@@ -16,6 +16,8 @@ CLIENT1_IFACE="${CLIENT1_IFACE:-wlxfca386b38672}"
 CLIENT2_IFACE="${CLIENT2_IFACE:-wlxfc221c300cbc}"
 DASHBOARD_INTERVAL="${DASHBOARD_INTERVAL:-1}"
 NO_CLEAR="${NO_CLEAR:-0}"
+NO_ALT_SCREEN="${NO_ALT_SCREEN:-0}"
+DASHBOARD_STTY_STATE=""
 
 if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
     C_RESET=$'\033[0m'
@@ -49,8 +51,9 @@ usage() {
   DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh client2-wfb
 
 执行上传窗口：
-  DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client1
-  DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client2
+  DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-all        # 推荐：一个终端同时接收两个 client 文件
+  DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client1    # 排障：只接收 client1 应用层 TCP
+  DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client2    # 排障：只接收 client2 应用层 TCP
   DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh client1-send
   DEMO_NAME=... bash tests/real_hardware/v6_manual_uplink_demo.sh client2-send
 
@@ -69,6 +72,7 @@ usage() {
   CHANNEL            默认 157
   CHANNEL_WIDTH      默认 HT40+
   NO_CLEAR=1         不清屏，方便录屏或保存终端输出
+  NO_ALT_SCREEN=1    不进入终端备用屏幕；默认使用备用屏幕原地刷新，避免滚动刷屏
 
 说明：
   本脚本不使用 ssh/scp。client 日志请用 U 盘或现场文件共享人工拷贝到 server。
@@ -121,29 +125,94 @@ require_sudo_session() {
     fi
 }
 
+terminal_cols() {
+    local cols
+    cols="$(tput cols 2>/dev/null || printf '80')"
+    if [ -z "$cols" ] || [ "$cols" -lt 50 ]; then
+        cols=80
+    fi
+    printf '%s\n' "$cols"
+}
+
+line_fill() {
+    local width="$1"
+    printf '%*s\n' "$width" '' | tr ' ' '='
+}
+
+short_path() {
+    local path="$1"
+    local max_width="${2:-68}"
+    if [[ "$path" == "$PROJECT_ROOT/"* ]]; then
+        path="\$PROJECT_ROOT/${path#"$PROJECT_ROOT/"}"
+    fi
+    if [ "${#path}" -gt "$max_width" ]; then
+        printf '...%s\n' "${path: -$((max_width - 3))}"
+    else
+        printf '%s\n' "$path"
+    fi
+}
+
+dashboard_enter() {
+    if [ -t 1 ] && command -v stty >/dev/null 2>&1; then
+        DASHBOARD_STTY_STATE="$(stty -g 2>/dev/null || true)"
+        # 面板逐行刷新依赖 LF 回到行首；现场终端可能被上一个程序留下 -opost/-onlcr。
+        stty opost onlcr 2>/dev/null || true
+    fi
+    if [ "$NO_CLEAR" != "1" ] && [ "$NO_ALT_SCREEN" != "1" ] && [ -t 1 ]; then
+        printf '\033[?1049h\033[?25l'
+    elif [ "$NO_CLEAR" != "1" ] && [ -t 1 ]; then
+        printf '\033[?25l'
+    fi
+}
+
+dashboard_cleanup() {
+    if [ -t 1 ]; then
+        printf '\033[?25h'
+        if [ "$NO_CLEAR" != "1" ] && [ "$NO_ALT_SCREEN" != "1" ]; then
+            printf '\033[?1049l'
+        fi
+    fi
+    if [ -n "$DASHBOARD_STTY_STATE" ] && command -v stty >/dev/null 2>&1; then
+        stty "$DASHBOARD_STTY_STATE" 2>/dev/null || true
+        DASHBOARD_STTY_STATE=""
+    fi
+}
+
 clear_screen() {
     if [ "$NO_CLEAR" != "1" ] && [ -t 1 ]; then
-        printf '\033[H\033[2J'
+        printf '\033[H\033[J'
     fi
 }
 
 banner() {
-    printf '%s\n' "${C_BOLD}============================================================${C_RESET}"
-    printf '%s\n' "${C_BOLD}$1${C_RESET}"
-    printf '%s\n' "${C_BOLD}============================================================${C_RESET}"
+    local width title
+    width="$(terminal_cols)"
+    if [ "$width" -gt 88 ]; then
+        width=88
+    fi
+    title="$1"
+    line_fill "$width"
+    printf '%s%s%s\n' "$C_BOLD" "$title" "$C_RESET"
+    line_fill "$width"
 }
 
 status_item() {
     local ok="$1"
     local label="$2"
     local detail="${3:-}"
+    local color tag
     if [ "$ok" = "yes" ]; then
-        printf '%s%-8s%s %s %s\n' "$C_GREEN" "[通过]" "$C_RESET" "$label" "$detail"
+        color="$C_GREEN"
+        tag="[通过]"
     elif [ "$ok" = "warn" ]; then
-        printf '%s%-8s%s %s %s\n' "$C_YELLOW" "[注意]" "$C_RESET" "$label" "$detail"
+        color="$C_YELLOW"
+        tag="[注意]"
     else
-        printf '%s%-8s%s %s %s\n' "$C_RED" "[等待]" "$C_RESET" "$label" "$detail"
+        color="$C_RED"
+        tag="[等待]"
     fi
+    # 显式回车把状态列钉在第 1 列；即使终端换行模式异常，等待/通过也不会斜向错位。
+    printf '\r%s%s%s  %s：%s\n' "$color" "$tag" "$C_RESET" "$label" "$detail"
 }
 
 count_regex() {
@@ -189,12 +258,39 @@ show_recent_errors() {
     if [ ! -f "$file" ]; then
         return
     fi
-    local lines
+    local lines line
     lines="$(grep -Ei 'error|failed|pcap_activate|绑定 raw air socket|no such device|permission|READY_REJECT|GRANT_FILTER' "$file" 2>/dev/null | tail -n 4 || true)"
     if [ -n "$lines" ]; then
-        printf '%s\n' "${C_YELLOW}最近需要关注的信息：${C_RESET}"
-        printf '%s\n' "$lines"
+        printf '\r%s\n' "${C_YELLOW}最近需要关注的信息：${C_RESET}"
+        while IFS= read -r line; do
+            printf '\r%s\n' "$line"
+        done <<< "$lines"
     fi
+}
+
+wfb_tun_error_line() {
+    local file="$1"
+    if [ ! -f "$file" ]; then
+        return 0
+    fi
+    grep -Ei 'TUNSETIFF failed|Device or resource busy|tun.*busy|failed.*tun|tun.*failed' "$file" 2>/dev/null | tail -n 1 || true
+}
+
+cleanup_tun_device() {
+    local tun_name="$1"
+    if ! ip link show "$tun_name" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    log_warn "发现旧 TUN 设备 $tun_name，正在删除，避免 TUNSETIFF: Device or resource busy。"
+    sudo ip link set "$tun_name" down 2>/dev/null || true
+    sudo ip link delete "$tun_name" 2>/dev/null || true
+    sleep 0.2
+
+    if ip link show "$tun_name" >/dev/null 2>&1; then
+        die "旧 TUN 设备 $tun_name 仍存在或被占用。请执行：sudo pkill -x wfb_v6_uplink || true; sudo ip link delete $tun_name 2>/dev/null || true"
+    fi
+    log_ok "旧 TUN 设备 $tun_name 已清理。"
 }
 
 build_binary() {
@@ -234,11 +330,12 @@ prepare_server() {
     require_sudo_session
     sudo pkill -x wfb_v6_uplink 2>/dev/null || true
     sudo pkill -f v6_manual_uplink_tcp_recv_progress.py 2>/dev/null || true
+    cleanup_tun_device v6us0
     configure_monitor "$SERVER_IFACE"
     banner "server 准备完成"
     log_ok "DEMO_NAME=$DEMO_NAME"
     log_ok "日志目录=$(uplink_root)"
-    log_info "下一步：另开终端执行 server-wfb、server-recv-client1、server-recv-client2。"
+    log_info "下一步：另开终端执行 server-wfb、server-recv-all。"
 }
 
 client_iface_for() {
@@ -309,8 +406,9 @@ prepare_client() {
     local role="$1"
     require_demo_name
     require_common_commands
-    local iface ulog source sha_file
+    local iface tun_name ulog source sha_file
     iface="$(client_iface_for "$role")"
+    tun_name="$(client_tun_for "$role")"
     ulog="$(client_log_dir "$role")"
     source="$ulog/${role}_uplink.bin"
     sha_file="$ulog/source_sha256.txt"
@@ -319,6 +417,7 @@ prepare_client() {
     require_sudo_session
     sudo pkill -x wfb_v6_uplink 2>/dev/null || true
     sudo pkill -f v6_manual_uplink_tcp_send_progress.py 2>/dev/null || true
+    cleanup_tun_device "$tun_name"
     configure_monitor "$iface"
     python3 "$SCRIPT_DIR/v6_manual_uplink_make_source.py" \
         --client "$role" \
@@ -335,7 +434,7 @@ prepare_client() {
 server_dashboard() {
     local pid="$1"
     local log_file="$2"
-    local trusted tun_ok c1_ready c2_ready c1_grants c2_grants ready_reject data_packets elapsed
+    local trusted tun_ok c1_ready c2_ready c1_grants c2_grants ready_reject data_packets elapsed log_display log_width tun_error
     trusted="$(has_regex 'trusted_plaintext' "$log_file")"
     if ip addr show v6us0 >/dev/null 2>&1; then tun_ok=yes; else tun_ok=no; fi
     c1_ready="$(count_regex '^ready_accept node_id=1' "$log_file")"
@@ -345,21 +444,33 @@ server_dashboard() {
     ready_reject="$(count_regex '^ready_reject ' "$log_file")"
     data_packets="$(pkt_sum "$log_file")"
     elapsed="$(ps -p "$pid" -o etime= 2>/dev/null | awk '{$1=$1; print}' || true)"
+    tun_error="$(wfb_tun_error_line "$log_file")"
+    log_width=$(( $(terminal_cols) - 12 ))
+    if [ "$log_width" -lt 36 ]; then
+        log_width=36
+    fi
+    log_display="$(short_path "$log_file" "$log_width")"
 
     clear_screen
-    banner "server 上行链路面板：给老师看的实时状态"
-    printf '演示名: %s\n' "$DEMO_NAME"
-    printf '运行时间: %s    日志: %s\n\n' "${elapsed:-running}" "$log_file"
+    banner "server 上行链路面板"
+    printf '\r演示名：%s\n' "$DEMO_NAME"
+    printf '\r运行时间：%s\n' "${elapsed:-running}"
+    printf '\r日志文件：%s\n\r\n' "$log_display"
     status_item "$trusted" "链路安全口径" "trusted_plaintext 已出现才算正确"
-    status_item "$tun_ok" "server TUN" "v6us0 = 10.80.0.1/24"
+    if [ -n "$tun_error" ]; then
+        status_item warn "server TUN" "创建失败：$tun_error；请清理旧 TUN/旧进程"
+    else
+        status_item "$tun_ok" "server TUN" "v6us0 = 10.80.0.1/24"
+    fi
     if [ "$c1_ready" -gt 0 ]; then status_item yes "client1 已进入调度" "ready_accept=$c1_ready"; else status_item no "client1 已进入调度" "等待 client1"; fi
     if [ "$c2_ready" -gt 0 ]; then status_item yes "client2 已进入调度" "ready_accept=$c2_ready"; else status_item no "client2 已进入调度" "等待 client2"; fi
     if [ "$c1_grants" -gt 0 ]; then status_item yes "client1 获得空口发送机会" "grants=$c1_grants"; else status_item no "client1 获得空口发送机会" "grants=0"; fi
     if [ "$c2_grants" -gt 0 ]; then status_item yes "client2 获得空口发送机会" "grants=$c2_grants"; else status_item no "client2 获得空口发送机会" "grants=0"; fi
     if [ "$data_packets" -gt 0 ]; then status_item yes "server 收到无线数据" "累计数据包=$data_packets"; else status_item no "server 收到无线数据" "等待 TCP 上传开始"; fi
     if [ "$ready_reject" -eq 0 ]; then status_item yes "调度拒收" "ready_reject=0"; else status_item warn "调度拒收" "ready_reject=$ready_reject，需要解释"; fi
-    printf '\n老师口径：两个 client 都出现“获得空口发送机会”，且 server 数据包增长，说明两台机器正在轮流通过真实无线链路上传。\n'
-    printf '操作提示：保持本窗口不关；另开两个 server 接收窗口，再让两个 client 执行发送。按 Ctrl-C 停止本机 WFB。\n\n'
+    printf '\r\n\r口径：两个 client 都有 grant，且 server 数据包增长 = 共享无线链路上传。\n'
+    printf '\r提示：保持本窗口；另开 server-recv-all，再启动两个 client-send。\n'
+    printf '\r停止：Ctrl-C 停止 WFB。\n\r\n'
     show_recent_errors "$log_file"
 }
 
@@ -368,7 +479,7 @@ client_dashboard() {
     local pid="$2"
     local log_file="$3"
     local send_log="$4"
-    local tun_name trusted tun_ok grant_accept auth sent_line elapsed
+    local tun_name trusted tun_ok grant_accept auth sent_line elapsed log_display log_width tun_error
     tun_name="$(client_tun_for "$role")"
     trusted="$(has_regex 'trusted_plaintext' "$log_file")"
     if ip addr show "$tun_name" >/dev/null 2>&1; then tun_ok=yes; else tun_ok=no; fi
@@ -379,18 +490,30 @@ client_dashboard() {
         sent_line="$(grep '上传完成：sent_bytes=' "$send_log" 2>/dev/null | tail -n 1 || true)"
     fi
     elapsed="$(ps -p "$pid" -o etime= 2>/dev/null | awk '{$1=$1; print}' || true)"
+    tun_error="$(wfb_tun_error_line "$log_file")"
+    log_width=$(( $(terminal_cols) - 12 ))
+    if [ "$log_width" -lt 36 ]; then
+        log_width=36
+    fi
+    log_display="$(short_path "$log_file" "$log_width")"
 
     clear_screen
-    banner "$role 上行链路面板：给老师看的实时状态"
-    printf '演示名: %s\n' "$DEMO_NAME"
-    printf '运行时间: %s    日志: %s\n\n' "${elapsed:-running}" "$log_file"
+    banner "$role 上行链路面板"
+    printf '\r演示名：%s\n' "$DEMO_NAME"
+    printf '\r运行时间：%s\n' "${elapsed:-running}"
+    printf '\r日志文件：%s\n\r\n' "$log_display"
     status_item "$trusted" "链路安全口径" "trusted_plaintext 已出现才算正确"
-    status_item "$tun_ok" "$role TUN" "$tun_name = $(client_ip_for "$role")/24"
+    if [ -n "$tun_error" ]; then
+        status_item warn "$role TUN" "创建失败：$tun_error；请清理旧 TUN/旧进程"
+    else
+        status_item "$tun_ok" "$role TUN" "$tun_name = $(client_ip_for "$role")/24"
+    fi
     if [ "$grant_accept" -gt 0 ]; then status_item yes "收到 server 授权" "grant_accept=$grant_accept"; else status_item no "收到 server 授权" "等待 server 调度"; fi
     if [ "$auth" -gt 0 ]; then status_item yes "允许发送数据" "authorized_sends=$auth"; else status_item no "允许发送数据" "等待 TCP 上传或授权"; fi
     if [ -n "$sent_line" ]; then status_item yes "TCP 文件上传" "$sent_line"; else status_item no "TCP 文件上传" "发送窗口完成后会显示"; fi
-    printf '\n老师口径：本机出现“收到 server 授权”和“允许发送数据”，说明它不是自己乱发，而是在 server 授权窗口内上传。\n'
-    printf '操作提示：保持本窗口不关；另开终端执行 %s-send。按 Ctrl-C 停止本机 WFB。\n\n' "$role"
+    printf '\r\n\r口径：出现 server 授权和允许发送数据 = 本机在授权窗口内上传。\n'
+    printf '\r提示：保持本窗口；另开终端执行 %s-send。\n' "$role"
+    printf '\r停止：Ctrl-C 停止 WFB。\n\r\n'
     show_recent_errors "$log_file"
 }
 
@@ -399,8 +522,9 @@ run_server_wfb() {
     require_common_commands
     require_sudo_session
     mkdir -p "$(server_log_dir)"
-    local log_file pid
+    local log_file pid status
     log_file="$(server_log_dir)/wfb_v6_uplink.log"
+    cleanup_tun_device v6us0
     : > "$log_file"
     log_info "启动 server WFB；屏幕只显示简化面板，完整日志写入 $log_file"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
@@ -423,12 +547,21 @@ run_server_wfb() {
         --log-interval 200 \
         > "$log_file" 2>&1 &
     pid=$!
-    trap 'kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true' INT TERM EXIT
+    status=0
+    dashboard_enter
+    trap 'kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true; dashboard_cleanup' INT TERM EXIT
     while kill -0 "$pid" 2>/dev/null; do
         server_dashboard "$pid" "$log_file"
         sleep "$DASHBOARD_INTERVAL"
     done
-    wait "$pid"
+    wait "$pid" || status=$?
+    dashboard_cleanup
+    trap - INT TERM EXIT
+    if [ "$status" -ne 0 ]; then
+        log_fail "server WFB 已退出，exit_status=$status。"
+        show_recent_errors "$log_file"
+        return "$status"
+    fi
 }
 
 run_client_wfb() {
@@ -436,7 +569,7 @@ run_client_wfb() {
     require_demo_name
     require_common_commands
     require_sudo_session
-    local ulog log_file send_log tun_name node_id iface pause resume queue_limit
+    local ulog log_file send_log tun_name node_id iface pause resume queue_limit status
     ulog="$(client_log_dir "$role")"
     mkdir -p "$ulog"
     log_file="$ulog/wfb_v6_uplink.log"
@@ -447,6 +580,7 @@ run_client_wfb() {
     pause="$(client_pause_for "$role")"
     resume="$(client_resume_for "$role")"
     queue_limit="$(client_queue_limit_for "$role")"
+    cleanup_tun_device "$tun_name"
     : > "$log_file"
     log_info "启动 $role WFB；屏幕只显示简化面板，完整日志写入 $log_file"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
@@ -464,15 +598,26 @@ run_client_wfb() {
         --log-interval 200 \
         > "$log_file" 2>&1 &
     local pid=$!
-    trap 'kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true' INT TERM EXIT
+    status=0
+    dashboard_enter
+    trap 'kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true; dashboard_cleanup' INT TERM EXIT
     while kill -0 "$pid" 2>/dev/null; do
         client_dashboard "$role" "$pid" "$log_file" "$send_log"
         sleep "$DASHBOARD_INTERVAL"
     done
-    wait "$pid"
+    wait "$pid" || status=$?
+    dashboard_cleanup
+    trap - INT TERM EXIT
+    if [ "$status" -ne 0 ]; then
+        log_fail "$role WFB 已退出，exit_status=$status。"
+        show_recent_errors "$log_file"
+        return "$status"
+    fi
 }
 
-server_recv() {
+# 在 server 的 TUN 口上启动一个应用层 TCP 文件接收器。
+# 注意：这不是 WFB/RF 接收进程；唯一的 server WFB 接收进程是 server-wfb。
+server_app_tcp_recv_one() {
     local role="$1"
     require_demo_name
     require_command python3
@@ -483,13 +628,42 @@ server_recv() {
     output="$ulog/${role}_uplink_received.bin"
     log_file="$ulog/${role}_tcp_recv.log"
     python3 "$SCRIPT_DIR/v6_manual_uplink_tcp_recv_progress.py" \
-        --label "server 接收 $role 上传" \
+        --label "server 应用层接收 $role TCP 文件" \
         --bind-ip 10.80.0.1 \
         --port "$port" \
         --output "$output" \
         --expected-bytes "$DEMO_FILE_SIZE" \
         --timeout 300 \
         --log-file "$log_file"
+}
+
+server_app_tcp_recv_all() {
+    require_demo_name
+    require_command python3
+    mkdir -p "$(server_log_dir)"
+    banner "server 应用层接收：一个窗口看两个 client 文件上传"
+    log_info "无线/WFB 接收进程只有 server-wfb 一个；这里启动的是两个应用层 TCP 接收器。"
+    log_info "两个 TCP 接收器共享同一个 TUN: 10.80.0.1，只是端口不同：client1=19111，client2=19112。"
+    log_info "等本窗口显示两个“接收器已就绪”后，再启动 client1-send 和 client2-send。"
+
+    server_app_tcp_recv_one client1 &
+    local pid1=$!
+    server_app_tcp_recv_one client2 &
+    local pid2=$!
+    local status1=0
+    local status2=0
+
+    trap 'kill "$pid1" "$pid2" 2>/dev/null || true; wait "$pid1" 2>/dev/null || true; wait "$pid2" 2>/dev/null || true' INT TERM
+    wait "$pid1" || status1=$?
+    wait "$pid2" || status2=$?
+    trap - INT TERM
+
+    if [ "$status1" -eq 0 ] && [ "$status2" -eq 0 ]; then
+        log_ok "两个 client 的应用层文件接收都完成。"
+        return 0
+    fi
+    log_fail "应用层接收未全部完成：client1_status=$status1 client2_status=$status2"
+    return 1
 }
 
 client_send() {
@@ -723,11 +897,14 @@ case "$cmd" in
     client2-wfb)
         run_client_wfb client2
         ;;
+    server-recv-all)
+        server_app_tcp_recv_all
+        ;;
     server-recv-client1)
-        server_recv client1
+        server_app_tcp_recv_one client1
         ;;
     server-recv-client2)
-        server_recv client2
+        server_app_tcp_recv_one client2
         ;;
     client1-send)
         client_send client1

@@ -51,9 +51,8 @@
 | 机器 | 终端 | 执行内容 |
 | --- | --- | --- |
 | server | S0 | 准备、最终解包和汇总 |
-| server | S1 | `server-wfb` 面板 |
-| server | S2 | `server-recv-client1` 接收进度条 |
-| server | S3 | `server-recv-client2` 接收进度条 |
+| server | S1 | `server-wfb`：唯一的 server 无线/WFB 接收进程面板 |
+| server | S2 | `server-recv-all`：应用层同时接收 client1/client2 两个 TCP 文件 |
 | client1 | C1-0 | 准备、打包日志 |
 | client1 | C1-1 | `client1-wfb` 面板 |
 | client1 | C1-2 | `client1-send` 上传进度条 |
@@ -61,7 +60,9 @@
 | client2 | C2-1 | `client2-wfb` 面板 |
 | client2 | C2-2 | `client2-send` 上传进度条 |
 
-现场同步点：S2/S3 都显示“接收器已就绪”后，再启动 C1-2/C2-2。
+关键区分：`server-wfb` 是唯一的 server 侧无线/WFB 接收进程，负责共享空口链路和 TUN；`server-recv-all` 只是 TUN 上的应用层 TCP 文件接收器，相当于 server 上开两个端口 `19111/19112` 接收两个客户端文件，不是两个 WFB RX。
+
+现场同步点：S2 同时显示 client1/client2 两个“接收器已就绪”后，再启动 C1-2/C2-2。
 
 ---
 
@@ -152,25 +153,28 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-prepare
 bash tests/real_hardware/v6_manual_uplink_demo.sh server-wfb
 ```
 
-屏幕会显示“server 上行链路面板”，而不是刷原始日志。示例：
+屏幕会显示“server 上行链路面板”，而不是刷原始日志。默认使用终端备用屏幕原地刷新，所以不会在滚动区不断追加同一屏内容；如现场终端不支持备用屏幕，可临时加 `NO_ALT_SCREEN=1`，如需要录屏保留每次刷新输出，可加 `NO_CLEAR=1`。
+
+示例：
 
 ```text
-============================================================
-server 上行链路面板：给老师看的实时状态
-============================================================
-演示名: v6手动上行_20260704_153000
-运行时间: 00:01:12    日志: .../uplink/server/wfb_v6_uplink.log
+================================================================================
+server 上行链路面板
+================================================================================
+演示名：v6手动上行_20260704_153000
+运行时间：00:01:12
+日志文件：$PROJECT_ROOT/tests/logs/.../uplink/server/wfb_v6_uplink.log
 
-[通过]   链路安全口径 trusted_plaintext 已出现才算正确
-[通过]   server TUN v6us0 = 10.80.0.1/24
-[通过]   client1 已进入调度 ready_accept=18
-[通过]   client2 已进入调度 ready_accept=16
-[通过]   client1 获得空口发送机会 grants=62
-[通过]   client2 获得空口发送机会 grants=59
-[通过]   server 收到无线数据 累计数据包=12840
-[通过]   调度拒收 ready_reject=0
+[通过]  链路安全口径：trusted_plaintext 已出现才算正确
+[通过]  server TUN：v6us0 = 10.80.0.1/24
+[通过]  client1 已进入调度：ready_accept=18
+[通过]  client2 已进入调度：ready_accept=16
+[通过]  client1 获得空口发送机会：grants=62
+[通过]  client2 获得空口发送机会：grants=59
+[通过]  server 收到无线数据：累计数据包=12840
+[通过]  调度拒收：ready_reject=0
 
-老师口径：两个 client 都出现“获得空口发送机会”，且 server 数据包增长，说明两台机器正在轮流通过真实无线链路上传。
+老师口径：两个 client 都“获得空口发送机会”，且 server 数据包增长 = 正在共享无线链路上传。
 ```
 
 如果屏幕出现 `[等待]`，表示该项还没发生；如果出现 `[注意]`，需要现场解释或排障。
@@ -184,13 +188,13 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client1-wfb
 屏幕会显示 client1 面板：
 
 ```text
-[通过]   链路安全口径 trusted_plaintext 已出现才算正确
-[通过]   client1 TUN v6uc1 = 10.80.0.11/24
-[通过]   收到 server 授权 grant_accept=61
-[通过]   允许发送数据 authorized_sends=1200
-[等待]   TCP 文件上传 发送窗口完成后会显示
+[通过]  链路安全口径：trusted_plaintext 已出现才算正确
+[通过]  client1 TUN：v6uc1 = 10.80.0.11/24
+[通过]  收到 server 授权：grant_accept=61
+[通过]  允许发送数据：authorized_sends=1200
+[等待]  TCP 文件上传：发送窗口完成后会显示
 
-老师口径：本机出现“收到 server 授权”和“允许发送数据”，说明它不是自己乱发，而是在 server 授权窗口内上传。
+老师口径：出现“收到 server 授权”和“允许发送数据” = 本机在 server 授权窗口内上传。
 ```
 
 ### 4.3 client2 C2-1
@@ -207,27 +211,29 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-wfb
 
 ## 5. 执行双 client 上行，可视化展示文件传输
 
-### 5.1 server S2：接收 client1
+### 5.1 server S2：启动应用层双文件接收器
 
 ```bash
-bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client1
+bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-all
 ```
 
-看到下面内容后保持等待：
+这个命令只启动应用层 TCP receiver，不启动新的 WFB RX。真正的共享无线接收仍然只有 S1 的 `server-wfb` 一个进程。
+
+看到下面两行后保持等待：
 
 ```text
 [等待] server 接收 client1 上传 | 接收器已就绪：10.80.0.1:19111，等待 client 连接
+[等待] server 接收 client2 上传 | 接收器已就绪：10.80.0.1:19112，等待 client 连接
 ```
 
-### 5.2 server S3：接收 client2
+如果排障时只想单独接收某一路，才使用：
 
 ```bash
+bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client1
 bash tests/real_hardware/v6_manual_uplink_demo.sh server-recv-client2
 ```
 
-看到 `接收器已就绪：10.80.0.1:19112` 后，让两个 client 启动发送。
-
-### 5.3 client1 C1-2：发送 client1 文件
+### 5.2 client1 C1-2：发送 client1 文件
 
 ```bash
 bash tests/real_hardware/v6_manual_uplink_demo.sh client1-send
@@ -245,7 +251,7 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client1-send
 
 给老师解释：进度条走到 100%，说明 client1 的 40MiB 文件已经通过 TUN TCP 送完；后面还要和 server 收到的 SHA256 对上。
 
-### 5.4 client2 C2-2：发送 client2 文件
+### 5.3 client2 C2-2：发送 client2 文件
 
 ```bash
 bash tests/real_hardware/v6_manual_uplink_demo.sh client2-send
@@ -253,9 +259,9 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-send
 
 通过标志同 client1。
 
-### 5.5 server S2/S3：接收完成标志
+### 5.4 server S2：接收完成标志
 
-两个 server 接收窗口都应显示：
+server 接收窗口应显示两路接收完成：
 
 ```text
 [接收中] server 接收 client1 上传 | [########################--------] ...
@@ -283,7 +289,7 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-send
 | client2 C2-1 | `收到 server 授权`、`允许发送数据` 为 `[通过]` | client2 在授权窗口内发送 |
 | client1 C1-2 | `上传完成：sent_bytes=41943040` | client1 TCP 文件发完 |
 | client2 C2-2 | `上传完成：sent_bytes=41943040` | client2 TCP 文件发完 |
-| server S2/S3 | `接收完成：received_bytes=41943040` | server 两个 TCP 文件都收完 |
+| server S2 | `接收完成：received_bytes=41943040` 两次 | server 两个 TCP 文件都收完 |
 
 即时通过口径：两个 client 都发完、server 都收完、server 面板中两个 client 都有 grant，才算“现场传输过程成功”。最终通过还要做 SHA 和 2A 摘要。
 
@@ -362,20 +368,20 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh server-summary
 最终面板示例：
 
 ```text
-============================================================
+================================================================================
 最终结果面板：给老师看的通过条件
-============================================================
-[通过]   client1 文件完整 source=... received=...
-[通过]   client2 文件完整 source=... received=...
-[通过]   client1 获得无线发送机会 grants=62
-[通过]   client2 获得无线发送机会 grants=59
-[通过]   client1 被授权发送 authorized_sends=1200
-[通过]   client2 被授权发送 authorized_sends=980
-[通过]   server 收到无线数据 server_data_packets_sum=12840
-[通过]   无调度拒收 ready_reject=0
-[通过]   2A 摘要生成 .../formal_2a_summary.json
+================================================================================
+[通过]  client1 文件完整：source=... received=...
+[通过]  client2 文件完整：source=... received=...
+[通过]  client1 获得无线发送机会：grants=62
+[通过]  client2 获得无线发送机会：grants=59
+[通过]  client1 被授权发送：authorized_sends=1200
+[通过]  client2 被授权发送：authorized_sends=980
+[通过]  server 收到无线数据：server_data_packets_sum=12840
+[通过]  无调度拒收：ready_reject=0
+[通过]  2A 摘要生成：.../formal_2a_summary.json
 
-[通过] 结论：本次无 SSH 手动双 client 上行演示通过。
+[通过]  结论：本次无 SSH 手动双 client 上行演示通过。
 ```
 
 ---
@@ -402,24 +408,38 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh server-summary
 
 ## 10. 常见失败与老师可见解释
 
-### 10.1 面板一直显示 TUN `[等待]`
+### 10.1 面板显示 TUN `[等待]` 或 `TUNSETIFF failed: Device or resource busy`
 
-说明：WFB 没有成功创建 TUN。
+说明：WFB 没有成功创建本轮 TUN。最常见原因是上一轮 `v6us0` / `v6uc1` / `v6uc2` 还残留，或者旧 `wfb_v6_uplink` 进程仍占着 TUN。新版脚本会在 `server-prepare`、`client*-prepare` 和 `*-wfb` 启动前自动尝试删除本角色 TUN；如果仍显示 busy，说明旧进程/旧设备没有被清掉。
 
-处理：回到对应机器执行准备脚本：
+server 处理：
 
 ```bash
+sudo pkill -x wfb_v6_uplink || true
+sudo ip link delete v6us0 2>/dev/null || true
 bash tests/real_hardware/v6_manual_uplink_demo.sh server-prepare
+bash tests/real_hardware/v6_manual_uplink_demo.sh server-wfb
 ```
 
-或对应 client：
+client1 处理：
 
 ```bash
+sudo pkill -x wfb_v6_uplink || true
+sudo ip link delete v6uc1 2>/dev/null || true
 bash tests/real_hardware/v6_manual_uplink_demo.sh client1-prepare
-bash tests/real_hardware/v6_manual_uplink_demo.sh client2-prepare
+bash tests/real_hardware/v6_manual_uplink_demo.sh client1-wfb
 ```
 
-重点看准备脚本是否显示网卡为 `monitor/UP`。
+client2 处理：
+
+```bash
+sudo pkill -x wfb_v6_uplink || true
+sudo ip link delete v6uc2 2>/dev/null || true
+bash tests/real_hardware/v6_manual_uplink_demo.sh client2-prepare
+bash tests/real_hardware/v6_manual_uplink_demo.sh client2-wfb
+```
+
+重点看准备脚本是否显示旧 TUN 已清理、网卡为 `monitor/UP`。
 
 ### 10.2 sender 一直显示“server 接收器尚未接通”
 
@@ -427,7 +447,7 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-prepare
 
 检查顺序：
 
-1. server S2/S3 是否已经显示“接收器已就绪”。
+1. server S2 是否已经同时显示 client1/client2 两个“接收器已就绪”。
 2. server S1 是否显示 `server TUN` 为 `[通过]`。
 3. client C1-1/C2-1 是否显示 client TUN 为 `[通过]`。
 4. server S1 是否显示该 client 获得空口发送机会。
@@ -461,12 +481,30 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-prepare
 
 ## 11. 清理现场
 
-三台机器如需强制清理残留进程：
+三台机器如需强制清理残留进程和本角色 TUN：
+
+server：
+
+```bash
+sudo pkill -x wfb_v6_uplink || true
+sudo pkill -f v6_manual_uplink_tcp_recv_progress.py || true
+sudo ip link delete v6us0 2>/dev/null || true
+```
+
+client1：
 
 ```bash
 sudo pkill -x wfb_v6_uplink || true
 sudo pkill -f v6_manual_uplink_tcp_send_progress.py || true
-sudo pkill -f v6_manual_uplink_tcp_recv_progress.py || true
+sudo ip link delete v6uc1 2>/dev/null || true
+```
+
+client2：
+
+```bash
+sudo pkill -x wfb_v6_uplink || true
+sudo pkill -f v6_manual_uplink_tcp_send_progress.py || true
+sudo ip link delete v6uc2 2>/dev/null || true
 ```
 
 如需把网卡切回 managed，按机器设置变量后执行：
