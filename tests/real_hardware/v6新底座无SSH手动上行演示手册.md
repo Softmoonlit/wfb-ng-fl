@@ -45,6 +45,8 @@
 - width：`HT40+`
 - link_id：`406`
 - uplink stream：`32`
+- raw air 发送参数：`RADIO_BANDWIDTH=40`、`RADIO_MCS_INDEX=1`、`RADIO_SHORT_GI=1`
+- client 上行队列水位：`UPLINK_PAUSE_THRESHOLD_BYTES=131072`、`UPLINK_RESUME_THRESHOLD_BYTES=65536`、`UPLINK_QUEUE_PACKETS_LIMIT=64`
 
 建议打开这些终端：
 
@@ -97,6 +99,16 @@ export DEMO_FILE_SIZE=1048576
 ```
 
 正式演示使用默认 40MiB，不需要设置 `DEMO_FILE_SIZE`。
+
+默认速度参数由脚本自动设置，三台机器无需额外导出；默认口径为 `HT40/MCS1/short GI`。如现场弱信号、丢包或连接不稳定，可在启动 `*-wfb` 前三台机器统一降档：
+
+```bash
+export RADIO_MCS_INDEX=1
+export RADIO_BANDWIDTH=20
+export RADIO_SHORT_GI=0
+```
+
+降档用于保稳定，速度会明显下降；如现场链路稳定、需要恢复更高性能展示口径，再统一升档到 `HT40/MCS3/short GI`。
 
 ---
 
@@ -476,6 +488,17 @@ bash tests/real_hardware/v6_manual_uplink_demo.sh client2-wfb
 2. 重新执行 `client1-pack` / `client2-pack`。
 3. 人工拷贝到 server 后重新执行 `server-unpack`。
 4. 再执行 `server-summary`。
+
+### 10.6 文件传输速度明显低，平均只有 0.0x MiB/s
+
+说明：当前默认口径已调整为 `HT40/MCS1/short GI`，用于先保稳启动；如需恢复更高性能展示，再手工统一升档到 `HT40/MCS3/short GI`。新版脚本启动 `server-wfb` / `client*-wfb` 时会显式传入当前环境中的 `--radio-bandwidth`、`--radio-mcs-index` 和可选 `--radio-short-gi`，并把 client 上行队列保持在 `131072/65536/64`。
+
+检查顺序：
+
+1. 三台机器先同步最新仓库/脚本并重新 `make wfb_v6_uplink`。
+2. 启动 `server-wfb`、`client1-wfb`、`client2-wfb` 时确认屏幕出现当前期望口径；默认应为 `raw air 发送参数：HT40 MCS1 short_gi=1`，升档后应为 `HT40 MCS3 short_gi=1`。
+3. 如果仍低于预期，查看 server WFB 日志里的 `RX_ANT` 行，确认收到的帧不是长期停在 `mcs=0 bw=20`。
+4. 弱信号才降档到 `RADIO_MCS_INDEX=1 RADIO_BANDWIDTH=20 RADIO_SHORT_GI=0`；降档后低速属于预期，不作为性能演示口径。
 
 ---
 

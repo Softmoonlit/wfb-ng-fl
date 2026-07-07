@@ -11,6 +11,18 @@ CHANNEL="${CHANNEL:-157}"
 CHANNEL_WIDTH="${CHANNEL_WIDTH:-HT40+}"
 LINK_ID="${LINK_ID:-406}"
 UPLINK_STREAM="${UPLINK_STREAM:-32}"
+RADIO_BANDWIDTH="${RADIO_BANDWIDTH:-40}"
+RADIO_MCS_INDEX="${RADIO_MCS_INDEX:-1}"
+RADIO_SHORT_GI="${RADIO_SHORT_GI:-1}"
+UPLINK_PAUSE_THRESHOLD_BYTES="${UPLINK_PAUSE_THRESHOLD_BYTES:-131072}"
+UPLINK_RESUME_THRESHOLD_BYTES="${UPLINK_RESUME_THRESHOLD_BYTES:-65536}"
+UPLINK_QUEUE_PACKETS_LIMIT="${UPLINK_QUEUE_PACKETS_LIMIT:-64}"
+CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES="${CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES:-$UPLINK_PAUSE_THRESHOLD_BYTES}"
+CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES="${CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES:-$UPLINK_RESUME_THRESHOLD_BYTES}"
+CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT="${CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT:-$UPLINK_QUEUE_PACKETS_LIMIT}"
+CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES="${CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES:-$UPLINK_PAUSE_THRESHOLD_BYTES}"
+CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES="${CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES:-$UPLINK_RESUME_THRESHOLD_BYTES}"
+CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT="${CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT:-$UPLINK_QUEUE_PACKETS_LIMIT}"
 SERVER_IFACE="${SERVER_IFACE:-wlxbcec23372588}"
 CLIENT1_IFACE="${CLIENT1_IFACE:-wlxfca386b38672}"
 CLIENT2_IFACE="${CLIENT2_IFACE:-wlxfc221c300cbc}"
@@ -71,6 +83,10 @@ usage() {
   CLIENT2_IFACE      默认 wlxfc221c300cbc
   CHANNEL            默认 157
   CHANNEL_WIDTH      默认 HT40+
+  RADIO_BANDWIDTH    raw air HT 带宽，默认 40；应与 CHANNEL_WIDTH=HT40+ 匹配
+  RADIO_MCS_INDEX    raw air HT MCS，默认 1；弱信号可降到 0
+  RADIO_SHORT_GI     1 表示启用 short GI，默认 1；弱信号可设 0
+  UPLINK_*           client 上行队列水位，默认 pause=131072 resume=65536 packets=64
   NO_CLEAR=1         不清屏，方便录屏或保存终端输出
   NO_ALT_SCREEN=1    不进入终端备用屏幕；默认使用备用屏幕原地刷新，避免滚动刷屏
 
@@ -380,24 +396,24 @@ client_port_for() {
 
 client_queue_limit_for() {
     case "$1" in
-        client1) printf '8\n' ;;
-        client2) printf '1\n' ;;
+        client1) printf '%s\n' "$CLIENT1_UPLINK_QUEUE_PACKETS_LIMIT" ;;
+        client2) printf '%s\n' "$CLIENT2_UPLINK_QUEUE_PACKETS_LIMIT" ;;
         *) die "未知 client：$1" ;;
     esac
 }
 
 client_pause_for() {
     case "$1" in
-        client1) printf '64\n' ;;
-        client2) printf '4096\n' ;;
+        client1) printf '%s\n' "$CLIENT1_UPLINK_PAUSE_THRESHOLD_BYTES" ;;
+        client2) printf '%s\n' "$CLIENT2_UPLINK_PAUSE_THRESHOLD_BYTES" ;;
         *) die "未知 client：$1" ;;
     esac
 }
 
 client_resume_for() {
     case "$1" in
-        client1) printf '32\n' ;;
-        client2) printf '2048\n' ;;
+        client1) printf '%s\n' "$CLIENT1_UPLINK_RESUME_THRESHOLD_BYTES" ;;
+        client2) printf '%s\n' "$CLIENT2_UPLINK_RESUME_THRESHOLD_BYTES" ;;
         *) die "未知 client：$1" ;;
     esac
 }
@@ -527,6 +543,11 @@ run_server_wfb() {
     cleanup_tun_device v6us0
     : > "$log_file"
     log_info "启动 server WFB；屏幕只显示简化面板，完整日志写入 $log_file"
+    local radio_args=(--radio-bandwidth "$RADIO_BANDWIDTH" --radio-mcs-index "$RADIO_MCS_INDEX")
+    if [ "$RADIO_SHORT_GI" = "1" ]; then
+        radio_args+=(--radio-short-gi)
+    fi
+    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}。"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
         --role server \
         --tun-name v6us0 \
@@ -534,6 +555,7 @@ run_server_wfb() {
         --node-id 9 \
         --link-id "$LINK_ID" \
         --stream "$UPLINK_STREAM" \
+        "${radio_args[@]}" \
         --air-interface "$SERVER_IFACE" \
         --known-clients 1,2 \
         --client-target 1:10.80.0.11:127.0.0.1:1 \
@@ -583,6 +605,11 @@ run_client_wfb() {
     cleanup_tun_device "$tun_name"
     : > "$log_file"
     log_info "启动 $role WFB；屏幕只显示简化面板，完整日志写入 $log_file"
+    local radio_args=(--radio-bandwidth "$RADIO_BANDWIDTH" --radio-mcs-index "$RADIO_MCS_INDEX")
+    if [ "$RADIO_SHORT_GI" = "1" ]; then
+        radio_args+=(--radio-short-gi)
+    fi
+    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}；上行队列 pause=${pause} resume=${resume} packets=${queue_limit}。"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
         --role client \
         --tun-name "$tun_name" \
@@ -590,6 +617,7 @@ run_client_wfb() {
         --node-id "$node_id" \
         --link-id "$LINK_ID" \
         --stream "$UPLINK_STREAM" \
+        "${radio_args[@]}" \
         --air-interface "$iface" \
         --uplink-pause-threshold-bytes "$pause" \
         --uplink-resume-threshold-bytes "$resume" \

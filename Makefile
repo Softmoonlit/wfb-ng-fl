@@ -48,6 +48,42 @@ src/%.o: src/%.c src/*.h
 src/%.o: src/%.cpp src/*.hpp src/*.h
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
 
+
+# Rules for tx_gate_test object files
+src/radiotap.tx_gate_test.o: src/radiotap.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/zfex.tx_gate_test.o: src/zfex.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/%.tx_gate_test.o: src/%.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
+
+# Rules for rx_test object files
+src/radiotap.rx_test.o: src/radiotap.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/zfex.rx_test.o: src/zfex.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/rx.rx_test.o: src/rx.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o $@ $<
+
+src/%.rx_test.o: src/%.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
+
+# Rules for v6_test object files
+src/radiotap.v6_test.o: src/radiotap.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/zfex.v6_test.o: src/zfex.c
+	$(CC) $(_CFLAGS) -std=gnu99 -c -o $@ $<
+
+src/rx.v6_test.o: src/rx.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o $@ $<
+
+src/%.v6_test.o: src/%.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
 wfb_rx: src/rx.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_event_ipc.o src/token_authorization_ipc.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
 
@@ -81,15 +117,8 @@ wfb_token_namespace_bridge: src/main_token_namespace_bridge.o src/token_namespac
 tx_authorization_integration_test: src/tx_authorization_integration_test.cpp src/token_authorization_ipc.cpp src/tx_token_gate.cpp src/token_authorization.cpp src/token_scheduler.cpp src/wifibroadcast.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
-tx_data_source_gate_test: src/tx_data_source_gate_test.cpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/token_authorization.cpp src/token_authorization_ipc.cpp src/token_event_ipc.cpp src/tx_token_gate.cpp
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.tx_gate_test.o src/radiotap.c
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.tx_gate_test.o src/zfex.c
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.tx_gate_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization.tx_gate_test.o src/token_authorization.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.tx_gate_test.o src/token_authorization_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.tx_gate_test.o src/token_event_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/tx_token_gate.tx_gate_test.o src/tx_token_gate.cpp
-	$(CXX) $(_CFLAGS) -o $@ src/tx_data_source_gate_test.cpp src/radiotap.tx_gate_test.o src/zfex.tx_gate_test.o src/wifibroadcast.tx_gate_test.o src/token_authorization.tx_gate_test.o src/token_authorization_ipc.tx_gate_test.o src/token_event_ipc.tx_gate_test.o src/tx_token_gate.tx_gate_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+tx_data_source_gate_test: src/tx_data_source_gate_test.cpp src/radiotap.tx_gate_test.o src/zfex.tx_gate_test.o src/wifibroadcast.tx_gate_test.o src/token_authorization.tx_gate_test.o src/token_authorization_ipc.tx_gate_test.o src/token_event_ipc.tx_gate_test.o src/tx_token_gate.tx_gate_test.o
+	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 : src/.cpp src/control_envelope.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
@@ -100,30 +129,14 @@ control_envelope_test: src/control_envelope_test.cpp src/control_envelope.cpp
 rx_token_ipc_test: src/rx_token_ipc_test.cpp src/token_event_ipc.cpp src/wifibroadcast.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
-rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.cpp src/rx.hpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/control_envelope.cpp src/token_event_ipc.cpp src/token_authorization_ipc.cpp
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.rx_test.o src/radiotap.c
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.rx_test.o src/zfex.c
-	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.rx_test.o src/rx.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.rx_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/control_envelope.rx_test.o src/control_envelope.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.rx_test.o src/token_event_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.rx_test.o src/token_authorization_ipc.cpp
-	$(CXX) $(_CFLAGS) -o $@ src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o
+	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 v6_uplink_queue_test: src/v6_uplink_queue_test.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
-v6_uplink_downlink_nonce_test: src/v6_uplink_downlink_nonce_test.cpp src/rx.cpp src/rx.hpp src/radiotap.c src/zfex.c src/wifibroadcast.cpp src/control_envelope.cpp src/token_scheduler.cpp src/token_authorization.cpp src/token_authorization_ipc.cpp src/token_event_ipc.cpp src/v6_uplink_queue.hpp
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.v6_test.o src/radiotap.c
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.v6_test.o src/zfex.c
-	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.v6_test.o src/rx.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.v6_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/control_envelope.v6_test.o src/control_envelope.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_scheduler.v6_test.o src/token_scheduler.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization.v6_test.o src/token_authorization.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_authorization_ipc.v6_test.o src/token_authorization_ipc.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/token_event_ipc.v6_test.o src/token_event_ipc.cpp
-	$(CXX) $(_CFLAGS) -o $@ src/v6_uplink_downlink_nonce_test.cpp src/rx.v6_test.o src/radiotap.v6_test.o src/zfex.v6_test.o src/wifibroadcast.v6_test.o src/control_envelope.v6_test.o src/token_scheduler.v6_test.o src/token_authorization.v6_test.o src/token_authorization_ipc.v6_test.o src/token_event_ipc.v6_test.o $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+v6_uplink_downlink_nonce_test: src/v6_uplink_downlink_nonce_test.cpp src/rx.v6_test.o src/radiotap.v6_test.o src/zfex.v6_test.o src/wifibroadcast.v6_test.o src/control_envelope.v6_test.o src/token_scheduler.v6_test.o src/token_authorization.v6_test.o src/token_authorization_ipc.v6_test.o src/token_event_ipc.v6_test.o
+	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 wfb_keygen: src/keygen.o
 	$(CC) -o $@ $^ $(_LDFLAGS)
@@ -138,11 +151,6 @@ wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 wfb_v6_uplink: src/v6_uplink.o src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/radiotap.rx_test.o src/radiotap.c
-	$(CC) $(_CFLAGS) -std=gnu99 -c -o src/zfex.rx_test.o src/zfex.c
-	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.rx_test.o src/rx.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/wifibroadcast.rx_test.o src/wifibroadcast.cpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o src/control_envelope.rx_test.o src/control_envelope.cpp
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
 
 kcp_tools: kcp_small_sender kcp_small_receiver

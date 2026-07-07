@@ -73,11 +73,48 @@ struct FeedbackWindowState {
     uint64_t close_count = 0;
     map<uint8_t, uint64_t> slot_hit_total_by_node;
 };
+struct RawAirRadioConfig {
+    uint8_t bandwidth = 20;
+    uint8_t mcs_index = 0;
+    bool short_gi = false;
+};
+
+vector<uint8_t> build_ht_radiotap_header(const RawAirRadioConfig &config)
+{
+    uint8_t flags = 0;
+    switch (config.bandwidth)
+    {
+    case 20:
+        flags |= IEEE80211_RADIOTAP_MCS_BW_20;
+        break;
+    case 40:
+        flags |= IEEE80211_RADIOTAP_MCS_BW_40;
+        break;
+    default:
+        throw invalid_argument("radio_bandwidth 只支持 HT 20/40 MHz");
+    }
+
+    if (config.mcs_index > 31)
+    {
+        throw invalid_argument("radio_mcs_index 只支持 HT MCS 0-31");
+    }
+    if (config.short_gi)
+    {
+        flags |= IEEE80211_RADIOTAP_MCS_SGI;
+    }
+
+    vector<uint8_t> header(radiotap_header_ht, radiotap_header_ht + sizeof(radiotap_header_ht));
+    header[MCS_FLAGS_OFF] = flags;
+    header[MCS_IDX_OFF] = config.mcs_index;
+    return header;
+}
+
 
 struct AirTransmitter {
     int sockfd = -1;
     sockaddr_in saddr = {};
     vector<int> raw_sockfds;
+    vector<uint8_t> raw_radiotap_header;
     uint64_t block_idx = 0;
     uint32_t channel_id = 0;
     uint16_t ieee80211_seq = 0;
@@ -105,8 +142,13 @@ struct AirTransmitter {
         saddr.sin_port = htons((unsigned short)port);
     }
 
-    AirTransmitter(const vector<string> &interfaces, uint32_t channel_id, uint8_t source_node)
-        : channel_id(channel_id), source_node(source_node)
+    AirTransmitter(const vector<string> &interfaces,
+                   uint32_t channel_id,
+                   uint8_t source_node,
+                   const RawAirRadioConfig &radio_config)
+        : raw_radiotap_header(build_ht_radiotap_header(radio_config)),
+          channel_id(channel_id),
+          source_node(source_node)
     {
         if (interfaces.empty())
         {
@@ -283,10 +325,11 @@ private:
         ieee80211_seq += 16;
 
         uint8_t buffer[sizeof(radiotap_header_ht) + sizeof(ieee80211_header) + MAX_FORWARDER_PACKET_SIZE] = {};
-        memcpy(buffer, radiotap_header_ht, sizeof(radiotap_header_ht));
-        memcpy(buffer + sizeof(radiotap_header_ht), ieee_hdr, sizeof(ieee_hdr));
-        memcpy(buffer + sizeof(radiotap_header_ht) + sizeof(ieee_hdr), packet, packet_size);
-        const size_t frame_size = sizeof(radiotap_header_ht) + sizeof(ieee_hdr) + packet_size;
+        const size_t radiotap_size = raw_radiotap_header.size();
+        memcpy(buffer, raw_radiotap_header.data(), radiotap_size);
+        memcpy(buffer + radiotap_size, ieee_hdr, sizeof(ieee_hdr));
+        memcpy(buffer + radiotap_size + sizeof(ieee_hdr), packet, packet_size);
+        const size_t frame_size = radiotap_size + sizeof(ieee_hdr) + packet_size;
 
         for (size_t i = 0; i < raw_sockfds.size(); ++i)
         {
@@ -360,6 +403,7 @@ struct Config {
     string air_target_host;
     int air_target_port = 0;
     vector<string> air_interfaces;
+    RawAirRadioConfig raw_air_radio;
     uint32_t grant_duration_ms = 100;
     uint32_t guard_interval_ms = 10;
     uint32_t feedback_window_period_ms = 0;
@@ -583,16 +627,24 @@ void print_usage(const char *progname)
             "  %s --role client --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
             "     { --air-listen-port PORT --air-target HOST:PORT | --air-interface IFACE[,IFACE...] } \\\n"
             "     [--uplink-pause-threshold-bytes BYTES] [--uplink-resume-threshold-bytes BYTES] \\\n"
-            "     [--uplink-queue-packets-limit N] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
+            "     [--uplink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
+            "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
             "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
             "     { --air-listen-port PORT | --air-interface IFACE[,IFACE...] } --known-clients N1,N2 \\\n"
             "     --client-target N:IP:HOST:PORT [--client-target ...] [--grant-duration-ms MS] \\\n"
             "     [--guard-interval-ms MS] [--feedback-window-period-ms MS] [--feedback-window-duration-ms MS] \\\n"
             "     [--downlink-pause-threshold-bytes BYTES] [--downlink-resume-threshold-bytes BYTES] \\\n"
-            "     [--downlink-queue-packets-limit N] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
+            "     [--downlink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
+            "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
             progname,
             progname);
 }
+enum LongOptionId {
+    OPT_RADIO_BANDWIDTH = 1000,
+    OPT_RADIO_MCS_INDEX,
+    OPT_RADIO_SHORT_GI,
+};
+
 
 Config parse_args(int argc, char **argv)
 {
@@ -627,6 +679,9 @@ Config parse_args(int argc, char **argv)
         {"downlink-queue-packets-limit", required_argument, 0, 'Z'},
         {"queue-summary-file", required_argument, 0, 'y'},
         {"air-interface", required_argument, 0, 'W'},
+        {"radio-bandwidth", required_argument, 0, OPT_RADIO_BANDWIDTH},
+        {"radio-mcs-index", required_argument, 0, OPT_RADIO_MCS_INDEX},
+        {"radio-short-gi", no_argument, 0, OPT_RADIO_SHORT_GI},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0},
     };
@@ -732,6 +787,15 @@ Config parse_args(int argc, char **argv)
             config.air_interfaces.insert(config.air_interfaces.end(), interfaces.begin(), interfaces.end());
             break;
         }
+        case OPT_RADIO_BANDWIDTH:
+            config.raw_air_radio.bandwidth = static_cast<uint8_t>(parse_u32(optarg, "radio_bandwidth"));
+            break;
+        case OPT_RADIO_MCS_INDEX:
+            config.raw_air_radio.mcs_index = static_cast<uint8_t>(parse_u32(optarg, "radio_mcs_index", true));
+            break;
+        case OPT_RADIO_SHORT_GI:
+            config.raw_air_radio.short_gi = true;
+            break;
         case 'h':
             print_usage(argv[0]);
             exit(0);
@@ -762,6 +826,7 @@ Config parse_args(int argc, char **argv)
         throw invalid_argument("当前最小实现只支持 trusted_plaintext FEC 1/1");
     }
     const bool raw_air_mode = !config.air_interfaces.empty();
+    (void)build_ht_radiotap_header(config.raw_air_radio);
     if (!raw_air_mode && config.air_listen_port <= 0)
     {
         throw invalid_argument("air-listen-port 必填");
@@ -1322,7 +1387,10 @@ void run_client(const Config &config)
     unique_ptr<AirTransmitter> uplink;
     if (raw_air_mode)
     {
-        uplink.reset(new AirTransmitter(config.air_interfaces, channel_id, config.node_id));
+        uplink.reset(new AirTransmitter(config.air_interfaces,
+                                        channel_id,
+                                        config.node_id,
+                                        config.raw_air_radio));
     }
     else
     {
@@ -1528,7 +1596,10 @@ void run_server(Config config)
         config.client_targets,
         raw_air_mode,
         [&]() {
-            return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces, channel_id, config.node_id));
+            return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces,
+                                                                 channel_id,
+                                                                 config.node_id,
+                                                                 config.raw_air_radio));
         },
         [&](const ClientTarget &target) {
             return shared_ptr<AirTransmitter>(new AirTransmitter(target.host,
