@@ -1,6 +1,8 @@
 # v6 新底座无 SSH 手动上行演示手册
 
-本文用于现场只有三台独立机器、server 无法 SSH 到 client1/client2 时，手动演示 `wfb_v6_uplink --role server/client` 上行能力。
+本文用于现场只有三台独立机器、server 无法 SSH 到 client1/client2 时，手动演示 `wfb_v6_uplink --role server/client` 的双 client 上行能力。
+
+当前定位：这是 `v6` 新底座 **real-hardware uplink 默认正式入口**，配套执行脚本是 `tests/real_hardware/v6_manual_uplink_demo.sh`。仓库默认的 `make acceptance_v6_realhw` 会把操作者引导到本手册；旧的 same-host / netns 自动跑数入口已经下线，不再作为正式验收路径。
 
 本版把原来的大段命令收敛为脚本文件，现场只需要执行短命令；关键状态用“面板 + 进度条”直接显示，不要求老师读原始日志。
 
@@ -25,6 +27,8 @@
 - 不使用旧 `wfb_rx` / `wfb_tx` / `wfb_token_scheduler` / `-K`。
 - 三台机器都运行同一个二进制：`wfb_v6_uplink`。
 - server 用 `--role server`；client1/client2 用 `--role client`。
+- 本手册虽然只验证 uplink 文件传输，但三端启动时仍统一显式传入 `--uplink-stream` 与 `--downlink-stream`；旧 `--stream` 不再适用。
+- 本手册只覆盖三机、无 SSH 自动控制、`trusted_plaintext`、dual-client uplink 正式证据；不覆盖 downlink / feedback-window 正式证据，也不是 namespace 自动验收入口。
 - 默认文件大小 `40MiB`；排障时三台机器都设置 `DEMO_FILE_SIZE=1048576` 做 1MiB 探针。
 
 ---
@@ -45,9 +49,11 @@
 - width：`HT40+`
 - link_id：`406`
 - uplink stream：`32`
+- downlink stream：`33`
+- 双 stream 口径：虽然本手册只做 uplink 演示，但脚本实际启动时会统一显式传入 `--uplink-stream 32 --downlink-stream 33`
 - raw air 发送参数：`RADIO_BANDWIDTH=40`、`RADIO_MCS_INDEX=1`、`RADIO_SHORT_GI=1`
 - trusted_plaintext FEC：`FEC_K=8`、`FEC_N=12`
-- client 上行队列水位：`UPLINK_PAUSE_THRESHOLD_BYTES=131072`、`UPLINK_RESUME_THRESHOLD_BYTES=65536`、`UPLINK_QUEUE_PACKETS_LIMIT=64`
+- client 上行队列水位：默认口径为 `131072/65536/64`，如需排障可按 client 分别覆盖
 
 建议打开这些终端：
 
@@ -111,7 +117,7 @@ export RADIO_SHORT_GI=0
 
 降档用于保稳定，速度会明显下降；如现场链路稳定、需要恢复更高性能展示口径，再统一升档到 `HT40/MCS3/short GI`。
 
-默认即按 step2 恢复空口冗余，三台机器无需额外导出 FEC 环境变量；默认口径为：
+默认即使用空口冗余，三台机器无需额外导出 FEC 环境变量；默认口径为：
 
 ```bash
 export FEC_K=8
@@ -551,11 +557,20 @@ sudo iw dev "$SERVER_IFACE" set type managed || true
 sudo ip link set "$SERVER_IFACE" up || true
 ```
 
-client：
+client1：
 
 ```bash
-export CLIENT_IFACE=替换为本机_client_网卡名
-sudo ip link set "$CLIENT_IFACE" down || true
-sudo iw dev "$CLIENT_IFACE" set type managed || true
-sudo ip link set "$CLIENT_IFACE" up || true
+export CLIENT1_IFACE=wlxfc221c500a88
+sudo ip link set "$CLIENT1_IFACE" down || true
+sudo iw dev "$CLIENT1_IFACE" set type managed || true
+sudo ip link set "$CLIENT1_IFACE" up || true
+```
+
+client2：
+
+```bash
+export CLIENT2_IFACE=wlxfc221c300cbc
+sudo ip link set "$CLIENT2_IFACE" down || true
+sudo iw dev "$CLIENT2_IFACE" set type managed || true
+sudo ip link set "$CLIENT2_IFACE" up || true
 ```
