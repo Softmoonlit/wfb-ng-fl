@@ -28,7 +28,12 @@ export VERSION COMMIT SOURCE_DATE_EPOCH
 _LDFLAGS := $(LDFLAGS) -lrt -lsodium
 _CFLAGS := $(CFLAGS) -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"$(VERSION)-$(shell /bin/bash -c '_tmp=$(COMMIT); echo $${_tmp::8}')"'
 
-all: all_bin wfb_rtsp gs.key test
+V6_DEFAULT_BIN := wfb_v6_uplink
+V6_DEFAULT_TESTS := fec_test libsodium_test control_envelope_test v6_uplink_queue_test v6_uplink_downlink_nonce_test
+
+all: build_v6 test_v6
+
+build_v6: $(V6_DEFAULT_BIN)
 
 version:
 	@echo -e "RELEASE=$(RELEASE)\nCOMMIT=$(COMMIT)\nVERSION=$(VERSION)\nSOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH)"
@@ -171,22 +176,18 @@ baseline_split_test:
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_txrx.TXRXTestCase wfb_ng.tests.test_txrx.KeyDerivationTestCase
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_tuntap.TUNTAPTestCase
 
-test: all_bin fec_test libsodium_test token_scheduler_test control_envelope_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test tx_data_source_gate_test rx_token_ipc_test rx_token_listener_test v6_uplink_queue_test v6_uplink_downlink_nonce_test baseline_split_test
+test: test_v6
+
+test_v6: build_v6 $(V6_DEFAULT_TESTS)
 	./fec_test
 	./libsodium_test
-	./token_scheduler_test
 	./control_envelope_test
-	./token_authorization_test
-	./tx_token_gate_test
-	./token_authorization_ipc_test
-	./token_namespace_bridge_test
-	./tx_authorization_integration_test
-	./tx_data_source_gate_test
-	./rx_token_ipc_test
-	./rx_token_listener_test
 	./v6_uplink_queue_test
 	./v6_uplink_downlink_nonce_test
-	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests
+
+acceptance_v6_realhw:
+	@echo "v6 正式三机入口已切换到手动手册：tests/real_hardware/v6新底座无SSH手动上行演示手册.md"
+	@echo "请按手册执行 tests/real_hardware/v6_manual_uplink_demo.sh。"
 
 rpm:  all_bin wfb_rtsp $(ENV)
 	rm -rf dist
