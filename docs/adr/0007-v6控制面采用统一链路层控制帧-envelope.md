@@ -24,6 +24,12 @@ v6 第一切片中，grant 控制帧在空口上只携带相对 `duration_ms`；
 
 控制面相关正式验收的唯一执行细则以 `docs/v6第一版正式验收标准细则.md` 为准；本 ADR 在此只保留与控制帧边界直接相关的验收约束摘要。
 
+## Known Divergence
+
+截至 2026-07-08，当前实现与本 ADR 以及 `CONTEXT.md` 中关于 `GRANT.source_node` 的来源身份语义存在已知冲突：实现保持现状，在接收 `GRANT` 时未严格校验 `source_node == server NODE_ID`，而是依赖当前单 server、受信任实验环境、`target_node` 过滤、过期判定与 `sequence` 新鲜度判定维持 v6/v7 前置场景可运行。
+
+该冲突当前不作为 v6 进入 v7 的阻塞项；也不在本次直接修改协议实现。后续若要重新收敛该语义，必须单独决策：要么恢复并实现本 ADR 当前定义的来源身份硬约束，要么修订本 ADR、`CONTEXT.md` 与验收口径，将 `GRANT.source_node` 降级为保留字段 / 日志上下文 / 序号命名空间字段之一。未完成该后续决策前，不应把当前实现误读为已经满足“`GRANT.source_node` 必须等于 server `NODE_ID`”的协议要求。
+
 ## Considered Options
 
 - 统一链路层控制帧 envelope
