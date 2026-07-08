@@ -70,6 +70,8 @@ def run_demo_action(action: str, extra_env: dict[str, str] | None = None) -> lis
                 "TERM": "xterm-256color",
                 "PATH": f"{bin_dir}{os.pathsep}{env.get('PATH', '')}",
                 "ARGV_FILE": str(argv_file),
+                "FEC_K": "8",
+                "FEC_N": "12",
             }
         )
         if extra_env:
@@ -101,6 +103,8 @@ def assert_lacks_flag(argv: list[str], option: str) -> None:
 def test_server_default_radio_args() -> None:
     argv = run_demo_action("server-wfb")
     assert_option_value(argv, "--role", "server")
+    assert_option_value(argv, "--fec-k", "8")
+    assert_option_value(argv, "--fec-n", "12")
     assert_option_value(argv, "--radio-bandwidth", "40")
     assert_option_value(argv, "--radio-mcs-index", "1")
     assert_has_flag(argv, "--radio-short-gi")
@@ -110,6 +114,8 @@ def test_client1_default_radio_and_queue_args() -> None:
     argv = run_demo_action("client1-wfb")
     assert_option_value(argv, "--role", "client")
     assert_option_value(argv, "--node-id", "1")
+    assert_option_value(argv, "--fec-k", "8")
+    assert_option_value(argv, "--fec-n", "12")
     assert_option_value(argv, "--radio-bandwidth", "40")
     assert_option_value(argv, "--radio-mcs-index", "1")
     assert_has_flag(argv, "--radio-short-gi")
@@ -122,6 +128,8 @@ def test_client1_radio_and_queue_overrides() -> None:
     argv = run_demo_action(
         "client1-wfb",
         {
+            "FEC_K": "1",
+            "FEC_N": "1",
             "RADIO_BANDWIDTH": "20",
             "RADIO_MCS_INDEX": "1",
             "RADIO_SHORT_GI": "0",
@@ -132,6 +140,8 @@ def test_client1_radio_and_queue_overrides() -> None:
     )
     assert_option_value(argv, "--role", "client")
     assert_option_value(argv, "--node-id", "1")
+    assert_option_value(argv, "--fec-k", "1")
+    assert_option_value(argv, "--fec-n", "1")
     assert_option_value(argv, "--radio-bandwidth", "20")
     assert_option_value(argv, "--radio-mcs-index", "1")
     assert_lacks_flag(argv, "--radio-short-gi")

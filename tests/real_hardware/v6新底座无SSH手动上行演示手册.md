@@ -46,6 +46,7 @@
 - link_id：`406`
 - uplink stream：`32`
 - raw air 发送参数：`RADIO_BANDWIDTH=40`、`RADIO_MCS_INDEX=1`、`RADIO_SHORT_GI=1`
+- trusted_plaintext FEC：`FEC_K=8`、`FEC_N=12`
 - client 上行队列水位：`UPLINK_PAUSE_THRESHOLD_BYTES=131072`、`UPLINK_RESUME_THRESHOLD_BYTES=65536`、`UPLINK_QUEUE_PACKETS_LIMIT=64`
 
 建议打开这些终端：
@@ -109,6 +110,15 @@ export RADIO_SHORT_GI=0
 ```
 
 降档用于保稳定，速度会明显下降；如现场链路稳定、需要恢复更高性能展示口径，再统一升档到 `HT40/MCS3/short GI`。
+
+默认即按 step2 恢复空口冗余，三台机器无需额外导出 FEC 环境变量；默认口径为：
+
+```bash
+export FEC_K=8
+export FEC_N=12
+```
+
+如需临时关闭冗余或回退到最小口径，再统一导出 `FEC_K=1`、`FEC_N=1`。
 
 ---
 

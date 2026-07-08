@@ -82,6 +82,9 @@ src/zfex.v6_test.o: src/zfex.c
 src/rx.v6_test.o: src/rx.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o $@ $<
 
+src/tx.v6_test.o: src/tx.cpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -D__WFB_TX_SHARED_LIBRARY__ -c -o $@ $<
+
 src/%.v6_test.o: src/%.cpp
 	$(CXX) $(_CFLAGS) -std=gnu++11 -c -o $@ $<
 wfb_rx: src/rx.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_event_ipc.o src/token_authorization_ipc.o
@@ -135,7 +138,7 @@ rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.rx_test.o src/radi
 v6_uplink_queue_test: src/v6_uplink_queue_test.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
-v6_uplink_downlink_nonce_test: src/v6_uplink_downlink_nonce_test.cpp src/rx.v6_test.o src/radiotap.v6_test.o src/zfex.v6_test.o src/wifibroadcast.v6_test.o src/control_envelope.v6_test.o src/token_scheduler.v6_test.o src/token_authorization.v6_test.o src/token_authorization_ipc.v6_test.o src/token_event_ipc.v6_test.o
+v6_uplink_downlink_nonce_test: src/v6_uplink_downlink_nonce_test.cpp src/v6_plaintext_fec_tx.o src/tx.v6_test.o src/rx.v6_test.o src/radiotap.v6_test.o src/zfex.v6_test.o src/wifibroadcast.v6_test.o src/control_envelope.v6_test.o src/token_scheduler.v6_test.o src/token_authorization.v6_test.o src/token_authorization_ipc.v6_test.o src/token_event_ipc.v6_test.o src/tx_token_gate.o
 	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
 wfb_keygen: src/keygen.o
@@ -150,7 +153,7 @@ wfb_tun: src/wfb_tun.o
 wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_authorization_ipc.o src/wifibroadcast.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-wfb_v6_uplink: src/v6_uplink.o src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o
+wfb_v6_uplink: src/v6_uplink.o src/v6_plaintext_fec_tx.o src/tx.v6_test.o src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
 
 kcp_tools: kcp_small_sender kcp_small_receiver

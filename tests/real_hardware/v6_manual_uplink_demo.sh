@@ -14,6 +14,8 @@ UPLINK_STREAM="${UPLINK_STREAM:-32}"
 RADIO_BANDWIDTH="${RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${RADIO_SHORT_GI:-1}"
+FEC_K="${FEC_K:-8}"
+FEC_N="${FEC_N:-12}"
 UPLINK_PAUSE_THRESHOLD_BYTES="${UPLINK_PAUSE_THRESHOLD_BYTES:-131072}"
 UPLINK_RESUME_THRESHOLD_BYTES="${UPLINK_RESUME_THRESHOLD_BYTES:-65536}"
 UPLINK_QUEUE_PACKETS_LIMIT="${UPLINK_QUEUE_PACKETS_LIMIT:-64}"
@@ -86,6 +88,7 @@ usage() {
   RADIO_BANDWIDTH    raw air HT 带宽，默认 40；应与 CHANNEL_WIDTH=HT40+ 匹配
   RADIO_MCS_INDEX    raw air HT MCS，默认 1；弱信号可降到 0
   RADIO_SHORT_GI     1 表示启用 short GI，默认 1；弱信号可设 0
+  FEC_K/FEC_N       trusted_plaintext FEC 参数，默认 8/12；如需关闭冗余可设 1/1
   UPLINK_*           client 上行队列水位，默认 pause=131072 resume=65536 packets=64
   NO_CLEAR=1         不清屏，方便录屏或保存终端输出
   NO_ALT_SCREEN=1    不进入终端备用屏幕；默认使用备用屏幕原地刷新，避免滚动刷屏
@@ -547,7 +550,7 @@ run_server_wfb() {
     if [ "$RADIO_SHORT_GI" = "1" ]; then
         radio_args+=(--radio-short-gi)
     fi
-    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}。"
+    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}；FEC=${FEC_K}/${FEC_N}。"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
         --role server \
         --tun-name v6us0 \
@@ -555,6 +558,8 @@ run_server_wfb() {
         --node-id 9 \
         --link-id "$LINK_ID" \
         --stream "$UPLINK_STREAM" \
+        --fec-k "$FEC_K" \
+        --fec-n "$FEC_N" \
         "${radio_args[@]}" \
         --air-interface "$SERVER_IFACE" \
         --known-clients 1,2 \
@@ -609,7 +614,7 @@ run_client_wfb() {
     if [ "$RADIO_SHORT_GI" = "1" ]; then
         radio_args+=(--radio-short-gi)
     fi
-    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}；上行队列 pause=${pause} resume=${resume} packets=${queue_limit}。"
+    log_info "raw air 发送参数：HT${RADIO_BANDWIDTH} MCS${RADIO_MCS_INDEX} short_gi=${RADIO_SHORT_GI}；FEC=${FEC_K}/${FEC_N}；上行队列 pause=${pause} resume=${resume} packets=${queue_limit}。"
     sudo "$PROJECT_ROOT/wfb_v6_uplink" \
         --role client \
         --tun-name "$tun_name" \
@@ -617,6 +622,8 @@ run_client_wfb() {
         --node-id "$node_id" \
         --link-id "$LINK_ID" \
         --stream "$UPLINK_STREAM" \
+        --fec-k "$FEC_K" \
+        --fec-n "$FEC_N" \
         "${radio_args[@]}" \
         --air-interface "$iface" \
         --uplink-pause-threshold-bytes "$pause" \

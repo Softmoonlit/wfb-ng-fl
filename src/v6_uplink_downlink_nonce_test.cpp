@@ -90,6 +90,36 @@ private:
     ScopedFd fd_;
     int port_ = 0;
 };
+class ScopedPipe {
+public:
+    ScopedPipe()
+    {
+        int fds[2] = {-1, -1};
+        REQUIRE(pipe(fds) == 0);
+        read_fd_ = fds[0];
+        write_fd_ = fds[1];
+    }
+
+    ~ScopedPipe()
+    {
+        if (read_fd_ >= 0)
+        {
+            close(read_fd_);
+        }
+        if (write_fd_ >= 0)
+        {
+            close(write_fd_);
+        }
+    }
+
+    int reader() const { return read_fd_; }
+    int writer() const { return write_fd_; }
+
+private:
+    int read_fd_ = -1;
+    int write_fd_ = -1;
+};
+
 
 const uint8_t *udp_forwarded_air_packet_data(const std::vector<uint8_t> &packet)
 {
@@ -112,6 +142,44 @@ std::vector<uint8_t> packet_payload(const std::vector<uint8_t> &packet)
     return std::vector<uint8_t>(air_packet + sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t),
                                 air_packet + sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + payload_size);
 }
+uint8_t packet_source_node(const std::vector<uint8_t> &packet)
+{
+    return data_nonce_source_node(packet_data_nonce(packet));
+}
+
+uint64_t packet_block_idx(const std::vector<uint8_t> &packet)
+{
+    return data_nonce_source_local_block_idx(packet_data_nonce(packet));
+}
+
+uint8_t packet_fragment_idx(const std::vector<uint8_t> &packet)
+{
+    return data_nonce_fragment_idx(packet_data_nonce(packet));
+}
+
+uint8_t packet_flags(const std::vector<uint8_t> &packet)
+{
+    const uint8_t *air_packet = udp_forwarded_air_packet_data(packet);
+    const wpacket_hdr_t *packet_hdr = reinterpret_cast<const wpacket_hdr_t *>(air_packet + sizeof(wblock_hdr_t));
+    return packet_hdr->flags;
+}
+
+void process_forwarded_packet(TunWriterAggregator &aggregator, const std::vector<uint8_t> &packet)
+{
+    REQUIRE(packet.size() >= sizeof(wrxfwd_t) + sizeof(wblock_hdr_t));
+    const wrxfwd_t *header = reinterpret_cast<const wrxfwd_t *>(packet.data());
+    aggregator.process_packet(packet.data() + sizeof(wrxfwd_t),
+                              packet.size() - sizeof(wrxfwd_t),
+                              header->wlan_idx,
+                              header->antenna,
+                              header->rssi,
+                              header->noise,
+                              header->freq,
+                              header->mcs_index,
+                              header->bandwidth,
+                              nullptr);
+}
+
 
 } // namespace
 
@@ -192,6 +260,121 @@ TEST_CASE("v6 client uplink data_nonce 编码包含 source_node 与本地 block 
     REQUIRE(data_nonce_source_node(second_nonce) == 23);
     REQUIRE(data_nonce_source_local_block_idx(second_nonce) == 1);
     REQUIRE(data_nonce_fragment_idx(second_nonce) == 0);
+}
+TEST_CASE("trusted_plaintext FEC 2/3 按同一 block 发出 primary-primary-parity")
+{
+    ScopedUdpReceiver receiver;
+    std::unique_ptr<AirTransmitter> transmitter(new AirTransmitter("127.0.0.1", receiver.port(), 0, 23, 2, 3));
+    const std::vector<uint8_t> first_payload = {0x10, 0x11, 0x12};
+    const std::vector<uint8_t> second_payload = {0x20, 0x21};
+
+    transmitter->send_data(first_payload.data(), first_payload.size());
+    transmitter->send_data(second_payload.data(), second_payload.size());
+
+    const std::vector<uint8_t> first_packet = receiver.recv_packet();
+    const std::vector<uint8_t> second_packet = receiver.recv_packet();
+    const std::vector<uint8_t> third_packet = receiver.recv_packet();
+
+    REQUIRE(packet_source_node(first_packet) == 23);
+    REQUIRE(packet_source_node(second_packet) == 23);
+    REQUIRE(packet_source_node(third_packet) == 23);
+
+    REQUIRE(packet_block_idx(first_packet) == 0);
+    REQUIRE(packet_block_idx(second_packet) == 0);
+    REQUIRE(packet_block_idx(third_packet) == 0);
+
+    REQUIRE(packet_fragment_idx(first_packet) == 0);
+    REQUIRE(packet_fragment_idx(second_packet) == 1);
+    REQUIRE(packet_fragment_idx(third_packet) == 2);
+
+    REQUIRE(packet_flags(first_packet) == 0);
+    REQUIRE(packet_flags(second_packet) == 0);
+    REQUIRE(packet_payload(first_packet) == first_payload);
+    REQUIRE(packet_payload(second_packet) == second_payload);
+}
+
+TEST_CASE("TunWriterAggregator 可用 surviving primary 加 parity 恢复缺失的首个 primary")
+{
+    ScopedUdpReceiver receiver;
+    std::unique_ptr<AirTransmitter> transmitter(new AirTransmitter("127.0.0.1", receiver.port(), 0, 37, 2, 3));
+    const std::vector<uint8_t> first_payload = {0x31, 0x32, 0x33};
+    const std::vector<uint8_t> second_payload = {0x41, 0x42};
+    ScopedPipe pipe;
+    TunWriterAggregator aggregator(pipe.writer(),
+                                   WFB_TRUSTED_PLAINTEXT_KEYPAIR,
+                                   0,
+                                   0,
+                                   0,
+                                   true,
+                                   2,
+                                   3);
+    std::vector<std::vector<uint8_t>> delivered_payloads;
+    aggregator.set_payload_observer([&](const uint8_t *payload, uint16_t packet_size) {
+        delivered_payloads.emplace_back(payload, payload + packet_size);
+    });
+
+    transmitter->send_data(first_payload.data(), first_payload.size());
+    transmitter->send_data(second_payload.data(), second_payload.size());
+
+    const std::vector<uint8_t> first_packet = receiver.recv_packet();
+    const std::vector<uint8_t> second_packet = receiver.recv_packet();
+    const std::vector<uint8_t> third_packet = receiver.recv_packet();
+
+    REQUIRE(packet_fragment_idx(first_packet) == 0);
+    REQUIRE(packet_fragment_idx(second_packet) == 1);
+    REQUIRE(packet_fragment_idx(third_packet) == 2);
+
+    process_forwarded_packet(aggregator, second_packet);
+    process_forwarded_packet(aggregator, third_packet);
+
+    REQUIRE(delivered_payloads == std::vector<std::vector<uint8_t>>{first_payload, second_payload});
+}
+
+TEST_CASE("flush_data_block 会封口半块且不会把 FEC_ONLY 写成业务 payload")
+{
+    ScopedUdpReceiver receiver;
+    std::unique_ptr<AirTransmitter> transmitter(new AirTransmitter("127.0.0.1", receiver.port(), 0, 41, 2, 3));
+    const std::vector<uint8_t> payload = {0xaa, 0xbb, 0xcc};
+    ScopedPipe pipe;
+    TunWriterAggregator aggregator(pipe.writer(),
+                                   WFB_TRUSTED_PLAINTEXT_KEYPAIR,
+                                   0,
+                                   0,
+                                   0,
+                                   true,
+                                   2,
+                                   3);
+    std::vector<std::vector<uint8_t>> delivered_payloads;
+    aggregator.set_payload_observer([&](const uint8_t *written_payload, uint16_t packet_size) {
+        delivered_payloads.emplace_back(written_payload, written_payload + packet_size);
+    });
+
+    transmitter->send_data(payload.data(), payload.size());
+    const std::vector<uint8_t> first_packet = receiver.recv_packet();
+
+    REQUIRE(packet_fragment_idx(first_packet) == 0);
+    REQUIRE(packet_payload(first_packet) == payload);
+    REQUIRE(transmitter->next_flush_deadline_ms() > 0);
+
+    REQUIRE(transmitter->flush_data_block());
+    REQUIRE_FALSE(transmitter->flush_data_block());
+    REQUIRE(transmitter->next_flush_deadline_ms() == 0);
+
+    const std::vector<uint8_t> second_packet = receiver.recv_packet();
+    const std::vector<uint8_t> third_packet = receiver.recv_packet();
+
+    REQUIRE(packet_block_idx(second_packet) == 0);
+    REQUIRE(packet_block_idx(third_packet) == 0);
+    REQUIRE(packet_fragment_idx(second_packet) == 1);
+    REQUIRE(packet_fragment_idx(third_packet) == 2);
+    REQUIRE((packet_flags(second_packet) & WFB_PACKET_FEC_ONLY) != 0);
+    REQUIRE(packet_payload(second_packet).empty());
+
+    process_forwarded_packet(aggregator, first_packet);
+    process_forwarded_packet(aggregator, second_packet);
+    process_forwarded_packet(aggregator, third_packet);
+
+    REQUIRE(delivered_payloads == std::vector<std::vector<uint8_t>>{payload});
 }
 
 int main(int argc, char **argv)

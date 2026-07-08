@@ -34,6 +34,7 @@
 #include "token_authorization.hpp"
 #include "token_scheduler.hpp"
 #include "wifibroadcast.hpp"
+#include "v6_plaintext_fec_tx.hpp"
 #include "v6_uplink_queue.hpp"
 
 using namespace std;
@@ -42,6 +43,7 @@ namespace {
 
 const uint32_t kIdleSleepMs = 10;
 const uint64_t kReadyRedeclareTimeoutMs = 4000;
+const uint64_t kFecFlushIdleMs = 2;
 
 struct AirReadyState {
     enum Phase {
@@ -115,12 +117,21 @@ struct AirTransmitter {
     sockaddr_in saddr = {};
     vector<int> raw_sockfds;
     vector<uint8_t> raw_radiotap_header;
-    uint64_t block_idx = 0;
     uint32_t channel_id = 0;
     uint16_t ieee80211_seq = 0;
     uint8_t source_node = 0;
-    AirTransmitter(const string &host, int port, int snd_buf, uint8_t source_node)
-        : source_node(source_node)
+    int plaintext_fec_k = 1;
+    uint64_t fec_flush_deadline_ms = 0;
+    unique_ptr<V6PlaintextFecTransmitter> data_transmitter_;
+
+    AirTransmitter(const string &host,
+                   int port,
+                   int snd_buf,
+                   uint8_t source_node,
+                   int plaintext_fec_k = 1,
+                   int plaintext_fec_n = 1)
+        : source_node(source_node),
+          plaintext_fec_k(plaintext_fec_k)
     {
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0)
@@ -140,15 +151,25 @@ struct AirTransmitter {
         saddr.sin_family = AF_INET;
         saddr.sin_addr.s_addr = inet_addr(host.c_str());
         saddr.sin_port = htons((unsigned short)port);
+
+        data_transmitter_.reset(new V6PlaintextFecTransmitter(host,
+                                                              port,
+                                                              snd_buf,
+                                                              source_node,
+                                                              plaintext_fec_k,
+                                                              plaintext_fec_n));
     }
 
     AirTransmitter(const vector<string> &interfaces,
                    uint32_t channel_id,
                    uint8_t source_node,
-                   const RawAirRadioConfig &radio_config)
+                   const RawAirRadioConfig &radio_config,
+                   int plaintext_fec_k = 1,
+                   int plaintext_fec_n = 1)
         : raw_radiotap_header(build_ht_radiotap_header(radio_config)),
           channel_id(channel_id),
-          source_node(source_node)
+          source_node(source_node),
+          plaintext_fec_k(plaintext_fec_k)
     {
         if (interfaces.empty())
         {
@@ -158,6 +179,17 @@ struct AirTransmitter {
         {
             raw_sockfds.push_back(open_raw_socket(interfaces[i]));
         }
+
+        V6PlaintextFecRadioConfig fec_radio = {};
+        fec_radio.bandwidth = radio_config.bandwidth;
+        fec_radio.mcs_index = radio_config.mcs_index;
+        fec_radio.short_gi = radio_config.short_gi;
+        data_transmitter_.reset(new V6PlaintextFecTransmitter(interfaces,
+                                                              channel_id,
+                                                              source_node,
+                                                              fec_radio,
+                                                              plaintext_fec_k,
+                                                              plaintext_fec_n));
     }
 
     ~AirTransmitter()
@@ -188,19 +220,39 @@ struct AirTransmitter {
         {
             throw runtime_error("数据面 payload 超过 MAX_PAYLOAD_SIZE");
         }
+        if (!data_transmitter_->send_payload(payload, payload_size))
+        {
+            throw runtime_error("发送数据面 payload 失败");
+        }
+        if (plaintext_fec_k > 1)
+        {
+            fec_flush_deadline_ms = get_time_ms() + kFecFlushIdleMs;
+        }
+    }
 
-        uint8_t packet[sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + MAX_PAYLOAD_SIZE] = {};
-        const uint64_t nonce = make_data_nonce(source_node, block_idx, 0);
-        block_idx += 1;
-        wblock_hdr_t *block_hdr = reinterpret_cast<wblock_hdr_t *>(packet);
-        block_hdr->packet_type = WFB_PACKET_DATA;
-        block_hdr->data_nonce = htobe64(nonce);
+    uint64_t next_flush_deadline_ms() const
+    {
+        return fec_flush_deadline_ms;
+    }
 
-        wpacket_hdr_t *packet_hdr = reinterpret_cast<wpacket_hdr_t *>(packet + sizeof(wblock_hdr_t));
-        packet_hdr->flags = 0;
-        packet_hdr->packet_size = htobe16(static_cast<uint16_t>(payload_size));
-        memcpy(packet + sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t), payload, payload_size);
-        send_air_datagram(packet, sizeof(wblock_hdr_t) + sizeof(wpacket_hdr_t) + payload_size);
+    bool flush_data_block()
+    {
+        bool emitted = false;
+        while (data_transmitter_->close_pending_block())
+        {
+            emitted = true;
+        }
+        fec_flush_deadline_ms = 0;
+        return emitted;
+    }
+
+    bool flush_data_block_if_due(uint64_t now_ms)
+    {
+        if (fec_flush_deadline_ms == 0 || now_ms < fec_flush_deadline_ms)
+        {
+            return false;
+        }
+        return flush_data_block();
     }
 
     void send_ready(uint8_t source_node)
@@ -821,9 +873,12 @@ Config parse_args(int argc, char **argv)
     {
         throw invalid_argument("node-id 必须是 1-255");
     }
-    if (config.plaintext_fec_k != 1 || config.plaintext_fec_n != 1)
+    if (config.plaintext_fec_k < 1 ||
+        config.plaintext_fec_n < 1 ||
+        config.plaintext_fec_k > config.plaintext_fec_n ||
+        config.plaintext_fec_n >= 256)
     {
-        throw invalid_argument("当前最小实现只支持 trusted_plaintext FEC 1/1");
+        throw invalid_argument("fec k/n 必须满足 1 <= k <= n < 256");
     }
     const bool raw_air_mode = !config.air_interfaces.empty();
     (void)build_ht_radiotap_header(config.raw_air_radio);
@@ -957,8 +1012,10 @@ public:
                         uint64_t epoch,
                         uint32_t channel_id,
                         uint8_t local_node_id,
-                        bool trusted_plaintext)
-        : Aggregator(keypair, epoch, channel_id, local_node_id, trusted_plaintext, 1, 1),
+                        bool trusted_plaintext,
+                        int plaintext_fec_k = 1,
+                        int plaintext_fec_n = 1)
+        : Aggregator(keypair, epoch, channel_id, local_node_id, trusted_plaintext, plaintext_fec_k, plaintext_fec_n),
           tun_fd_(tun_fd)
     {
     }
@@ -1243,6 +1300,40 @@ void send_downlink_payload(vector<ClientTarget> &targets,
     }
 }
 
+uint64_t next_target_flush_deadline_ms(const vector<ClientTarget> &targets)
+{
+    uint64_t deadline_ms = 0;
+    set<const AirTransmitter *> seen;
+    for (size_t i = 0; i < targets.size(); ++i)
+    {
+        const AirTransmitter *transmitter = targets[i].transmitter.get();
+        if (transmitter == NULL || !seen.insert(transmitter).second)
+        {
+            continue;
+        }
+        const uint64_t candidate = transmitter->next_flush_deadline_ms();
+        if (candidate > 0 && (deadline_ms == 0 || candidate < deadline_ms))
+        {
+            deadline_ms = candidate;
+        }
+    }
+    return deadline_ms;
+}
+
+void flush_due_target_transmitters(vector<ClientTarget> &targets, uint64_t now_ms)
+{
+    set<AirTransmitter *> seen;
+    for (size_t i = 0; i < targets.size(); ++i)
+    {
+        AirTransmitter *transmitter = targets[i].transmitter.get();
+        if (transmitter == NULL || !seen.insert(transmitter).second)
+        {
+            continue;
+        }
+        transmitter->flush_data_block_if_due(now_ms);
+    }
+}
+
 void open_feedback_window(FeedbackWindowState *state,
                           uint64_t now_ms,
                           size_t known_clients_count)
@@ -1390,11 +1481,18 @@ void run_client(const Config &config)
         uplink.reset(new AirTransmitter(config.air_interfaces,
                                         channel_id,
                                         config.node_id,
-                                        config.raw_air_radio));
+                                        config.raw_air_radio,
+                                        config.plaintext_fec_k,
+                                        config.plaintext_fec_n));
     }
     else
     {
-        uplink.reset(new AirTransmitter(config.air_target_host, config.air_target_port, config.snd_buf, config.node_id));
+        uplink.reset(new AirTransmitter(config.air_target_host,
+                                        config.air_target_port,
+                                        config.snd_buf,
+                                        config.node_id,
+                                        config.plaintext_fec_k,
+                                        config.plaintext_fec_n));
     }
 
     TokenAuthorizationState authorization_state;
@@ -1404,7 +1502,9 @@ void run_client(const Config &config)
                                             config.epoch,
                                             channel_id,
                                             config.node_id,
-                                            true);
+                                            true,
+                                            config.plaintext_fec_k,
+                                            config.plaintext_fec_n);
     downlink_aggregator.set_token_control_listener(&grant_listener);
 
     vector<unique_ptr<Receiver>> raw_receivers;
@@ -1443,7 +1543,13 @@ void run_client(const Config &config)
         fds[0].events = uplink_queue.tun_read_enabled() ? POLLIN : 0;
 
         uint64_t now_ms = get_time_ms();
-        int timeout_ms = static_cast<int>(max<int64_t>(0, static_cast<int64_t>(log_send_ts - now_ms)));
+        uint64_t next_wakeup = log_send_ts;
+        const uint64_t uplink_flush_deadline_ms = uplink->next_flush_deadline_ms();
+        if (uplink_flush_deadline_ms > 0)
+        {
+            next_wakeup = min(next_wakeup, uplink_flush_deadline_ms);
+        }
+        int timeout_ms = static_cast<int>(next_wakeup > now_ms ? next_wakeup - now_ms : 0);
         int rc = poll(fds.data(), fds.size(), timeout_ms);
         if (rc < 0)
         {
@@ -1515,9 +1621,11 @@ void run_client(const Config &config)
             }
         }
 
+        now_ms = get_time_ms();
         const QueuedTunPacket *pending_packet = uplink_queue.front();
         if (pending_packet == NULL)
         {
+            uplink->flush_data_block_if_due(now_ms);
             continue;
         }
 
@@ -1566,7 +1674,9 @@ void run_server(Config config)
                                           config.epoch,
                                           channel_id,
                                           config.node_id,
-                                          true);
+                                          true,
+                                          config.plaintext_fec_k,
+                                          config.plaintext_fec_n);
     uplink_aggregator.set_token_control_listener(&ready_listener);
     uplink_aggregator.set_known_client_node_ids(set<uint8_t>(config.known_clients.begin(), config.known_clients.end()));
 
@@ -1599,13 +1709,17 @@ void run_server(Config config)
             return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces,
                                                                  channel_id,
                                                                  config.node_id,
-                                                                 config.raw_air_radio));
+                                                                 config.raw_air_radio,
+                                                                 config.plaintext_fec_k,
+                                                                 config.plaintext_fec_n));
         },
         [&](const ClientTarget &target) {
             return shared_ptr<AirTransmitter>(new AirTransmitter(target.host,
-                                                                target.port,
-                                                                config.snd_buf,
-                                                                config.node_id));
+                                                                 target.port,
+                                                                 config.snd_buf,
+                                                                 config.node_id,
+                                                                 config.plaintext_fec_k,
+                                                                 config.plaintext_fec_n));
         });
 
     FeedbackWindowState feedback_state = {};
@@ -1634,6 +1748,11 @@ void run_server(Config config)
 
         uint64_t now_ms = get_time_ms();
         uint64_t next_wakeup = min(log_send_ts, next_grant_at_ms);
+        const uint64_t downlink_flush_deadline_ms = next_target_flush_deadline_ms(config.client_targets);
+        if (downlink_flush_deadline_ms > 0)
+        {
+            next_wakeup = min(next_wakeup, downlink_flush_deadline_ms);
+        }
         if (feedback_state.enabled)
         {
             if (feedback_state.active)
@@ -1715,13 +1834,19 @@ void run_server(Config config)
         {
             open_feedback_window(&feedback_state, now_ms, config.known_clients.size());
         }
+
+        const QueuedTunPacket *pending_packet = downlink_queue.front();
+        if (pending_packet == NULL)
+        {
+            flush_due_target_transmitters(config.client_targets, now_ms);
+        }
+
         if (feedback_state.active)
         {
             maybe_send_feedback_grant(&feedback_state, &scheduler, config, config.client_targets, now_ms);
             continue;
         }
 
-        const QueuedTunPacket *pending_packet = downlink_queue.front();
         if (pending_packet != NULL)
         {
             uint32_t dest_ipv4 = 0;
@@ -1788,11 +1913,13 @@ int main(int argc, char **argv)
     try
     {
         Config config = parse_args(argc, argv);
-        WFB_INFO("v6_uplink role=%s node_id=%u link_id=0x%06x stream=%u trusted_plaintext risk=受信任环境/无链路机密性\n",
+        WFB_INFO("v6_uplink role=%s node_id=%u link_id=0x%06x stream=%u trusted_plaintext fec=%d/%d risk=受信任环境/无链路机密性\n",
                  config.role.c_str(),
                  static_cast<unsigned>(config.node_id),
                  config.link_id,
-                 static_cast<unsigned>(config.stream));
+                 static_cast<unsigned>(config.stream),
+                 config.plaintext_fec_k,
+                 config.plaintext_fec_n);
 
         if (config.role == "client")
         {
