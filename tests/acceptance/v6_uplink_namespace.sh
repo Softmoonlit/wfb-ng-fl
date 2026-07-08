@@ -54,7 +54,8 @@ SERVER_NODE_ID="${SERVER_NODE_ID:-9}"
 CLIENT1_NODE_ID="${CLIENT1_NODE_ID:-1}"
 CLIENT2_NODE_ID="${CLIENT2_NODE_ID:-2}"
 LINK_ID="${LINK_ID:-406}"
-STREAM_ID="${STREAM_ID:-32}"
+UPLINK_STREAM_ID="${UPLINK_STREAM_ID:-32}"
+DOWNLINK_STREAM_ID="${DOWNLINK_STREAM_ID:-33}"
 SERVER_AIR_PORT="${SERVER_AIR_PORT:-42000}"
 CLIENT1_AIR_PORT="${CLIENT1_AIR_PORT:-42011}"
 CLIENT2_AIR_PORT="${CLIENT2_AIR_PORT:-42012}"
@@ -326,7 +327,8 @@ start_server() {
         --tun-addr "$SERVER_TUN_ADDR" \
         --node-id "$SERVER_NODE_ID" \
         --link-id "$LINK_ID" \
-        --stream "$STREAM_ID" \
+        --uplink-stream "$UPLINK_STREAM_ID" \
+        --downlink-stream "$DOWNLINK_STREAM_ID" \
         --air-listen-port "$SERVER_AIR_PORT" \
         --known-clients "$CLIENT1_NODE_ID,$CLIENT2_NODE_ID" \
         --client-target "$CLIENT1_NODE_ID:$CLIENT1_TUN_IP:$CLIENT1_MGMT_IP:$CLIENT1_AIR_PORT" \
@@ -360,7 +362,8 @@ start_client() {
         --tun-addr "$tun_addr" \
         --node-id "$node_id" \
         --link-id "$LINK_ID" \
-        --stream "$STREAM_ID" \
+        --uplink-stream "$UPLINK_STREAM_ID" \
+        --downlink-stream "$DOWNLINK_STREAM_ID" \
         --air-listen-port "$listen_port" \
         --air-target "$air_target_ip:$SERVER_AIR_PORT" \
         --uplink-pause-threshold-bytes "$pause_threshold_bytes" \

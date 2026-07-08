@@ -54,7 +54,8 @@ SERVER_NODE_ID="${SERVER_NODE_ID:-9}"
 CLIENT1_NODE_ID="${CLIENT1_NODE_ID:-1}"
 CLIENT2_NODE_ID="${CLIENT2_NODE_ID:-2}"
 LINK_ID="${LINK_ID:-406}"
-STREAM_ID="${STREAM_ID:-32}"
+UPLINK_STREAM_ID="${UPLINK_STREAM_ID:-32}"
+DOWNLINK_STREAM_ID="${DOWNLINK_STREAM_ID:-33}"
 GRANT_DURATION_MS="${GRANT_DURATION_MS:-120}"
 GUARD_INTERVAL_MS="${GUARD_INTERVAL_MS:-20}"
 LOG_INTERVAL_MS="${LOG_INTERVAL_MS:-200}"
@@ -185,7 +186,8 @@ server_tun=$SERVER_TUN_NAME $SERVER_TUN_ADDR
 client1_tun=$CLIENT1_TUN_NAME $CLIENT1_TUN_ADDR
 client2_tun=$CLIENT2_TUN_NAME $CLIENT2_TUN_ADDR
 link_id=$LINK_ID
-stream_id=$STREAM_ID
+uplink_stream_id=$UPLINK_STREAM_ID
+downlink_stream_id=$DOWNLINK_STREAM_ID
 grant_duration_ms=$GRANT_DURATION_MS
 guard_interval_ms=$GUARD_INTERVAL_MS
 v6_uplink_longrun_duration_sec=$V6_UPLINK_LONGRUN_DURATION_SEC
@@ -306,7 +308,8 @@ start_server() {
         --tun-addr "$SERVER_TUN_ADDR" \
         --node-id "$SERVER_NODE_ID" \
         --link-id "$LINK_ID" \
-        --stream "$STREAM_ID" \
+        --uplink-stream "$UPLINK_STREAM_ID" \
+        --downlink-stream "$DOWNLINK_STREAM_ID" \
         --air-interface "$SERVER_IFACE" \
         --known-clients "$CLIENT1_NODE_ID,$CLIENT2_NODE_ID" \
         --client-target "$CLIENT1_NODE_ID:$CLIENT1_TUN_IP:127.0.0.1:1" \
@@ -341,7 +344,8 @@ start_client() {
         --tun-addr "$tun_addr" \
         --node-id "$node_id" \
         --link-id "$LINK_ID" \
-        --stream "$STREAM_ID" \
+        --uplink-stream "$UPLINK_STREAM_ID" \
+        --downlink-stream "$DOWNLINK_STREAM_ID" \
         --air-interface "$iface" \
         --uplink-pause-threshold-bytes "$pause_bytes" \
         --uplink-resume-threshold-bytes "$resume_bytes" \

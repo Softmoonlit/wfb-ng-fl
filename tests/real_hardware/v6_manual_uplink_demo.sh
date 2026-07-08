@@ -11,6 +11,7 @@ CHANNEL="${CHANNEL:-157}"
 CHANNEL_WIDTH="${CHANNEL_WIDTH:-HT40+}"
 LINK_ID="${LINK_ID:-406}"
 UPLINK_STREAM="${UPLINK_STREAM:-32}"
+DOWNLINK_STREAM="${DOWNLINK_STREAM:-33}"
 RADIO_BANDWIDTH="${RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${RADIO_SHORT_GI:-1}"
@@ -89,6 +90,8 @@ usage() {
   RADIO_MCS_INDEX    raw air HT MCS，默认 1；弱信号可降到 0
   RADIO_SHORT_GI     1 表示启用 short GI，默认 1；弱信号可设 0
   FEC_K/FEC_N       trusted_plaintext FEC 参数，默认 8/12；如需关闭冗余可设 1/1
+  UPLINK_STREAM      上行方向 stream，默认 32
+  DOWNLINK_STREAM    下行方向 stream，默认 33
   UPLINK_*           client 上行队列水位，默认 pause=131072 resume=65536 packets=64
   NO_CLEAR=1         不清屏，方便录屏或保存终端输出
   NO_ALT_SCREEN=1    不进入终端备用屏幕；默认使用备用屏幕原地刷新，避免滚动刷屏
@@ -557,7 +560,8 @@ run_server_wfb() {
         --tun-addr 10.80.0.1/24 \
         --node-id 9 \
         --link-id "$LINK_ID" \
-        --stream "$UPLINK_STREAM" \
+        --uplink-stream "$UPLINK_STREAM" \
+        --downlink-stream "$DOWNLINK_STREAM" \
         --fec-k "$FEC_K" \
         --fec-n "$FEC_N" \
         "${radio_args[@]}" \
@@ -621,7 +625,8 @@ run_client_wfb() {
         --tun-addr "$(client_ip_for "$role")/24" \
         --node-id "$node_id" \
         --link-id "$LINK_ID" \
-        --stream "$UPLINK_STREAM" \
+        --uplink-stream "$UPLINK_STREAM" \
+        --downlink-stream "$DOWNLINK_STREAM" \
         --fec-k "$FEC_K" \
         --fec-n "$FEC_N" \
         "${radio_args[@]}" \

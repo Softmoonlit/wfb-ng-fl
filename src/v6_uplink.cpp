@@ -444,7 +444,10 @@ struct Config {
     string tun_addr;
     uint8_t node_id = 0;
     uint32_t link_id = 0;
-    uint8_t stream = 0;
+    uint8_t uplink_stream = 0;
+    uint8_t downlink_stream = 0;
+    bool has_uplink_stream = false;
+    bool has_downlink_stream = false;
     uint64_t epoch = 0;
     int plaintext_fec_k = 1;
     int plaintext_fec_n = 1;
@@ -676,12 +679,14 @@ void print_usage(const char *progname)
 {
     fprintf(stderr,
             "Usage:\n"
-            "  %s --role client --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
+            "  %s --role client --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID \\\n"
+            "     --uplink-stream US --downlink-stream DS \\\n"
             "     { --air-listen-port PORT --air-target HOST:PORT | --air-interface IFACE[,IFACE...] } \\\n"
             "     [--uplink-pause-threshold-bytes BYTES] [--uplink-resume-threshold-bytes BYTES] \\\n"
             "     [--uplink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
             "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
-            "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID --stream S \\\n"
+            "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID \\\n"
+            "     --uplink-stream US --downlink-stream DS \\\n"
             "     { --air-listen-port PORT | --air-interface IFACE[,IFACE...] } --known-clients N1,N2 \\\n"
             "     --client-target N:IP:HOST:PORT [--client-target ...] [--grant-duration-ms MS] \\\n"
             "     [--guard-interval-ms MS] [--feedback-window-period-ms MS] [--feedback-window-duration-ms MS] \\\n"
@@ -692,7 +697,10 @@ void print_usage(const char *progname)
             progname);
 }
 enum LongOptionId {
-    OPT_RADIO_BANDWIDTH = 1000,
+    OPT_UPLINK_STREAM = 1000,
+    OPT_DOWNLINK_STREAM,
+    OPT_LEGACY_STREAM,
+    OPT_RADIO_BANDWIDTH,
     OPT_RADIO_MCS_INDEX,
     OPT_RADIO_SHORT_GI,
 };
@@ -708,7 +716,9 @@ Config parse_args(int argc, char **argv)
         {"tun-addr", required_argument, 0, 'a'},
         {"node-id", required_argument, 0, 'q'},
         {"link-id", required_argument, 0, 'i'},
-        {"stream", required_argument, 0, 'p'},
+        {"uplink-stream", required_argument, 0, OPT_UPLINK_STREAM},
+        {"downlink-stream", required_argument, 0, OPT_DOWNLINK_STREAM},
+        {"stream", required_argument, 0, OPT_LEGACY_STREAM},
         {"epoch", required_argument, 0, 'e'},
         {"fec-k", required_argument, 0, 'k'},
         {"fec-n", required_argument, 0, 'n'},
@@ -739,7 +749,7 @@ Config parse_args(int argc, char **argv)
     };
 
     int opt = 0;
-    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:p:e:k:n:R:s:l:u:c:m:x:d:g:f:F:b:j:z:B:J:Z:y:W:h", long_options, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "r:t:a:q:i:e:k:n:R:s:l:u:c:m:x:d:g:f:F:b:j:z:B:J:Z:y:W:h", long_options, NULL)) != -1)
     {
         switch (opt)
         {
@@ -758,9 +768,16 @@ Config parse_args(int argc, char **argv)
         case 'i':
             config.link_id = parse_u32(optarg, "link_id", true) & 0xffffff;
             break;
-        case 'p':
-            config.stream = static_cast<uint8_t>(parse_u32(optarg, "stream", true) & 0xff);
+        case OPT_UPLINK_STREAM:
+            config.uplink_stream = static_cast<uint8_t>(parse_u32(optarg, "uplink_stream", true) & 0xff);
+            config.has_uplink_stream = true;
             break;
+        case OPT_DOWNLINK_STREAM:
+            config.downlink_stream = static_cast<uint8_t>(parse_u32(optarg, "downlink_stream", true) & 0xff);
+            config.has_downlink_stream = true;
+            break;
+        case OPT_LEGACY_STREAM:
+            throw invalid_argument("stream 已拆分为 uplink_stream/downlink_stream；请改用 --uplink-stream 与 --downlink-stream");
         case 'e':
             config.epoch = strtoull(optarg, NULL, 10);
             break;
@@ -872,6 +889,14 @@ Config parse_args(int argc, char **argv)
     if (config.node_id == 0)
     {
         throw invalid_argument("node-id 必须是 1-255");
+    }
+    if (!config.has_uplink_stream || !config.has_downlink_stream)
+    {
+        throw invalid_argument("uplink-stream 与 downlink-stream 必须显式同时提供");
+    }
+    if (config.uplink_stream == config.downlink_stream)
+    {
+        throw invalid_argument("uplink-stream 与 downlink-stream 不能相同");
     }
     if (config.plaintext_fec_k < 1 ||
         config.plaintext_fec_n < 1 ||
@@ -1469,7 +1494,8 @@ bool maybe_send_feedback_grant(FeedbackWindowState *state,
 
 void run_client(const Config &config)
 {
-    const uint32_t channel_id = (config.link_id << 8) + config.stream;
+    const uint32_t uplink_channel_id = (config.link_id << 8) + config.uplink_stream;
+    const uint32_t downlink_channel_id = (config.link_id << 8) + config.downlink_stream;
     const string keypair = WFB_TRUSTED_PLAINTEXT_KEYPAIR;
     const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
@@ -1479,7 +1505,7 @@ void run_client(const Config &config)
     if (raw_air_mode)
     {
         uplink.reset(new AirTransmitter(config.air_interfaces,
-                                        channel_id,
+                                        uplink_channel_id,
                                         config.node_id,
                                         config.raw_air_radio,
                                         config.plaintext_fec_k,
@@ -1500,7 +1526,7 @@ void run_client(const Config &config)
     TunWriterAggregator downlink_aggregator(tun_fd,
                                             keypair,
                                             config.epoch,
-                                            channel_id,
+                                            downlink_channel_id,
                                             config.node_id,
                                             true,
                                             config.plaintext_fec_k,
@@ -1516,7 +1542,7 @@ void run_client(const Config &config)
         {
             raw_receivers.push_back(unique_ptr<Receiver>(new Receiver(config.air_interfaces[i].c_str(),
                                                                       static_cast<int>(i),
-                                                                      channel_id,
+                                                                      downlink_channel_id,
                                                                       &downlink_aggregator,
                                                                       config.rcv_buf)));
             fds[1 + i].fd = raw_receivers[i]->getfd();
@@ -1656,7 +1682,8 @@ void run_client(const Config &config)
 
 void run_server(Config config)
 {
-    const uint32_t channel_id = (config.link_id << 8) + config.stream;
+    const uint32_t uplink_channel_id = (config.link_id << 8) + config.uplink_stream;
+    const uint32_t downlink_channel_id = (config.link_id << 8) + config.downlink_stream;
     const string keypair = WFB_TRUSTED_PLAINTEXT_KEYPAIR;
     const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
@@ -1672,7 +1699,7 @@ void run_server(Config config)
     TunWriterAggregator uplink_aggregator(tun_fd,
                                           keypair,
                                           config.epoch,
-                                          channel_id,
+                                          uplink_channel_id,
                                           config.node_id,
                                           true,
                                           config.plaintext_fec_k,
@@ -1689,7 +1716,7 @@ void run_server(Config config)
         {
             raw_receivers.push_back(unique_ptr<Receiver>(new Receiver(config.air_interfaces[i].c_str(),
                                                                       static_cast<int>(i),
-                                                                      channel_id,
+                                                                      uplink_channel_id,
                                                                       &uplink_aggregator,
                                                                       config.rcv_buf)));
             fds[1 + i].fd = raw_receivers[i]->getfd();
@@ -1707,7 +1734,7 @@ void run_server(Config config)
         raw_air_mode,
         [&]() {
             return shared_ptr<AirTransmitter>(new AirTransmitter(config.air_interfaces,
-                                                                 channel_id,
+                                                                 downlink_channel_id,
                                                                  config.node_id,
                                                                  config.raw_air_radio,
                                                                  config.plaintext_fec_k,
@@ -1913,11 +1940,12 @@ int main(int argc, char **argv)
     try
     {
         Config config = parse_args(argc, argv);
-        WFB_INFO("v6_uplink role=%s node_id=%u link_id=0x%06x stream=%u trusted_plaintext fec=%d/%d risk=受信任环境/无链路机密性\n",
+        WFB_INFO("v6_uplink role=%s node_id=%u link_id=0x%06x uplink_stream=%u downlink_stream=%u trusted_plaintext fec=%d/%d risk=受信任环境/无链路机密性\n",
                  config.role.c_str(),
                  static_cast<unsigned>(config.node_id),
                  config.link_id,
-                 static_cast<unsigned>(config.stream),
+                 static_cast<unsigned>(config.uplink_stream),
+                 static_cast<unsigned>(config.downlink_stream),
                  config.plaintext_fec_k,
                  config.plaintext_fec_n);
 
