@@ -12,7 +12,7 @@ if [ -f "$PROJECT_ROOT/tests/config/test_config.sh" ]; then
     source "$PROJECT_ROOT/tests/config/test_config.sh"
 else
     WIFI_IFACE="${WIFI_IFACE:-wlxbcec23372588}"
-    WIFI_IFACE_CLIENT="${WIFI_IFACE_CLIENT:-wlxfca386b38672}"
+    WIFI_IFACE_CLIENT="${WIFI_IFACE_CLIENT:-wlxfc221c500a88}"
     CHANNEL="${CHANNEL:-157}"
     MCS="${MCS:-0}"
     NODE_ID="${NODE_ID:-1}"
