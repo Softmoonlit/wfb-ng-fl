@@ -11,7 +11,7 @@
 - 默认配置：`default/`
 - systemd 单元：`systemd/`
 - 系统调优：`sysctl/`、`logrotate/`
-- 安装辅助：`install_gs.sh`
+- 网卡发现与辅助：`wfb-nics`
 
 ## 子目录说明
 
@@ -24,7 +24,7 @@
 
 ## 历史 / 弃用说明
 
-本目录中存在历史 standalone 脚本与早期辅助脚本，不应误当成当前 `v6` real-hardware 主入口。
+此前遗留的 standalone/桌面辅助旧脚本已经从当前仓库清理；本目录仍然不是当前 `v6` real-hardware 主入口。
 
 判断原则：
 

@@ -26,14 +26,7 @@
 
 ## 变体入口与历史文件
 
-- `v6新底座现场演示手册.md`
-  - 这是 SSH 变体演示手册，不是当前默认正式入口
-- `test_token_gated_uplink.sh`
-  - 旧 split-process / token-gated 真实硬件诊断脚本，不作为 `v6 trusted_plaintext` 正式证据入口
-- `one_click_test.sh`
-  - 旧 token-gated split-process 包装入口，不是当前 `v6` 主入口
-- `test_full_transfer.sh`、`collect_metrics.sh`、`generate_report.sh`
-  - 保留的历史/补充链路资产，使用前应先确认是否仍适配当前目标
+此前遗留的 SSH 变体手册、token-gated split-process 诊断脚本、one-click 包装入口以及旧的大文件传输/摘要链路脚本，已经从当前仓库清理，不再作为可运行入口保留。
 
 ## 不要误用的判断原则
 
