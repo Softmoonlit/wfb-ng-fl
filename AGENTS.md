@@ -4,15 +4,6 @@
 
 需要 root 权限的命令可直接使用 `sudo` 执行，不要仅因当前用户不是 root 就停止。
 
-## 常用命令
-
-### 开发工具
-
-- `make` - 编译项目
-- `make test` - 运行单元测试
-- `make clean` - 清理编译产物
-- `make install` - 安装到系统
-
 ## Agent skills
 
 ### Issue tracker
