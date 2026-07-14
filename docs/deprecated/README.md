@@ -15,7 +15,7 @@
 如果你需要当前规范，请优先阅读：
 
 - 仓库根目录 `CONTEXT.md`
-- `docs/联邦学习无线空口传输总设计.md`
+- `docs/联邦学习系统设计入口.md`
 - `docs/v6第一版正式验收标准细则.md`
 - `docs/v6旧参数迁移矩阵.md`
 - `docs/adr/README.md`
