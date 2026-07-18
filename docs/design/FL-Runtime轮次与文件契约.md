@@ -17,7 +17,7 @@ Runtime 以本地库接口表达严格同步轮次语义：
 
 接口不接收或返回 `round_id`。Runtime 自动生成、读取和持久化当前轮次上下文；算法层不得传入、覆盖或根据标识查询历史轮次。成功的空返回是命令接口唯一成功信号，失败通过带稳定 `error_code` 的结构化错误报告。
 
-`publish_model(...)` 成功表示已达到下行 Transport 完成边界；`submit_update(...)` 成功表示 client 已收到该提交的最终 `201 Created`。`wait_for_updates()` 成功只返回严格同步本轮的完整 update 映射。
+`publish_model(...)` 成功表示已达到下行 Transport 完成边界；`submit_update(...)` 成功表示 client 已收到该提交的最终 `201 Created`。`wait_for_updates()` 成功只返回严格同步本轮的完整 update 映射。若下行完成时提前到达的 update 已经全员收齐，server 仍按 `publishing_model -> waiting_for_updates -> succeeded` 持久化状态，`publish_model(...)` 随后正常空返回；它观察到成功终态不构成错误，也不交付或消费 update 结果。
 
 ## 轮次身份与生命周期
 
@@ -31,9 +31,9 @@ server 的开轮顺序如下：
 2. 确认不存在活动轮次或未消费的终态结果。
 3. 在不分配轮次的前提下解析并固定输入路径，打开文件，确认最终目标是可读取普通文件。
 4. 预检成功后在受保护临界区生成 `round_id`、创建目录并原子落盘 `publishing_model` 初始状态。
-5. 归档模型、生成 manifest，并把托管文件交给 Transport。
+5. 归档模型、生成 manifest，向 Transport 一次性安装本轮不可变准入上下文，启动下行操作并保存 Transport 返回的不透明操作句柄。
 
-并发竞争时，只有一个调用取得开轮门禁；其他调用在分配标识前以 `operation_in_progress` 失败。已有活动轮次时返回 `round_in_progress`，当前终态结果未消费时返回 `round_result_pending`。这些前序拒绝和预检失败不得访问新调用传入的模型文件，也不得创建轮次目录。预检通过后发生的读取、源文件稳定性、manifest、持久化或传输失败都会形成保留的失败轮次。
+并发竞争时，只有一个调用取得开轮门禁；其他调用在分配标识前以 `operation_in_progress` 失败。已有活动轮次时返回 `round_in_progress`，当前终态结果未消费时返回 `round_result_pending`。这些前序拒绝和预检失败不得访问新调用传入的模型文件，也不得创建轮次目录。预检通过后发生的读取、源文件稳定性、manifest、持久化或传输失败都会形成保留的失败轮次。`publish_model(...)` 只在下行 operation 已自然完成或取消完成后返回或抛错，因此下一轮只使用上述 Runtime 轮次门禁，不另建已终态 Transport operation 的跨轮历史门禁。
 
 server 状态为：
 
@@ -51,13 +51,13 @@ model_received -> submitting_update -> succeeded
        +------------------+-> failed
 ```
 
-状态只能沿定义方向推进，终态不能回退。`publishing_model` 期间允许接收本轮参与 client 的提前 update，但下行完成屏障未达成前不能成功。Transport 失败、交付校验失败或重启中断使轮次进入 `failed`。严格同步模式下，正式提交阶段任一参与 client 的确定性失败使整个轮次失败；不能返回部分结果。
+状态只能沿定义方向推进，终态不能回退。server 与 client 的同名 `succeeded` 是各自状态机中的角色本地事实，不是共享的全局终态：client `succeeded` 只表示本节点 `submit_update(...)` 已收到 Transport 最终 `201 Created`；server `succeeded` 表示下行完成屏障已达成且本轮参与 update 已全部收齐，可以向算法层交付完整聚合输入。client 成功不声明 server 轮次或聚合成功；第一版没有 server 全局终局通知，允许 client 保持 `succeeded` 而 server 随后进入 `failed`。`publishing_model` 期间允许接收本轮参与 client 的提前 update，但下行完成屏障未达成前 server 不能成功。Transport 失败、交付校验失败或重启中断使对应轮次进入 `failed`。严格同步模式下，正式提交阶段任一参与 client 的确定性失败使 server 整个轮次失败；不能返回部分结果。
 
 ## 参与集合和模型 manifest
 
 server 初始化时持有非空默认训练客户端集合，成员是 `NODE_ID`，并且属于链路层静态已知 client 集。启动和开轮时都执行 fail-fast 校验。
 
-每次开轮从默认集合冻结本轮参与客户端集合。该快照同时约束模型发布目标和 `wait_for_updates()` 的收齐集合，不等同于静态已知 client 集，也不承载底层逐包目标。
+每次开轮从默认集合冻结本轮参与客户端集合。该快照同时约束模型发布目标和 `wait_for_updates()` 的收齐集合，不等同于静态已知 client 集，也不承载底层逐包目标。Runtime 开轮时向 Transport 一次性安装不可变准入上下文，至少包含 `round_id`、参与集合、共享大小限制和固定目录。安装完成后，Transport 按该上下文独立裁决上传请求；Runtime 后续状态变化不撤回上下文，也不参与单个 HTTP 请求的准入。
 
 模型 manifest 使用 UTF-8 严格 JSON，顶层必须为 object，至少包含：
 
@@ -74,11 +74,11 @@ server 初始化时持有非空默认训练客户端集合，成员是 `NODE_ID`
 
 只接受整数 `schema_version: 1`。必需字段缺失、重复、类型错误或值域非法时失败；未知字段可忽略，字段顺序无语义。改变既有字段含义或作不兼容变更必须新增 schema 版本，不能静默重定义。manifest 不签名、不加密；`sha256` 只表示文件完整性。
 
-Runtime 通过 Transport 收到“全部预期目标的模型文件交付成功”结果后，才把 `publish_model(...)` 视为成功。单个 client 在本机完整校验模型后可以先返回 `wait_for_model()` 并训练，不需要等待其他 client。
+Runtime 通过 Transport 收到“全部预期目标的模型文件交付成功”结果后，才把 `publish_model(...)` 视为成功。Runtime 保存启动下行时取得的不透明操作句柄，只通过 Transport 的句柄接口等待结果或请求取消，不直接管理 UFTP 子进程和 PID。单个 client 在本机完整校验模型后可以先返回 `wait_for_model()` 并训练，不需要等待其他 client。
 
 ## client 模型接收
 
-`wait_for_model()` 不接收参数，使用部署配置中的本机 `NODE_ID` 和工作目录阻塞等待下一份模型。只有 manifest 合法、模型文件完整性通过且本机在 `participant_node_ids` 中时，才持久化当前 `round_id` 并返回托管 `model.bin` 的规范化绝对路径。
+`wait_for_model()` 不接收参数，使用部署配置中的本机 `NODE_ID` 和工作目录阻塞等待下一份模型。client Transport 已在服务启动阶段启动并持续管理唯一常驻 `uftpd`；`wait_for_model()` 不启停或直接管理该进程，只等待 Transport 已提交的候选交付物。只有 manifest 合法、模型文件完整性通过且本机在 `participant_node_ids` 中时，Runtime 才持久化当前 `round_id` 并返回托管 `model.bin` 的规范化绝对路径。
 
 对已出现最终 manifest 的候选交付物，裁决顺序固定为：
 
@@ -144,21 +144,21 @@ client 目录在同一轮下使用 `model.bin`、`model.manifest.json`、`round-
 
 ## 收齐结果和消费
 
-server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配当前轮、本机 `NODE_ID` 属于本轮集合、传输完成且完整性校验通过。每个 `(round_id, NODE_ID)` 只接受第一份有效 update；重复、迟到或未知节点不计入收齐且不得覆盖既有文件。
+server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配当前轮、本机 `NODE_ID` 属于本轮集合、传输完成且完整性校验通过。每个 `(round_id, NODE_ID)` 只接受第一份有效 update；重复、迟到或未知节点不计入收齐且不得覆盖既有文件。最终 `update.manifest.json` 的原子出现是 Transport 向 Runtime 交付成功结果的持久权威事实；进程内通知只用于立即唤醒协调循环，可以丢失且不承载唯一状态。Runtime 收到通知后按当前 `round_id` 与冻结参与集合确定的固定路径读取并校验交付物；通知丢失时，协调循环和 `wait_for_updates()` 必须能检查这些固定位置，幂等发现并补记尚未进入收齐快照的有效 update。不得扫描未知轮次、未知节点或根据任意文件名猜测交付物。
 
-`wait_for_updates()` 阻塞到下行完成屏障已达成且本轮参与集合全部收齐，或发生明确错误。成功前先持久化 `succeeded`、参与集合和 `updates_by_node`。返回值为只读映射：键是整数 `NODE_ID`，按数值升序稳定迭代，值是规范化绝对 `update_path`；键集合必须与冻结参与集合完全相等。
+`wait_for_updates()` 阻塞到下行完成屏障已达成且本轮参与集合全部收齐，或发生明确错误。成功前先原子持久化 `succeeded`、冻结的参与节点集合和已提交 update 节点集合，两个集合必须完全相等；状态文件不保存 `updates_by_node` 或绝对路径。若轮次已因提前 update 全员收齐而在 `publish_model(...)` 返回前进入 `succeeded`，本接口从托管记录立即返回完整结果。返回值在读取时根据固定目录布局和各节点 manifest 重建为只读映射：键是整数 `NODE_ID`，按数值升序稳定迭代，值是规范化绝对 `update_path`；键集合必须与冻结参与集合完全相等。
 
 同一活动轮次最多一个未完成的 `wait_for_updates()`；并发调用以 `operation_in_progress` 失败。接口没有 `timeout`、`min_clients` 或 `allow_partial` 参数。
 
-结果交付到当前调用栈的返回或抛错边界前，在内存中标记为已消费，不写入状态文件。成功或失败结果消费后，下一轮开启前重复调用 `wait_for_updates()` 可以从托管目录和状态记录重建相同结果；成功重读复核 manifest、固定路径、存在性和大小，不再次计算整文件 SHA-256。失败终态重放结构化错误。`publish_model(...)` 直接报告的轮次错误同样视为已交付。
+结果交付到当前调用栈的返回或抛错边界前，在内存中标记为已消费，不写入状态文件。成功终态只能由 `wait_for_updates()` 交付和消费；`publish_model(...)` 正常返回不得顺便标记成功结果已消费，未消费结果继续占据当前轮位置并阻止开启下一轮。成功或失败结果消费后，下一轮开启前重复调用 `wait_for_updates()` 可以从托管目录和状态记录重建相同结果；成功结果首次交付和重读都只复核 manifest、固定路径、存在性和大小，不再次计算整文件 SHA-256。若 `succeeded` 终态的托管 update 已被部署侧清理，接口以 `round_artifacts_removed` 抛出结果交付错误；文件仍在但上述结构或大小不符时以 `round_artifacts_corrupted` 抛出。同大小内容被外部改写不在交付复核的检测保证内，属于违反托管目录和只读调用契约；目录权限和可选只读属性用于降低此类误操作，但不提供并发篡改下的强一致保证。结果交付错误不把 `succeeded` 改写为 `failed`，但在抛错边界消费本轮；下一轮开启前重复调用重放同一交付错误。失败终态重放结构化轮次错误。`publish_model(...)` 直接报告的轮次错误同样视为已交付。
 
 ## 状态持久化、重启与工作目录锁
 
-`round-state.json` 使用严格 JSON，至少包含 `schema_version: 1`、`round_id`、`role` 和 `state`；失败状态还包含 `error_code`、`error_message`，update 失败在可判定时包含 `node_id`。它不是实时阻塞指示器、网络进度或文件有效性判据。
+`round-state.json` 使用严格 JSON，至少包含 `schema_version: 1`、`round_id`、`role` 和 `state`；server 的 `succeeded` 状态还包含 `participant_node_ids` 与 `committed_update_node_ids`，两者必须按整数升序记录且集合完全相等，不包含 update 路径或重复的大小和摘要。失败状态还包含 `error_code`、`error_message`，update 失败在可判定时包含 `node_id`。它不是实时阻塞指示器、网络进度或文件有效性判据。
 
 每个 Runtime 实例对工作目录持有操作系统排他的跨进程锁；第二个实例必须 fail-fast。server 和 client 使用不同工作目录，同机多个 client 也必须各自独占目录。离线清理工具获取同一把锁后才可清理终态轮次。
 
-进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。成功/失败终态不恢复为新进程当前轮；新进程必须以新的 `round_id` 开始。临时或未校验文件不得恢复为有效交付。
+进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。成功/失败终态不恢复为新进程当前轮；新进程必须以新的 `round_id` 开始。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新 Runtime 实例前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
 
 终态目录默认不自动删除。托管路径只承诺在当前部署和工作目录位置下有效，调用方不得原地修改、重命名或删除；清理只能处理可确认终态，不能删除活动轮次。Runtime 不提供在线清理、历史查询或跨进程恢复接口。
 
@@ -168,6 +168,6 @@ server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配
 
 发生明确错误时，Runtime 尽力先原子写入 `failed`、`error_code` 和 `error_message`，再向调用方报告。状态写入失败本身也是错误；若连失败状态都无法落盘，仍同时报告原始错误和持久化错误。
 
-Transport 把已提交的 update、body 接收失败、响应丢失等结果按其定义的边界交给 Runtime。任何参与 client 在正式 body 接收阶段确定性失败，严格同步轮次立即失败，`wait_for_updates()` 不返回已收齐的部分映射。若失败发生在 `publish_model(...)` 阻塞期间，Runtime 终止正在运行的下行子进程但不让附加退出结果覆盖最初主错误。失败终态不能逆转为成功。
+Transport 已成功提交的 update 由 Runtime 根据最终 manifest 持久事实幂等发现；最终 manifest 提交点一旦越过，该请求的 Transport 成功不可逆，即使 Runtime 随后或并发进入 `failed`，也不得要求 Transport 把当前响应改写为 `round_failed`。上传槽位预留成功后，本次操作已经由 Transport 接受；Runtime 状态不再参与其推进和结果裁决。最终 manifest 提交前发生的确定性 Transport 失败，由请求处理流程通过同进程可靠结果调用同步交给 Runtime；结果必须携带接受时上下文中的 `round_id` 和 `NODE_ID`，不建立额外失败结果文件。只有结果身份匹配 Runtime 当前非终态轮次时，Runtime 才在该调用返回前接受失败并尽力持久化 server `failed`；无法可靠接收和分类结果，或无法持久化必要的失败状态时进入 Runtime 致命状态，`wait_for_updates()` 不返回已收齐的部分映射。结果所属轮次已处于终态或已不再是当前轮时，后到失败只附加到原 `round_id` 的诊断记录，不能改写任何终态、覆盖最初错误或影响新轮。若 Runtime 在 `publish_model(...)` 阻塞期间进入 `failed`，它作为下行操作的调用者，必须使用保存的不透明句柄调用 Transport 的显式取消接口；Runtime 不直接操作 UFTP PID。`publish_model(...)` 必须等待 Transport 以有界停止流程返回 `cancelled` 或 `already_completed` 的最终取消裁决后，才向调用方交付导致 Runtime 失败的最初主错误；该等待只以本地 UFTP operation 形成终态为边界，不等待远端 client 确认 `ABORT` 或完成文件清理。Transport 保留自然完成时已经形成的 UFTP 原结果，UFTP 原结果和取消结果只作附加诊断，不能改写 `failed` 或覆盖主错误。失败终态不能逆转为成功；进程在失败结果持久化前崩溃时沿用 `runtime_restarted` 规则，不恢复原始 Transport 错误。
 
 错误至少包含稳定 `error_code`，可在可靠取得时附带 `round_id`、`node_id` 和底层原因。调用方不得依赖可读错误文本控制流程；不冻结具体语言异常类名。
