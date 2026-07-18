@@ -6,7 +6,7 @@
 
 本文档唯一拥有文件交换到具体 Transport 的映射、UFTP/HTTP 资源和元数据、传输完成条件、响应边界和传输失败语义。它不拥有 FL Runtime 的轮次状态机，也不拥有 READY、GRANT、Token Passing 或物理层机制。
 
-Runtime 与其角色对应的 Transport Backend 运行在同一服务生命周期中。服务启动时先启动 Transport，由 Transport 创建并管理角色所需的常驻接收器；Transport 报告 ready 后 Runtime 四接口才可用。client Transport 常驻运行一个原生 `uftpd` 接收下行，server Transport 常驻运行 HTTP listener 接收上行。常驻只描述接收器生命周期：server 的 `uftp` 发送进程仍由每次 `publish_model(...)` 对应的下行 operation 按需启动，client 的 HTTP PUT 仍由每次 `submit_update(...)` 对应的提交 operation 单独发起。接收器的启动、监控和停止均属于 Transport 实现，Runtime 不直接管理 `uftpd`、HTTP listener 或连接。
+角色主进程、Runtime 与 Transport 的进程边界由[系统分层与跨层契约](系统分层与跨层契约.md#cross-layer-contracts)拥有。Transport 在角色进程启动时先初始化并创建角色所需的常驻接收器；Transport 报告 ready 后 Runtime 四接口才可用。client Transport 常驻运行一个原生 `uftpd` 子进程接收下行，server Transport 在主进程内常驻运行 HTTP listener 接收上行。常驻只描述接收器生命周期：server 的 `uftp` 发送进程仍由每次 `publish_model(...)` 对应的下行 operation 按需启动，client 的 HTTP PUT 仍由每次 `submit_update(...)` 对应的提交 operation 单独发起。接收器的启动、监控和停止均属于 Transport 实现，Runtime 不直接管理 `uftpd`、HTTP listener 或连接。
 
 ## 下行 UFTP
 
@@ -30,6 +30,8 @@ Transport 接受并启动下行 UFTP 时，向 Runtime 返回只标识本次下�
 `cancel_downlink(...)` 必须在返回前形成最终取消裁决，不能只表示停止请求已经发出。Transport 先请求原生 UFTP 优雅停止并在宽限期内等待；宽限期到达后强制结束，再等待并确认本地子进程退出和回收。该裁决只拥有本地 UFTP operation 的终态，不承诺 `ABORT` 已送达任何 client，也不等待或证明远端 client 已完成文件清理。v8 最小闭环不为强制结束后仍无法回收子进程的操作系统极端失效定义额外业务结果。
 
 同一 Transport 实例同时最多有一个活动下行 UFTP operation；启动第二个活动下行属于内部接口违约并直接 fail-fast。Transport 不维护已终态 operation 的跨轮历史门禁；Runtime 的同步接口完成边界和严格串行轮次门禁保证新下行启动前旧 operation 已经形成终态并被回收。
+
+UFTP 自然传输依赖原生协议的 GRTT、ROBUST、消息重传和阶段失败机制形成终态；相关参数必须适配目标 Token 调度环境。v8 不为整个下行 operation 增加总时长 deadline，以免把随模型大小和空口吞吐变化的正常长传输误判为失败。显式取消的停止宽限期只约束本地子进程在取消裁决中的退出，不是自然传输 timeout。
 
 ## 上行 HTTP 资源
 
@@ -98,13 +100,13 @@ server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它�
 
 上传槽位预留后、最终 manifest 提交前发生的 `100 Continue` 写回失败、连接中断、长度或摘要不符、数据文件或 manifest 原子提交失败，都必须使本次已接受的 Transport 提交失败。请求处理流程必须通过同进程可靠结果调用把带原 `round_id` 和 `NODE_ID` 的失败同步交给 Runtime 后才能结束，不能使用允许静默丢弃的通知；失败不建立额外的磁盘结果文件，也不要求 Runtime 从磁盘恢复原始 Transport 错误。Runtime 根据结果身份决定是否推进匹配轮次；无法可靠接收并分类结果或无法持久化必要的轮次失败时升级为 Runtime 致命错误，但不能改变已经成立的 Transport 失败事实。两份文件已经原子提交后，Runtime 的收齐记账或状态持久化失败属于上层轮次失败，不改变该 update 的 Transport 成功事实，也不删除或覆盖已提交文件。Transport 根据自己持有的准入上下文独立裁决后续请求，不查询 Runtime 终态。若该失败使 Runtime 请求取消同时运行的下行 UFTP，Transport 独立裁决取消与 UFTP 自然完成的先后关系；UFTP 原结果和取消结果都不能覆盖最初轮次错误。
 
-## 并发、grant 和 watchdog
+## 并发、grant 和连接等待
 
 同一 server 同时只允许一个 HTTP request 取得全局上传槽位并进入已接受状态。server 可以并发解析少量连接和 headers，但必须把“全局槽位空闲”和“同键首次提交”纳入同一次原子预留；只有预留成功的请求尝试返回 `100 Continue`。其他请求立即返回 `409`、`upload_in_progress`，仍属未被 Transport 接受，不得排队或自动重试。全局槽位由该操作的最终 Transport 成功或失败裁决释放，不因 Runtime 状态变化释放。
 
 HTTP 请求和 TCP 连接可以跨多个链路层 grant 保持；grant 到期只暂停空口发送，连接、请求和暂存文件继续保持，后续 grant 从同一 body 继续。Transport 依赖[链路层空口调度与反压](链路层空口调度与反压.md#link-contract)提供发送机会和有限队列，不调用链路层 Token API。
 
-等待 `100 Continue`、最终响应和连接建立的 watchdog 必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应。具体数值由实现和目标运行环境冻结，不与 Runtime 的轮次等待 timeout 混同。
+HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都必须设置有界的连接与 I/O 等待期限，使每次请求 operation 最终形成成功或失败裁决。等待期限必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应；具体数值由实现和目标运行环境冻结，不与 Runtime 轮次等待混同。优先使用 HTTP 库、socket 或事件循环提供的连接、读写和响应 timeout，不要求新增独立 watchdog 组件。
 
 一条连接最多承载一个 PUT，client 使用 `Connection: close`，不使用 pipelining。HTTP client 库必须禁用全部自动重试；一次 `submit_update(...)` 只建立一次连接、发送一次 PUT。connect、body、最终响应缺失和全部 `4xx`/`5xx` 都是明确失败，不能自动重发。
 
@@ -113,3 +115,16 @@ server 若已提交 update 但响应写回失败，只记录自身可观测的 `
 ## Runtime 交付边界
 
 Transport 只交付文件传输结果、完整性结果和结构化传输错误。成功结果以最终 manifest 为持久权威事实，进程内通知只负责唤醒；正式提交失败则通过同进程可靠结果调用同步上报，不额外持久化 Transport 失败文件。Runtime 决定轮次状态、下行完成屏障、结果消费和严格同步失败传播；Transport 不复制或改写 Runtime 的状态机。跨层完整流程见[系统分层与跨层契约](系统分层与跨层契约.md#cross-layer-contracts)。
+
+## 后续扩展（非当前版本规范）
+
+本节整体不属于现行规范，不进入 v8 spec。候选必须在未来版本中重新评审并激活为现行规范后，才能形成实现要求。
+
+### UFTP 本机控制与结构化终态增强
+
+- **状态**：候选方向。
+- **保留理由**：原生 UFTP 的阶段取消表现和 status 文件观测能力有限，已有源码调查结论可避免未来重复研究。
+- **触发条件**：真实测试证明现有原生 UFTP 计时、专属 status file 或 `TERM -> 停止宽限期 -> KILL -> reap` 无法满足已经确认的取消或观测需求。
+- **候选方向**：保持 UFTP 子进程隔离，只研究本机控制通道和结构化终态增强。
+- **必须重新裁决**：是否修改 UFTP 源码、本机控制协议、终态字段、兼容与部署方式，以及 Transport 内部接口。
+- **当前不承诺**：不修改 UFTP wire protocol，不增加 `ABORT` ACK，也不预先冻结任何本机控制接口或结构化结果 schema。

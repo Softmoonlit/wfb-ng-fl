@@ -156,9 +156,9 @@ server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配
 
 `round-state.json` 使用严格 JSON，至少包含 `schema_version: 1`、`round_id`、`role` 和 `state`；server 的 `succeeded` 状态还包含 `participant_node_ids` 与 `committed_update_node_ids`，两者必须按整数升序记录且集合完全相等，不包含 update 路径或重复的大小和摘要。失败状态还包含 `error_code`、`error_message`，update 失败在可判定时包含 `node_id`。它不是实时阻塞指示器、网络进度或文件有效性判据。
 
-每个 Runtime 实例对工作目录持有操作系统排他的跨进程锁；第二个实例必须 fail-fast。server 和 client 使用不同工作目录，同机多个 client 也必须各自独占目录。离线清理工具获取同一把锁后才可清理终态轮次。
+每个 Runtime 实例对工作目录持有操作系统排他的跨进程锁；第二个实例必须 fail-fast。server 和 client 使用不同工作目录，同机多个 client 也必须各自独占目录。该锁用于协调实例所有权，不是文件权限或安全边界；v8 不要求实现专用的锁感知清理工具。部署侧只能在对应角色服务已经停止并确认 Runtime、Transport 及其子进程不再使用该目录后清理终态轮次。
 
-进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。成功/失败终态不恢复为新进程当前轮；新进程必须以新的 `round_id` 开始。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新 Runtime 实例前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
+进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。成功/失败终态不恢复为新进程当前轮；新进程必须以新的 `round_id` 开始。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新角色进程前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
 
 终态目录默认不自动删除。托管路径只承诺在当前部署和工作目录位置下有效，调用方不得原地修改、重命名或删除；清理只能处理可确认终态，不能删除活动轮次。Runtime 不提供在线清理、历史查询或跨进程恢复接口。
 
