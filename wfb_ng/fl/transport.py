@@ -21,16 +21,18 @@ from .errors import FLRuntimeError
 @dataclass(frozen=True)
 class RoundContext:
     round_id: str
-    participant_node_id: int
+    participant_node_ids: tuple
     round_dir: str
     max_update_size_bytes: int
     failure_callback: object
 
 
 class ServerTransport(object):
-    def __init__(self, participant_uftp_uid, server_uftp_uid, uftp_port,
+    def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
                  http_host='127.0.0.1', http_port=0, io_timeout=10):
-        self.participant_uftp_uid = participant_uftp_uid
+        if isinstance(participant_uftp_uids, int):
+            participant_uftp_uids = (participant_uftp_uids,)
+        self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
         self.server_uftp_uid = server_uftp_uid
         self.uftp_port = uftp_port
         self.http_host = http_host
@@ -40,6 +42,7 @@ class ServerTransport(object):
         self._context = None
         self._context_lock = threading.Lock()
         self._upload_active = False
+        self._used_uploads = set()
         self._update_event = threading.Event()
         self._http_server = None
         self._http_thread = None
@@ -113,12 +116,13 @@ class ServerTransport(object):
         self._http_thread.start()
         self.ready = True
 
-    def install_round(self, round_id, participant_node_id, round_dir,
+    def install_round(self, round_id, participant_node_ids, round_dir,
                       max_update_size_bytes, failure_callback):
         with self._context_lock:
             self._context = RoundContext(
-                round_id, participant_node_id, round_dir,
+                round_id, tuple(sorted(participant_node_ids)), round_dir,
                 max_update_size_bytes, failure_callback)
+            self._used_uploads = set()
             self._update_event.clear()
 
     def publish_model(self, round_id, model_path, manifest_path):
@@ -133,7 +137,7 @@ class ServerTransport(object):
             '-M', '127.0.0.1',
             '-p', str(self.uftp_port),
             '-U', _format_uid(self.server_uftp_uid),
-            '-H', _format_uid(self.participant_uftp_uid),
+            '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
             '-R', '10000',
             '-r', '0.1:0.01:2.0',
@@ -154,11 +158,16 @@ class ServerTransport(object):
                 'transport_failed', 'UFTP 退出码为 %d' % return_code,
                 round_id=round_id)
         _validate_uftp_status(
-            status_path, self.participant_uftp_uid,
+            status_path, self.participant_uftp_uids,
             ('%s/model.bin' % round_id, '%s/model.manifest.json' % round_id))
 
     def wait_for_update(self, timeout):
         self._update_event.wait(timeout)
+        self._update_event.clear()
+
+    def cancel_downlink(self):
+        if self._uftp_process is not None:
+            _stop_process(self._uftp_process)
 
     def close(self):
         self.ready = False
@@ -178,10 +187,21 @@ class ServerTransport(object):
             context = self._context
             if context is None:
                 return 404, 'round_not_found', '轮次不存在'
-            expected_path = '/v1/rounds/%s/updates/%d' % (
-                context.round_id, context.participant_node_id)
-            if handler.command != 'PUT' or handler.path != expected_path:
-                return 404, 'round_not_found', '轮次或节点不存在'
+            prefix = '/v1/rounds/%s/updates/' % context.round_id
+            if handler.command != 'PUT' or not handler.path.startswith(prefix):
+                return 404, 'round_not_found', '轮次不存在'
+            try:
+                node_id = int(handler.path[len(prefix):])
+            except ValueError:
+                return 400, 'invalid_node_id', '节点标识无效'
+            if node_id not in context.participant_node_ids:
+                return 404, 'node_not_participant', '节点不属于本轮'
+            update_key = (context.round_id, node_id)
+            update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
+            if os.path.isfile(os.path.join(update_dir, 'update.manifest.json')):
+                return 409, 'update_already_submitted', 'update 已提交'
+            if update_key in self._used_uploads:
+                return 409, 'update_submission_used', 'update 提交机会已占用'
             if self._upload_active:
                 return 409, 'upload_in_progress', '已有 update 正在上传'
             try:
@@ -196,7 +216,8 @@ class ServerTransport(object):
             if digest is None:
                 return 400, 'invalid_content_digest', 'Content-Digest 无效'
             self._upload_active = True
-            handler._upload_context = (context, content_length, digest)
+            self._used_uploads.add(update_key)
+            handler._upload_context = (context, node_id, content_length, digest)
             return None
 
     def _release_upload(self):
@@ -204,20 +225,19 @@ class ServerTransport(object):
             self._upload_active = False
 
     def _fail_accepted_upload(self, upload_context, error_code, error_message):
-        context, _, _ = upload_context
+        context, node_id, _, _ = upload_context
         try:
             context.failure_callback(
-                context.round_id, context.participant_node_id,
-                error_code, error_message)
+                context.round_id, node_id, error_code, error_message)
         finally:
             self._release_upload()
 
     def _receive_update(self, handler, upload_context):
-        context, content_length, expected_digest = upload_context
-        update_dir = os.path.join(
-            context.round_dir, 'updates', str(context.participant_node_id))
+        context, node_id, content_length, expected_digest = upload_context
+        update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
         os.makedirs(update_dir, exist_ok=True)
         temp_path = None
+        committed = False
         try:
             digest = hashlib.sha256()
             received = 0
@@ -238,7 +258,7 @@ class ServerTransport(object):
                 error_code = 'digest_mismatch'
                 error_message = 'update 摘要不匹配'
                 context.failure_callback(
-                    context.round_id, context.participant_node_id,
+                    context.round_id, node_id,
                     error_code, error_message)
                 handler._send_error(422, error_code, error_message)
                 return
@@ -250,10 +270,11 @@ class ServerTransport(object):
                 'schema_version': 1,
                 'artifact_type': 'update',
                 'round_id': context.round_id,
-                'node_id': context.participant_node_id,
+                'node_id': node_id,
                 'size_bytes': content_length,
                 'sha256': digest.hexdigest(),
             })
+            committed = True
             self._update_event.set()
             handler.send_response(201)
             handler.send_header('Content-Length', '0')
@@ -261,10 +282,13 @@ class ServerTransport(object):
             handler.end_headers()
             handler.close_connection = True
         except (FLRuntimeError, OSError, socket.timeout) as exc:
+            if committed:
+                handler.close_connection = True
+                return
             error_code = 'upload_incomplete'
             error_message = 'update body 接收失败'
             context.failure_callback(
-                context.round_id, context.participant_node_id,
+                context.round_id, node_id,
                 error_code, error_message)
             try:
                 handler._send_error(422, error_code, error_message)
@@ -291,6 +315,7 @@ class ClientTransport(object):
         self._temp_dir = os.path.join(self.work_dir, 'uftp-tmp')
         self._uftpd_process = None
         self._uftpd_stderr = None
+        self._delivered_candidates = set()
 
     def start(self):
         executable = shutil.which('uftpd')
@@ -332,8 +357,11 @@ class ClientTransport(object):
                 names = []
             for name in names:
                 candidate = os.path.join(self._inbox_dir, name)
+                if candidate in self._delivered_candidates:
+                    continue
                 if (os.path.isdir(candidate) and
                         os.path.isfile(os.path.join(candidate, 'model.manifest.json'))):
+                    self._delivered_candidates.add(candidate)
                     return candidate
             if self._uftpd_process.poll() is not None:
                 raise FLRuntimeError('transport_failed', 'uftpd 意外退出')
@@ -404,7 +432,7 @@ def _parse_content_digest(value):
     return digest if len(digest) == 32 else None
 
 
-def _validate_uftp_status(path, expected_uid, expected_files):
+def _validate_uftp_status(path, expected_uids, expected_files):
     connect = []
     results = []
     try:
@@ -417,10 +445,14 @@ def _validate_uftp_status(path, expected_uid, expected_files):
                     results.append((int(fields[1], 16), fields[2], fields[4]))
     except (OSError, ValueError) as exc:
         raise FLRuntimeError('transport_failed', '无法解析 UFTP status') from exc
-    if connect != [('success', expected_uid)]:
+    expected_connect = sorted(('success', uid) for uid in expected_uids)
+    if sorted(connect) != expected_connect:
         raise FLRuntimeError('transport_failed', 'UFTP client 连接矩阵不完整')
-    expected = [(expected_uid, filename, 'copy') for filename in expected_files]
-    if results != expected:
+    expected = sorted(
+        (uid, filename, 'copy')
+        for uid in expected_uids
+        for filename in expected_files)
+    if sorted(results) != expected:
         raise FLRuntimeError('transport_failed', 'UFTP 文件结果矩阵不完整')
 
 
