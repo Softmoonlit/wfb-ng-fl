@@ -149,6 +149,19 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         with self.assertRaises(FLRuntimeError) as waiting:
             server.wait_for_updates()
         self.assertEqual('upload_incomplete', waiting.exception.error_code)
+        state_path = os.path.join(
+            server._round_dir, 'round-state.json')
+        with open(state_path, 'r', encoding='utf-8') as fh:
+            state = json.load(fh)
+        self.assertEqual('upload_incomplete', state['error_code'])
+        self.assertEqual(2, state['node_id'])
+        self.assertEqual({
+            'cancel_error': {
+                'exception_type': 'OSError',
+                'message': 'cancel failed',
+            },
+            'natural_result': 'succeeded',
+        }, state['downlink_diagnostics'])
 
     def test_participant_submit_failure_cancels_active_downlink(self):
         server, _, transport = self.make_round((1, 2))

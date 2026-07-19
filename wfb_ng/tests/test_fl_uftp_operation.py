@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import glob
+import json
 import os
 import shutil
 import stat
@@ -68,46 +69,41 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         self.assertNotEqual(status_paths[0], status_paths[1])
 
     def test_rejects_invalid_status_matrix_and_nonzero_exit(self):
+        success = self.success_status()
         cases = {
-            'missing_connect': [
-                'CONNECT;success;0x00000001',
-                'RESULT;0x00000001;round/model.bin;1;copy;0',
-                'RESULT;0x00000001;round/model.manifest.json;1;copy;0',
-                'RESULT;0x00000002;round/model.bin;1;copy;0',
-                'RESULT;0x00000002;round/model.manifest.json;1;copy;0',
-            ],
-            'rejected_connect': [
-                'CONNECT;success;0x00000001',
-                'CONNECT;rejected;0x00000002',
-            ],
-            'unknown_client': [
-                'CONNECT;success;0x00000001',
-                'CONNECT;success;0x00000002',
-                'CONNECT;success;0x00000009',
-            ],
-            'unknown_file': [
-                'CONNECT;success;0x00000001',
-                'CONNECT;success;0x00000002',
-                'RESULT;0x00000001;round/other.bin;1;copy;0',
-            ],
-            'skipped': [
-                'CONNECT;success;0x00000001',
-                'CONNECT;success;0x00000002',
-                'RESULT;0x00000001;round/model.bin;1;skipped;0',
-            ],
-            'overwrite': [
-                'CONNECT;success;0x00000001',
-                'CONNECT;success;0x00000002',
-                'RESULT;0x00000001;round/model.bin;1;overwrite;0',
-            ],
+            'missing_connect': success[:1] + success[2:],
+            'duplicate_connect': success + [success[0]],
+            'rejected_connect': self.replace_line(
+                success, 1, 'CONNECT;rejected;0x00000002'),
+            'unknown_connect_client': success + [
+                'CONNECT;success;0x00000009'],
+            'unknown_result_client': self.replace_line(
+                success, 2,
+                'RESULT;0x00000009;round/model.bin;1;copy;0'),
+            'missing_result': success[:-1],
+            'duplicate_result': success + [success[2]],
+            'unknown_file': self.replace_line(
+                success, 2,
+                'RESULT;0x00000001;round/other.bin;1;copy;0'),
+            'skipped': self.replace_line(
+                success, 2,
+                'RESULT;0x00000001;round/model.bin;1;skipped;0'),
+            'overwrite': self.replace_line(
+                success, 2,
+                'RESULT;0x00000001;round/model.bin;1;overwrite;0'),
+            'other_non_copy': self.replace_line(
+                success, 2,
+                'RESULT;0x00000001;round/model.bin;1;failed;0'),
+            'malformed_connect': self.replace_line(
+                success, 0, 'CONNECT;success;invalid'),
+            'malformed_result': self.replace_line(
+                success, 2, 'RESULT;0x00000001;broken'),
         }
         for name, lines in cases.items():
             with self.subTest(name=name):
                 self.assert_operation_failed(lines)
 
-        self.assert_operation_failed(self.success_status(), exit_code=7)
-        self.assert_operation_failed(
-            self.success_status() + ['RESULT;0x00000001;broken'])
+        self.assert_operation_failed(success, exit_code=7)
 
     def test_existing_operation_status_path_is_rejected_before_start(self):
         transport, model_path, manifest_path = self.make_transport()
@@ -147,6 +143,7 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         self.write_status(round_dir, self.success_status())
         executable = self.write_status_fixture(0)
         parsing = threading.Event()
+        exit_observed = threading.Event()
         release = threading.Event()
 
         def validate(*args):
@@ -160,13 +157,23 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
             operation = transport.start_downlink(
                 'round', model_path, manifest_path)
             self.assertTrue(parsing.wait(2))
-            cancelling = ThreadResult(
-                lambda: transport.cancel_downlink(operation))
-            cancelling.start()
-            time.sleep(0.02)
-            self.assertTrue(cancelling.is_alive())
-            release.set()
-            self.assertEqual('already_completed', cancelling.join())
+            process = transport._downlink_operation.process
+            original_poll = process.poll
+
+            def observe_poll():
+                return_code = original_poll()
+                if return_code is not None:
+                    exit_observed.set()
+                return return_code
+
+            with mock.patch.object(process, 'poll', side_effect=observe_poll):
+                cancelling = ThreadResult(
+                    lambda: transport.cancel_downlink(operation))
+                cancelling.start()
+                self.assertTrue(exit_observed.wait(2))
+                self.assertTrue(cancelling.is_alive())
+                release.set()
+                self.assertEqual('already_completed', cancelling.join())
 
         self.assertIsNone(transport.wait_downlink(operation))
 
@@ -194,6 +201,14 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
                 publishing.join()
 
         self.assertEqual('upload_incomplete', raised.exception.error_code)
+        state_path = os.path.join(
+            runtime_root, 'rounds', round_id, 'round-state.json')
+        with open(state_path, 'r', encoding='utf-8') as fh:
+            state = json.load(fh)
+        self.assertEqual('upload_incomplete', state['error_code'])
+        self.assertEqual(1, state['node_id'])
+        self.assertEqual(
+            {'cancel_result': 'cancelled'}, state['downlink_diagnostics'])
 
     def test_runtime_reaps_process_when_failure_persistence_is_fatal(self):
         pid_path = os.path.join(self.root, 'fatal-runtime.pid')
@@ -276,6 +291,11 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
             'RESULT;0x00000002;round/model.bin;1;copy;0',
             'RESULT;0x00000002;round/model.manifest.json;1;copy;0',
         ]
+
+    def replace_line(self, lines, index, value):
+        replaced = list(lines)
+        replaced[index] = value
+        return replaced
 
     def assert_operation_failed(self, lines, exit_code=0):
         transport, model_path, manifest_path = self.make_transport()
