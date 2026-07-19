@@ -21,6 +21,14 @@ class ReadyServerTransport(object):
         self.round_id = round_id
         self.round_dir = round_dir
 
+    def start_downlink(self, round_id, model_path, manifest_path):
+        self.publish_model(round_id, model_path, manifest_path)
+        return self
+
+    def wait_downlink(self, operation):
+        if operation is not self:
+            raise RuntimeError('unexpected operation handle')
+
     def publish_model(self, round_id, model_path, manifest_path):
         update = b'update'
         update_dir = os.path.join(self.round_dir, 'updates', '1')

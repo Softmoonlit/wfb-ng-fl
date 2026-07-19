@@ -218,6 +218,7 @@ class ServerRuntime(object):
         self._recovered_participant_node_ids = None
         self._round_result_consumed = False
         self._publish_active = False
+        self._downlink_operation = None
         self._wait_for_updates_active = False
         if recovered_state is not None:
             self._restore_terminal_state(recovered_state)
@@ -321,20 +322,37 @@ class ServerRuntime(object):
                     max_update_size_bytes=self.max_update_size_bytes,
                     failure_callback=self.report_update_failure,
                 )
-                self.transport.publish_model(round_id, model_target, manifest_path)
+                operation = self.transport.start_downlink(
+                    round_id, model_target, manifest_path)
+                with self._condition:
+                    self._downlink_operation = operation
+                    failure = self._failure
+                if failure is not None:
+                    try:
+                        self.transport.cancel_downlink(operation)
+                    except Exception:
+                        pass
+                try:
+                    self.transport.wait_downlink(operation)
+                finally:
+                    with self._condition:
+                        self._downlink_operation = None
             except FLRuntimeError as exc:
                 if self._failure is None:
                     self._fail_round(exc.error_code, exc.error_message)
                 with self._condition:
                     self._round_result_consumed = True
-                raise self._failure or exc
+                raise self._fatal_error or self._failure or exc
             except Exception as exc:
                 self._fail_round('transport_failed', 'UFTP 下行失败')
                 with self._condition:
                     self._round_result_consumed = True
-                raise self._failure from exc
+                raise self._fatal_error or self._failure from exc
 
             with self._condition:
+                if self._fatal_error is not None:
+                    self._round_result_consumed = True
+                    raise self._fatal_error
                 if self._failure is not None:
                     self._round_result_consumed = True
                     raise self._failure
@@ -447,6 +465,7 @@ class ServerRuntime(object):
         return update_paths
 
     def report_update_failure(self, round_id, node_id, error_code, error_message):
+        persistence_error = None
         with self._condition:
             if (round_id != self._round_id or
                     node_id not in self.participant_node_ids or
@@ -459,15 +478,17 @@ class ServerRuntime(object):
                 self._write_state(
                     'failed', error_code=error_code, error_message=error_message,
                     node_id=node_id)
-            except Exception:
-                self._condition.notify_all()
-                raise
+            except Exception as exc:
+                persistence_error = exc
             self._condition.notify_all()
-        if self._publish_active:
+            operation = self._downlink_operation if self._publish_active else None
+        if operation is not None:
             try:
-                self.transport.cancel_downlink()
+                self.transport.cancel_downlink(operation)
             except Exception:
                 pass
+        if persistence_error is not None:
+            raise persistence_error
 
     def _validate_update_manifest(self, manifest, round_id, node_id):
         _validate_exact_fields(manifest, (

@@ -88,6 +88,14 @@ class OneShotHttpPeer(object):
 
 
 class RuntimeHttpTransport(ServerTransport):
+    def start_downlink(self, round_id, model_path, manifest_path):
+        self.round_id = round_id
+        return self
+
+    def wait_downlink(self, operation):
+        if operation is not self:
+            raise RuntimeError('unexpected operation handle')
+
     def publish_model(self, round_id, model_path, manifest_path):
         self.round_id = round_id
 

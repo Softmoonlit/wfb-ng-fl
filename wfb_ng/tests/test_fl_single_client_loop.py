@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import glob
 import hashlib
 import json
 import os
@@ -169,8 +170,9 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
         self.assertEqual([1], server_state['committed_update_node_ids'])
         self.assertEqual('succeeded', client_state['state'])
 
-        status_path = os.path.join(server_round, 'uftp.status')
-        with open(status_path, 'r', encoding='utf-8') as fh:
+        status_paths = glob.glob(os.path.join(server_round, 'uftp-*.status'))
+        self.assertEqual(1, len(status_paths))
+        with open(status_paths[0], 'r', encoding='utf-8') as fh:
             status = fh.read()
         self.assertIn('CONNECT;success;0x00000001', status)
         self.assertIn('%s/model.bin' % round_id, status)
@@ -312,6 +314,13 @@ class ControlledServerTransport(object):
         self.round_id = round_id
         self.node_id = participant_node_ids[0]
         self.failure_callback = failure_callback
+
+    def start_downlink(self, round_id, model_path, manifest_path):
+        return self
+
+    def wait_downlink(self, operation):
+        if operation is not self:
+            raise RuntimeError('unexpected operation handle')
 
     def publish_model(self, round_id, model_path, manifest_path):
         return None
