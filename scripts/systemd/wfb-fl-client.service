@@ -1,0 +1,16 @@
+[Unit]
+Description=WFB-ng FL client role
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/fl-client.json
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=on-failure
+RestartSec=5s
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
