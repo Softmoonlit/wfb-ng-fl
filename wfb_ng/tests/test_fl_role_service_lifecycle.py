@@ -40,6 +40,23 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertEqual('transport_already_started', raised.exception.error_code)
         self.assertIs(transport._http_server, None)
 
+    def test_server_transport_observes_listener_failure(self):
+        transport = ServerTransport((1,), 2, 9000)
+        fake_server = mock.Mock()
+        fake_server.server_address = ('127.0.0.1', 1234)
+        fake_server.serve_forever.return_value = None
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/usr/bin/uftp'), \
+                mock.patch('wfb_ng.fl.transport.http.server.ThreadingHTTPServer',
+                           return_value=fake_server):
+            transport.start()
+            transport._http_thread.join(1)
+            error = transport.poll_failure()
+            transport.close()
+
+        self.assertIsNotNone(error)
+        self.assertEqual('transport_failed', error.error_code)
+        self.assertFalse(transport.ready)
+
     def test_client_transport_rejects_duplicate_receiver(self):
         transport = ClientTransport(self.root, 1, 9000, ('127.0.0.1', 8080))
         process = mock.Mock()
@@ -142,7 +159,9 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'max_update_size_bytes': 4096,
-                'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24'],
+                'link_args': [
+                    '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
+                    '--known-clients', '1,2'],
             }, fh)
 
         with mock.patch('wfb_ng.fl.service.shutil.which',
@@ -153,8 +172,41 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertIsInstance(service.role, ServerRole)
         self.assertEqual([
             '/usr/bin/wfb_v6_uplink', '--role', 'server', '--node-id', '10',
-            '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24'],
+            '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
+            '--known-clients', '1,2'],
             service.link.command)
+
+    def test_server_config_rejects_participant_outside_known_clients(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1, 2],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1,3'])
+
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            with self.assertRaises(FLRuntimeError) as raised:
+                load_role_service(config_path, expected_role='server')
+
+        self.assertEqual('invalid_configuration', raised.exception.error_code)
+        self.assertFalse(os.path.exists(os.path.join(self.root, 'work')))
+
+    def test_server_config_rejects_missing_or_invalid_known_clients(self):
+        invalid_arguments = (
+            ['--tun-name', 'wfb0'],
+            ['--tun-name', 'wfb0', '--known-clients', '1,1'],
+            ['--tun-name', 'wfb0', '--known-clients', '0'],
+            ['--tun-name', 'wfb0', '--known-clients', '1,,2'],
+        )
+        for index, link_args in enumerate(invalid_arguments):
+            config_path = self.write_server_config(
+                participant_node_ids=[1], link_args=link_args,
+                name='invalid-known-clients-%d.json' % index)
+            with self.subTest(link_args=link_args), mock.patch(
+                    'wfb_ng.fl.service.shutil.which',
+                    side_effect=lambda name: '/usr/bin/' + name):
+                with self.assertRaises(FLRuntimeError) as raised:
+                    load_role_service(config_path, expected_role='server')
+                self.assertEqual(
+                    'invalid_configuration', raised.exception.error_code)
 
     def test_config_rejects_missing_runtime_dependencies(self):
         config_path = os.path.join(self.root, 'client.json')
@@ -239,7 +291,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'max_update_size_bytes': 4096,
-                'link_args': ['--tun-name', 'wfb0'],
+                'link_args': [
+                    '--tun-name', 'wfb0', '--known-clients', '1'],
             }, fh)
         with mock.patch('wfb_ng.fl.service.shutil.which',
                         side_effect=lambda name: '/usr/bin/' + name), mock.patch(
@@ -280,6 +333,27 @@ class RoleLifecycleTestCase(unittest.TestCase):
 
         self.assertEqual(0, process.wait(timeout=2))
         self.assertTrue(os.path.isfile(marker))
+
+    def write_server_config(self, participant_node_ids, link_args,
+                            name='server.json'):
+        config_path = os.path.join(self.root, name)
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'role': 'server',
+                'work_dir': os.path.join(self.root, 'work'),
+                'node_id': 10,
+                'participant_node_ids': participant_node_ids,
+                'participant_uftp_uids': [100 + node_id
+                                          for node_id in participant_node_ids],
+                'server_uftp_uid': 100,
+                'uftp_port': 9000,
+                'http_host': '10.0.0.1',
+                'http_port': 8080,
+                'max_update_size_bytes': 4096,
+                'link_args': link_args,
+            }, fh)
+        return config_path
 
     def stop_process(self, process):
         if process.poll() is None:

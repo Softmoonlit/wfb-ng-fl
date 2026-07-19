@@ -162,6 +162,11 @@ class ServerTransport(object):
         self._state = 'ready'
 
     def poll_failure(self):
+        thread = self._http_thread
+        if self.ready and thread is not None and not thread.is_alive():
+            self.ready = False
+            self._state = 'failed'
+            return FLRuntimeError('transport_failed', 'HTTP listener 意外退出')
         return None
 
     def install_round(self, round_id, participant_node_ids, round_dir,

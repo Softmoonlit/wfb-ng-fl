@@ -159,6 +159,12 @@ def load_role_service(path, expected_role=None):
 
     link_args = config['link_args']
     tun_name = _single_option_value(link_args, '--tun-name')
+    if role_name == 'server':
+        known_client_node_ids = _parse_known_client_node_ids(
+            _single_option_value(link_args, '--known-clients'))
+        if not set(config['participant_node_ids']).issubset(known_client_node_ids):
+            raise FLRuntimeError(
+                'invalid_configuration', '参与节点不属于链路静态已知 client 集')
     tun_path = os.path.join('/sys/class/net', tun_name)
     if os.path.exists(tun_path):
         raise FLRuntimeError(
@@ -239,6 +245,21 @@ def _single_option_value(arguments, option):
         raise FLRuntimeError(
             'invalid_configuration', '链路参数缺少唯一 %s' % option)
     return arguments[positions[0] + 1]
+
+
+def _parse_known_client_node_ids(value):
+    items = value.split(',')
+    try:
+        node_ids = [int(item) for item in items]
+    except ValueError as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '链路 known-clients 参数无效') from exc
+    if (any(not item.isascii() or not item.isdigit() for item in items) or
+            any(node_id <= 0 or node_id > 255 for node_id in node_ids) or
+            len(set(node_ids)) != len(node_ids)):
+        raise FLRuntimeError(
+            'invalid_configuration', '链路 known-clients 参数无效')
+    return set(node_ids)
 
 
 def _notify_ready():
