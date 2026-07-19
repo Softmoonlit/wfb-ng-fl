@@ -13,6 +13,31 @@ from .errors import FLRuntimeError
 CHUNK_SIZE = 64 * 1024
 
 
+def _fsync_directory(path):
+    directory_fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+
+
+def inspect_artifact(source_path, max_size_bytes=None):
+    source_path = os.path.abspath(os.fspath(source_path))
+    try:
+        source = open(source_path, 'rb')
+    except OSError as exc:
+        raise FLRuntimeError('invalid_artifact', '无法读取输入文件') from exc
+    try:
+        source_stat = os.fstat(source.fileno())
+        if not stat.S_ISREG(source_stat.st_mode):
+            raise FLRuntimeError('invalid_artifact', '输入必须是普通文件')
+        if max_size_bytes is not None and source_stat.st_size > max_size_bytes:
+            raise FLRuntimeError('artifact_too_large', '输入文件超过大小限制')
+        return source_path
+    finally:
+        source.close()
+
+
 def archive_file(source_path, target_path, max_size_bytes=None):
     source_path = os.path.abspath(os.fspath(source_path))
     try:
@@ -51,6 +76,7 @@ def archive_file(source_path, target_path, max_size_bytes=None):
             raise FLRuntimeError('artifact_changed', '输入文件在归档期间发生变化')
         os.replace(temp_path, target_path)
         temp_path = None
+        _fsync_directory(os.path.dirname(target_path))
         return size_bytes, digest.hexdigest()
     finally:
         source.close()
@@ -75,6 +101,7 @@ def write_json_atomic(path, value):
             os.fsync(fh.fileno())
         os.replace(temp_path, path)
         temp_path = None
+        _fsync_directory(os.path.dirname(path))
     finally:
         if temp_path is not None:
             try:
@@ -83,10 +110,25 @@ def write_json_atomic(path, value):
                 pass
 
 
+def _strict_object(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError('duplicate JSON key')
+        value[key] = item
+    return value
+
+
+def _reject_json_constant(value):
+    raise ValueError('invalid JSON constant: %s' % value)
+
+
 def read_json(path):
     try:
         with open(path, 'r', encoding='utf-8') as fh:
-            return json.load(fh)
+            return json.load(
+                fh, object_pairs_hook=_strict_object,
+                parse_constant=_reject_json_constant)
     except (OSError, ValueError) as exc:
         raise FLRuntimeError('invalid_manifest', '无法读取 manifest') from exc
 
