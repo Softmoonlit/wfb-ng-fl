@@ -5,19 +5,32 @@ from .runtime import ClientRuntime, ServerRuntime
 from .transport import ClientTransport, ServerTransport
 
 
+def _as_tuple(value):
+    if isinstance(value, int):
+        return (value,)
+    return tuple(value)
+
+
 class ServerRole(object):
     def __init__(self, work_dir, participant_node_id, participant_uftp_uid,
                  server_uftp_uid, uftp_port, http_port,
                  max_update_size_bytes):
+        participant_node_ids = _as_tuple(participant_node_id)
+        participant_uftp_uids = _as_tuple(participant_uftp_uid)
+        if len(participant_node_ids) != len(participant_uftp_uids):
+            raise ValueError('参与节点与 UFTP UID 数量不一致')
+        if (not participant_uftp_uids or
+                len(set(participant_uftp_uids)) != len(participant_uftp_uids)):
+            raise ValueError('UFTP UID 集合无效')
         self.transport = ServerTransport(
-            participant_uftp_uid=participant_uftp_uid,
+            participant_uftp_uids=participant_uftp_uids,
             server_uftp_uid=server_uftp_uid,
             uftp_port=uftp_port,
             http_port=http_port,
         )
         self.runtime = ServerRuntime(
             work_dir=work_dir,
-            participant_node_id=participant_node_id,
+            participant_node_ids=participant_node_ids,
             max_update_size_bytes=max_update_size_bytes,
             transport=self.transport,
         )

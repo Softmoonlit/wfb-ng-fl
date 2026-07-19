@@ -181,7 +181,7 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
         transport = ServerTransport(1, 2, self.uftp_port)
         round_id = str(uuid.uuid4())
         transport.install_round(
-            round_id, 1, os.path.join(self.root, 'server-failure'), 1024,
+            round_id, (1,), os.path.join(self.root, 'server-failure'), 1024,
             lambda *args: failures.append(args))
         handler = make_upload_handler(round_id, 1, b'update')
 
@@ -195,8 +195,9 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
             (round_id, 1, 'continue_write_failed', '100 Continue 写回失败'),
         ], failures)
         retry_handler = make_upload_handler(round_id, 1, b'update')
-        self.assertIsNone(transport._reserve_upload(retry_handler))
-        transport._release_upload()
+        self.assertEqual(
+            (409, 'update_submission_used', 'update 提交机会已占用'),
+            transport._reserve_upload(retry_handler))
 
     def test_submit_update_wraps_transport_error_and_persists_failure(self):
         work_dir = os.path.join(self.root, 'client-failure')
@@ -304,10 +305,10 @@ class ControlledServerTransport(object):
         self.node_id = None
         self.failure_callback = None
 
-    def install_round(self, round_id, participant_node_id, round_dir,
+    def install_round(self, round_id, participant_node_ids, round_dir,
                       max_update_size_bytes, failure_callback):
         self.round_id = round_id
-        self.node_id = participant_node_id
+        self.node_id = participant_node_ids[0]
         self.failure_callback = failure_callback
 
     def publish_model(self, round_id, model_path, manifest_path):
