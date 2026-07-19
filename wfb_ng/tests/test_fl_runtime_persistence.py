@@ -21,6 +21,14 @@ class ReadyServerTransport(object):
         self.round_id = round_id
         self.round_dir = round_dir
 
+    def start_downlink(self, round_id, model_path, manifest_path):
+        self.publish_model(round_id, model_path, manifest_path)
+        return self
+
+    def wait_downlink(self, operation):
+        if operation is not self:
+            raise RuntimeError('unexpected operation handle')
+
     def publish_model(self, round_id, model_path, manifest_path):
         update = b'update'
         update_dir = os.path.join(self.round_dir, 'updates', '1')
@@ -315,6 +323,70 @@ class V8RuntimePersistenceTestCase(unittest.TestCase):
         with self.assertRaises(FLRuntimeError) as raised:
             ServerRuntime(work_dir, 1, 1024, ReadyServerTransport())
         self.assertEqual('round_state_corrupted', raised.exception.error_code)
+
+    def test_active_round_rejects_downlink_diagnostics(self):
+        work_dir = os.path.join(self.root, 'active-diagnostics')
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(work_dir, 'rounds', round_id)
+        os.makedirs(round_dir)
+        self.write_json(os.path.join(round_dir, 'round-state.json'), {
+            'schema_version': 1,
+            'round_id': round_id,
+            'role': 'server',
+            'state': 'publishing_model',
+            'downlink_diagnostics': {'cancel_result': 'cancelled'},
+        })
+
+        with self.assertRaises(FLRuntimeError) as raised:
+            ServerRuntime(work_dir, 1, 1024, ReadyServerTransport())
+        self.assertEqual('round_state_corrupted', raised.exception.error_code)
+
+    def test_corrupted_downlink_diagnostics_fail_startup(self):
+        cases = (None, {}, {
+            'natural_result': None,
+        }, {
+            'cancel_result': None,
+        }, {
+            'cancel_error': None,
+        }, {
+            'cancel_result': 'unknown',
+        }, {
+            'cancel_result': 'cancelled',
+            'cancel_error': {
+                'exception_type': 'OSError',
+                'message': 'cancel failed',
+            },
+        }, {
+            'unknown': 'value',
+        })
+        for index, diagnostics in enumerate(cases):
+            with self.subTest(diagnostics=diagnostics):
+                work_dir = os.path.join(
+                    self.root, 'corrupted-diagnostics-%d' % index)
+                round_id = str(uuid.uuid4())
+                round_dir = os.path.join(work_dir, 'rounds', round_id)
+                os.makedirs(round_dir)
+                self.write_json(os.path.join(
+                    round_dir, 'round-state.json'), {
+                        'schema_version': 1,
+                        'round_id': round_id,
+                        'role': 'server',
+                        'state': 'failed',
+                        'error_code': 'upload_incomplete',
+                        'error_message': 'update body 接收失败',
+                        'downlink_diagnostics': diagnostics,
+                    })
+                self.write_json(os.path.join(
+                    work_dir, 'current-round.json'), {
+                        'schema_version': 1,
+                        'role': 'server',
+                        'round_id': round_id,
+                    })
+
+                with self.assertRaises(FLRuntimeError) as raised:
+                    ServerRuntime(work_dir, 1, 1024, ReadyServerTransport())
+                self.assertEqual(
+                    'round_state_corrupted', raised.exception.error_code)
 
     def test_noncurrent_terminal_state_is_strictly_validated(self):
         work_dir = os.path.join(self.root, 'noncurrent-corrupted-state')

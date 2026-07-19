@@ -149,6 +149,19 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         with self.assertRaises(FLRuntimeError) as waiting:
             server.wait_for_updates()
         self.assertEqual('upload_incomplete', waiting.exception.error_code)
+        state_path = os.path.join(
+            server._round_dir, 'round-state.json')
+        with open(state_path, 'r', encoding='utf-8') as fh:
+            state = json.load(fh)
+        self.assertEqual('upload_incomplete', state['error_code'])
+        self.assertEqual(2, state['node_id'])
+        self.assertEqual({
+            'cancel_error': {
+                'exception_type': 'OSError',
+                'message': 'cancel failed',
+            },
+            'natural_result': 'succeeded',
+        }, state['downlink_diagnostics'])
 
     def test_participant_submit_failure_cancels_active_downlink(self):
         server, _, transport = self.make_round((1, 2))
@@ -163,6 +176,8 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
             publishing.join()
         self.assertEqual('upload_incomplete', raised.exception.error_code)
         self.assertEqual(1, transport.cancel_count)
+        self.assertIs(transport.operation_handle, transport.cancelled_handle)
+        self.assertTrue(transport.cancel_completed)
 
     def test_participant_submit_failure_fails_round_without_partial_result(self):
         server, clients, transport = self.make_round((1, 2))
@@ -388,6 +403,9 @@ class SharedRoundTransport(object):
         self._update_event = threading.Event()
         self.cancel_count = 0
         self.cancel_error = None
+        self.operation_handle = object()
+        self.cancelled_handle = None
+        self.cancel_completed = False
 
     def client(self, node_id):
         return SharedClientTransport(self, node_id)
@@ -399,7 +417,7 @@ class SharedRoundTransport(object):
         self.round_dir = round_dir
         self.failure_callback = failure_callback
 
-    def publish_model(self, round_id, model_path, manifest_path):
+    def start_downlink(self, round_id, model_path, manifest_path):
         for node_id in self.participant_node_ids:
             candidate = os.path.join(self.inbox_root, str(node_id), round_id)
             os.makedirs(candidate)
@@ -407,17 +425,31 @@ class SharedRoundTransport(object):
             shutil.copyfile(
                 manifest_path, os.path.join(candidate, 'model.manifest.json'))
         self._publishing.set()
+        return self.operation_handle
+
+    def wait_downlink(self, operation_handle):
+        if operation_handle is not self.operation_handle:
+            raise RuntimeError('unexpected operation handle')
         self._downlink_complete.wait(5)
+
+    def publish_model(self, round_id, model_path, manifest_path):
+        operation = self.start_downlink(round_id, model_path, manifest_path)
+        return self.wait_downlink(operation)
 
     def wait_until_publishing(self):
         if not self._publishing.wait(5):
             raise AssertionError('shared downlink did not start')
 
-    def cancel_downlink(self):
+    def cancel_downlink(self, operation_handle):
+        if operation_handle is not self.operation_handle:
+            raise RuntimeError('unexpected operation handle')
         self.cancel_count += 1
+        self.cancelled_handle = operation_handle
         self._downlink_complete.set()
         if self.cancel_error is not None:
             raise self.cancel_error
+        self.cancel_completed = True
+        return 'cancelled'
 
     def complete_downlink(self):
         self._downlink_complete.set()

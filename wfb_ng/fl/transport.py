@@ -12,6 +12,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import uuid
 from dataclasses import dataclass
 
 from .artifacts import write_json_atomic
@@ -27,9 +28,24 @@ class RoundContext:
     failure_callback: object
 
 
+class _DownlinkHandle(object):
+    pass
+
+
+@dataclass
+class _DownlinkOperation:
+    handle: object
+    process: object
+    status_path: str
+    expected_files: tuple
+    state: str = 'active'
+    error: object = None
+
+
 class ServerTransport(object):
     def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
-                 http_host='127.0.0.1', http_port=0, io_timeout=10):
+                 http_host='127.0.0.1', http_port=0, io_timeout=10,
+                 cancel_grace_period=2):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
         self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
@@ -38,6 +54,7 @@ class ServerTransport(object):
         self.http_host = http_host
         self.http_port = http_port
         self.io_timeout = io_timeout
+        self.cancel_grace_period = cancel_grace_period
         self.ready = False
         self._context = None
         self._context_lock = threading.Lock()
@@ -46,7 +63,8 @@ class ServerTransport(object):
         self._update_event = threading.Event()
         self._http_server = None
         self._http_thread = None
-        self._uftp_process = None
+        self._downlink_condition = threading.Condition()
+        self._downlink_operation = None
 
     @property
     def http_address(self):
@@ -136,10 +154,22 @@ class ServerTransport(object):
             self._update_event.clear()
 
     def publish_model(self, round_id, model_path, manifest_path):
-        status_path = os.path.join(os.path.dirname(model_path), 'uftp.status')
-        log_path = os.path.join(os.path.dirname(model_path), 'uftp.log')
-        if os.path.exists(status_path):
-            raise FLRuntimeError('transport_failed', 'UFTP status 文件已存在')
+        operation = self.start_downlink(round_id, model_path, manifest_path)
+        return self.wait_downlink(operation)
+
+    def start_downlink(self, round_id, model_path, manifest_path):
+        round_dir = os.path.dirname(model_path)
+        status_path = _new_uftp_status_path(round_dir)
+        try:
+            descriptor = os.open(
+                status_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            os.close(descriptor)
+            os.unlink(status_path)
+        except OSError as exc:
+            raise FLRuntimeError(
+                'transport_failed', 'UFTP status 文件无法创建') from exc
+        log_path = os.path.join(
+            round_dir, 'uftp-%s.log' % uuid.uuid4())
         command = [
             shutil.which('uftp'),
             '-q',
@@ -158,32 +188,90 @@ class ServerTransport(object):
             os.path.basename(model_path),
             os.path.basename(manifest_path),
         ]
-        self._uftp_process = subprocess.Popen(
-            command, cwd=os.path.dirname(model_path), stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return_code = self._uftp_process.wait()
-        self._uftp_process = None
-        if return_code != 0:
-            raise FLRuntimeError(
-                'transport_failed', 'UFTP 退出码为 %d' % return_code,
-                round_id=round_id)
-        _validate_uftp_status(
-            status_path, self.participant_uftp_uids,
-            ('%s/model.bin' % round_id, '%s/model.manifest.json' % round_id))
+        handle = _DownlinkHandle()
+        with self._downlink_condition:
+            if (self._downlink_operation is not None and
+                    self._downlink_operation.state != 'completed'):
+                raise RuntimeError('已有活动下行 operation')
+            process = subprocess.Popen(
+                command, cwd=round_dir, stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            operation = _DownlinkOperation(
+                handle, process, status_path,
+                ('%s/model.bin' % round_id,
+                 '%s/model.manifest.json' % round_id))
+            self._downlink_operation = operation
+            threading.Thread(
+                target=self._monitor_downlink, args=(operation,),
+                name='fl-uftp-operation', daemon=True).start()
+        return handle
+
+    def wait_downlink(self, handle):
+        with self._downlink_condition:
+            operation = self._require_downlink(handle)
+            while operation.state != 'completed':
+                self._downlink_condition.wait()
+            if operation.error is not None:
+                raise operation.error
+
+    def cancel_downlink(self, handle):
+        with self._downlink_condition:
+            operation = self._require_downlink(handle)
+            if operation.state == 'completed':
+                return 'already_completed'
+            if operation.state == 'active' and operation.process.poll() is not None:
+                while operation.state != 'completed':
+                    self._downlink_condition.wait()
+                return 'already_completed'
+            if operation.state == 'active':
+                operation.state = 'cancelling'
+                operation.process.terminate()
+            while operation.state != 'completed':
+                try:
+                    operation.process.wait(timeout=self.cancel_grace_period)
+                except subprocess.TimeoutExpired:
+                    operation.process.kill()
+                    operation.process.wait()
+                self._downlink_condition.wait()
+            return 'cancelled'
+
+    def _monitor_downlink(self, operation):
+        return_code = operation.process.wait()
+        error = None
+        with self._downlink_condition:
+            cancelled = operation.state == 'cancelling'
+        if not cancelled:
+            if return_code != 0:
+                error = FLRuntimeError(
+                    'transport_failed', 'UFTP 退出码为 %d' % return_code)
+            else:
+                try:
+                    _validate_uftp_status(
+                        operation.status_path, self.participant_uftp_uids,
+                        operation.expected_files)
+                except FLRuntimeError as exc:
+                    error = exc
+        with self._downlink_condition:
+            operation.error = error
+            operation.state = 'completed'
+            self._downlink_condition.notify_all()
+
+    def _require_downlink(self, handle):
+        operation = self._downlink_operation
+        if operation is None or operation.handle is not handle:
+            raise RuntimeError('未知 UFTP operation handle')
+        return operation
 
     def wait_for_update(self, timeout):
         self._update_event.wait(timeout)
         self._update_event.clear()
 
-    def cancel_downlink(self):
-        if self._uftp_process is not None:
-            _stop_process(self._uftp_process)
-
     def close(self):
         self.ready = False
-        if self._uftp_process is not None:
-            _stop_process(self._uftp_process)
-            self._uftp_process = None
+        with self._downlink_condition:
+            operation = self._downlink_operation
+        if operation is not None and operation.state != 'completed':
+            self.cancel_downlink(operation.handle)
         if self._http_server is not None:
             self._http_server.shutdown()
             self._http_server.server_close()
@@ -553,6 +641,10 @@ def _parse_content_digest(value):
     return digest if len(digest) == 32 else None
 
 
+def _new_uftp_status_path(round_dir):
+    return os.path.join(round_dir, 'uftp-%s.status' % uuid.uuid4())
+
+
 def _validate_uftp_status(path, expected_uids, expected_files):
     connect = []
     results = []
@@ -560,9 +652,13 @@ def _validate_uftp_status(path, expected_uids, expected_files):
         with open(path, 'r', encoding='utf-8') as fh:
             for raw_line in fh:
                 fields = raw_line.rstrip('\n').split(';')
-                if fields[0] == 'CONNECT' and len(fields) >= 3:
+                if fields[0] == 'CONNECT':
+                    if len(fields) != 3:
+                        raise ValueError('invalid CONNECT record')
                     connect.append((fields[1], int(fields[2], 16)))
-                elif fields[0] == 'RESULT' and len(fields) >= 6:
+                elif fields[0] == 'RESULT':
+                    if len(fields) != 6:
+                        raise ValueError('invalid RESULT record')
                     results.append((int(fields[1], 16), fields[2], fields[4]))
     except (OSError, ValueError) as exc:
         raise FLRuntimeError('transport_failed', '无法解析 UFTP status') from exc

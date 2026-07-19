@@ -100,6 +100,9 @@ def validate_round_state(state, round_id, role, active_states):
                 participant_node_ids != sorted(set(participant_node_ids)) or
                 committed_node_ids != participant_node_ids):
             raise FLRuntimeError('round_state_corrupted', '成功轮次参与集合无效')
+    diagnostics = state.get('downlink_diagnostics')
+    if ('downlink_diagnostics' in state and state['state'] != 'failed'):
+        raise FLRuntimeError('round_state_corrupted', '下行诊断状态无效')
     if state['state'] == 'failed':
         if (not isinstance(state.get('error_code'), str) or
                 not state['error_code'] or
@@ -108,6 +111,40 @@ def validate_round_state(state, round_id, role, active_states):
         node_id = state.get('node_id')
         if node_id is not None and (type(node_id) is not int or node_id <= 0):
             raise FLRuntimeError('round_state_corrupted', '失败轮次节点标识无效')
+        diagnostics = state.get('downlink_diagnostics')
+        if 'downlink_diagnostics' in state:
+            _validate_downlink_diagnostics(diagnostics, role)
+
+
+def _validate_downlink_diagnostics(value, role):
+    allowed_fields = {'natural_result', 'cancel_result', 'cancel_error'}
+    if (role != 'server' or not isinstance(value, dict) or not value or
+            not set(value).issubset(allowed_fields)):
+        raise FLRuntimeError('round_state_corrupted', '下行诊断结构无效')
+    natural_result = value.get('natural_result')
+    if 'natural_result' in value:
+        if natural_result == 'succeeded':
+            pass
+        elif (not isinstance(natural_result, dict) or
+              set(natural_result) != {'error_code', 'error_message'} or
+              not isinstance(natural_result['error_code'], str) or
+              not natural_result['error_code'] or
+              not isinstance(natural_result['error_message'], str)):
+            raise FLRuntimeError('round_state_corrupted', '下行自然结果无效')
+    cancel_result = value.get('cancel_result')
+    cancel_error = value.get('cancel_error')
+    if ('cancel_result' in value and cancel_result not in (
+            'cancelled', 'already_completed')):
+        raise FLRuntimeError('round_state_corrupted', '下行取消结果无效')
+    if 'cancel_error' in value:
+        if (not isinstance(cancel_error, dict) or
+                set(cancel_error) != {'exception_type', 'message'} or
+                not isinstance(cancel_error['exception_type'], str) or
+                not cancel_error['exception_type'] or
+                not isinstance(cancel_error['message'], str)):
+            raise FLRuntimeError('round_state_corrupted', '下行取消异常无效')
+    if cancel_result is not None and cancel_error is not None:
+        raise FLRuntimeError('round_state_corrupted', '下行取消诊断冲突')
 
 
 def recover_round_states(work_dir, role):
@@ -218,6 +255,11 @@ class ServerRuntime(object):
         self._recovered_participant_node_ids = None
         self._round_result_consumed = False
         self._publish_active = False
+        self._downlink_operation = None
+        self._downlink_diagnostics = {}
+        self._downlink_diagnostics_persistence_error = None
+        self._downlink_cancel_active = False
+        self._downlink_cancel_finished = False
         self._wait_for_updates_active = False
         if recovered_state is not None:
             self._restore_terminal_state(recovered_state)
@@ -248,6 +290,8 @@ class ServerRuntime(object):
             self._failure = FLRuntimeError(
                 state['error_code'], state['error_message'],
                 round_id=round_id, node_id=state.get('node_id'))
+            self._downlink_diagnostics = dict(
+                state.get('downlink_diagnostics', {}))
         else:
             self._owner.close()
             raise FLRuntimeError('round_state_corrupted', '当前轮次不是终态')
@@ -293,6 +337,9 @@ class ServerRuntime(object):
                 self._round_dir = round_dir
                 self._downlink_completed = False
                 self._failure = None
+                self._downlink_diagnostics = {}
+                self._downlink_cancel_active = False
+                self._downlink_cancel_finished = False
                 self._round_result_consumed = False
                 self._write_state('publishing_model')
 
@@ -321,20 +368,55 @@ class ServerRuntime(object):
                     max_update_size_bytes=self.max_update_size_bytes,
                     failure_callback=self.report_update_failure,
                 )
-                self.transport.publish_model(round_id, model_target, manifest_path)
+                operation = self.transport.start_downlink(
+                    round_id, model_target, manifest_path)
+                with self._condition:
+                    self._downlink_operation = operation
+                    failure = self._failure
+                if failure is not None:
+                    self._cancel_downlink(operation)
+                try:
+                    self.transport.wait_downlink(operation)
+                except FLRuntimeError as exc:
+                    self._record_downlink_natural_result({
+                        'error_code': exc.error_code,
+                        'error_message': exc.error_message,
+                    })
+                    raise
+                except Exception as exc:
+                    self._record_downlink_natural_result({
+                        'error_code': type(exc).__name__,
+                        'error_message': str(exc),
+                    })
+                    raise
+                else:
+                    with self._condition:
+                        while self._downlink_cancel_active:
+                            self._condition.wait()
+                        cancelled = (
+                            self._downlink_diagnostics.get('cancel_result') ==
+                            'cancelled')
+                    if not cancelled:
+                        self._record_downlink_natural_result('succeeded')
+                finally:
+                    with self._condition:
+                        self._downlink_operation = None
             except FLRuntimeError as exc:
                 if self._failure is None:
                     self._fail_round(exc.error_code, exc.error_message)
                 with self._condition:
                     self._round_result_consumed = True
-                raise self._failure or exc
+                raise self._fatal_error or self._failure or exc
             except Exception as exc:
                 self._fail_round('transport_failed', 'UFTP 下行失败')
                 with self._condition:
                     self._round_result_consumed = True
-                raise self._failure from exc
+                raise self._fatal_error or self._failure from exc
 
             with self._condition:
+                if self._fatal_error is not None:
+                    self._round_result_consumed = True
+                    raise self._fatal_error
                 if self._failure is not None:
                     self._round_result_consumed = True
                     raise self._failure
@@ -447,6 +529,7 @@ class ServerRuntime(object):
         return update_paths
 
     def report_update_failure(self, round_id, node_id, error_code, error_message):
+        persistence_error = None
         with self._condition:
             if (round_id != self._round_id or
                     node_id not in self.participant_node_ids or
@@ -459,15 +542,64 @@ class ServerRuntime(object):
                 self._write_state(
                     'failed', error_code=error_code, error_message=error_message,
                     node_id=node_id)
-            except Exception:
-                self._condition.notify_all()
-                raise
+            except Exception as exc:
+                persistence_error = exc
             self._condition.notify_all()
-        if self._publish_active:
-            try:
-                self.transport.cancel_downlink()
-            except Exception:
-                pass
+            operation = self._downlink_operation if self._publish_active else None
+        if operation is not None:
+            self._cancel_downlink(operation)
+        if persistence_error is not None:
+            raise persistence_error
+
+    def _cancel_downlink(self, operation):
+        with self._condition:
+            while self._downlink_cancel_active:
+                self._condition.wait()
+            if self._downlink_cancel_finished:
+                return
+            self._downlink_cancel_active = True
+        try:
+            result = self.transport.cancel_downlink(operation)
+        except Exception as exc:
+            diagnostics = {
+                'cancel_error': {
+                    'exception_type': type(exc).__name__,
+                    'message': str(exc),
+                },
+            }
+        else:
+            diagnostics = {'cancel_result': result}
+        with self._condition:
+            self._downlink_diagnostics.update(diagnostics)
+            self._downlink_cancel_active = False
+            self._downlink_cancel_finished = True
+            self._persist_downlink_diagnostics()
+            self._condition.notify_all()
+
+    def _record_downlink_natural_result(self, result):
+        with self._condition:
+            self._downlink_diagnostics['natural_result'] = result
+            self._persist_downlink_diagnostics()
+
+    def _persist_downlink_diagnostics(self):
+        if self._state != 'failed' or self._failure is None:
+            return
+        value = {
+            'schema_version': 1,
+            'round_id': self._round_id,
+            'role': 'server',
+            'state': 'failed',
+            'error_code': self._failure.error_code,
+            'error_message': self._failure.error_message,
+            'downlink_diagnostics': dict(self._downlink_diagnostics),
+        }
+        if self._failure.node_id is not None:
+            value['node_id'] = self._failure.node_id
+        try:
+            write_json_atomic(
+                os.path.join(self._round_dir, 'round-state.json'), value)
+        except Exception as exc:
+            self._downlink_diagnostics_persistence_error = exc
 
     def _validate_update_manifest(self, manifest, round_id, node_id):
         _validate_exact_fields(manifest, (
@@ -516,7 +648,14 @@ class ServerRuntime(object):
                 return
             self._failure = FLRuntimeError(
                 error_code, error_message, round_id=self._round_id)
-            self._write_state('failed', error_code=error_code, error_message=error_message)
+            extra = {
+                'error_code': error_code,
+                'error_message': error_message,
+            }
+            if self._downlink_diagnostics:
+                extra['downlink_diagnostics'] = dict(
+                    self._downlink_diagnostics)
+            self._write_state('failed', **extra)
             self._condition.notify_all()
 
 

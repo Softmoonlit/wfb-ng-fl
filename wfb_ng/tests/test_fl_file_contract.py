@@ -373,6 +373,14 @@ class ServerStub(object):
     def install_round(self, **kwargs):
         return None
 
+    def start_downlink(self, round_id, model_path, manifest_path):
+        self.publish_model(round_id, model_path, manifest_path)
+        return self
+
+    def wait_downlink(self, operation):
+        if operation is not self:
+            raise RuntimeError('unexpected operation handle')
+
     def publish_model(self, round_id, model_path, manifest_path):
         return None
 
