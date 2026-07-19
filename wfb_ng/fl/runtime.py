@@ -1,13 +1,160 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import errno
+import fcntl
 import os
 import threading
 import uuid
 from types import MappingProxyType
 
-from .artifacts import archive_file, read_json, validate_artifact, write_json_atomic
+from .artifacts import (
+    archive_file,
+    inspect_artifact,
+    read_json,
+    validate_artifact,
+    write_json_atomic,
+)
 from .errors import FLRuntimeError
+
+
+class WorkDirLock(object):
+    def __init__(self, work_dir):
+        os.makedirs(work_dir, exist_ok=True)
+        lock_path = os.path.join(work_dir, 'runtime.lock')
+        self._lock_file = None
+        try:
+            self._lock_file = open(lock_path, 'a+b')
+        except OSError as exc:
+            raise FLRuntimeError(
+                'work_dir_unavailable', '无法打开 Runtime 工作目录锁') from exc
+        try:
+            fcntl.flock(
+                self._lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            self._lock_file.close()
+            self._lock_file = None
+            if exc.errno in (errno.EACCES, errno.EAGAIN):
+                raise FLRuntimeError(
+                    'work_dir_locked',
+                    '工作目录已被其他 Runtime 实例占用') from exc
+            raise FLRuntimeError(
+                'work_dir_unavailable', '无法取得 Runtime 工作目录锁') from exc
+
+    def close(self):
+        if self._lock_file is None:
+            return
+        fcntl.flock(self._lock_file.fileno(), fcntl.LOCK_UN)
+        self._lock_file.close()
+        self._lock_file = None
+
+    def __del__(self):
+        self.close()
+
+
+def validate_round_state(state, round_id, role, active_states):
+    terminal_states = ('succeeded', 'failed')
+    if (not isinstance(state, dict) or
+            type(state.get('schema_version')) is not int or
+            state.get('schema_version') != 1 or
+            state.get('round_id') != round_id or
+            state.get('role') != role or
+            state.get('state') not in active_states + terminal_states):
+        raise FLRuntimeError('round_state_corrupted', '轮次状态结构无效')
+    if state['state'] == 'succeeded' and role == 'server':
+        participant_node_ids = state.get('participant_node_ids')
+        committed_node_ids = state.get('committed_update_node_ids')
+        if (not isinstance(participant_node_ids, list) or
+                any(type(node_id) is not int or node_id <= 0
+                    for node_id in participant_node_ids) or
+                participant_node_ids != sorted(set(participant_node_ids)) or
+                committed_node_ids != participant_node_ids):
+            raise FLRuntimeError('round_state_corrupted', '成功轮次参与集合无效')
+    if state['state'] == 'failed':
+        if (not isinstance(state.get('error_code'), str) or
+                not state['error_code'] or
+                not isinstance(state.get('error_message'), str)):
+            raise FLRuntimeError('round_state_corrupted', '失败轮次错误无效')
+        node_id = state.get('node_id')
+        if node_id is not None and (type(node_id) is not int or node_id <= 0):
+            raise FLRuntimeError('round_state_corrupted', '失败轮次节点标识无效')
+
+
+def recover_round_states(work_dir, role):
+    rounds_dir = os.path.join(work_dir, 'rounds')
+    try:
+        names = os.listdir(rounds_dir)
+    except FileNotFoundError:
+        return None
+    except OSError as exc:
+        raise FLRuntimeError(
+            'round_state_corrupted', '无法扫描轮次状态') from exc
+
+    active_states = {
+        'server': ('publishing_model', 'waiting_for_updates'),
+        'client': ('model_received', 'submitting_update'),
+    }
+    terminal_states = ('succeeded', 'failed')
+    terminal_by_id = {}
+    restarted = []
+    for name in names:
+        round_dir = os.path.join(rounds_dir, name)
+        if not os.path.isdir(round_dir):
+            raise FLRuntimeError('round_state_corrupted', '轮次目录结构无效')
+        try:
+            round_id = str(uuid.UUID(name))
+        except (ValueError, TypeError, AttributeError) as exc:
+            raise FLRuntimeError('round_state_corrupted', '轮次目录标识无效') from exc
+        if round_id != name:
+            raise FLRuntimeError('round_state_corrupted', '轮次目录标识无效')
+        state_path = os.path.join(round_dir, 'round-state.json')
+        try:
+            state = read_json(state_path)
+        except FLRuntimeError as exc:
+            raise FLRuntimeError('round_state_corrupted', '无法读取轮次状态') from exc
+        validate_round_state(state, round_id, role, active_states[role])
+        if state['state'] in terminal_states:
+            terminal_by_id[round_id] = state
+            continue
+        previous_state = state['state']
+        state.update({
+            'state': 'failed',
+            'error_code': 'runtime_restarted',
+            'error_message': 'Runtime 重启终结了未完成轮次',
+            'restart_previous_state': previous_state,
+        })
+        write_json_atomic(state_path, state)
+        terminal_by_id[round_id] = state
+        restarted.append(state)
+
+    current_path = os.path.join(work_dir, 'current-round.json')
+    if not os.path.exists(current_path):
+        if len(restarted) == 1:
+            return restarted[0]
+        if len(restarted) > 1:
+            raise FLRuntimeError(
+                'round_state_corrupted', '无法确定重启前当前轮次')
+        return None
+    try:
+        current = read_json(current_path)
+        round_id = str(uuid.UUID(current['round_id']))
+    except (FLRuntimeError, KeyError, ValueError, TypeError, AttributeError) as exc:
+        raise FLRuntimeError('round_state_corrupted', '当前轮次指针无效') from exc
+    if current != {
+            'schema_version': 1, 'role': role, 'round_id': round_id}:
+        raise FLRuntimeError('round_state_corrupted', '当前轮次指针无效')
+    try:
+        return terminal_by_id[round_id]
+    except KeyError as exc:
+        raise FLRuntimeError('round_state_corrupted', '当前轮次状态不存在') from exc
+
+
+def write_current_round(work_dir, role, round_id):
+    write_json_atomic(os.path.join(work_dir, 'current-round.json'), {
+        'schema_version': 1,
+        'role': role,
+        'round_id': round_id,
+    })
 
 
 class ServerRuntime(object):
@@ -24,15 +171,57 @@ class ServerRuntime(object):
         self.participant_node_ids = tuple(sorted(participant_node_ids))
         self.max_update_size_bytes = max_update_size_bytes
         self.transport = transport
+        self._owner = WorkDirLock(self.work_dir)
+        try:
+            recovered_state = recover_round_states(self.work_dir, 'server')
+        except Exception:
+            self._owner.close()
+            raise
         self._condition = threading.Condition()
         self._round_id = None
         self._round_dir = None
         self._downlink_completed = False
         self._failure = None
         self._state = None
+        self._recovered_participant_node_ids = None
         self._round_result_consumed = False
         self._publish_active = False
         self._wait_for_updates_active = False
+        if recovered_state is not None:
+            self._restore_terminal_state(recovered_state)
+
+    def close(self):
+        self._owner.close()
+
+    def _restore_terminal_state(self, state):
+        round_id = state['round_id']
+        if state['state'] == 'succeeded':
+            participant_node_ids = state.get('participant_node_ids')
+            committed_node_ids = state.get('committed_update_node_ids')
+            if (not isinstance(participant_node_ids, list) or
+                    any(type(node_id) is not int or node_id <= 0
+                        for node_id in participant_node_ids) or
+                    participant_node_ids != sorted(set(participant_node_ids)) or
+                    committed_node_ids != participant_node_ids):
+                self._owner.close()
+                raise FLRuntimeError(
+                    'round_state_corrupted', '成功轮次参与集合无效')
+            self._recovered_participant_node_ids = tuple(participant_node_ids)
+            self._downlink_completed = True
+        elif state['state'] == 'failed':
+            if (not isinstance(state.get('error_code'), str) or
+                    not isinstance(state.get('error_message'), str)):
+                self._owner.close()
+                raise FLRuntimeError('round_state_corrupted', '失败轮次错误无效')
+            self._failure = FLRuntimeError(
+                state['error_code'], state['error_message'],
+                round_id=round_id, node_id=state.get('node_id'))
+        else:
+            self._owner.close()
+            raise FLRuntimeError('round_state_corrupted', '当前轮次不是终态')
+        self._round_id = round_id
+        self._round_dir = os.path.join(self.work_dir, 'rounds', round_id)
+        self._state = state['state']
 
     def publish_model(self, model_path):
         self._require_ready()
@@ -69,6 +258,12 @@ class ServerRuntime(object):
             self._write_state('publishing_model')
 
         try:
+            try:
+                write_current_round(self.work_dir, 'server', round_id)
+            except Exception as exc:
+                self._fail_round(
+                    'state_persistence_failed', '当前轮次指针持久化失败')
+                raise self._failure from exc
             size_bytes, digest = archive_file(model_path, model_target)
             manifest = {
                 'schema_version': 1,
@@ -121,7 +316,11 @@ class ServerRuntime(object):
             round_dir = self._round_dir
 
         try:
-            result = self._wait_for_complete_updates(round_id, round_dir)
+            if (self._state == 'succeeded' and
+                    self._recovered_participant_node_ids is not None):
+                result = self._rebuild_terminal_updates(round_id, round_dir)
+            else:
+                result = self._wait_for_complete_updates(round_id, round_dir)
             with self._condition:
                 self._round_result_consumed = True
             return result
@@ -142,6 +341,29 @@ class ServerRuntime(object):
             if update_paths is not None:
                 return MappingProxyType(update_paths)
             self.transport.wait_for_update(0.1)
+
+    def _rebuild_terminal_updates(self, round_id, round_dir):
+        update_paths = {}
+        node_ids = self._recovered_participant_node_ids
+        for node_id in node_ids:
+            update_dir = os.path.join(round_dir, 'updates', str(node_id))
+            manifest_path = os.path.join(update_dir, 'update.manifest.json')
+            update_path = os.path.abspath(os.path.join(update_dir, 'update.bin'))
+            if not os.path.isfile(manifest_path) or not os.path.isfile(update_path):
+                raise FLRuntimeError(
+                    'round_artifacts_removed', '轮次托管交付物已被移除',
+                    round_id=round_id)
+            try:
+                manifest = read_json(manifest_path)
+                self._validate_update_manifest(manifest, round_id, node_id)
+                if os.path.getsize(update_path) != manifest['size_bytes']:
+                    raise OSError('update size mismatch')
+            except (FLRuntimeError, OSError) as exc:
+                raise FLRuntimeError(
+                    'round_artifacts_corrupted', '轮次托管交付物已损坏',
+                    round_id=round_id, node_id=node_id) from exc
+            update_paths[node_id] = update_path
+        return MappingProxyType(update_paths)
 
     def _complete_round_if_ready(self, round_id, round_dir):
         with self._condition:
@@ -202,9 +424,10 @@ class ServerRuntime(object):
         }
         if any(manifest.get(key) != value for key, value in expected.items()):
             raise FLRuntimeError('invalid_manifest', 'update manifest 身份无效')
-        if not isinstance(manifest.get('size_bytes'), int):
+        if type(manifest.get('size_bytes')) is not int or manifest['size_bytes'] < 0:
             raise FLRuntimeError('invalid_manifest', 'update manifest 大小无效')
-        if not isinstance(manifest.get('sha256'), str):
+        if (not isinstance(manifest.get('sha256'), str) or
+                len(manifest['sha256']) != 64):
             raise FLRuntimeError('invalid_manifest', 'update manifest 摘要无效')
 
     def _require_ready(self):
@@ -241,12 +464,21 @@ class ClientRuntime(object):
         self.node_id = node_id
         self.max_update_size_bytes = max_update_size_bytes
         self.transport = transport
+        self._owner = WorkDirLock(self.work_dir)
+        try:
+            recover_round_states(self.work_dir, 'client')
+        except Exception:
+            self._owner.close()
+            raise
         self._condition = threading.Condition()
         self._round_id = None
         self._round_dir = None
         self._state = None
         self._wait_for_model_active = False
         self._submit_update_active = False
+
+    def close(self):
+        self._owner.close()
 
     def wait_for_model(self):
         self._require_ready()
@@ -280,6 +512,14 @@ class ClientRuntime(object):
         self._round_id = round_id
         self._round_dir = round_dir
         self._write_state('model_received')
+        try:
+            write_current_round(self.work_dir, 'client', round_id)
+        except Exception as exc:
+            self._write_failed_state(
+                'state_persistence_failed', '当前轮次指针持久化失败')
+            raise FLRuntimeError(
+                'state_persistence_failed', '当前轮次指针持久化失败',
+                round_id=round_id, node_id=self.node_id) from exc
         return model_path
 
     def submit_update(self, update_path):
@@ -297,7 +537,20 @@ class ClientRuntime(object):
                 raise FLRuntimeError('round_in_progress', '轮次正在提交 update')
             self._submit_update_active = True
         try:
+            update_path = inspect_artifact(
+                update_path, self.max_update_size_bytes)
+            self._write_state('submitting_update')
             return self._submit_update(update_path)
+        except FLRuntimeError as exc:
+            if self._state == 'submitting_update':
+                self._write_failed_state(exc.error_code, exc.error_message)
+            raise
+        except Exception as exc:
+            error = FLRuntimeError(
+                'update_submit_failed', 'update 提交失败',
+                round_id=self._round_id, node_id=self.node_id)
+            self._write_failed_state(error.error_code, error.error_message)
+            raise error from exc
         finally:
             with self._condition:
                 self._submit_update_active = False
@@ -315,19 +568,8 @@ class ClientRuntime(object):
             'sha256': digest,
         }
         write_json_atomic(os.path.join(self._round_dir, 'update.manifest.json'), manifest)
-        self._write_state('submitting_update')
-        try:
-            self.transport.submit_update(
-                self._round_id, self.node_id, managed_update, size_bytes, digest)
-        except FLRuntimeError as exc:
-            self._write_failed_state(exc.error_code, exc.error_message)
-            raise
-        except Exception as exc:
-            error = FLRuntimeError(
-                'update_submit_failed', 'update 提交失败',
-                round_id=self._round_id, node_id=self.node_id)
-            self._write_failed_state(error.error_code, error.error_message)
-            raise error from exc
+        self.transport.submit_update(
+            self._round_id, self.node_id, managed_update, size_bytes, digest)
         self._write_state('succeeded')
         return None
 
@@ -351,9 +593,10 @@ class ClientRuntime(object):
             raise FLRuntimeError('invalid_manifest', '模型 manifest 参与集合无效')
         if self.node_id not in participant_node_ids:
             raise FLRuntimeError('model_not_for_this_node', '模型不属于本节点')
-        if not isinstance(manifest.get('size_bytes'), int):
+        if type(manifest.get('size_bytes')) is not int or manifest['size_bytes'] < 0:
             raise FLRuntimeError('invalid_manifest', '模型 manifest 大小无效')
-        if not isinstance(manifest.get('sha256'), str):
+        if (not isinstance(manifest.get('sha256'), str) or
+                len(manifest['sha256']) != 64):
             raise FLRuntimeError('invalid_manifest', '模型 manifest 摘要无效')
 
     def _require_ready(self):

@@ -48,7 +48,10 @@ class ServerRole(object):
         return self.runtime
 
     def close(self):
-        self.transport.close()
+        try:
+            self.transport.close()
+        finally:
+            self.runtime.close()
 
     def __enter__(self):
         self.start()
@@ -83,7 +86,10 @@ class ClientRole(object):
         return self.runtime
 
     def close(self):
-        self.transport.close()
+        try:
+            self.transport.close()
+        finally:
+            self.runtime.close()
 
     def __enter__(self):
         self.start()
