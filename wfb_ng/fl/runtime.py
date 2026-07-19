@@ -4,13 +4,15 @@
 import errno
 import fcntl
 import os
+import shutil
 import threading
 import uuid
 from types import MappingProxyType
 
 from .artifacts import (
     archive_file,
-    inspect_artifact,
+    archive_open_file,
+    preflight_artifact,
     read_json,
     validate_artifact,
     write_json_atomic,
@@ -50,6 +52,34 @@ class WorkDirLock(object):
 
     def __del__(self):
         self.close()
+
+
+def _validate_max_update_size(value):
+    if type(value) is not int or value <= 0:
+        raise FLRuntimeError('invalid_configuration', 'update 大小限制无效')
+
+
+def _parse_round_id(value):
+    if not isinstance(value, str):
+        raise FLRuntimeError('invalid_manifest', '轮次标识无效')
+    try:
+        parsed = uuid.UUID(value)
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise FLRuntimeError('invalid_manifest', '轮次标识无效') from exc
+    if parsed.version != 4 or str(parsed) != value:
+        raise FLRuntimeError('invalid_manifest', '轮次标识无效')
+    return value
+
+
+def _validate_sha256(value):
+    if (not isinstance(value, str) or len(value) != 64 or
+            any(character not in '0123456789abcdef' for character in value)):
+        raise FLRuntimeError('invalid_manifest', 'SHA-256 摘要无效')
+
+
+def _validate_exact_fields(value, fields):
+    if not isinstance(value, dict) or set(value) != set(fields):
+        raise FLRuntimeError('invalid_manifest', 'manifest 字段无效')
 
 
 def validate_round_state(state, round_id, role, active_states):
@@ -169,6 +199,7 @@ class ServerRuntime(object):
                 len(set(participant_node_ids)) != len(participant_node_ids)):
             raise FLRuntimeError('invalid_configuration', '参与节点集合无效')
         self.participant_node_ids = tuple(sorted(participant_node_ids))
+        _validate_max_update_size(max_update_size_bytes)
         self.max_update_size_bytes = max_update_size_bytes
         self.transport = transport
         self._owner = WorkDirLock(self.work_dir)
@@ -178,6 +209,7 @@ class ServerRuntime(object):
             self._owner.close()
             raise
         self._condition = threading.Condition()
+        self._fatal_error = None
         self._round_id = None
         self._round_dir = None
         self._downlink_completed = False
@@ -243,66 +275,76 @@ class ServerRuntime(object):
                 self._publish_active = False
 
     def _publish_model(self, model_path):
-        round_id = str(uuid.uuid4())
-        round_dir = os.path.join(self.work_dir, 'rounds', round_id)
-        model_target = os.path.join(round_dir, 'model.bin')
-        manifest_path = os.path.join(round_dir, 'model.manifest.json')
-
-        with self._condition:
-            os.makedirs(round_dir)
-            self._round_id = round_id
-            self._round_dir = round_dir
-            self._downlink_completed = False
-            self._failure = None
-            self._round_result_consumed = False
-            self._write_state('publishing_model')
-
+        source, source_stat = preflight_artifact(model_path)
         try:
-            try:
-                write_current_round(self.work_dir, 'server', round_id)
-            except Exception as exc:
-                self._fail_round(
-                    'state_persistence_failed', '当前轮次指针持久化失败')
-                raise self._failure from exc
-            size_bytes, digest = archive_file(model_path, model_target)
-            manifest = {
-                'schema_version': 1,
-                'artifact_type': 'model',
-                'round_id': round_id,
-                'size_bytes': size_bytes,
-                'sha256': digest,
-                'participant_node_ids': list(self.participant_node_ids),
-            }
-            write_json_atomic(manifest_path, manifest)
-            self.transport.install_round(
-                round_id=round_id,
-                participant_node_ids=self.participant_node_ids,
-                round_dir=round_dir,
-                max_update_size_bytes=self.max_update_size_bytes,
-                failure_callback=self.report_update_failure,
-            )
-            self.transport.publish_model(round_id, model_target, manifest_path)
-        except FLRuntimeError as exc:
-            if self._failure is None:
-                self._fail_round('model_publish_failed', '模型发布失败')
-            with self._condition:
-                self._round_result_consumed = True
-            raise self._failure or exc
-        except Exception as exc:
-            self._fail_round('transport_failed', 'UFTP 下行失败')
-            with self._condition:
-                self._round_result_consumed = True
-            raise self._failure from exc
+            while True:
+                round_id = str(uuid.uuid4())
+                round_dir = os.path.join(self.work_dir, 'rounds', round_id)
+                try:
+                    os.makedirs(round_dir)
+                    break
+                except FileExistsError:
+                    continue
+            model_target = os.path.join(round_dir, 'model.bin')
+            manifest_path = os.path.join(round_dir, 'model.manifest.json')
 
-        with self._condition:
-            if self._failure is not None:
-                self._round_result_consumed = True
-                raise self._failure
-            self._downlink_completed = True
-            self._write_state('waiting_for_updates')
-            self._condition.notify_all()
-        self._complete_round_if_ready(round_id, round_dir)
-        return None
+            with self._condition:
+                self._round_id = round_id
+                self._round_dir = round_dir
+                self._downlink_completed = False
+                self._failure = None
+                self._round_result_consumed = False
+                self._write_state('publishing_model')
+
+            try:
+                try:
+                    write_current_round(self.work_dir, 'server', round_id)
+                except Exception as exc:
+                    self._fail_round(
+                        'state_persistence_failed', '当前轮次指针持久化失败')
+                    raise self._failure from exc
+                size_bytes, digest = archive_open_file(
+                    source, source_stat, model_target)
+                manifest = {
+                    'schema_version': 1,
+                    'artifact_type': 'model',
+                    'round_id': round_id,
+                    'size_bytes': size_bytes,
+                    'sha256': digest,
+                    'participant_node_ids': list(self.participant_node_ids),
+                }
+                write_json_atomic(manifest_path, manifest)
+                self.transport.install_round(
+                    round_id=round_id,
+                    participant_node_ids=self.participant_node_ids,
+                    round_dir=round_dir,
+                    max_update_size_bytes=self.max_update_size_bytes,
+                    failure_callback=self.report_update_failure,
+                )
+                self.transport.publish_model(round_id, model_target, manifest_path)
+            except FLRuntimeError as exc:
+                if self._failure is None:
+                    self._fail_round(exc.error_code, exc.error_message)
+                with self._condition:
+                    self._round_result_consumed = True
+                raise self._failure or exc
+            except Exception as exc:
+                self._fail_round('transport_failed', 'UFTP 下行失败')
+                with self._condition:
+                    self._round_result_consumed = True
+                raise self._failure from exc
+
+            with self._condition:
+                if self._failure is not None:
+                    self._round_result_consumed = True
+                    raise self._failure
+                self._downlink_completed = True
+                self._write_state('waiting_for_updates')
+                self._condition.notify_all()
+            self._complete_round_if_ready(round_id, round_dir)
+            return None
+        finally:
+            source.close()
 
     def wait_for_updates(self):
         self._require_ready()
@@ -316,8 +358,7 @@ class ServerRuntime(object):
             round_dir = self._round_dir
 
         try:
-            if (self._state == 'succeeded' and
-                    self._recovered_participant_node_ids is not None):
+            if self._state == 'succeeded':
                 result = self._rebuild_terminal_updates(round_id, round_dir)
             else:
                 result = self._wait_for_complete_updates(round_id, round_dir)
@@ -344,7 +385,8 @@ class ServerRuntime(object):
 
     def _rebuild_terminal_updates(self, round_id, round_dir):
         update_paths = {}
-        node_ids = self._recovered_participant_node_ids
+        node_ids = (
+            self._recovered_participant_node_ids or self.participant_node_ids)
         for node_id in node_ids:
             update_dir = os.path.join(round_dir, 'updates', str(node_id))
             manifest_path = os.path.join(update_dir, 'update.manifest.json')
@@ -357,7 +399,8 @@ class ServerRuntime(object):
                 manifest = read_json(manifest_path)
                 self._validate_update_manifest(manifest, round_id, node_id)
                 validate_artifact(
-                    update_path, manifest['size_bytes'], manifest['sha256'])
+                    update_path, manifest['size_bytes'], manifest['sha256'],
+                    self.max_update_size_bytes)
             except (FLRuntimeError, OSError) as exc:
                 raise FLRuntimeError(
                     'round_artifacts_corrupted', '轮次托管交付物已损坏',
@@ -384,7 +427,9 @@ class ServerRuntime(object):
                     round_dir, 'updates', str(node_id), 'update.manifest.json')
                 manifest = read_json(manifest_path)
                 self._validate_update_manifest(manifest, round_id, node_id)
-                validate_artifact(update_path, manifest['size_bytes'], manifest['sha256'])
+                validate_artifact(
+                    update_path, manifest['size_bytes'], manifest['sha256'],
+                    self.max_update_size_bytes)
         except FLRuntimeError as exc:
             self._fail_round(exc.error_code, exc.error_message)
             raise
@@ -416,26 +461,29 @@ class ServerRuntime(object):
             self.transport.cancel_downlink()
 
     def _validate_update_manifest(self, manifest, round_id, node_id):
-        expected = {
-            'schema_version': 1,
-            'artifact_type': 'update',
-            'round_id': round_id,
-            'node_id': node_id,
-        }
-        if any(manifest.get(key) != value for key, value in expected.items()):
+        _validate_exact_fields(manifest, (
+            'schema_version', 'artifact_type', 'round_id', 'node_id',
+            'size_bytes', 'sha256'))
+        if (type(manifest['schema_version']) is not int or
+                manifest['schema_version'] != 1 or
+                manifest['artifact_type'] != 'update' or
+                _parse_round_id(manifest['round_id']) != round_id or
+                type(manifest['node_id']) is not int or
+                manifest['node_id'] != node_id):
             raise FLRuntimeError('invalid_manifest', 'update manifest 身份无效')
-        if type(manifest.get('size_bytes')) is not int or manifest['size_bytes'] < 0:
+        if type(manifest['size_bytes']) is not int or manifest['size_bytes'] < 0:
             raise FLRuntimeError('invalid_manifest', 'update manifest 大小无效')
-        if (not isinstance(manifest.get('sha256'), str) or
-                len(manifest['sha256']) != 64):
-            raise FLRuntimeError('invalid_manifest', 'update manifest 摘要无效')
+        if manifest['size_bytes'] > self.max_update_size_bytes:
+            raise FLRuntimeError('artifact_too_large', 'update 超过大小限制')
+        _validate_sha256(manifest['sha256'])
 
     def _require_ready(self):
+        if self._fatal_error is not None:
+            raise self._fatal_error
         if not self.transport.ready:
             raise FLRuntimeError('transport_not_ready', 'Transport 尚未 ready')
 
     def _write_state(self, state, **extra):
-        self._state = state
         value = {
             'schema_version': 1,
             'round_id': self._round_id,
@@ -443,7 +491,14 @@ class ServerRuntime(object):
             'state': state,
         }
         value.update(extra)
-        write_json_atomic(os.path.join(self._round_dir, 'round-state.json'), value)
+        try:
+            write_json_atomic(os.path.join(self._round_dir, 'round-state.json'), value)
+        except Exception as exc:
+            self._fatal_error = FLRuntimeError(
+                'state_persistence_failed', 'server 轮次状态持久化失败',
+                round_id=self._round_id)
+            raise self._fatal_error from exc
+        self._state = state
 
     def _fail_round(self, error_code, error_message):
         with self._condition:
@@ -462,6 +517,7 @@ class ClientRuntime(object):
         if not isinstance(node_id, int) or isinstance(node_id, bool) or node_id <= 0:
             raise FLRuntimeError('invalid_configuration', '本机节点标识无效')
         self.node_id = node_id
+        _validate_max_update_size(max_update_size_bytes)
         self.max_update_size_bytes = max_update_size_bytes
         self.transport = transport
         self._owner = WorkDirLock(self.work_dir)
@@ -471,6 +527,7 @@ class ClientRuntime(object):
             self._owner.close()
             raise
         self._condition = threading.Condition()
+        self._fatal_error = None
         self._round_id = None
         self._round_dir = None
         self._state = None
@@ -514,32 +571,153 @@ class ClientRuntime(object):
                 self._wait_for_model_active = False
 
     def _wait_for_model(self):
-        candidate_dir = self.transport.wait_for_model_candidate()
-        manifest = read_json(os.path.join(candidate_dir, 'model.manifest.json'))
-        self._validate_model_manifest(manifest)
-        source_model = os.path.join(candidate_dir, 'model.bin')
-        validate_artifact(source_model, manifest['size_bytes'], manifest['sha256'])
+        while True:
+            candidate_dir = self.transport.wait_for_model_candidate()
+            manifest = None
+            try:
+                manifest = read_json(os.path.join(candidate_dir, 'model.manifest.json'))
+                self._validate_model_manifest(manifest)
+            except FLRuntimeError as exc:
+                round_id = self._candidate_round_id(manifest)
+                if round_id is not None:
+                    self._fail_model_delivery(round_id, exc)
+                self._quarantine_candidate(candidate_dir, exc.error_code, exc.error_message)
+                raise
 
-        round_id = manifest['round_id']
+            round_id = manifest['round_id']
+            if self.node_id not in manifest['participant_node_ids']:
+                self._quarantine_candidate(
+                    candidate_dir, 'model_not_for_this_node', '模型不属于本节点')
+                continue
+
+            existing_manifest = self._read_existing_model_manifest(round_id)
+            if existing_manifest is not None:
+                if self._model_delivery_matches(
+                        candidate_dir, manifest, existing_manifest, round_id):
+                    self._quarantine_candidate(
+                        candidate_dir, 'duplicate_model_ignored',
+                        '重复模型交付已忽略')
+                    continue
+                self._quarantine_candidate(
+                    candidate_dir, 'round_id_content_conflict',
+                    '相同轮次标识对应不同模型内容')
+                raise FLRuntimeError(
+                    'round_id_content_conflict', '相同轮次标识对应不同模型内容',
+                    round_id=round_id, node_id=self.node_id)
+
+            source_model = os.path.join(candidate_dir, 'model.bin')
+            try:
+                validate_artifact(
+                    source_model, manifest['size_bytes'], manifest['sha256'])
+                round_dir = os.path.join(self.work_dir, 'rounds', round_id)
+                model_path = os.path.abspath(os.path.join(round_dir, 'model.bin'))
+                size_bytes, digest = archive_file(source_model, model_path)
+                if size_bytes != manifest['size_bytes'] or digest != manifest['sha256']:
+                    raise FLRuntimeError(
+                        'artifact_integrity_failed', '模型归档校验失败')
+                write_json_atomic(
+                    os.path.join(round_dir, 'model.manifest.json'), manifest)
+            except FLRuntimeError as exc:
+                self._fail_model_delivery(round_id, exc)
+                self._quarantine_candidate(
+                    candidate_dir, exc.error_code, exc.error_message)
+                raise FLRuntimeError(
+                    exc.error_code, exc.error_message,
+                    round_id=round_id, node_id=self.node_id) from exc
+
+            self._round_id = round_id
+            self._round_dir = round_dir
+            self._failure = None
+            self._round_result_consumed = True
+            self._write_state('model_received')
+            try:
+                write_current_round(self.work_dir, 'client', round_id)
+            except Exception as exc:
+                self._write_failed_state(
+                    'state_persistence_failed', '当前轮次指针持久化失败')
+                raise FLRuntimeError(
+                    'state_persistence_failed', '当前轮次指针持久化失败',
+                    round_id=round_id, node_id=self.node_id) from exc
+            return model_path
+
+    def _candidate_round_id(self, manifest):
+        if not isinstance(manifest, dict):
+            return None
+        try:
+            return _parse_round_id(manifest.get('round_id'))
+        except FLRuntimeError:
+            return None
+
+    def _read_existing_model_manifest(self, round_id):
+        manifest_path = os.path.join(
+            self.work_dir, 'rounds', round_id, 'model.manifest.json')
+        if not os.path.isfile(manifest_path):
+            return None
+        try:
+            manifest = read_json(manifest_path)
+            self._validate_model_manifest(manifest)
+            return manifest
+        except FLRuntimeError as exc:
+            raise FLRuntimeError(
+                'round_artifacts_corrupted', '既有模型托管交付物已损坏',
+                round_id=round_id, node_id=self.node_id) from exc
+
+    def _model_delivery_matches(
+            self, candidate_dir, manifest, existing_manifest, round_id):
+        if manifest != existing_manifest:
+            return False
+        try:
+            validate_artifact(
+                os.path.join(candidate_dir, 'model.bin'),
+                manifest['size_bytes'], manifest['sha256'])
+            validate_artifact(
+                os.path.join(self.work_dir, 'rounds', round_id, 'model.bin'),
+                existing_manifest['size_bytes'], existing_manifest['sha256'])
+        except FLRuntimeError:
+            return False
+        return True
+
+    def _fail_model_delivery(self, round_id, error):
         round_dir = os.path.join(self.work_dir, 'rounds', round_id)
-        model_path = os.path.abspath(os.path.join(round_dir, 'model.bin'))
-        size_bytes, digest = archive_file(source_model, model_path)
-        if size_bytes != manifest['size_bytes'] or digest != manifest['sha256']:
-            raise FLRuntimeError('artifact_integrity_failed', '模型归档校验失败')
-        write_json_atomic(os.path.join(round_dir, 'model.manifest.json'), manifest)
-
+        state_path = os.path.join(round_dir, 'round-state.json')
+        if os.path.isfile(state_path):
+            try:
+                state = read_json(state_path)
+            except FLRuntimeError:
+                state = None
+            if isinstance(state, dict) and state.get('state') in ('succeeded', 'failed'):
+                return
+        os.makedirs(round_dir, exist_ok=True)
         self._round_id = round_id
         self._round_dir = round_dir
-        self._write_state('model_received')
+        self._failure = FLRuntimeError(
+            error.error_code, error.error_message,
+            round_id=round_id, node_id=self.node_id)
+        self._round_result_consumed = True
+        self._write_failed_state(error.error_code, error.error_message)
+        write_current_round(self.work_dir, 'client', round_id)
+
+    def _quarantine_candidate(self, candidate_dir, error_code, error_message):
+        rejected_root = os.path.join(self.work_dir, 'rejected-models')
+        os.makedirs(rejected_root, exist_ok=True)
+        while True:
+            rejected_dir = os.path.join(rejected_root, str(uuid.uuid4()))
+            try:
+                os.makedirs(rejected_dir)
+                break
+            except FileExistsError:
+                continue
         try:
-            write_current_round(self.work_dir, 'client', round_id)
-        except Exception as exc:
-            self._write_failed_state(
-                'state_persistence_failed', '当前轮次指针持久化失败')
+            shutil.move(candidate_dir, os.path.join(rejected_dir, 'delivery'))
+        except (OSError, shutil.Error) as exc:
             raise FLRuntimeError(
-                'state_persistence_failed', '当前轮次指针持久化失败',
-                round_id=round_id, node_id=self.node_id) from exc
-        return model_path
+                'model_quarantine_failed', '模型候选隔离失败',
+                node_id=self.node_id) from exc
+        write_json_atomic(os.path.join(rejected_dir, 'rejection.json'), {
+            'schema_version': 1,
+            'error_code': error_code,
+            'error_message': error_message,
+        })
 
     def submit_update(self, update_path):
         self._require_ready()
@@ -561,29 +739,36 @@ class ClientRuntime(object):
             if self._state != 'model_received':
                 raise FLRuntimeError('round_in_progress', '轮次正在提交 update')
             self._submit_update_active = True
+        source = None
         try:
-            update_path = inspect_artifact(
+            source, source_stat = preflight_artifact(
                 update_path, self.max_update_size_bytes)
             self._write_state('submitting_update')
-            return self._submit_update(update_path)
+            return self._submit_update(source, source_stat)
         except FLRuntimeError as exc:
             if self._state == 'submitting_update':
+                self._failure = FLRuntimeError(
+                    exc.error_code, exc.error_message,
+                    round_id=self._round_id, node_id=self.node_id)
                 self._write_failed_state(exc.error_code, exc.error_message)
             raise
         except Exception as exc:
             error = FLRuntimeError(
                 'update_submit_failed', 'update 提交失败',
                 round_id=self._round_id, node_id=self.node_id)
+            self._failure = error
             self._write_failed_state(error.error_code, error.error_message)
             raise error from exc
         finally:
+            if source is not None:
+                source.close()
             with self._condition:
                 self._submit_update_active = False
 
-    def _submit_update(self, update_path):
+    def _submit_update(self, source, source_stat):
         managed_update = os.path.join(self._round_dir, 'update.bin')
-        size_bytes, digest = archive_file(
-            update_path, managed_update, self.max_update_size_bytes)
+        size_bytes, digest = archive_open_file(
+            source, source_stat, managed_update, self.max_update_size_bytes)
         manifest = {
             'schema_version': 1,
             'artifact_type': 'update',
@@ -599,37 +784,32 @@ class ClientRuntime(object):
         return None
 
     def _validate_model_manifest(self, manifest):
-        try:
-            parsed = uuid.UUID(manifest['round_id'])
-        except (KeyError, ValueError, TypeError, AttributeError) as exc:
-            raise FLRuntimeError('invalid_manifest', '模型轮次标识无效') from exc
-        expected = {
-            'schema_version': 1,
-            'artifact_type': 'model',
-            'round_id': str(parsed),
-        }
-        if any(manifest.get(key) != value for key, value in expected.items()):
+        _validate_exact_fields(manifest, (
+            'schema_version', 'artifact_type', 'round_id', 'size_bytes',
+            'sha256', 'participant_node_ids'))
+        if (type(manifest['schema_version']) is not int or
+                manifest['schema_version'] != 1 or
+                manifest['artifact_type'] != 'model'):
             raise FLRuntimeError('invalid_manifest', '模型 manifest 身份无效')
-        participant_node_ids = manifest.get('participant_node_ids')
+        _parse_round_id(manifest['round_id'])
+        participant_node_ids = manifest['participant_node_ids']
         if (not isinstance(participant_node_ids, list) or
-                any(not isinstance(node_id, int) or isinstance(node_id, bool)
+                not participant_node_ids or
+                any(type(node_id) is not int or node_id <= 0
                     for node_id in participant_node_ids) or
-                len(set(participant_node_ids)) != len(participant_node_ids)):
+                participant_node_ids != sorted(set(participant_node_ids))):
             raise FLRuntimeError('invalid_manifest', '模型 manifest 参与集合无效')
-        if self.node_id not in participant_node_ids:
-            raise FLRuntimeError('model_not_for_this_node', '模型不属于本节点')
-        if type(manifest.get('size_bytes')) is not int or manifest['size_bytes'] < 0:
+        if type(manifest['size_bytes']) is not int or manifest['size_bytes'] < 0:
             raise FLRuntimeError('invalid_manifest', '模型 manifest 大小无效')
-        if (not isinstance(manifest.get('sha256'), str) or
-                len(manifest['sha256']) != 64):
-            raise FLRuntimeError('invalid_manifest', '模型 manifest 摘要无效')
+        _validate_sha256(manifest['sha256'])
 
     def _require_ready(self):
+        if self._fatal_error is not None:
+            raise self._fatal_error
         if not self.transport.ready:
             raise FLRuntimeError('transport_not_ready', 'Transport 尚未 ready')
 
     def _write_state(self, state, **extra):
-        self._state = state
         value = {
             'schema_version': 1,
             'round_id': self._round_id,
@@ -637,7 +817,14 @@ class ClientRuntime(object):
             'state': state,
         }
         value.update(extra)
-        write_json_atomic(os.path.join(self._round_dir, 'round-state.json'), value)
+        try:
+            write_json_atomic(os.path.join(self._round_dir, 'round-state.json'), value)
+        except Exception as exc:
+            self._fatal_error = FLRuntimeError(
+                'state_persistence_failed', 'client 轮次状态持久化失败',
+                round_id=self._round_id, node_id=self.node_id)
+            raise self._fatal_error from exc
+        self._state = state
 
     def _write_failed_state(self, error_code, error_message):
         self._write_state(
