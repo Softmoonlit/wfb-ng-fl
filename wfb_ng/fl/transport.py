@@ -64,8 +64,16 @@ class ServerTransport(object):
                 if error is not None:
                     self._send_error(*error)
                     return False
-                self.send_response_only(100)
-                self.end_headers()
+                try:
+                    self.send_response_only(100)
+                    self.end_headers()
+                except OSError:
+                    transport._fail_accepted_upload(
+                        self._upload_context,
+                        'continue_write_failed',
+                        '100 Continue 写回失败')
+                    self.close_connection = True
+                    return False
                 return True
 
             def do_PUT(self):
@@ -194,6 +202,15 @@ class ServerTransport(object):
     def _release_upload(self):
         with self._context_lock:
             self._upload_active = False
+
+    def _fail_accepted_upload(self, upload_context, error_code, error_message):
+        context, _, _ = upload_context
+        try:
+            context.failure_callback(
+                context.round_id, context.participant_node_id,
+                error_code, error_message)
+        finally:
+            self._release_upload()
 
     def _receive_update(self, handler, upload_context):
         context, content_length, expected_digest = upload_context

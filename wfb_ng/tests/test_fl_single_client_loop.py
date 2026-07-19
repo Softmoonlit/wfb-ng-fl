@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import base64
 import hashlib
 import json
 import os
@@ -11,6 +12,7 @@ import threading
 import time
 import unittest
 import uuid
+from types import SimpleNamespace
 
 from wfb_ng.fl import (
     ClientRole,
@@ -19,6 +21,7 @@ from wfb_ng.fl import (
     ServerRole,
     ServerRuntime,
 )
+from wfb_ng.fl.transport import ServerTransport
 
 
 def reserve_udp_port():
@@ -173,6 +176,28 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
         self.assertIn('%s/model.bin' % round_id, status)
         self.assertIn('%s/model.manifest.json' % round_id, status)
 
+    def test_continue_write_failure_reports_failure_and_releases_upload_slot(self):
+        failures = []
+        transport = ServerTransport(1, 2, self.uftp_port)
+        round_id = str(uuid.uuid4())
+        transport.install_round(
+            round_id, 1, os.path.join(self.root, 'server-failure'), 1024,
+            lambda *args: failures.append(args))
+        handler = make_upload_handler(round_id, 1, b'update')
+
+        self.assertIsNone(transport._reserve_upload(handler))
+        transport._fail_accepted_upload(
+            handler._upload_context,
+            'continue_write_failed',
+            '100 Continue 写回失败')
+
+        self.assertEqual([
+            (round_id, 1, 'continue_write_failed', '100 Continue 写回失败'),
+        ], failures)
+        retry_handler = make_upload_handler(round_id, 1, b'update')
+        self.assertIsNone(transport._reserve_upload(retry_handler))
+        transport._release_upload()
+
     def test_submit_update_wraps_transport_error_and_persists_failure(self):
         work_dir = os.path.join(self.root, 'client-failure')
         round_id = str(uuid.uuid4())
@@ -242,6 +267,20 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
                 return
             time.sleep(0.02)
         self.fail('server round was not created')
+
+
+def make_upload_handler(round_id, node_id, body):
+    digest = hashlib.sha256(body).digest()
+    content_digest = base64.b64encode(digest).decode('ascii')
+    return SimpleNamespace(
+        command='PUT',
+        path='/v1/rounds/%s/updates/%d' % (round_id, node_id),
+        headers={
+            'Content-Length': str(len(body)),
+            'Content-Type': 'application/octet-stream',
+            'Content-Digest': 'sha-256=:%s:' % content_digest,
+        },
+    )
 
 
 class FailingClientTransport(object):
