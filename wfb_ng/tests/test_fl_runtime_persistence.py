@@ -294,7 +294,7 @@ class V8RuntimePersistenceTestCase(unittest.TestCase):
                     os.unlink(update_path)
                 else:
                     with open(update_path, 'wb') as fh:
-                        fh.write(b'changed-size')
+                        fh.write(b'tamper')
 
                 recovered = ServerRuntime(
                     work_dir, 1, 1024, ReadyServerTransport())
@@ -403,13 +403,94 @@ class V8RuntimePersistenceTestCase(unittest.TestCase):
 
         runtime = ClientRuntime(work_dir, 1, 1024, transport)
         self.addCleanup(runtime.close)
-        model_path = runtime.wait_for_model()
+        with self.assertRaises(FLRuntimeError) as pending:
+            runtime.wait_for_model()
+        self.assertEqual('round_result_pending', pending.exception.error_code)
 
+        with self.assertRaises(FLRuntimeError) as restarted:
+            runtime.submit_update(os.path.join(self.root, 'missing-update'))
+        self.assertEqual('runtime_restarted', restarted.exception.error_code)
+        self.assertEqual(old_round_id, restarted.exception.round_id)
+        self.assertEqual(0, transport.submit_count)
+
+        with self.assertRaises(FLRuntimeError) as consumed:
+            runtime.submit_update(os.path.join(self.root, 'missing-update'))
+        self.assertEqual('round_already_failed', consumed.exception.error_code)
+
+        model_path = runtime.wait_for_model()
         self.assertIn(new_round_id, model_path)
         self.assertEqual(0, transport.submit_count)
         with open(old_state_path, 'r', encoding='utf-8') as fh:
             old_state = json.load(fh)
         self.assertEqual('runtime_restarted', old_state['error_code'])
+
+    def test_client_success_result_is_replayed_before_new_round(self):
+        work_dir = os.path.join(self.root, 'successful-client')
+        first_round_id = str(uuid.uuid4())
+        update_path = os.path.join(self.root, 'successful-update.input')
+        with open(update_path, 'wb') as fh:
+            fh.write(b'update')
+
+        first_transport = CandidateClientTransport(
+            self.make_model_candidate(first_round_id))
+        first = ClientRuntime(work_dir, 1, 1024, first_transport)
+        first.wait_for_model()
+        first.submit_update(update_path)
+        self.assertEqual(1, first_transport.submit_count)
+        first.close()
+
+        second_round_id = str(uuid.uuid4())
+        second_transport = CandidateClientTransport(
+            self.make_model_candidate(second_round_id))
+        recovered = ClientRuntime(work_dir, 1, 1024, second_transport)
+        self.addCleanup(recovered.close)
+        with self.assertRaises(FLRuntimeError) as pending:
+            recovered.wait_for_model()
+        self.assertEqual('round_result_pending', pending.exception.error_code)
+
+        self.assertIsNone(recovered.submit_update(
+            os.path.join(self.root, 'missing-update')))
+        self.assertEqual(0, second_transport.submit_count)
+        with self.assertRaises(FLRuntimeError) as consumed:
+            recovered.submit_update(os.path.join(self.root, 'missing-update'))
+        self.assertEqual('round_already_succeeded', consumed.exception.error_code)
+
+        model_path = recovered.wait_for_model()
+        self.assertIn(second_round_id, model_path)
+        self.assertNotEqual(first_round_id, second_round_id)
+
+    def test_client_persisted_failure_replays_original_error(self):
+        work_dir = os.path.join(self.root, 'failed-client')
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(work_dir, 'rounds', round_id)
+        os.makedirs(round_dir)
+        self.write_json(os.path.join(round_dir, 'round-state.json'), {
+            'schema_version': 1,
+            'round_id': round_id,
+            'role': 'client',
+            'state': 'failed',
+            'error_code': 'update_submit_failed',
+            'error_message': '原始提交错误',
+            'node_id': 1,
+        })
+        self.write_json(os.path.join(work_dir, 'current-round.json'), {
+            'schema_version': 1,
+            'role': 'client',
+            'round_id': round_id,
+        })
+
+        runtime = ClientRuntime(work_dir, 1, 1024, ReadyClientTransport())
+        self.addCleanup(runtime.close)
+        with self.assertRaises(FLRuntimeError) as replayed:
+            runtime.submit_update(os.path.join(self.root, 'missing-update'))
+        self.assertEqual('update_submit_failed', replayed.exception.error_code)
+        self.assertEqual('原始提交错误', replayed.exception.error_message)
+        self.assertEqual(round_id, replayed.exception.round_id)
+        self.assertEqual(1, replayed.exception.node_id)
+
+        with self.assertRaises(FLRuntimeError) as consumed:
+            runtime.submit_update(os.path.join(self.root, 'missing-update'))
+        self.assertEqual('round_already_failed', consumed.exception.error_code)
 
     def make_model_candidate(self, round_id):
         candidate = os.path.join(self.root, 'candidate', round_id)

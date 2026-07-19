@@ -356,8 +356,8 @@ class ServerRuntime(object):
             try:
                 manifest = read_json(manifest_path)
                 self._validate_update_manifest(manifest, round_id, node_id)
-                if os.path.getsize(update_path) != manifest['size_bytes']:
-                    raise OSError('update size mismatch')
+                validate_artifact(
+                    update_path, manifest['size_bytes'], manifest['sha256'])
             except (FLRuntimeError, OSError) as exc:
                 raise FLRuntimeError(
                     'round_artifacts_corrupted', '轮次托管交付物已损坏',
@@ -466,7 +466,7 @@ class ClientRuntime(object):
         self.transport = transport
         self._owner = WorkDirLock(self.work_dir)
         try:
-            recover_round_states(self.work_dir, 'client')
+            recovered_state = recover_round_states(self.work_dir, 'client')
         except Exception:
             self._owner.close()
             raise
@@ -474,19 +474,38 @@ class ClientRuntime(object):
         self._round_id = None
         self._round_dir = None
         self._state = None
+        self._failure = None
+        self._round_result_consumed = True
         self._wait_for_model_active = False
         self._submit_update_active = False
+        if recovered_state is not None:
+            self._restore_terminal_state(recovered_state)
 
     def close(self):
         self._owner.close()
+
+    def _restore_terminal_state(self, state):
+        round_id = state['round_id']
+        if state['state'] == 'failed':
+            self._failure = FLRuntimeError(
+                state['error_code'], state['error_message'],
+                round_id=round_id, node_id=state.get('node_id'))
+        self._round_id = round_id
+        self._round_dir = os.path.join(self.work_dir, 'rounds', round_id)
+        self._state = state['state']
+        self._round_result_consumed = False
 
     def wait_for_model(self):
         self._require_ready()
         with self._condition:
             if self._wait_for_model_active:
                 raise FLRuntimeError('operation_in_progress', '已有模型等待正在进行')
-            if self._round_id is not None and self._state not in ('succeeded', 'failed'):
-                raise FLRuntimeError('round_in_progress', '已有活动轮次')
+            if self._round_id is not None:
+                if self._state in ('succeeded', 'failed'):
+                    if not self._round_result_consumed:
+                        raise FLRuntimeError('round_result_pending', '轮次结果尚未消费')
+                else:
+                    raise FLRuntimeError('round_in_progress', '已有活动轮次')
             self._wait_for_model_active = True
         try:
             return self._wait_for_model()
@@ -530,8 +549,14 @@ class ClientRuntime(object):
             if self._round_id is None:
                 raise FLRuntimeError('no_active_round', '没有活动轮次')
             if self._state == 'succeeded':
+                if not self._round_result_consumed:
+                    self._round_result_consumed = True
+                    return None
                 raise FLRuntimeError('round_already_succeeded', '轮次已成功')
             if self._state == 'failed':
+                if not self._round_result_consumed:
+                    self._round_result_consumed = True
+                    raise self._failure
                 raise FLRuntimeError('round_already_failed', '轮次已失败')
             if self._state != 'model_received':
                 raise FLRuntimeError('round_in_progress', '轮次正在提交 update')

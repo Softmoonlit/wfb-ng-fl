@@ -92,7 +92,7 @@ Runtime 通过 Transport 收到“全部预期目标的模型文件交付成功�
 
 同一 `round_id` 的重复模型若 schema、参与集合、大小、摘要和实际内容完全一致，记录 `duplicate_model_ignored`，不覆盖也不再次返回。关键字段或内容不一致时记录 `round_id_content_conflict`，保留原文件并隔离冲突物；活动轮次失败，终态轮次保持原终态。同一标识不能代表两个内容版本。
 
-同一 client 同时最多一个未完成的 `wait_for_model()`；并发调用以 `operation_in_progress` 失败。成功返回后，在轮次终态前再次等待以 `round_in_progress` 拒绝；进入终态后才可等待新轮次。
+同一 client 同时最多一个未完成的 `wait_for_model()`；并发调用以 `operation_in_progress` 失败。成功返回后，在轮次终态前再次等待以 `round_in_progress` 拒绝；进入终态后才可等待新轮次。重启恢复出的终态结果尚未消费时，`wait_for_model()` 以 `round_result_pending` 拒绝，且不从 Transport 取得新模型候选。
 
 ## update 提交和 update manifest
 
@@ -111,7 +111,7 @@ Runtime 通过 Transport 收到“全部预期目标的模型文件交付成功�
 
 每个 client 每轮最多占用一次真正提交机会。只有状态为 `model_received` 时才允许进入受并发门禁保护的无副作用预检；预检确认固定路径、可读取普通文件且大小不超过 `max_update_size_bytes`。预检失败保持 `model_received`，不占用提交机会，调用方可修正后重试。
 
-预检通过后，Runtime 在开始归档前原子转入 `submitting_update`，这是提交机会的占用边界。之后不能替换路径、取消或同轮重提；归档、manifest、持久化、连接或 HTTP 失败均使本轮 `failed`。已占用提交机会的失败即使发生在发送 body 前也不允许同轮重提。状态为 `succeeded` 或 `failed` 时分别返回 `round_already_succeeded` 或 `round_already_failed`。
+预检通过后，Runtime 在开始归档前原子转入 `submitting_update`，这是提交机会的占用边界。之后不能替换路径、取消或同轮重提；归档、manifest、持久化、连接或 HTTP 失败均使本轮 `failed`。已占用提交机会的失败即使发生在发送 body 前也不允许同轮重提。状态为 `succeeded` 或 `failed` 时分别返回 `round_already_succeeded` 或 `round_already_failed`。唯一例外是重启恢复出的待消费终态：第一次 `submit_update(...)` 不访问输入路径、不调用 Transport，成功终态返回 `None`，失败终态重放持久化的结构化轮次错误，并在返回或抛错边界标记结果已消费；此后重复调用恢复上述常规终态错误。
 
 client 本地归档和 server 接收都必须独立校验 manifest 与数据文件。client 的 update manifest 不作为独立 HTTP 资源上传；server 根据已验证传输元数据重新生成权威 manifest。
 
@@ -150,7 +150,7 @@ server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配
 
 同一活动轮次最多一个未完成的 `wait_for_updates()`；并发调用以 `operation_in_progress` 失败。接口没有 `timeout`、`min_clients` 或 `allow_partial` 参数。
 
-结果交付到当前调用栈的返回或抛错边界前，在内存中标记为已消费，不写入状态文件。成功终态只能由 `wait_for_updates()` 交付和消费；`publish_model(...)` 正常返回不得顺便标记成功结果已消费，未消费结果继续占据当前轮位置并阻止开启下一轮。成功或失败结果消费后，下一轮开启前重复调用 `wait_for_updates()` 可以从托管目录和状态记录重建相同结果；成功结果首次交付和重读都只复核 manifest、固定路径、存在性和大小，不再次计算整文件 SHA-256。若 `succeeded` 终态的托管 update 已被部署侧清理，接口以 `round_artifacts_removed` 抛出结果交付错误；文件仍在但上述结构或大小不符时以 `round_artifacts_corrupted` 抛出。同大小内容被外部改写不在交付复核的检测保证内，属于违反托管目录和只读调用契约；目录权限和可选只读属性用于降低此类误操作，但不提供并发篡改下的强一致保证。结果交付错误不把 `succeeded` 改写为 `failed`，但在抛错边界消费本轮；下一轮开启前重复调用重放同一交付错误。失败终态重放结构化轮次错误。`publish_model(...)` 直接报告的轮次错误同样视为已交付。
+结果交付到当前调用栈的返回或抛错边界前，在内存中标记为已消费，不写入状态文件。成功终态只能由 `wait_for_updates()` 交付和消费；`publish_model(...)` 正常返回不得顺便标记成功结果已消费，未消费结果继续占据当前轮位置并阻止开启下一轮。成功或失败结果消费后，下一轮开启前重复调用 `wait_for_updates()` 可以从托管目录和状态记录重建相同结果；成功结果首次交付和重读都复核 manifest、固定路径、存在性、大小和整文件 SHA-256。若 `succeeded` 终态的托管 update 已被部署侧清理，接口以 `round_artifacts_removed` 抛出结果交付错误；文件仍在但上述结构、大小或摘要不符时以 `round_artifacts_corrupted` 抛出。调用方仍不得原地改写托管交付物；目录权限和可选只读属性用于降低误操作，但不提供并发篡改下的强一致保证。结果交付错误不把 `succeeded` 改写为 `failed`，但在抛错边界消费本轮；下一轮开启前重复调用重放同一交付错误。失败终态重放结构化轮次错误。`publish_model(...)` 直接报告的轮次错误同样视为已交付。
 
 ## 状态持久化、重启与工作目录锁
 
@@ -158,7 +158,7 @@ server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配
 
 每个 Runtime 实例对工作目录持有操作系统排他的跨进程锁；第二个实例必须 fail-fast。server 和 client 使用不同工作目录，同机多个 client 也必须各自独占目录。该锁用于协调实例所有权，不是文件权限或安全边界；v8 不要求实现专用的锁感知清理工具。部署侧只能在对应角色服务已经停止并确认 Runtime、Transport 及其子进程不再使用该目录后清理终态轮次。
 
-进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。成功/失败终态不恢复为新进程当前轮；新进程必须以新的 `round_id` 开始。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新角色进程前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
+进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。当前成功或失败终态恢复为对应结果接口的待消费结果，不恢复任何活动 operation；结果消费后，新进程必须以新的 `round_id` 开始下一轮。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新角色进程前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
 
 终态目录默认不自动删除。托管路径只承诺在当前部署和工作目录位置下有效，调用方不得原地修改、重命名或删除；清理只能处理可确认终态，不能删除活动轮次。Runtime 不提供在线清理、历史查询或跨进程恢复接口。
 
