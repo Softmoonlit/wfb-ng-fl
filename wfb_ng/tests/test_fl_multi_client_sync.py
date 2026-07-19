@@ -133,6 +133,23 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         clients[2].submit_update(self.write_file('last-update.input', b'last'))
         self.assertEqual([1, 2], list(waiting.join()))
 
+    def test_cancel_failure_does_not_replace_participant_submit_failure(self):
+        server, _, transport = self.make_round((1, 2))
+        transport.cancel_error = OSError('cancel failed')
+        publishing = ThreadResult(lambda: server.publish_model(
+            self.write_file('cancel-error-model.input', b'model')))
+        publishing.start()
+        transport.wait_until_publishing()
+
+        transport.fail_upload(2, 'upload_incomplete', '节点 2 提交失败')
+
+        with self.assertRaises(FLRuntimeError) as raised:
+            publishing.join()
+        self.assertEqual('upload_incomplete', raised.exception.error_code)
+        with self.assertRaises(FLRuntimeError) as waiting:
+            server.wait_for_updates()
+        self.assertEqual('upload_incomplete', waiting.exception.error_code)
+
     def test_participant_submit_failure_cancels_active_downlink(self):
         server, _, transport = self.make_round((1, 2))
         publishing = ThreadResult(lambda: server.publish_model(
@@ -309,6 +326,8 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
                 'Content-Length': '1',
                 'Content-Type': 'application/octet-stream',
                 'Content-Digest': 'sha-256=:%s:' % ('A' * 43 + '='),
+                'Expect': '100-continue',
+                'Connection': 'close',
             },
         )
 
@@ -368,6 +387,7 @@ class SharedRoundTransport(object):
         self._downlink_complete = threading.Event()
         self._update_event = threading.Event()
         self.cancel_count = 0
+        self.cancel_error = None
 
     def client(self, node_id):
         return SharedClientTransport(self, node_id)
@@ -396,6 +416,8 @@ class SharedRoundTransport(object):
     def cancel_downlink(self):
         self.cancel_count += 1
         self._downlink_complete.set()
+        if self.cancel_error is not None:
+            raise self.cancel_error
 
     def complete_downlink(self):
         self._downlink_complete.set()

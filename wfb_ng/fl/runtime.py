@@ -376,6 +376,8 @@ class ServerRuntime(object):
     def _wait_for_complete_updates(self, round_id, round_dir):
         while True:
             with self._condition:
+                if self._fatal_error is not None:
+                    raise self._fatal_error
                 if self._failure is not None:
                     raise self._failure
             update_paths = self._complete_round_if_ready(round_id, round_dir)
@@ -453,12 +455,19 @@ class ServerRuntime(object):
                 return
             self._failure = FLRuntimeError(
                 error_code, error_message, round_id=round_id, node_id=node_id)
-            self._write_state(
-                'failed', error_code=error_code, error_message=error_message,
-                node_id=node_id)
+            try:
+                self._write_state(
+                    'failed', error_code=error_code, error_message=error_message,
+                    node_id=node_id)
+            except Exception:
+                self._condition.notify_all()
+                raise
             self._condition.notify_all()
         if self._publish_active:
-            self.transport.cancel_downlink()
+            try:
+                self.transport.cancel_downlink()
+            except Exception:
+                pass
 
     def _validate_update_manifest(self, manifest, round_id, node_id):
         _validate_exact_fields(manifest, (

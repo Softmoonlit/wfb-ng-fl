@@ -62,6 +62,10 @@ class ServerTransport(object):
         class UpdateHandler(http.server.BaseHTTPRequestHandler):
             protocol_version = 'HTTP/1.1'
 
+            def setup(self):
+                super().setup()
+                self.connection.settimeout(transport.io_timeout)
+
             def handle_expect_100(self):
                 error = transport._reserve_upload(self)
                 if error is not None:
@@ -83,11 +87,17 @@ class ServerTransport(object):
                 if not getattr(self, '_upload_context', None):
                     self._send_error(400, 'expect_required', '必须使用 Expect: 100-continue')
                     return
-                self.connection.settimeout(transport.io_timeout)
                 try:
                     transport._receive_update(self, self._upload_context)
                 finally:
                     transport._release_upload()
+
+            def do_GET(self):
+                self._send_error(400, 'method_not_allowed', '只允许 PUT 请求')
+
+            do_POST = do_GET
+            do_PATCH = do_GET
+            do_DELETE = do_GET
 
             def _send_error(self, status, error_code, message):
                 body = json.dumps({
@@ -187,12 +197,19 @@ class ServerTransport(object):
             context = self._context
             if context is None:
                 return 404, 'round_not_found', '轮次不存在'
+            if handler.command != 'PUT':
+                return 400, 'method_not_allowed', '只允许 PUT 请求'
             prefix = '/v1/rounds/%s/updates/' % context.round_id
-            if handler.command != 'PUT' or not handler.path.startswith(prefix):
+            if not handler.path.startswith(prefix):
                 return 404, 'round_not_found', '轮次不存在'
+            node_id_text = handler.path[len(prefix):]
+            if not node_id_text or not node_id_text.isascii() or not node_id_text.isdigit():
+                return 400, 'invalid_node_id', '节点标识无效'
             try:
-                node_id = int(handler.path[len(prefix):])
+                node_id = int(node_id_text)
             except ValueError:
+                return 400, 'invalid_node_id', '节点标识无效'
+            if str(node_id) != node_id_text or node_id <= 0:
                 return 400, 'invalid_node_id', '节点标识无效'
             if node_id not in context.participant_node_ids:
                 return 404, 'node_not_participant', '节点不属于本轮'
@@ -204,17 +221,43 @@ class ServerTransport(object):
                 return 409, 'update_submission_used', 'update 提交机会已占用'
             if self._upload_active:
                 return 409, 'upload_in_progress', '已有 update 正在上传'
-            try:
-                content_length = int(handler.headers['Content-Length'])
-            except (KeyError, TypeError, ValueError):
+            if _header_values(handler.headers, 'Transfer-Encoding'):
+                return 400, 'invalid_request_headers', '请求 headers 无效'
+            expect_values = _header_values(handler.headers, 'Expect')
+            connection_values = _header_values(handler.headers, 'Connection')
+            if expect_values != ['100-continue']:
+                return 400, 'invalid_request_headers', '请求 headers 无效'
+            if connection_values != ['close']:
+                return 400, 'connection_close_required', '必须使用 Connection: close'
+            content_lengths = _header_values(handler.headers, 'Content-Length')
+            content_digests = _header_values(handler.headers, 'Content-Digest')
+            content_types = _header_values(handler.headers, 'Content-Type')
+            if (len(content_lengths) > 1 or len(content_digests) != 1 or
+                    len(content_types) != 1):
+                return 400, 'invalid_request_headers', '请求 headers 无效'
+            if not content_lengths:
                 return 411, 'length_required', '缺少合法 Content-Length'
-            if content_length < 0 or content_length > context.max_update_size_bytes:
+            try:
+                content_length = int(content_lengths[0])
+            except (TypeError, ValueError):
+                return 400, 'invalid_content_length', 'Content-Length 无效'
+            if content_length < 0:
+                return 400, 'invalid_content_length', 'Content-Length 无效'
+            if content_length > context.max_update_size_bytes:
                 return 413, 'update_too_large', 'update 超过大小限制'
-            if handler.headers.get('Content-Type') != 'application/octet-stream':
+            if content_types[0] != 'application/octet-stream':
                 return 415, 'unsupported_media_type', 'Content-Type 无效'
-            digest = _parse_content_digest(handler.headers.get('Content-Digest'))
+            digest = _parse_content_digest(content_digests[0])
             if digest is None:
                 return 400, 'invalid_content_digest', 'Content-Digest 无效'
+            try:
+                os.makedirs(update_dir, exist_ok=True)
+                with tempfile.NamedTemporaryFile(
+                        mode='wb', dir=update_dir, prefix='.upload-preflight.',
+                        delete=True):
+                    pass
+            except OSError:
+                return 507, 'storage_unavailable', 'update 目标存储不可用'
             self._upload_active = True
             self._used_uploads.add(update_key)
             handler._upload_context = (context, node_id, content_length, digest)
@@ -235,45 +278,86 @@ class ServerTransport(object):
     def _receive_update(self, handler, upload_context):
         context, node_id, content_length, expected_digest = upload_context
         update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
-        os.makedirs(update_dir, exist_ok=True)
+        update_path = os.path.join(update_dir, 'update.bin')
         temp_path = None
+        data_placed = False
         committed = False
         try:
-            digest = hashlib.sha256()
-            received = 0
-            with tempfile.NamedTemporaryFile(
+            try:
+                os.makedirs(update_dir, exist_ok=True)
+                target = tempfile.NamedTemporaryFile(
                     mode='wb', dir=update_dir, prefix='.update.bin.',
-                    delete=False) as target:
-                temp_path = target.name
-                while received < content_length:
-                    chunk = handler.rfile.read(min(64 * 1024, content_length - received))
-                    if not chunk:
-                        raise FLRuntimeError('upload_incomplete', 'update body 提前结束')
-                    target.write(chunk)
-                    digest.update(chunk)
-                    received += len(chunk)
-                target.flush()
-                os.fsync(target.fileno())
-            if digest.digest() != expected_digest:
-                error_code = 'digest_mismatch'
-                error_message = 'update 摘要不匹配'
-                context.failure_callback(
-                    context.round_id, node_id,
-                    error_code, error_message)
-                handler._send_error(422, error_code, error_message)
+                    delete=False)
+            except OSError:
+                self._reject_accepted_upload(
+                    handler, context, node_id, 507,
+                    'storage_failed', 'update 数据落盘失败')
                 return
 
-            update_path = os.path.join(update_dir, 'update.bin')
-            os.replace(temp_path, update_path)
+            temp_path = target.name
+            digest = hashlib.sha256()
+            received = 0
+            try:
+                with target:
+                    while received < content_length:
+                        try:
+                            chunk = handler.rfile.read(
+                                min(64 * 1024, content_length - received))
+                        except (OSError, socket.timeout):
+                            raise FLRuntimeError(
+                                'upload_incomplete', 'update body 接收失败')
+                        if not chunk:
+                            raise FLRuntimeError(
+                                'upload_incomplete', 'update body 提前结束')
+                        try:
+                            target.write(chunk)
+                        except OSError:
+                            raise FLRuntimeError(
+                                'storage_failed', 'update 数据落盘失败')
+                        digest.update(chunk)
+                        received += len(chunk)
+                    try:
+                        target.flush()
+                        os.fsync(target.fileno())
+                    except OSError:
+                        raise FLRuntimeError(
+                            'storage_failed', 'update 数据落盘失败')
+            except FLRuntimeError as exc:
+                status = 507 if exc.error_code == 'storage_failed' else 422
+                self._reject_accepted_upload(
+                    handler, context, node_id, status,
+                    exc.error_code, exc.error_message)
+                return
+
+            if digest.digest() != expected_digest:
+                self._reject_accepted_upload(
+                    handler, context, node_id, 422,
+                    'digest_mismatch', 'update 摘要不匹配')
+                return
+
+            try:
+                os.replace(temp_path, update_path)
+            except OSError:
+                self._reject_accepted_upload(
+                    handler, context, node_id, 507,
+                    'storage_failed', 'update 数据落盘失败')
+                return
             temp_path = None
-            write_json_atomic(os.path.join(update_dir, 'update.manifest.json'), {
-                'schema_version': 1,
-                'artifact_type': 'update',
-                'round_id': context.round_id,
-                'node_id': node_id,
-                'size_bytes': content_length,
-                'sha256': digest.hexdigest(),
-            })
+            data_placed = True
+            try:
+                write_json_atomic(os.path.join(update_dir, 'update.manifest.json'), {
+                    'schema_version': 1,
+                    'artifact_type': 'update',
+                    'round_id': context.round_id,
+                    'node_id': node_id,
+                    'size_bytes': content_length,
+                    'sha256': digest.hexdigest(),
+                })
+            except Exception:
+                self._reject_accepted_upload(
+                    handler, context, node_id, 500,
+                    'manifest_commit_failed', 'update manifest 提交失败')
+                return
             committed = True
             self._update_event.set()
             handler.send_response(201)
@@ -281,25 +365,38 @@ class ServerTransport(object):
             handler.send_header('Connection', 'close')
             handler.end_headers()
             handler.close_connection = True
-        except (FLRuntimeError, OSError, socket.timeout) as exc:
+        except OSError:
             if committed:
                 handler.close_connection = True
                 return
-            error_code = 'upload_incomplete'
-            error_message = 'update body 接收失败'
-            context.failure_callback(
-                context.round_id, node_id,
-                error_code, error_message)
-            try:
-                handler._send_error(422, error_code, error_message)
-            except OSError:
-                pass
+            self._reject_accepted_upload(
+                handler, context, node_id, 422,
+                'upload_incomplete', 'update body 接收失败')
         finally:
             if temp_path is not None:
                 try:
                     os.unlink(temp_path)
                 except FileNotFoundError:
                     pass
+            if data_placed and not committed:
+                try:
+                    os.unlink(update_path)
+                except FileNotFoundError:
+                    pass
+
+    def _reject_accepted_upload(
+            self, handler, context, node_id, status, error_code, error_message):
+        try:
+            context.failure_callback(
+                context.round_id, node_id, error_code, error_message)
+        except Exception:
+            status = 500
+            error_code = 'runtime_result_failed'
+            error_message = 'Runtime 无法可靠接收上传失败结果'
+        try:
+            handler._send_error(status, error_code, error_message)
+        except OSError:
+            handler.close_connection = True
 
 
 class ClientTransport(object):
@@ -370,10 +467,12 @@ class ClientTransport(object):
 
     def submit_update(self, round_id, node_id, update_path, size_bytes, digest_hex):
         host, port = self.server_http_address
-        sock = socket.create_connection((host, port), timeout=self.io_timeout)
-        sock.settimeout(self.io_timeout)
-        response_file = sock.makefile('rb')
+        sock = None
+        response_file = None
         try:
+            sock = socket.create_connection((host, port), timeout=self.io_timeout)
+            sock.settimeout(self.io_timeout)
+            response_file = sock.makefile('rb')
             path = '/v1/rounds/%s/updates/%d' % (round_id, node_id)
             digest = base64.b64encode(bytes.fromhex(digest_hex)).decode('ascii')
             headers = (
@@ -388,9 +487,10 @@ class ClientTransport(object):
             sock.sendall(headers.encode('ascii'))
             status, response_headers = _read_http_response(response_file)
             if status != 100:
-                raise FLRuntimeError(
-                    'update_rejected', 'server 在 body 前返回 HTTP %d' % status,
-                    round_id=round_id, node_id=node_id)
+                raise _read_http_error(
+                    response_file, status, response_headers,
+                    'update_rejected', 'server 在 body 前拒绝 update',
+                    round_id, node_id)
             with open(update_path, 'rb') as fh:
                 while True:
                     chunk = fh.read(64 * 1024)
@@ -398,14 +498,27 @@ class ClientTransport(object):
                         break
                     sock.sendall(chunk)
             status, response_headers = _read_http_response(response_file)
-            content_length = int(response_headers.get('content-length', '0'))
-            if status != 201 or content_length != 0:
+            if status != 201:
+                raise _read_http_error(
+                    response_file, status, response_headers,
+                    'update_submit_failed', 'server 拒绝 update 提交',
+                    round_id, node_id)
+            content_lengths = response_headers.get('content-length', [])
+            if content_lengths != ['0']:
                 raise FLRuntimeError(
                     'update_submit_failed', 'server 最终响应不是空 body 201',
                     round_id=round_id, node_id=node_id)
+        except FLRuntimeError:
+            raise
+        except (OSError, socket.timeout) as exc:
+            raise FLRuntimeError(
+                'update_submit_failed', 'update HTTP 提交失败',
+                round_id=round_id, node_id=node_id) from exc
         finally:
-            response_file.close()
-            sock.close()
+            if response_file is not None:
+                response_file.close()
+            if sock is not None:
+                sock.close()
 
     def close(self):
         self.ready = False
@@ -415,6 +528,14 @@ class ClientTransport(object):
         if self._uftpd_stderr is not None:
             self._uftpd_stderr.close()
             self._uftpd_stderr = None
+
+
+def _header_values(headers, name):
+    get_all = getattr(headers, 'get_all', None)
+    if get_all is not None:
+        return get_all(name, [])
+    value = headers.get(name)
+    return [] if value is None else [value]
 
 
 def _format_uid(uid):
@@ -468,9 +589,48 @@ def _read_http_response(response_file):
             break
         if not line:
             raise FLRuntimeError('invalid_http_response', 'HTTP 响应 headers 不完整')
-        name, value = line.decode('iso-8859-1').split(':', 1)
-        headers[name.strip().lower()] = value.strip()
-    return int(parts[1]), headers
+        try:
+            name, value = line.decode('iso-8859-1').split(':', 1)
+        except ValueError as exc:
+            raise FLRuntimeError(
+                'invalid_http_response', 'HTTP 响应 header 无效') from exc
+        headers.setdefault(name.strip().lower(), []).append(value.strip())
+    try:
+        return int(parts[1]), headers
+    except ValueError as exc:
+        raise FLRuntimeError('invalid_http_response', 'HTTP 响应状态码无效') from exc
+
+
+def _read_http_error(
+        response_file, status, headers, default_code, default_message,
+        round_id, node_id):
+    content_lengths = headers.get('content-length', [])
+    if len(content_lengths) != 1:
+        return FLRuntimeError(
+            default_code, '%s，HTTP %d' % (default_message, status),
+            round_id=round_id, node_id=node_id)
+    try:
+        content_length = int(content_lengths[0])
+    except ValueError:
+        content_length = -1
+    if content_length < 0 or content_length > 16 * 1024:
+        return FLRuntimeError(
+            default_code, '%s，HTTP %d' % (default_message, status),
+            round_id=round_id, node_id=node_id)
+    try:
+        body = response_file.read(content_length)
+        value = json.loads(body.decode('utf-8'))
+        error_code = value['error_code']
+        error_message = value['error_message']
+        if (not isinstance(error_code, str) or not error_code or
+                not isinstance(error_message, str)):
+            raise ValueError('invalid error body')
+    except (KeyError, TypeError, ValueError, UnicodeError, json.JSONDecodeError):
+        return FLRuntimeError(
+            default_code, '%s，HTTP %d' % (default_message, status),
+            round_id=round_id, node_id=node_id)
+    return FLRuntimeError(
+        error_code, error_message, round_id=round_id, node_id=node_id)
 
 
 def _stop_process(process):
