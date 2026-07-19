@@ -176,7 +176,12 @@ baseline_split_test:
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_txrx.TXRXTestCase wfb_ng.tests.test_txrx.KeyDerivationTestCase
 	PYTHONPATH=`pwd` $(PYTHON) -m twisted.trial wfb_ng.tests.test_tuntap.TUNTAPTestCase
 
-test: test_v6
+test: test_v6 test_v8
+
+test_v8:
+	@command -v uftp >/dev/null || { echo "缺少原生 uftp 可执行文件" >&2; exit 1; }
+	@command -v uftpd >/dev/null || { echo "缺少原生 uftpd 可执行文件" >&2; exit 1; }
+	PYTHONPATH=`pwd` $(PYTHON) -m unittest discover -s wfb_ng/tests -p 'test_fl_*.py' -v
 
 test_v6: build_v6 $(V6_DEFAULT_TESTS)
 	./fec_test

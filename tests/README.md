@@ -6,7 +6,8 @@
 
 ## 当前推荐入口
 
-- 默认构建/测试入口：仓库根目录 `Makefile` 中的 `test` / `test_v6`
+- 默认构建/测试入口：仓库根目录 `Makefile` 中的 `test`，同时运行 `test_v6` 与 `test_v8`
+- v8 本机自动测试入口：`make test_v8`，无需 root 或无线硬件，但要求系统安装原生 `uftp` 和 `uftpd`
 - namespace 验收入口：`tests/acceptance/`
 - real-hardware 入口：`tests/real_hardware/`
 
