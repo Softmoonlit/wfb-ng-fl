@@ -280,6 +280,7 @@ def make_upload_handler(round_id, node_id, body):
             'Content-Length': str(len(body)),
             'Content-Type': 'application/octet-stream',
             'Content-Digest': 'sha-256=:%s:' % content_digest,
+            'Expect': '100-continue',
             'Connection': 'close',
         },
     )

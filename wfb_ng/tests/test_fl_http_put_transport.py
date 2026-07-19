@@ -561,6 +561,18 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
                 400, 'connection_close_required',
             ),
             (
+                'duplicate expect',
+                valid.replace(
+                    b'\r\n\r\n', b'\r\nExpect: nonsense\r\n\r\n'),
+                400, 'invalid_request_headers',
+            ),
+            (
+                'duplicate connection',
+                valid.replace(
+                    b'\r\n\r\n', b'\r\nConnection: keep-alive\r\n\r\n'),
+                400, 'connection_close_required',
+            ),
+            (
                 'transfer encoding',
                 valid.replace(
                     b'\r\n\r\n', b'\r\nTransfer-Encoding: chunked\r\n\r\n'),

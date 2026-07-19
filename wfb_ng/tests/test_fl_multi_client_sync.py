@@ -326,6 +326,7 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
                 'Content-Length': '1',
                 'Content-Type': 'application/octet-stream',
                 'Content-Digest': 'sha-256=:%s:' % ('A' * 43 + '='),
+                'Expect': '100-continue',
                 'Connection': 'close',
             },
         )

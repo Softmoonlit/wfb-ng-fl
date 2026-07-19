@@ -223,7 +223,11 @@ class ServerTransport(object):
                 return 409, 'upload_in_progress', '已有 update 正在上传'
             if _header_values(handler.headers, 'Transfer-Encoding'):
                 return 400, 'invalid_request_headers', '请求 headers 无效'
-            if handler.headers.get('Connection', '').lower() != 'close':
+            expect_values = _header_values(handler.headers, 'Expect')
+            connection_values = _header_values(handler.headers, 'Connection')
+            if expect_values != ['100-continue']:
+                return 400, 'invalid_request_headers', '请求 headers 无效'
+            if connection_values != ['close']:
                 return 400, 'connection_close_required', '必须使用 Connection: close'
             content_lengths = _header_values(handler.headers, 'Content-Length')
             content_digests = _header_values(handler.headers, 'Content-Digest')
