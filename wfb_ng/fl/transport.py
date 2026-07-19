@@ -56,6 +56,7 @@ class ServerTransport(object):
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
         self.ready = False
+        self._state = 'new'
         self._context = None
         self._context_lock = threading.Lock()
         self._upload_active = False
@@ -73,7 +74,12 @@ class ServerTransport(object):
         return self._http_server.server_address
 
     def start(self):
+        if self._state != 'new':
+            raise FLRuntimeError(
+                'transport_already_started', 'Transport 不能重复启动')
+        self._state = 'starting'
         if not shutil.which('uftp'):
+            self._state = 'failed'
             raise FLRuntimeError('transport_unavailable', '缺少 uftp 可执行文件')
         transport = self
 
@@ -134,15 +140,34 @@ class ServerTransport(object):
                 return
 
         class UpdateServer(http.server.ThreadingHTTPServer):
-            daemon_threads = True
+            daemon_threads = False
+            block_on_close = True
             allow_reuse_address = True
 
-        self._http_server = UpdateServer((self.http_host, self.http_port), UpdateHandler)
-        self._http_thread = threading.Thread(
-            target=self._http_server.serve_forever,
-            name='fl-update-listener', daemon=True)
-        self._http_thread.start()
+        try:
+            self._http_server = UpdateServer(
+                (self.http_host, self.http_port), UpdateHandler)
+            self._http_thread = threading.Thread(
+                target=self._http_server.serve_forever,
+                name='fl-update-listener', daemon=True)
+            self._http_thread.start()
+        except OSError as exc:
+            if self._http_server is not None:
+                self._http_server.server_close()
+                self._http_server = None
+            self._state = 'failed'
+            raise FLRuntimeError(
+                'transport_start_failed', 'HTTP listener 启动失败') from exc
         self.ready = True
+        self._state = 'ready'
+
+    def poll_failure(self):
+        thread = self._http_thread
+        if self.ready and thread is not None and not thread.is_alive():
+            self.ready = False
+            self._state = 'failed'
+            return FLRuntimeError('transport_failed', 'HTTP listener 意外退出')
+        return None
 
     def install_round(self, round_id, participant_node_ids, round_dir,
                       max_update_size_bytes, failure_callback):
@@ -267,7 +292,10 @@ class ServerTransport(object):
         self._update_event.clear()
 
     def close(self):
+        if self._state == 'closed':
+            return
         self.ready = False
+        self._state = 'stopping'
         with self._downlink_condition:
             operation = self._downlink_operation
         if operation is not None and operation.state != 'completed':
@@ -279,6 +307,7 @@ class ServerTransport(object):
         if self._http_thread is not None:
             self._http_thread.join(2)
             self._http_thread = None
+        self._state = 'closed'
 
     def _reserve_upload(self, handler):
         with self._context_lock:
@@ -496,6 +525,10 @@ class ClientTransport(object):
         self.server_http_address = server_http_address
         self.io_timeout = io_timeout
         self.ready = False
+        self._state = 'new'
+        self._operation_condition = threading.Condition()
+        self._operation_socket = None
+        self._operation_active = False
         self._inbox_dir = os.path.join(self.work_dir, 'inbox')
         self._temp_dir = os.path.join(self.work_dir, 'uftp-tmp')
         self._uftpd_process = None
@@ -503,36 +536,64 @@ class ClientTransport(object):
         self._delivered_candidates = set()
 
     def start(self):
+        if self._state != 'new':
+            raise FLRuntimeError(
+                'transport_already_started', 'Transport 不能重复启动')
+        self._state = 'starting'
         executable = shutil.which('uftpd')
         if not executable:
+            self._state = 'failed'
             raise FLRuntimeError('transport_unavailable', '缺少 uftpd 可执行文件')
-        os.makedirs(self._inbox_dir, exist_ok=True)
-        os.makedirs(self._temp_dir, exist_ok=True)
-        stderr_path = os.path.join(self.work_dir, 'uftpd.log')
-        self._uftpd_stderr = open(stderr_path, 'ab')
-        command = [
-            executable,
-            '-d',
-            '-q',
-            '-I', '127.0.0.1',
-            '-p', str(self.uftp_port),
-            '-U', _format_uid(self.uftp_uid),
-            '-D', self._inbox_dir,
-            '-T', self._temp_dir,
-            '-F', os.path.join(self.work_dir, 'uftpd.status'),
-        ]
-        self._uftpd_process = subprocess.Popen(
-            command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-            stderr=self._uftpd_stderr)
+        try:
+            os.makedirs(self._inbox_dir, exist_ok=True)
+            os.makedirs(self._temp_dir, exist_ok=True)
+            stderr_path = os.path.join(self.work_dir, 'uftpd.log')
+            self._uftpd_stderr = open(stderr_path, 'ab')
+            command = [
+                executable,
+                '-d',
+                '-q',
+                '-I', '127.0.0.1',
+                '-p', str(self.uftp_port),
+                '-U', _format_uid(self.uftp_uid),
+                '-D', self._inbox_dir,
+                '-T', self._temp_dir,
+                '-F', os.path.join(self.work_dir, 'uftpd.status'),
+            ]
+            self._uftpd_process = subprocess.Popen(
+                command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                stderr=self._uftpd_stderr)
+        except OSError as exc:
+            self.close()
+            self._state = 'failed'
+            raise FLRuntimeError(
+                'transport_start_failed', 'uftpd 启动失败') from exc
         deadline = time.monotonic() + 5
         while time.monotonic() < deadline:
             if self._uftpd_process.poll() is not None:
+                self.close()
+                self._state = 'failed'
                 raise FLRuntimeError('transport_start_failed', 'uftpd 启动失败')
             if _process_listens_udp(self._uftpd_process.pid, self.uftp_port):
                 self.ready = True
+                self._state = 'ready'
                 return
             time.sleep(0.02)
+        self.close()
+        self._state = 'failed'
         raise FLRuntimeError('transport_start_failed', 'uftpd 未进入监听状态')
+
+    def poll_failure(self):
+        process = self._uftpd_process
+        if self.ready and process is not None:
+            return_code = process.poll()
+            if return_code is not None:
+                self.ready = False
+                self._state = 'failed'
+                return FLRuntimeError(
+                    'transport_failed',
+                    'uftpd 意外退出，退出码为 %d' % return_code)
+        return None
 
     def wait_for_model_candidate(self):
         while self.ready:
@@ -554,11 +615,22 @@ class ClientTransport(object):
         raise FLRuntimeError('transport_not_ready', 'Transport 尚未 ready')
 
     def submit_update(self, round_id, node_id, update_path, size_bytes, digest_hex):
+        with self._operation_condition:
+            if self._operation_active:
+                raise RuntimeError('已有活动 HTTP PUT operation')
+            self._operation_active = True
         host, port = self.server_http_address
         sock = None
         response_file = None
         try:
             sock = socket.create_connection((host, port), timeout=self.io_timeout)
+            with self._operation_condition:
+                self._operation_socket = sock
+                if self._state == 'stopping':
+                    sock.close()
+                    raise FLRuntimeError(
+                        'transport_not_ready', 'Transport 尚未 ready',
+                        round_id=round_id, node_id=node_id)
             sock.settimeout(self.io_timeout)
             response_file = sock.makefile('rb')
             path = '/v1/rounds/%s/updates/%d' % (round_id, node_id)
@@ -607,15 +679,31 @@ class ClientTransport(object):
                 response_file.close()
             if sock is not None:
                 sock.close()
+            with self._operation_condition:
+                self._operation_socket = None
+                self._operation_active = False
+                self._operation_condition.notify_all()
 
     def close(self):
+        if self._state == 'closed':
+            return
         self.ready = False
+        self._state = 'stopping'
+        with self._operation_condition:
+            if self._operation_socket is not None:
+                try:
+                    self._operation_socket.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+            while self._operation_active:
+                self._operation_condition.wait()
         if self._uftpd_process is not None:
             _stop_process(self._uftpd_process)
             self._uftpd_process = None
         if self._uftpd_stderr is not None:
             self._uftpd_stderr.close()
             self._uftpd_stderr = None
+        self._state = 'closed'
 
 
 def _header_values(headers, name):

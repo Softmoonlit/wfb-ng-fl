@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "role": "client",
+  "work_dir": "/var/lib/wfb-ng/fl-client",
+  "node_id": 1,
+  "uftp_uid": 1,
+  "uftp_port": 1044,
+  "server_http_host": "10.0.0.1",
+  "server_http_port": 8080,
+  "max_update_size_bytes": 1073741824,
+  "link_args": [
+    "--tun-name", "wfb-fl0",
+    "--tun-addr", "10.0.0.2/24",
+    "--link-id", "1",
+    "--uplink-stream", "32",
+    "--downlink-stream", "160",
+    "--air-interface", "wlan0"
+  ]
+}

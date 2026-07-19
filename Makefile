@@ -178,10 +178,16 @@ baseline_split_test:
 
 test: test_v6 test_v8
 
+install_v8: build_v6
+	./scripts/install-v8.sh
+
 test_v8:
 	@command -v uftp >/dev/null || { echo "缺少原生 uftp 可执行文件" >&2; exit 1; }
 	@command -v uftpd >/dev/null || { echo "缺少原生 uftpd 可执行文件" >&2; exit 1; }
 	PYTHONPATH=`pwd` $(PYTHON) -m unittest discover -s wfb_ng/tests -p 'test_fl_*.py' -v
+
+test_v8_systemd:
+	sudo env PYTHONPATH=`pwd` WFB_RUN_SYSTEMD_TESTS=1 $(PYTHON) -m unittest wfb_ng.tests.test_fl_role_systemd_lifecycle -v
 
 test_v6: build_v6 $(V6_DEFAULT_TESTS)
 	./fec_test

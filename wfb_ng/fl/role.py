@@ -14,7 +14,7 @@ def _as_tuple(value):
 class ServerRole(object):
     def __init__(self, work_dir, participant_node_id, participant_uftp_uid,
                  server_uftp_uid, uftp_port, http_port,
-                 max_update_size_bytes):
+                 max_update_size_bytes, http_host='127.0.0.1'):
         participant_node_ids = _as_tuple(participant_node_id)
         participant_uftp_uids = _as_tuple(participant_uftp_uid)
         if len(participant_node_ids) != len(participant_uftp_uids):
@@ -26,6 +26,7 @@ class ServerRole(object):
             participant_uftp_uids=participant_uftp_uids,
             server_uftp_uid=server_uftp_uid,
             uftp_port=uftp_port,
+            http_host=http_host,
             http_port=http_port,
         )
         self.runtime = ServerRuntime(
@@ -39,6 +40,9 @@ class ServerRole(object):
     def http_address(self):
         return self.transport.http_address
 
+    def poll_failure(self):
+        return self.transport.poll_failure()
+
     def start(self):
         try:
             self.transport.start()
@@ -47,11 +51,17 @@ class ServerRole(object):
             raise
         return self.runtime
 
+    def close_transport(self):
+        self.transport.close()
+
+    def close_runtime(self):
+        self.runtime.close()
+
     def close(self):
         try:
-            self.transport.close()
+            self.close_transport()
         finally:
-            self.runtime.close()
+            self.close_runtime()
 
     def __enter__(self):
         self.start()
@@ -77,6 +87,9 @@ class ClientRole(object):
             transport=self.transport,
         )
 
+    def poll_failure(self):
+        return self.transport.poll_failure()
+
     def start(self):
         try:
             self.transport.start()
@@ -85,11 +98,17 @@ class ClientRole(object):
             raise
         return self.runtime
 
+    def close_transport(self):
+        self.transport.close()
+
+    def close_runtime(self):
+        self.runtime.close()
+
     def close(self):
         try:
-            self.transport.close()
+            self.close_transport()
         finally:
-            self.runtime.close()
+            self.close_runtime()
 
     def __enter__(self):
         self.start()
