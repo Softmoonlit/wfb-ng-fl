@@ -79,7 +79,18 @@ if ip link show "$AIR_IFACE" >/dev/null 2>&1; then
     mode="$(iw dev "$AIR_IFACE" info 2>/dev/null | awk '/type / {print $2; exit}')"
     channel_line="$(iw dev "$AIR_IFACE" info 2>/dev/null | awk '/channel / {print; exit}')"
     state="$(ip -br link show "$AIR_IFACE" 2>/dev/null | awk '{print $2}')"
-    if [ "$mode" = monitor ] && [ "$state" = UP ] && [[ "$channel_line" == *"channel $CHANNEL"* ]] && [[ "$channel_line" == *"$CHANNEL_WIDTH"* ]]; then
+    channel_width_ok=false
+    case "$CHANNEL_WIDTH" in
+        HT40+|HT40-)
+            if [[ "$channel_line" == *"$CHANNEL_WIDTH"* ]] || [[ "$channel_line" == *'width: 40 MHz'* ]]; then
+                channel_width_ok=true
+            fi
+            ;;
+        *)
+            [[ "$channel_line" == *"$CHANNEL_WIDTH"* ]] && channel_width_ok=true
+            ;;
+    esac
+    if [ "$mode" = monitor ] && [ "$state" = UP ] && [[ "$channel_line" == *"channel $CHANNEL"* ]] && [ "$channel_width_ok" = true ]; then
         pass "实际无线接口: $AIR_IFACE monitor/UP $CHANNEL/$CHANNEL_WIDTH"
     else
         fail "无线接口状态不符: iface=$AIR_IFACE mode=${mode:-?} state=${state:-?} channel=${channel_line:-?}"
