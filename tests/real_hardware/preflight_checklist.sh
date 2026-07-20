@@ -117,9 +117,11 @@ else
         fail "实际 TUN 不存在: $TUN_NAME"
     fi
     [ -n "$processes" ] && pass '角色进程存在' || fail '角色进程不存在'
-    [ -n "$udp" ] && pass "实际 UFTP UDP/$UFTP_PORT 在监听" || fail "UFTP UDP/$UFTP_PORT 未监听"
     if [ "$ROLE" = server ]; then
+        pass "server 运行态不要求本机 UFTP UDP/$UFTP_PORT 监听"
         [ -n "$tcp" ] && pass "实际 HTTP TCP/$HTTP_PORT 在监听" || fail "HTTP TCP/$HTTP_PORT 未监听"
+    else
+        [ -n "$udp" ] && pass "实际 UFTP UDP/$UFTP_PORT 在监听" || fail "UFTP UDP/$UFTP_PORT 未监听"
     fi
     [ -n "$route" ] && pass "实际组播路由: $route" || fail "缺少组播路由: $MCAST dev $TUN_NAME"
 fi
