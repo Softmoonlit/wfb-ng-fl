@@ -37,7 +37,7 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         model_path = self.write_file(round_dir, 'model.bin', b'model')
         manifest_path = self.write_file(
             round_dir, 'model.manifest.json', b'{}')
-        transport = ServerTransport((1, 2), 3, 9000)
+        transport = ServerTransport((1, 2), 3, 9000, '127.0.0.1', '230.4.4.1')
 
         self.write_status(round_dir, [
             'CONNECT;success;0x00000001',
@@ -48,9 +48,14 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
             'RESULT;0x00000002;round/model.manifest.json;1;copy;0',
         ])
         with mock.patch('wfb_ng.fl.transport.shutil.which',
-                        return_value=self.executable):
+                        return_value=self.executable), mock.patch(
+                            'wfb_ng.fl.transport.subprocess.Popen',
+                            wraps=__import__('subprocess').Popen) as popen:
             first = transport.start_downlink('round', model_path, manifest_path)
             self.assertIsNone(transport.wait_downlink(first))
+            command = popen.call_args.args[0]
+            self.assertEqual('127.0.0.1', command[command.index('-I') + 1])
+            self.assertEqual('230.4.4.1', command[command.index('-M') + 1])
 
             self.write_status(round_dir, [
                 'CONNECT;success;0x00000001',
@@ -181,7 +186,7 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         pid_path = os.path.join(self.root, 'runtime.pid')
         executable = self.write_blocking_fixture(
             pid_path, os.path.join(self.root, 'runtime.term'), False)
-        transport = ServerTransport((1,), 2, 9000, cancel_grace_period=0.5)
+        transport = ServerTransport((1,), 2, 9000, '127.0.0.1', '230.4.4.1', cancel_grace_period=0.5)
         transport.ready = True
         runtime_root = os.path.join(self.root, 'runtime')
         runtime = ServerRuntime(runtime_root, (1,), 1024, transport)
@@ -214,7 +219,7 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         pid_path = os.path.join(self.root, 'fatal-runtime.pid')
         executable = self.write_blocking_fixture(
             pid_path, os.path.join(self.root, 'fatal-runtime.term'), False)
-        transport = ServerTransport((1,), 2, 9000, cancel_grace_period=0.5)
+        transport = ServerTransport((1,), 2, 9000, '127.0.0.1', '230.4.4.1', cancel_grace_period=0.5)
         transport.ready = True
         runtime_root = os.path.join(self.root, 'fatal-runtime')
         runtime = ServerRuntime(runtime_root, (1,), 1024, transport)
@@ -315,7 +320,7 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
         model_path = self.write_file(round_dir, 'model.bin', b'model')
         manifest_path = self.write_file(
             round_dir, 'model.manifest.json', b'{}')
-        return ServerTransport((1, 2), 3, 9000, **kwargs), model_path, manifest_path
+        return ServerTransport((1, 2), 3, 9000, '127.0.0.1', '230.4.4.1', **kwargs), model_path, manifest_path
 
     def write_status_fixture(self, exit_code):
         path = os.path.join(self.root, 'uftp-fixture-%d' % exit_code)

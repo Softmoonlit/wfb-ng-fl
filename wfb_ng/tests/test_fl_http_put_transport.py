@@ -71,6 +71,9 @@ class OneShotHttpPeer(object):
                 self.body = body
                 if self.behavior == 'hold_final':
                     time.sleep(0.3)
+                elif self.behavior == 'success':
+                    connection.sendall(
+                        b'HTTP/1.1 201 Created\r\nContent-Length: 0\r\n\r\n')
         except BaseException as exc:
             self.error = exc
 
@@ -104,7 +107,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp(prefix='wfb-v8-http-')
         self.addCleanup(shutil.rmtree, self.root, True)
-        self.transport = ServerTransport((1, 2), 3, 9000, http_port=0)
+        self.transport = ServerTransport((1, 2), 3, 9000, '127.0.0.1', '230.4.4.1', http_port=0)
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
             self.transport.start()
         self.addCleanup(self.transport.close)
@@ -245,7 +248,8 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
 
     def test_runtime_failure_persistence_error_becomes_fatal(self):
         self.transport.close()
-        self.transport = RuntimeHttpTransport((1,), 3, 9000, http_port=0)
+        self.transport = RuntimeHttpTransport(
+            (1,), 3, 9000, '127.0.0.1', '230.4.4.1', http_port=0)
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
             self.transport.start()
         runtime = ServerRuntime(
@@ -287,7 +291,8 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
 
     def test_accepted_failure_terminates_server_runtime_strict_round(self):
         self.transport.close()
-        self.transport = RuntimeHttpTransport((1,), 3, 9000, http_port=0)
+        self.transport = RuntimeHttpTransport(
+            (1,), 3, 9000, '127.0.0.1', '230.4.4.1', http_port=0)
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
             self.transport.start()
         runtime = ServerRuntime(
@@ -361,11 +366,43 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             fh.write(body)
         return update_path
 
+    def test_client_persists_verified_single_put_201_result(self):
+        peer = OneShotHttpPeer('success')
+        self.addCleanup(peer.close)
+        body = b'accepted-update'
+        update_path = self.write_update('accepted-update.bin', body)
+        work_dir = os.path.join(self.root, 'successful-client')
+        client = ClientTransport(
+            work_dir, 1, 9000, '127.0.0.1', '230.4.4.1',
+            peer.address, io_timeout=1)
+
+        client.submit_update(
+            self.round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        peer.wait()
+        self.assertEqual(1, peer.connection_count)
+        with open(os.path.join(
+                work_dir, 'rounds', self.round_id,
+                'http-put-result.json'), encoding='utf-8') as fh:
+            result = json.load(fh)
+        self.assertEqual({
+            'schema_version': 1,
+            'round_id': self.round_id,
+            'node_id': 1,
+            'connection_count': 1,
+            'put_request_count': 1,
+            'continue_status': 100,
+            'final_status': 201,
+            'final_content_length': 0,
+        }, result)
+
     def test_client_connect_timeout_is_bounded_and_structured(self):
         body = b'update'
         update_path = self.write_update('connect-timeout.bin', body)
         client = ClientTransport(
             os.path.join(self.root, 'connect-timeout-client'), 1, 9000,
+            '127.0.0.1', '230.4.4.1',
             ('127.0.0.1', 1), io_timeout=0.1)
 
         with mock.patch(
@@ -384,7 +421,8 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
     def test_server_body_read_timeout_is_a_formal_failure(self):
         self.transport.close()
         self.transport = ServerTransport(
-            (1, 2), 3, 9000, http_port=0, io_timeout=0.1)
+            (1, 2), 3, 9000, '127.0.0.1', '230.4.4.1',
+            http_port=0, io_timeout=0.1)
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
             self.transport.start()
         self.transport.install_round(
@@ -410,7 +448,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         update_path = self.write_update('body-write-timeout.bin', body)
         client = ClientTransport(
             os.path.join(self.root, 'body-timeout-client'), 1, 9000,
-            peer.address, io_timeout=0.05)
+            '127.0.0.1', '230.4.4.1', peer.address, io_timeout=0.05)
 
         started = time.monotonic()
         with self.assertRaises(FLRuntimeError) as raised:
@@ -430,7 +468,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         update_path = self.write_update('final-timeout.bin', body)
         client = ClientTransport(
             os.path.join(self.root, 'final-timeout-client'), 1, 9000,
-            peer.address, io_timeout=0.05)
+            '127.0.0.1', '230.4.4.1', peer.address, io_timeout=0.05)
 
         started = time.monotonic()
         with self.assertRaises(FLRuntimeError) as raised:
@@ -453,7 +491,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             fh.write(body)
         client = ClientTransport(
             os.path.join(self.root, 'timeout-client'), 1, 9000,
-            peer.address, io_timeout=0.1)
+            '127.0.0.1', '230.4.4.1', peer.address, io_timeout=0.1)
 
         started = time.monotonic()
         with self.assertRaises(FLRuntimeError) as raised:
@@ -476,7 +514,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             fh.write(body)
         client = ClientTransport(
             os.path.join(self.root, 'lost-response-client'), 1, 9000,
-            peer.address, io_timeout=0.2)
+            '127.0.0.1', '230.4.4.1', peer.address, io_timeout=0.2)
 
         with self.assertRaises(FLRuntimeError) as raised:
             client.submit_update(
@@ -496,6 +534,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             fh.write(body)
         client = ClientTransport(
             os.path.join(self.root, 'client'), 1, 9000,
+            '127.0.0.1', '230.4.4.1',
             self.transport.http_address, io_timeout=1)
 
         with self.assertRaises(FLRuntimeError) as raised:

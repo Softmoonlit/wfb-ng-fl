@@ -7,6 +7,8 @@
   "participant_uftp_uids": [1],
   "server_uftp_uid": 255,
   "uftp_port": 1044,
+  "uftp_interface_address": "10.0.0.1",
+  "uftp_multicast_address": "230.4.4.1",
   "http_host": "10.0.0.1",
   "http_port": 8080,
   "max_update_size_bytes": 1073741824,

@@ -5,6 +5,8 @@
   "node_id": 1,
   "uftp_uid": 1,
   "uftp_port": 1044,
+  "uftp_bind_address": "10.0.0.2",
+  "server_uftp_multicast_address": "230.4.4.1",
   "server_http_host": "10.0.0.1",
   "server_http_port": 8080,
   "max_update_size_bytes": 1073741824,

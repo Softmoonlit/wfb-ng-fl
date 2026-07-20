@@ -8,6 +8,7 @@ import signal
 import socket
 import stat
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -16,8 +17,19 @@ from unittest import mock
 
 from wfb_ng.fl import FLRuntimeError
 from wfb_ng.fl.role import ServerRole
-from wfb_ng.fl.service import LinkProcess, RoleService, load_role_service
+from wfb_ng.fl.service import (
+    LinkProcess,
+    RoleService,
+    load_algorithm,
+    load_algorithm_config,
+    load_role_service,
+    main,
+)
 from wfb_ng.fl.transport import ClientTransport, ServerTransport
+
+
+_LOOPBACK = '127.0.0.1'
+_MULTICAST = '230.4.4.1'
 
 
 class RoleLifecycleTestCase(unittest.TestCase):
@@ -26,7 +38,7 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.root, True)
 
     def test_server_transport_rejects_duplicate_receiver(self):
-        transport = ServerTransport((1,), 2, 9000)
+        transport = ServerTransport((1,), 2, 9000, _LOOPBACK, _MULTICAST)
         fake_server = mock.Mock()
         fake_server.server_address = ('127.0.0.1', 1234)
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/usr/bin/uftp'), \
@@ -41,7 +53,7 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertIs(transport._http_server, None)
 
     def test_server_transport_observes_listener_failure(self):
-        transport = ServerTransport((1,), 2, 9000)
+        transport = ServerTransport((1,), 2, 9000, _LOOPBACK, _MULTICAST)
         fake_server = mock.Mock()
         fake_server.server_address = ('127.0.0.1', 1234)
         fake_server.serve_forever.return_value = None
@@ -58,11 +70,12 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertFalse(transport.ready)
 
     def test_client_transport_rejects_duplicate_receiver(self):
-        transport = ClientTransport(self.root, 1, 9000, ('127.0.0.1', 8080))
+        transport = ClientTransport(self.root, 1, 9000, _LOOPBACK, _MULTICAST,
+                                    ('127.0.0.1', 8080))
         process = mock.Mock()
         process.poll.return_value = None
         with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/usr/bin/uftpd'), \
-                mock.patch('wfb_ng.fl.transport.subprocess.Popen', return_value=process), \
+                mock.patch('wfb_ng.fl.transport.subprocess.Popen', return_value=process) as popen, \
                 mock.patch('wfb_ng.fl.transport._process_listens_udp', return_value=True):
             transport.start()
             with self.assertRaises(FLRuntimeError) as raised:
@@ -70,6 +83,9 @@ class RoleLifecycleTestCase(unittest.TestCase):
             transport.close()
 
         self.assertEqual('transport_already_started', raised.exception.error_code)
+        command = popen.call_args.args[0]
+        self.assertEqual(_LOOPBACK, command[command.index('-I') + 1])
+        self.assertEqual(_MULTICAST, command[command.index('-M') + 1])
 
     def test_service_rolls_back_link_and_role_when_receiver_start_fails(self):
         events = []
@@ -120,7 +136,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
         client_sock, server_sock = socket.socketpair()
         self.addCleanup(server_sock.close)
         transport = ClientTransport(
-            self.root, 1, 9000, ('127.0.0.1', 8080), io_timeout=5)
+            self.root, 1, 9000, _LOOPBACK, _MULTICAST,
+            ('127.0.0.1', 8080), io_timeout=5)
         transport.ready = True
         transport._state = 'ready'
         result = ThreadResult(lambda: transport.submit_update(
@@ -156,6 +173,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'participant_uftp_uids': [101, 102],
                 'server_uftp_uid': 100,
                 'uftp_port': 9000,
+                'uftp_interface_address': '10.0.0.1',
+                'uftp_multicast_address': '230.4.4.1',
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'max_update_size_bytes': 4096,
@@ -218,6 +237,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'node_id': 1,
                 'uftp_uid': 1,
                 'uftp_port': 9000,
+                'uftp_bind_address': '10.0.0.2',
+                'server_uftp_multicast_address': '230.4.4.1',
                 'server_http_host': '10.0.0.1',
                 'server_http_port': 8080,
                 'max_update_size_bytes': 4096,
@@ -254,7 +275,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
         listener.listen()
         self.addCleanup(listener.close)
         transport = ServerTransport(
-            (1,), 2, 9000, http_port=listener.getsockname()[1])
+            (1,), 2, 9000, _LOOPBACK, _MULTICAST,
+            http_port=listener.getsockname()[1])
         with mock.patch('wfb_ng.fl.transport.shutil.which',
                         return_value='/usr/bin/uftp'):
             with self.assertRaises(FLRuntimeError) as raised:
@@ -265,7 +287,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
 
     def test_client_start_wraps_process_creation_failure(self):
         transport = ClientTransport(
-            self.root, 1, 9000, ('127.0.0.1', 8080))
+            self.root, 1, 9000, _LOOPBACK, _MULTICAST,
+            ('127.0.0.1', 8080))
         with mock.patch('wfb_ng.fl.transport.shutil.which',
                         return_value='/usr/bin/uftpd'), mock.patch(
                             'wfb_ng.fl.transport.subprocess.Popen',
@@ -288,6 +311,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'participant_uftp_uids': [101],
                 'server_uftp_uid': 100,
                 'uftp_port': 9000,
+                'uftp_interface_address': '10.0.0.1',
+                'uftp_multicast_address': '230.4.4.1',
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'max_update_size_bytes': 4096,
@@ -301,6 +326,97 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 load_role_service(config_path, expected_role='server')
 
         self.assertEqual('link_interface_exists', raised.exception.error_code)
+
+    def test_algorithm_loader_and_config_require_formal_contract(self):
+        config_path = os.path.join(self.root, 'algorithm.json')
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump({'rounds': 2}, fh)
+
+        self.assertIs(json.dumps, load_algorithm('json:dumps'))
+        self.assertEqual({'rounds': 2}, load_algorithm_config(config_path))
+        invalid_config_path = os.path.join(self.root, 'algorithm-list.json')
+        with open(invalid_config_path, 'w', encoding='utf-8') as fh:
+            json.dump([], fh)
+        for specification in ('json', 'json:missing', 'json:decoder.JSONDecoder'):
+            with self.subTest(specification=specification):
+                with self.assertRaises(FLRuntimeError) as raised:
+                    load_algorithm(specification)
+                self.assertEqual('invalid_algorithm', raised.exception.error_code)
+        for path in ('relative.json', invalid_config_path):
+            with self.subTest(path=path):
+                with self.assertRaises(FLRuntimeError) as raised:
+                    load_algorithm_config(path)
+                self.assertEqual(
+                    'invalid_algorithm_config', raised.exception.error_code)
+
+    def test_algorithm_normal_return_is_supervised_and_closes_service(self):
+        events = []
+        service = MainStubService(events)
+        algorithm_config = {'rounds': 2}
+
+        def algorithm(runtime, config):
+            service.algorithm_release.wait(1)
+            events.append(('algorithm', runtime, config))
+
+        with mock.patch('wfb_ng.fl.service.load_algorithm', return_value=algorithm), \
+                mock.patch('wfb_ng.fl.service.load_algorithm_config',
+                           return_value=algorithm_config), mock.patch(
+                    'wfb_ng.fl.service.load_role_service', return_value=service), \
+                mock.patch('wfb_ng.fl.service._notify_ready'), mock.patch(
+                    'sys.argv', ['wfb-fl-server', '--config', 'role.json',
+                                 '--algorithm', 'fixture:run',
+                                 '--algorithm-config', '/algorithm.json']):
+            result = main('server')
+
+        self.assertEqual(0, result)
+        self.assertGreater(service.wait_count, 0)
+        self.assertEqual([
+            'service.start',
+            ('algorithm', service.runtime, algorithm_config),
+            'service.close',
+        ], events)
+
+    def test_algorithm_exception_closes_service_and_exits_failure(self):
+        events = []
+        service = MainStubService(events)
+
+        def algorithm(runtime, config):
+            raise ValueError('failed')
+
+        with mock.patch('wfb_ng.fl.service.load_algorithm', return_value=algorithm), \
+                mock.patch('wfb_ng.fl.service.load_algorithm_config',
+                           return_value={}), mock.patch(
+                    'wfb_ng.fl.service.load_role_service', return_value=service), \
+                mock.patch('wfb_ng.fl.service._notify_ready'), mock.patch(
+                    'sys.argv', ['wfb-fl-client', '--config', 'role.json',
+                                 '--algorithm', 'fixture:run',
+                                 '--algorithm-config', '/algorithm.json']):
+            result = main('client')
+
+        self.assertEqual(1, result)
+        self.assertEqual(['service.start', 'service.close'], events)
+
+    def test_uftp_address_config_is_strict_ipv4(self):
+        cases = (
+            ('uftp_interface_address', 'localhost'),
+            ('uftp_interface_address', '::1'),
+            ('uftp_interface_address', '127.000.000.001'),
+            ('uftp_multicast_address', '127.0.0.1'),
+            ('uftp_multicast_address', 'ff02::1'),
+        )
+        for index, (field, value) in enumerate(cases):
+            config_path = self.write_server_config(
+                participant_node_ids=[1],
+                link_args=['--tun-name', 'wfb0', '--known-clients', '1'],
+                name='invalid-address-%d.json' % index,
+                **{field: value})
+            with self.subTest(field=field, value=value), mock.patch(
+                    'wfb_ng.fl.service.shutil.which',
+                    side_effect=lambda name: '/usr/bin/' + name):
+                with self.assertRaises(FLRuntimeError) as raised:
+                    load_role_service(config_path, expected_role='server')
+                self.assertEqual(
+                    'invalid_configuration', raised.exception.error_code)
 
     def test_role_entry_handles_sigterm_and_exits_cleanly(self):
         marker = os.path.join(self.root, 'closed')
@@ -316,6 +432,9 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 '    def wait(self, interval): threading.Event().wait(interval)\n'
                 '    def close(self):\n'
                 '        with open(%r, "w") as output: output.write("closed")\n'
+                'service.load_algorithm = lambda specification: '
+                '(lambda runtime, config: threading.Event().wait())\n'
+                'service.load_algorithm_config = lambda path: {}\n'
                 'service.load_role_service = lambda path, expected_role=None: Service()\n'
                 'service._notify_ready = lambda: None\n'
                 'raise SystemExit(service.main("server"))\n' % (started, marker))
@@ -323,7 +442,9 @@ class RoleLifecycleTestCase(unittest.TestCase):
         env['PYTHONPATH'] = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '..', '..'))
         process = subprocess.Popen(
-            [shutil.which('python3'), entry, '--config', 'ignored'], env=env)
+            [shutil.which('python3'), entry, '--config', 'ignored',
+             '--algorithm', 'fixture:run',
+             '--algorithm-config', '/ignored.json'], env=env)
         self.addCleanup(self.stop_process, process)
         deadline = time.monotonic() + 2
         while not os.path.isfile(started) and time.monotonic() < deadline:
@@ -335,24 +456,28 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile(marker))
 
     def write_server_config(self, participant_node_ids, link_args,
-                            name='server.json'):
+                            name='server.json', **overrides):
         config_path = os.path.join(self.root, name)
+        config = {
+            'schema_version': 1,
+            'role': 'server',
+            'work_dir': os.path.join(self.root, 'work'),
+            'node_id': 10,
+            'participant_node_ids': participant_node_ids,
+            'participant_uftp_uids': [100 + node_id
+                                      for node_id in participant_node_ids],
+            'server_uftp_uid': 100,
+            'uftp_port': 9000,
+            'uftp_interface_address': '10.0.0.1',
+            'uftp_multicast_address': '230.4.4.1',
+            'http_host': '10.0.0.1',
+            'http_port': 8080,
+            'max_update_size_bytes': 4096,
+            'link_args': link_args,
+        }
+        config.update(overrides)
         with open(config_path, 'w', encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'role': 'server',
-                'work_dir': os.path.join(self.root, 'work'),
-                'node_id': 10,
-                'participant_node_ids': participant_node_ids,
-                'participant_uftp_uids': [100 + node_id
-                                          for node_id in participant_node_ids],
-                'server_uftp_uid': 100,
-                'uftp_port': 9000,
-                'http_host': '10.0.0.1',
-                'http_port': 8080,
-                'max_update_size_bytes': 4096,
-                'link_args': link_args,
-            }, fh)
+            json.dump(config, fh)
         return config_path
 
     def stop_process(self, process):
@@ -427,10 +552,90 @@ class DeploymentContractTestCase(unittest.TestCase):
             self.assertIn('TimeoutStopSec=15s', unit)
             self.assertIn('Restart=on-failure', unit)
             self.assertIn(
-                'ExecStart=/usr/bin/wfb-fl-%s --config /etc/wfb-ng/fl-%s.json' %
-                (role, role), unit)
+                'EnvironmentFile=/etc/default/wfb-fl-%s' % role, unit)
+            self.assertIn(
+                'ExecStart=/usr/bin/wfb-fl-%s '
+                '--config=/etc/wfb-ng/fl-%s.json '
+                '--algorithm=${ALGORITHM} '
+                '--algorithm-config=${ALGORITHM_CONFIG}' % (role, role), unit)
+            self.assertNotIn('$ALGORITHM ', unit)
+            self.assertNotIn('$ALGORITHM_CONFIG', unit)
+            self.assertNotIn('package.module:callable', unit)
+            self.assertNotIn('algorithm_fixture', unit)
             self.assertNotIn('/bin/sh', unit)
             self.assertNotIn('/bin/bash', unit)
+
+            environment_path = os.path.join(
+                self.root, 'scripts', 'default', 'wfb-fl-%s' % role)
+            with open(environment_path, 'r', encoding='utf-8') as fh:
+                environment = fh.read()
+            self.assertIn('ALGORITHM=\n', environment)
+            self.assertIn('ALGORITHM_CONFIG=\n', environment)
+
+    def test_empty_systemd_algorithm_values_fail_before_role_start(self):
+        entry = os.path.join(self.root, 'scripts', 'wfb-fl-server')
+        cases = (
+            ('', '/etc/wfb-ng/fl-server-algorithm.json', 'invalid_algorithm'),
+            ('json:dumps', '', 'invalid_algorithm_config'),
+        )
+        environment = os.environ.copy()
+        environment['PYTHONPATH'] = self.root
+        for algorithm, algorithm_config, error_code in cases:
+            with self.subTest(error_code=error_code):
+                result = subprocess.run([
+                    sys.executable,
+                    entry,
+                    '--config=/does/not/exist.json',
+                    '--algorithm=' + algorithm,
+                    '--algorithm-config=' + algorithm_config,
+                ], capture_output=True, text=True, env=environment)
+            self.assertEqual(1, result.returncode)
+            self.assertIn(error_code + ':', result.stderr)
+
+    def test_installer_installs_importable_algorithm_fixture_and_examples(self):
+        destination = tempfile.mkdtemp(prefix='wfb-v8-install-')
+        self.addCleanup(shutil.rmtree, destination, True)
+        command_dir = os.path.join(destination, 'commands')
+        os.makedirs(command_dir)
+        for name in ('uftp', 'uftpd'):
+            path = os.path.join(command_dir, name)
+            with open(path, 'w', encoding='ascii') as fh:
+                fh.write('#!/bin/sh\nexit 0\n')
+            os.chmod(path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        environment = os.environ.copy()
+        environment.update({
+            'DESTDIR': destination,
+            'PATH': command_dir + ':' + environment['PATH'],
+            'PREFIX': '/usr',
+            'PYTHON': sys.executable,
+        })
+        subprocess.run(
+            [os.path.join(self.root, 'scripts', 'install-v8.sh')],
+            cwd=self.root, env=environment, check=True)
+
+        purelib = subprocess.check_output([
+            sys.executable, '-c',
+            'import sysconfig; print(sysconfig.get_path('
+            '"purelib", vars={"base": "/usr", "platbase": "/usr"}))',
+        ], text=True).strip()
+        installed_package = os.path.join(destination, purelib.lstrip('/'))
+        fixture_path = os.path.join(
+            installed_package, 'wfb_ng', 'fl', 'acceptance_fixture.py')
+        self.assertTrue(os.path.isfile(fixture_path))
+        import_environment = os.environ.copy()
+        import_environment['PYTHONPATH'] = installed_package
+        subprocess.run([
+            sys.executable, '-c',
+            'from wfb_ng.fl.acceptance_fixture import client, server; '
+            'assert callable(client) and callable(server)',
+        ], env=import_environment, check=True)
+        for path in (
+                'etc/default/wfb-fl-server',
+                'etc/default/wfb-fl-client',
+                'etc/wfb-ng/fl-server-algorithm.json',
+                'etc/wfb-ng/fl-client-algorithm.json',
+                'usr/share/wfb-ng/fl-fixture-model.bin'):
+            self.assertTrue(os.path.isfile(os.path.join(destination, path)), path)
 
     def test_package_contains_role_services_and_runtime_dependencies(self):
         install_path = os.path.join(self.root, 'scripts', 'install-v8.sh')
@@ -446,8 +651,13 @@ class DeploymentContractTestCase(unittest.TestCase):
                 'scripts/v8-wfb-ng-init.py',
                 'scripts/systemd/wfb-fl-server.service',
                 'scripts/systemd/wfb-fl-client.service',
+                'scripts/default/wfb-fl-server',
+                'scripts/default/wfb-fl-client',
                 'scripts/default/fl-server.json',
-                'scripts/default/fl-client.json'):
+                'scripts/default/fl-client.json',
+                'scripts/default/fl-server-algorithm.json',
+                'scripts/default/fl-client-algorithm.json',
+                'scripts/fixtures/fl-fixture-model.bin'):
             self.assertIn(value, installer)
         self.assertTrue(os.access(install_path, os.X_OK))
 
@@ -482,6 +692,26 @@ class ThreadResult(object):
             raise AssertionError('operation did not finish')
         if self.error is not None:
             raise self.error
+
+
+class MainStubService(object):
+    def __init__(self, events):
+        self.events = events
+        self.runtime = object()
+        self.wait_count = 0
+        self.algorithm_release = threading.Event()
+
+    def start(self):
+        self.events.append('service.start')
+        return self.runtime
+
+    def wait(self, interval):
+        self.wait_count += 1
+        self.algorithm_release.set()
+        time.sleep(0.001)
+
+    def close(self):
+        self.events.append('service.close')
 
 
 class StubLink(object):

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import importlib
+import ipaddress
 import json
 import os
 import shutil
@@ -22,10 +24,12 @@ _COMMON_FIELDS = {
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
+    'uftp_interface_address', 'uftp_multicast_address',
     'http_host', 'http_port',
 }
 _CLIENT_FIELDS = {
-    'uftp_uid', 'server_http_host', 'server_http_port',
+    'uftp_uid', 'uftp_bind_address', 'server_uftp_multicast_address',
+    'server_http_host', 'server_http_port',
 }
 
 
@@ -182,6 +186,8 @@ def load_role_service(path, expected_role=None):
                 participant_uftp_uid=config['participant_uftp_uids'],
                 server_uftp_uid=config['server_uftp_uid'],
                 uftp_port=config['uftp_port'],
+                uftp_interface_address=config['uftp_interface_address'],
+                uftp_multicast_address=config['uftp_multicast_address'],
                 http_host=config['http_host'],
                 http_port=config['http_port'],
                 max_update_size_bytes=config['max_update_size_bytes'],
@@ -192,6 +198,9 @@ def load_role_service(path, expected_role=None):
                 node_id=config['node_id'],
                 uftp_uid=config['uftp_uid'],
                 uftp_port=config['uftp_port'],
+                uftp_bind_address=config['uftp_bind_address'],
+                server_uftp_multicast_address=(
+                    config['server_uftp_multicast_address']),
                 server_http_address=(
                     config['server_http_host'], config['server_http_port']),
                 max_update_size_bytes=config['max_update_size_bytes'],
@@ -235,7 +244,86 @@ def _read_config(path):
         raise FLRuntimeError(
             'invalid_configuration', '链路角色参数不能重复指定')
     _single_option_value(link_args, '--tun-name')
+    if role == 'server':
+        _validate_ipv4(config, 'uftp_interface_address')
+        _validate_ipv4(config, 'uftp_multicast_address', multicast=True)
+    else:
+        _validate_ipv4(config, 'uftp_bind_address')
+        _validate_ipv4(
+            config, 'server_uftp_multicast_address', multicast=True)
     return config
+
+
+def _validate_ipv4(config, name, multicast=False):
+    value = config.get(name)
+    if not isinstance(value, str):
+        raise FLRuntimeError('invalid_configuration', '%s 必须是 IPv4 地址' % name)
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 必须是 IPv4 地址' % name) from exc
+    if address.version != 4 or str(address) != value:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 必须是规范 IPv4 地址' % name)
+    if multicast and not address.is_multicast:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 必须是 IPv4 组播地址' % name)
+
+
+def load_algorithm(specification):
+    if (not isinstance(specification, str) or
+            specification.count(':') != 1):
+        raise FLRuntimeError('invalid_algorithm', '算法入口定位符无效')
+    module_name, callable_name = specification.split(':')
+    if not module_name or not callable_name or '.' in callable_name:
+        raise FLRuntimeError('invalid_algorithm', '算法入口定位符无效')
+    try:
+        module = importlib.import_module(module_name)
+        algorithm = getattr(module, callable_name)
+    except (ImportError, AttributeError, ValueError) as exc:
+        raise FLRuntimeError('invalid_algorithm', '算法入口无法加载') from exc
+    if not callable(algorithm):
+        raise FLRuntimeError('invalid_algorithm', '算法入口不是 callable')
+    return algorithm
+
+
+def load_algorithm_config(path):
+    if not isinstance(path, str) or not os.path.isabs(path):
+        raise FLRuntimeError(
+            'invalid_algorithm_config', '算法配置路径必须是绝对路径')
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FLRuntimeError(
+            'invalid_algorithm_config', '算法配置无法读取') from exc
+    if not isinstance(config, dict):
+        raise FLRuntimeError(
+            'invalid_algorithm_config', '算法配置必须是 JSON object')
+    return config
+
+
+class AlgorithmWorker(object):
+    def __init__(self, algorithm, runtime, config):
+        self.algorithm = algorithm
+        self.runtime = runtime
+        self.config = config
+        self.error = None
+        self.finished = threading.Event()
+        self._thread = threading.Thread(
+            target=self._run, name='fl-algorithm', daemon=True)
+
+    def start(self):
+        self._thread.start()
+
+    def _run(self):
+        try:
+            self.algorithm(self.runtime, self.config)
+        except BaseException as exc:
+            self.error = exc
+        finally:
+            self.finished.set()
 
 
 def _single_option_value(arguments, option):
@@ -279,8 +367,13 @@ def _notify_ready():
 def main(role=None):
     parser = argparse.ArgumentParser(description='WFB-ng FL 角色服务')
     parser.add_argument('--config', required=True, help='角色服务 JSON 配置')
+    parser.add_argument(
+        '--algorithm', required=True, help='算法入口 package.module:callable')
+    parser.add_argument(
+        '--algorithm-config', required=True, help='算法作业绝对 JSON 配置路径')
     args = parser.parse_args()
     service = None
+    worker = None
     stop_event = threading.Event()
 
     def stop(signum, frame):
@@ -289,11 +382,20 @@ def main(role=None):
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
+        algorithm = load_algorithm(args.algorithm)
+        algorithm_config = load_algorithm_config(args.algorithm_config)
         service = load_role_service(args.config, expected_role=role)
-        service.start()
+        runtime = service.start()
         _notify_ready()
-        while not stop_event.is_set():
+        worker = AlgorithmWorker(algorithm, runtime, algorithm_config)
+        worker.start()
+        while not stop_event.is_set() and not worker.finished.is_set():
             service.wait(0.2)
+        if worker.finished.is_set() and worker.error is not None:
+            if isinstance(worker.error, FLRuntimeError):
+                raise worker.error
+            raise FLRuntimeError(
+                'algorithm_failed', '算法作业执行失败') from worker.error
     except FLRuntimeError as exc:
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1

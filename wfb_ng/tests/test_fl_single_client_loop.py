@@ -67,6 +67,8 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
             participant_uftp_uid=1,
             server_uftp_uid=2,
             uftp_port=self.uftp_port,
+            uftp_interface_address='127.0.0.1',
+            uftp_multicast_address='230.4.4.1',
             http_port=0,
             max_update_size_bytes=1024 * 1024,
         )
@@ -77,6 +79,8 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
             node_id=1,
             uftp_uid=1,
             uftp_port=self.uftp_port,
+            uftp_bind_address='127.0.0.1',
+            server_uftp_multicast_address='230.4.4.1',
             server_http_address=server_address,
             max_update_size_bytes=1024 * 1024,
         )
@@ -180,7 +184,7 @@ class V8SingleClientLoopTestCase(unittest.TestCase):
 
     def test_continue_write_failure_reports_failure_and_releases_upload_slot(self):
         failures = []
-        transport = ServerTransport(1, 2, self.uftp_port)
+        transport = ServerTransport(1, 2, self.uftp_port, '127.0.0.1', '230.4.4.1')
         round_id = str(uuid.uuid4())
         transport.install_round(
             round_id, (1,), os.path.join(self.root, 'server-failure'), 1024,

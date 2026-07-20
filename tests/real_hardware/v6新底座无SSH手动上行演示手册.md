@@ -2,7 +2,7 @@
 
 本文用于现场只有三台独立机器、server 无法 SSH 到 client1/client2 时，手动演示 `wfb_v6_uplink --role server/client` 的双 client 上行能力。
 
-当前定位：这是 `v6` 新底座 **real-hardware uplink 默认正式入口**，配套执行脚本是 `tests/real_hardware/v6_manual_uplink_demo.sh`。仓库默认的 `make acceptance_v6_realhw` 会把操作者引导到本手册；旧的 same-host / netns 自动跑数入口已经下线，不再作为正式验收路径。
+当前定位：这是 `v6` 新底座 **real-hardware uplink 基线入口**，配套执行脚本是 `tests/real_hardware/v6_manual_uplink_demo.sh`。仓库默认的 `make acceptance_v6_realhw` 会把操作者引导到本手册；旧的 same-host / netns 自动跑数入口已经下线，不再作为正式验收路径。issue #41 的 shared downlink、feedback 和完整 FL Runtime systemd 闭环直接复用本基线，继续执行 `tests/real_hardware/issue41三机正式验收手册.md`，不要复制另一套拓扑。
 
 本版把原来的大段命令收敛为脚本文件，现场只需要执行短命令；关键状态用“面板 + 进度条”直接显示，不要求老师读原始日志。
 

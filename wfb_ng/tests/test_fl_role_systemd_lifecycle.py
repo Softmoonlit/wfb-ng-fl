@@ -140,7 +140,8 @@ class RoleSystemdLifecycleTestCase(unittest.TestCase):
                 '[Service]\n'
                 'Type=notify\n'
                 'NotifyAccess=main\n'
-                'ExecStart=%s --config %s\n'
+                'ExecStart=%s --config %s --algorithm fixture:run '
+                '--algorithm-config /ignored-algorithm.json\n'
                 'Environment=PYTHONPATH=%s:%s\n'
                 'Environment=PATH=%s\n'
                 'Environment=WFB_TEST_ROLE=%s\n'
@@ -172,6 +173,8 @@ class RoleSystemdLifecycleTestCase(unittest.TestCase):
                 'participant_node_ids': [1],
                 'participant_uftp_uids': [1],
                 'server_uftp_uid': 255,
+                'uftp_interface_address': '127.0.0.1',
+                'uftp_multicast_address': '230.4.4.1',
                 'http_host': '127.0.0.1',
                 'http_port': 0,
             })
@@ -179,6 +182,8 @@ class RoleSystemdLifecycleTestCase(unittest.TestCase):
         else:
             config.update({
                 'uftp_uid': 1,
+                'uftp_bind_address': '127.0.0.1',
+                'server_uftp_multicast_address': '230.4.4.1',
                 'server_http_host': '127.0.0.1',
                 'server_http_port': self.http_server.port,
             })
@@ -201,22 +206,17 @@ if os.environ.get("WFB_TEST_ROLE") in ("server", "client"):
         service._SYSTEMD_TEST_RUNTIME = runtime
         return runtime
     service.RoleService.start = start_and_capture
-    if os.environ["WFB_TEST_ROLE"] == "server":
-        def notify_ready_and_run():
-            original_notify_ready()
-            threading.Thread(
-                target=service._SYSTEMD_TEST_RUNTIME.publish_model,
-                args=(os.environ["WFB_TEST_MODEL"],),
-                daemon=True).start()
-    else:
-        def run_client():
-            runtime = service._SYSTEMD_TEST_RUNTIME
+    def run_algorithm(runtime, config):
+        if os.environ["WFB_TEST_ROLE"] == "server":
+            runtime.publish_model(os.environ["WFB_TEST_MODEL"])
+        else:
             runtime.wait_for_model()
             runtime.submit_update(os.environ["WFB_TEST_UPDATE"])
-        def notify_ready_and_run():
-            original_notify_ready()
-            threading.Thread(target=run_client, daemon=True).start()
-    service._notify_ready = notify_ready_and_run
+    service.load_algorithm = lambda specification: run_algorithm
+    service.load_algorithm_config = lambda path: {}
+    def notify_ready():
+        original_notify_ready()
+    service._notify_ready = notify_ready
 ''')
 
     def write_link_fixture(self):

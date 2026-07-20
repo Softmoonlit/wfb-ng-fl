@@ -13,8 +13,9 @@ def _as_tuple(value):
 
 class ServerRole(object):
     def __init__(self, work_dir, participant_node_id, participant_uftp_uid,
-                 server_uftp_uid, uftp_port, http_port,
-                 max_update_size_bytes, http_host='127.0.0.1'):
+                 server_uftp_uid, uftp_port, uftp_interface_address,
+                 uftp_multicast_address, http_port, max_update_size_bytes,
+                 http_host='127.0.0.1'):
         participant_node_ids = _as_tuple(participant_node_id)
         participant_uftp_uids = _as_tuple(participant_uftp_uid)
         if len(participant_node_ids) != len(participant_uftp_uids):
@@ -26,6 +27,8 @@ class ServerRole(object):
             participant_uftp_uids=participant_uftp_uids,
             server_uftp_uid=server_uftp_uid,
             uftp_port=uftp_port,
+            uftp_interface_address=uftp_interface_address,
+            uftp_multicast_address=uftp_multicast_address,
             http_host=http_host,
             http_port=http_port,
         )
@@ -73,11 +76,14 @@ class ServerRole(object):
 
 class ClientRole(object):
     def __init__(self, work_dir, node_id, uftp_uid, uftp_port,
+                 uftp_bind_address, server_uftp_multicast_address,
                  server_http_address, max_update_size_bytes):
         self.transport = ClientTransport(
             work_dir=work_dir,
             uftp_uid=uftp_uid,
             uftp_port=uftp_port,
+            uftp_bind_address=uftp_bind_address,
+            server_uftp_multicast_address=server_uftp_multicast_address,
             server_http_address=server_http_address,
         )
         self.runtime = ClientRuntime(

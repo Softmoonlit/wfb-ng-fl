@@ -231,7 +231,7 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
 
     def test_client_transport_delivers_each_model_candidate_once(self):
         work_dir = os.path.join(self.root, 'candidate-transport')
-        transport = ClientTransport(work_dir, 1, 9000, ('127.0.0.1', 1))
+        transport = ClientTransport(work_dir, 1, 9000, '127.0.0.1', '230.4.4.1', ('127.0.0.1', 1))
         transport.ready = True
         transport._uftpd_process = SimpleNamespace(poll=lambda: None)
         for name in ('round-a', 'round-b'):
@@ -250,7 +250,7 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         round_id = '550e8400-e29b-41d4-a716-446655440000'
         round_dir = os.path.join(self.root, 'committed-round')
         failures = []
-        transport = ServerTransport((1,), 2, 9000)
+        transport = ServerTransport((1,), 2, 9000, '127.0.0.1', '230.4.4.1')
         transport.install_round(
             round_id, (1,), round_dir, 1024,
             lambda *args: failures.append(args))
@@ -287,7 +287,7 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
     def test_transport_rejects_old_nonparticipant_and_duplicate_updates(self):
         round_id = '550e8400-e29b-41d4-a716-446655440000'
         round_dir = os.path.join(self.root, 'transport-round')
-        transport = ServerTransport((1, 2), 3, 9000)
+        transport = ServerTransport((1, 2), 3, 9000, '127.0.0.1', '230.4.4.1')
         transport.install_round(round_id, (1, 2), round_dir, 1024, lambda *args: None)
 
         old_round = self.make_handler(

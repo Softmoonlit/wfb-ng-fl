@@ -44,6 +44,7 @@ class _DownlinkOperation:
 
 class ServerTransport(object):
     def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
+                 uftp_interface_address, uftp_multicast_address,
                  http_host='127.0.0.1', http_port=0, io_timeout=10,
                  cancel_grace_period=2):
         if isinstance(participant_uftp_uids, int):
@@ -51,6 +52,8 @@ class ServerTransport(object):
         self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
         self.server_uftp_uid = server_uftp_uid
         self.uftp_port = uftp_port
+        self.uftp_interface_address = uftp_interface_address
+        self.uftp_multicast_address = uftp_multicast_address
         self.http_host = http_host
         self.http_port = http_port
         self.io_timeout = io_timeout
@@ -198,8 +201,8 @@ class ServerTransport(object):
         command = [
             shutil.which('uftp'),
             '-q',
-            '-I', '127.0.0.1',
-            '-M', '127.0.0.1',
+            '-I', self.uftp_interface_address,
+            '-M', self.uftp_multicast_address,
             '-p', str(self.uftp_port),
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
@@ -517,11 +520,14 @@ class ServerTransport(object):
 
 
 class ClientTransport(object):
-    def __init__(self, work_dir, uftp_uid, uftp_port, server_http_address,
+    def __init__(self, work_dir, uftp_uid, uftp_port, uftp_bind_address,
+                 server_uftp_multicast_address, server_http_address,
                  io_timeout=10):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
+        self.uftp_bind_address = uftp_bind_address
+        self.server_uftp_multicast_address = server_uftp_multicast_address
         self.server_http_address = server_http_address
         self.io_timeout = io_timeout
         self.ready = False
@@ -553,7 +559,8 @@ class ClientTransport(object):
                 executable,
                 '-d',
                 '-q',
-                '-I', '127.0.0.1',
+                '-I', self.uftp_bind_address,
+                '-M', self.server_uftp_multicast_address,
                 '-p', str(self.uftp_port),
                 '-U', _format_uid(self.uftp_uid),
                 '-D', self._inbox_dir,
@@ -668,6 +675,25 @@ class ClientTransport(object):
                 raise FLRuntimeError(
                     'update_submit_failed', 'server 最终响应不是空 body 201',
                     round_id=round_id, node_id=node_id)
+            try:
+                write_json_atomic(
+                    os.path.join(
+                        self.work_dir, 'rounds', round_id,
+                        'http-put-result.json'), {
+                            'schema_version': 1,
+                            'round_id': round_id,
+                            'node_id': node_id,
+                            'connection_count': 1,
+                            'put_request_count': 1,
+                            'continue_status': 100,
+                            'final_status': 201,
+                            'final_content_length': 0,
+                        })
+            except (OSError, TypeError, ValueError) as exc:
+                raise FLRuntimeError(
+                    'http_result_persistence_failed',
+                    'HTTP 201 已成立但本地结果证据持久化失败',
+                    round_id=round_id, node_id=node_id) from exc
         except FLRuntimeError:
             raise
         except (OSError, socket.timeout) as exc:

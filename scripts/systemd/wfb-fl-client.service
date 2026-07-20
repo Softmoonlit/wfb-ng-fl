@@ -5,7 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/fl-client.json
+EnvironmentFile=/etc/default/wfb-fl-client
+ExecStart=/usr/bin/wfb-fl-client --config=/etc/wfb-ng/fl-client.json --algorithm=${ALGORITHM} --algorithm-config=${ALGORITHM_CONFIG}
 KillMode=control-group
 TimeoutStopSec=15s
 Restart=on-failure
