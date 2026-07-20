@@ -16,6 +16,20 @@ FL 算法层表达同步联邦学习业务语义：
 
 模型和 update 的内容、序列化格式、框架对象类型以及聚合器内部算法对本层之外保持不透明。算法层只把可读取的模型路径或 update 路径交给 Runtime，不把原始路径写入 Runtime 托管目录。
 
+## 算法作业与入口
+
+一个算法入口的一次执行表示该角色参与的一次完整 FL 算法作业，而不是单个联邦学习轮次或单项训练任务。server 和 client 算法入口分别在作业内拥有自己的多轮业务循环：server 决定初始模型、聚合、评估、下一轮模型和停止条件；client 持续等待每轮模型、执行本地训练并提交该轮 update。算法入口正常返回表示该角色的完整算法作业已经结束；角色主进程随后按序关闭该作业使用的 Runtime、Transport 和链路资源并正常退出。算法入口抛出异常表示作业失败，角色主进程仍须完成同样的资源清理，再以失败结果退出。
+
+算法入口是 FL 算法层的最小正式进程内 callable 契约。角色主进程在 Runtime 与 Transport ready 后，把同一 Runtime 实例交给算法入口；算法入口直接调用 Runtime 四接口，不经过验收专用分支、中间 Runner 层、独立算法进程或 Runtime RPC。生产算法和确定性验收 fixture 必须实现同一入口契约，fixture 不是绕过正式调用路径的特殊入口。
+
+角色可执行入口通过必填命令行参数 `--algorithm package.module:callable` 显式定位本次作业的算法函数，并通过必填的 `--algorithm-config /absolute/path.json` 指定独立算法作业配置。角色主进程把配置文件读取为一个 JSON object 后，以 `callable(runtime, config)` 形式在进程内调用算法入口；`config` 字段的语义和严格校验由具体算法拥有。角色入口只校验路径为绝对路径、文件可读、JSON 合法且顶层为 object，不解释算法字段。模型、update、Runtime 四接口参数和结果都不经过命令行。
+
+算法作业 JSON 与角色基础设施 JSON 分离：前者表达轮数、模型输入、算法参数和算法产物位置等作业语义，后者继续只表达链路、Transport、Runtime 工作目录和角色身份。算法入口不能通过约定环境变量、固定隐藏路径或动态导入副作用取得未显式传入的作业配置。
+
+算法入口契约只定义角色、Runtime 和算法作业配置等必要输入以及正常返回或异常结果，不建立插件注册表、App 分发、多租户、多 run、热切换或动态依赖安装机制。Flower 的 `ServerApp`/`ClientApp` 只作为“算法代码通过明确入口使用运行时且不管理底层通信”的职责参考；Flower 的 SuperExec、AppIo 和独立 App 进程不属于 v8。
+
+同一个 Runtime 与 Transport 在作业的全部轮次之间持续复用。单轮结束只结束该轮的 Runtime 状态和按次 Transport operation，不关闭常驻 server HTTP listener、client `uftpd`、Runtime 或链路进程；这些资源只在完整算法作业及其宿主角色服务的生命周期边界按跨层契约处理。
+
 ## Runtime 调用边界
 
 算法层通过 Runtime 的四个本机接口表达文件交换：
