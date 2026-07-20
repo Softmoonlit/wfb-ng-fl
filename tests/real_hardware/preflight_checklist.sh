@@ -101,7 +101,7 @@ fi
 
 processes="$(pgrep -a -f '(^|/)(wfb_v6_uplink|wfb-fl-server|wfb-fl-client|uftp|uftpd)( |$)' 2>/dev/null || true)"
 tun_exists=false; ip link show "$TUN_NAME" >/dev/null 2>&1 && tun_exists=true
-udp="$(ss -H -lunp 2>/dev/null | awk -v p=":$UFTP_PORT" '$5 ~ p"$" {print}' || true)"
+udp="$(ss -H -lunp 2>/dev/null | awk -v p=":$UFTP_PORT" '($4 ~ p"$") || ($5 ~ p"$") {print}' || true)"
 tcp="$(ss -H -ltnp 2>/dev/null | awk -v p=":$HTTP_PORT" '$4 ~ p"$" {print}' || true)"
 route="$(ip route show table all 2>/dev/null | awk -v m="$MCAST" -v d="$TUN_NAME" '$1 == m && $0 ~ ("dev " d "( |$)") {print}' || true)"
 if [ "$PHASE" = clean ]; then
