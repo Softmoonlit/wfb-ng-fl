@@ -70,7 +70,11 @@ copy_to() {
 copy_from() {
     local target="$1" source="$2" destination="$3"
     mkdir -p "$destination"
-    scp "${SSH_ARGS[@]}" -r "$target:$source/." "$destination/"
+    ssh "${SSH_ARGS[@]}" "$target" bash -s -- "$source" <<'REMOTE' | tar -C "$destination" -xf -
+set -euo pipefail
+cd "$1"
+tar -cf - .
+REMOTE
 }
 
 check_targets() {
