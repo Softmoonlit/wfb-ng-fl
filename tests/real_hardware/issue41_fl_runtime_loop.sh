@@ -254,7 +254,7 @@ assert_runtime_uftp_route() {
     if [ "$role" = server ]; then
         route="$(ip route show "$group/32" 2>&1)" || die "server 无法查询 UFTP 组播路由：$route"
         case " $route " in
-            *"$group/32 dev $tun"*) ;;
+            *"$group dev $tun"*) ;;
             *) die "server UFTP 精确组播路由未指向 $tun：$route" ;;
         esac
         route="$(ip route get "$group" from "$source_ip" 2>&1)" || die "server 无法查询 UFTP 源地址路由：$route"
@@ -263,7 +263,7 @@ assert_runtime_uftp_route() {
             *) die "server UFTP 源地址路由未指向 $tun：$route" ;;
         esac
     else
-        remote "$role" "route=\$(ip route show '$group/32' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 组播路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\"$group/32 dev $tun\"*) ;; *) printf '%s\\n' \"$role UFTP 精确组播路由未指向 $tun：\$route\" >&2; exit 1 ;; esac; route=\$(ip route get '$group' from '$source_ip' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 源地址路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\" dev $tun \"*) ;; *) printf '%s\\n' \"$role UFTP 源地址路由未指向 $tun：\$route\" >&2; exit 1 ;; esac"
+        remote "$role" "route=\$(ip route show '$group/32' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 组播路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\"$group dev $tun\"*) ;; *) printf '%s\\n' \"$role UFTP 精确组播路由未指向 $tun：\$route\" >&2; exit 1 ;; esac; route=\$(ip route get '$group' from '$source_ip' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 源地址路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\" dev $tun \"*) ;; *) printf '%s\\n' \"$role UFTP 源地址路由未指向 $tun：\$route\" >&2; exit 1 ;; esac"
     fi
 }
 

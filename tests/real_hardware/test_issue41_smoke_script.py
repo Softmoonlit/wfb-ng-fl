@@ -74,6 +74,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"',
                 'for role in client1 client2',
                 'ip route show "$group/32"',
+                '*"$group dev $tun"*)',
                 'ip route get "$group" from "$source_ip"',
                 'UFTP_PRIVATE_GROUP'):
             self.assertIn(fragment, self.script)
