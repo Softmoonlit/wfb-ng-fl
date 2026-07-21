@@ -34,6 +34,7 @@ RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
+SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
 
 cmd="${1:-help}"
 shift || true
@@ -277,7 +278,7 @@ start_smoke_wfb() {
     sudo install -d "$server_dir"
     sudo chown "$(id -u):$(id -g)" "$server_dir"
     for role in client1 client2; do
-        remote "$role" "sudo rm -rf '$(smoke_dir "$name")' && sudo install -d '$(smoke_dir "$name")/$role'"
+        remote "$role" "sudo rm -rf '$(smoke_dir "$name")' && sudo install -d '$(smoke_dir "$name")/$role' && sudo chown \$(id -u):\$(id -g) '$(smoke_dir "$name")/$role'"
     done
     server_iface="$(find_wlx)"
     [ "$(printf '%s\n' "$server_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
@@ -290,9 +291,9 @@ start_smoke_wfb() {
     configure_remote_monitor client2 "$client2_iface" "$client2_dir"
     short_gi="$(issue41_wfb_short_gi_arg)"
 
-    sudo bash -c "cd '$PROJECT_ROOT' && nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'"
-    remote client1 "sudo bash -c \"cd '$REMOTE_REPO' && nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT1_TUN' --tun-addr '$CLIENT1_TUN_ADDR' --node-id 1 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client1_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client1_dir/client1_queue_summary.json' --log-interval 200 > '$client1_dir/wfb.log' 2>&1 & echo \\\$! > '$client1_dir/wfb.pid'\""
-    remote client2 "sudo bash -c \"cd '$REMOTE_REPO' && nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT2_TUN' --tun-addr '$CLIENT2_TUN_ADDR' --node-id 2 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client2_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client2_dir/client2_queue_summary.json' --log-interval 200 > '$client2_dir/wfb.log' 2>&1 & echo \\\$! > '$client2_dir/wfb.pid'\""
+    sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
+    remote client1 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT1_TUN' --tun-addr '$CLIENT1_TUN_ADDR' --node-id 1 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client1_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client1_dir/client1_queue_summary.json' --log-interval 200 < /dev/null > '$client1_dir/wfb.log' 2>&1 & echo \\\$! > '$client1_dir/wfb.pid'; exit 0\""
+    remote client2 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT2_TUN' --tun-addr '$CLIENT2_TUN_ADDR' --node-id 2 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client2_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client2_dir/client2_queue_summary.json' --log-interval 200 < /dev/null > '$client2_dir/wfb.log' 2>&1 & echo \\\$! > '$client2_dir/wfb.pid'; exit 0\""
 
     wait_local_tun "$SERVER_TUN" || die "server smoke TUN 未出现：$SERVER_TUN"
     wait_remote_tun client1 "$CLIENT1_TUN" || die "client1 smoke TUN 未出现：$CLIENT1_TUN"
@@ -367,7 +368,7 @@ PY
     sleep 1
     status="$work/uftp.status"
     log="$work/uftp.log"
-    sudo bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 10000 -r 0.1:0.01:2.0 -s 10 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
+    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 10000 -r 0.1:0.01:2.0 -s 10 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
     sleep 1
     collect_smoke_evidence "$name"
     python3 - "$archive" "$status" <<'PY'
@@ -443,7 +444,7 @@ PY
     for _ in $(seq 1 50); do [ -f "$server_dir/http-server-ready" ] && break; sleep 0.1; done
     [ -f "$server_dir/http-server-ready" ] || die "HTTP PUT receiver 未 ready"
     for role in client1 client2; do
-        remote "$role" "sudo python3 - '$(smoke_dir "$name")/$role' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' <<'PY'
+        remote "$role" "sudo timeout '$SMOKE_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' <<'PY'
 import hashlib, http.client, json, os, sys, time
 work, source_ip, host, port, role = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5]
 os.makedirs(work, exist_ok=True)
@@ -526,7 +527,8 @@ cmd_stop_all() {
     sudo pkill -x wfb_v6_uplink 2>/dev/null || true
     sudo pkill -x uftp 2>/dev/null || true
     sudo pkill -x uftpd 2>/dev/null || true
-    for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service 2>/dev/null || true; sudo pkill -x wfb_v6_uplink 2>/dev/null || true; sudo pkill -x uftp 2>/dev/null || true; sudo pkill -x uftpd 2>/dev/null || true" || true; done
+    sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true
+    for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service 2>/dev/null || true; sudo pkill -x wfb_v6_uplink 2>/dev/null || true; sudo pkill -x uftp 2>/dev/null || true; sudo pkill -x uftpd 2>/dev/null || true; sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true" || true; done
 }
 
 cmd_clean() {
