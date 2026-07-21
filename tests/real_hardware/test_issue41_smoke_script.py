@@ -58,6 +58,14 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         ):
             self.assertIn(fragment, self.script)
 
+    def test_formal_client_config_uses_shared_uftp_multicast_host(self):
+        self.assertIn(
+            '"role":"client","work_dir":"$work_dir","node_id":$node_id,'
+            '"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,'
+            '"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,'
+            '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP"',
+            self.script)
+
     def test_smoke_writes_summary_markers(self):
         self.assertIn('write_smoke_marker "$name"', self.script)
         self.assertIn('"smoke":"$name"', self.script)

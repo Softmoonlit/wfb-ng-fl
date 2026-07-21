@@ -21,7 +21,7 @@ UFTP 必须启用 `-q` 和 `-S status_file`。每个下行 operation 在固定�
 
 `STATS` 只用于观测，不能替代逐 client、逐文件结果矩阵。status 文件只参与本次 operation 的自然完成结果校验，不能判断取消请求是否成功，也不能替代 Transport 对取消与自然完成先后关系的裁决。UFTP 已报告文件交付成功，不等于 client Runtime 的 manifest、参与集合和 SHA-256 校验成功；client 必须独立校验。
 
-client `uftpd` 不通过公开 `wait_for_model()` 启动或停止；它由 client Transport 在服务启动阶段启动并持续接收候选下行文件。`wait_for_model()` 只等待和消费 Transport 已提交的候选交付物，再由 Runtime 执行 manifest、参与集合和 SHA-256 校验。v8 每个 client Transport 实例只运行一个 `uftpd`；其意外退出使当前模型等待明确失败，不定义进程内自动恢复状态机，由服务重启恢复。
+client `uftpd` 不通过公开 `wait_for_model()` 启动或停止；它由 client Transport 在服务启动阶段启动并持续接收候选下行文件。client `uftpd` 必须使用与 server `uftp` 一致的公共组播地址加入下行接收组；该地址属于 client Transport 配置，不由 Runtime 轮次接口传递。`wait_for_model()` 只等待和消费 Transport 已提交的候选交付物，再由 Runtime 执行 manifest、参与集合和 SHA-256 校验。v8 每个 client Transport 实例只运行一个 `uftpd`；其意外退出使当前模型等待明确失败，不定义进程内自动恢复状态机，由服务重启恢复。
 
 下行反馈机会由链路层调度。Client 可以先行训练和提交 update，但 Transport 只有确认全部预期目标的模型文件结果后，才向 Runtime 交付下行完成结果。
 

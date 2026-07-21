@@ -27,6 +27,7 @@ _SERVER_FIELDS = {
 }
 _CLIENT_FIELDS = {
     'uftp_uid', 'server_http_host', 'server_http_port', 'uftp_bind_host',
+    'uftp_multicast_host',
 }
 
 
@@ -199,6 +200,7 @@ def load_role_service(path, expected_role=None):
                     config['server_http_host'], config['server_http_port']),
                 max_update_size_bytes=config['max_update_size_bytes'],
                 uftp_bind_host=config['uftp_bind_host'],
+                uftp_multicast_host=config['uftp_multicast_host'],
             )
     except FLRuntimeError:
         raise
@@ -223,6 +225,7 @@ def _read_config(path):
         config.setdefault('uftp_multicast_host', '127.0.0.1')
     elif role == 'client':
         config.setdefault('uftp_bind_host', '127.0.0.1')
+        config.setdefault('uftp_multicast_host', '127.0.0.1')
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
     if role not in ('server', 'client') or set(config) != allowed:

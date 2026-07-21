@@ -71,6 +71,23 @@ class RoleLifecycleTestCase(unittest.TestCase):
 
         self.assertEqual('transport_already_started', raised.exception.error_code)
 
+    def test_client_transport_uses_configured_multicast_host(self):
+        transport = ClientTransport(
+            self.root, 1, 9000, ('127.0.0.1', 8080),
+            uftp_bind_host='10.80.0.11',
+            uftp_multicast_host='239.80.41.1')
+        process = mock.Mock()
+        process.poll.return_value = None
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/usr/bin/uftpd'), \
+                mock.patch('wfb_ng.fl.transport.subprocess.Popen', return_value=process) as popen, \
+                mock.patch('wfb_ng.fl.transport._process_listens_udp', return_value=True):
+            transport.start()
+            command = popen.call_args.args[0]
+            self.assertEqual('10.80.0.11', command[command.index('-I') + 1])
+            self.assertEqual(
+                '239.80.41.1', command[command.index('-M') + 1])
+            transport.close()
+
     def test_service_rolls_back_link_and_role_when_receiver_start_fails(self):
         events = []
         link = StubLink(events)
@@ -195,8 +212,35 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertEqual('10.80.0.1', service.role.transport.uftp_bind_host)
         self.assertEqual('239.80.41.1', service.role.transport.uftp_multicast_host)
 
-    def test_client_config_defaults_uftp_bind_host_for_compatibility(self):
-        config_path = os.path.join(self.root, 'client-default-bind.json')
+    def test_client_config_passes_uftp_bind_and_multicast_hosts(self):
+        config_path = os.path.join(self.root, 'client.json')
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'role': 'client',
+                'work_dir': os.path.join(self.root, 'work'),
+                'node_id': 1,
+                'uftp_uid': 1,
+                'uftp_port': 9000,
+                'server_http_host': '10.0.0.1',
+                'server_http_port': 8080,
+                'uftp_bind_host': '10.80.0.11',
+                'uftp_multicast_host': '239.80.41.1',
+                'max_update_size_bytes': 4096,
+                'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
+            }, fh)
+
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            service = load_role_service(config_path, expected_role='client')
+
+        self.addCleanup(service.close)
+        self.assertEqual('10.80.0.11', service.role.transport.uftp_bind_host)
+        self.assertEqual(
+            '239.80.41.1', service.role.transport.uftp_multicast_host)
+
+    def test_client_config_defaults_uftp_bind_and_multicast_hosts_for_compatibility(self):
+        config_path = os.path.join(self.root, 'client-defaults.json')
         with open(config_path, 'w', encoding='utf-8') as fh:
             json.dump({
                 'schema_version': 1,
@@ -217,6 +261,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
 
         self.addCleanup(service.close)
         self.assertEqual('127.0.0.1', service.role.transport.uftp_bind_host)
+        self.assertEqual(
+            '127.0.0.1', service.role.transport.uftp_multicast_host)
 
     def test_algorithm_entry_runs_after_service_ready(self):
         events = []

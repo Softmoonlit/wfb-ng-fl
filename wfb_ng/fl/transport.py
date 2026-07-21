@@ -522,12 +522,14 @@ class ServerTransport(object):
 
 class ClientTransport(object):
     def __init__(self, work_dir, uftp_uid, uftp_port, server_http_address,
-                 uftp_bind_host='127.0.0.1', io_timeout=10):
+                 uftp_bind_host='127.0.0.1', io_timeout=10,
+                 uftp_multicast_host='127.0.0.1'):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
         self.server_http_address = server_http_address
         self.uftp_bind_host = uftp_bind_host
+        self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
         self.ready = False
         self._state = 'new'
@@ -559,6 +561,7 @@ class ClientTransport(object):
                 '-d',
                 '-q',
                 '-I', self.uftp_bind_host,
+                '-M', self.uftp_multicast_host,
                 '-p', str(self.uftp_port),
                 '-U', _format_uid(self.uftp_uid),
                 '-D', self._inbox_dir,

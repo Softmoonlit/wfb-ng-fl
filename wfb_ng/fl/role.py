@@ -78,13 +78,15 @@ class ServerRole(object):
 class ClientRole(object):
     def __init__(self, work_dir, node_id, uftp_uid, uftp_port,
                  server_http_address, max_update_size_bytes,
-                 uftp_bind_host='127.0.0.1'):
+                 uftp_bind_host='127.0.0.1',
+                 uftp_multicast_host='127.0.0.1'):
         self.transport = ClientTransport(
             work_dir=work_dir,
             uftp_uid=uftp_uid,
             uftp_port=uftp_port,
             server_http_address=server_http_address,
             uftp_bind_host=uftp_bind_host,
+            uftp_multicast_host=uftp_multicast_host,
         )
         self.runtime = ClientRuntime(
             work_dir=work_dir,
