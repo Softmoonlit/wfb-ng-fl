@@ -35,6 +35,7 @@ RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
+RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
 RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
 RADIO_MIN_USB_SPEED="${ISSUE41_RADIO_MIN_USB_SPEED:-480}"
@@ -65,6 +66,8 @@ usage() {
 说明：
   run-all 不执行 push-branch，也不执行 sync-remotes。push 是显式对外发布步骤。
   密码不得写入脚本、日志或归档；请使用 SSH key 或交互式 sudo/ssh。
+  run-runtime-loop 默认拒绝复用旧 work_dir；重试前执行 clean，或显式设置：
+    ISSUE41_RESET_RUNTIME_STATE=1 ... run-runtime-loop
 EOF
 }
 
@@ -682,7 +685,42 @@ PY
     log_ok "smoke-uplink-http-put 通过"
 }
 
+runtime_state_exists_local() {
+    [ -d /var/lib/wfb-ng/issue41/server ] && find /var/lib/wfb-ng/issue41/server -mindepth 1 -print -quit | grep -q . && return 0
+    return 1
+}
+
+runtime_state_exists_remote() {
+    local role="$1"
+    remote "$role" "[ -d /var/lib/wfb-ng/issue41/client ] && find /var/lib/wfb-ng/issue41/client -mindepth 1 -print -quit | grep -q ."
+}
+
+assert_runtime_processes_stopped() {
+    if pgrep -x wfb-fl-server >/dev/null || pgrep -x wfb_v6_uplink >/dev/null || pgrep -x uftp >/dev/null || pgrep -x uftpd >/dev/null; then
+        die "启动 Runtime 前本机仍有 issue41 相关进程"
+    fi
+    for role in client1 client2; do
+        remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null" || die "$role 启动 Runtime 前仍有 issue41 相关进程"
+    done
+}
+
+prepare_runtime_state() {
+    cmd_stop_all
+    assert_runtime_processes_stopped
+    if runtime_state_exists_local || runtime_state_exists_remote client1 || runtime_state_exists_remote client2; then
+        if [ "$RESET_RUNTIME_STATE" != "1" ]; then
+            die "检测到上次 Runtime 现场；默认拒绝复用，请先执行 clean，或设置 ISSUE41_RESET_RUNTIME_STATE=1"
+        fi
+        sudo rm -rf /var/lib/wfb-ng/issue41/server
+        for role in client1 client2; do
+            remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
+        done
+        log_warn "已按 ISSUE41_RESET_RUNTIME_STATE=1 清理旧 Runtime work_dir"
+    fi
+}
+
 cmd_run_runtime_loop() {
+    prepare_runtime_state
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2

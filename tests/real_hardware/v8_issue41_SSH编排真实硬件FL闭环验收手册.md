@@ -328,6 +328,26 @@ READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只�
 - 数据面必须走 `10.80.0.0/24` TUN 地址。
 - 只有 Runtime 四接口驱动正式闭环，不能用 ping、普通 TCP 文件探针或人工复制替代。
 
+重试与失败现场：
+
+- Runtime 失败时默认保留 `/var/lib/wfb-ng/issue41/{server,client}`，用于采集失败证据。
+- `run-runtime-loop` 启动前会停止 issue41 相关服务并检查无残留进程；检测到旧 work_dir 时默认拒绝复用，避免旧的 `runtime.lock`、`uftp-tmp` 或未完成轮次影响新测试。
+- 排障完成后，推荐显式清理再重试：
+
+```bash
+bash tests/real_hardware/issue41_fl_runtime_loop.sh clean
+bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
+```
+
+- 如确认不需要保留旧 work_dir，也可以使用显式重置：
+
+```bash
+ISSUE41_RESET_RUNTIME_STATE=1 \
+  bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
+```
+
+该选项只清理 issue41 管理的 Runtime work_dir，不删除归档、仓库或其他系统目录。未显式设置时脚本不得删除失败现场。
+
 算法 fixture：
 
 - 默认单轮 `rounds=1`。

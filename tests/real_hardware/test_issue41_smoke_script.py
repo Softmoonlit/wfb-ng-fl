@@ -92,6 +92,16 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'cmd_collect\n    sudo rm -rf /var/lib/wfb-ng/issue41/server'):
             self.assertIn(fragment, self.script)
 
+    def test_runtime_rejects_stale_work_dir_without_explicit_reset(self):
+        for fragment in (
+                'prepare_runtime_state',
+                'assert_runtime_processes_stopped',
+                'ISSUE41_RESET_RUNTIME_STATE',
+                '默认拒绝复用，请先执行 clean',
+                'sudo rm -rf /var/lib/wfb-ng/issue41/server',
+                'sudo rm -rf /var/lib/wfb-ng/issue41/client'):
+            self.assertIn(fragment, self.script)
+
     def test_smoke_writes_summary_markers(self):
         self.assertIn('write_smoke_marker "$name"', self.script)
         self.assertIn('"smoke":"$name"', self.script)
