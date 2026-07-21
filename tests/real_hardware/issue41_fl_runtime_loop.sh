@@ -20,6 +20,7 @@ SERVER_TUN_ADDR="${ISSUE41_SERVER_TUN_ADDR:-10.80.0.1/24}"
 CLIENT1_TUN_ADDR="${ISSUE41_CLIENT1_TUN_ADDR:-10.80.0.11/24}"
 CLIENT2_TUN_ADDR="${ISSUE41_CLIENT2_TUN_ADDR:-10.80.0.12/24}"
 UFTP_GROUP="${ISSUE41_UFTP_GROUP:-239.80.41.1}"
+UFTP_PRIVATE_GROUP="${ISSUE41_UFTP_PRIVATE_GROUP:-239.80.41.2}"
 UFTP_PORT="${ISSUE41_UFTP_PORT:-1044}"
 HTTP_HOST="${ISSUE41_HTTP_HOST:-10.80.0.1}"
 HTTP_PORT="${ISSUE41_HTTP_PORT:-8080}"
@@ -194,7 +195,7 @@ write_issue41_configs() {
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":1,"participant_node_ids":[1,2],"client_dataset_seeds":{"1":"client1-seed","2":"client2-seed"},"result_path":"$result"}
@@ -202,12 +203,12 @@ EOF
         sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-server.service.d
         sudo install -m 0644 "$tmp/fl.json" /etc/wfb-ng/issue41/fl-server.json
         sudo install -m 0644 "$tmp/algorithm.json" /etc/wfb-ng/issue41/server-algorithm.json
-        printf '[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --algorithm %s --algorithm-config /etc/wfb-ng/issue41/server-algorithm.json\n' "$algorithm" | sudo tee /etc/systemd/system/wfb-fl-server.service.d/issue41.conf >/dev/null
+        printf '[Service]\nRestart=no\nExecStart=\nExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --algorithm %s --algorithm-config /etc/wfb-ng/issue41/server-algorithm.json\n' "$algorithm" | sudo tee /etc/systemd/system/wfb-fl-server.service.d/issue41.conf >/dev/null
     else
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$iface"]}
+{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$iface"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":1,"node_id":$node_id,"training_delay_ms":$delay,"client_dataset_seed":"$seed","result_path":"$result"}
@@ -216,7 +217,7 @@ EOF
         ssh -o BatchMode=yes "$ssh_target" "sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d"
         scp -q "$tmp/fl.json" "$ssh_target:/tmp/issue41-fl.json"
         scp -q "$tmp/algorithm.json" "$ssh_target:/tmp/issue41-algorithm.json"
-        ssh -o BatchMode=yes "$ssh_target" "sudo install -m 0644 /tmp/issue41-fl.json /etc/wfb-ng/issue41/fl-client.json && sudo install -m 0644 /tmp/issue41-algorithm.json /etc/wfb-ng/issue41/client-algorithm.json && printf '[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/issue41/fl-client.json --algorithm $algorithm --algorithm-config /etc/wfb-ng/issue41/client-algorithm.json\n' | sudo tee /etc/systemd/system/wfb-fl-client.service.d/issue41.conf >/dev/null"
+        ssh -o BatchMode=yes "$ssh_target" "sudo install -m 0644 /tmp/issue41-fl.json /etc/wfb-ng/issue41/fl-client.json && sudo install -m 0644 /tmp/issue41-algorithm.json /etc/wfb-ng/issue41/client-algorithm.json && printf '[Service]\nRestart=no\nExecStart=\nExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/issue41/fl-client.json --algorithm $algorithm --algorithm-config /etc/wfb-ng/issue41/client-algorithm.json\n' | sudo tee /etc/systemd/system/wfb-fl-client.service.d/issue41.conf >/dev/null"
     fi
     rm -rf "$tmp"
 }
@@ -238,23 +239,44 @@ wait_remote_tun() {
     remote "$role" "deadline=\$((SECONDS + 15)); while [ \$SECONDS -lt \$deadline ]; do [ -d '/sys/class/net/$tun' ] && exit 0; sleep 0.2; done; exit 1"
 }
 
+wait_remote_service_ready() {
+    local role="$1" unit="$2"
+    remote "$role" "sudo systemctl restart '$unit' && sudo systemctl is-active --quiet '$unit'"
+}
+
+assert_remote_service_active() {
+    local role="$1" unit="$2"
+    remote "$role" "sudo systemctl is-active --quiet '$unit'"
+}
+
 assert_runtime_uftp_route() {
-    local role="$1" tun="$2" route
+    local role="$1" tun="$2" source_ip="$3" group="$4" route
     if [ "$role" = server ]; then
-        route="$(ip route get "$UFTP_GROUP" 2>&1)" || die "server 无法查询 UFTP 组播路由：$route"
+        route="$(ip route show "$group/32" 2>&1)" || die "server 无法查询 UFTP 组播路由：$route"
+        case " $route " in
+            *"$group/32 dev $tun"*) ;;
+            *) die "server UFTP 精确组播路由未指向 $tun：$route" ;;
+        esac
+        route="$(ip route get "$group" from "$source_ip" 2>&1)" || die "server 无法查询 UFTP 源地址路由：$route"
         case " $route " in
             *" dev $tun "*) ;;
-            *) die "server UFTP 组播路由未指向 $tun：$route" ;;
+            *) die "server UFTP 源地址路由未指向 $tun：$route" ;;
         esac
     else
-        remote "$role" "route=\$(ip route get '$UFTP_GROUP' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 组播路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\" dev $tun \"*) ;; *) printf '%s\\n' \"$role UFTP 组播路由未指向 $tun：\$route\" >&2; exit 1 ;; esac"
+        remote "$role" "route=\$(ip route show '$group/32' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 组播路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\"$group/32 dev $tun\"*) ;; *) printf '%s\\n' \"$role UFTP 精确组播路由未指向 $tun：\$route\" >&2; exit 1 ;; esac; route=\$(ip route get '$group' from '$source_ip' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 源地址路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\" dev $tun \"*) ;; *) printf '%s\\n' \"$role UFTP 源地址路由未指向 $tun：\$route\" >&2; exit 1 ;; esac"
     fi
 }
 
 assert_runtime_uftp_routes() {
-    assert_runtime_uftp_route server "$SERVER_TUN"
-    assert_runtime_uftp_route client1 "$CLIENT1_TUN"
-    assert_runtime_uftp_route client2 "$CLIENT2_TUN"
+    local role tun source_ip group
+    for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
+        assert_runtime_uftp_route server "$SERVER_TUN" "${SERVER_TUN_ADDR%/*}" "$group"
+        for role in client1 client2; do
+            tun="$(client_tun "$role")"
+            source_ip="$(client_ip "$role")"
+            assert_runtime_uftp_route "$role" "$tun" "$source_ip" "$group"
+        done
+    done
 }
 
 write_smoke_marker() {
@@ -317,9 +339,12 @@ start_smoke_wfb() {
     wait_local_tun "$SERVER_TUN" || die "server smoke TUN 未出现：$SERVER_TUN"
     wait_remote_tun client1 "$CLIENT1_TUN" || die "client1 smoke TUN 未出现：$CLIENT1_TUN"
     wait_remote_tun client2 "$CLIENT2_TUN" || die "client2 smoke TUN 未出现：$CLIENT2_TUN"
-    sudo ip route replace "$UFTP_GROUP/32" dev "$SERVER_TUN"
-    remote client1 "sudo ip route replace '$UFTP_GROUP/32' dev '$CLIENT1_TUN'"
-    remote client2 "sudo ip route replace '$UFTP_GROUP/32' dev '$CLIENT2_TUN'"
+    local group
+    for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
+        sudo ip route replace "$group/32" dev "$SERVER_TUN"
+        remote client1 "sudo ip route replace '$group/32' dev '$CLIENT1_TUN'"
+        remote client2 "sudo ip route replace '$group/32' dev '$CLIENT2_TUN'"
+    done
 }
 
 collect_smoke_evidence() {
@@ -387,7 +412,7 @@ PY
     sleep 1
     status="$work/uftp.status"
     log="$work/uftp.log"
-    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 10000 -r 0.1:0.01:2.0 -s 10 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
+    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 10000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
     sleep 1
     collect_smoke_evidence "$name"
     python3 - "$archive" "$status" <<'PY'
@@ -515,7 +540,11 @@ cmd_run_runtime_loop() {
     write_issue41_configs client1
     write_issue41_configs client2
     sudo systemctl daemon-reload
-    for role in client1 client2; do remote "$role" "sudo systemctl daemon-reload && sudo systemctl restart wfb-fl-client.service"; done
+    for role in client1 client2; do
+        remote "$role" "sudo systemctl daemon-reload"
+        wait_remote_service_ready "$role" wfb-fl-client.service
+        assert_remote_service_active "$role" wfb-fl-client.service
+    done
     sudo systemctl restart wfb-fl-server.service
     assert_runtime_uftp_routes
     log_ok "Runtime loop 服务已启动；UFTP 组播路由已指向三机 TUN；使用 systemd/journal 观察直到算法退出或失败。"
@@ -532,8 +561,11 @@ cmd_lifecycle_stop_restart() {
     for role in client1 client2; do
         remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null"
     done
+    for role in client1 client2; do
+        wait_remote_service_ready "$role" wfb-fl-client.service
+        assert_remote_service_active "$role" wfb-fl-client.service
+    done
     sudo systemctl restart wfb-fl-server.service
-    for role in client1 client2; do remote "$role" "sudo systemctl restart wfb-fl-client.service"; done
     sleep 2
     sudo systemctl stop wfb-fl-server.service || true
     for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service || true"; done
@@ -558,25 +590,49 @@ cmd_clean() {
     log_ok "issue41 管理路径已清理"
 }
 
+capture_runtime_routes() {
+    local role group tun source_ip prefix
+    for role in server client1 client2; do
+        if [ "$role" = server ]; then
+            tun="$SERVER_TUN"
+            source_ip="${SERVER_TUN_ADDR%/*}"
+        else
+            tun="$(client_tun "$role")"
+            source_ip="$(client_ip "$role")"
+        fi
+        for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
+            prefix="$ARCHIVE_DIR/raw/$role-route-${group//./-}"
+            if [ "$role" = server ]; then
+                ip route show "$group/32" > "$prefix-show.txt" 2>&1 || true
+                ip route get "$group" from "$source_ip" > "$prefix-get.txt" 2>&1 || true
+            else
+                remote "$role" "ip route show '$group/32'" > "$prefix-show.txt" 2>&1 || true
+                remote "$role" "ip route get '$group' from '$source_ip'" > "$prefix-get.txt" 2>&1 || true
+            fi
+        done
+    done
+}
+
 cmd_collect() {
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop/server" "$ARCHIVE_DIR/lifecycle" "$ARCHIVE_DIR/raw"
     sudo systemctl status wfb-fl-server.service > "$ARCHIVE_DIR/raw/server-systemctl-status.txt" 2>&1 || true
-    sudo journalctl -u wfb-fl-server.service --no-pager > "$ARCHIVE_DIR/raw/server-journal.txt" 2>&1 || true
+    sudo journalctl -u wfb-fl-server.service --output=short-precise --no-pager > "$ARCHIVE_DIR/raw/server-journal.txt" 2>&1 || true
     sudo cp -a /var/lib/wfb-ng/issue41/server/. "$ARCHIVE_DIR/formal_runtime_loop/server/" 2>/dev/null || true
     for role in client1 client2; do
         mkdir -p "$ARCHIVE_DIR/formal_runtime_loop/$role"
-        remote "$role" "sudo tar -C /var/lib/wfb-ng/issue41/client -czf /tmp/issue41-$role-client.tgz . 2>/dev/null || true; systemctl status wfb-fl-client.service > /tmp/issue41-$role-status.txt 2>&1 || true; journalctl -u wfb-fl-client.service --no-pager > /tmp/issue41-$role-journal.txt 2>&1 || true"
+        remote "$role" "sudo tar -C /var/lib/wfb-ng/issue41/client -czf /tmp/issue41-$role-client.tgz . 2>/dev/null || true; systemctl status wfb-fl-client.service > /tmp/issue41-$role-status.txt 2>&1 || true; journalctl -u wfb-fl-client.service --output=short-precise --no-pager > /tmp/issue41-$role-journal.txt 2>&1 || true"
         if scp -q "$(client_ssh "$role"):/tmp/issue41-$role-client.tgz" "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" 2>/dev/null; then
             tar -C "$ARCHIVE_DIR/formal_runtime_loop/$role" -xzf "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" || true
         fi
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-status.txt" "$ARCHIVE_DIR/raw/$role-systemctl-status.txt" 2>/dev/null || true
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-journal.txt" "$ARCHIVE_DIR/raw/$role-journal.txt" 2>/dev/null || true
     done
+    capture_runtime_routes
     log_ok "归档采集完成：$ARCHIVE_DIR"
 }
 
 cmd_summary() {
-    local server_result client1_result client2_result conclusion status reason smoke_downlink smoke_uplink
+    local server_result client1_result client2_result conclusion status reason smoke_downlink smoke_uplink route_evidence role group suffix
     server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
     client1_result="$ARCHIVE_DIR/formal_runtime_loop/client1/issue41-client1-result.json"
     client2_result="$ARCHIVE_DIR/formal_runtime_loop/client2/issue41-client2-result.json"
@@ -592,8 +648,18 @@ cmd_summary() {
     if [ "$smoke_downlink" = passed ] && [ "$smoke_uplink" = passed ] && [ -f "$server_result" ] && [ -f "$client1_result" ] && [ -f "$client2_result" ]; then
         status=passed; reason="所有脚本可见关键证据存在"
     fi
+    route_evidence=
+    for role in server client1 client2; do
+        for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
+            suffix="${group//./-}"
+            for direction in show get; do
+                [ -z "$route_evidence" ] || route_evidence="$route_evidence,"
+                route_evidence="$route_evidence\"$ARCHIVE_DIR/raw/$role-route-$suffix-$direction.txt\""
+            done
+        done
+    done
     cat > "$ARCHIVE_DIR/issue41_summary.json" <<EOF
-{"orchestration":{"status":"passed"},"pre_runtime_smoke":{"downlink_uftp":{"status":"$smoke_downlink"},"uplink_http_put":{"status":"$smoke_uplink"}},"formal_runtime_loop":{"status":"$status","runtime_interfaces":["publish_model","wait_for_model","submit_update","wait_for_updates"],"data_plane":"10.80.0.0/24","server_wait_for_updates_returned_node_ids":[1,2],"partial_result_returned":false,"update_timing":{"client1_before_client2":true},"server_result":"$server_result","client1_result":"$client1_result","client2_result":"$client2_result"},"lifecycle":{"status":"$status"},"conclusion":{"status":"$status","reason":"$reason"}}
+{"orchestration":{"status":"passed"},"pre_runtime_smoke":{"downlink_uftp":{"status":"$smoke_downlink"},"uplink_http_put":{"status":"$smoke_uplink"}},"formal_runtime_loop":{"status":"$status","runtime_interfaces":["publish_model","wait_for_model","submit_update","wait_for_updates"],"data_plane":"10.80.0.0/24","server_wait_for_updates_returned_node_ids":[1,2],"partial_result_returned":false,"update_timing":{"client1_before_client2":true},"server_result":"$server_result","client1_result":"$client1_result","client2_result":"$client2_result","server_journal":"$ARCHIVE_DIR/raw/server-journal.txt","client1_journal":"$ARCHIVE_DIR/raw/client1-journal.txt","client2_journal":"$ARCHIVE_DIR/raw/client2-journal.txt","route_evidence":[$route_evidence]},"lifecycle":{"status":"$status"},"conclusion":{"status":"$status","reason":"$reason"}}
 EOF
     cat > "$ARCHIVE_DIR/result.md" <<EOF
 # issue41 真实硬件 FL Runtime 闭环结果

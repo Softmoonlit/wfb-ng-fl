@@ -25,10 +25,11 @@ _COMMON_FIELDS = {
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
     'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
+    'uftp_private_multicast_host',
 }
 _CLIENT_FIELDS = {
     'uftp_uid', 'server_http_host', 'server_http_port', 'uftp_bind_host',
-    'uftp_multicast_host',
+    'uftp_multicast_host', 'uftp_private_multicast_host',
 }
 
 
@@ -98,25 +99,25 @@ def _is_ipv4_multicast(host):
 
 
 class MulticastRoute(object):
-    """管理 UFTP 公共组播地址到角色 TUN 的主机路由。"""
+    """管理 UFTP 公共和私有组播地址到角色 TUN 的主机路由。"""
 
-    def __init__(self, ip_executable, multicast_host, tun_name):
+    def __init__(self, ip_executable, multicast_hosts, tun_name):
         self.ip_executable = ip_executable
-        self.multicast_host = multicast_host
+        self.multicast_hosts = tuple(multicast_hosts)
         self.tun_name = tun_name
         self._installed = False
 
     def setup(self):
-        if not _is_ipv4_multicast(self.multicast_host):
+        if not all(_is_ipv4_multicast(host) for host in self.multicast_hosts):
             return
-        command = [
-            self.ip_executable, 'route', 'replace',
-            '%s/32' % self.multicast_host, 'dev', self.tun_name,
-        ]
         try:
-            subprocess.run(
-                command, check=True, stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE, text=True)
+            for multicast_host in self.multicast_hosts:
+                subprocess.run(
+                    [
+                        self.ip_executable, 'route', 'replace',
+                        '%s/32' % multicast_host, 'dev', self.tun_name,
+                    ], check=True, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE, text=True)
         except (OSError, subprocess.CalledProcessError) as exc:
             raise FLRuntimeError(
                 'network_route_setup_failed',
@@ -218,13 +219,13 @@ def load_role_service(path, expected_role=None):
     if os.path.exists(tun_path):
         raise FLRuntimeError(
             'link_interface_exists', '链路 TUN 已存在，拒绝复用旧接口')
-    multicast_route = None
-    if _is_ipv4_multicast(config['uftp_multicast_host']):
-        ip_executable = shutil.which('ip')
-        if not ip_executable:
-            raise FLRuntimeError('transport_unavailable', '缺少 ip 可执行文件')
-        multicast_route = MulticastRoute(
-            ip_executable, config['uftp_multicast_host'], tun_name)
+    ip_executable = shutil.which('ip')
+    if not ip_executable:
+        raise FLRuntimeError('transport_unavailable', '缺少 ip 可执行文件')
+    multicast_route = MulticastRoute(
+        ip_executable,
+        (config['uftp_multicast_host'],
+         config['uftp_private_multicast_host']), tun_name)
     link = LinkProcess([
         executables['wfb_v6_uplink'],
         '--role', role_name,
@@ -242,6 +243,8 @@ def load_role_service(path, expected_role=None):
                 http_port=config['http_port'],
                 uftp_bind_host=config['uftp_bind_host'],
                 uftp_multicast_host=config['uftp_multicast_host'],
+                uftp_private_multicast_host=(
+                    config['uftp_private_multicast_host']),
                 max_update_size_bytes=config['max_update_size_bytes'],
             )
         else:
@@ -274,12 +277,8 @@ def _read_config(path):
     if not isinstance(config, dict):
         raise FLRuntimeError('invalid_configuration', '角色服务配置结构无效')
     role = config.get('role')
-    if role == 'server':
+    if role in ('server', 'client'):
         config.setdefault('uftp_bind_host', '127.0.0.1')
-        config.setdefault('uftp_multicast_host', '127.0.0.1')
-    elif role == 'client':
-        config.setdefault('uftp_bind_host', '127.0.0.1')
-        config.setdefault('uftp_multicast_host', '127.0.0.1')
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
     if role not in ('server', 'client') or set(config) != allowed:
@@ -293,10 +292,17 @@ def _read_config(path):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
-    for name in ('uftp_bind_host', 'uftp_multicast_host'):
-        if name in config and (not isinstance(config[name], str) or not config[name]):
+    for name in ('uftp_bind_host', 'uftp_multicast_host',
+                 'uftp_private_multicast_host'):
+        if not isinstance(config.get(name), str) or not config[name]:
             raise FLRuntimeError(
                 'invalid_configuration', 'UFTP 地址配置无效')
+    if (not _is_ipv4_multicast(config['uftp_multicast_host']) or
+            not _is_ipv4_multicast(config['uftp_private_multicast_host']) or
+            config['uftp_multicast_host'] ==
+            config['uftp_private_multicast_host']):
+        raise FLRuntimeError(
+            'invalid_configuration', 'UFTP 组播地址配置无效')
     link_args = config.get('link_args')
     if (not isinstance(link_args, list) or not link_args or
             any(not isinstance(value, str) or not value for value in link_args)):

@@ -46,7 +46,8 @@ class ServerTransport(object):
     def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
                  http_host='127.0.0.1', http_port=0,
                  uftp_bind_host='127.0.0.1',
-                 uftp_multicast_host='127.0.0.1', io_timeout=10,
+                 uftp_multicast_host='127.0.0.1',
+                 uftp_private_multicast_host='239.255.0.1', io_timeout=10,
                  cancel_grace_period=2):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
@@ -57,6 +58,7 @@ class ServerTransport(object):
         self.http_port = http_port
         self.uftp_bind_host = uftp_bind_host
         self.uftp_multicast_host = uftp_multicast_host
+        self.uftp_private_multicast_host = uftp_private_multicast_host
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
         self.ready = False
@@ -204,13 +206,14 @@ class ServerTransport(object):
             '-q',
             '-I', self.uftp_bind_host,
             '-M', self.uftp_multicast_host,
+            '-P', self.uftp_private_multicast_host,
             '-p', str(self.uftp_port),
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
             '-R', '10000',
             '-r', '0.1:0.01:2.0',
-            '-s', '10',
+            '-s', '20',
             '-L', log_path,
             '-S', status_path,
             '-D', round_id,

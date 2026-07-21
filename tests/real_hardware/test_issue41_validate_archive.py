@@ -18,6 +18,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
     def test_accepts_complete_passed_summary(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
             self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
         self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
         self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
         self.write_json('issue41_summary.json', self.complete_summary('passed'))
@@ -57,6 +58,12 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.assertTrue(any('smoke marker downlink_uftp' in error for error in errors))
         self.assertTrue(any('smoke marker uplink_http_put' in error for error in errors))
 
+    def write_runtime_evidence(self):
+        for name in ('server-journal.txt', 'client1-journal.txt', 'client2-journal.txt'):
+            self.write_text(name, 'evidence\n')
+        for index in range(12):
+            self.write_text('route-%d.txt' % index, 'route\n')
+
     def complete_summary(self, conclusion):
         return {
             'orchestration': {'status': 'passed'},
@@ -76,6 +83,12 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'server_result': os.path.join(self.root, 'server-result.json'),
                 'client1_result': os.path.join(self.root, 'client1-result.json'),
                 'client2_result': os.path.join(self.root, 'client2-result.json'),
+                'server_journal': os.path.join(self.root, 'server-journal.txt'),
+                'client1_journal': os.path.join(self.root, 'client1-journal.txt'),
+                'client2_journal': os.path.join(self.root, 'client2-journal.txt'),
+                'route_evidence': [
+                    os.path.join(self.root, 'route-%d.txt' % index)
+                    for index in range(12)],
             },
             'lifecycle': {'status': 'passed'},
             'conclusion': {

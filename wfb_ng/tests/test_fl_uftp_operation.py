@@ -34,7 +34,8 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
     def test_server_downlink_uses_configured_bind_and_multicast_hosts(self):
         transport, model_path, manifest_path = self.make_transport(
             uftp_bind_host='10.80.0.1',
-            uftp_multicast_host='239.80.41.1')
+            uftp_multicast_host='239.80.41.1',
+            uftp_private_multicast_host='239.80.41.2')
         round_dir = os.path.dirname(model_path)
         self.write_status(round_dir, self.success_status())
         captured = []
@@ -58,6 +59,8 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
 
         self.assertEqual('10.80.0.1', captured[0][captured[0].index('-I') + 1])
         self.assertEqual('239.80.41.1', captured[0][captured[0].index('-M') + 1])
+        self.assertEqual('239.80.41.2', captured[0][captured[0].index('-P') + 1])
+        self.assertEqual('20', captured[0][captured[0].index('-s') + 1])
 
     def test_each_operation_uses_fresh_status_and_requires_complete_matrix(self):
         round_dir = os.path.join(self.root, 'round')

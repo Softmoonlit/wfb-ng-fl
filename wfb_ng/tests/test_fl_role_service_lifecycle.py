@@ -119,19 +119,28 @@ class RoleLifecycleTestCase(unittest.TestCase):
             'role.close_runtime'], events)
         self.assertFalse(service.ready)
 
-    def test_multicast_route_replaces_exact_tun_route(self):
-        route = MulticastRoute('/usr/sbin/ip', '239.80.41.1', 'wfb0')
+    def test_multicast_route_replaces_each_exact_tun_route(self):
+        route = MulticastRoute(
+            '/usr/sbin/ip', ('239.80.41.1', '239.80.41.2'), 'wfb0')
 
         with mock.patch('wfb_ng.fl.service.subprocess.run') as run:
             route.setup()
 
         self.assertEqual([
-            '/usr/sbin/ip', 'route', 'replace',
-            '239.80.41.1/32', 'dev', 'wfb0'], run.call_args.args[0])
-        self.assertTrue(run.call_args.kwargs['check'])
+            mock.call(
+                ['/usr/sbin/ip', 'route', 'replace',
+                 '239.80.41.1/32', 'dev', 'wfb0'],
+                check=True, stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE, text=True),
+            mock.call(
+                ['/usr/sbin/ip', 'route', 'replace',
+                 '239.80.41.2/32', 'dev', 'wfb0'],
+                check=True, stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE, text=True),
+        ], run.call_args_list)
 
     def test_multicast_route_ignores_non_multicast_host(self):
-        route = MulticastRoute('/usr/sbin/ip', '127.0.0.1', 'wfb0')
+        route = MulticastRoute('/usr/sbin/ip', ('127.0.0.1',), 'wfb0')
 
         with mock.patch('wfb_ng.fl.service.subprocess.run') as run:
             route.setup()
@@ -209,6 +218,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
                 'max_update_size_bytes': 4096,
                 'link_args': [
                     '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
@@ -235,6 +246,7 @@ class RoleLifecycleTestCase(unittest.TestCase):
             config = json.load(fh)
         config['uftp_bind_host'] = '10.80.0.1'
         config['uftp_multicast_host'] = '239.80.41.1'
+        config['uftp_private_multicast_host'] = '239.80.41.2'
         with open(config_path, 'w', encoding='utf-8') as fh:
             json.dump(config, fh)
 
@@ -245,6 +257,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.addCleanup(service.close)
         self.assertEqual('10.80.0.1', service.role.transport.uftp_bind_host)
         self.assertEqual('239.80.41.1', service.role.transport.uftp_multicast_host)
+        self.assertEqual(
+            '239.80.41.2', service.role.transport.uftp_private_multicast_host)
 
     def test_client_config_passes_uftp_bind_and_multicast_hosts(self):
         config_path = os.path.join(self.root, 'client.json')
@@ -260,6 +274,7 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'server_http_port': 8080,
                 'uftp_bind_host': '10.80.0.11',
                 'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
                 'max_update_size_bytes': 4096,
                 'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
             }, fh)
@@ -273,7 +288,28 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertEqual(
             '239.80.41.1', service.role.transport.uftp_multicast_host)
 
-    def test_client_config_defaults_uftp_bind_and_multicast_hosts_for_compatibility(self):
+    def test_config_rejects_missing_or_invalid_private_multicast_host(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1'])
+        with open(config_path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+        for private_host in (None, '239.80.41.1', '127.0.0.1', 'ff02::1'):
+            with self.subTest(private_host=private_host):
+                candidate = dict(config)
+                if private_host is not None:
+                    candidate['uftp_private_multicast_host'] = private_host
+                else:
+                    candidate.pop('uftp_private_multicast_host')
+                with open(config_path, 'w', encoding='utf-8') as fh:
+                    json.dump(candidate, fh)
+                with mock.patch('wfb_ng.fl.service.shutil.which',
+                                side_effect=lambda name: '/usr/bin/' + name):
+                    with self.assertRaises(FLRuntimeError) as raised:
+                        load_role_service(config_path, expected_role='server')
+                self.assertEqual('invalid_configuration', raised.exception.error_code)
+
+    def test_client_config_rejects_missing_private_multicast_host(self):
         config_path = os.path.join(self.root, 'client-defaults.json')
         with open(config_path, 'w', encoding='utf-8') as fh:
             json.dump({
@@ -291,12 +327,10 @@ class RoleLifecycleTestCase(unittest.TestCase):
 
         with mock.patch('wfb_ng.fl.service.shutil.which',
                         side_effect=lambda name: '/usr/bin/' + name):
-            service = load_role_service(config_path, expected_role='client')
+            with self.assertRaises(FLRuntimeError) as raised:
+                load_role_service(config_path, expected_role='client')
 
-        self.addCleanup(service.close)
-        self.assertEqual('127.0.0.1', service.role.transport.uftp_bind_host)
-        self.assertEqual(
-            '127.0.0.1', service.role.transport.uftp_multicast_host)
+        self.assertEqual('invalid_configuration', raised.exception.error_code)
 
     def test_algorithm_entry_runs_after_service_ready(self):
         events = []
@@ -387,6 +421,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'server_http_host': '10.0.0.1',
                 'server_http_port': 8080,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
                 'max_update_size_bytes': 4096,
                 'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
             }, fh)
@@ -457,6 +493,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
                 'max_update_size_bytes': 4096,
                 'link_args': [
                     '--tun-name', 'wfb0', '--known-clients', '1'],
@@ -517,6 +555,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
                 'max_update_size_bytes': 4096,
                 'link_args': link_args,
             }, fh)

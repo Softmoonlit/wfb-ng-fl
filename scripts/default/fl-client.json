@@ -7,6 +7,9 @@
   "uftp_port": 1044,
   "server_http_host": "10.0.0.1",
   "server_http_port": 8080,
+  "uftp_bind_host": "10.0.0.2",
+  "uftp_multicast_host": "239.80.41.1",
+  "uftp_private_multicast_host": "239.80.41.2",
   "max_update_size_bytes": 1073741824,
   "link_args": [
     "--tun-name", "wfb-fl0",

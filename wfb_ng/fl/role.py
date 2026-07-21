@@ -16,7 +16,8 @@ class ServerRole(object):
                  server_uftp_uid, uftp_port, http_port,
                  max_update_size_bytes, http_host='127.0.0.1',
                  uftp_bind_host='127.0.0.1',
-                 uftp_multicast_host='127.0.0.1'):
+                 uftp_multicast_host='127.0.0.1',
+                 uftp_private_multicast_host='239.255.0.1'):
         participant_node_ids = _as_tuple(participant_node_id)
         participant_uftp_uids = _as_tuple(participant_uftp_uid)
         if len(participant_node_ids) != len(participant_uftp_uids):
@@ -32,6 +33,7 @@ class ServerRole(object):
             http_port=http_port,
             uftp_bind_host=uftp_bind_host,
             uftp_multicast_host=uftp_multicast_host,
+            uftp_private_multicast_host=uftp_private_multicast_host,
         )
         self.runtime = ServerRuntime(
             work_dir=work_dir,

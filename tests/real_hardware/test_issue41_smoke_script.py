@@ -28,6 +28,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 "uftp -q -I '${SERVER_TUN_ADDR%/*}'",
                 "-M '$UFTP_GROUP'",
+                "-P '$UFTP_PRIVATE_GROUP'",
                 "-p '$UFTP_PORT'",
                 "-U 0x000000ff",
                 "-H 0x00000001,0x00000002",
@@ -63,16 +64,27 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
             '"role":"client","work_dir":"$work_dir","node_id":$node_id,'
             '"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,'
             '"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,'
-            '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP"',
+            '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP"',
             self.script)
 
     def test_formal_runtime_asserts_uftp_routes_use_runtime_tuns(self):
         self.assertIn('assert_runtime_uftp_routes', self.script)
         for fragment in (
                 'assert_runtime_uftp_route server "$SERVER_TUN"',
-                'assert_runtime_uftp_route client1 "$CLIENT1_TUN"',
-                'assert_runtime_uftp_route client2 "$CLIENT2_TUN"',
-                'ip route get "$UFTP_GROUP"'):
+                'for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"',
+                'for role in client1 client2',
+                'ip route show "$group/32"',
+                'ip route get "$group" from "$source_ip"',
+                'UFTP_PRIVATE_GROUP'):
+            self.assertIn(fragment, self.script)
+
+    def test_runtime_starts_clients_ready_before_server_and_disables_restarts(self):
+        for fragment in (
+                'wait_remote_service_ready "$role" wfb-fl-client.service',
+                'assert_remote_service_active "$role" wfb-fl-client.service',
+                'sudo systemctl restart wfb-fl-server.service',
+                "printf '[Service]\\nRestart=no\\nExecStart=\\n",
+                'cmd_lifecycle_stop_restart'):
             self.assertIn(fragment, self.script)
 
     def test_smoke_writes_summary_markers(self):

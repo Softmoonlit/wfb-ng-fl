@@ -124,10 +124,15 @@ def _validate_runtime(value, errors):
         errors.append('formal_runtime_loop 缺少 client1 早于 client2 的证据')
     if value.get('partial_result_returned') is not False:
         errors.append('formal_runtime_loop 必须证明 server 未返回 partial result')
-    for role in ('server_result', 'client1_result', 'client2_result'):
+    for role in ('server_result', 'client1_result', 'client2_result',
+                 'server_journal', 'client1_journal', 'client2_journal'):
         path = value.get(role)
         if not _archive_file_exists(path):
             errors.append('formal_runtime_loop 缺少 %s 文件证据' % role)
+    route_evidence = value.get('route_evidence')
+    if (not isinstance(route_evidence, list) or len(route_evidence) != 12 or
+            any(not _archive_file_exists(path) for path in route_evidence)):
+        errors.append('formal_runtime_loop 缺少六组双向 UFTP 路由证据')
 
 
 def _validate_conclusion(conclusion, summary, errors):
