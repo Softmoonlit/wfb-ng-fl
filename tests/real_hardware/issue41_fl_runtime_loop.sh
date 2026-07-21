@@ -34,6 +34,8 @@ FEC_N="${ISSUE41_FEC_N:-12}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
+FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
+FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
@@ -263,7 +265,7 @@ write_issue41_configs() {
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--feedback-window-start-immediately"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":1,"participant_node_ids":[1,2],"client_dataset_seeds":{"1":"client1-seed","2":"client2-seed"},"result_path":"$result"}

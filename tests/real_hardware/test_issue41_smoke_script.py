@@ -67,6 +67,15 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
             '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP"',
             self.script)
 
+    def test_formal_runtime_enables_immediate_known_client_feedback_window(self):
+        for fragment in (
+                'ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500',
+                'ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15',
+                '"--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS"',
+                '"--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS"',
+                '"--feedback-window-start-immediately"'):
+            self.assertIn(fragment, self.script)
+
     def test_formal_runtime_asserts_uftp_routes_use_runtime_tuns(self):
         self.assertIn('assert_runtime_uftp_routes', self.script)
         for fragment in (

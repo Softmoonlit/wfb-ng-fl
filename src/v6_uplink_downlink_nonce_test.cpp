@@ -36,6 +36,33 @@ std::vector<ClientTarget> make_two_targets()
     return targets;
 }
 
+Config parse_server_config(const std::vector<std::string> &extra_args)
+{
+    std::vector<std::string> arguments = {
+        "wfb_v6_uplink",
+        "--role", "server",
+        "--tun-name", "test0",
+        "--tun-addr", "10.6.0.1/24",
+        "--node-id", "255",
+        "--link-id", "1",
+        "--uplink-stream", "1",
+        "--downlink-stream", "2",
+        "--air-listen-port", "10000",
+        "--known-clients", "11,12",
+        "--client-target", "11:10.6.0.11:127.0.0.1:10011",
+        "--client-target", "12:10.6.0.12:127.0.0.1:10012",
+    };
+    arguments.insert(arguments.end(), extra_args.begin(), extra_args.end());
+
+    std::vector<char *> argv;
+    for (std::string &argument : arguments)
+    {
+        argv.push_back(const_cast<char *>(argument.c_str()));
+    }
+    optind = 1;
+    return parse_args(static_cast<int>(argv.size()), argv.data());
+}
+
 class ScopedFd {
 public:
     explicit ScopedFd(int fd = -1) : fd_(fd) {}
@@ -180,8 +207,73 @@ void process_forwarded_packet(TunWriterAggregator &aggregator, const std::vector
                               nullptr);
 }
 
+std::vector<uint8_t> make_ipv4_packet(const char *source, const char *destination)
+{
+    std::vector<uint8_t> packet(20, 0);
+    packet[0] = 0x45;
+    in_addr source_address = {};
+    in_addr destination_address = {};
+    REQUIRE(inet_aton(source, &source_address) == 1);
+    REQUIRE(inet_aton(destination, &destination_address) == 1);
+    memcpy(packet.data() + 12, &source_address, sizeof(source_address));
+    memcpy(packet.data() + 16, &destination_address, sizeof(destination_address));
+    return packet;
+}
 
 } // namespace
+
+TEST_CASE("反馈窗口可选择立即开始首轮")
+{
+    Config delayed = parse_server_config({
+        "--feedback-window-period-ms", "500",
+        "--feedback-window-duration-ms", "15",
+    });
+    FeedbackWindowState delayed_state = make_feedback_window_state(delayed, 1000);
+    REQUIRE(delayed_state.enabled);
+    REQUIRE(delayed_state.next_open_at_ms == 1500);
+
+    Config immediate = parse_server_config({
+        "--feedback-window-period-ms", "500",
+        "--feedback-window-duration-ms", "15",
+        "--feedback-window-start-immediately",
+    });
+    FeedbackWindowState immediate_state = make_feedback_window_state(immediate, 1000);
+    REQUIRE(immediate_state.enabled);
+    REQUIRE(immediate_state.next_open_at_ms == 1000);
+
+    REQUIRE_THROWS(parse_server_config({
+        "--feedback-window-start-immediately",
+    }));
+}
+
+TEST_CASE("反馈窗口无需 READY 即按 known_clients 发放短 GRANT")
+{
+    Config config = {};
+    config.node_id = 255;
+    config.known_clients = {11, 12};
+    config.guard_interval_ms = 10;
+    config.feedback_window_period_ms = 500;
+    config.feedback_window_duration_ms = 15;
+    std::vector<ClientTarget> targets = make_two_targets();
+
+    TokenSchedulerConfig scheduler_config = {};
+    scheduler_config.node_ids = config.known_clients;
+    scheduler_config.duration_ms = 100;
+    scheduler_config.guard_interval_ms = config.guard_interval_ms;
+    TokenScheduler scheduler(scheduler_config);
+    FeedbackWindowState state = make_feedback_window_state(config, 1000);
+    open_feedback_window(&state, 1000, config.known_clients.size());
+
+    REQUIRE(maybe_send_feedback_grant(&state, &scheduler, config, targets, 1000));
+    REQUIRE(state.current_node_id == 11);
+    state.current_slot_expires_at_ms = UINT64_MAX;
+    const std::vector<uint8_t> response = make_ipv4_packet("10.6.0.11", "10.6.0.1");
+    maybe_record_feedback_uplink_hit(&state, &scheduler, targets, response.data(), response.size());
+    REQUIRE(state.slot_hit_total_by_node[11] == 1);
+
+    REQUIRE(maybe_send_feedback_grant(&state, &scheduler, config, targets, 1025));
+    REQUIRE(state.current_node_id == 12);
+}
 
 TEST_CASE("raw-air server 下多个 client target 共享同一个下行 nonce 序列")
 {

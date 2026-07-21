@@ -273,7 +273,9 @@ ISSUE41_STRICT_USB_SPEED=1 ISSUE41_RADIO_MIN_USB_SPEED=480 \
   bash tests/real_hardware/issue41_fl_runtime_loop.sh preflight
 ```
 
-READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只表示本地尝试发送 READY，server 日志中的 `ready_accept` 才表示声明已送达并进入活跃队列。当前正式实现只有单层活跃队列；未送达的 READY 不是一次“降为睡眠节点”的状态转换。对于 issue #41 固定参与集合 `[1,2]`，链路层暂时不活跃不能改变 Runtime 严格同步参与集合；两个 client 已本地声明但 server 始终没有 `ready_accept` 时，应归类为链路健康失败并保留结构化诊断。
+READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只表示本地尝试发送 READY，server 日志中的 `ready_accept` 才表示声明已送达并进入普通活跃队列。当前正式实现只有单层活跃队列；未送达的 READY 不是一次“降为睡眠节点”的状态转换。对于 issue #41 固定参与集合 `[1,2]`，链路层暂时不活跃不能改变 Runtime 严格同步参与集合。
+
+Issue #41 P0 的正式 Runtime server 额外启用立即开始的静态 feedback window：它按 `[1,2]` 轮发短 GRANT，不以 `ready_accept` 为 UFTP REGISTER 的前提。client 仍可能发出 READY，且 server 仍可记录它，但 UFTP downlink 失败不能仅因缺少 `ready_accept` 归类为链路健康失败；必须同时检查 UFTP status matrix、feedback window、短 GRANT 和 `feedback_uplink_hit` 证据。
 
 ### 4.2 smoke-downlink-uftp
 
@@ -327,6 +329,8 @@ READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只�
 - 必须使用 issue41 drop-in 和 `/etc/wfb-ng/issue41/*` 配置。
 - 数据面必须走 `10.80.0.0/24` TUN 地址。
 - 只有 Runtime 四接口驱动正式闭环，不能用 ping、普通 TCP 文件探针或人工复制替代。
+- server `link_args` 使用 `ISSUE41_FEEDBACK_WINDOW_PERIOD_MS`（默认 `500`）、`ISSUE41_FEEDBACK_WINDOW_DURATION_MS`（默认 `15`）和 `--feedback-window-start-immediately`。该 P0 配置从链路启动即按静态 `[1,2]` 轮发短 GRANT，持续到角色服务结束；两个参数只用于 Issue #41 脚本，可通过环境变量调参，不是产品默认值。
+- P0 只消除 UFTP 注册对 READY 的启动依赖；它不实现 UFTP/HTTP 阶段隔离，短、长 GRANT 仍可能交错。动态 feedback lease、可靠上行阶段 release 和 client `submit_update(...)` 门禁属于后续设计，不是本次验收行为。
 
 重试与失败现场：
 

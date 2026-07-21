@@ -463,6 +463,7 @@ struct Config {
     uint32_t guard_interval_ms = 10;
     uint32_t feedback_window_period_ms = 0;
     uint32_t feedback_window_duration_ms = 0;
+    bool feedback_window_start_immediately = false;
     uint32_t uplink_pause_threshold_bytes = 131072;
     uint32_t uplink_resume_threshold_bytes = 65536;
     uint32_t uplink_queue_packets_limit = 64;
@@ -690,6 +691,7 @@ void print_usage(const char *progname)
             "     { --air-listen-port PORT | --air-interface IFACE[,IFACE...] } --known-clients N1,N2 \\\n"
             "     --client-target N:IP:HOST:PORT [--client-target ...] [--grant-duration-ms MS] \\\n"
             "     [--guard-interval-ms MS] [--feedback-window-period-ms MS] [--feedback-window-duration-ms MS] \\\n"
+            "     [--feedback-window-start-immediately] \\\n"
             "     [--downlink-pause-threshold-bytes BYTES] [--downlink-resume-threshold-bytes BYTES] \\\n"
             "     [--downlink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
             "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
@@ -703,6 +705,7 @@ enum LongOptionId {
     OPT_RADIO_BANDWIDTH,
     OPT_RADIO_MCS_INDEX,
     OPT_RADIO_SHORT_GI,
+    OPT_FEEDBACK_WINDOW_START_IMMEDIATELY,
 };
 
 
@@ -733,6 +736,7 @@ Config parse_args(int argc, char **argv)
         {"guard-interval-ms", required_argument, 0, 'g'},
         {"feedback-window-period-ms", required_argument, 0, 'f'},
         {"feedback-window-duration-ms", required_argument, 0, 'F'},
+        {"feedback-window-start-immediately", no_argument, 0, OPT_FEEDBACK_WINDOW_START_IMMEDIATELY},
         {"uplink-pause-threshold-bytes", required_argument, 0, 'b'},
         {"uplink-resume-threshold-bytes", required_argument, 0, 'j'},
         {"uplink-queue-packets-limit", required_argument, 0, 'z'},
@@ -829,6 +833,9 @@ Config parse_args(int argc, char **argv)
         case 'F':
             config.feedback_window_duration_ms = parse_u32(optarg, "feedback_window_duration_ms");
             break;
+        case OPT_FEEDBACK_WINDOW_START_IMMEDIATELY:
+            config.feedback_window_start_immediately = true;
+            break;
         case 'b':
             config.uplink_pause_threshold_bytes = parse_u32(optarg, "uplink_pause_threshold_bytes");
             break;
@@ -914,6 +921,10 @@ Config parse_args(int argc, char **argv)
 
     if (config.role == "client")
     {
+        if (config.feedback_window_start_immediately)
+        {
+            throw invalid_argument("feedback_window_start_immediately 仅适用于 server");
+        }
         if (!raw_air_mode && (config.air_target_host.empty() || config.air_target_port <= 0))
         {
             throw invalid_argument("client 需要 air-target 或 air-interface");
@@ -938,6 +949,10 @@ Config parse_args(int argc, char **argv)
             throw invalid_argument("server 至少需要一个 client-target");
         }
         const bool feedback_window_enabled = config.feedback_window_period_ms > 0 || config.feedback_window_duration_ms > 0;
+        if (config.feedback_window_start_immediately && !feedback_window_enabled)
+        {
+            throw invalid_argument("feedback_window_start_immediately 需要 feedback window 参数");
+        }
         if (feedback_window_enabled)
         {
             if (config.feedback_window_period_ms == 0 || config.feedback_window_duration_ms == 0)
@@ -1680,6 +1695,19 @@ void run_client(const Config &config)
     }
 }
 
+FeedbackWindowState make_feedback_window_state(const Config &config, uint64_t now_ms)
+{
+    FeedbackWindowState state = {};
+    state.enabled = config.feedback_window_period_ms > 0 && config.feedback_window_duration_ms > 0;
+    state.period_ms = config.feedback_window_period_ms;
+    state.duration_ms = config.feedback_window_duration_ms;
+    if (state.enabled)
+    {
+        state.next_open_at_ms = config.feedback_window_start_immediately ? now_ms : now_ms + state.period_ms;
+    }
+    return state;
+}
+
 void run_server(Config config)
 {
     const uint32_t uplink_channel_id = (config.link_id << 8) + config.uplink_stream;
@@ -1749,14 +1777,7 @@ void run_server(Config config)
                                                                  config.plaintext_fec_n));
         });
 
-    FeedbackWindowState feedback_state = {};
-    feedback_state.enabled = config.feedback_window_period_ms > 0 && config.feedback_window_duration_ms > 0;
-    feedback_state.period_ms = config.feedback_window_period_ms;
-    feedback_state.duration_ms = config.feedback_window_duration_ms;
-    if (feedback_state.enabled)
-    {
-        feedback_state.next_open_at_ms = get_time_ms() + feedback_state.period_ms;
-    }
+    FeedbackWindowState feedback_state = make_feedback_window_state(config, get_time_ms());
 
     FixedCapacityTunReadQueue downlink_queue(config.downlink_pause_threshold_bytes,
                                              config.downlink_resume_threshold_bytes,
