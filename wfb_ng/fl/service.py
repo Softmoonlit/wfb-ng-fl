@@ -3,6 +3,7 @@
 
 import argparse
 import importlib
+import ipaddress
 import json
 import os
 import shutil
@@ -88,10 +89,50 @@ class LinkProcess(object):
             process.wait()
 
 
+def _is_ipv4_multicast(host):
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return isinstance(address, ipaddress.IPv4Address) and address.is_multicast
+
+
+class MulticastRoute(object):
+    """管理 UFTP 公共组播地址到角色 TUN 的主机路由。"""
+
+    def __init__(self, ip_executable, multicast_host, tun_name):
+        self.ip_executable = ip_executable
+        self.multicast_host = multicast_host
+        self.tun_name = tun_name
+        self._installed = False
+
+    def setup(self):
+        if not _is_ipv4_multicast(self.multicast_host):
+            return
+        command = [
+            self.ip_executable, 'route', 'replace',
+            '%s/32' % self.multicast_host, 'dev', self.tun_name,
+        ]
+        try:
+            subprocess.run(
+                command, check=True, stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE, text=True)
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise FLRuntimeError(
+                'network_route_setup_failed',
+                'UFTP 组播路由安装失败') from exc
+        self._installed = True
+
+    def close(self):
+        # 路由绑定的 TUN 由 LinkProcess 负责销毁，内核会同步移除该路由。
+        self._installed = False
+
+
 class RoleService(object):
-    def __init__(self, role, link):
+    def __init__(self, role, link, multicast_route=None):
         self.role = role
         self.link = link
+        self.multicast_route = multicast_route
         self.ready = False
         self._started = False
         self._closed = False
@@ -107,6 +148,8 @@ class RoleService(object):
         self._started = True
         try:
             self.link.start()
+            if self.multicast_route is not None:
+                self.multicast_route.setup()
             runtime = self.role.start()
         except Exception:
             self.close()
@@ -138,9 +181,13 @@ class RoleService(object):
             self.role.close_transport()
         finally:
             try:
-                self.link.close()
+                if self.multicast_route is not None:
+                    self.multicast_route.close()
             finally:
-                self.role.close_runtime()
+                try:
+                    self.link.close()
+                finally:
+                    self.role.close_runtime()
 
 
 def load_role_service(path, expected_role=None):
@@ -171,6 +218,13 @@ def load_role_service(path, expected_role=None):
     if os.path.exists(tun_path):
         raise FLRuntimeError(
             'link_interface_exists', '链路 TUN 已存在，拒绝复用旧接口')
+    multicast_route = None
+    if _is_ipv4_multicast(config['uftp_multicast_host']):
+        ip_executable = shutil.which('ip')
+        if not ip_executable:
+            raise FLRuntimeError('transport_unavailable', '缺少 ip 可执行文件')
+        multicast_route = MulticastRoute(
+            ip_executable, config['uftp_multicast_host'], tun_name)
     link = LinkProcess([
         executables['wfb_v6_uplink'],
         '--role', role_name,
@@ -207,7 +261,7 @@ def load_role_service(path, expected_role=None):
     except (TypeError, ValueError) as exc:
         raise FLRuntimeError(
             'invalid_configuration', '角色专属配置无效') from exc
-    return RoleService(role, link)
+    return RoleService(role, link, multicast_route)
 
 
 def _read_config(path):

@@ -66,6 +66,15 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
             '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP"',
             self.script)
 
+    def test_formal_runtime_asserts_uftp_routes_use_runtime_tuns(self):
+        self.assertIn('assert_runtime_uftp_routes', self.script)
+        for fragment in (
+                'assert_runtime_uftp_route server "$SERVER_TUN"',
+                'assert_runtime_uftp_route client1 "$CLIENT1_TUN"',
+                'assert_runtime_uftp_route client2 "$CLIENT2_TUN"',
+                'ip route get "$UFTP_GROUP"'):
+            self.assertIn(fragment, self.script)
+
     def test_smoke_writes_summary_markers(self):
         self.assertIn('write_smoke_marker "$name"', self.script)
         self.assertIn('"smoke":"$name"', self.script)

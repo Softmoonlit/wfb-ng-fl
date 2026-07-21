@@ -238,6 +238,25 @@ wait_remote_tun() {
     remote "$role" "deadline=\$((SECONDS + 15)); while [ \$SECONDS -lt \$deadline ]; do [ -d '/sys/class/net/$tun' ] && exit 0; sleep 0.2; done; exit 1"
 }
 
+assert_runtime_uftp_route() {
+    local role="$1" tun="$2" route
+    if [ "$role" = server ]; then
+        route="$(ip route get "$UFTP_GROUP" 2>&1)" || die "server 无法查询 UFTP 组播路由：$route"
+        case " $route " in
+            *" dev $tun "*) ;;
+            *) die "server UFTP 组播路由未指向 $tun：$route" ;;
+        esac
+    else
+        remote "$role" "route=\$(ip route get '$UFTP_GROUP' 2>&1) || { printf '%s\\n' \"$role 无法查询 UFTP 组播路由：\$route\" >&2; exit 1; }; case \" \$route \" in *\" dev $tun \"*) ;; *) printf '%s\\n' \"$role UFTP 组播路由未指向 $tun：\$route\" >&2; exit 1 ;; esac"
+    fi
+}
+
+assert_runtime_uftp_routes() {
+    assert_runtime_uftp_route server "$SERVER_TUN"
+    assert_runtime_uftp_route client1 "$CLIENT1_TUN"
+    assert_runtime_uftp_route client2 "$CLIENT2_TUN"
+}
+
 write_smoke_marker() {
     local name="$1" marker_dir
     marker_dir="$(smoke_archive_dir "$name")"
@@ -498,7 +517,8 @@ cmd_run_runtime_loop() {
     sudo systemctl daemon-reload
     for role in client1 client2; do remote "$role" "sudo systemctl daemon-reload && sudo systemctl restart wfb-fl-client.service"; done
     sudo systemctl restart wfb-fl-server.service
-    log_ok "Runtime loop 服务已启动；使用 systemd/journal 观察直到算法退出或失败。"
+    assert_runtime_uftp_routes
+    log_ok "Runtime loop 服务已启动；UFTP 组播路由已指向三机 TUN；使用 systemd/journal 观察直到算法退出或失败。"
 }
 
 cmd_lifecycle_stop_restart() {

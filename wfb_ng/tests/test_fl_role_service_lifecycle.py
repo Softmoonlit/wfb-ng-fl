@@ -16,7 +16,8 @@ from unittest import mock
 
 from wfb_ng.fl import FLRuntimeError
 from wfb_ng.fl.role import ServerRole
-from wfb_ng.fl.service import LinkProcess, RoleService, load_role_service
+from wfb_ng.fl.service import (
+    LinkProcess, MulticastRoute, RoleService, load_role_service)
 from wfb_ng.fl.transport import ClientTransport, ServerTransport
 
 
@@ -103,6 +104,39 @@ class RoleLifecycleTestCase(unittest.TestCase):
             'link.start', 'role.start', 'role.close_transport',
             'link.close', 'role.close_runtime'], events)
         self.assertFalse(service.ready)
+
+    def test_service_installs_multicast_route_after_link_before_role(self):
+        events = []
+        service = RoleService(
+            StubRole(events), StubLink(events), StubRoute(events))
+
+        service.start()
+        service.close()
+
+        self.assertEqual([
+            'link.start', 'route.setup', 'role.start',
+            'role.close_transport', 'route.close', 'link.close',
+            'role.close_runtime'], events)
+        self.assertFalse(service.ready)
+
+    def test_multicast_route_replaces_exact_tun_route(self):
+        route = MulticastRoute('/usr/sbin/ip', '239.80.41.1', 'wfb0')
+
+        with mock.patch('wfb_ng.fl.service.subprocess.run') as run:
+            route.setup()
+
+        self.assertEqual([
+            '/usr/sbin/ip', 'route', 'replace',
+            '239.80.41.1/32', 'dev', 'wfb0'], run.call_args.args[0])
+        self.assertTrue(run.call_args.kwargs['check'])
+
+    def test_multicast_route_ignores_non_multicast_host(self):
+        route = MulticastRoute('/usr/sbin/ip', '127.0.0.1', 'wfb0')
+
+        with mock.patch('wfb_ng.fl.service.subprocess.run') as run:
+            route.setup()
+
+        run.assert_not_called()
 
     def test_service_stops_transport_before_link_and_runtime_lock(self):
         events = []
@@ -647,6 +681,17 @@ class StubLink(object):
 
     def close(self):
         self.events.append('link.close')
+
+
+class StubRoute(object):
+    def __init__(self, events):
+        self.events = events
+
+    def setup(self):
+        self.events.append('route.setup')
+
+    def close(self):
+        self.events.append('route.close')
 
 
 class StubRole(object):
