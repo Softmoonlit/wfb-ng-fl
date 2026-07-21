@@ -547,6 +547,7 @@ cmd_run_runtime_loop() {
     done
     sudo systemctl restart wfb-fl-server.service
     assert_runtime_uftp_routes
+    capture_runtime_routes
     log_ok "Runtime loop 服务已启动；UFTP 组播路由已指向三机 TUN；使用 systemd/journal 观察直到算法退出或失败。"
 }
 
@@ -627,7 +628,9 @@ cmd_collect() {
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-status.txt" "$ARCHIVE_DIR/raw/$role-systemctl-status.txt" 2>/dev/null || true
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-journal.txt" "$ARCHIVE_DIR/raw/$role-journal.txt" 2>/dev/null || true
     done
-    capture_runtime_routes
+    if [ "$(find "$ARCHIVE_DIR/raw" -maxdepth 1 -name '*-route-*.txt' -type f | wc -l)" -lt 12 ]; then
+        capture_runtime_routes
+    fi
     log_ok "归档采集完成：$ARCHIVE_DIR"
 }
 

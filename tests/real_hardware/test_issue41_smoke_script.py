@@ -76,7 +76,8 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'ip route show "$group/32"',
                 '*"$group dev $tun"*)',
                 'ip route get "$group" from "$source_ip"',
-                'UFTP_PRIVATE_GROUP'):
+                'UFTP_PRIVATE_GROUP',
+                'assert_runtime_uftp_routes\n    capture_runtime_routes'):
             self.assertIn(fragment, self.script)
 
     def test_runtime_starts_clients_ready_before_server_and_disables_restarts(self):
