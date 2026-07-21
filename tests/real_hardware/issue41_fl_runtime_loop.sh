@@ -154,7 +154,7 @@ cmd_preflight() {
         [ "$remote_head" = "$head" ] || die "$role commit 与本机不一致：$remote_head != $head"
         remote_status="$(remote "$role" "cd '$REMOTE_REPO' && git status --short")"
         [ -z "$remote_status" ] || die "$role 工作区不干净：$remote_status"
-        remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \\\$2}' | grep '^wlx' || true")"
+        remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         remote_iface_count="$(printf '%s\n' "$remote_ifaces" | grep -c '^wlx' || true)"
         [ "$remote_iface_count" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH' && hostname && whoami && git status --short --branch && sudo -n true && command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null"
@@ -203,7 +203,7 @@ EOF
         sudo install -m 0644 "$tmp/algorithm.json" /etc/wfb-ng/issue41/server-algorithm.json
         printf '[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --algorithm %s --algorithm-config /etc/wfb-ng/issue41/server-algorithm.json\n' "$algorithm" | sudo tee /etc/systemd/system/wfb-fl-server.service.d/issue41.conf >/dev/null
     else
-        iface="$(remote "$role" "iw dev | awk '/Interface / {print \\\$2}' | grep '^wlx' || true")"
+        iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         cat > "$tmp/fl.json" <<EOF
 {"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$iface"]}
@@ -281,8 +281,8 @@ start_smoke_wfb() {
     done
     server_iface="$(find_wlx)"
     [ "$(printf '%s\n' "$server_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
-    client1_iface="$(remote client1 "iw dev | awk '/Interface / {print \\\$2}' | grep '^wlx' || true")"
-    client2_iface="$(remote client2 "iw dev | awk '/Interface / {print \\\$2}' | grep '^wlx' || true")"
+    client1_iface="$(remote client1 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+    client2_iface="$(remote client2 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
     [ "$(printf '%s\n' "$client1_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client1 必须恰好发现一个 wlx* 网卡"
     [ "$(printf '%s\n' "$client2_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client2 必须恰好发现一个 wlx* 网卡"
     configure_local_monitor "$server_iface" "$server_dir"
