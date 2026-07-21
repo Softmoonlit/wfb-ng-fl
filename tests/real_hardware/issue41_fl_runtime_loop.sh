@@ -36,6 +36,7 @@ RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-1}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
+RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
 
 cmd="${1:-help}"
 shift || true
@@ -277,6 +278,30 @@ assert_runtime_uftp_routes() {
             assert_runtime_uftp_route "$role" "$tun" "$source_ip" "$group"
         done
     done
+}
+
+wait_runtime_result() {
+    local role="$1" path="$2" deadline
+    if [ "$role" = server ]; then
+        deadline=$((SECONDS + RUNTIME_TIMEOUT_SECONDS))
+        while [ "$SECONDS" -lt "$deadline" ]; do
+            if [ -f "$path" ]; then
+                python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$path" || die "server Runtime 作业未成功"
+                return
+            fi
+            sleep 0.2
+        done
+    else
+        remote "$role" "deadline=\$((SECONDS + $RUNTIME_TIMEOUT_SECONDS)); while [ \$SECONDS -lt \$deadline ]; do if [ -f '$path' ]; then python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$path'; exit \$?; fi; sleep 0.2; done; exit 1" || die "$role Runtime 作业未在期限内成功"
+        return
+    fi
+    die "server Runtime 作业未在期限内成功"
+}
+
+wait_runtime_results() {
+    wait_runtime_result server /var/lib/wfb-ng/issue41/server/issue41-server-result.json
+    wait_runtime_result client1 /var/lib/wfb-ng/issue41/client/issue41-client1-result.json
+    wait_runtime_result client2 /var/lib/wfb-ng/issue41/client/issue41-client2-result.json
 }
 
 write_smoke_marker() {
@@ -548,7 +573,8 @@ cmd_run_runtime_loop() {
     sudo systemctl restart wfb-fl-server.service
     assert_runtime_uftp_routes
     capture_runtime_routes
-    log_ok "Runtime loop 服务已启动；UFTP 组播路由已指向三机 TUN；使用 systemd/journal 观察直到算法退出或失败。"
+    wait_runtime_results
+    log_ok "Runtime loop 作业与 UFTP 组播路由验收通过。"
 }
 
 cmd_lifecycle_stop_restart() {

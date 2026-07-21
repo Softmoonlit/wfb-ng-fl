@@ -85,6 +85,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'wait_remote_service_ready "$role" wfb-fl-client.service',
                 'assert_remote_service_active "$role" wfb-fl-client.service',
                 'sudo systemctl restart wfb-fl-server.service',
+                'wait_runtime_results',
                 "printf '[Service]\\nRestart=no\\nExecStart=\\n",
                 'cmd_lifecycle_stop_restart'):
             self.assertIn(fragment, self.script)
