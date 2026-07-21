@@ -44,7 +44,9 @@ class _DownlinkOperation:
 
 class ServerTransport(object):
     def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
-                 http_host='127.0.0.1', http_port=0, io_timeout=10,
+                 http_host='127.0.0.1', http_port=0,
+                 uftp_bind_host='127.0.0.1',
+                 uftp_multicast_host='127.0.0.1', io_timeout=10,
                  cancel_grace_period=2):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
@@ -53,6 +55,8 @@ class ServerTransport(object):
         self.uftp_port = uftp_port
         self.http_host = http_host
         self.http_port = http_port
+        self.uftp_bind_host = uftp_bind_host
+        self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
         self.ready = False
@@ -198,8 +202,8 @@ class ServerTransport(object):
         command = [
             shutil.which('uftp'),
             '-q',
-            '-I', '127.0.0.1',
-            '-M', '127.0.0.1',
+            '-I', self.uftp_bind_host,
+            '-M', self.uftp_multicast_host,
             '-p', str(self.uftp_port),
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
@@ -518,11 +522,12 @@ class ServerTransport(object):
 
 class ClientTransport(object):
     def __init__(self, work_dir, uftp_uid, uftp_port, server_http_address,
-                 io_timeout=10):
+                 uftp_bind_host='127.0.0.1', io_timeout=10):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
         self.server_http_address = server_http_address
+        self.uftp_bind_host = uftp_bind_host
         self.io_timeout = io_timeout
         self.ready = False
         self._state = 'new'
@@ -553,7 +558,7 @@ class ClientTransport(object):
                 executable,
                 '-d',
                 '-q',
-                '-I', '127.0.0.1',
+                '-I', self.uftp_bind_host,
                 '-p', str(self.uftp_port),
                 '-U', _format_uid(self.uftp_uid),
                 '-D', self._inbox_dir,

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import importlib
 import json
 import os
 import shutil
@@ -22,10 +23,10 @@ _COMMON_FIELDS = {
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
-    'http_host', 'http_port',
+    'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
 }
 _CLIENT_FIELDS = {
-    'uftp_uid', 'server_http_host', 'server_http_port',
+    'uftp_uid', 'server_http_host', 'server_http_port', 'uftp_bind_host',
 }
 
 
@@ -184,6 +185,8 @@ def load_role_service(path, expected_role=None):
                 uftp_port=config['uftp_port'],
                 http_host=config['http_host'],
                 http_port=config['http_port'],
+                uftp_bind_host=config['uftp_bind_host'],
+                uftp_multicast_host=config['uftp_multicast_host'],
                 max_update_size_bytes=config['max_update_size_bytes'],
             )
         else:
@@ -195,6 +198,7 @@ def load_role_service(path, expected_role=None):
                 server_http_address=(
                     config['server_http_host'], config['server_http_port']),
                 max_update_size_bytes=config['max_update_size_bytes'],
+                uftp_bind_host=config['uftp_bind_host'],
             )
     except FLRuntimeError:
         raise
@@ -214,6 +218,11 @@ def _read_config(path):
     if not isinstance(config, dict):
         raise FLRuntimeError('invalid_configuration', '角色服务配置结构无效')
     role = config.get('role')
+    if role == 'server':
+        config.setdefault('uftp_bind_host', '127.0.0.1')
+        config.setdefault('uftp_multicast_host', '127.0.0.1')
+    elif role == 'client':
+        config.setdefault('uftp_bind_host', '127.0.0.1')
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
     if role not in ('server', 'client') or set(config) != allowed:
@@ -227,6 +236,10 @@ def _read_config(path):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
+    for name in ('uftp_bind_host', 'uftp_multicast_host'):
+        if name in config and (not isinstance(config[name], str) or not config[name]):
+            raise FLRuntimeError(
+                'invalid_configuration', 'UFTP 地址配置无效')
     link_args = config.get('link_args')
     if (not isinstance(link_args, list) or not link_args or
             any(not isinstance(value, str) or not value for value in link_args)):
@@ -262,6 +275,54 @@ def _parse_known_client_node_ids(value):
     return set(node_ids)
 
 
+def _run_algorithm(algorithm, runtime, config, errors, stop_event):
+    try:
+        algorithm(runtime, config)
+    except FLRuntimeError as exc:
+        errors.append(exc)
+    except Exception:
+        errors.append(FLRuntimeError(
+            'algorithm_failed', '算法入口执行失败'))
+    finally:
+        stop_event.set()
+
+
+def _read_algorithm_config(path):
+    if path is None:
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '算法配置无法读取') from exc
+    if not isinstance(config, dict):
+        raise FLRuntimeError('invalid_configuration', '算法配置结构无效')
+    return config
+
+
+def _load_algorithm(spec):
+    if spec is None:
+        return None
+    if ':' not in spec:
+        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
+    module_name, callable_name = spec.split(':', 1)
+    if not module_name or not callable_name:
+        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
+    try:
+        module = importlib.import_module(module_name)
+        target = module
+        for part in callable_name.split('.'):
+            if not part:
+                raise AttributeError(part)
+            target = getattr(target, part)
+    except (ImportError, AttributeError) as exc:
+        raise FLRuntimeError('invalid_configuration', '算法入口无法导入') from exc
+    if not callable(target):
+        raise FLRuntimeError('invalid_configuration', '算法入口不可调用')
+    return target
+
+
 def _notify_ready():
     address = os.environ.get('NOTIFY_SOCKET')
     if not address:
@@ -279,25 +340,48 @@ def _notify_ready():
 def main(role=None):
     parser = argparse.ArgumentParser(description='WFB-ng FL 角色服务')
     parser.add_argument('--config', required=True, help='角色服务 JSON 配置')
+    parser.add_argument('--algorithm', help='算法入口，格式为 package.module:callable')
+    parser.add_argument('--algorithm-config', help='算法 JSON object 配置')
     args = parser.parse_args()
     service = None
+    algorithm_thread = None
+    algorithm_error = []
     stop_event = threading.Event()
 
     def stop(signum, frame):
         stop_event.set()
 
+    previous_sigterm = signal.getsignal(signal.SIGTERM)
+    previous_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
+        algorithm = _load_algorithm(args.algorithm)
+        algorithm_config = _read_algorithm_config(args.algorithm_config)
         service = load_role_service(args.config, expected_role=role)
-        service.start()
+        runtime = service.start()
         _notify_ready()
+        if algorithm is not None:
+            algorithm_thread = threading.Thread(
+                target=_run_algorithm,
+                args=(algorithm, runtime, algorithm_config, algorithm_error, stop_event),
+                name='fl-algorithm', daemon=True)
+            algorithm_thread.start()
         while not stop_event.is_set():
+            if algorithm_thread is not None and not algorithm_thread.is_alive():
+                stop_event.set()
+                break
             service.wait(0.2)
+        if algorithm_thread is not None:
+            algorithm_thread.join(0)
+            if algorithm_error:
+                raise algorithm_error[0]
     except FLRuntimeError as exc:
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1
     finally:
+        signal.signal(signal.SIGTERM, previous_sigterm)
+        signal.signal(signal.SIGINT, previous_sigint)
         if service is not None:
             service.close()
     return 0

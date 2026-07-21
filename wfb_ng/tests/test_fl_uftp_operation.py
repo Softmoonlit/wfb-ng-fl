@@ -31,6 +31,34 @@ class UFTPDownlinkOperationTestCase(unittest.TestCase):
                 'shutil.copyfile(os.path.join(os.getcwd(), "fixture.status"), status_path)\n')
         os.chmod(self.executable, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
 
+    def test_server_downlink_uses_configured_bind_and_multicast_hosts(self):
+        transport, model_path, manifest_path = self.make_transport(
+            uftp_bind_host='10.80.0.1',
+            uftp_multicast_host='239.80.41.1')
+        round_dir = os.path.dirname(model_path)
+        self.write_status(round_dir, self.success_status())
+        captured = []
+
+        class Process(object):
+            def wait(self):
+                return 0
+
+        def popen(command, **kwargs):
+            captured.append(command)
+            status_path = command[command.index('-S') + 1]
+            shutil.copyfile(os.path.join(kwargs['cwd'], 'fixture.status'), status_path)
+            return Process()
+
+        with mock.patch('wfb_ng.fl.transport.shutil.which',
+                        return_value=self.write_status_fixture(0)), \
+                mock.patch('wfb_ng.fl.transport.subprocess.Popen',
+                           side_effect=popen):
+            operation = transport.start_downlink('round', model_path, manifest_path)
+            transport.wait_downlink(operation)
+
+        self.assertEqual('10.80.0.1', captured[0][captured[0].index('-I') + 1])
+        self.assertEqual('239.80.41.1', captured[0][captured[0].index('-M') + 1])
+
     def test_each_operation_uses_fresh_status_and_requires_complete_matrix(self):
         round_dir = os.path.join(self.root, 'round')
         os.makedirs(round_dir)

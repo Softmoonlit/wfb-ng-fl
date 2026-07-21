@@ -176,6 +176,93 @@ class RoleLifecycleTestCase(unittest.TestCase):
             '--known-clients', '1,2'],
             service.link.command)
 
+    def test_config_passes_uftp_bind_and_multicast_hosts(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1, 2],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1,2'])
+        with open(config_path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+        config['uftp_bind_host'] = '10.80.0.1'
+        config['uftp_multicast_host'] = '239.80.41.1'
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump(config, fh)
+
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            service = load_role_service(config_path, expected_role='server')
+
+        self.addCleanup(service.close)
+        self.assertEqual('10.80.0.1', service.role.transport.uftp_bind_host)
+        self.assertEqual('239.80.41.1', service.role.transport.uftp_multicast_host)
+
+    def test_client_config_defaults_uftp_bind_host_for_compatibility(self):
+        config_path = os.path.join(self.root, 'client-default-bind.json')
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'role': 'client',
+                'work_dir': os.path.join(self.root, 'work'),
+                'node_id': 1,
+                'uftp_uid': 1,
+                'uftp_port': 9000,
+                'server_http_host': '10.0.0.1',
+                'server_http_port': 8080,
+                'max_update_size_bytes': 4096,
+                'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
+            }, fh)
+
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            service = load_role_service(config_path, expected_role='client')
+
+        self.addCleanup(service.close)
+        self.assertEqual('127.0.0.1', service.role.transport.uftp_bind_host)
+
+    def test_algorithm_entry_runs_after_service_ready(self):
+        events = []
+        algorithm_config = {'rounds': 1}
+
+        def algorithm(runtime, config):
+            events.append(('algorithm', runtime, dict(config)))
+
+        with mock.patch('wfb_ng.fl.service._load_algorithm', return_value=algorithm), \
+                mock.patch('wfb_ng.fl.service._read_algorithm_config',
+                           return_value=algorithm_config), \
+                mock.patch('wfb_ng.fl.service.load_role_service',
+                           return_value=StubService(events)), \
+                mock.patch('wfb_ng.fl.service._notify_ready',
+                           side_effect=lambda: events.append(('ready',))):
+            from wfb_ng.fl import service
+            with mock.patch('sys.argv', [
+                    'wfb-fl-server', '--config', 'ignored', '--algorithm',
+                    'fixture:main', '--algorithm-config', 'job.json']):
+                self.assertEqual(0, service.main('server'))
+
+        self.assertEqual('service.start', events[0])
+        self.assertEqual(('ready',), events[1])
+        self.assertEqual('algorithm', events[2][0])
+        self.assertEqual(algorithm_config, events[2][2])
+        self.assertEqual('service.close', events[-1])
+
+    def test_algorithm_failure_exits_nonzero_and_closes_service(self):
+        events = []
+
+        def algorithm(runtime, config):
+            raise FLRuntimeError('fixture_failed', 'fixture failed')
+
+        with mock.patch('wfb_ng.fl.service._load_algorithm', return_value=algorithm), \
+                mock.patch('wfb_ng.fl.service._read_algorithm_config', return_value={}), \
+                mock.patch('wfb_ng.fl.service.load_role_service',
+                           return_value=StubService(events)), \
+                mock.patch('wfb_ng.fl.service._notify_ready'), \
+                mock.patch('sys.argv', [
+                    'wfb-fl-server', '--config', 'ignored', '--algorithm',
+                    'fixture:main']):
+            from wfb_ng.fl import service
+            self.assertEqual(1, service.main('server'))
+
+        self.assertEqual('service.close', events[-1])
+
     def test_server_config_rejects_participant_outside_known_clients(self):
         config_path = self.write_server_config(
             participant_node_ids=[1, 2],
@@ -482,6 +569,23 @@ class ThreadResult(object):
             raise AssertionError('operation did not finish')
         if self.error is not None:
             raise self.error
+
+
+class StubService(object):
+    def __init__(self, events):
+        self.events = events
+        self.runtime = object()
+
+    def start(self):
+        self.events.append('service.start')
+        return self.runtime
+
+    def wait(self, interval):
+        self.events.append('service.wait')
+        time.sleep(interval)
+
+    def close(self):
+        self.events.append('service.close')
 
 
 class StubLink(object):
