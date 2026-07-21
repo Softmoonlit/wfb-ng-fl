@@ -40,6 +40,7 @@ KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
 RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
+STOP_CLEANUP_TIMEOUT_SECONDS="${ISSUE41_STOP_CLEANUP_TIMEOUT_SECONDS:-5}"
 RADIO_MIN_USB_SPEED="${ISSUE41_RADIO_MIN_USB_SPEED:-480}"
 STRICT_USB_SPEED="${ISSUE41_STRICT_USB_SPEED:-0}"
 
@@ -307,6 +308,31 @@ wait_local_tun() {
 wait_remote_tun() {
     local role="$1" tun="$2"
     remote "$role" "deadline=\$((SECONDS + 15)); while [ \$SECONDS -lt \$deadline ]; do [ -d '/sys/class/net/$tun' ] && exit 0; sleep 0.2; done; exit 1"
+}
+
+wait_local_issue41_cleanup() {
+    local deadline=$((SECONDS + STOP_CLEANUP_TIMEOUT_SECONDS))
+    while [ "$SECONDS" -lt "$deadline" ]; do
+        if ! pgrep -x wfb-fl-server >/dev/null && \
+           ! pgrep -x wfb_v6_uplink >/dev/null && \
+           ! pgrep -x uftp >/dev/null && \
+           ! pgrep -x uftpd >/dev/null && \
+           [ ! -e "/sys/class/net/$SERVER_TUN" ]; then
+            return 0
+        fi
+        sleep 0.2
+    done
+    printf '本机 issue41 停止后仍有残留：\n' >&2
+    for process in wfb-fl-server wfb_v6_uplink uftp uftpd; do
+        pgrep -a -x "$process" >&2 || true
+    done
+    ip link show "$SERVER_TUN" >&2 2>&1 || true
+    return 1
+}
+
+wait_remote_issue41_cleanup() {
+    local role="$1" tun="$2"
+    remote "$role" "deadline=\$((SECONDS + $STOP_CLEANUP_TIMEOUT_SECONDS)); while [ \$SECONDS -lt \$deadline ]; do if ! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null && [ ! -e '/sys/class/net/$tun' ]; then exit 0; fi; sleep 0.2; done; printf '%s\n' 'issue41 停止后仍有残留：' >&2; for process in wfb-fl-client wfb_v6_uplink uftp uftpd; do pgrep -a -x \"\$process\" >&2 || true; done; ip link show '$tun' >&2 2>&1 || true; exit 1"
 }
 
 wait_remote_service_ready() {
@@ -750,6 +776,10 @@ cmd_lifecycle_stop_restart() {
     for role in client1 client2; do
         remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null"
     done
+    wait_local_issue41_cleanup || die "本机 issue41 停止后清理超时"
+    for role in client1 client2; do
+        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role issue41 停止后清理超时"
+    done
     cmd_collect
     sudo rm -rf /var/lib/wfb-ng/issue41/server
     for role in client1 client2; do
@@ -765,6 +795,10 @@ cmd_lifecycle_stop_restart() {
     for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service || true"; done
     sudo systemctl is-active --quiet wfb-fl-server.service && die "server service restart 后未停止" || true
     for role in client1 client2; do remote "$role" "! systemctl is-active --quiet wfb-fl-client.service"; done
+    wait_local_issue41_cleanup || die "本机 restart 后清理超时"
+    for role in client1 client2; do
+        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role restart 后清理超时"
+    done
     log_ok "服务 stop/restart/inactive 检查通过"
 }
 
@@ -775,6 +809,10 @@ cmd_stop_all() {
     sudo pkill -x uftpd 2>/dev/null || true
     sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true
     for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service 2>/dev/null || true; sudo pkill -x wfb_v6_uplink 2>/dev/null || true; sudo pkill -x uftp 2>/dev/null || true; sudo pkill -x uftpd 2>/dev/null || true; sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true" || true; done
+    wait_local_issue41_cleanup || die "本机 issue41 停止后清理超时"
+    for role in client1 client2; do
+        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role issue41 停止后清理超时"
+    done
 }
 
 cmd_clean() {
@@ -875,7 +913,7 @@ EOF
 }
 
 cmd_run_all() {
-    trap 'if [ "$KEEP_RUNNING_ON_FAIL" != "1" ]; then cmd_stop_all; fi; cmd_collect || true; cmd_summary || true' ERR
+    trap 'if [ "$KEEP_RUNNING_ON_FAIL" != "1" ]; then cmd_stop_all || true; fi; cmd_collect || true; cmd_summary || true' ERR
     cmd_preflight
     cmd_install
     cmd_smoke_downlink_uftp

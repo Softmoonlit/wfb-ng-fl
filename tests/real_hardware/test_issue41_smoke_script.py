@@ -111,6 +111,17 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'sudo rm -rf /var/lib/wfb-ng/issue41/client'):
             self.assertIn(fragment, self.script)
 
+    def test_stop_waits_for_processes_and_tuns_to_disappear(self):
+        for fragment in (
+                'STOP_CLEANUP_TIMEOUT_SECONDS',
+                'wait_local_issue41_cleanup',
+                'wait_remote_issue41_cleanup',
+                '/sys/class/net/$SERVER_TUN',
+                '/sys/class/net/$tun',
+                '本机 issue41 停止后清理超时',
+                'restart 后清理超时'):
+            self.assertIn(fragment, self.script)
+
     def test_smoke_writes_summary_markers(self):
         self.assertIn('write_smoke_marker "$name"', self.script)
         self.assertIn('"smoke":"$name"', self.script)
