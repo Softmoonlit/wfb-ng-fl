@@ -588,6 +588,11 @@ cmd_lifecycle_stop_restart() {
     for role in client1 client2; do
         remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null"
     done
+    cmd_collect
+    sudo rm -rf /var/lib/wfb-ng/issue41/server
+    for role in client1 client2; do
+        remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
+    done
     for role in client1 client2; do
         wait_remote_service_ready "$role" wfb-fl-client.service
         assert_remote_service_active "$role" wfb-fl-client.service

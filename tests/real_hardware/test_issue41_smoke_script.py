@@ -88,7 +88,8 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'wait_runtime_results',
                 'sudo python3 -c',
                 "printf '[Service]\\nRestart=no\\nExecStart=\\n",
-                'cmd_lifecycle_stop_restart'):
+                'cmd_lifecycle_stop_restart',
+                'cmd_collect\n    sudo rm -rf /var/lib/wfb-ng/issue41/server'):
             self.assertIn(fragment, self.script)
 
     def test_smoke_writes_summary_markers(self):
