@@ -363,7 +363,7 @@ with open(manifest, 'w', encoding='utf-8') as fh:
     json.dump({'schema_version': 1, 'artifact_type': 'model', 'sha256': hashlib.sha256(data).hexdigest()}, fh, separators=(',', ':'))
 PY
     for role in client1 client2; do
-        remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/inbox' '$(smoke_dir "$name")/$role/tmp'; sudo bash -c \"nohup uftpd -d -q -I '$(client_ip "$role")' -p '$UFTP_PORT' -U '0x0000000${role#client}' -D '$(smoke_dir "$name")/$role/inbox' -T '$(smoke_dir "$name")/$role/tmp' -F '$(smoke_dir "$name")/$role/uftpd.status' > '$(smoke_dir "$name")/$role/uftpd.log' 2>&1 & echo \\\$! > '$(smoke_dir "$name")/$role/uftpd.pid'\""
+        remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/inbox' '$(smoke_dir "$name")/$role/tmp'; sudo bash -c \"nohup uftpd -d -q -I '$(client_ip "$role")' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U '0x0000000${role#client}' -D '$(smoke_dir "$name")/$role/inbox' -T '$(smoke_dir "$name")/$role/tmp' -F '$(smoke_dir "$name")/$role/uftpd.status' > '$(smoke_dir "$name")/$role/uftpd.log' 2>&1 & echo \\\$! > '$(smoke_dir "$name")/$role/uftpd.pid'\""
     done
     sleep 1
     status="$work/uftp.status"

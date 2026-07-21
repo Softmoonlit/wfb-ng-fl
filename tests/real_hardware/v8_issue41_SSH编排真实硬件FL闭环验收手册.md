@@ -59,7 +59,7 @@
 
 | 角色 | `wlx*` 接口 |
 | --- | --- |
-| server | `wlxbcec23372588` |
+| server | `wlxfc221c300cbb` |
 | client1 | `wlxfc221c500a88` |
 | client2 | `wlxfc221c300cbc` |
 
@@ -277,7 +277,7 @@ preflight 检查：
 行为：
 
 1. 三台机器启动临时 `wfb_v6_uplink` 链路进程。
-2. client1/client2 启动临时 `uftpd -I <client_tun_ip>`。
+2. client1/client2 启动临时 `uftpd -I <client_tun_ip> -M 239.80.41.1`，加入与 server 一致的公共组播地址。
 3. server 执行一次原生 `uftp -I 10.80.0.1 -M 239.80.41.1 -p 1044 -U 0x000000ff -H 0x00000001,0x00000002 ...`。
 4. 下发小模型样例和 manifest。
 5. 校验两个 client 文件 SHA-256 与 server 源文件一致。

@@ -34,7 +34,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "-Y none",
                 "-S '$status'",
                 "-D '$src' 'model.bin' 'model.manifest.json'",
-                "uftpd -d -q -I '$(client_ip \"$role\")'",
+                "uftpd -d -q -I '$(client_ip \"$role\")' -M '$UFTP_GROUP'",
                 "-F '$(smoke_dir \"$name\")/$role/uftpd.status'",
         ):
             self.assertIn(fragment, self.script)
