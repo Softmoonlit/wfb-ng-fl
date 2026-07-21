@@ -286,7 +286,7 @@ wait_runtime_result() {
         deadline=$((SECONDS + RUNTIME_TIMEOUT_SECONDS))
         while [ "$SECONDS" -lt "$deadline" ]; do
             if [ -f "$path" ]; then
-                python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$path" || die "server Runtime 作业未成功"
+                sudo python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$path" || die "server Runtime 作业未成功"
                 return
             fi
             sleep 0.2
