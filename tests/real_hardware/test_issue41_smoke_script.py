@@ -97,6 +97,30 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         self.assertIn('"smoke":"$name"', self.script)
         self.assertIn('pre_runtime_smoke/%s', self.script)
 
+    def test_preflight_archives_usb_health_with_optional_strict_mode(self):
+        for fragment in (
+                'ISSUE41_RADIO_MIN_USB_SPEED',
+                'ISSUE41_STRICT_USB_SPEED',
+                'capture_local_radio_health server',
+                'capture_remote_radio_health "$role"',
+                'usb-speed.txt',
+                'usb-topology.txt',
+                'kernel-radio.log',
+                '低于建议值',
+                '低于严格阈值'):
+            self.assertIn(fragment, self.script)
+
+    def test_downlink_failure_distinguishes_declare_from_ready_accept(self):
+        for fragment in (
+                'write_downlink_failure_diagnosis',
+                "'client_declared_locally': client_declared",
+                "'server_ready_accepted': server_accepted",
+                "'local_declare_is_not_server_accept': True",
+                "'missing_server_accept_is_not_a_sleep_transition': True",
+                "'strict_runtime_participants_may_not_be_downgraded': True",
+                'server_radio_receive_path_unhealthy_or_disconnected'):
+            self.assertIn(fragment, self.script)
+
 
 if __name__ == '__main__':
     unittest.main()

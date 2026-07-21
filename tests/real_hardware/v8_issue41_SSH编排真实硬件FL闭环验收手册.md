@@ -256,12 +256,24 @@ preflight 检查：
 - 三台机器 sudo 可用。
 - 三台机器仓库 branch/commit/status 一致。
 - 每台机器恰好一个 `wlx*` 接口，或显式指定。
+- 三个角色统一归档无线接口 sysfs path、驱动、USB speed、USB 拓扑、接口统计和相关 kernel journal；该规则不依赖 client 是 VM USB passthrough 还是真实机器。
+- USB speed 默认建议至少为 `480 Mbit/s`。低于建议值时默认明确告警并继续，现场 USB 受限时仍可验收，但结论必须保留硬件风险证据；设置 `ISSUE41_STRICT_USB_SPEED=1` 后低于 `ISSUE41_RADIO_MIN_USB_SPEED`（默认 `480`）才 fail-closed。
+- 脚本不默认自动 reset 或重新枚举 USB 网卡，避免 VM passthrough 或真实机器设备身份被意外改变；需要时由操作者显式处理硬件后重跑。
 - `rfkill` 未 soft blocked。
 - `ip`、`iw`、`systemctl`、`journalctl`、`make`、`python3`、`uftp`、`uftpd` 等依赖存在。
 - TUN 名称不存在。
 - `10.80.0.1:8080`、UFTP port 未被未知进程占用。
 - `/var/lib/wfb-ng/issue41/*` 和 `/var/tmp/wfb-ng-issue41-smoke` 清理边界可确认。
 - 没有旧 `wfb-fl-*`、`wfb_v6_uplink`、`uftp`、`uftpd` 残留进程；若是上次 issue41 残留，可由 stop/clean 子命令处理。
+
+USB 严格检查示例：
+
+```bash
+ISSUE41_STRICT_USB_SPEED=1 ISSUE41_RADIO_MIN_USB_SPEED=480 \
+  bash tests/real_hardware/issue41_fl_runtime_loop.sh preflight
+```
+
+READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只表示本地尝试发送 READY，server 日志中的 `ready_accept` 才表示声明已送达并进入活跃队列。当前正式实现只有单层活跃队列；未送达的 READY 不是一次“降为睡眠节点”的状态转换。对于 issue #41 固定参与集合 `[1,2]`，链路层暂时不活跃不能改变 Runtime 严格同步参与集合；两个 client 已本地声明但 server 始终没有 `ready_accept` 时，应归类为链路健康失败并保留结构化诊断。
 
 ### 4.2 smoke-downlink-uftp
 

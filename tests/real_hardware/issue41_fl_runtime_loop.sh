@@ -37,6 +37,8 @@ RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
 RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
+RADIO_MIN_USB_SPEED="${ISSUE41_RADIO_MIN_USB_SPEED:-480}"
+STRICT_USB_SPEED="${ISSUE41_STRICT_USB_SPEED:-0}"
 
 cmd="${1:-help}"
 shift || true
@@ -141,6 +143,64 @@ find_wlx() {
     iw dev | awk '/Interface / {print $2}' | grep '^wlx' || true
 }
 
+radio_usb_speed_file() {
+    local iface="$1" device_path
+    device_path="$(readlink -f "/sys/class/net/$iface/device" 2>/dev/null || true)"
+    [ -n "$device_path" ] || return 1
+    printf '%s/speed\n' "$(dirname "$device_path")"
+}
+
+capture_local_radio_health() {
+    local role="$1" iface="$2" dir speed_file
+    dir="${3:-$ARCHIVE_DIR/orchestration/radio-health/$role}"
+    mkdir -p "$dir"
+    printf '%s\n' "$iface" > "$dir/interface.txt"
+    readlink -f "/sys/class/net/$iface/device" > "$dir/sysfs-device.txt" 2>&1 || true
+    readlink -f "/sys/class/net/$iface/device/driver" > "$dir/driver.txt" 2>&1 || true
+    speed_file="$(radio_usb_speed_file "$iface" || true)"
+    if [ -n "$speed_file" ] && [ -r "$speed_file" ]; then
+        cat "$speed_file" > "$dir/usb-speed.txt"
+    else
+        printf 'unknown\n' > "$dir/usb-speed.txt"
+    fi
+    iw dev "$iface" info > "$dir/iw-info.txt" 2>&1 || true
+    ip -s link show "$iface" > "$dir/ip-link-stats.txt" 2>&1 || true
+    rfkill list > "$dir/rfkill.txt" 2>&1 || true
+    lsusb -t > "$dir/usb-topology.txt" 2>&1 || true
+    sudo journalctl -k --no-pager 2>/dev/null | grep -E "$iface|not running at top speed|USB disconnect|new (full|high|super)-speed USB device" | tail -200 > "$dir/kernel-radio.log" || true
+}
+
+capture_remote_radio_health() {
+    local role="$1" iface="$2" dir remote_dir archive
+    archive="${3:-$ARCHIVE_DIR/orchestration/radio-health/$role}"
+    remote_dir="/tmp/issue41-radio-health-$role"
+    mkdir -p "$archive"
+    remote "$role" "rm -rf '$remote_dir'; mkdir -p '$remote_dir'; printf '%s\\n' '$iface' > '$remote_dir/interface.txt'; device_path=\$(readlink -f '/sys/class/net/$iface/device' 2>/dev/null || true); printf '%s\\n' \"\$device_path\" > '$remote_dir/sysfs-device.txt'; readlink -f '/sys/class/net/$iface/device/driver' > '$remote_dir/driver.txt' 2>&1 || true; speed_file=\$(dirname \"\$device_path\")/speed; if [ -n \"\$device_path\" ] && [ -r \"\$speed_file\" ]; then cat \"\$speed_file\" > '$remote_dir/usb-speed.txt'; else printf 'unknown\\n' > '$remote_dir/usb-speed.txt'; fi; iw dev '$iface' info > '$remote_dir/iw-info.txt' 2>&1 || true; ip -s link show '$iface' > '$remote_dir/ip-link-stats.txt' 2>&1 || true; rfkill list > '$remote_dir/rfkill.txt' 2>&1 || true; lsusb -t > '$remote_dir/usb-topology.txt' 2>&1 || true; sudo journalctl -k --no-pager 2>/dev/null | grep -E '$iface|not running at top speed|USB disconnect|new (full|high|super)-speed USB device' | tail -200 > '$remote_dir/kernel-radio.log' || true; tar -C '$remote_dir' -czf '$remote_dir.tgz' ."
+    scp -q "$(client_ssh "$role"):$remote_dir.tgz" "$archive/radio-health.tgz"
+    tar -C "$archive" -xzf "$archive/radio-health.tgz"
+}
+
+check_radio_usb_speed() {
+    local role="$1" speed_file speed
+    speed_file="$ARCHIVE_DIR/orchestration/radio-health/$role/usb-speed.txt"
+    speed="$(cat "$speed_file" 2>/dev/null || printf 'unknown')"
+    if ! [[ "$speed" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+        if [ "$STRICT_USB_SPEED" = "1" ]; then
+            die "$role 无法确认无线网卡 USB speed；严格模式拒绝继续"
+        fi
+        log_warn "$role 无法确认无线网卡 USB speed，已归档为 unknown"
+        return
+    fi
+    if awk -v actual="$speed" -v minimum="$RADIO_MIN_USB_SPEED" 'BEGIN { exit !(actual < minimum) }'; then
+        if [ "$STRICT_USB_SPEED" = "1" ]; then
+            die "$role 无线网卡 USB speed=${speed}Mbit/s，低于严格阈值 ${RADIO_MIN_USB_SPEED}Mbit/s"
+        fi
+        log_warn "$role 无线网卡 USB speed=${speed}Mbit/s，低于建议值 ${RADIO_MIN_USB_SPEED}Mbit/s；继续执行但结果存在硬件不稳定风险"
+    else
+        log_ok "$role 无线网卡 USB speed=${speed}Mbit/s"
+    fi
+}
+
 cmd_preflight() {
     run_local_capture local-git git -C "$PROJECT_ROOT" status --short --branch
     for name in ip iw systemctl journalctl make python3 uftp uftpd; do
@@ -150,6 +210,8 @@ cmd_preflight() {
     local ifaces
     ifaces="$(find_wlx)"
     [ "$(printf '%s\n' "$ifaces" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
+    capture_local_radio_health server "$ifaces"
+    check_radio_usb_speed server
     local head remote_head remote_status remote_ifaces remote_iface_count
     head="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
     for role in client1 client2; do
@@ -160,6 +222,8 @@ cmd_preflight() {
         remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         remote_iface_count="$(printf '%s\n' "$remote_ifaces" | grep -c '^wlx' || true)"
         [ "$remote_iface_count" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
+        capture_remote_radio_health "$role" "$remote_ifaces"
+        check_radio_usb_speed "$role"
         remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH' && hostname && whoami && git status --short --branch && sudo -n true && command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null"
         log_ok "$role preflight 基础检查通过"
     done
@@ -355,6 +419,9 @@ start_smoke_wfb() {
     configure_local_monitor "$server_iface" "$server_dir"
     configure_remote_monitor client1 "$client1_iface" "$client1_dir"
     configure_remote_monitor client2 "$client2_iface" "$client2_dir"
+    capture_local_radio_health server "$server_iface" "$(smoke_archive_dir "$name")/server/radio-health"
+    capture_remote_radio_health client1 "$client1_iface" "$(smoke_archive_dir "$name")/client1/radio-health"
+    capture_remote_radio_health client2 "$client2_iface" "$(smoke_archive_dir "$name")/client2/radio-health"
     short_gi="$(issue41_wfb_short_gi_arg)"
 
     sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
@@ -389,6 +456,61 @@ collect_smoke_evidence() {
     done
 }
 
+write_downlink_failure_diagnosis() {
+    local archive
+    archive="$(smoke_archive_dir downlink_uftp)"
+    mkdir -p "$archive"
+    python3 - "$archive" <<'PY'
+import json
+import os
+import sys
+
+archive = sys.argv[1]
+
+def read_text(path):
+    try:
+        with open(path, 'r', encoding='utf-8', errors='replace') as fh:
+            return fh.read()
+    except OSError:
+        return ''
+
+server_log = read_text(os.path.join(archive, 'server', 'wfb.log'))
+client_logs = {
+    role: read_text(os.path.join(archive, role, 'wfb.log'))
+    for role in ('client1', 'client2')
+}
+client_declared = {
+    role: 'first_declare node_id=%s' % node_id in client_logs[role]
+    for role, node_id in (('client1', 1), ('client2', 2))
+}
+server_accepted = {
+    role: 'ready_accept node_id=%s' % node_id in server_log
+    for role, node_id in (('client1', 1), ('client2', 2))
+}
+server_rx_ant_samples = server_log.count('\tRX_ANT\t')
+classification = 'insufficient_evidence'
+if all(client_declared.values()) and not any(server_accepted.values()) and server_rx_ant_samples == 0:
+    classification = 'server_radio_receive_path_unhealthy_or_disconnected'
+elif all(client_declared.values()) and not all(server_accepted.values()):
+    classification = 'ready_delivery_incomplete'
+result = {
+    'schema_version': 1,
+    'classification': classification,
+    'client_declared_locally': client_declared,
+    'server_ready_accepted': server_accepted,
+    'server_rx_ant_samples': server_rx_ant_samples,
+    'semantics': {
+        'local_declare_is_not_server_accept': True,
+        'missing_server_accept_is_not_a_sleep_transition': True,
+        'strict_runtime_participants_may_not_be_downgraded': True,
+    },
+}
+with open(os.path.join(archive, 'link-health-diagnosis.json'), 'w', encoding='utf-8') as fh:
+    json.dump(result, fh, ensure_ascii=False, indent=2, sort_keys=True)
+    fh.write('\n')
+PY
+}
+
 stop_smoke_http_server() {
     local pid_file
     pid_file="$(smoke_dir uplink_http_put)/server/http-server.pid"
@@ -415,7 +537,7 @@ cmd_smoke_downlink_uftp() {
     local name=downlink_uftp work src model manifest status log archive
     work="$(smoke_dir "$name")/server/round1"
     archive="$(smoke_archive_dir "$name")"
-    trap 'cmd_stop_all; collect_smoke_evidence downlink_uftp || true' ERR
+    trap 'cmd_stop_all; collect_smoke_evidence downlink_uftp || true; write_downlink_failure_diagnosis || true' ERR
     start_smoke_wfb "$name"
     sudo install -d "$work"
     sudo chown "$(id -u):$(id -g)" "$work"
@@ -666,13 +788,19 @@ cmd_collect() {
 }
 
 cmd_summary() {
-    local server_result client1_result client2_result conclusion status reason smoke_downlink smoke_uplink route_evidence role group suffix
+    local server_result client1_result client2_result conclusion status reason smoke_downlink smoke_uplink route_evidence role group suffix downlink_diagnosis diagnosis_class
     server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
     client1_result="$ARCHIVE_DIR/formal_runtime_loop/client1/issue41-client1-result.json"
     client2_result="$ARCHIVE_DIR/formal_runtime_loop/client2/issue41-client2-result.json"
     status=failed; reason="关键真实硬件证据仍需现场校验"
     smoke_downlink=failed
     smoke_uplink=failed
+    downlink_diagnosis=null
+    if [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json" ]; then
+        downlink_diagnosis="\"$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json\""
+        diagnosis_class="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('classification', 'unknown'))" "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json" 2>/dev/null || printf 'unknown')"
+        reason="downlink_uftp 失败，链路诊断：$diagnosis_class"
+    fi
     if [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/passed.json" ]; then
         smoke_downlink=passed
     fi
@@ -693,7 +821,7 @@ cmd_summary() {
         done
     done
     cat > "$ARCHIVE_DIR/issue41_summary.json" <<EOF
-{"orchestration":{"status":"passed"},"pre_runtime_smoke":{"downlink_uftp":{"status":"$smoke_downlink"},"uplink_http_put":{"status":"$smoke_uplink"}},"formal_runtime_loop":{"status":"$status","runtime_interfaces":["publish_model","wait_for_model","submit_update","wait_for_updates"],"data_plane":"10.80.0.0/24","server_wait_for_updates_returned_node_ids":[1,2],"partial_result_returned":false,"update_timing":{"client1_before_client2":true},"server_result":"$server_result","client1_result":"$client1_result","client2_result":"$client2_result","server_journal":"$ARCHIVE_DIR/raw/server-journal.txt","client1_journal":"$ARCHIVE_DIR/raw/client1-journal.txt","client2_journal":"$ARCHIVE_DIR/raw/client2-journal.txt","route_evidence":[$route_evidence]},"lifecycle":{"status":"$status"},"conclusion":{"status":"$status","reason":"$reason"}}
+{"orchestration":{"status":"passed","radio_health_dir":"$ARCHIVE_DIR/orchestration/radio-health"},"pre_runtime_smoke":{"downlink_uftp":{"status":"$smoke_downlink","link_health_diagnosis":$downlink_diagnosis},"uplink_http_put":{"status":"$smoke_uplink"}},"formal_runtime_loop":{"status":"$status","runtime_interfaces":["publish_model","wait_for_model","submit_update","wait_for_updates"],"data_plane":"10.80.0.0/24","server_wait_for_updates_returned_node_ids":[1,2],"partial_result_returned":false,"update_timing":{"client1_before_client2":true},"server_result":"$server_result","client1_result":"$client1_result","client2_result":"$client2_result","server_journal":"$ARCHIVE_DIR/raw/server-journal.txt","client1_journal":"$ARCHIVE_DIR/raw/client1-journal.txt","client2_journal":"$ARCHIVE_DIR/raw/client2-journal.txt","route_evidence":[$route_evidence]},"lifecycle":{"status":"$status"},"conclusion":{"status":"$status","reason":"$reason"}}
 EOF
     cat > "$ARCHIVE_DIR/result.md" <<EOF
 # issue41 真实硬件 FL Runtime 闭环结果
