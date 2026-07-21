@@ -292,7 +292,7 @@ wait_runtime_result() {
             sleep 0.2
         done
     else
-        remote "$role" "deadline=\$((SECONDS + $RUNTIME_TIMEOUT_SECONDS)); while [ \$SECONDS -lt \$deadline ]; do if [ -f '$path' ]; then python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$path'; exit \$?; fi; sleep 0.2; done; exit 1" || die "$role Runtime 作业未在期限内成功"
+        remote "$role" "deadline=\$((SECONDS + $RUNTIME_TIMEOUT_SECONDS)); while [ \$SECONDS -lt \$deadline ]; do if [ -f '$path' ]; then sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$path'; exit \$?; fi; sleep 0.2; done; exit 1" || die "$role Runtime 作业未在期限内成功"
         return
     fi
     die "server Runtime 作业未在期限内成功"
