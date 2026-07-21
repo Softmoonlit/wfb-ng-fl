@@ -15,6 +15,13 @@
 
 仓库根目录 `Makefile` 的 `acceptance_v6_realhw` 也会把操作者引导到这套入口。
 
+当前 `v8` / GitHub issue #41 的真实硬件 FL Runtime 闭环验收入口是：
+
+- 手册：`v8_issue41_SSH编排真实硬件FL闭环验收手册.md`
+- 计划配套执行脚本：`issue41_fl_runtime_loop.sh`
+
+该入口通过 SSH 编排三台真实机器完成代码同步、安装、UFTP/HTTP smoke、systemd Runtime loop、lifecycle 和归档。SSH 编排、远端仓库同步和归档汇总机身份仅属于 issue #41 验证阶段，不是正式产品运行语义。
+
 ## 当前有效的辅助文件
 
 - `v6_formal_2a_summary.py`：生成 real-hardware 统一 2A 摘要

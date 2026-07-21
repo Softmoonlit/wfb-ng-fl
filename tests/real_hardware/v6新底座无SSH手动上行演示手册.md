@@ -1,5 +1,7 @@
 # v6 新底座无 SSH 手动上行演示手册
 
+> 本手册是 v6 阶段的无 SSH 手动 uplink 基线手册。V8 / GitHub issue #41 的 SSH 编排真实硬件 FL Runtime 闭环验收请见 `v8_issue41_SSH编排真实硬件FL闭环验收手册.md`。
+
 本文用于现场只有三台独立机器、server 无法 SSH 到 client1/client2 时，手动演示 `wfb_v6_uplink --role server/client` 的双 client 上行能力。
 
 当前定位：这是 `v6` 新底座 **real-hardware uplink 默认正式入口**，配套执行脚本是 `tests/real_hardware/v6_manual_uplink_demo.sh`。仓库默认的 `make acceptance_v6_realhw` 会把操作者引导到本手册；旧的 same-host / netns 自动跑数入口已经下线，不再作为正式验收路径。
