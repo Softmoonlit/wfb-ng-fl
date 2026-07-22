@@ -89,6 +89,24 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'assert_runtime_uftp_routes\n    capture_runtime_routes'):
             self.assertIn(fragment, self.script)
 
+    def test_formal_runtime_configures_monitor_radios_before_services(self):
+        for fragment in (
+                'configure_runtime_monitors',
+                'server 空口网卡未进入 monitor 模式',
+                'client1 空口网卡 monitor/UP 验证失败',
+                'client2 空口网卡 monitor/UP 验证失败',
+                'formal_runtime_loop/server/radio-health'):
+            self.assertIn(fragment, self.script)
+
+        runtime_body = self.script.split('cmd_run_runtime_loop() {', 1)[1]
+        runtime_body = runtime_body.split('\n}', 1)[0]
+        self.assertLess(
+            runtime_body.index('prepare_runtime_state'),
+            runtime_body.index('configure_runtime_monitors'))
+        self.assertLess(
+            runtime_body.index('configure_runtime_monitors'),
+            runtime_body.index('write_issue41_configs server'))
+
     def test_runtime_starts_clients_ready_before_server_and_disables_restarts(self):
         for fragment in (
                 'wait_remote_service_ready "$role" wfb-fl-client.service',

@@ -441,6 +441,36 @@ configure_remote_monitor() {
     remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
 }
 
+configure_runtime_monitors() {
+    local server_iface client1_iface client2_iface server_archive client1_archive client2_archive
+    server_iface="$(find_wlx)"
+    client1_iface="$(remote client1 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+    client2_iface="$(remote client2 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+    [ "$(printf '%s\n' "$server_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "server 必须恰好发现一个 wlx* 网卡"
+    [ "$(printf '%s\n' "$client1_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client1 必须恰好发现一个 wlx* 网卡"
+    [ "$(printf '%s\n' "$client2_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client2 必须恰好发现一个 wlx* 网卡"
+
+    server_archive="$ARCHIVE_DIR/formal_runtime_loop/server/radio-health"
+    client1_archive="$ARCHIVE_DIR/formal_runtime_loop/client1/radio-health"
+    client2_archive="$ARCHIVE_DIR/formal_runtime_loop/client2/radio-health"
+    mkdir -p "$server_archive" "$client1_archive" "$client2_archive"
+    remote client1 "rm -rf /tmp/issue41-runtime-radio; mkdir -p /tmp/issue41-runtime-radio"
+    remote client2 "rm -rf /tmp/issue41-runtime-radio; mkdir -p /tmp/issue41-runtime-radio"
+
+    configure_local_monitor "$server_iface" "$server_archive"
+    configure_remote_monitor client1 "$client1_iface" /tmp/issue41-runtime-radio
+    configure_remote_monitor client2 "$client2_iface" /tmp/issue41-runtime-radio
+
+    iw dev "$server_iface" info | grep -q 'type monitor' || die "server 空口网卡未进入 monitor 模式"
+    ip link show "$server_iface" | grep -q '<[^>]*UP' || die "server 空口网卡未启动"
+    remote client1 "iw dev '$client1_iface' info | grep -q 'type monitor' && ip link show '$client1_iface' | grep -q '<[^>]*UP'" || die "client1 空口网卡 monitor/UP 验证失败"
+    remote client2 "iw dev '$client2_iface' info | grep -q 'type monitor' && ip link show '$client2_iface' | grep -q '<[^>]*UP'" || die "client2 空口网卡 monitor/UP 验证失败"
+
+    capture_local_radio_health server "$server_iface" "$server_archive"
+    capture_remote_radio_health client1 "$client1_iface" "$client1_archive"
+    capture_remote_radio_health client2 "$client2_iface" "$client2_archive"
+}
+
 start_smoke_wfb() {
     local name="$1" server_dir client1_dir client2_dir server_iface client1_iface client2_iface short_gi
     server_dir="$(smoke_dir "$name")/server"
@@ -761,6 +791,7 @@ prepare_runtime_state() {
 
 cmd_run_runtime_loop() {
     prepare_runtime_state
+    configure_runtime_monitors
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2
