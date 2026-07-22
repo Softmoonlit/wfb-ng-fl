@@ -1,205 +1,240 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import hashlib
-import json
 import os
 import time
 
-from .artifacts import file_sha256, read_json, write_json_atomic
+from .artifacts import archive_file, file_sha256, inspect_artifact, write_json_atomic
 from .errors import FLRuntimeError
 
 
-FIXTURE_VERSION = 'issue41-v1'
+ALGORITHM_VERSION = 'issue41-opaque-file-placeholder-v1'
 
 
 def server_main(runtime, config):
+    """运行服务端多轮作业：发布模型、收齐 update、聚合下一轮模型。"""
     rounds = _positive_int(config.get('rounds', 1), 'rounds')
-    expected_nodes = tuple(config.get(
-        'participant_node_ids', getattr(runtime, 'participant_node_ids', ())))
-    expected_nodes = _node_ids(expected_nodes, 'participant_node_ids')
+    expected_nodes = _node_ids(
+        config.get('participant_node_ids',
+                   getattr(runtime, 'participant_node_ids', ())),
+        'participant_node_ids')
+    initial_model_path = _required_artifact(
+        config.get('initial_model_path'), 'initial_model_path')
+    artifact_dir = _artifact_dir(runtime, config)
     result_path = config.get('result_path') or os.path.join(
         runtime.work_dir, 'issue41-server-result.json')
-    fixture_dir = os.path.join(runtime.work_dir, 'issue41-fixture')
     events = []
     rounds_result = []
+    model_path = initial_model_path
 
-    for index in range(1, rounds + 1):
-        model_path = os.path.join(fixture_dir, 'round-%04d-model.bin' % index)
-        _write_bytes(model_path, _model_bytes(index, expected_nodes, config))
-        model_sha256 = file_sha256(model_path)
-        events.append(_event('publish_model_start', round_index=index,
-                             model_sha256=model_sha256))
-        runtime.publish_model(model_path)
-        round_id = _current_round_id(runtime.work_dir, 'server')
-        events.append(_event('publish_model_done', round_index=index,
-                             round_id=round_id))
-        events.append(_event('wait_for_updates_start', round_index=index,
-                             round_id=round_id))
-        updates = runtime.wait_for_updates()
-        ordered_nodes = list(updates)
-        if ordered_nodes != list(expected_nodes):
+    for round_index in range(1, rounds + 1):
+        published_model_path = model_path
+        input_model_sha256 = file_sha256(published_model_path)
+        events.append(_event(
+            'publish_model_start', round_index=round_index,
+            model_sha256=input_model_sha256))
+        runtime.publish_model(published_model_path)
+        events.append(_event(
+            'publish_model_done', round_index=round_index,
+            model_sha256=input_model_sha256))
+
+        events.append(_event(
+            'wait_for_updates_start', round_index=round_index))
+        updates_by_node = runtime.wait_for_updates()
+        ordered_nodes = tuple(updates_by_node)
+        if ordered_nodes != expected_nodes:
             raise FLRuntimeError(
-                'issue41_fixture_failed', 'server 收到的 update 集合不完整或顺序错误')
-        update_entries = []
-        for node_id in ordered_nodes:
-            update_sha256 = file_sha256(updates[node_id])
-            update_entries.append({
-                'node_id': node_id,
-                'path': updates[node_id],
-                'sha256': update_sha256,
-                'expected_sha256': _update_sha256(
-                    round_id, node_id, model_sha256,
-                    _client_seed(config, node_id),
-                    config.get('fixture_version', FIXTURE_VERSION)),
-            })
-        for entry in update_entries:
-            if entry['sha256'] != entry['expected_sha256']:
-                raise FLRuntimeError(
-                    'issue41_fixture_failed', 'update 确定性摘要不匹配')
-        events.append(_event('wait_for_updates_done', round_index=index,
-                             round_id=round_id, update_node_ids=ordered_nodes))
+                'algorithm_failed', 'server 收到的 update 集合不完整或顺序错误')
+        events.append(_event(
+            'wait_for_updates_done', round_index=round_index,
+            update_node_ids=list(ordered_nodes)))
+
+        output_model_path = os.path.join(
+            artifact_dir, 'global-model-round-%04d.bin' % round_index)
+        events.append(_event(
+            'aggregate_start', round_index=round_index,
+            update_node_ids=list(ordered_nodes)))
+        model_path = aggregate(
+            model_path=published_model_path,
+            updates_by_node=updates_by_node,
+            output_model_path=output_model_path,
+            config=config)
+        output_model_sha256 = file_sha256(model_path)
+        events.append(_event(
+            'aggregate_done', round_index=round_index,
+            output_model_sha256=output_model_sha256))
+
         rounds_result.append({
-            'round_index': index,
-            'round_id': round_id,
-            'model_sha256': model_sha256,
-            'update_node_ids': ordered_nodes,
-            'updates': update_entries,
+            'round_index': round_index,
+            'input_model_path': published_model_path,
+            'input_model_sha256': input_model_sha256,
+            'update_node_ids': list(ordered_nodes),
+            'updates': [
+                {
+                    'node_id': node_id,
+                    'path': updates_by_node[node_id],
+                    'size_bytes': os.path.getsize(updates_by_node[node_id]),
+                    'sha256': file_sha256(updates_by_node[node_id]),
+                }
+                for node_id in ordered_nodes
+            ],
+            'aggregation_delay_ms': _aggregation_delay_ms(config),
+            'output_model_path': model_path,
+            'output_model_size_bytes': os.path.getsize(model_path),
+            'output_model_sha256': output_model_sha256,
         })
 
     write_json_atomic(result_path, {
         'schema_version': 1,
         'role': 'server',
-        'fixture_version': config.get('fixture_version', FIXTURE_VERSION),
+        'algorithm_version': ALGORITHM_VERSION,
+        'initial_model_path': initial_model_path,
+        'initial_model_size_bytes': os.path.getsize(initial_model_path),
+        'initial_model_sha256': file_sha256(initial_model_path),
         'rounds': rounds_result,
+        'final_model_path': model_path,
+        'final_model_sha256': file_sha256(model_path),
         'events': events,
         'conclusion': 'succeeded',
     })
 
 
 def client_main(runtime, config):
+    """运行客户端多轮作业：等待模型、本地训练、提交 update。"""
     rounds = _positive_int(config.get('rounds', 1), 'rounds')
-    node_id = _positive_int(config.get('node_id', getattr(runtime, 'node_id', None)),
-                            'node_id')
-    delay_ms = _non_negative_int(config.get('training_delay_ms', 0),
-                                 'training_delay_ms')
-    seed = _client_seed(config, node_id)
+    node_id = _positive_int(
+        config.get('node_id', getattr(runtime, 'node_id', None)), 'node_id')
+    update_template_path = _required_artifact(
+        config.get('update_template_path'), 'update_template_path')
+    artifact_dir = _artifact_dir(runtime, config)
     result_path = config.get('result_path') or os.path.join(
         runtime.work_dir, 'issue41-client-result.json')
-    fixture_dir = os.path.join(runtime.work_dir, 'issue41-fixture')
     events = []
     rounds_result = []
 
-    for index in range(1, rounds + 1):
-        events.append(_event('wait_for_model_start', round_index=index,
-                             node_id=node_id))
+    for round_index in range(1, rounds + 1):
+        events.append(_event(
+            'wait_for_model_start', round_index=round_index,
+            node_id=node_id))
         model_path = runtime.wait_for_model()
-        manifest = read_json(os.path.join(os.path.dirname(model_path),
-                                          'model.manifest.json'))
-        round_id = manifest['round_id']
         model_sha256 = file_sha256(model_path)
-        if model_sha256 != manifest['sha256']:
-            raise FLRuntimeError(
-                'issue41_fixture_failed', 'client 模型摘要与 manifest 不一致')
-        if node_id not in manifest['participant_node_ids']:
-            raise FLRuntimeError(
-                'issue41_fixture_failed', 'client 不属于模型参与集合')
-        events.append(_event('wait_for_model_done', round_index=index,
-                             round_id=round_id, model_sha256=model_sha256))
-        if delay_ms:
-            time.sleep(delay_ms / 1000.0)
+        events.append(_event(
+            'wait_for_model_done', round_index=round_index,
+            node_id=node_id, model_sha256=model_sha256))
+
         update_path = os.path.join(
-            fixture_dir, '%s-node-%d-update.bin' % (round_id, node_id))
-        update_content = _update_bytes(
-            round_id, node_id, model_sha256, seed,
-            config.get('fixture_version', FIXTURE_VERSION))
-        _write_bytes(update_path, update_content)
+            artifact_dir,
+            'local-update-round-%04d-node-%d.bin' % (round_index, node_id))
+        events.append(_event(
+            'train_start', round_index=round_index, node_id=node_id))
+        update_path = train(
+            model_path=model_path,
+            output_update_path=update_path,
+            config=config)
         update_sha256 = file_sha256(update_path)
-        events.append(_event('submit_update_start', round_index=index,
-                             round_id=round_id, node_id=node_id,
-                             update_sha256=update_sha256))
+        events.append(_event(
+            'train_done', round_index=round_index, node_id=node_id,
+            update_sha256=update_sha256))
+
+        events.append(_event(
+            'submit_update_start', round_index=round_index,
+            node_id=node_id, update_sha256=update_sha256))
         runtime.submit_update(update_path)
-        events.append(_event('submit_update_done', round_index=index,
-                             round_id=round_id, node_id=node_id,
-                             update_sha256=update_sha256))
+        events.append(_event(
+            'submit_update_done', round_index=round_index,
+            node_id=node_id, update_sha256=update_sha256))
+
         rounds_result.append({
-            'round_index': index,
-            'round_id': round_id,
+            'round_index': round_index,
             'node_id': node_id,
+            'model_path': model_path,
+            'model_size_bytes': os.path.getsize(model_path),
             'model_sha256': model_sha256,
+            'update_path': update_path,
+            'update_size_bytes': os.path.getsize(update_path),
             'update_sha256': update_sha256,
-            'training_delay_ms': delay_ms,
-            'client_dataset_seed': seed,
+            'training_delay_ms': _training_delay_ms(config),
         })
 
     write_json_atomic(result_path, {
         'schema_version': 1,
         'role': 'client',
-        'fixture_version': config.get('fixture_version', FIXTURE_VERSION),
+        'algorithm_version': ALGORITHM_VERSION,
         'node_id': node_id,
+        'update_template_path': update_template_path,
+        'update_template_sha256': file_sha256(update_template_path),
         'rounds': rounds_result,
         'events': events,
         'conclusion': 'succeeded',
     })
 
 
-def _model_bytes(round_index, participant_node_ids, config):
-    payload = {
-        'fixture_version': config.get('fixture_version', FIXTURE_VERSION),
-        'round_index': round_index,
-        'participant_node_ids': list(participant_node_ids),
-        'model_seed': config.get('model_seed', 'issue41-model-seed'),
-    }
-    return json.dumps(payload, ensure_ascii=False, sort_keys=True,
-                      separators=(',', ':')).encode('utf-8') + b'\n'
+def train(model_path, output_update_path, config):
+    """占位训练边界；真实实现应读取模型和本地数据并写出 update。"""
+    inspect_artifact(model_path)
+    update_template_path = _required_artifact(
+        config.get('update_template_path'), 'update_template_path')
+    delay_ms = _training_delay_ms(config)
+    if delay_ms:
+        time.sleep(delay_ms / 1000.0)
+
+    # 当前只复制任意参数文件；替换真实训练时保留函数签名和返回约定。
+    archive_file(update_template_path, output_update_path)
+    return output_update_path
 
 
-def _update_bytes(round_id, node_id, model_sha256, client_dataset_seed,
-                  fixture_version):
-    payload = {
-        'fixture_version': fixture_version,
-        'round_id': round_id,
-        'node_id': node_id,
-        'model_sha256': model_sha256,
-        'client_dataset_seed': client_dataset_seed,
-    }
-    return json.dumps(payload, ensure_ascii=False, sort_keys=True,
-                      separators=(',', ':')).encode('utf-8') + b'\n'
+def aggregate(model_path, updates_by_node, output_model_path, config):
+    """占位聚合边界；真实实现应读取全部 update 并写出下一轮模型。"""
+    inspect_artifact(model_path)
+    if not updates_by_node:
+        raise FLRuntimeError('algorithm_failed', '聚合输入不能为空')
+    for update_path in updates_by_node.values():
+        inspect_artifact(update_path)
+
+    delay_ms = _aggregation_delay_ms(config)
+    if delay_ms:
+        time.sleep(delay_ms / 1000.0)
+
+    # 当前不改变模型内容；替换真实聚合时在 output_model_path 写入新模型。
+    archive_file(model_path, output_model_path)
+    return output_model_path
 
 
-def _update_sha256(round_id, node_id, model_sha256, client_dataset_seed,
-                   fixture_version):
-    return hashlib.sha256(_update_bytes(
-        round_id, node_id, model_sha256, client_dataset_seed,
-        fixture_version)).hexdigest()
+def _artifact_dir(runtime, config):
+    path = config.get('artifact_dir') or os.path.join(
+        runtime.work_dir, 'issue41-algorithm')
+    try:
+        return os.path.abspath(os.fspath(path))
+    except (TypeError, ValueError) as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', 'artifact_dir 必须是有效路径') from exc
 
 
-def _client_seed(config, node_id):
-    seeds = config.get('client_dataset_seeds', {})
-    if isinstance(seeds, dict):
-        value = seeds.get(str(node_id), seeds.get(node_id))
-        if value is not None:
-            return value
-    return config.get('client_dataset_seed', 'issue41-client-%d' % node_id)
+def _required_artifact(path, name):
+    if path is None:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 为必填项' % name)
+    try:
+        return inspect_artifact(path)
+    except FLRuntimeError as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 必须指向可读取普通文件' % name) from exc
 
 
-def _current_round_id(work_dir, role):
-    current = read_json(os.path.join(work_dir, 'current-round.json'))
-    if current.get('role') != role:
-        raise FLRuntimeError('issue41_fixture_failed', '当前轮次角色不一致')
-    return current['round_id']
+def _training_delay_ms(config):
+    return _non_negative_int(
+        config.get('training_delay_ms', 0), 'training_delay_ms')
+
+
+def _aggregation_delay_ms(config):
+    return _non_negative_int(
+        config.get('aggregation_delay_ms', 0), 'aggregation_delay_ms')
 
 
 def _event(name, **fields):
     value = {'name': name, 'monotonic_time': time.monotonic()}
     value.update(fields)
     return value
-
-
-def _write_bytes(path, content):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'wb') as fh:
-        fh.write(content)
 
 
 def _positive_int(value, name):
@@ -216,7 +251,8 @@ def _non_negative_int(value, name):
 
 def _node_ids(values, name):
     result = tuple(values)
-    if (not result or any(type(item) is not int or item <= 0 for item in result) or
+    if (not result or
+            any(type(item) is not int or item <= 0 for item in result) or
             tuple(sorted(set(result))) != result):
         raise FLRuntimeError('invalid_configuration', '%s 无效' % name)
     return result

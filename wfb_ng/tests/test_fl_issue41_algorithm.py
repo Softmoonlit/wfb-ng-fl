@@ -6,11 +6,14 @@ import json
 import os
 import shutil
 import tempfile
-import threading
 import unittest
-import uuid
+from unittest import mock
 
+from wfb_ng.fl import issue41_algorithm
 from wfb_ng.fl.issue41_algorithm import client_main, server_main
+
+
+MODEL_SIZE_BYTES = 40 * 1024 * 1024
 
 
 class Issue41AlgorithmTestCase(unittest.TestCase):
@@ -18,118 +21,161 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
         self.root = tempfile.mkdtemp(prefix='wfb-v8-issue41-algorithm-')
         self.addCleanup(shutil.rmtree, self.root, True)
 
-    def test_server_waits_for_complete_ordered_updates_and_writes_result(self):
-        runtime = ServerFixtureRuntime(os.path.join(self.root, 'server'), (1, 2))
+    def test_server_republishes_unchanged_model_after_placeholder_aggregation(self):
+        initial_model = self.make_binary_file(
+            'input/model.bin', MODEL_SIZE_BYTES, b'model-content')
+        runtime = ServerOpaqueRuntime(
+            os.path.join(self.root, 'server'), (1, 2))
         result_path = os.path.join(self.root, 'server-result.json')
 
-        server_main(runtime, {
-            'rounds': 1,
-            'participant_node_ids': [1, 2],
-            'client_dataset_seeds': {'1': 'seed-1', '2': 'seed-2'},
-            'result_path': result_path,
-        })
+        with mock.patch.object(issue41_algorithm.time, 'sleep') as sleep:
+            server_main(runtime, {
+                'rounds': 2,
+                'participant_node_ids': [1, 2],
+                'initial_model_path': initial_model,
+                'aggregation_delay_ms': 25,
+                'result_path': result_path,
+            })
 
-        with open(result_path, 'r', encoding='utf-8') as fh:
-            result = json.load(fh)
+        self.assertEqual(
+            ['publish_model', 'wait_for_updates'] * 2,
+            runtime.events)
+        self.assertEqual(2, len(runtime.published_models))
+        self.assertEqual(MODEL_SIZE_BYTES, os.path.getsize(runtime.published_models[0]))
+        self.assertEqual(
+            sha256(runtime.published_models[0]),
+            sha256(runtime.published_models[1]))
+        self.assertEqual([mock.call(0.025), mock.call(0.025)], sleep.call_args_list)
+
+        result = read_json(result_path)
         self.assertEqual('succeeded', result['conclusion'])
+        self.assertEqual(MODEL_SIZE_BYTES, result['initial_model_size_bytes'])
         self.assertEqual([1, 2], result['rounds'][0]['update_node_ids'])
-        self.assertLess(
-            runtime.events.index('publish_model'),
-            runtime.events.index('wait_for_updates'))
+        self.assertEqual(
+            result['rounds'][0]['input_model_sha256'],
+            result['rounds'][0]['output_model_sha256'])
+        self.assertEqual(
+            result['rounds'][0]['output_model_path'],
+            result['rounds'][1]['input_model_path'])
+        self.assertIn('aggregate_start', event_names(result))
+        self.assertIn('aggregate_done', event_names(result))
 
-    def test_client_waits_for_model_delays_and_submits_deterministic_update(self):
-        candidate = self.make_model_candidate((1, 2))
-        runtime = ClientFixtureRuntime(os.path.join(self.root, 'client'), 2, candidate)
+    def test_client_submits_opaque_update_template_after_training_delay(self):
+        model_path = self.make_binary_file(
+            'candidate/model.bin', MODEL_SIZE_BYTES, b'opaque-model')
+        update_template = self.make_binary_file(
+            'input/update.params', 1024 * 1024, b'opaque-update')
+        runtime = ClientOpaqueRuntime(
+            os.path.join(self.root, 'client'), 2, model_path)
         result_path = os.path.join(self.root, 'client-result.json')
 
-        client_main(runtime, {
-            'rounds': 1,
-            'node_id': 2,
-            'training_delay_ms': 0,
-            'client_dataset_seed': 'client-2-seed',
-            'result_path': result_path,
-        })
+        with mock.patch.object(issue41_algorithm.time, 'sleep') as sleep:
+            client_main(runtime, {
+                'rounds': 1,
+                'node_id': 2,
+                'training_delay_ms': 30,
+                'update_template_path': update_template,
+                'result_path': result_path,
+            })
 
-        with open(result_path, 'r', encoding='utf-8') as fh:
-            result = json.load(fh)
-        self.assertEqual('succeeded', result['conclusion'])
-        self.assertEqual(2, result['node_id'])
+        sleep.assert_called_once_with(0.03)
         self.assertEqual(1, len(runtime.submitted_updates))
         submitted = runtime.submitted_updates[0]
-        self.assertEqual(result['rounds'][0]['update_sha256'], sha256(submitted))
-        with open(submitted, 'rb') as fh:
-            payload = json.loads(fh.read().decode('utf-8'))
-        self.assertEqual('client-2-seed', payload['client_dataset_seed'])
-        self.assertEqual(2, payload['node_id'])
+        self.assertEqual(os.path.getsize(update_template), os.path.getsize(submitted))
+        self.assertEqual(sha256(update_template), sha256(submitted))
 
-    def make_model_candidate(self, participant_node_ids):
-        round_id = str(uuid.uuid4())
-        candidate = os.path.join(self.root, 'candidate', round_id)
-        os.makedirs(candidate)
-        model_path = os.path.join(candidate, 'model.bin')
-        with open(model_path, 'wb') as fh:
-            fh.write(b'issue41-model')
-        with open(os.path.join(candidate, 'model.manifest.json'), 'w',
-                  encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'artifact_type': 'model',
-                'round_id': round_id,
-                'size_bytes': os.path.getsize(model_path),
-                'sha256': sha256(model_path),
-                'participant_node_ids': list(participant_node_ids),
-            }, fh)
-        return model_path
+        result = read_json(result_path)
+        self.assertEqual('succeeded', result['conclusion'])
+        self.assertEqual(2, result['node_id'])
+        self.assertEqual(MODEL_SIZE_BYTES, result['rounds'][0]['model_size_bytes'])
+        self.assertEqual(sha256(submitted), result['rounds'][0]['update_sha256'])
+        self.assertEqual(
+            ['wait_for_model_start', 'wait_for_model_done',
+             'train_start', 'train_done',
+             'submit_update_start', 'submit_update_done'],
+            event_names(result))
+
+    def test_required_input_files_fail_before_runtime_operations(self):
+        server_runtime = ServerOpaqueRuntime(
+            os.path.join(self.root, 'server'), (1, 2))
+        with self.assertRaisesRegex(Exception, 'initial_model_path'):
+            server_main(server_runtime, {
+                'rounds': 1,
+                'participant_node_ids': [1, 2],
+            })
+        self.assertEqual([], server_runtime.events)
+
+        client_runtime = ClientOpaqueRuntime(
+            os.path.join(self.root, 'client'), 1,
+            self.make_binary_file('candidate/model.bin', 16, b'model'))
+        with self.assertRaisesRegex(Exception, 'update_template_path'):
+            client_main(client_runtime, {'rounds': 1, 'node_id': 1})
+        self.assertEqual(0, client_runtime.wait_count)
+
+    def make_binary_file(self, relative_path, size_bytes, pattern):
+        path = os.path.join(self.root, relative_path)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        chunk = (pattern * ((64 * 1024 // len(pattern)) + 1))[:64 * 1024]
+        with open(path, 'wb') as fh:
+            remaining = size_bytes
+            while remaining:
+                current = chunk[:remaining]
+                fh.write(current)
+                remaining -= len(current)
+        return path
 
 
-class ServerFixtureRuntime(object):
+class ServerOpaqueRuntime(object):
     def __init__(self, work_dir, participant_node_ids):
         self.work_dir = work_dir
         self.participant_node_ids = tuple(participant_node_ids)
         self.events = []
+        self.published_models = []
+        self.round_index = 0
 
     def publish_model(self, model_path):
         self.events.append('publish_model')
-        round_id = str(uuid.uuid4())
-        os.makedirs(self.work_dir, exist_ok=True)
-        with open(os.path.join(self.work_dir, 'current-round.json'), 'w',
-                  encoding='utf-8') as fh:
-            json.dump({'schema_version': 1, 'role': 'server', 'round_id': round_id}, fh)
-        self.round_id = round_id
-        self.model_sha256 = sha256(model_path)
+        self.published_models.append(model_path)
+        self.round_index += 1
 
     def wait_for_updates(self):
         self.events.append('wait_for_updates')
         updates = {}
         for node_id in self.participant_node_ids:
-            path = os.path.join(self.work_dir, 'updates', str(node_id), 'update.bin')
+            path = os.path.join(
+                self.work_dir, 'updates', str(self.round_index),
+                str(node_id), 'update.bin')
             os.makedirs(os.path.dirname(path), exist_ok=True)
-            payload = {
-                'fixture_version': 'issue41-v1',
-                'round_id': self.round_id,
-                'node_id': node_id,
-                'model_sha256': self.model_sha256,
-                'client_dataset_seed': 'seed-%d' % node_id,
-            }
             with open(path, 'wb') as fh:
-                fh.write(json.dumps(payload, ensure_ascii=False, sort_keys=True,
-                                    separators=(',', ':')).encode('utf-8') + b'\n')
+                fh.write(
+                    b'opaque-update-node-' + str(node_id).encode('ascii'))
             updates[node_id] = path
         return updates
 
 
-class ClientFixtureRuntime(object):
+class ClientOpaqueRuntime(object):
     def __init__(self, work_dir, node_id, model_path):
         self.work_dir = work_dir
         self.node_id = node_id
         self.model_path = model_path
         self.submitted_updates = []
+        self.wait_count = 0
 
     def wait_for_model(self):
+        self.wait_count += 1
         return self.model_path
 
     def submit_update(self, update_path):
         self.submitted_updates.append(update_path)
+
+
+def read_json(path):
+    with open(path, 'r', encoding='utf-8') as fh:
+        return json.load(fh)
+
+
+def event_names(result):
+    return [event['name'] for event in result['events']]
 
 
 def sha256(path):

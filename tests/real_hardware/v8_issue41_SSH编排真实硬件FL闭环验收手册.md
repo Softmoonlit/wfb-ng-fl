@@ -11,8 +11,8 @@
 1. server 通过 Runtime `publish_model()` 发布模型。
 2. Transport 用一次 shared UFTP group operation 下发 `model.bin` 和 `model.manifest.json`。
 3. client1/client2 分别通过 Runtime `wait_for_model()` 收到并校验模型。
-4. client1/client2 执行确定性训练 fixture，并各自通过 Runtime `submit_update()` 发起单连接、单 PUT HTTP update。
-5. server 通过 Runtime `wait_for_updates()` 在两个有效 update 全部收齐后返回按 `NODE_ID` 数值升序排列的完整映射。
+4. client1/client2 执行正式算法入口中的 `train()` 占位训练，并各自通过 Runtime `submit_update()` 发起单连接、单 PUT HTTP update。
+5. server 通过 Runtime `wait_for_updates()` 在两个有效 update 全部收齐后返回按 `NODE_ID` 数值升序排列的完整映射，再执行正式算法入口中的 `aggregate()` 占位聚合；占位实现保持原模型内容不变。
 6. 同一轮保留 UFTP feedback、v6 READY/GRANT、authorized sends、queue/backpressure、reassembly、systemd lifecycle 和无孤儿进程证据。
 
 ### 0.2 本手册不验证什么
@@ -21,7 +21,7 @@
 - 不重跑旧普通 TCP 文件探针作为本次 #41 成功条件。
 - 不用管理网 IP 传输模型或 update。
 - 不把 SSH 编排、远端仓库同步、本机归档汇总角色写成正式产品语义。
-- 不推广本次现场 IP、SSH 地址、网卡名或 fixture 参数为正式默认值。
+- 不推广本次现场 IP、SSH 地址、网卡名或占位算法参数为正式默认值。
 - 不把 smoke test 成功当作 Runtime 正式验收成功。
 
 ### 0.3 与 v6 手册的关系
@@ -213,7 +213,7 @@ ExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --a
 
 client 类似，使用 `wfb_ng.fl.issue41_algorithm:client_main`。
 
-若 issue #41 验证完全通过，这种“外部配置选择角色基础设施配置、算法入口和算法作业配置”的结构可作为后续正式版配置形态候选；但本次现场 SSH、网卡、fixture seed、training delay 和 issue41 work_dir 不直接推广为正式默认值。
+若 issue #41 验证完全通过，这种“外部配置选择角色基础设施配置、算法入口和算法作业配置”的结构可作为后续正式版配置形态候选；但本次现场 SSH、网卡、占位数据 seed、训练/聚合延时和 issue41 work_dir 不直接推广为正式默认值。
 
 ## 4. 验收阶段
 
@@ -352,17 +352,51 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 
 该选项只清理 issue41 管理的 Runtime work_dir，不删除归档、仓库或其他系统目录。未显式设置时脚本不得删除失败现场。
 
-算法 fixture：
+正式算法入口与占位算法：
 
-- 默认单轮 `rounds=1`。
-- server 生成确定性模型文件。
-- client1/client2 调用 `wait_for_model()`，校验 manifest、参与集合、大小、SHA-256 后训练。
-- client update 由 `round_id`、`node_id`、`model_sha256`、`client_dataset_seed`、`fixture_version` 确定性生成。
-- client1 `training_delay_ms=0`。
-- client2 `training_delay_ms=3000`。
+- 模型和 update 对 Runtime 及当前占位算法都是不透明普通文件，不要求 JSON、checkpoint 或特定框架格式。
+- server 从必填 `initial_model_path` 读取操作者提供的模型并调用 `publish_model()`；40MB 模型属于合法输入。
+- client1/client2 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验，算法层不解析 Runtime manifest。
+- client `train(model_path, output_update_path, config)` 默认只等待 `training_delay_ms`，再把必填 `update_template_path` 原子复制为本轮 update。client1 默认延时 `0ms`，client2 默认延时 `3000ms`。
 - client1 必须早于 client2 完成 HTTP PUT；server 在只收到 client1 时不得返回 partial result。
 - server `wait_for_updates()` 只能在两个有效 update 全部收齐后返回完整 `[1, 2]` 映射。
+- server `aggregate(model_path, updates_by_node, output_model_path, config)` 默认等待 `aggregation_delay_ms=1000`，确认全部 update 是可读取普通文件，再把当前模型原子复制为下一轮模型；输入输出 SHA-256 必须一致。
+- 默认 `ISSUE41_ROUNDS=1`。设置 `ISSUE41_ROUNDS=2` 后，第二轮会再次下发第一轮占位聚合输出；其内容与操作者提供的原模型完全一致。
+- `server_main/client_main` 只负责 Runtime 编排。接入真实算法时保留 `train()`、`aggregate()` 的函数签名和输出文件约定，只替换两个函数内部实现。
+- 结果事件必须包含 client 的 `train_start/train_done` 和 server 的 `aggregate_start/aggregate_done`；模型/update 的路径、大小和 SHA-256 必须进入算法结果 JSON。
+- 本次占位训练与聚合用于证明正式算法执行边界和真实文件体量传输，不代表最终业务模型精度验收。
 - 本次不强制制造“client1 早于 server 下行完成屏障提交”的极端时序；若自然发生，可记录为额外证据。
+
+运行前分别在三台机器准备输入文件。默认路径不位于 Runtime work_dir，`clean` 不会删除这些输入：
+
+```bash
+# server 本机
+sudo install -d /var/lib/wfb-ng/issue41-input
+sudo install -m 0644 /path/to/model-40mb.bin \
+  /var/lib/wfb-ng/issue41-input/model.bin
+
+# client1/client2 分别执行；两个客户端可以使用不同内容
+sudo install -d /var/lib/wfb-ng/issue41-input
+sudo install -m 0644 /path/to/client-update.bin \
+  /var/lib/wfb-ng/issue41-input/update.bin
+```
+
+验证两轮“原模型下发 -> update 上行 -> 占位聚合 -> 原模型再次下发”时使用：
+
+```bash
+ISSUE41_ROUNDS=2 ISSUE41_RUNTIME_TIMEOUT_SECONDS=600 \
+  bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
+```
+
+需要使用其他位置时，分别设置：
+
+```text
+ISSUE41_INITIAL_MODEL_PATH
+ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH
+ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH
+```
+
+`preflight` 会在 server 本机检查初始模型，并通过 SSH 在 client1/client2 检查各自 update 模板；任一文件缺失、不是普通文件或不可读时 fail-closed。
 
 必需归档：
 
