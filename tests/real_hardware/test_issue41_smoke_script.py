@@ -71,6 +71,19 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_uses_mcs3_by_default(self):
         self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
 
+    def test_formal_runtime_defaults_to_two_40mib_rounds_with_immediate_clients(self):
+        for fragment in (
+                'ROUNDS="${ISSUE41_ROUNDS:-2}"',
+                'INPUT_SIZE_BYTES=$((40 * 1024 * 1024))',
+                'update-client1-40mib.bin',
+                'update-client2-40mib.bin',
+                'required_artifact_size_bytes',
+                'delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
+                '两个 client 的 40 MiB update 模板 SHA-256 必须不同',
+                '"live_observation":true',
+                'issue41_build_summary.py'):
+            self.assertIn(fragment, self.script)
+
     def test_formal_runtime_enables_immediate_known_client_feedback_window(self):
         for fragment in (
                 'ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500',

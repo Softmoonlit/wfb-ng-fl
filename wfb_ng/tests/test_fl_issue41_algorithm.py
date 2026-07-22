@@ -95,6 +95,39 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
              'submit_update_start', 'submit_update_done'],
             event_names(result))
 
+    def test_client_records_round_identity_and_immediate_40mib_template_copy(self):
+        model_path = self.make_binary_file(
+            'candidate/model.bin', MODEL_SIZE_BYTES, b'opaque-model')
+        update_template = self.make_binary_file(
+            'input/update-node-1.params', MODEL_SIZE_BYTES, b'node-1-update')
+        runtime = ClientOpaqueRuntime(
+            os.path.join(self.root, 'client'), 1, model_path)
+        result_path = os.path.join(self.root, 'client-result.json')
+
+        with mock.patch.object(issue41_algorithm.time, 'sleep') as sleep:
+            client_main(runtime, {
+                'rounds': 2,
+                'node_id': 1,
+                'training_delay_ms': 0,
+                'required_artifact_size_bytes': MODEL_SIZE_BYTES,
+                'update_template_path': update_template,
+                'result_path': result_path,
+            })
+
+        sleep.assert_not_called()
+        result = read_json(result_path)
+        self.assertEqual(2, len(result['rounds']))
+        self.assertNotEqual(
+            result['rounds'][0]['round_id'], result['rounds'][1]['round_id'])
+        self.assertEqual(MODEL_SIZE_BYTES, result['rounds'][0]['model_size_bytes'])
+        self.assertEqual(MODEL_SIZE_BYTES, result['rounds'][0]['update_size_bytes'])
+        self.assertLessEqual(
+            result['rounds'][0]['model_receive_interval']['start'],
+            result['rounds'][0]['model_receive_interval']['end'])
+        self.assertLessEqual(
+            result['rounds'][0]['put_interval']['start'],
+            result['rounds'][0]['put_interval']['end'])
+
     def test_required_input_files_fail_before_runtime_operations(self):
         server_runtime = ServerOpaqueRuntime(
             os.path.join(self.root, 'server'), (1, 2))
@@ -149,6 +182,8 @@ class ServerOpaqueRuntime(object):
             with open(path, 'wb') as fh:
                 fh.write(
                     b'opaque-update-node-' + str(node_id).encode('ascii'))
+            with open(os.path.join(os.path.dirname(path), 'update.manifest.json'), 'w', encoding='utf-8') as fh:
+                json.dump({'round_id': 'test-server-round-%d' % self.round_index}, fh)
             updates[node_id] = path
         return updates
 
@@ -163,7 +198,14 @@ class ClientOpaqueRuntime(object):
 
     def wait_for_model(self):
         self.wait_count += 1
-        return self.model_path
+        round_id = 'test-round-%d' % self.wait_count
+        round_dir = os.path.join(self.work_dir, 'rounds', round_id)
+        os.makedirs(round_dir, exist_ok=True)
+        model_path = os.path.join(round_dir, 'model.bin')
+        shutil.copyfile(self.model_path, model_path)
+        with open(os.path.join(round_dir, 'model.manifest.json'), 'w', encoding='utf-8') as fh:
+            json.dump({'round_id': round_id}, fh)
+        return model_path
 
     def submit_update(self, update_path):
         self.submitted_updates.append(update_path)

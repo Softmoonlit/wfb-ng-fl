@@ -4,7 +4,7 @@
 import os
 import time
 
-from .artifacts import archive_file, file_sha256, inspect_artifact, write_json_atomic
+from .artifacts import archive_file, file_sha256, inspect_artifact, read_json, write_json_atomic
 from .errors import FLRuntimeError
 
 
@@ -20,6 +20,8 @@ def server_main(runtime, config):
         'participant_node_ids')
     initial_model_path = _required_artifact(
         config.get('initial_model_path'), 'initial_model_path')
+    required_size = _required_artifact_size(config)
+    _require_size(initial_model_path, required_size, 'initial_model_path')
     artifact_dir = _artifact_dir(runtime, config)
     result_path = config.get('result_path') or os.path.join(
         runtime.work_dir, 'issue41-server-result.json')
@@ -42,12 +44,13 @@ def server_main(runtime, config):
             'wait_for_updates_start', round_index=round_index))
         updates_by_node = runtime.wait_for_updates()
         ordered_nodes = tuple(updates_by_node)
+        round_id = _round_id_for_update(updates_by_node[ordered_nodes[0]])
         if ordered_nodes != expected_nodes:
             raise FLRuntimeError(
                 'algorithm_failed', 'server 收到的 update 集合不完整或顺序错误')
         events.append(_event(
             'wait_for_updates_done', round_index=round_index,
-            update_node_ids=list(ordered_nodes)))
+            round_id=round_id, update_node_ids=list(ordered_nodes)))
 
         output_model_path = os.path.join(
             artifact_dir, 'global-model-round-%04d.bin' % round_index)
@@ -66,7 +69,9 @@ def server_main(runtime, config):
 
         rounds_result.append({
             'round_index': round_index,
+            'round_id': round_id,
             'input_model_path': published_model_path,
+            'input_model_size_bytes': os.path.getsize(published_model_path),
             'input_model_sha256': input_model_sha256,
             'update_node_ids': list(ordered_nodes),
             'updates': [
@@ -106,6 +111,8 @@ def client_main(runtime, config):
         config.get('node_id', getattr(runtime, 'node_id', None)), 'node_id')
     update_template_path = _required_artifact(
         config.get('update_template_path'), 'update_template_path')
+    required_size = _required_artifact_size(config)
+    _require_size(update_template_path, required_size, 'update_template_path')
     artifact_dir = _artifact_dir(runtime, config)
     result_path = config.get('result_path') or os.path.join(
         runtime.work_dir, 'issue41-client-result.json')
@@ -113,14 +120,18 @@ def client_main(runtime, config):
     rounds_result = []
 
     for round_index in range(1, rounds + 1):
+        model_receive_start = time.monotonic()
         events.append(_event(
             'wait_for_model_start', round_index=round_index,
             node_id=node_id))
         model_path = runtime.wait_for_model()
         model_sha256 = file_sha256(model_path)
+        round_id = _round_id_for_model(model_path)
+        _require_size(model_path, required_size, 'received model')
         events.append(_event(
             'wait_for_model_done', round_index=round_index,
-            node_id=node_id, model_sha256=model_sha256))
+            round_id=round_id, node_id=node_id, model_sha256=model_sha256))
+        model_receive_end = time.monotonic()
 
         update_path = os.path.join(
             artifact_dir,
@@ -136,23 +147,30 @@ def client_main(runtime, config):
             'train_done', round_index=round_index, node_id=node_id,
             update_sha256=update_sha256))
 
+        submit_start = time.monotonic()
         events.append(_event(
             'submit_update_start', round_index=round_index,
-            node_id=node_id, update_sha256=update_sha256))
+            round_id=round_id, node_id=node_id, update_sha256=update_sha256))
         runtime.submit_update(update_path)
+        submit_end = time.monotonic()
         events.append(_event(
             'submit_update_done', round_index=round_index,
-            node_id=node_id, update_sha256=update_sha256))
+            round_id=round_id, node_id=node_id, update_sha256=update_sha256))
 
         rounds_result.append({
             'round_index': round_index,
+            'round_id': round_id,
             'node_id': node_id,
             'model_path': model_path,
             'model_size_bytes': os.path.getsize(model_path),
             'model_sha256': model_sha256,
+            'model_receive_interval': {
+                'start': model_receive_start, 'end': model_receive_end,
+            },
             'update_path': update_path,
             'update_size_bytes': os.path.getsize(update_path),
             'update_sha256': update_sha256,
+            'put_interval': {'start': submit_start, 'end': submit_end},
             'training_delay_ms': _training_delay_ms(config),
         })
 
@@ -219,6 +237,29 @@ def _required_artifact(path, name):
     except FLRuntimeError as exc:
         raise FLRuntimeError(
             'invalid_configuration', '%s 必须指向可读取普通文件' % name) from exc
+
+
+def _round_id_for_model(model_path):
+    manifest = read_json(os.path.join(os.path.dirname(model_path), 'model.manifest.json'))
+    return manifest['round_id']
+
+
+def _round_id_for_update(update_path):
+    manifest = read_json(os.path.join(os.path.dirname(update_path), 'update.manifest.json'))
+    return manifest['round_id']
+
+
+def _required_artifact_size(config):
+    value = config.get('required_artifact_size_bytes')
+    if value is None:
+        return None
+    return _positive_int(value, 'required_artifact_size_bytes')
+
+
+def _require_size(path, expected_size, name):
+    if expected_size is not None and os.path.getsize(path) != expected_size:
+        raise FLRuntimeError(
+            'invalid_configuration', '%s 必须恰好为 %d 字节' % (name, expected_size))
 
 
 def _training_delay_ms(config):

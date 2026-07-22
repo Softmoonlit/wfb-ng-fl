@@ -36,11 +36,12 @@ RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
-AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-1000}"
-ROUNDS="${ISSUE41_ROUNDS:-1}"
-INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model.bin}"
-CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update.bin}"
-CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update.bin}"
+AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
+ROUNDS="${ISSUE41_ROUNDS:-2}"
+INPUT_SIZE_BYTES=$((40 * 1024 * 1024))
+INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-40mib.bin}"
+CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-40mib.bin}"
+CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-40mib.bin}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
@@ -216,6 +217,8 @@ cmd_preflight() {
     run_local_capture local-git git -C "$PROJECT_ROOT" status --short --branch
     [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
         die "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH"
+    [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
+        die "server 初始模型必须恰好为 40 MiB：$INITIAL_MODEL_PATH"
     for name in ip iw systemctl journalctl make python3 uftp uftpd; do
         command -v "$name" >/dev/null 2>&1 || die "本机缺少命令：$name"
     done
@@ -225,7 +228,7 @@ cmd_preflight() {
     [ "$(printf '%s\n' "$ifaces" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
     capture_local_radio_health server "$ifaces"
     check_radio_usb_speed server
-    local head remote_head remote_status remote_ifaces remote_iface_count update_template_path
+    local head remote_head remote_status remote_ifaces remote_iface_count update_template_path client1_template_sha256 client2_template_sha256
     head="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
     for role in client1 client2; do
         remote_head="$(remote "$role" "cd '$REMOTE_REPO' && git rev-parse HEAD")"
@@ -242,9 +245,14 @@ cmd_preflight() {
             client2) update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH" ;;
         esac
         remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH' && hostname && whoami && git status --short --branch && sudo -n true && command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null"
-        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path'" || die "$role update 模板不是可读取普通文件：$update_template_path"
+        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || die "$role update 模板必须是可读取的 40 MiB 普通文件：$update_template_path"
+        case "$role" in
+            client1) client1_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
+            client2) client2_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
+        esac
         log_ok "$role preflight 基础检查通过"
     done
+    [ "$client1_template_sha256" != "$client2_template_sha256" ] || die "两个 client 的 40 MiB update 模板 SHA-256 必须不同"
     log_ok "preflight 通过"
 }
 
@@ -271,17 +279,17 @@ write_issue41_configs() {
             ;;
         client2)
             node_id=2; tun="$CLIENT2_TUN"; addr="$CLIENT2_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
             ;;
     esac
     local tmp
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--feedback-window-start-immediately"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--feedback-window-start-immediately"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
-{"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
+{"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
 EOF
         sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-server.service.d
         sudo install -m 0644 "$tmp/fl.json" /etc/wfb-ng/issue41/fl-server.json
@@ -291,10 +299,10 @@ EOF
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$iface"]}
+{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--air-interface","$iface"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
-{"rounds":$ROUNDS,"node_id":$node_id,"update_template_path":"$update_template_path","training_delay_ms":$delay,"result_path":"$result"}
+{"rounds":$ROUNDS,"node_id":$node_id,"update_template_path":"$update_template_path","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"training_delay_ms":$delay,"result_path":"$result"}
 EOF
         ssh_target="$(client_ssh "$role")"
         ssh -o BatchMode=yes "$ssh_target" "sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d"
@@ -913,24 +921,10 @@ cmd_summary() {
     server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
     client1_result="$ARCHIVE_DIR/formal_runtime_loop/client1/issue41-client1-result.json"
     client2_result="$ARCHIVE_DIR/formal_runtime_loop/client2/issue41-client2-result.json"
-    status=failed; reason="关键真实硬件证据仍需现场校验"
     smoke_downlink=failed
     smoke_uplink=failed
-    downlink_diagnosis=null
-    if [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json" ]; then
-        downlink_diagnosis="\"$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json\""
-        diagnosis_class="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8')).get('classification', 'unknown'))" "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/link-health-diagnosis.json" 2>/dev/null || printf 'unknown')"
-        reason="downlink_uftp 失败，链路诊断：$diagnosis_class"
-    fi
-    if [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/passed.json" ]; then
-        smoke_downlink=passed
-    fi
-    if [ -f "$ARCHIVE_DIR/pre_runtime_smoke/uplink_http_put/passed.json" ]; then
-        smoke_uplink=passed
-    fi
-    if [ "$smoke_downlink" = passed ] && [ "$smoke_uplink" = passed ] && [ -f "$server_result" ] && [ -f "$client1_result" ] && [ -f "$client2_result" ]; then
-        status=passed; reason="所有脚本可见关键证据存在"
-    fi
+    [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/passed.json" ] && smoke_downlink=passed
+    [ -f "$ARCHIVE_DIR/pre_runtime_smoke/uplink_http_put/passed.json" ] && smoke_uplink=passed
     route_evidence=
     for role in server client1 client2; do
         for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
@@ -941,9 +935,50 @@ cmd_summary() {
             done
         done
     done
-    cat > "$ARCHIVE_DIR/issue41_summary.json" <<EOF
-{"orchestration":{"status":"passed","radio_health_dir":"$ARCHIVE_DIR/orchestration/radio-health"},"pre_runtime_smoke":{"downlink_uftp":{"status":"$smoke_downlink","link_health_diagnosis":$downlink_diagnosis},"uplink_http_put":{"status":"$smoke_uplink"}},"formal_runtime_loop":{"status":"$status","runtime_interfaces":["publish_model","wait_for_model","submit_update","wait_for_updates"],"data_plane":"10.80.0.0/24","server_wait_for_updates_returned_node_ids":[1,2],"partial_result_returned":false,"update_timing":{"client1_before_client2":true},"server_result":"$server_result","client1_result":"$client1_result","client2_result":"$client2_result","server_journal":"$ARCHIVE_DIR/raw/server-journal.txt","client1_journal":"$ARCHIVE_DIR/raw/client1-journal.txt","client2_journal":"$ARCHIVE_DIR/raw/client2-journal.txt","route_evidence":[$route_evidence]},"lifecycle":{"status":"$status"},"conclusion":{"status":"$status","reason":"$reason"}}
-EOF
+    python3 "$SCRIPT_DIR/issue41_build_summary.py" "$ARCHIVE_DIR" > "$ARCHIVE_DIR/formal-runtime-summary.json"
+    python3 - "$ARCHIVE_DIR" "$smoke_downlink" "$smoke_uplink" "$route_evidence" <<'PY'
+import json
+import os
+import sys
+
+archive_dir, smoke_downlink, smoke_uplink, route_evidence = sys.argv[1:]
+with open(os.path.join(archive_dir, 'formal-runtime-summary.json'), encoding='utf-8') as fh:
+    formal = json.load(fh)
+status = 'passed' if (smoke_downlink == 'passed' and smoke_uplink == 'passed' and
+                      formal['status'] == 'passed') else 'failed'
+reason = formal['reason']
+if status != 'passed' and formal['status'] == 'passed':
+    reason = 'smoke 前置条件未通过'
+summary = {
+    'orchestration': {'status': 'passed', 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
+    'pre_runtime_smoke': {
+        'downlink_uftp': {'status': smoke_downlink},
+        'uplink_http_put': {'status': smoke_uplink},
+    },
+    'formal_runtime_loop': {
+        'status': formal['status'],
+        'runtime_interfaces': ['publish_model', 'wait_for_model', 'submit_update', 'wait_for_updates'],
+        'data_plane': '10.80.0.0/24',
+        'server_wait_for_updates_returned_node_ids': formal['server_wait_for_updates_returned_node_ids'],
+        'partial_result_returned': formal['partial_result_returned'],
+        'scenario': formal['scenario'],
+        'rounds': formal['rounds'],
+        'server_result': os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json'),
+        'client1_result': os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'issue41-client1-result.json'),
+        'client2_result': os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'issue41-client2-result.json'),
+        'server_journal': os.path.join(archive_dir, 'raw', 'server-journal.txt'),
+        'client1_journal': os.path.join(archive_dir, 'raw', 'client1-journal.txt'),
+        'client2_journal': os.path.join(archive_dir, 'raw', 'client2-journal.txt'),
+        'route_evidence': json.loads('[%s]' % route_evidence),
+    },
+    'lifecycle': {'status': formal['status']},
+    'conclusion': {'status': status, 'reason': reason},
+}
+with open(os.path.join(archive_dir, 'issue41_summary.json'), 'w', encoding='utf-8') as fh:
+    json.dump(summary, fh, ensure_ascii=True, separators=(',', ':'))
+PY
+    status="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['conclusion']['status'])" "$ARCHIVE_DIR/issue41_summary.json")"
+    reason="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['conclusion']['reason'])" "$ARCHIVE_DIR/issue41_summary.json")"
     cat > "$ARCHIVE_DIR/result.md" <<EOF
 # issue41 真实硬件 FL Runtime 闭环结果
 

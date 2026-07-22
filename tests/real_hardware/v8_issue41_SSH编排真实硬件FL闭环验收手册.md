@@ -1,6 +1,6 @@
 # V8 issue #41 SSH 编排真实硬件 FL Runtime 闭环验收手册
 
-本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
+本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）及 issue #53（双 40 MiB 两轮正式场景）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
 
 ## 0. 定位与边界
 
@@ -356,13 +356,12 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 正式算法入口与占位算法：
 
 - 模型和 update 对 Runtime 及当前占位算法都是不透明普通文件，不要求 JSON、checkpoint 或特定框架格式。
-- server 从必填 `initial_model_path` 读取操作者提供的模型并调用 `publish_model()`；40MB 模型属于合法输入。
-- client1/client2 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验，算法层不解析 Runtime manifest。
-- client `train(model_path, output_update_path, config)` 默认只等待 `training_delay_ms`，再把必填 `update_template_path` 原子复制为本轮 update。client1 默认延时 `0ms`，client2 默认延时 `3000ms`。
-- client1 必须早于 client2 完成 HTTP PUT；server 在只收到 client1 时不得返回 partial result。
-- server `wait_for_updates()` 只能在两个有效 update 全部收齐后返回完整 `[1, 2]` 映射。
-- server `aggregate(model_path, updates_by_node, output_model_path, config)` 默认等待 `aggregation_delay_ms=1000`，确认全部 update 是可读取普通文件，再把当前模型原子复制为下一轮模型；输入输出 SHA-256 必须一致。
-- 默认 `ISSUE41_ROUNDS=1`。设置 `ISSUE41_ROUNDS=2` 后，第二轮会再次下发第一轮占位聚合输出；其内容与操作者提供的原模型完全一致。
+- 正式场景固定 `ISSUE41_ROUNDS=2`。server 输入模型、client1 模板和 client2 模板均必须恰好为 40 MiB；`preflight` 在 live run 前检查它们，不生成或修改输入。
+- 两个客户端模板必须具有不同 SHA-256，并各自在两轮中重复使用同一模板。默认路径分别为 `model-40mib.bin`、`update-client1-40mib.bin` 和 `update-client2-40mib.bin`。
+- client1/client2 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验。模型校验完成后两个客户端均以 `training_delay_ms=0` 立即执行占位训练。
+- `train(model_path, output_update_path, config)` 的占位训练只复制必填 `update_template_path`，synthetic update 不来自真实训练。server `aggregate(...)` 的占位聚合只复制当前模型，不执行或声称执行 FedAvg。
+- server `wait_for_updates()` 只在两个有效 update 全部收齐后返回完整 `[1, 2]` 映射；单个 update 到达时不返回 partial result。
+- 每轮在算法结果和 systemd journal 中记录独立轮次标识、模型接收及 PUT 时间区间、大小、SHA-256、活动上传集合与最终 HTTP 结果。任何 `upload_in_progress` 或 client/server 提交事实不一致均不能通过。
 - `server_main/client_main` 只负责 Runtime 编排。接入真实算法时保留 `train()`、`aggregate()` 的函数签名和输出文件约定，只替换两个函数内部实现。
 - 结果事件必须包含 client 的 `train_start/train_done` 和 server 的 `aggregate_start/aggregate_done`；模型/update 的路径、大小和 SHA-256 必须进入算法结果 JSON。
 - 本次占位训练与聚合用于证明正式算法执行边界和真实文件体量传输，不代表最终业务模型精度验收。
@@ -371,21 +370,28 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 运行前分别在三台机器准备输入文件。默认路径不位于 Runtime work_dir，`clean` 不会删除这些输入：
 
 ```bash
-# server 本机
+# server 本机：操作者提供的 40 MiB 模型
 sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/model-40mb.bin \
-  /var/lib/wfb-ng/issue41-input/model.bin
+sudo install -m 0644 /path/to/model-40mib.bin \
+  /var/lib/wfb-ng/issue41-input/model-40mib.bin
 
-# client1/client2 分别执行；两个客户端可以使用不同内容
+# client1：操作者提供的 40 MiB synthetic update 模板
 sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/client-update.bin \
-  /var/lib/wfb-ng/issue41-input/update.bin
+sudo install -m 0644 /path/to/client1-update-40mib.bin \
+  /var/lib/wfb-ng/issue41-input/update-client1-40mib.bin
+
+# client2：内容必须不同于 client1 的 40 MiB synthetic update 模板
+sudo install -d /var/lib/wfb-ng/issue41-input
+sudo install -m 0644 /path/to/client2-update-40mib.bin \
+  /var/lib/wfb-ng/issue41-input/update-client2-40mib.bin
 ```
 
-验证两轮“原模型下发 -> update 上行 -> 占位聚合 -> 原模型再次下发”时使用：
+先运行 `preflight`。它会 fail-closed 检查三个输入的普通文件、可读性、恰好 40 MiB 大小，以及两个 client 模板 SHA-256 不同。输入位于 Runtime work_dir 外，live run 和 `clean` 都不会生成、修改或删除它们。
+
+正式两轮运行使用：
 
 ```bash
-ISSUE41_ROUNDS=2 ISSUE41_RUNTIME_TIMEOUT_SECONDS=600 \
+ISSUE41_RUNTIME_TIMEOUT_SECONDS=600 \
   bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
 ```
 
@@ -397,7 +403,7 @@ ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH
 ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH
 ```
 
-`preflight` 会在 server 本机检查初始模型，并通过 SSH 在 client1/client2 检查各自 update 模板；任一文件缺失、不是普通文件或不可读时 fail-closed。
+`preflight` 会在 server 本机检查初始模型，并通过 SSH 在 client1/client2 检查各自 update 模板；任一文件缺失、不是普通文件、不可读、大小不是 40 MiB 或两份模板摘要相同都会 fail-closed。
 
 必需归档：
 
@@ -501,8 +507,8 @@ tests/logs/v8_issue41_<timestamp>/
 4. `smoke-uplink-http-put` 通过，但它只作为诊断前置。
 5. Runtime 正式闭环通过：`publish_model`、两个 `wait_for_model`、两个 `submit_update`、`wait_for_updates` 全部经正式接口完成。
 6. shared UFTP downlink 每轮一次，两个 client 的 model 和 manifest status matrix 完整。
-7. 两个 client 的模型 SHA 与 server 一致；两个 update 的 SHA 与 server 收到结果一致。
-8. client1 早于 client2 完成 update，server 不返回 partial result，最终返回 `[1, 2]` 完整映射。
+7. 两轮中两个 client 的模型 SHA 均与 server 一致；每个 40 MiB update 的 SHA、大小、客户端 HTTP 201 与 server committed 事实一致。
+8. 每轮均记录独立轮次标识、模型接收和 PUT 时间区间、活动上传集合及最终 HTTP 结果；不得出现 `upload_in_progress`，server 不返回 partial result，最终返回 `[1, 2]` 完整映射。
 9. v6 直接依赖证据完整：READY/GRANT、authorized sends、server 接收、queue pause/resume、bytes/packets 反压、reassembly、sender isolation、feedback window。
 10. lifecycle stop/restart 和无孤儿进程验证通过。
 11. `result.md` 和 `issue41_summary.json` 明确区分 baseline、smoke、formal runtime loop、lifecycle。
