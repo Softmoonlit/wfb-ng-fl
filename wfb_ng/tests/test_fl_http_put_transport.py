@@ -55,6 +55,12 @@ class OneShotHttpPeer(object):
                     time.sleep(0.2)
                     self.body = remainder
                     return
+                if self.behavior == 'reject_partial_body':
+                    connection.sendall(
+                        b'HTTP/1.1 409 Conflict\r\nContent-Length: 10\r\n'
+                        b'Connection: close\r\n\r\n{')
+                    time.sleep(0.2)
+                    return
                 if self.behavior == 'hold_body':
                     connection.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
                     connection.sendall(b'HTTP/1.1 100 Continue\r\n\r\n')
@@ -374,6 +380,133 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             }, manifest)
         self.assertEqual([], self.failures)
 
+    def test_live_events_report_upload_boundaries_and_client_phases(self):
+        server_events = EventBuffer()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=server_events, role_node_id=9)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'observed-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'observed-update'
+        update_path = self.write_update('observed-update.bin', body)
+        client_events = EventBuffer()
+        client = ClientTransport(
+            os.path.join(self.root, 'observed-client'), 1, 9000,
+            server.http_address, live_observation=True,
+            observation_writer=client_events)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        server_values = server_events.values()
+        self.assertEqual(
+            ['upload_accepted', 'active_uploads', 'upload_committed',
+             'response_write_completed', 'active_uploads'],
+            [value['event'] for value in server_values])
+        self.assertEqual([1], server_values[1]['active_node_ids'])
+        self.assertEqual([], server_values[-1]['active_node_ids'])
+        self.assertTrue(all(value['role'] == 'server' for value in server_values))
+        self.assertTrue(all(value['role_node_id'] == 9 for value in server_values))
+        self.assertTrue(all(value['round'] == round_id for value in server_values))
+        self.assertTrue(all(value['size_bytes'] == len(body) for value in server_values))
+        self.assertTrue(all(value['sha256'] == hashlib.sha256(body).hexdigest()
+                            for value in server_values))
+        self.assertEqual(
+            ['connect', 'continue', 'body', 'final_response'],
+            [value['phase'] for value in client_events.values()])
+        self.assertTrue(all(value['role'] == 'client'
+                            for value in client_events.values()))
+        self.assertTrue(all(value['node_id'] == 1
+                            for value in client_events.values()))
+
+    def test_live_events_capture_each_concurrent_active_set_snapshot(self):
+        events = EventBuffer()
+        server = ServerTransport(
+            (1, 2), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=events)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'concurrent-observed-round')
+        server.install_round(round_id, (1, 2), round_dir, 1024, lambda *args: None)
+        body_one = b'node-one'
+        body_two = b'node-two'
+        first_sock, first_response = self.send_headers(
+            self.make_request(round_id, 1, body_one), server.http_address)
+        self.addCleanup(first_response.close)
+        self.addCleanup(first_sock.close)
+        self.assertEqual(100, read_response(first_response)[0])
+        second_sock, second_response = self.send_headers(
+            self.make_request(round_id, 2, body_two), server.http_address)
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        first_sock.sendall(body_one)
+        self.assertEqual(201, read_response(first_response)[0])
+        second_sock.sendall(body_two)
+        self.assertEqual(201, read_response(second_response)[0])
+
+        self.assertEqual(
+            [[1], [1, 2], [2], []],
+            [value['active_node_ids'] for value in events.values()
+             if value['event'] == 'active_uploads'])
+
+    def test_disabled_observation_writes_no_events(self):
+        events = EventBuffer()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, observation_writer=events)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'silent-observation-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'silent-observation-update'
+        update_path = self.write_update('silent-observation-update.bin', body)
+        client = ClientTransport(
+            os.path.join(self.root, 'silent-observation-client'), 1, 9000,
+            server.http_address, observation_writer=events)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        self.assertEqual([], events.lines)
+
+    def test_observation_write_failures_do_not_change_upload_result(self):
+        failing_writer = FailingWriter()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=failing_writer)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'failing-observation-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'observation-failure-update'
+        update_path = self.write_update('observation-failure-update.bin', body)
+        client = ClientTransport(
+            os.path.join(self.root, 'failing-observation-client'), 1, 9000,
+            server.http_address, live_observation=True,
+            observation_writer=failing_writer)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        with open(os.path.join(
+                round_dir, 'updates', '1', 'update.manifest.json'),
+                'r', encoding='utf-8') as fh:
+            self.assertEqual(hashlib.sha256(body).hexdigest(), json.load(fh)['sha256'])
+
     def test_client_transports_submit_different_nodes(self):
         update_one = self.write_update('client-node-1.bin', b'client-node-1')
         update_two = self.write_update('client-node-2.bin', b'client-node-2')
@@ -545,9 +678,11 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         update_path = os.path.join(self.root, 'timeout-update.bin')
         with open(update_path, 'wb') as fh:
             fh.write(body)
+        events = EventBuffer()
         client = ClientTransport(
             os.path.join(self.root, 'timeout-client'), 1, 9000,
-            peer.address, io_timeout=0.1)
+            peer.address, io_timeout=0.1, live_observation=True,
+            observation_writer=events)
 
         started = time.monotonic()
         with self.assertRaises(FLRuntimeError) as raised:
@@ -557,9 +692,35 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
 
         self.assertLess(time.monotonic() - started, 1)
         self.assertEqual('update_submit_failed', raised.exception.error_code)
+        self.assertIn('continue', raised.exception.error_message)
+        self.assertEqual('continue', events.values()[-1]['phase'])
+        self.assertEqual('timeout', events.values()[-1]['transport_outcome'])
         peer.wait()
         self.assertEqual(1, peer.connection_count)
         self.assertEqual(b'', peer.body)
+
+    def test_client_error_body_timeout_names_continue_phase(self):
+        peer = OneShotHttpPeer('reject_partial_body')
+        self.addCleanup(peer.close)
+        body = b'update-body'
+        update_path = self.write_update('partial-error-body.bin', body)
+        events = EventBuffer()
+        client = ClientTransport(
+            os.path.join(self.root, 'partial-error-body-client'), 1, 9000,
+            peer.address, io_timeout=0.05, live_observation=True,
+            observation_writer=events)
+
+        with self.assertRaises(FLRuntimeError) as raised:
+            client.submit_update(
+                self.round_id, 1, update_path, len(body),
+                hashlib.sha256(body).hexdigest())
+
+        self.assertEqual('update_submit_failed', raised.exception.error_code)
+        self.assertIn('continue', raised.exception.error_message)
+        self.assertEqual('continue', events.values()[-1]['phase'])
+        self.assertEqual('timeout', events.values()[-1]['transport_outcome'])
+        peer.wait()
+        self.assertEqual(1, peer.connection_count)
 
     def test_client_does_not_retry_when_final_response_is_lost(self):
         peer = OneShotHttpPeer('drop_final')
@@ -721,13 +882,37 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         headers.extend(extra_headers)
         return ('\r\n'.join(headers) + '\r\n\r\n').encode('ascii')
 
-    def send_headers(self, request):
-        sock = socket.create_connection(self.transport.http_address, timeout=2)
+    def send_headers(self, request, address=None):
+        sock = socket.create_connection(
+            self.transport.http_address if address is None else address, timeout=2)
         sock.settimeout(2)
         response = sock.makefile('rb')
         self.addCleanup(response.close)
         sock.sendall(request)
         return sock, response
+
+
+class FailingWriter(object):
+    def write(self, value):
+        raise OSError('observation unavailable')
+
+    def flush(self):
+        raise OSError('observation unavailable')
+
+
+class EventBuffer(object):
+    def __init__(self):
+        self.lines = []
+
+    def write(self, value):
+        self.lines.append(value)
+
+    def flush(self):
+        pass
+
+    def values(self):
+        return [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                for line in self.lines]
 
 
 def read_response(response):

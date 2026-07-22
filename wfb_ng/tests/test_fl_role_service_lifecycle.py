@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import base64
+import hashlib
+import io
 import json
 import os
 import shutil
@@ -237,6 +240,97 @@ class RoleLifecycleTestCase(unittest.TestCase):
             '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
             '--known-clients', '1,2'],
             service.link.command)
+
+    def test_live_observation_is_disabled_by_default_and_configurable(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1'])
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            disabled = load_role_service(config_path, expected_role='server')
+        self.assertFalse(disabled.role.transport.live_observation)
+        disabled.close()
+
+        with open(config_path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+        config['live_observation'] = True
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump(config, fh)
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            enabled = load_role_service(config_path, expected_role='server')
+        self.addCleanup(enabled.close)
+        self.assertTrue(enabled.role.transport.live_observation)
+
+    def test_role_configuration_controls_structured_upload_output(self):
+        body = b'role-observed-update'
+
+        def submit(address, round_id):
+            digest = base64.b64encode(hashlib.sha256(body).digest()).decode('ascii')
+            request = (
+                'PUT /v1/rounds/%s/updates/1 HTTP/1.1\r\n'
+                'Host: 127.0.0.1\r\n'
+                'Content-Length: %d\r\n'
+                'Content-Digest: sha-256=:%s:\r\n'
+                'Content-Type: application/octet-stream\r\n'
+                'Expect: 100-continue\r\n'
+                'Connection: close\r\n\r\n'
+            ) % (round_id, len(body), digest)
+            sock = socket.create_connection(address, timeout=1)
+            self.addCleanup(sock.close)
+            response = sock.makefile('rb')
+            self.addCleanup(response.close)
+            sock.sendall(request.encode('ascii'))
+            self.assertIn(b' 100 ', response.readline())
+            while response.readline() not in (b'\r\n', b'\n'):
+                pass
+            sock.sendall(body)
+            self.assertIn(b' 201 ', response.readline())
+
+        def run(live_observation, writer, name):
+            config_path = self.write_server_config(
+                participant_node_ids=[1],
+                link_args=['--tun-name', 'wfb0', '--known-clients', '1'],
+                name=name)
+            with open(config_path, 'r', encoding='utf-8') as fh:
+                config = json.load(fh)
+            config['work_dir'] = os.path.join(self.root, name + '-work')
+            config['http_host'] = '127.0.0.1'
+            config['http_port'] = 0
+            config['live_observation'] = live_observation
+            with open(config_path, 'w', encoding='utf-8') as fh:
+                json.dump(config, fh)
+            with mock.patch('wfb_ng.fl.observation.sys.stdout', writer), \
+                    mock.patch('wfb_ng.fl.service.shutil.which',
+                               side_effect=lambda executable: '/bin/true'):
+                service = load_role_service(config_path, expected_role='server')
+            self.addCleanup(service.role.close)
+            with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+                service.role.start()
+            round_id = '00000000-0000-4000-8000-000000000001'
+            service.role.transport.install_round(
+                round_id, (1,), os.path.join(config['work_dir'], 'round'),
+                1024, lambda *args: None)
+            submit(service.role.http_address, round_id)
+            service.role.close()
+
+        disabled_output = io.StringIO()
+        run(False, disabled_output, 'silent-role.json')
+        self.assertEqual('', disabled_output.getvalue())
+
+        enabled_output = io.StringIO()
+        run(True, enabled_output, 'observed-role.json')
+        events = [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                  for line in enabled_output.getvalue().splitlines()]
+        self.assertEqual(
+            ['upload_accepted', 'active_uploads', 'upload_committed',
+             'response_write_completed', 'active_uploads'],
+            [event['event'] for event in events])
+        for event in events:
+            self.assertTrue({
+                'role', 'role_node_id', 'node_id', 'round', 'phase',
+                'size_bytes', 'sha256', 'elapsed_ms', 'transport_outcome',
+            }.issubset(event))
 
     def test_config_passes_uftp_bind_and_multicast_hosts(self):
         config_path = self.write_server_config(

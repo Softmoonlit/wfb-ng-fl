@@ -114,6 +114,14 @@ HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都
 
 server 若已提交 update 但响应写回失败，只记录自身可观测的 `response_write_completed` 或 `response_write_failed_after_commit`，不声称 client 已收到 `201`。client 记录 `final_response_received`、`final_response_missing` 或 `final_response_invalid`；两端使用 `round_id` 与 `NODE_ID` 关联排障。
 
+## 实时结构化观测
+
+角色基础设施配置中的 `live_observation` 缺省为 `false`。启用时，Transport 向标准输出写入以 `WFB_FL_EVENT ` 为固定前缀、后接单行排序 JSON 的实时事件；控制器只解析此前缀和 JSON，不解析 journal 的人类可读文本。每条上传相关事件都包含 `event`、`role`、`node_id`、`round`、`phase`、`size_bytes`、`sha256`、`elapsed_ms` 和 `transport_outcome`；server 还包含本机 `role_node_id`，以及 `active_uploads` 事件中的有序 `active_node_ids`。
+
+server 在每个已接受上传、活动集合变化、提交和已接受失败边界各输出一次。client 对一次 PUT 仅输出 connect、等待 `100 Continue`、body 和最终响应四个阶段的结果；timeout 结果的 `phase` 必须明确为发生等待的阶段。观测不逐 chunk、packet 或 GRANT 输出。
+
+事件编码、格式化、写出或 flush 的任何失败均被丢弃，不参与准入、Runtime 回调、HTTP 状态或算法结论裁决。关闭观测时不写入实时展示事件。
+
 ## Runtime 交付边界
 
 Transport 只交付文件传输结果、完整性结果和结构化传输错误。成功结果以最终 manifest 为持久权威事实，进程内通知只负责唤醒；正式提交失败则通过同进程可靠结果调用同步上报，不额外持久化 Transport 失败文件。Runtime 决定轮次状态、下行完成屏障、结果消费和严格同步失败传播；Transport 不复制或改写 Runtime 的状态机。跨层完整流程见[系统分层与跨层契约](系统分层与跨层契约.md#cross-layer-contracts)。
