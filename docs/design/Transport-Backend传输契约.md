@@ -58,7 +58,7 @@ server 只接受 Transport 当前准入上下文所标识的轮次、合法 UUID
 
 `Content-Digest` 必须是唯一、语法正确且算法为 `sha-256` 的标准字段。client 使用归档得到的同一 32 字节摘要编码为 base64；本地 manifest 仍保存 64 位小写十六进制。server 流式读取 body 时独立计算摘要并比较。摘要用于交付完整性，不构成敌对环境认证。
 
-server 先完成 method、路径、身份、Transport 当前准入上下文、参与集合、重复提交、媒体类型、长度、摘要语法、大小和存储检查。全部通过后，Transport 为 `(round_id, NODE_ID)` 原子预留唯一上传槽位；预留成功是 Transport 接受本次上传操作的边界，发生在尝试发送 `100 Continue` 之前。操作被接受不表示已经接收任何上行数据：只有 `100 Continue` 成功写回后，client 才能发送 body，server 才进入 body 接收。预留前检查失败只拒绝本次请求，当前 Transport 准入上下文继续等待该 client 的有效首份提交；client 不自动重试。
+server 先完成 method、路径、身份、Transport 当前准入上下文、参与集合、重复提交、媒体类型、长度、摘要语法、大小和存储检查。全部通过后，Transport 为 `(round_id, NODE_ID)` 原子预留唯一上传槽位；预留成功是 Transport 接受本次上传操作的边界，发生在尝试发送 `100 Continue` 之前。预留必须同时捕获不可变的轮次上下文快照，包括 `round_id`、参与集合、固定目录、大小限制和失败回调。操作被接受不表示已经接收任何上行数据：只有 `100 Continue` 成功写回后，client 才能发送 body，server 才进入 body 接收。预留前检查失败只拒绝本次请求，当前 Transport 准入上下文继续等待该 client 的有效首份提交；client 不自动重试。
 
 client 固定使用 `Expect: 100-continue`，在收到 `100 Continue` 前不得写入任何 body。若先收到最终 `4xx`/`5xx`，或等待中间响应超时，直接失败，不降级为先发 body。TCP SYN 和 headers 已足以进入 TUN 上行队列，不需要 body 才能触发链路层 READY。
 
@@ -86,7 +86,7 @@ server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它�
 | --- | --- |
 | `400 Bad Request` | URL、header、摘要格式或请求结构非法 |
 | `404 Not Found` | `round_id` 不存在或不匹配 Transport 当前准入上下文 |
-| `409 Conflict` | `(round_id, NODE_ID)` 已有有效 update，存在同键竞争请求，或全局上传槽位已被占用 |
+| `409 Conflict` | `(round_id, NODE_ID)` 已有有效 update、已接受的同键竞争请求，或该键已经用尽首次提交机会 |
 | `411 Length Required` | 缺少 `Content-Length` |
 | `413 Content Too Large` | update 超过配置上限 |
 | `415 Unsupported Media Type` | `Content-Type` 不是 `application/octet-stream` |
@@ -102,11 +102,13 @@ server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它�
 
 ## 并发、grant 和连接等待
 
-同一 server 同时只允许一个 HTTP request 取得全局上传槽位并进入已接受状态。server 可以并发解析少量连接和 headers，但必须把“全局槽位空闲”和“同键首次提交”纳入同一次原子预留；只有预留成功的请求尝试返回 `100 Continue`。其他请求立即返回 `409`、`upload_in_progress`，仍属未被 Transport 接受，不得排队或自动重试。全局槽位由该操作的最终 Transport 成功或失败裁决释放，不因 Runtime 状态变化释放。
+同一轮中，不同参与 `NODE_ID` 的 HTTP request 可以同时取得各自的 `(round_id, NODE_ID)` 上传预留并进入已接受状态。server 可以并发解析连接和 headers，并且必须把轮次验证、参与集合验证、同键首次提交和预留创建纳入同一次原子操作；只有预留成功的请求尝试返回 `100 Continue`。同一键的活动竞争和提交后重复请求立即返回 `409 Conflict`，仍属未被 Transport 接受，不得排队或自动重试。
+
+活动上传的总数由每个已接受操作的冻结参与集合约束：一个参与节点最多持有其一个键的预留，因此单个轮次上下文最多同时有该参与集合大小的活动上传。Transport 不硬编码演示拓扑的节点数量，也不使用全局单上传槽位。每个已接受操作使用自己的上下文快照完成接收、临时文件清理、manifest 提交和失败回调；一个操作的成功、失败或资源释放只影响其自身预留，不能取消、释放或重新准入其他活动操作。新准入上下文安装后，已接受的旧操作仍按其旧 `round_id` 和 `NODE_ID` 独立裁决并报告。
 
 HTTP 请求和 TCP 连接可以跨多个链路层 grant 保持；grant 到期只暂停空口发送，连接、请求和暂存文件继续保持，后续 grant 从同一 body 继续。Transport 依赖[链路层空口调度与反压](链路层空口调度与反压.md#link-contract)提供发送机会和有限队列，不调用链路层 Token API。
 
-HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都必须设置有界的连接与 I/O 等待期限，使每次请求 operation 最终形成成功或失败裁决。等待期限必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应；具体数值由实现和目标运行环境冻结，不与 Runtime 轮次等待混同。优先使用 HTTP 库、socket 或事件循环提供的连接、读写和响应 timeout，不要求新增独立 watchdog 组件。
+HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都必须设置有界的连接与 I/O 等待期限，使每次请求 operation 最终形成成功或失败裁决。默认连接和 I/O timeout 为 10 秒；该期限必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应。具体数值由实现和目标运行环境冻结，不与 Runtime 轮次等待混同。优先使用 HTTP 库、socket 或事件循环提供的连接、读写和响应 timeout，不要求新增独立 watchdog 组件。
 
 一条连接最多承载一个 PUT，client 使用 `Connection: close`，不使用 pipelining。HTTP client 库必须禁用全部自动重试；一次 `submit_update(...)` 只建立一次连接、发送一次 PUT。connect、body、最终响应缺失和全部 `4xx`/`5xx` 都是明确失败，不能自动重发。
 

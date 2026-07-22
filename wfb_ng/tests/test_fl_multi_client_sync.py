@@ -270,7 +270,7 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         self.assertEqual([], failures)
         self.assertTrue(os.path.isfile(os.path.join(
             round_dir, 'updates', '1', 'update.manifest.json')))
-        transport._release_upload()
+        transport._release_upload(handler._upload_context)
 
     def test_model_manifest_rejects_boolean_node_id(self):
         round_id = '550e8400-e29b-41d4-a716-446655440000'

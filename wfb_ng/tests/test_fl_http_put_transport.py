@@ -149,7 +149,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         }, json.loads(body.decode('utf-8')))
         self.assertEqual([], self.failures)
 
-    def test_installing_new_round_does_not_release_accepted_old_round_body(self):
+    def test_installing_new_round_keeps_accepted_upload_contexts_independent(self):
         old_body = b'old-round-update'
         old_sock, old_response = self.send_headers(
             self.make_request(self.round_id, 1, old_body))
@@ -164,23 +164,31 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             lambda *args: self.failures.append(args))
         new_sock, new_response = self.send_headers(
             self.make_request(new_round_id, 2, b'new-round-update'))
-        status, _, body = read_response(new_response)
+        self.addCleanup(new_response.close)
+        self.addCleanup(new_sock.close)
+        self.assertEqual(100, read_response(new_response)[0])
+
+        old_sock.sendall(b'old-round-error!')
+        status, _, body = read_response(old_response)
+        self.assertEqual(422, status)
+        self.assertEqual(
+            'digest_mismatch', json.loads(body.decode('utf-8'))['error_code'])
+        self.assertEqual([
+            (self.round_id, 1, 'digest_mismatch', 'update 摘要不匹配'),
+        ], self.failures)
+
+        new_sock.sendall(b'new-round-update')
+        self.assertEqual(201, read_response(new_response)[0])
+
+        duplicate_sock, duplicate_response = self.send_headers(
+            self.make_request(new_round_id, 2, b'accepted'))
+        self.addCleanup(duplicate_response.close)
+        self.addCleanup(duplicate_sock.close)
+        status, _, body = read_response(duplicate_response)
         self.assertEqual(409, status)
         self.assertEqual(
-            'upload_in_progress', json.loads(body.decode('utf-8'))['error_code'])
-        new_response.close()
-        new_sock.close()
-
-        old_sock.sendall(old_body)
-        self.assertEqual(201, read_response(old_response)[0])
-
-        accepted_sock, accepted_response = self.send_headers(
-            self.make_request(new_round_id, 2, b'accepted'))
-        self.addCleanup(accepted_response.close)
-        self.addCleanup(accepted_sock.close)
-        self.assertEqual(100, read_response(accepted_response)[0])
-        accepted_sock.sendall(b'accepted')
-        self.assertEqual(201, read_response(accepted_response)[0])
+            'update_already_submitted',
+            json.loads(body.decode('utf-8'))['error_code'])
 
     def test_accepted_storage_failure_returns_507_and_reports_runtime_failure(self):
         body = b'update'
@@ -314,7 +322,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         self.assertEqual(self.transport.round_id, raised.exception.round_id)
         self.assertEqual(1, raised.exception.node_id)
 
-    def test_only_one_body_is_accepted_and_success_is_streamed_to_final_files(self):
+    def test_different_nodes_overlap_and_same_node_competition_is_rejected(self):
         first_body = b'node-1-update' * 50
         first_request = self.make_request(self.round_id, 1, first_body)
         first_sock, first_response = self.send_headers(first_request)
@@ -322,14 +330,21 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         self.addCleanup(first_sock.close)
         self.assertEqual(100, read_response(first_response)[0])
 
-        second_request = self.make_request(self.round_id, 2, b'node-2-update')
-        second_sock, second_response = self.send_headers(second_request)
-        status, _, body = read_response(second_response)
+        second_body = b'node-2-update'
+        second_sock, second_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        competing_sock, competing_response = self.send_headers(first_request)
+        status, _, body = read_response(competing_response)
         self.assertEqual(409, status)
         self.assertEqual(
-            'upload_in_progress', json.loads(body.decode('utf-8'))['error_code'])
-        second_response.close()
-        second_sock.close()
+            'upload_in_progress',
+            json.loads(body.decode('utf-8'))['error_code'])
+        competing_response.close()
+        competing_sock.close()
 
         first_sock.sendall(first_body)
         status, headers, body = read_response(first_response)
@@ -339,21 +354,100 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         first_response.close()
         first_sock.close()
 
-        update_dir = os.path.join(self.round_dir, 'updates', '1')
-        with open(os.path.join(update_dir, 'update.bin'), 'rb') as fh:
-            self.assertEqual(first_body, fh.read())
-        with open(os.path.join(update_dir, 'update.manifest.json'),
-                  'r', encoding='utf-8') as fh:
-            manifest = json.load(fh)
-        self.assertEqual({
-            'schema_version': 1,
-            'artifact_type': 'update',
-            'round_id': self.round_id,
-            'node_id': 1,
-            'size_bytes': len(first_body),
-            'sha256': hashlib.sha256(first_body).hexdigest(),
-        }, manifest)
+        second_sock.sendall(second_body)
+        self.assertEqual(201, read_response(second_response)[0])
+
+        for node_id, update_body in ((1, first_body), (2, second_body)):
+            update_dir = os.path.join(self.round_dir, 'updates', str(node_id))
+            with open(os.path.join(update_dir, 'update.bin'), 'rb') as fh:
+                self.assertEqual(update_body, fh.read())
+            with open(os.path.join(update_dir, 'update.manifest.json'),
+                      'r', encoding='utf-8') as fh:
+                manifest = json.load(fh)
+            self.assertEqual({
+                'schema_version': 1,
+                'artifact_type': 'update',
+                'round_id': self.round_id,
+                'node_id': node_id,
+                'size_bytes': len(update_body),
+                'sha256': hashlib.sha256(update_body).hexdigest(),
+            }, manifest)
         self.assertEqual([], self.failures)
+
+    def test_client_transports_submit_different_nodes(self):
+        update_one = self.write_update('client-node-1.bin', b'client-node-1')
+        update_two = self.write_update('client-node-2.bin', b'client-node-2')
+        clients = (
+            (1, update_one, b'client-node-1'),
+            (2, update_two, b'client-node-2'),
+        )
+        barrier = threading.Barrier(len(clients) + 1)
+        failures = []
+
+        def submit(node_id, update_path, body):
+            client = ClientTransport(
+                os.path.join(self.root, 'client-%d' % node_id), node_id, 9000,
+                self.transport.http_address, io_timeout=2)
+            try:
+                barrier.wait()
+                client.submit_update(
+                    self.round_id, node_id, update_path, len(body),
+                    hashlib.sha256(body).hexdigest())
+            except BaseException as exc:
+                failures.append(exc)
+
+        threads = [threading.Thread(target=submit, args=client)
+                   for client in clients]
+        for thread in threads:
+            thread.start()
+        barrier.wait()
+        for thread in threads:
+            thread.join(2)
+            self.assertFalse(thread.is_alive())
+        self.assertEqual([], failures)
+        for node_id, _, body in clients:
+            with open(os.path.join(
+                    self.round_dir, 'updates', str(node_id), 'update.bin'),
+                    'rb') as fh:
+                self.assertEqual(body, fh.read())
+
+    def test_one_accepted_failure_does_not_cancel_another_node_upload(self):
+        first_sock, first_response = self.send_headers(
+            self.make_request(self.round_id, 1, b'expected-node-1'))
+        self.addCleanup(first_response.close)
+        self.addCleanup(first_sock.close)
+        self.assertEqual(100, read_response(first_response)[0])
+
+        second_body = b'node-2-update'
+        second_sock, second_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        first_sock.sendall(b'corrupt-node-1!')
+        status, _, body = read_response(first_response)
+        self.assertEqual(422, status)
+        self.assertEqual(
+            'digest_mismatch', json.loads(body.decode('utf-8'))['error_code'])
+        self.assertEqual([
+            (self.round_id, 1, 'digest_mismatch', 'update 摘要不匹配'),
+        ], self.failures)
+
+        competing_sock, competing_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        status, _, body = read_response(competing_response)
+        self.assertEqual(409, status)
+        self.assertEqual(
+            'upload_in_progress',
+            json.loads(body.decode('utf-8'))['error_code'])
+        competing_response.close()
+        competing_sock.close()
+
+        second_sock.sendall(second_body)
+        self.assertEqual(201, read_response(second_response)[0])
+        self.assertTrue(os.path.isfile(os.path.join(
+            self.round_dir, 'updates', '2', 'update.manifest.json')))
 
     def write_update(self, name, body):
         update_path = os.path.join(self.root, name)

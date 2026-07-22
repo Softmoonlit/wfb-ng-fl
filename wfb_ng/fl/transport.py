@@ -28,6 +28,14 @@ class RoundContext:
     failure_callback: object
 
 
+@dataclass(frozen=True)
+class _UploadContext:
+    round_context: RoundContext
+    node_id: int
+    content_length: int
+    expected_digest: bytes
+
+
 class _DownlinkHandle(object):
     pass
 
@@ -65,7 +73,7 @@ class ServerTransport(object):
         self._state = 'new'
         self._context = None
         self._context_lock = threading.Lock()
-        self._upload_active = False
+        self._active_uploads = set()
         self._used_uploads = set()
         self._update_event = threading.Event()
         self._http_server = None
@@ -120,7 +128,7 @@ class ServerTransport(object):
                 try:
                     transport._receive_update(self, self._upload_context)
                 finally:
-                    transport._release_upload()
+                    transport._release_upload(self._upload_context)
 
             def do_GET(self):
                 self._send_error(400, 'method_not_allowed', '只允许 PUT 请求')
@@ -181,7 +189,6 @@ class ServerTransport(object):
             self._context = RoundContext(
                 round_id, tuple(sorted(participant_node_ids)), round_dir,
                 max_update_size_bytes, failure_callback)
-            self._used_uploads = set()
             self._update_event.clear()
 
     def publish_model(self, round_id, model_path, manifest_path):
@@ -341,10 +348,10 @@ class ServerTransport(object):
             update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
             if os.path.isfile(os.path.join(update_dir, 'update.manifest.json')):
                 return 409, 'update_already_submitted', 'update 已提交'
+            if update_key in self._active_uploads:
+                return 409, 'upload_in_progress', 'update 正在上传'
             if update_key in self._used_uploads:
                 return 409, 'update_submission_used', 'update 提交机会已占用'
-            if self._upload_active:
-                return 409, 'upload_in_progress', '已有 update 正在上传'
             if _header_values(handler.headers, 'Transfer-Encoding'):
                 return 400, 'invalid_request_headers', '请求 headers 无效'
             expect_values = _header_values(handler.headers, 'Expect')
@@ -382,25 +389,30 @@ class ServerTransport(object):
                     pass
             except OSError:
                 return 507, 'storage_unavailable', 'update 目标存储不可用'
-            self._upload_active = True
+            self._active_uploads.add(update_key)
             self._used_uploads.add(update_key)
-            handler._upload_context = (context, node_id, content_length, digest)
+            handler._upload_context = _UploadContext(
+                context, node_id, content_length, digest)
             return None
 
-    def _release_upload(self):
+    def _release_upload(self, upload_context):
         with self._context_lock:
-            self._upload_active = False
+            self._active_uploads.discard((
+                upload_context.round_context.round_id, upload_context.node_id))
 
     def _fail_accepted_upload(self, upload_context, error_code, error_message):
-        context, node_id, _, _ = upload_context
+        context = upload_context.round_context
         try:
             context.failure_callback(
-                context.round_id, node_id, error_code, error_message)
+                context.round_id, upload_context.node_id, error_code, error_message)
         finally:
-            self._release_upload()
+            self._release_upload(upload_context)
 
     def _receive_update(self, handler, upload_context):
-        context, node_id, content_length, expected_digest = upload_context
+        context = upload_context.round_context
+        node_id = upload_context.node_id
+        content_length = upload_context.content_length
+        expected_digest = upload_context.expected_digest
         update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
         update_path = os.path.join(update_dir, 'update.bin')
         temp_path = None
