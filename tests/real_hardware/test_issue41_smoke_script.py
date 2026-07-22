@@ -33,6 +33,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "-U 0x000000ff",
                 "-H 0x00000001,0x00000002",
                 "-Y none",
+                "-R 15000",
                 "-S '$status'",
                 "-D '$src' 'model.bin' 'model.manifest.json'",
                 "uftpd -d -q -I '$(client_ip \"$role\")' -M '$UFTP_GROUP'",
@@ -66,6 +67,9 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
             '"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,'
             '"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP"',
             self.script)
+
+    def test_formal_runtime_uses_mcs3_by_default(self):
+        self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
 
     def test_formal_runtime_enables_immediate_known_client_feedback_window(self):
         for fragment in (

@@ -32,7 +32,7 @@ DOWNLINK_STREAM="${ISSUE41_DOWNLINK_STREAM:-33}"
 FEC_K="${ISSUE41_FEC_K:-8}"
 FEC_N="${ISSUE41_FEC_N:-12}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
-RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-1}"
+RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
@@ -632,7 +632,7 @@ PY
     sleep 1
     status="$work/uftp.status"
     log="$work/uftp.log"
-    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 10000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
+    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
     sleep 1
     collect_smoke_evidence "$name"
     python3 - "$archive" "$status" <<'PY'

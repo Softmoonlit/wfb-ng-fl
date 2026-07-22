@@ -211,7 +211,7 @@ class ServerTransport(object):
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
-            '-R', '10000',
+            '-R', '15000',
             '-r', '0.1:0.01:2.0',
             '-s', '20',
             '-L', log_path,

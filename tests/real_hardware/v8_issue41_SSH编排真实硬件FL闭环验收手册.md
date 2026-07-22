@@ -81,6 +81,7 @@ Transport 参数：
 | --- | --- |
 | UFTP multicast/group | `239.80.41.1` |
 | UFTP port | `1044` |
+| UFTP 发送速率 | `15000 Kbps`（15 Mbps） |
 | server HTTP bind | `10.80.0.1:8080` |
 | server work_dir | `/var/lib/wfb-ng/issue41/server` |
 | client work_dir | `/var/lib/wfb-ng/issue41/client` |
@@ -96,7 +97,7 @@ Transport 参数：
 | uplink stream | `32` |
 | downlink stream | `33` |
 | radio bandwidth | `40` |
-| radio MCS index | `1` |
+| radio MCS index | `3` |
 | radio short GI | `1` |
 | FEC K/N | `8/12` |
 
