@@ -172,6 +172,14 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 '[ "$status" = passed ] || die "归档结论为 failed：$reason"'):
             self.assertIn(fragment, self.script)
 
+    def test_collect_preserves_first_formal_runtime_artifacts(self):
+        for fragment in (
+                'server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"',
+                'if [ ! -f "$server_result" ]; then',
+                'client_result="$ARCHIVE_DIR/formal_runtime_loop/$role/issue41-$role-result.json"',
+                'if [ ! -f "$client_result" ]; then'):
+            self.assertIn(fragment, self.script)
+
     def test_smoke_writes_summary_markers(self):
         self.assertIn('write_smoke_marker "$name"', self.script)
         self.assertIn('"smoke":"$name"', self.script)

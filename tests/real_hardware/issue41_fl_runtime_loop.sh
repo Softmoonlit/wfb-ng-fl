@@ -899,16 +899,23 @@ capture_runtime_routes() {
 }
 
 cmd_collect() {
+    local server_result role client_result
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop/server" "$ARCHIVE_DIR/lifecycle" "$ARCHIVE_DIR/raw"
     sudo systemctl status wfb-fl-server.service > "$ARCHIVE_DIR/raw/server-systemctl-status.txt" 2>&1 || true
     sudo journalctl -u wfb-fl-server.service --output=short-precise --no-pager > "$ARCHIVE_DIR/raw/server-journal.txt" 2>&1 || true
-    sudo cp -a /var/lib/wfb-ng/issue41/server/. "$ARCHIVE_DIR/formal_runtime_loop/server/" 2>/dev/null || true
+    server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
+    if [ ! -f "$server_result" ]; then
+        sudo cp -a /var/lib/wfb-ng/issue41/server/. "$ARCHIVE_DIR/formal_runtime_loop/server/" 2>/dev/null || true
+    fi
     sudo chown -R "$(id -u):$(id -g)" "$ARCHIVE_DIR/formal_runtime_loop/server"
     for role in client1 client2; do
         mkdir -p "$ARCHIVE_DIR/formal_runtime_loop/$role"
         remote "$role" "sudo tar -C /var/lib/wfb-ng/issue41/client -czf /tmp/issue41-$role-client.tgz . 2>/dev/null || true; systemctl status wfb-fl-client.service > /tmp/issue41-$role-status.txt 2>&1 || true; journalctl -u wfb-fl-client.service --output=short-precise --no-pager > /tmp/issue41-$role-journal.txt 2>&1 || true"
-        if scp -q "$(client_ssh "$role"):/tmp/issue41-$role-client.tgz" "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" 2>/dev/null; then
-            tar -C "$ARCHIVE_DIR/formal_runtime_loop/$role" -xzf "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" || true
+        client_result="$ARCHIVE_DIR/formal_runtime_loop/$role/issue41-$role-result.json"
+        if [ ! -f "$client_result" ]; then
+            if scp -q "$(client_ssh "$role"):/tmp/issue41-$role-client.tgz" "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" 2>/dev/null; then
+                tar -C "$ARCHIVE_DIR/formal_runtime_loop/$role" -xzf "$ARCHIVE_DIR/formal_runtime_loop/$role/client.tgz" || true
+            fi
         fi
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-status.txt" "$ARCHIVE_DIR/raw/$role-systemctl-status.txt" 2>/dev/null || true
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-journal.txt" "$ARCHIVE_DIR/raw/$role-journal.txt" 2>/dev/null || true
