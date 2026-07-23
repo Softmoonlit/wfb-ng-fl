@@ -81,7 +81,9 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
                 '两个 client 的 40 MiB update 模板 SHA-256 必须不同',
                 '"live_observation":true',
-                'issue41_build_summary.py'):
+                'issue41_build_summary.py',
+                'ISSUE41_LINK_LOG_INTERVAL_MS:-1000',
+                '"--log-interval","$LINK_LOG_INTERVAL_MS"'):
             self.assertIn(fragment, self.script)
 
     def test_formal_runtime_enables_immediate_known_client_feedback_window(self):
@@ -155,6 +157,12 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 '/sys/class/net/$tun',
                 '本机 issue41 停止后清理超时',
                 'restart 后清理超时'):
+            self.assertIn(fragment, self.script)
+
+    def test_summary_keeps_collected_server_artifacts_readable_and_fails_closed(self):
+        for fragment in (
+                'sudo chown -R "$(id -u):$(id -g)" "$ARCHIVE_DIR/formal_runtime_loop/server"',
+                '[ "$status" = passed ] || die "归档结论为 failed：$reason"'):
             self.assertIn(fragment, self.script)
 
     def test_smoke_writes_summary_markers(self):
