@@ -15,7 +15,8 @@
 | `DEMO_CONTROL_BIND` | `0.0.0.0` | server 监听地址 |
 | `DEMO_SERVER_HOST` | `192.168.122.1` | client 连接的 server 管理网地址 |
 | `DEMO_CONTROL_PORT` | `45557` | TCP 控制端口 |
-| `DEMO_TRANSFER_MBPS` | `5` | 未传位置参数时使用的演示速率 |
+| `DEMO_TRANSFER_MBPS` | `5` | 未传第一个位置参数时使用的演示速率 |
+| `DEMO_FILE_SIZE_MB` | 未设置 | 未传第二个位置参数时可指定十进制 MB；均未设置则兼容旧的 40 MiB |
 | `DEMO_CONNECT_TIMEOUT_SECONDS` | `120` | 等待连接上限 |
 | `DEMO_CONTROL_TIMEOUT_SECONDS` | 动态值 | 默认为 `max(180, 基准传输秒数 × 2)` |
 
@@ -36,35 +37,35 @@ server 必须发现两个不同的 NODE_ID `[1,2]` 才会发布第一轮模型�
 建议先启动 server：
 
 ```bash
-bash tests/real_hardware/issue57_server_demo.sh 5
+bash tests/real_hardware/issue57_server_demo.sh 10 50
 ```
 
 然后启动 client1：
 
 ```bash
 DEMO_SERVER_HOST=192.168.122.1 \
-  bash tests/real_hardware/issue56_client1_demo.sh 5
+  bash tests/real_hardware/issue56_client1_demo.sh 10 50
 ```
 
 再启动 client2：
 
 ```bash
 DEMO_SERVER_HOST=192.168.122.1 \
-  bash tests/real_hardware/issue56_client2_demo.sh 5
+  bash tests/real_hardware/issue56_client2_demo.sh 10 50
 ```
 
-client 可以先于 server 启动；此时会重复显示“等待 server 控制通道”，连接成功后才继续。server 会等待两个 client 都注册，不依赖人工控制终端时序。三台机器的位置参数必须使用同一个 Mbps 值，否则 server 会拒绝继续。
+client 可以先于 server 启动；此时会重复显示“等待 server 控制通道”，连接成功后才继续。server 会等待两个 client 都注册，不依赖人工控制终端时序。三台机器必须使用相同的 Mbps 和 MB 参数，否则 server 会拒绝继续。
 
-## 速率和演示时长
+## 速率、大小和演示时长
 
-入口的第一个位置参数表示十进制 Mbps。例如 `5` 表示 `5,000,000 bit/s`。当前模型和 update 均为 `41943040 bytes`（40 MiB），基准时间公式为：
+第一个位置参数表示十进制 Mbps，第二个位置参数表示十进制 MB。`10 50` 表示 `10,000,000 bit/s` 和 `50,000,000 bytes`，model 与每个 update 都使用该大小。基准时间公式为：
 
 ```text
-传输秒数 = 41943040 × 8 ÷ (Mbps × 1000000)
-5 Mbps   = 67.108864 秒
+传输秒数 = (MB × 1000000 × 8) ÷ (Mbps × 1000000)
+10 Mbps、50 MB = 40.00 秒
 ```
 
-model 下发按一次广播过程计算，server 与两个 client 使用 `1.02` 到 `1.08` 的小幅耗时系数，保证观测到的 effective Mbps 严格小于配置速率。update 上行由两个 client 共享信道，每个 client 的有效速率约为配置值的一半，耗时系数为 `1.93` 到 `2.08`；server 的双路接收窗口略长，系数为 `2.11` 到 `2.15`。因此三台机器配置都显示 `5 Mbps`，但每次传输的 elapsed 和 effective Mbps 不会完全相同。5 Mbps 示例：
+model 下发按一次广播过程计算，server 与两个 client 使用 `1.02` 到 `1.08` 的小幅耗时系数，保证观测到的 effective Mbps 严格小于配置速率。update 上行由两个 client 共享信道，每个 client 的有效速率约为配置值的一半，耗时系数为 `1.93` 到 `2.08`；server 的双路接收窗口略长，系数为 `2.11` 到 `2.15`。因此三台机器配置相同，但每次传输的 elapsed 和 effective Mbps 不会完全相同。未传 MB 参数时保留旧的 `41943040 bytes`（40 MiB）默认口径。原 5 Mbps / 40 MiB 示例：
 
 | 角色与阶段 | 示例耗时 |
 | --- | --- |
@@ -80,13 +81,14 @@ model 下发按一次广播过程计算，server 与两个 client 使用 `1.02` 
 也可以不传位置参数，统一使用环境变量：
 
 ```bash
-export DEMO_TRANSFER_MBPS=5
+export DEMO_TRANSFER_MBPS=10
+export DEMO_FILE_SIZE_MB=50
 ```
 
 自动测试时可以关闭显示计时，但保留控制连接和同步屏障：
 
 ```bash
-DEMO_DELAY_SECONDS=0 bash tests/real_hardware/issue57_server_demo.sh 5
+DEMO_DELAY_SECONDS=0 bash tests/real_hardware/issue57_server_demo.sh 10 50
 ```
 
 `DEMO_WAIT_STEP_SECONDS` 控制等待状态的刷新间隔，默认 2 秒。每个传输阶段固定显示五步。设置 `NO_COLOR=1` 可关闭 ANSI 颜色。
@@ -121,5 +123,5 @@ update_path=/var/lib/wfb-ng/issue55-57/server/round-1/updates/node-1.bin
 - 不通过控制通道传输模型、update 或其他 FL 数据。
 - 不执行 SSH、SCP、HTTP、UFTP 或无线数据传输。
 - 不调用 systemd、sudo、`ip`、`iw` 或项目二进制。
-- 不读取或生成 40 MiB 文件。
+- 不读取或生成参数所表示的 model/update 文件。
 - 不创建日志、result、summary、archive 或其他验收证据文件。

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Issue #55-#57 演示控制通道，只同步终端过程，不传输 FL 数据。"""
 
+import hashlib
 import json
 import os
 import select
@@ -10,12 +11,7 @@ import sys
 import time
 
 
-MODEL_BYTES = 41943040
-MODEL_SHA = 'b2d3f56bc197fd985d5965079b5e7148bf3953521b79f7d97bbfb3fcb1f1bd2a'
-UPDATE_SHA = {
-    1: '04b960de0ef52999cb53417f383fc4cd4b32d756b1095fa7c3558b2afc8f66ce',
-    2: '9e013a73b8c508f192624b6a658da8a80f56aa39b5806d029d3f1f26e5ecbb32',
-}
+DEFAULT_MODEL_BYTES = 41943040
 TRANSFER_FACTORS = {
     'model': {
         'server': (1.04, 1.08),
@@ -55,13 +51,29 @@ HOST = os.environ.get('DEMO_SERVER_HOST', '192.168.122.1')
 BIND = os.environ.get('DEMO_CONTROL_BIND', '0.0.0.0')
 try:
     PORT = int(os.environ.get('DEMO_CONTROL_PORT', '45557'))
-    speed_value = sys.argv[2] if len(sys.argv) == 3 else os.environ.get(
+    speed_value = sys.argv[2] if len(sys.argv) >= 3 else os.environ.get(
         'DEMO_TRANSFER_MBPS', '5')
+    size_value = sys.argv[3] if len(sys.argv) >= 4 else os.environ.get(
+        'DEMO_FILE_SIZE_MB')
     TRANSFER_MBPS = float(speed_value)
+    FILE_SIZE_MB = float(size_value) if size_value is not None else None
 except ValueError as exc:
-    raise SystemExit('[失败] 端口必须是整数，Mbps 必须是数字') from exc
+    raise SystemExit('[失败] 端口必须是整数，Mbps 和 MB 必须是数字') from exc
 if TRANSFER_MBPS <= 0:
     raise SystemExit('[失败] Mbps 必须大于 0')
+if FILE_SIZE_MB is not None and FILE_SIZE_MB <= 0:
+    raise SystemExit('[失败] MB 必须大于 0')
+MODEL_BYTES = (
+    int(round(FILE_SIZE_MB * 1_000_000))
+    if FILE_SIZE_MB is not None else DEFAULT_MODEL_BYTES)
+if MODEL_BYTES <= 0:
+    raise SystemExit('[失败] MB 换算后必须至少为 1 byte')
+MODEL_SHA = hashlib.sha256(f'model:{MODEL_BYTES}'.encode('ascii')).hexdigest()
+UPDATE_SHA = {
+    node_id: hashlib.sha256(
+        f'update:{node_id}:{MODEL_BYTES}'.encode('ascii')).hexdigest()
+    for node_id in (1, 2)
+}
 BASE_TRANSFER_SECONDS = MODEL_BYTES * 8 / (TRANSFER_MBPS * 1_000_000)
 CONTROL_TIMEOUT = env_float(
     'DEMO_CONTROL_TIMEOUT_SECONDS', max(180, BASE_TRANSFER_SECONDS * 2))
@@ -217,7 +229,7 @@ def show_preflight(role):
     info(f'角色={role}；演示模式=control-channel-simulation')
     ok('固定角色配置已载入')
     ok('本机准备版本与演示版本一致')
-    ok('40 MiB 输入元数据检查通过')
+    ok(f'输入元数据检查通过：size={MODEL_BYTES / (1024 * 1024):.2f} MiB')
     info(f'演示速率={TRANSFER_MBPS:g} Mbps')
     ok('未发现残留角色状态')
 
@@ -247,6 +259,7 @@ def accept_clients(listener):
             expect(hello, 'hello')
             node_id = hello.get('node_id')
             client_mbps = hello.get('transfer_mbps')
+            client_file_bytes = hello.get('file_bytes')
             if node_id not in (1, 2):
                 raise DemoError(f'拒绝未知 NODE_ID：{node_id}')
             if node_id in clients:
@@ -256,6 +269,10 @@ def accept_clients(listener):
                 raise DemoError(
                     f'拒绝速率不一致：server={TRANSFER_MBPS:g}Mbps '
                     f'client{node_id}={client_mbps}Mbps')
+            if client_file_bytes != MODEL_BYTES:
+                raise DemoError(
+                    f'拒绝文件大小不一致：server={MODEL_BYTES}bytes '
+                    f'client{node_id}={client_file_bytes}bytes')
             clients[node_id] = connection
             ok(f'client{node_id} 控制连接已建立：NODE_ID={node_id} peer={address[0]}')
         except Exception:
@@ -420,7 +437,8 @@ def run_client(role):
     connection = connect_client(node_id)
     try:
         connection.send(
-            'hello', node_id=node_id, transfer_mbps=TRANSFER_MBPS)
+            'hello', node_id=node_id, transfer_mbps=TRANSFER_MBPS,
+            file_bytes=MODEL_BYTES)
         ready = connection.receive(CONTROL_TIMEOUT, '等待另一个 client 就绪')
         expect(ready, 'ready')
         ok(f'本机 client 角色进入模型等待状态；NODE_ID={node_id}')
@@ -486,11 +504,11 @@ def run_client(role):
 
 
 def main():
-    if len(sys.argv) not in (2, 3) or sys.argv[1] not in (
+    if len(sys.argv) not in (2, 3, 4) or sys.argv[1] not in (
             'server', 'client1', 'client2'):
         print(
             f'用法：{os.path.basename(sys.argv[0])} '
-            '{server|client1|client2} [Mbps]',
+            '{server|client1|client2} [Mbps] [MB]',
             file=sys.stderr,
         )
         return 2

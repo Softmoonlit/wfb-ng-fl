@@ -26,7 +26,7 @@
 
 #53 的真实硬件链路问题解决前，可按 `issue55_57_临时终端模拟演示手册.md` 使用三个固定角色入口。它们通过管理网 TCP 控制消息执行真实的三端阶段同步，但模型和 update 传输仍为计时模拟；入口不启动角色服务、不传输 FL 数据、不写入证据，不能作为任何真实硬件 issue 的验收结果。
 
-公共 shell 入口是 `issue55_57_terminal_demo.sh`，控制器是 `issue55_57_demo_control.py`。现场应使用 `issue57_server_demo.sh`、`issue56_client1_demo.sh` 和 `issue56_client2_demo.sh` 三个固定角色入口；三个入口接受相同的 Mbps 位置参数，并根据 40 MiB 大小计算演示时长。
+公共 shell 入口是 `issue55_57_terminal_demo.sh`，控制器是 `issue55_57_demo_control.py`。现场应使用 `issue57_server_demo.sh`、`issue56_client1_demo.sh` 和 `issue56_client2_demo.sh` 三个固定角色入口；三个入口接受相同的 `<Mbps> <MB>` 位置参数，并根据配置的 model/update 大小计算演示时长。
 
 ## 当前有效的辅助文件
 

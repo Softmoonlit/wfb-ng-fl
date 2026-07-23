@@ -43,10 +43,12 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
         env.update(overrides)
         return env
 
-    def start_role(self, role, env, cwd=None, speed=None):
+    def start_role(self, role, env, cwd=None, speed=None, size_mb=None):
         command = ['/bin/bash', WRAPPERS[role]]
         if speed is not None:
             command.append(str(speed))
+        if size_mb is not None:
+            command.append(str(size_mb))
         return subprocess.Popen(
             command,
             cwd=cwd,
@@ -56,14 +58,14 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
             text=True,
         )
 
-    def run_trio(self, cwd=None, speed=5, env_overrides=None):
+    def run_trio(self, cwd=None, speed=5, size_mb=None, env_overrides=None):
         port = self.free_port()
         env = self.demo_env(port)
         if env_overrides:
             env.update(env_overrides)
-        server = self.start_role('server', env, cwd, speed)
-        client1 = self.start_role('client1', env, cwd, speed)
-        client2 = self.start_role('client2', env, cwd, speed)
+        server = self.start_role('server', env, cwd, speed, size_mb)
+        client1 = self.start_role('client1', env, cwd, speed, size_mb)
+        client2 = self.start_role('client2', env, cwd, speed, size_mb)
         processes = {'server': server, 'client1': client1, 'client2': client2}
         results = {}
         try:
@@ -100,6 +102,7 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
                 self.assertEqual(0, returncode)
 
         server_output = results['server'][1]
+        self.assertIn('输入元数据检查通过：size=40.00 MiB', server_output)
         self.assertIn('演示速率=5 Mbps', server_output)
         self.assertNotIn('基准传输时间', server_output)
         self.assertIn('client1 控制连接已建立', server_output)
@@ -186,6 +189,31 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
             self.assertEqual(
                 2, output.count('server 已确认本机 update 完整接收；控制同步成功'))
 
+    def test_ten_mbps_fifty_mb_uses_dynamic_size_and_time(self):
+        results = self.run_trio(speed=10, size_mb=50)
+
+        for role, (returncode, output, stderr) in results.items():
+            with self.subTest(role=role):
+                self.assertEqual(0, returncode)
+                self.assertEqual('', stderr)
+                self.assertIn(
+                    '输入元数据检查通过：size=47.68 MiB', output)
+                self.assertIn('演示速率=10 Mbps', output)
+                self.assertIn('bytes=50000000', output)
+
+        self.assertIn(
+            'elapsed=41.60s effective_mbps=9.62', results['server'][1])
+        self.assertIn(
+            'elapsed=86.00s effective_mbps=4.65', results['server'][1])
+        self.assertIn(
+            'elapsed=40.80s effective_mbps=9.80', results['client1'][1])
+        self.assertIn(
+            'elapsed=83.20s effective_mbps=4.81', results['client1'][1])
+        self.assertIn(
+            'elapsed=42.40s effective_mbps=9.43', results['client2'][1])
+        self.assertIn(
+            'elapsed=77.20s effective_mbps=5.18', results['client2'][1])
+
     def test_server_does_not_publish_without_both_clients(self):
         port = self.free_port()
         env = self.demo_env(
@@ -252,6 +280,25 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
         self.assertIn('拒绝速率不一致', outputs[0])
         self.assertNotIn('模型发布开始', outputs[0])
 
+    def test_mismatched_file_size_fails_closed(self):
+        port = self.free_port()
+        env = self.demo_env(port)
+        server = self.start_role('server', env, speed=10, size_mb=50)
+        client1 = self.start_role('client1', env, speed=10, size_mb=40)
+        client2 = self.start_role('client2', env, speed=10, size_mb=50)
+        processes = (server, client1, client2)
+        try:
+            outputs = [process.communicate(timeout=4)[0] for process in processes]
+        finally:
+            for process in processes:
+                if process.poll() is None:
+                    process.kill()
+                    process.wait()
+
+        self.assertNotEqual(0, server.returncode)
+        self.assertIn('拒绝文件大小不一致', outputs[0])
+        self.assertNotIn('模型发布开始', outputs[0])
+
     def test_client_does_not_continue_without_server(self):
         port = self.free_port()
         env = self.demo_env(port, DEMO_CONNECT_TIMEOUT_SECONDS='0.2')
@@ -288,6 +335,18 @@ class Issue55To57TerminalDemoTestCase(unittest.TestCase):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, combined)
         self.assertIn("if len(encoded) > 1024", controller)
+
+    def test_non_positive_file_size_is_rejected(self):
+        result = subprocess.run(
+            [sys.executable, CONTROL, 'client1', '10', '0'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn('MB 必须大于 0', result.stdout + result.stderr)
 
     def test_unknown_role_fails_with_usage(self):
         result = subprocess.run(
