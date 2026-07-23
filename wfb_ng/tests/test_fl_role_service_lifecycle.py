@@ -262,6 +262,23 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.addCleanup(enabled.close)
         self.assertTrue(enabled.role.transport.live_observation)
 
+    def test_role_configuration_passes_explicit_transport_io_timeout(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1'])
+        with open(config_path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+        config['io_timeout_seconds'] = 120
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump(config, fh)
+
+        with mock.patch('wfb_ng.fl.service.shutil.which',
+                        side_effect=lambda name: '/usr/bin/' + name):
+            service = load_role_service(config_path, expected_role='server')
+
+        self.addCleanup(service.close)
+        self.assertEqual(120, service.role.transport.io_timeout)
+
     def test_role_configuration_controls_structured_upload_output(self):
         body = b'role-observed-update'
 

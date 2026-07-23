@@ -21,6 +21,7 @@ from .role import ClientRole, ServerRole
 _COMMON_FIELDS = {
     'schema_version', 'role', 'work_dir', 'node_id', 'uftp_port',
     'max_update_size_bytes', 'link_args', 'live_observation',
+    'io_timeout_seconds',
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
@@ -248,6 +249,7 @@ def load_role_service(path, expected_role=None):
                     config['uftp_private_multicast_host']),
                 max_update_size_bytes=config['max_update_size_bytes'],
                 live_observation=config['live_observation'],
+                io_timeout=config['io_timeout_seconds'],
             )
         else:
             role = ClientRole(
@@ -261,6 +263,7 @@ def load_role_service(path, expected_role=None):
                 uftp_bind_host=config['uftp_bind_host'],
                 uftp_multicast_host=config['uftp_multicast_host'],
                 live_observation=config['live_observation'],
+                io_timeout=config['io_timeout_seconds'],
             )
     except FLRuntimeError:
         raise
@@ -283,6 +286,7 @@ def _read_config(path):
     if role in ('server', 'client'):
         config.setdefault('uftp_bind_host', '127.0.0.1')
         config.setdefault('live_observation', False)
+        config.setdefault('io_timeout_seconds', 10)
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
     if role not in ('server', 'client') or set(config) != allowed:
@@ -294,7 +298,8 @@ def _read_config(path):
     if (not isinstance(config.get('work_dir'), str) or
             not os.path.isabs(config['work_dir'])):
         raise FLRuntimeError('invalid_configuration', '工作目录必须是绝对路径')
-    for name in ('node_id', 'uftp_port', 'max_update_size_bytes'):
+    for name in ('node_id', 'uftp_port', 'max_update_size_bytes',
+                 'io_timeout_seconds'):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
