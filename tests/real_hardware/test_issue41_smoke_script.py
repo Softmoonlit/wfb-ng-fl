@@ -126,6 +126,9 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
             runtime_body.index('configure_runtime_monitors'),
             runtime_body.index('write_issue41_configs server'))
 
+    def test_runtime_disables_role_journal_rate_limiting_for_observations(self):
+        self.assertEqual(2, self.script.count('LogRateLimitIntervalSec=0'))
+
     def test_runtime_starts_clients_ready_before_server_and_disables_restarts(self):
         for fragment in (
                 'wait_remote_service_ready "$role" wfb-fl-client.service',
@@ -133,7 +136,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'sudo systemctl restart wfb-fl-server.service',
                 'wait_runtime_results',
                 'sudo python3 -c',
-                "printf '[Service]\\nRestart=no\\nExecStart=\\n",
+                "printf '[Service]\\nRestart=no\\nLogRateLimitIntervalSec=0\\nExecStart=\\n",
                 'cmd_lifecycle_stop_restart',
                 'cmd_collect\n    sudo rm -rf /var/lib/wfb-ng/issue41/server'):
             self.assertIn(fragment, self.script)

@@ -296,7 +296,7 @@ EOF
         sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-server.service.d
         sudo install -m 0644 "$tmp/fl.json" /etc/wfb-ng/issue41/fl-server.json
         sudo install -m 0644 "$tmp/algorithm.json" /etc/wfb-ng/issue41/server-algorithm.json
-        printf '[Service]\nRestart=no\nExecStart=\nExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --algorithm %s --algorithm-config /etc/wfb-ng/issue41/server-algorithm.json\n' "$algorithm" | sudo tee /etc/systemd/system/wfb-fl-server.service.d/issue41.conf >/dev/null
+        printf '[Service]\nRestart=no\nLogRateLimitIntervalSec=0\nExecStart=\nExecStart=/usr/bin/wfb-fl-server --config /etc/wfb-ng/issue41/fl-server.json --algorithm %s --algorithm-config /etc/wfb-ng/issue41/server-algorithm.json\n' "$algorithm" | sudo tee /etc/systemd/system/wfb-fl-server.service.d/issue41.conf >/dev/null
     else
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
@@ -310,7 +310,7 @@ EOF
         ssh -o BatchMode=yes "$ssh_target" "sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d"
         scp -q "$tmp/fl.json" "$ssh_target:/tmp/issue41-fl.json"
         scp -q "$tmp/algorithm.json" "$ssh_target:/tmp/issue41-algorithm.json"
-        ssh -o BatchMode=yes "$ssh_target" "sudo install -m 0644 /tmp/issue41-fl.json /etc/wfb-ng/issue41/fl-client.json && sudo install -m 0644 /tmp/issue41-algorithm.json /etc/wfb-ng/issue41/client-algorithm.json && printf '[Service]\nRestart=no\nExecStart=\nExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/issue41/fl-client.json --algorithm $algorithm --algorithm-config /etc/wfb-ng/issue41/client-algorithm.json\n' | sudo tee /etc/systemd/system/wfb-fl-client.service.d/issue41.conf >/dev/null"
+        ssh -o BatchMode=yes "$ssh_target" "sudo install -m 0644 /tmp/issue41-fl.json /etc/wfb-ng/issue41/fl-client.json && sudo install -m 0644 /tmp/issue41-algorithm.json /etc/wfb-ng/issue41/client-algorithm.json && printf '[Service]\nRestart=no\nLogRateLimitIntervalSec=0\nExecStart=\nExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/issue41/fl-client.json --algorithm $algorithm --algorithm-config /etc/wfb-ng/issue41/client-algorithm.json\n' | sudo tee /etc/systemd/system/wfb-fl-client.service.d/issue41.conf >/dev/null"
     fi
     rm -rf "$tmp"
 }
