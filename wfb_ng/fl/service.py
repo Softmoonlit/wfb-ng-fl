@@ -21,7 +21,7 @@ from .role import ClientRole, ServerRole
 _COMMON_FIELDS = {
     'schema_version', 'role', 'work_dir', 'node_id', 'uftp_port',
     'max_update_size_bytes', 'link_args', 'live_observation',
-    'io_timeout_seconds',
+    'observation_path', 'io_timeout_seconds',
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
@@ -249,6 +249,7 @@ def load_role_service(path, expected_role=None):
                     config['uftp_private_multicast_host']),
                 max_update_size_bytes=config['max_update_size_bytes'],
                 live_observation=config['live_observation'],
+                observation_path=config['observation_path'],
                 io_timeout=config['io_timeout_seconds'],
             )
         else:
@@ -263,6 +264,7 @@ def load_role_service(path, expected_role=None):
                 uftp_bind_host=config['uftp_bind_host'],
                 uftp_multicast_host=config['uftp_multicast_host'],
                 live_observation=config['live_observation'],
+                observation_path=config['observation_path'],
                 io_timeout=config['io_timeout_seconds'],
             )
     except FLRuntimeError:
@@ -286,6 +288,7 @@ def _read_config(path):
     if role in ('server', 'client'):
         config.setdefault('uftp_bind_host', '127.0.0.1')
         config.setdefault('live_observation', False)
+        config.setdefault('observation_path', None)
         config.setdefault('io_timeout_seconds', 10)
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
@@ -295,6 +298,10 @@ def _read_config(path):
         raise FLRuntimeError('invalid_configuration', '角色服务配置版本无效')
     if type(config['live_observation']) is not bool:
         raise FLRuntimeError('invalid_configuration', '实时观测配置无效')
+    if (config['observation_path'] is not None and
+            (not isinstance(config['observation_path'], str) or
+             not os.path.isabs(config['observation_path']))):
+        raise FLRuntimeError('invalid_configuration', '实时观测路径无效')
     if (not isinstance(config.get('work_dir'), str) or
             not os.path.isabs(config['work_dir'])):
         raise FLRuntimeError('invalid_configuration', '工作目录必须是绝对路径')

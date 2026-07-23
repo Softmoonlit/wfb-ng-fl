@@ -68,7 +68,7 @@ class ServerTransport(object):
                  uftp_multicast_host='127.0.0.1',
                  uftp_private_multicast_host='239.255.0.1', io_timeout=10,
                  cancel_grace_period=2, live_observation=False,
-                 observation_writer=None, role_node_id=None):
+                 observation_writer=None, observation_path=None, role_node_id=None):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
         self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
@@ -83,7 +83,8 @@ class ServerTransport(object):
         self.cancel_grace_period = cancel_grace_period
         self.live_observation = live_observation
         self.role_node_id = role_node_id
-        self._observation = LiveObservation(live_observation, observation_writer)
+        self._observation = LiveObservation(
+            live_observation, observation_writer, observation_path)
         self.ready = False
         self._state = 'new'
         self._context = None
@@ -336,6 +337,7 @@ class ServerTransport(object):
         if self._http_thread is not None:
             self._http_thread.join(2)
             self._http_thread = None
+        self._observation.close()
         self._state = 'closed'
 
     def _reserve_upload(self, handler):
@@ -601,7 +603,7 @@ class ClientTransport(object):
     def __init__(self, work_dir, uftp_uid, uftp_port, server_http_address,
                  uftp_bind_host='127.0.0.1', io_timeout=10,
                  uftp_multicast_host='127.0.0.1', live_observation=False,
-                 observation_writer=None):
+                 observation_writer=None, observation_path=None):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
@@ -610,7 +612,8 @@ class ClientTransport(object):
         self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
         self.live_observation = live_observation
-        self._observation = LiveObservation(live_observation, observation_writer)
+        self._observation = LiveObservation(
+            live_observation, observation_writer, observation_path)
         self.ready = False
         self._state = 'new'
         self._operation_condition = threading.Condition()
@@ -882,6 +885,7 @@ class ClientTransport(object):
         if self._uftpd_stderr is not None:
             self._uftpd_stderr.close()
             self._uftpd_stderr = None
+        self._observation.close()
         self._state = 'closed'
 
 

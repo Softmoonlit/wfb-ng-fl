@@ -81,6 +81,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
                 '两个 client 的 40 MiB update 模板 SHA-256 必须不同',
                 '"live_observation":true',
+                '"observation_path":"$work_dir/observation.jsonl"',
                 'issue41_build_summary.py',
                 'ISSUE41_LINK_LOG_INTERVAL_MS:-1000',
                 '"--log-interval","$LINK_LOG_INTERVAL_MS"'):

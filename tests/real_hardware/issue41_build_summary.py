@@ -32,7 +32,11 @@ def main(argv=None):
     }
     errors = []
     results = {name: _read_json(path, errors) for name, path in result_paths.items()}
-    observations = {name: _read_observations(path, errors) for name, path in journal_paths.items()}
+    observations = {
+        name: _read_observations(_observation_path(
+            archive_dir, name, journal_paths[name]), errors)
+        for name in journal_paths
+    }
     rounds = _build_rounds(results, observations, errors)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
@@ -165,6 +169,12 @@ def _find_round(result, index, round_id):
         if value.get('round_index') == index and value.get('round_id') == round_id:
             return value
     return None
+
+
+def _observation_path(archive_dir, role, journal_path):
+    path = os.path.join(
+        archive_dir, 'formal_runtime_loop', role, 'observation.jsonl')
+    return path if os.path.isfile(path) else journal_path
 
 
 def _read_json(path, errors):
