@@ -71,6 +71,9 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_uses_mcs3_by_default(self):
         self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
 
+    def test_formal_runtime_allows_tcp_recovery_with_600_second_io_timeout(self):
+        self.assertIn('ISSUE41_IO_TIMEOUT_SECONDS:-600', self.script)
+
     def test_formal_runtime_defaults_to_two_40mib_rounds_with_immediate_clients(self):
         for fragment in (
                 'ROUNDS="${ISSUE41_ROUNDS:-2}"',

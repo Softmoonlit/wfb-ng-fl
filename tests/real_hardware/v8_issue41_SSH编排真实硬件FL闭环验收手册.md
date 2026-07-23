@@ -331,6 +331,7 @@ Issue #41 P0 的正式 Runtime server 额外启用立即开始的静态 feedback
 - 数据面必须走 `10.80.0.0/24` TUN 地址。
 - 只有 Runtime 四接口驱动正式闭环，不能用 ping、普通 TCP 文件探针或人工复制替代。
 - server `link_args` 使用 `ISSUE41_FEEDBACK_WINDOW_PERIOD_MS`（默认 `500`）、`ISSUE41_FEEDBACK_WINDOW_DURATION_MS`（默认 `15`）和 `--feedback-window-start-immediately`。该 P0 配置从链路启动即按静态 `[1,2]` 轮发短 GRANT，持续到角色服务结束；两个参数只用于 Issue #41 脚本，可通过环境变量调参，不是产品默认值。
+- `ISSUE41_IO_TIMEOUT_SECONDS` 默认 `600`。真实无线高丢包可能使 TCP 进入超过 120 秒的重传退避；server/client 不应在连接仍可恢复时先行关闭。该值只延长单次 I/O 空闲容忍度，正式作业仍由 `ISSUE41_RUNTIME_TIMEOUT_SECONDS=600` 封顶。
 - P0 只消除 UFTP 注册对 READY 的启动依赖；它不实现 UFTP/HTTP 阶段隔离，短、长 GRANT 仍可能交错。动态 feedback lease、可靠上行阶段 release 和 client `submit_update(...)` 门禁属于后续设计，不是本次验收行为。
 
 重试与失败现场：
@@ -391,6 +392,7 @@ sudo install -m 0644 /path/to/client2-update-40mib.bin \
 正式两轮运行使用：
 
 ```bash
+ISSUE41_IO_TIMEOUT_SECONDS=600 \
 ISSUE41_RUNTIME_TIMEOUT_SECONDS=600 \
   bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
 ```
