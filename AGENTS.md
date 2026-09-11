@@ -16,7 +16,7 @@
 
 ### Triage labels
 
-使用五个标准分流标签：`needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`。详见 `docs/agents/triage-labels.md`。
+使用七个标准分流标签：`needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`、`need-for-review`、`resolved`。详见 `docs/agents/triage-labels.md`。
 
 ### Domain docs
 
