@@ -3,7 +3,7 @@ Category: enhancement
 
 ## Parent
 
-PRD: `.scratch/v1-mainline/PRD.md`
+Spec: `.scratch/v1-mainline/spec.md`
 
 ## What to build
 

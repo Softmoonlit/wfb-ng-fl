@@ -13,7 +13,7 @@
 
 ### Issue tracker
 
-问题和 PRD 使用 `.scratch/` 下的本地 Markdown 文件管理。详见 `docs/agents/issue-tracker.md`。
+问题和规格使用 `.scratch/` 下的本地 Markdown 文件管理。详见 `docs/agents/issue-tracker.md`。
 
 ### Triage labels
 

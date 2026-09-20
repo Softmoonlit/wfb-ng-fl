@@ -1,4 +1,4 @@
-# Issue #6: PRD: 基于拆分架构实现上行 Token Passing 底层通信
+# Issue #6： 基于拆分架构实现上行 Token Passing 底层通信
 
 - 原始链接: https://github.com/Softmoonlit/wfb-ng/issues/6
 - 状态: open
@@ -12,7 +12,7 @@
 
 当前 `wfb_core` 单进程合并架构在真实 server/client 上执行后无法 ping 通，而既有 `wfb_tx`、`wfb_rx`、`wfb_tun` 拆分进程架构已经验证可以跑通并 ping 通。团队需要在不破坏已验证链路的前提下，以最小改动实现联邦学习无线空口的底层上行控制能力：客户端没有 Token 时绝对不发射，只有获得服务器授权窗口时才允许上行，从而为多节点无碰撞传输打基础。
 
-规范文档中的“单进程 + 用户态浅水池 + 动态水位线”方案理论完整，但第一阶段实现复杂度高，且会偏离当前可用基线。因此本 PRD 聚焦第一阶段：保留 `wfb_tx / wfb_rx / wfb_tun` 拆分架构，在现有可 ping 通路径上实现上行 Token Passing 的最小闭环。
+规范文档中的“单进程 + 用户态浅水池 + 动态水位线”方案理论完整，但第一阶段实现复杂度高，且会偏离当前可用基线。因此本规格聚焦第一阶段：保留 `wfb_tx / wfb_rx / wfb_tun` 拆分架构，在现有可 ping 通路径上实现上行 Token Passing 的最小闭环。
 
 ## Solution
 
@@ -119,6 +119,6 @@
 
 ## Further Notes
 
-This PRD intentionally deviates from the full architecture specification in order to preserve the currently working split-process baseline. The full spec remains useful for later phases, especially safety ring buffer, application backpressure, downlink breath scheduling, and AEW scheduling. The key first-stage principle is fail-closed uplink control: a Client without a valid Token must be silent.
+This 规格 intentionally deviates from the full architecture specification in order to preserve the currently working split-process baseline. The full spec remains useful for later phases, especially safety ring buffer, application backpressure, downlink breath scheduling, and AEW scheduling. The key first-stage principle is fail-closed uplink control: a Client without a valid Token must be silent.
 
 Relevant accepted decision: ADR-0002 records why split process architecture is the first-stage mainline despite the single-process design in the deeper architecture specification.
