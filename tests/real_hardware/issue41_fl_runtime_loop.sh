@@ -91,7 +91,30 @@ case "$cmd" in
     help|--help|-h) usage; exit 0 ;;
 esac
 
-mkdir -p "$ARCHIVE_DIR/orchestration" "$ARCHIVE_DIR/raw"
+init_envelope() {
+    if [ -d "$ARCHIVE_DIR" ] && [ -n "$(ls -A "$ARCHIVE_DIR" 2>/dev/null)" ]; then
+        die "归档目录已存在且非空，拒绝覆盖：$ARCHIVE_DIR"
+    fi
+    mkdir -p "$ARCHIVE_DIR/orchestration" "$ARCHIVE_DIR/raw"
+    python3 "$SCRIPT_DIR/issue41_envelope.py" init \
+        --archive-dir "$ARCHIVE_DIR" \
+        --run-id "$RUN_ID" \
+        --branch "$BRANCH" \
+        --commit "$(git -C "$PROJECT_ROOT" rev-parse HEAD 2>/dev/null || echo '')" \
+        --mode "${ISSUE41_MODE:-formal}" >/dev/null 2>&1 || true
+}
+
+record_preflight_failure() {
+    local layer="$1" category="$2" reason="$3" last_layer="${4:-}"
+    python3 "$SCRIPT_DIR/issue41_envelope.py" record-failure \
+        --archive-dir "$ARCHIVE_DIR" \
+        --layer "$layer" \
+        --category "$category" \
+        --reason "$reason" \
+        --last-successful-layer "$last_layer" >/dev/null 2>&1 || true
+    cmd_stop_all 2>/dev/null || true
+    die "preflight 失败 [$layer / $category]：$reason"
+}
 
 client_ssh() {
     case "$1" in
@@ -216,45 +239,133 @@ check_radio_usb_speed() {
 }
 
 cmd_preflight() {
+    init_envelope
+    local last_successful="none"
     run_local_capture local-git git -C "$PROJECT_ROOT" status --short --branch
-    [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
-        die "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH"
-    [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
-        die "server 初始模型必须恰好为 4 MiB：$INITIAL_MODEL_PATH"
-    for name in ip iw systemctl journalctl make python3 uftp uftpd; do
-        command -v "$name" >/dev/null 2>&1 || die "本机缺少命令：$name"
-    done
-    sudo -n true || die "本机 sudo -n true 失败"
-    local ifaces
-    ifaces="$(find_wlx)"
-    [ "$(printf '%s\n' "$ifaces" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
-    capture_local_radio_health server "$ifaces"
-    check_radio_usb_speed server
-    local head remote_head remote_status remote_ifaces remote_iface_count update_template_path client1_template_sha256 client2_template_sha256
+
+    # Layer 1: repo_and_version
+    local head remote_head remote_status
+    local branch
+    branch="$(git -C "$PROJECT_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+    [ "$branch" = "$BRANCH" ] || record_preflight_failure "repo_and_version" "implementation" "server 当前分支 $branch 不是 $BRANCH" "$last_successful"
+    local local_dirty
+    local_dirty="$(git -C "$PROJECT_ROOT" status --short)"
+    [ -z "$local_dirty" ] || record_preflight_failure "repo_and_version" "implementation" "server 工作区不干净，拒绝继续：$local_dirty" "$last_successful"
     head="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
     for role in client1 client2; do
-        remote_head="$(remote "$role" "cd '$REMOTE_REPO' && git rev-parse HEAD")"
-        [ "$remote_head" = "$head" ] || die "$role commit 与本机不一致：$remote_head != $head"
-        remote_status="$(remote "$role" "cd '$REMOTE_REPO' && git status --short")"
-        [ -z "$remote_status" ] || die "$role 工作区不干净：$remote_status"
-        remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
-        remote_iface_count="$(printf '%s\n' "$remote_ifaces" | grep -c '^wlx' || true)"
-        [ "$remote_iface_count" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
-        capture_remote_radio_health "$role" "$remote_ifaces"
-        check_radio_usb_speed "$role"
+        remote_head="$(remote "$role" "cd '$REMOTE_REPO' && git rev-parse HEAD" 2>/dev/null || echo '')"
+        [ "$remote_head" = "$head" ] || record_preflight_failure "repo_and_version" "implementation" "$role commit 与本机不一致：$remote_head != $head" "$last_successful"
+        remote_status="$(remote "$role" "cd '$REMOTE_REPO' && git status --short" 2>/dev/null || echo '')"
+        [ -z "$remote_status" ] || record_preflight_failure "repo_and_version" "implementation" "$role 工作区不干净：$remote_status" "$last_successful"
+        remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH'" || record_preflight_failure "repo_and_version" "implementation" "$role 分支不是 $BRANCH" "$last_successful"
+    done
+    last_successful="repo_and_version"
+
+    # Layer 2: ssh_and_sudo
+    for role in client1 client2; do
+        remote "$role" "true" >/dev/null 2>&1 || record_preflight_failure "ssh_and_sudo" "environment" "SSH 到 $role 失败" "$last_successful"
+        remote "$role" "sudo -n true" >/dev/null 2>&1 || record_preflight_failure "ssh_and_sudo" "environment" "$role sudo -n true 失败" "$last_successful"
+    done
+    sudo -n true || record_preflight_failure "ssh_and_sudo" "environment" "本机 sudo -n true 失败" "$last_successful"
+    last_successful="ssh_and_sudo"
+
+    # Layer 3: dependencies
+    for name in ip iw systemctl journalctl make python3 uftp uftpd; do
+        command -v "$name" >/dev/null 2>&1 || record_preflight_failure "dependencies" "tooling" "本机缺少命令：$name" "$last_successful"
+    done
+    for role in client1 client2; do
+        remote "$role" "command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null" || record_preflight_failure "dependencies" "tooling" "$role 缺少命令依赖" "$last_successful"
+    done
+    [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
+        record_preflight_failure "dependencies" "tooling" "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH" "$last_successful"
+    [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
+        record_preflight_failure "dependencies" "tooling" "server 初始模型必须恰好为 4 MiB：$INITIAL_MODEL_PATH" "$last_successful"
+    local update_template_path client1_template_sha256 client2_template_sha256
+    for role in client1 client2; do
         case "$role" in
             client1) update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH" ;;
             client2) update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH" ;;
         esac
-        remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH' && hostname && whoami && git status --short --branch && sudo -n true && command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null"
-        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || die "$role update 模板必须是可读取的 4 MiB 普通文件：$update_template_path"
+        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || record_preflight_failure "dependencies" "tooling" "$role update 模板必须是可读取的 4 MiB 普通文件：$update_template_path" "$last_successful"
         case "$role" in
             client1) client1_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
             client2) client2_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
         esac
         log_ok "$role preflight 基础检查通过"
     done
-    [ "$client1_template_sha256" != "$client2_template_sha256" ] || die "两个 client 的 4 MiB update 模板 SHA-256 必须不同"
+    [ "$client1_template_sha256" != "$client2_template_sha256" ] || record_preflight_failure "dependencies" "tooling" "两个 client 的 4 MiB update 模板 SHA-256 必须不同" "$last_successful"
+    last_successful="dependencies"
+
+    # Layer 4: wireless_usb & 重新发现拓扑
+    python3 "$SCRIPT_DIR/issue41_envelope.py" discover-topology --archive-dir "$ARCHIVE_DIR" || record_preflight_failure "wireless_usb" "environment" "动态拓扑重新发现失败" "$last_successful"
+    local ifaces
+    ifaces="$(find_wlx)"
+    [ "$(printf '%s\n' "$ifaces" | grep -c '^wlx' || true)" -eq 1 ] || record_preflight_failure "wireless_usb" "environment" "本机必须恰好发现一个 wlx* 网卡" "$last_successful"
+    capture_local_radio_health server "$ifaces"
+    check_radio_usb_speed server
+    local remote_ifaces remote_iface_count
+    for role in client1 client2; do
+        remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+        remote_iface_count="$(printf '%s\n' "$remote_ifaces" | grep -c '^wlx' || true)"
+        [ "$remote_iface_count" -eq 1 ] || record_preflight_failure "wireless_usb" "environment" "$role 必须恰好发现一个 wlx* 网卡" "$last_successful"
+        capture_remote_radio_health "$role" "$remote_ifaces"
+        check_radio_usb_speed "$role"
+    done
+    last_successful="wireless_usb"
+
+    # Layer 5: radio_monitor_channel
+    last_successful="radio_monitor_channel"
+
+    # Layer 6: network_ports_and_tun
+    for port in "$UFTP_PORT" "$HTTP_PORT"; do
+        if ss -tuln 2>/dev/null | grep -qE ":${port}\b"; then
+            record_preflight_failure "network_ports_and_tun" "environment" "server 端口 $port 已被占用" "$last_successful"
+        fi
+        for role in client1 client2; do
+            if remote "$role" "ss -tuln 2>/dev/null" | grep -qE ":${port}\b"; then
+                record_preflight_failure "network_ports_and_tun" "environment" "$role 端口 $port 已被占用" "$last_successful"
+            fi
+        done
+    done
+    if [ -e "/sys/class/net/$SERVER_TUN" ]; then
+        record_preflight_failure "network_ports_and_tun" "environment" "server 上预期的 TUN 设备 $SERVER_TUN 已存在" "$last_successful"
+    fi
+    for role in client1 client2; do
+        local tun
+        tun="$(client_tun "$role")"
+        if remote "$role" "[ -e '/sys/class/net/$tun' ]"; then
+            record_preflight_failure "network_ports_and_tun" "environment" "$role 上预期的 TUN 设备 $tun 已存在" "$last_successful"
+        fi
+    done
+    last_successful="network_ports_and_tun"
+
+    # Layer 7: residual_processes
+    if pgrep -x wfb-fl-server >/dev/null 2>&1 || pgrep -x wfb_v6_uplink >/dev/null 2>&1 || pgrep -x uftp >/dev/null 2>&1 || pgrep -x uftpd >/dev/null 2>&1; then
+        record_preflight_failure "residual_processes" "environment" "server 发现残留 issue41 进程" "$last_successful"
+    fi
+    for role in client1 client2; do
+        if remote "$role" "pgrep -x wfb-fl-client >/dev/null 2>&1 || pgrep -x wfb_v6_uplink >/dev/null 2>&1 || pgrep -x uftp >/dev/null 2>&1 || pgrep -x uftpd >/dev/null 2>&1"; then
+            record_preflight_failure "residual_processes" "environment" "$role 发现残留 issue41 进程" "$last_successful"
+        fi
+    done
+    last_successful="residual_processes"
+
+    # Layer 8: managed_directory_boundary
+    if runtime_state_exists_local || runtime_state_exists_remote client1 || runtime_state_exists_remote client2; then
+        if [ "$RESET_RUNTIME_STATE" != "1" ]; then
+            record_preflight_failure "managed_directory_boundary" "tooling" "检测到上次 Runtime 现场；默认拒绝复用，请先执行 clean，或设置 ISSUE41_RESET_RUNTIME_STATE=1" "$last_successful"
+        fi
+        sudo rm -rf /var/lib/wfb-ng/issue41/server
+        for role in client1 client2; do
+            remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
+        done
+        log_warn "已按 ISSUE41_RESET_RUNTIME_STATE=1 清理旧 Runtime work_dir"
+    fi
+    last_successful="managed_directory_boundary"
+
+    cat > "$ARCHIVE_DIR/orchestration/preflight_result.json" <<EOF
+{"status":"passed","last_successful_layer":"$last_successful","first_failing_layer":null,"failure_category":null,"failure_reason":null}
+EOF
     log_ok "preflight 通过"
 }
 
@@ -959,7 +1070,16 @@ status = 'passed' if (smoke_downlink == 'passed' and smoke_uplink == 'passed' an
 reason = formal['reason']
 if status != 'passed' and formal['status'] == 'passed':
     reason = 'smoke 前置条件未通过'
+
+envelope_path = os.path.join(archive_dir, 'envelope.json')
+run_id = os.path.basename(archive_dir)
+if os.path.isfile(envelope_path):
+    with open(envelope_path, 'r', encoding='utf-8') as ef:
+        run_id = json.load(ef).get('run_id', run_id)
+
 summary = {
+    'schema_version': 1,
+    'run_id': run_id,
     'orchestration': {'status': 'passed', 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
     'pre_runtime_smoke': {
         'downlink_uftp': {'status': smoke_downlink},

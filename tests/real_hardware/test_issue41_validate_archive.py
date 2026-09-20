@@ -104,6 +104,40 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
 
         self.assertTrue(any('upload_in_progress' in error for error in errors))
 
+    def test_envelope_validation_rejects_mismatched_run_id(self):
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-456',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('run_id 不一致' in error for error in errors))
+
+    def test_envelope_validation_rejects_missing_network_isolation(self):
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'network_isolation': {'prohibit_management_as_data_plane': False},
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('明确限制管理网' in error for error in errors))
+
     def write_runtime_evidence(self):
         for name in ('server-journal.txt', 'client1-journal.txt', 'client2-journal.txt'):
             self.write_text(name, 'evidence\n')

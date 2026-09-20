@@ -57,7 +57,26 @@ def validate_archive(archive_dir):
     _validate_runtime(summary['formal_runtime_loop'], errors)
     _require_status(summary['lifecycle'], 'lifecycle', errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
+    _validate_envelope(archive_dir, summary, errors)
     return errors
+
+
+def _validate_envelope(archive_dir, summary, errors):
+    envelope_path = os.path.join(archive_dir, 'envelope.json')
+    if not os.path.isfile(envelope_path):
+        return
+    envelope = _read_json_file(envelope_path, 'envelope.json', errors)
+    if envelope is None:
+        return
+    if 'run_id' in summary and envelope.get('run_id') != summary.get('run_id'):
+        errors.append('envelope.json 与 summary 的 run_id 不一致')
+    isolation = envelope.get('network_isolation')
+    if not isinstance(isolation, dict) or not isolation.get('prohibit_management_as_data_plane'):
+        errors.append('envelope.json 必须明确限制管理网不可作为数据平面')
+    conclusion = summary.get('conclusion', {})
+    category = conclusion.get('category')
+    if category and category not in ('environment', 'tooling', 'implementation', 'link_capability'):
+        errors.append('conclusion.category 无效：%s' % category)
 
 
 def _read_json(path, errors):
