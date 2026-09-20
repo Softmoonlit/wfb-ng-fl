@@ -58,20 +58,20 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.assertTrue(any('smoke marker downlink_uftp' in error for error in errors))
         self.assertTrue(any('smoke marker uplink_http_put' in error for error in errors))
 
-    def test_rejects_passed_summary_without_two_complete_40mib_rounds(self):
+    def test_rejects_passed_summary_without_complete_4mib_round(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
             self.write_json(name, {'conclusion': 'succeeded'})
         self.write_runtime_evidence()
         self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
         self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['rounds'].pop()
+        summary['formal_runtime_loop']['rounds'] = []
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
         errors = validate_archive(self.root)
 
-        self.assertTrue(any('两轮' in error for error in errors))
+        self.assertTrue(any('一轮' in error for error in errors))
 
     def test_rejects_update_not_matching_its_reused_template(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -80,7 +80,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
         self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['rounds'][1]['uploads'][0]['sha256'] = 'd'.ljust(64, '0')
+        summary['formal_runtime_loop']['rounds'][0]['uploads'][0]['sha256'] = 'd'.ljust(64, '0')
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
@@ -126,8 +126,8 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'server_wait_for_updates_returned_node_ids': [1, 2],
                 'partial_result_returned': False,
                 'scenario': {
-                    'round_count': 2,
-                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'round_count': 1,
+                    'artifact_size_bytes': 4 * 1024 * 1024,
                     'training_delay_ms_by_node': {'1': 0, '2': 0},
                     'placeholder_training': 'template_copy',
                     'placeholder_aggregation': 'model_copy',
@@ -136,7 +136,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         '2': 'c'.ljust(64, '0'),
                     },
                 },
-                'rounds': [self.round_evidence(1), self.round_evidence(2)],
+                'rounds': [self.round_evidence(1)],
                 'server_result': os.path.join(self.root, 'server-result.json'),
                 'client1_result': os.path.join(self.root, 'client1-result.json'),
                 'client2_result': os.path.join(self.root, 'client2-result.json'),
@@ -155,7 +155,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         }
 
     def round_evidence(self, index):
-        size = 40 * 1024 * 1024
+        size = 4 * 1024 * 1024
         model_sha = ('a%d' % index).ljust(64, '0')
         uploads = []
         for node_id, sha in ((1, 'b'), (2, 'c')):

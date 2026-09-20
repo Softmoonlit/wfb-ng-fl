@@ -41,9 +41,9 @@
 
 | 角色 | 默认网卡 | TUN IP | TUN 名称 | node_id |
 | --- | --- | --- | --- | --- |
-| server | `wlxbcec23372588` | `10.80.0.1/24` | `v6us0` | `9` |
-| client1 | `wlxfc221c500a88` | `10.80.0.11/24` | `v6uc1` | `1` |
-| client2 | `wlxfc221c300cbc` | `10.80.0.12/24` | `v6uc2` | `2` |
+| server | `wlxfc221c300cbc` | `10.80.0.1/24` | `v6us0` | `9` |
+| client1 | `wlxfc221c300cbb` | `10.80.0.11/24` | `v6uc1` | `1` |
+| client2 | `wlxfc221c500a88` | `10.80.0.12/24` | `v6uc2` | `2` |
 
 默认无线参数：
 
@@ -553,7 +553,7 @@ sudo ip link delete v6uc2 2>/dev/null || true
 server：
 
 ```bash
-export SERVER_IFACE=wlxbcec23372588
+export SERVER_IFACE=wlxfc221c300cbc
 sudo ip link set "$SERVER_IFACE" down || true
 sudo iw dev "$SERVER_IFACE" set type managed || true
 sudo ip link set "$SERVER_IFACE" up || true
@@ -562,7 +562,7 @@ sudo ip link set "$SERVER_IFACE" up || true
 client1：
 
 ```bash
-export CLIENT1_IFACE=wlxfc221c500a88
+export CLIENT1_IFACE=wlxfc221c300cbb
 sudo ip link set "$CLIENT1_IFACE" down || true
 sudo iw dev "$CLIENT1_IFACE" set type managed || true
 sudo ip link set "$CLIENT1_IFACE" up || true
@@ -571,7 +571,7 @@ sudo ip link set "$CLIENT1_IFACE" up || true
 client2：
 
 ```bash
-export CLIENT2_IFACE=wlxfc221c300cbc
+export CLIENT2_IFACE=wlxfc221c500a88
 sudo ip link set "$CLIENT2_IFACE" down || true
 sudo iw dev "$CLIENT2_IFACE" set type managed || true
 sudo ip link set "$CLIENT2_IFACE" up || true

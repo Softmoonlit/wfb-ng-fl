@@ -74,15 +74,15 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_fails_on_120_second_io_stall(self):
         self.assertIn('ISSUE41_IO_TIMEOUT_SECONDS:-120', self.script)
 
-    def test_formal_runtime_defaults_to_two_40mib_rounds_with_immediate_clients(self):
+    def test_formal_runtime_defaults_to_single_4mib_round_with_delayed_client2(self):
         for fragment in (
-                'ROUNDS="${ISSUE41_ROUNDS:-2}"',
-                'INPUT_SIZE_BYTES=$((40 * 1024 * 1024))',
-                'update-client1-40mib.bin',
-                'update-client2-40mib.bin',
+                'ROUNDS="${ISSUE41_ROUNDS:-1}"',
+                'INPUT_SIZE_BYTES=$((4 * 1024 * 1024))',
+                'update-client1-4mib.bin',
+                'update-client2-4mib.bin',
                 'required_artifact_size_bytes',
-                'delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
-                '两个 client 的 40 MiB update 模板 SHA-256 必须不同',
+                'delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
+                '两个 client 的 4 MiB update 模板 SHA-256 必须不同',
                 '"live_observation":true',
                 '"observation_path":"$work_dir/observation.jsonl"',
                 'issue41_build_summary.py',
@@ -90,14 +90,14 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 '"--log-interval","$LINK_LOG_INTERVAL_MS"'):
             self.assertIn(fragment, self.script)
 
-    def test_formal_runtime_enables_immediate_known_client_feedback_window(self):
+    def test_formal_runtime_configures_feedback_window_without_immediate_candidate(self):
         for fragment in (
                 'ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500',
                 'ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15',
                 '"--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS"',
-                '"--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS"',
-                '"--feedback-window-start-immediately"'):
+                '"--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS"'):
             self.assertIn(fragment, self.script)
+        self.assertNotIn('"--feedback-window-start-immediately"', self.script)
 
     def test_formal_runtime_asserts_uftp_routes_use_runtime_tuns(self):
         self.assertIn('assert_runtime_uftp_routes', self.script)

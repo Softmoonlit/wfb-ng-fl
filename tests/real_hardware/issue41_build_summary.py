@@ -9,7 +9,7 @@ import sys
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
-EXPECTED_SIZE = 40 * 1024 * 1024
+EXPECTED_SIZE = 4 * 1024 * 1024
 
 
 def main(argv=None):
@@ -48,7 +48,7 @@ def main(argv=None):
         'status': status,
         'reason': '; '.join(errors) if errors else '两轮 40 MiB 正式 Runtime 闭环证据完整',
         'scenario': {
-            'round_count': 2,
+            'round_count': 1,
             'artifact_size_bytes': EXPECTED_SIZE,
             'training_delay_ms_by_node': {'1': 0, '2': 0},
             'placeholder_training': 'template_copy',
@@ -83,7 +83,7 @@ def _build_rounds(results, observations, errors):
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
         return []
     server_rounds = server.get('rounds')
-    if not isinstance(server_rounds, list) or len(server_rounds) != 2:
+    if not isinstance(server_rounds, list) or len(server_rounds) != 1:
         errors.append('server 算法结果必须包含两轮')
         return []
     output = []

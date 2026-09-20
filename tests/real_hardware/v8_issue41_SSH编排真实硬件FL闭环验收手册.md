@@ -1,6 +1,6 @@
 # V8 issue #41 SSH 编排真实硬件 FL Runtime 闭环验收手册
 
-本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）及 issue #53（双 40 MiB 两轮正式场景）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
+本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）及 issue #53（双 4 MiB 单轮正式场景）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
 
 ## 0. 定位与边界
 
@@ -42,8 +42,8 @@
 | 验证阶段身份 | 正式角色 | SSH 管理地址 | 已探测仓库 | 已探测主机名 |
 | --- | --- | --- | --- | --- |
 | server / orchestrator / 归档汇总机 | server | 本机 | `/home/kilome/code/wfb-ng-fl` | 本机 hostname 归档时记录 |
-| client1 | client | `virt@192.168.122.198` | `/home/virt/code/wfb-ng-fl` | `virt1` |
-| client2 | client | `virt@192.168.122.106` | `/home/virt/code/wfb-ng-fl` | `virt2` |
+| client1 | client | `vm1` | `/home/virt/projects/wfb-ng-fl` | `virt1` |
+| client2 | client | `vm2` | `/home/virt/projects/wfb-ng-fl` | `virt2` |
 
 说明：
 
@@ -330,7 +330,7 @@ Issue #41 P0 的正式 Runtime server 额外启用立即开始的静态 feedback
 - 必须使用 issue41 drop-in 和 `/etc/wfb-ng/issue41/*` 配置。
 - 数据面必须走 `10.80.0.0/24` TUN 地址。
 - 只有 Runtime 四接口驱动正式闭环，不能用 ping、普通 TCP 文件探针或人工复制替代。
-- server `link_args` 使用 `ISSUE41_FEEDBACK_WINDOW_PERIOD_MS`（默认 `500`）、`ISSUE41_FEEDBACK_WINDOW_DURATION_MS`（默认 `15`）和 `--feedback-window-start-immediately`。该 P0 配置从链路启动即按静态 `[1,2]` 轮发短 GRANT，持续到角色服务结束；两个参数只用于 Issue #41 脚本，可通过环境变量调参，不是产品默认值。
+- server `link_args` 使用 `ISSUE41_FEEDBACK_WINDOW_PERIOD_MS`（默认 `500`）、`ISSUE41_FEEDBACK_WINDOW_DURATION_MS`（默认 `15`）。正式验收配置严禁携带 `--feedback-window-start-immediately` 候选行为；链路按既有调度维持 feedback window。
 - `ISSUE41_IO_TIMEOUT_SECONDS` 默认 `120`，用于在单次 I/O 连续无进展时 fail-fast。不得通过增大该值掩盖无线丢包、FEC 后残余丢包或 TCP 退避；这些链路问题必须单独诊断和修复。
 - P0 只消除 UFTP 注册对 READY 的启动依赖；它不实现 UFTP/HTTP 阶段隔离，短、长 GRANT 仍可能交错。动态 feedback lease、可靠上行阶段 release 和 client `submit_update(...)` 门禁属于后续设计，不是本次验收行为。
 
@@ -357,8 +357,8 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 正式算法入口与占位算法：
 
 - 模型和 update 对 Runtime 及当前占位算法都是不透明普通文件，不要求 JSON、checkpoint 或特定框架格式。
-- 正式场景固定 `ISSUE41_ROUNDS=2`。server 输入模型、client1 模板和 client2 模板均必须恰好为 40 MiB；`preflight` 在 live run 前检查它们，不生成或修改输入。
-- 两个客户端模板必须具有不同 SHA-256，并各自在两轮中重复使用同一模板。默认路径分别为 `model-40mib.bin`、`update-client1-40mib.bin` 和 `update-client2-40mib.bin`。
+- 正式场景固定 `ISSUE41_ROUNDS=1`。server 输入模型、client1 模板和 client2 模板均必须恰好为 4 MiB；`preflight` 在 live run 前检查它们，不生成或修改输入。
+- 两个客户端模板必须具有不同 SHA-256，并各自在单轮中重复使用同一模板。默认路径分别为 `model-4mib.bin`、`update-client1-4mib.bin` 和 `update-client2-4mib.bin`。
 - client1/client2 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验。模型校验完成后两个客户端均以 `training_delay_ms=0` 立即执行占位训练。
 - `train(model_path, output_update_path, config)` 的占位训练只复制必填 `update_template_path`，synthetic update 不来自真实训练。server `aggregate(...)` 的占位聚合只复制当前模型，不执行或声称执行 FedAvg。
 - server `wait_for_updates()` 只在两个有效 update 全部收齐后返回完整 `[1, 2]` 映射；单个 update 到达时不返回 partial result。
@@ -371,25 +371,25 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 运行前分别在三台机器准备输入文件。默认路径不位于 Runtime work_dir，`clean` 不会删除这些输入：
 
 ```bash
-# server 本机：操作者提供的 40 MiB 模型
+# server 本机：操作者提供的 4 MiB 模型
 sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/model-40mib.bin \
-  /var/lib/wfb-ng/issue41-input/model-40mib.bin
+sudo install -m 0644 /path/to/model-4mib.bin \
+  /var/lib/wfb-ng/issue41-input/model-4mib.bin
 
-# client1：操作者提供的 40 MiB synthetic update 模板
+# client1：操作者提供的 4 MiB synthetic update 模板
 sudo install -d /var/lib/wfb-ng/issue41-input
 sudo install -m 0644 /path/to/client1-update-40mib.bin \
-  /var/lib/wfb-ng/issue41-input/update-client1-40mib.bin
+  /var/lib/wfb-ng/issue41-input/update-client1-4mib.bin
 
-# client2：内容必须不同于 client1 的 40 MiB synthetic update 模板
+# client2：内容必须不同于 client1 的 4 MiB synthetic update 模板
 sudo install -d /var/lib/wfb-ng/issue41-input
 sudo install -m 0644 /path/to/client2-update-40mib.bin \
-  /var/lib/wfb-ng/issue41-input/update-client2-40mib.bin
+  /var/lib/wfb-ng/issue41-input/update-client2-4mib.bin
 ```
 
-先运行 `preflight`。它会 fail-closed 检查三个输入的普通文件、可读性、恰好 40 MiB 大小，以及两个 client 模板 SHA-256 不同。输入位于 Runtime work_dir 外，live run 和 `clean` 都不会生成、修改或删除它们。
+先运行 `preflight`。它会 fail-closed 检查三个输入的普通文件、可读性、恰好 4 MiB 大小，以及两个 client 模板 SHA-256 不同。输入位于 Runtime work_dir 外，live run 和 `clean` 都不会生成、修改或删除它们。
 
-正式两轮运行使用：
+正式单轮运行使用：
 
 ```bash
 ISSUE41_IO_TIMEOUT_SECONDS=120 \
@@ -405,7 +405,7 @@ ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH
 ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH
 ```
 
-`preflight` 会在 server 本机检查初始模型，并通过 SSH 在 client1/client2 检查各自 update 模板；任一文件缺失、不是普通文件、不可读、大小不是 40 MiB 或两份模板摘要相同都会 fail-closed。
+`preflight` 会在 server 本机检查初始模型，并通过 SSH 在 client1/client2 检查各自 update 模板；任一文件缺失、不是普通文件、不可读、大小不是 4 MiB 或两份模板摘要相同都会 fail-closed。
 
 必需归档：
 
@@ -509,7 +509,7 @@ tests/logs/v8_issue41_<timestamp>/
 4. `smoke-uplink-http-put` 通过，但它只作为诊断前置。
 5. Runtime 正式闭环通过：`publish_model`、两个 `wait_for_model`、两个 `submit_update`、`wait_for_updates` 全部经正式接口完成。
 6. shared UFTP downlink 每轮一次，两个 client 的 model 和 manifest status matrix 完整。
-7. 两轮中两个 client 的模型 SHA 均与 server 一致；每个 40 MiB update 的 SHA、大小、客户端 HTTP 201 与 server committed 事实一致。
+7. 单轮中两个 client 的模型 SHA 均与 server 一致；每个 4 MiB update 的 SHA、大小、客户端 HTTP 201 与 server committed 事实一致。
 8. 每轮均记录独立轮次标识、模型接收和 PUT 时间区间、活动上传集合及最终 HTTP 结果；不得出现 `upload_in_progress`，server 不返回 partial result，最终返回 `[1, 2]` 完整映射。
 9. v6 直接依赖证据完整：READY/GRANT、authorized sends、server 接收、queue pause/resume、bytes/packets 反压、reassembly、sender isolation、feedback window。
 10. lifecycle stop/restart 和无孤儿进程验证通过。

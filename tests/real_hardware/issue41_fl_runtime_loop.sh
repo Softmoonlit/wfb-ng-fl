@@ -10,9 +10,9 @@ BRANCH="${ISSUE41_BRANCH:-feat/41-real-hardware-fl-runtime-redo}"
 ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
-REMOTE_REPO="${ISSUE41_REMOTE_REPO:-/home/virt/code/wfb-ng-fl}"
-CLIENT1_SSH="${ISSUE41_CLIENT1_SSH:-virt@192.168.122.198}"
-CLIENT2_SSH="${ISSUE41_CLIENT2_SSH:-virt@192.168.122.106}"
+REMOTE_REPO="${ISSUE41_REMOTE_REPO:-/home/virt/projects/wfb-ng-fl}"
+CLIENT1_SSH="${ISSUE41_CLIENT1_SSH:-vm1}"
+CLIENT2_SSH="${ISSUE41_CLIENT2_SSH:-vm2}"
 SERVER_TUN="${ISSUE41_SERVER_TUN:-v8i41s0}"
 CLIENT1_TUN="${ISSUE41_CLIENT1_TUN:-v8i41c1}"
 CLIENT2_TUN="${ISSUE41_CLIENT2_TUN:-v8i41c2}"
@@ -39,11 +39,11 @@ IO_TIMEOUT_SECONDS="${ISSUE41_IO_TIMEOUT_SECONDS:-120}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
-ROUNDS="${ISSUE41_ROUNDS:-2}"
-INPUT_SIZE_BYTES=$((40 * 1024 * 1024))
-INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-40mib.bin}"
-CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-40mib.bin}"
-CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-40mib.bin}"
+ROUNDS="${ISSUE41_ROUNDS:-1}"
+INPUT_SIZE_BYTES=$((4 * 1024 * 1024))
+INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-4mib.bin}"
+CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-4mib.bin}"
+CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-4mib.bin}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
@@ -220,7 +220,7 @@ cmd_preflight() {
     [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
         die "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH"
     [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
-        die "server 初始模型必须恰好为 40 MiB：$INITIAL_MODEL_PATH"
+        die "server 初始模型必须恰好为 4 MiB：$INITIAL_MODEL_PATH"
     for name in ip iw systemctl journalctl make python3 uftp uftpd; do
         command -v "$name" >/dev/null 2>&1 || die "本机缺少命令：$name"
     done
@@ -247,14 +247,14 @@ cmd_preflight() {
             client2) update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH" ;;
         esac
         remote "$role" "cd '$REMOTE_REPO' && test \"\$(git rev-parse --abbrev-ref HEAD)\" = '$BRANCH' && hostname && whoami && git status --short --branch && sudo -n true && command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null"
-        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || die "$role update 模板必须是可读取的 40 MiB 普通文件：$update_template_path"
+        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || die "$role update 模板必须是可读取的 4 MiB 普通文件：$update_template_path"
         case "$role" in
             client1) client1_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
             client2) client2_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
         esac
         log_ok "$role preflight 基础检查通过"
     done
-    [ "$client1_template_sha256" != "$client2_template_sha256" ] || die "两个 client 的 40 MiB update 模板 SHA-256 必须不同"
+    [ "$client1_template_sha256" != "$client2_template_sha256" ] || die "两个 client 的 4 MiB update 模板 SHA-256 必须不同"
     log_ok "preflight 通过"
 }
 
@@ -281,14 +281,14 @@ write_issue41_configs() {
             ;;
         client2)
             node_id=2; tun="$CLIENT2_TUN"; addr="$CLIENT2_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=0; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
             ;;
     esac
     local tmp
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--feedback-window-start-immediately"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS",]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}

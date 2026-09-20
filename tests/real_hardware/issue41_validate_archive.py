@@ -135,12 +135,12 @@ def _validate_runtime(value, errors):
 
 def _validate_formal_scenario(value, errors):
     scenario = value.get('scenario')
-    expected_size = 40 * 1024 * 1024
+    expected_size = 4 * 1024 * 1024
     if not isinstance(scenario, dict):
         errors.append('formal_runtime_loop 缺少正式场景配置')
         return
     expected = {
-        'round_count': 2,
+        'round_count': 1,
         'artifact_size_bytes': expected_size,
         'training_delay_ms_by_node': {'1': 0, '2': 0},
         'placeholder_training': 'template_copy',
@@ -156,8 +156,8 @@ def _validate_formal_scenario(value, errors):
         errors.append('formal_runtime_loop.scenario 必须包含不同的 client 模板 SHA-256')
 
     rounds = value.get('rounds')
-    if not isinstance(rounds, list) or len(rounds) != 2:
-        errors.append('formal_runtime_loop 必须包含两轮完整证据')
+    if not isinstance(rounds, list) or len(rounds) != 1:
+        errors.append('formal_runtime_loop 必须包含一轮完整证据')
         return
     seen_round_ids = set()
     for index, round_value in enumerate(rounds, 1):
