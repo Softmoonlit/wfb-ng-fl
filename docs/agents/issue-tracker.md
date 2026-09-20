@@ -1,22 +1,29 @@
-# 问题追踪器：GitHub
+# 问题追踪器：本地 Markdown
 
-本仓库的问题和 PRD 使用 GitHub Issues 管理。相关读写操作统一通过 `gh` CLI 执行。
+本仓库的问题、PRD 和执行记录使用 `.scratch/` 下的本地 Markdown 文件管理，不调用 GitHub 或 GitLab 的问题追踪 API。
 
-## 约定
+## 目录约定
 
-- 创建问题：`gh issue create --title "..." --body "..."`
-- 读取问题：`gh issue view <编号> --comments`
-- 列出问题：使用 `gh issue list`，按需要附加 `--label`、`--state` 等过滤条件
-- 评论问题：`gh issue comment <编号> --body "..."`
-- 增删标签：`gh issue edit <编号> --add-label "..."` / `--remove-label "..."`
-- 关闭问题：`gh issue close <编号> --comment "..."`
+- 一个工作项使用一个目录：`.scratch/<feature-slug>/`
+- 工作项说明使用 `.scratch/<feature-slug>/PRD.md`
+- 实现任务放在 `.scratch/<feature-slug>/issues/` 下，每个任务一个 Markdown 文件。
+- 任务文件使用两位数字编号，从 `01` 开始，例如 `issues/01-<slug>.md`。
+- 任务文件顶部附近使用 `Status:` 记录状态，状态值见 `docs/agents/triage-labels.md`。
+- 对话和处理记录追加在文件末尾的 `## Comments` 标题下。
 
-在仓库克隆目录内执行时，`gh` 会根据 `git remote -v` 自动推断当前仓库。
+## 发布和读取
 
-## 当技能说“发布到问题追踪器”时
+- 技能要求“发布到问题追踪器”时，在对应的 `.scratch/<feature-slug>/` 目录创建或更新 Markdown 文件。
+- 技能要求“获取工单”时，读取用户提供的路径或编号对应的本地文件。
+- 不创建 GitHub Issue，不使用 `gh issue` 命令替代本地记录。
 
-创建一个 GitHub issue。
+## Wayfinder 约定
 
-## 当技能说“获取相关工单”时
+`/wayfinder` 使用以下本地文件结构：
 
-运行 `gh issue view <编号> --comments` 读取问题正文、标签和评论历史。
+- Map：`.scratch/<effort>/map.md`
+- Child ticket：`.scratch/<effort>/issues/NN-<slug>.md`
+- Child ticket 使用 `Type:` 记录 `research`、`prototype`、`grilling` 或 `task`。
+- `Blocked by: NN, NN` 记录前置任务。
+- 所有前置任务为 `resolved` 后，任务才算解除阻塞。
+- 解决任务时，在 `## Answer` 下追加答案，将 `Status:` 设为 `resolved`，再把结论摘要追加到 `map.md` 的 Decisions-so-far。
