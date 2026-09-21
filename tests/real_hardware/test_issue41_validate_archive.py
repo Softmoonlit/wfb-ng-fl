@@ -20,6 +20,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             self.write_json(name, {'conclusion': 'succeeded'})
         self.write_runtime_evidence()
         self.write_smoke_marker()
+        self.write_lifecycle_evidence()
         self.write_json('issue41_summary.json', self.complete_summary('passed'))
         self.write_text('result.md', '# result\n')
 
@@ -317,6 +318,149 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         for index in range(12):
             self.write_text('route-%d.txt' % index, 'route\n')
 
+    def test_rejects_passed_lifecycle_missing_first_stop(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle'].pop('first_stop')
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('缺少阶段: first_stop' in error for error in errors))
+
+    def test_rejects_lifecycle_first_stop_with_tun_residual(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['first_stop']['roles']['client1']['tun_exists'] = True
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('TUN 设备必须已消失' in error for error in errors))
+
+    def test_rejects_lifecycle_first_stop_with_cgroup_residual(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['first_stop']['roles']['server']['cgroup_clean'] = False
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('cgroup 必须清理干净' in error for error in errors))
+
+    def test_rejects_lifecycle_first_stop_with_orphan_proc(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['first_stop']['roles']['client2']['orphan_processes'] = ['uftpd']
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('不得残留孤儿进程' in error for error in errors))
+
+    def test_rejects_lifecycle_restart_unclean_work_dir(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['restart']['clean_state_verified'] = False
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('必须证明工作区干净隔离' in error for error in errors))
+
+    def test_rejects_lifecycle_restart_cgroup_child_overlap(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['restart']['roles']['server']['cgroup_disjoint'] = False
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('子进程与旧进程集合重叠' in error for error in errors))
+
+    def test_rejects_lifecycle_restart_missing_old_main_pid(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['restart']['roles']['client1']['old_main_pid'] = 0
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('必须记录有效的前序 MainPID' in error for error in errors))
+
+    def test_rejects_lifecycle_restart_with_pid_overlap(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['restart']['roles']['server']['pid_reused'] = True
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('禁止复用旧进程 PID' in error for error in errors))
+
+    def test_rejects_lifecycle_restart_with_tun_down(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['restart']['roles']['client1']['tun_up'] = False
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('处于 UP 状态' in error for error in errors))
+
+    def test_rejects_lifecycle_second_stop_with_tun_residual(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle']['second_stop']['roles']['client2']['tun_exists'] = True
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('TUN 设备必须已消失' in error for error in errors))
+
+    def test_rejects_lifecycle_missing_evidence_files(self):
+        summary = self.complete_summary('passed')
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        # 故意不调用 write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('缺少 lifecycle 原始证据文件' in error for error in errors))
+
+    def test_rejects_passed_conclusion_when_lifecycle_failed(self):
+        summary = self.complete_summary('passed')
+        summary['lifecycle'] = {'status': 'failed', 'reason': '残留孤儿进程'}
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('存在未通过分区时 conclusion 不能 passed' in error for error in errors))
+
     def smoke_gate_evidence(self):
         cycles = [self.cycle_evidence(i) for i in (1, 2, 3)]
         return {
@@ -480,12 +624,63 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                     os.path.join(self.root, 'route-%d.txt' % index)
                     for index in range(12)],
             },
-            'lifecycle': {'status': 'passed'},
+            'lifecycle': self.lifecycle_evidence(),
             'conclusion': {
                 'status': conclusion,
                 'reason': 'all evidence complete' if conclusion == 'passed' else 'failed section',
             },
         }
+
+    def lifecycle_evidence(self):
+        return {
+            'status': 'passed',
+            'first_stop': {
+                'status': 'passed',
+                'roles': {
+                    role: {
+                        'unit_status': 'inactive',
+                        'cgroup_clean': True,
+                        'tun_exists': False,
+                        'orphan_processes': [],
+                    } for role in ('server', 'client1', 'client2')
+                }
+            },
+            'restart': {
+                'status': 'passed',
+                'clean_state_verified': True,
+                'roles': {
+                    role: {
+                        'unit_status': 'active',
+                        'main_pid': 2000 + i,
+                        'old_main_pid': 1000 + i,
+                        'pid_reused': False,
+                        'cgroup_disjoint': True,
+                        'tun_up': True,
+                    } for i, role in enumerate(('server', 'client1', 'client2'), 1)
+                }
+            },
+            'second_stop': {
+                'status': 'passed',
+                'roles': {
+                    role: {
+                        'unit_status': 'inactive',
+                        'cgroup_clean': True,
+                        'tun_exists': False,
+                        'orphan_processes': [],
+                    } for role in ('server', 'client1', 'client2')
+                }
+            },
+            'evidence_files': [
+                'lifecycle/first_stop_evidence.json',
+                'lifecycle/restart_evidence.json',
+                'lifecycle/second_stop_evidence.json',
+            ],
+        }
+
+    def write_lifecycle_evidence(self):
+        self.write_json('lifecycle/first_stop_evidence.json', {'status': 'passed'})
+        self.write_json('lifecycle/restart_evidence.json', {'status': 'passed'})
+        self.write_json('lifecycle/second_stop_evidence.json', {'status': 'passed'})
 
     def round_evidence(self, index):
         size = 4 * 1024 * 1024

@@ -1252,6 +1252,15 @@ cmd_run_runtime_loop() {
     capture_runtime_routes
     wait_runtime_results
 
+    log_info "记录三角色服务运行 MainPID 以备生命周期 no-overlap 验证..."
+    mkdir -p "$ARCHIVE_DIR/lifecycle"
+    server_main_pid="$(sudo systemctl show -p MainPID --value wfb-fl-server.service 2>/dev/null || echo 0)"
+    client1_main_pid="$(remote client1 "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
+    client2_main_pid="$(remote client2 "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
+    cat > "$ARCHIVE_DIR/lifecycle/initial_pids.json" <<EOF
+{"server": $server_main_pid, "client1": $client1_main_pid, "client2": $client2_main_pid}
+EOF
+
     log_info "正式 Runtime 作业已成功返回，执行三角色服务受控停止..."
     sudo systemctl stop wfb-fl-server.service || true
     for role in client1 client2; do
@@ -1269,40 +1278,23 @@ EOF
 }
 
 cmd_lifecycle_stop_restart() {
-    sudo systemctl stop wfb-fl-server.service || true
-    for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service || true"; done
-    sudo systemctl is-active --quiet wfb-fl-server.service && die "server service 未停止" || true
-    for role in client1 client2; do remote "$role" "! systemctl is-active --quiet wfb-fl-client.service"; done
-    if pgrep -x wfb-fl-server >/dev/null || pgrep -x wfb_v6_uplink >/dev/null || pgrep -x uftp >/dev/null || pgrep -x uftpd >/dev/null; then
-        die "本机发现 issue41 相关孤儿进程"
-    fi
-    for role in client1 client2; do
-        remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null"
-    done
-    wait_local_issue41_cleanup || die "本机 issue41 停止后清理超时"
-    for role in client1 client2; do
-        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role issue41 停止后清理超时"
-    done
+    log_info "执行三角色服务 stop/restart/no-overlap 及资源生命周期审计..."
     cmd_collect
-    sudo rm -rf /var/lib/wfb-ng/issue41/server
-    for role in client1 client2; do
-        remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
-    done
-    for role in client1 client2; do
-        wait_remote_service_ready "$role" wfb-fl-client.service
-        assert_remote_service_active "$role" wfb-fl-client.service
-    done
-    sudo systemctl restart wfb-fl-server.service
-    sleep 2
-    sudo systemctl stop wfb-fl-server.service || true
-    for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service || true"; done
-    sudo systemctl is-active --quiet wfb-fl-server.service && die "server service restart 后未停止" || true
-    for role in client1 client2; do remote "$role" "! systemctl is-active --quiet wfb-fl-client.service"; done
-    wait_local_issue41_cleanup || die "本机 restart 后清理超时"
-    for role in client1 client2; do
-        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role restart 后清理超时"
-    done
-    log_ok "服务 stop/restart/inactive 检查通过"
+    python3 "$SCRIPT_DIR/issue41_lifecycle.py" run "$ARCHIVE_DIR" \
+        --server-tun "$SERVER_TUN" \
+        --client1-tun "$(client_tun client1)" \
+        --client2-tun "$(client_tun client2)" \
+        --client1-ssh "$(client_ssh client1)" \
+        --client2-ssh "$(client_ssh client2)" \
+        --initial-pids "$ARCHIVE_DIR/lifecycle/initial_pids.json" \
+        --timeout "$STOP_CLEANUP_TIMEOUT_SECONDS" || die "三角色服务 stop/restart 及资源生命周期审计未通过"
+    if [ -f "$ARCHIVE_DIR/envelope.json" ]; then
+        python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
+            --archive-dir "$ARCHIVE_DIR" \
+            --name lifecycle \
+            --json-file "$ARCHIVE_DIR/lifecycle/lifecycle_summary.json" >/dev/null 2>&1 || true
+    fi
+    log_ok "三角色服务 stop/restart 及资源清理审计通过。"
 }
 
 cmd_stop_all() {
@@ -1412,10 +1404,26 @@ elif os.path.isfile(passed_marker_path):
 else:
     smoke_gate = {'status': 'failed', 'reason': 'gate_summary.json 缺失'}
 
-status = 'passed' if (smoke_gate.get('status') == 'passed' and formal['status'] == 'passed') else 'failed'
-reason = formal['reason']
-if status != 'passed' and formal['status'] == 'passed':
-    reason = '数据面 Gate 前置条件未通过'
+lifecycle_path = os.path.join(archive_dir, 'lifecycle', 'lifecycle_summary.json')
+if os.path.isfile(lifecycle_path):
+    with open(lifecycle_path, 'r', encoding='utf-8') as lf:
+        lifecycle_data = json.load(lf)
+else:
+    lifecycle_data = {'status': 'failed', 'reason': 'lifecycle_summary.json 缺失'}
+
+status = 'passed' if (smoke_gate.get('status') == 'passed' and
+                     formal.get('status') == 'passed' and
+                     lifecycle_data.get('status') == 'passed') else 'failed'
+reason = formal.get('reason', '')
+if status != 'passed':
+    if smoke_gate.get('status') != 'passed':
+        reason = smoke_gate.get('reason', '数据面 Gate 前置条件未通过')
+    elif formal.get('status') != 'passed':
+        reason = formal.get('reason', '正式一轮 Runtime 闭环未通过')
+    elif lifecycle_data.get('status') != 'passed':
+        reason = lifecycle_data.get('reason', '生命周期 stop/restart 审计未通过')
+    else:
+        reason = '存在未通过的阶段'
 
 envelope_path = os.path.join(archive_dir, 'envelope.json')
 run_id = os.path.basename(archive_dir)
@@ -1446,7 +1454,7 @@ summary = {
         'config_equivalence': formal.get('config_equivalence', {'status': 'passed'}),
         'controlled_stop': formal.get('controlled_stop', {'status': 'passed'}),
     },
-    'lifecycle': {'status': formal['status']},
+    'lifecycle': lifecycle_data,
     'conclusion': {'status': status, 'reason': reason},
 }
 with open(os.path.join(archive_dir, 'issue41_summary.json'), 'w', encoding='utf-8') as fh:

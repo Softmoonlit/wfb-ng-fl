@@ -162,7 +162,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'sudo python3 -c',
                 "printf '[Service]\\nRestart=no\\nLogRateLimitIntervalSec=0\\nExecStart=\\n",
                 'cmd_lifecycle_stop_restart',
-                'cmd_collect\n    sudo rm -rf /var/lib/wfb-ng/issue41/server'):
+                'initial_pids.json'):
             self.assertIn(fragment, self.script)
 
     def test_runtime_rejects_stale_work_dir_without_explicit_reset(self):
@@ -182,8 +182,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 'wait_remote_issue41_cleanup',
                 '/sys/class/net/$SERVER_TUN',
                 '/sys/class/net/$tun',
-                '本机 issue41 停止后清理超时',
-                'restart 后清理超时'):
+                '本机 issue41 停止后清理超时'):
             self.assertIn(fragment, self.script)
 
     def test_summary_keeps_collected_server_artifacts_readable_and_fails_closed(self):
@@ -227,6 +226,17 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "'missing_server_accept_is_not_a_sleep_transition': True",
                 "'strict_runtime_participants_may_not_be_downgraded': True",
                 'server_radio_receive_path_unhealthy_or_disconnected'):
+            self.assertIn(fragment, self.script)
+
+    def test_lifecycle_uses_independent_auditor_and_summary(self):
+        for fragment in (
+                'issue41_lifecycle.py" run "$ARCHIVE_DIR"',
+                '--server-tun "$SERVER_TUN"',
+                '--client1-tun "$(client_tun client1)"',
+                '--client2-tun "$(client_tun client2)"',
+                "lifecycle_path = os.path.join(archive_dir, 'lifecycle', 'lifecycle_summary.json')",
+                "'lifecycle': lifecycle_data",
+                "lifecycle_data.get('status') == 'passed'"):
             self.assertIn(fragment, self.script)
 
 

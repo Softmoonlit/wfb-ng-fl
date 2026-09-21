@@ -7,6 +7,7 @@ import os
 import sys
 
 from tests.real_hardware.issue41_gate import GateConfig, validate_gate_summary
+from tests.real_hardware.issue41_lifecycle import validate_lifecycle_summary
 
 
 REQUIRED_TOP_LEVEL = (
@@ -54,7 +55,7 @@ def validate_archive(archive_dir):
         return errors
     _validate_smoke_gate(archive_dir, smoke, errors)
     _validate_runtime(summary['formal_runtime_loop'], errors)
-    _require_status(summary['lifecycle'], 'lifecycle', errors)
+    _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
     _validate_envelope(archive_dir, summary, errors)
     return errors
@@ -93,6 +94,15 @@ def _read_json_file(path, name, errors):
         errors.append('%s 顶层必须是对象' % name)
         return None
     return value
+
+
+def _validate_lifecycle(archive_dir, value, errors):
+    _require_status(value, 'lifecycle', errors)
+    if not isinstance(value, dict):
+        return
+    lc_errors = validate_lifecycle_summary(value, archive_dir)
+    for err in lc_errors:
+        errors.append('lifecycle 校验失败：%s' % err)
 
 
 def _require_status(value, name, errors):
