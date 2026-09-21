@@ -144,6 +144,9 @@ def _validate_envelope(archive_dir, summary, errors):
                 val = resolved.get(deadline_key)
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            io_timeout_cfg = resolved.get('io_timeout_seconds')
+            if isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and envelope.get('mode') == 'formal':
+                errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 不得大于 120 秒')
             smoke = summary.get('pre_runtime_smoke', {})
             if isinstance(smoke, dict):
                 if 'cycle_deadline_seconds' in smoke and smoke['cycle_deadline_seconds'] != resolved.get('smoke_cycle_deadline_seconds'):
@@ -229,17 +232,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         if isinstance(env_obj, dict):
             resolved_cfg = env_obj.get('resolved_config', {})
 
-    cycles = value.get('cycles') if isinstance(value, dict) else []
-    first_cycle_size = 4 * 1024 * 1024
-    if isinstance(cycles, list) and cycles and isinstance(cycles[0], dict):
-        downlink = cycles[0].get('downlink', {})
-        if isinstance(downlink.get('file'), dict) and downlink['file'].get('size_bytes'):
-            first_cycle_size = downlink['file']['size_bytes']
-        files = downlink.get('files', [])
-        if files and isinstance(files[0], dict) and files[0].get('size_bytes'):
-            first_cycle_size = files[0]['size_bytes']
-
-    artifact_size = int(resolved_cfg.get('artifact_size_bytes', value.get('artifact_size_bytes', first_cycle_size)))
+    artifact_size = int(resolved_cfg.get('artifact_size_bytes', value.get('artifact_size_bytes', 40 * 1024 * 1024)))
     cycle_count = int(resolved_cfg.get('smoke_cycle_count', 3))
     io_timeout = int(resolved_cfg.get('smoke_io_timeout_seconds', resolved_cfg.get('io_timeout_seconds', 120)))
     cycle_deadline = int(resolved_cfg.get('smoke_cycle_deadline_seconds', 240))
@@ -454,14 +447,16 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
                 errors.append('%s UFTP 文件接收矩阵未全部 copy' % prefix)
 
     concurrent_put = value.get('concurrent_put')
-    if concurrent_put is not None:
-        if not isinstance(concurrent_put, dict):
-            errors.append('%s.concurrent_put 必须是对象' % prefix)
-        else:
-            if not isinstance(concurrent_put.get('natural_overlap'), bool):
-                errors.append('%s.concurrent_put 缺少 natural_overlap 标记' % prefix)
-            if not isinstance(concurrent_put.get('overlap_duration_seconds'), (int, float)):
-                errors.append('%s.concurrent_put 缺少 overlap_duration_seconds' % prefix)
+    if concurrent_put is None or not isinstance(concurrent_put, dict):
+        errors.append('%s 缺少 concurrent_put 并发观测事实' % prefix)
+    else:
+        if not isinstance(concurrent_put.get('natural_overlap'), bool):
+            errors.append('%s.concurrent_put 缺少 natural_overlap 标记' % prefix)
+        if not isinstance(concurrent_put.get('overlap_duration_seconds'), (int, float)):
+            errors.append('%s.concurrent_put 缺少 overlap_duration_seconds' % prefix)
+        client_intervals = concurrent_put.get('client_intervals')
+        if not isinstance(client_intervals, dict) or set(client_intervals) != {'1', '2'}:
+            errors.append('%s.concurrent_put 缺少客户端 PUT 区间' % prefix)
 
     telem = value.get('telemetry')
     if telem is None:

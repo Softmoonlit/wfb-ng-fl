@@ -1055,6 +1055,14 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'natural_overlap': True,
                 'overlap_duration_seconds': 1.5,
                 'concurrent_active_observed': True,
+                'client_intervals': {
+                    '1': {'start': 1.0, 'end': 2.0},
+                    '2': {'start': 1.0, 'end': 2.0},
+                },
+                'server_intervals': {
+                    '1': {'start': 1.0, 'end': 2.0},
+                    '2': {'start': 1.0, 'end': 2.0},
+                },
             },
             'strict_sync': {
                 'client1_committed_before_client2': True,

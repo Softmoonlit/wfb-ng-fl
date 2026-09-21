@@ -70,28 +70,23 @@ def main(argv=None):
     round_deadline = resolved_cfg.get('runtime_timeout_seconds', 400)
     io_timeout = resolved_cfg.get('io_timeout_seconds', 120)
 
-    # 场景参数解析（从 envelope.json 的 resolved_config 获取；若未配置 envelope，则默认 1 轮 4 MiB 回归配置）
-    if 'rounds' in resolved_cfg:
-        expected_rounds = int(resolved_cfg['rounds'])
-    else:
-        expected_rounds = 1
-
-    if 'artifact_size_bytes' in resolved_cfg:
-        expected_size = int(resolved_cfg['artifact_size_bytes'])
-    elif expected_rounds == 1:
-        expected_size = 4 * 1024 * 1024
-    else:
-        expected_size = 40 * 1024 * 1024
-
+    # 场景参数解析（从 envelope.json 的 resolved_config 获取；默认 2 轮 40 MiB 正式场景）
+    expected_rounds = int(resolved_cfg.get('rounds', 2))
+    expected_size = int(resolved_cfg.get('artifact_size_bytes', 40 * 1024 * 1024))
     if 'training_delay_ms_by_node' in resolved_cfg:
         expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
     else:
-        if expected_rounds == 1 and expected_size == 4 * 1024 * 1024:
-            expected_delays = {1: 0, 2: 3000}
-        else:
-            expected_delays = {1: 0, 2: 0}
+        expected_delays = {1: 0, 2: 0}
 
-    rounds = _build_rounds(results, observations, archive_dir, errors, expected_rounds, expected_size, expected_delays, round_deadline, io_timeout)
+    scenario_cfg = {
+        'rounds': expected_rounds,
+        'artifact_size_bytes': expected_size,
+        'training_delays': expected_delays,
+        'round_deadline': round_deadline,
+        'io_timeout': io_timeout,
+    }
+
+    rounds = _build_rounds(results, observations, archive_dir, errors, scenario_cfg)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
     complete_nodes = [1, 2] if all(
@@ -139,7 +134,12 @@ def _template_hashes(results, errors):
     return hashes
 
 
-def _build_rounds(results, observations, archive_dir, errors, expected_rounds, expected_size, expected_delays, round_deadline=400, io_timeout=120):
+def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
+    expected_rounds = scenario_cfg['rounds']
+    expected_size = scenario_cfg['artifact_size_bytes']
+    expected_delays = scenario_cfg['training_delays']
+    round_deadline = scenario_cfg.get('round_deadline', 400)
+    io_timeout = scenario_cfg.get('io_timeout', 120)
     server = results.get('server')
     clients = {1: results.get('client1'), 2: results.get('client2')}
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
@@ -317,6 +317,24 @@ def _build_rounds(results, observations, archive_dir, errors, expected_rounds, e
             },
         }
 
+        # 确定本轮时间区间用于分轮遥测过滤
+        all_starts = []
+        all_ends = []
+        for r_int in receive_intervals.values():
+            if isinstance(r_int, dict) and 'start' in r_int:
+                all_starts.append(r_int['start'])
+            if isinstance(r_int, dict) and 'end' in r_int:
+                all_ends.append(r_int['end'])
+        for u in uploads:
+            c_int = u.get('client_put_interval')
+            if isinstance(c_int, dict) and 'start' in c_int:
+                all_starts.append(c_int['start'])
+            if isinstance(c_int, dict) and 'end' in c_int:
+                all_ends.append(c_int['end'])
+
+        r_start = min(all_starts) if all_starts else None
+        r_end = max(all_ends) if all_ends else None
+
         output.append({
             'round_index': index,
             'round_id': round_id,
@@ -329,7 +347,7 @@ def _build_rounds(results, observations, archive_dir, errors, expected_rounds, e
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
-            'telemetry': _build_telemetry(archive_dir, errors),
+            'telemetry': _build_telemetry(archive_dir, errors, round_start=r_start, round_end=r_end),
             'deadline_seconds': round_deadline,
             'io_timeout_seconds': io_timeout,
         })
@@ -489,7 +507,25 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     }
 
 
-def _build_telemetry(archive_dir, errors):
+def _filter_log_by_time(log_text, start_time, end_time):
+    if not log_text or start_time is None or end_time is None:
+        return log_text
+    filtered = []
+    for line in log_text.splitlines():
+        parts = line.split('\t', 1)
+        if parts:
+            try:
+                ts = float(parts[0])
+                if start_time <= ts <= end_time:
+                    filtered.append(line)
+                continue
+            except (ValueError, TypeError):
+                pass
+        filtered.append(line)
+    return '\n'.join(filtered)
+
+
+def _build_telemetry(archive_dir, errors, round_start=None, round_end=None):
     s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
     c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
     c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
@@ -499,6 +535,11 @@ def _build_telemetry(archive_dir, errors):
         os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'wfb.log'))
     c2_log = _read_file_text(c2_log_path) or _read_file_text(
         os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
+
+    if round_start is not None and round_end is not None:
+        s_log = _filter_log_by_time(s_log, round_start, round_end)
+        c1_log = _filter_log_by_time(c1_log, round_start, round_end)
+        c2_log = _filter_log_by_time(c2_log, round_start, round_end)
 
     s_queue_path = os.path.join(
         archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')

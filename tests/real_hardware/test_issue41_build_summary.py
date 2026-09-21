@@ -277,6 +277,19 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
                        returned_node_ids=None, same_template_hash=False,
                        size=4 * 1024 * 1024, concurrent_obs=False,
                        duplicate_round_id=False, client_mismatched_template=False):
+        env_path = os.path.join(self.archive_dir, 'envelope.json')
+        if not os.path.exists(env_path):
+            with open(env_path, 'w', encoding='utf-8') as fh:
+                json.dump({
+                    'schema_version': 1,
+                    'run_id': 'test-run',
+                    'resolved_config': {
+                        'rounds': 1,
+                        'artifact_size_bytes': 4 * 1024 * 1024,
+                        'training_delay_ms_by_node': {'1': 0, '2': 3000},
+                    }
+                }, fh)
+
         model_sha = 'a' * 64
         c1_sha = '1' * 64
         c2_sha = '1' * 64 if same_template_hash else '2' * 64
