@@ -9,9 +9,10 @@ import re
 import sys
 
 try:
-    from tests.real_hardware.issue41_gate import parse_telemetry
+    from tests.real_hardware.issue41_gate import parse_telemetry, make_empty_node_telemetry
 except ImportError:
     parse_telemetry = None
+    make_empty_node_telemetry = None
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
@@ -473,26 +474,8 @@ def _build_telemetry(archive_dir, errors):
             'packets_fec_recovered': 0,
         },
         'loss_and_fec_by_node': {
-            '1': {
-                'rx_packets': 0,
-                'rx_bytes': 0,
-                'packets_fec_recovered': 0,
-                'packets_lost': 0,
-                'out_packets': 0,
-                'out_bytes': 0,
-                'loss_rate': 0.0,
-                'fec_recovery_rate': 0.0,
-            },
-            '2': {
-                'rx_packets': 0,
-                'rx_bytes': 0,
-                'packets_fec_recovered': 0,
-                'packets_lost': 0,
-                'out_packets': 0,
-                'out_bytes': 0,
-                'loss_rate': 0.0,
-                'fec_recovery_rate': 0.0,
-            },
+            '1': make_empty_node_telemetry() if make_empty_node_telemetry else {},
+            '2': make_empty_node_telemetry() if make_empty_node_telemetry else {},
         },
         'tcp_retransmits': 0,
         'phase_durations': {

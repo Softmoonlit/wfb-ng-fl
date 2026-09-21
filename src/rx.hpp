@@ -129,21 +129,6 @@ typedef struct {
 
 #define RX_RING_SIZE 40
 
-typedef struct {
-    uint8_t source_node;
-    uint32_t seq;
-    rx_ring_item_t rx_ring[RX_RING_SIZE];
-    int rx_ring_front;
-    int rx_ring_alloc;
-    uint64_t last_known_block;
-    uint32_t count_p_raw;
-    uint32_t count_b_raw;
-    uint32_t count_p_fec_recovered;
-    uint32_t count_p_lost;
-    uint32_t count_p_outgoing;
-    uint32_t count_b_outgoing;
-} rx_source_state_t;
-
 struct RxSourceStats {
     uint32_t count_p_raw;
     uint32_t count_b_raw;
@@ -152,6 +137,16 @@ struct RxSourceStats {
     uint32_t count_p_outgoing;
     uint32_t count_b_outgoing;
 };
+
+typedef struct {
+    uint8_t source_node;
+    uint32_t seq;
+    rx_ring_item_t rx_ring[RX_RING_SIZE];
+    int rx_ring_front;
+    int rx_ring_alloc;
+    uint64_t last_known_block;
+    RxSourceStats stats;
+} rx_source_state_t;
 
 static inline int modN(int x, int base)
 {

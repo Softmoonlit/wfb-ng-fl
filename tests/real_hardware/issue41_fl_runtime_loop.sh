@@ -999,10 +999,16 @@ cmd_smoke_gate() {
     local t_ul_start t_ul_end ul_dur
     local work src model manifest status log
     local cycle_files=()
+    local s_lines_before=0 c1_lines_before=0 c2_lines_before=0
 
     for cycle in $(seq 1 "$SMOKE_CYCLE_COUNT"); do
         log_info "=== 运行数据面 Gate 周期 $cycle / $SMOKE_CYCLE_COUNT ==="
         t_cycle_start="$(python3 -c 'import time; print(time.monotonic())')"
+
+        # 记录本周期启动前各节点日志行数，用于准确截取单周期遥测
+        s_lines_before=$(wc -l < "$server_dir/wfb.log" 2>/dev/null || echo 0)
+        c1_lines_before=$(remote client1 "wc -l < '$(smoke_dir "$name")/client1/wfb.log' 2>/dev/null || echo 0")
+        c2_lines_before=$(remote client2 "wc -l < '$(smoke_dir "$name")/client2/wfb.log' 2>/dev/null || echo 0")
 
         # 1. 确定性生成交付物与 update 文件
         work="$server_dir/cycle$cycle"
@@ -1150,9 +1156,14 @@ PY
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
         done
 
-        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/wfb.log" "$server_dir/$role-wfb.log" "$server_dir/client1-wfb.log" "$server_dir/client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
+        # 截取本周期的日志切片
+        tail -n +"$((s_lines_before + 1))" "$server_dir/wfb.log" > "$server_dir/cycle${cycle}_server-wfb.log" 2>/dev/null || true
+        tail -n +"$((c1_lines_before + 1))" "$server_dir/client1-wfb.log" > "$server_dir/cycle${cycle}_client1-wfb.log" 2>/dev/null || true
+        tail -n +"$((c2_lines_before + 1))" "$server_dir/client2-wfb.log" > "$server_dir/cycle${cycle}_client2-wfb.log" 2>/dev/null || true
+
+        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/cycle${cycle}_server-wfb.log" "$server_dir/cycle${cycle}_client1-wfb.log" "$server_dir/cycle${cycle}_client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
 import json, os, sys
-cycle_idx, dl_path, ul_path, s_log_p, _, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
+cycle_idx, dl_path, ul_path, s_log_p, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import parse_telemetry, build_cycle_evidence, validate_cycle_evidence, GateConfig
 with open(dl_path, 'r', encoding='utf-8') as fh:
     dl = json.load(fh)
@@ -1205,21 +1216,7 @@ PY
         done
         cycle_files+=("$server_dir/cycle$cycle.json")
         log_ok "Gate 周期 $cycle 验收通过 (耗时: ${cycle_dur}s)"
-        python3 - "$server_dir/cycle$cycle.json" <<'PY'
-import json, sys
-cycle_ev = json.load(open(sys.argv[1], 'r', encoding='utf-8'))
-telem = cycle_ev.get('telemetry', {})
-by_node = telem.get('loss_and_fec_by_node', {})
-for nid in sorted(by_node.keys()):
-    data = by_node[nid]
-    rx_p = data.get('rx_packets', 0)
-    lost_p = data.get('packets_lost', 0)
-    fec_p = data.get('packets_fec_recovered', 0)
-    out_p = data.get('out_packets', 0)
-    loss_r = data.get('loss_rate', 0.0) * 100
-    fec_r = data.get('fec_recovery_rate', 0.0) * 100
-    print(f"       [分源遥测 Client{nid}] raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts")
-PY
+        python3 "$SCRIPT_DIR/issue41_gate.py" format-cycle-telemetry --cycle-json "$server_dir/cycle$cycle.json"
     done
 
     # 停止进程并清理收尾
@@ -1258,25 +1255,7 @@ PY
         --name pre_runtime_smoke \
         --json-file "$archive/gate_summary.json"
 
-    python3 - "$archive/gate_summary.json" <<'PY'
-import json, sys
-summary = json.load(open(sys.argv[1], 'r', encoding='utf-8'))
-cycles = summary.get('cycles', [])
-print("       ==== 分源遥测汇总 ====")
-for c in cycles:
-    c_idx = c.get('cycle_index')
-    telem = c.get('telemetry', {})
-    by_node = telem.get('loss_and_fec_by_node', {})
-    for nid in sorted(by_node.keys()):
-        data = by_node[nid]
-        rx_p = data.get('rx_packets', 0)
-        lost_p = data.get('packets_lost', 0)
-        fec_p = data.get('packets_fec_recovered', 0)
-        out_p = data.get('out_packets', 0)
-        loss_r = data.get('loss_rate', 0.0) * 100
-        fec_r = data.get('fec_recovery_rate', 0.0) * 100
-        print(f"       Cycle {c_idx} Client{nid}: raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts")
-PY
+    python3 "$SCRIPT_DIR/issue41_gate.py" format-summary-telemetry --summary-json "$archive/gate_summary.json"
 
     trap - ERR
     log_ok "数据面 Gate 全部通过 (共 $SMOKE_CYCLE_COUNT 周期)！"

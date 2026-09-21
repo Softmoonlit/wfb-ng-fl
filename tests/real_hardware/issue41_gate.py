@@ -665,21 +665,55 @@ def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
     """解析单行 PKT_SRC 统计，若格式不合法则返回 None。"""
     if '\tPKT_SRC\t' not in line:
         return None
-    m = re.search(r'\tPKT_SRC\t(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)(?:\s|$)', line)
+    m = re.match(r'^\s*(\d+)\tPKT_SRC\t(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)\s*$', line)
     if not m:
         return None
     try:
         return {
-            'node_id': str(int(m.group(1))),
-            'rx_packets': int(m.group(2)),
-            'rx_bytes': int(m.group(3)),
-            'packets_fec_recovered': int(m.group(4)),
-            'packets_lost': int(m.group(5)),
-            'out_packets': int(m.group(6)),
-            'out_bytes': int(m.group(7)),
+            'timestamp_ms': int(m.group(1)),
+            'node_id': str(int(m.group(2))),
+            'rx_packets': int(m.group(3)),
+            'rx_bytes': int(m.group(4)),
+            'packets_fec_recovered': int(m.group(5)),
+            'packets_lost': int(m.group(6)),
+            'out_packets': int(m.group(7)),
+            'out_bytes': int(m.group(8)),
         }
     except (ValueError, IndexError):
         return None
+
+
+def make_empty_node_telemetry() -> Dict[str, Any]:
+    """生成初始化的单节点丢包与 FEC 遥测结构。"""
+    return {
+        'rx_packets': 0,
+        'rx_bytes': 0,
+        'packets_fec_recovered': 0,
+        'packets_lost': 0,
+        'out_packets': 0,
+        'out_bytes': 0,
+        'loss_rate': 0.0,
+        'fec_recovery_rate': 0.0,
+    }
+
+
+def format_node_telemetry_lines(loss_and_fec_by_node: Dict[str, Dict[str, Any]],
+                                label_prefix: str = "") -> List[str]:
+    """格式化各节点分源遥测文本行。"""
+    lines = []
+    for nid in sorted(loss_and_fec_by_node.keys(), key=lambda x: int(x) if str(x).isdigit() else str(x)):
+        data = loss_and_fec_by_node[nid]
+        rx_p = data.get('rx_packets', 0)
+        lost_p = data.get('packets_lost', 0)
+        fec_p = data.get('packets_fec_recovered', 0)
+        out_p = data.get('out_packets', 0)
+        loss_r = data.get('loss_rate', 0.0) * 100
+        fec_r = data.get('fec_recovery_rate', 0.0) * 100
+        lines.append(
+            f"{label_prefix}Client{nid}: raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), "
+            f"fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts"
+        )
+    return lines
 
 
 def parse_telemetry(server_log: str,
@@ -724,26 +758,8 @@ def parse_telemetry(server_log: str,
     packets_lost = 0
     packets_fec_recovered = 0
     loss_and_fec_by_node: Dict[str, Dict[str, Any]] = {
-        '1': {
-            'rx_packets': 0,
-            'rx_bytes': 0,
-            'packets_fec_recovered': 0,
-            'packets_lost': 0,
-            'out_packets': 0,
-            'out_bytes': 0,
-            'loss_rate': 0.0,
-            'fec_recovery_rate': 0.0,
-        },
-        '2': {
-            'rx_packets': 0,
-            'rx_bytes': 0,
-            'packets_fec_recovered': 0,
-            'packets_lost': 0,
-            'out_packets': 0,
-            'out_bytes': 0,
-            'loss_rate': 0.0,
-            'fec_recovery_rate': 0.0,
-        },
+        '1': make_empty_node_telemetry(),
+        '2': make_empty_node_telemetry(),
     }
     for line in server_log.splitlines():
         if '\tRX_ANT\t' in line:
@@ -758,16 +774,7 @@ def parse_telemetry(server_log: str,
         if src_entry:
             nid = src_entry['node_id']
             if nid not in loss_and_fec_by_node:
-                loss_and_fec_by_node[nid] = {
-                    'rx_packets': 0,
-                    'rx_bytes': 0,
-                    'packets_fec_recovered': 0,
-                    'packets_lost': 0,
-                    'out_packets': 0,
-                    'out_bytes': 0,
-                    'loss_rate': 0.0,
-                    'fec_recovery_rate': 0.0,
-                }
+                loss_and_fec_by_node[nid] = make_empty_node_telemetry()
             loss_and_fec_by_node[nid]['rx_packets'] += src_entry['rx_packets']
             loss_and_fec_by_node[nid]['rx_bytes'] += src_entry['rx_bytes']
             loss_and_fec_by_node[nid]['packets_fec_recovered'] += src_entry['packets_fec_recovered']
@@ -1268,6 +1275,12 @@ def main(argv=None) -> int:
     p_eq.add_argument("--client2-fl", required=True)
     p_eq.add_argument("--out", default=None)
 
+    p_fct = subparsers.add_parser("format-cycle-telemetry")
+    p_fct.add_argument("--cycle-json", required=True)
+
+    p_fst = subparsers.add_parser("format-summary-telemetry")
+    p_fst.add_argument("--summary-json", required=True)
+
     args = parser.parse_args(argv)
     config = GateConfig()
 
@@ -1444,6 +1457,25 @@ def main(argv=None) -> int:
             for err in res["errors"]:
                 print(f"CONFIG_EQUIVALENCE_ERROR: {err}", file=sys.stderr)
             return 1
+        return 0
+
+    if args.command == "format-cycle-telemetry":
+        with open(args.cycle_json, "r", encoding="utf-8") as fh:
+            cycle_ev = json.load(fh)
+        by_node = cycle_ev.get("telemetry", {}).get("loss_and_fec_by_node", {})
+        for line in format_node_telemetry_lines(by_node, label_prefix="       [分源遥测 "):
+            print(f"{line}]")
+        return 0
+
+    if args.command == "format-summary-telemetry":
+        with open(args.summary_json, "r", encoding="utf-8") as fh:
+            summary = json.load(fh)
+        print("       ==== 分源遥测汇总 ====")
+        for c in summary.get("cycles", []):
+            c_idx = c.get("cycle_index")
+            by_node = c.get("telemetry", {}).get("loss_and_fec_by_node", {})
+            for line in format_node_telemetry_lines(by_node, label_prefix=f"       Cycle {c_idx} "):
+                print(line)
         return 0
 
     return 0

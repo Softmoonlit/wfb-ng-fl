@@ -13,6 +13,8 @@ from tests.real_hardware.issue41_gate import (
     build_cycle_evidence,
     build_gate_summary,
     classify_gate_failure,
+    format_node_telemetry_lines,
+    make_empty_node_telemetry,
     parse_pkt_src_line,
     parse_telemetry,
     validate_cycle_evidence,
@@ -167,6 +169,28 @@ class Issue41GateTestCase(unittest.TestCase):
         # 空行与随机文本
         self.assertIsNone(parse_pkt_src_line(""))
         self.assertIsNone(parse_pkt_src_line("corrupted line without tab"))
+        # 行尾追加多余字段或文本（行锚定保护）
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900:extra\n"))
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900 garbage\n"))
+
+    def test_format_node_telemetry_lines(self):
+        by_node = {
+            '1': {
+                'rx_packets': 100,
+                'rx_bytes': 10000,
+                'packets_fec_recovered': 5,
+                'packets_lost': 2,
+                'out_packets': 98,
+                'out_bytes': 9800,
+                'loss_rate': 0.02,
+                'fec_recovery_rate': 0.05,
+            }
+        }
+        lines = format_node_telemetry_lines(by_node, label_prefix="[前缀] ")
+        self.assertEqual(1, len(lines))
+        self.assertIn("Client1", lines[0])
+        self.assertIn("lost=2 (2.00%)", lines[0])
+        self.assertIn("fec_recovered=5 (5.00%)", lines[0])
 
     def test_parse_telemetry_extracts_per_node_loss_and_fec(self):
         server_log = (

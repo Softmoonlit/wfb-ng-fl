@@ -671,12 +671,12 @@ void Aggregator::dump_stats(void)
     for(uint8_t node_id : nodes_to_report)
     {
         rx_source_state_t *state = source_states_[node_id];
-        uint32_t raw_p = (state != NULL) ? state->count_p_raw : 0;
-        uint32_t raw_b = (state != NULL) ? state->count_b_raw : 0;
-        uint32_t fec_rec = (state != NULL) ? state->count_p_fec_recovered : 0;
-        uint32_t lost = (state != NULL) ? state->count_p_lost : 0;
-        uint32_t out_p = (state != NULL) ? state->count_p_outgoing : 0;
-        uint32_t out_b = (state != NULL) ? state->count_b_outgoing : 0;
+        uint32_t raw_p = (state != NULL) ? state->stats.count_p_raw : 0;
+        uint32_t raw_b = (state != NULL) ? state->stats.count_b_raw : 0;
+        uint32_t fec_rec = (state != NULL) ? state->stats.count_p_fec_recovered : 0;
+        uint32_t lost = (state != NULL) ? state->stats.count_p_lost : 0;
+        uint32_t out_p = (state != NULL) ? state->stats.count_p_outgoing : 0;
+        uint32_t out_b = (state != NULL) ? state->stats.count_b_outgoing : 0;
 
         IPC_MSG("%" PRIu64 "\tPKT_SRC\t%u:%u:%u:%u:%u:%u:%u\n", ts,
                 static_cast<unsigned>(node_id),
@@ -737,12 +737,7 @@ void Aggregator::clear_stats(void)
     {
         if (source_states_[i] != NULL)
         {
-            source_states_[i]->count_p_raw = 0;
-            source_states_[i]->count_b_raw = 0;
-            source_states_[i]->count_p_fec_recovered = 0;
-            source_states_[i]->count_p_lost = 0;
-            source_states_[i]->count_p_outgoing = 0;
-            source_states_[i]->count_b_outgoing = 0;
+            memset(&source_states_[i]->stats, 0, sizeof(source_states_[i]->stats));
         }
     }
 }
@@ -755,12 +750,7 @@ bool Aggregator::get_source_stats(uint8_t source_node, RxSourceStats *stats) con
     }
     if (stats != NULL)
     {
-        stats->count_p_raw = source_states_[source_node]->count_p_raw;
-        stats->count_b_raw = source_states_[source_node]->count_b_raw;
-        stats->count_p_fec_recovered = source_states_[source_node]->count_p_fec_recovered;
-        stats->count_p_lost = source_states_[source_node]->count_p_lost;
-        stats->count_p_outgoing = source_states_[source_node]->count_p_outgoing;
-        stats->count_b_outgoing = source_states_[source_node]->count_b_outgoing;
+        *stats = source_states_[source_node]->stats;
     }
     return true;
 }
@@ -1055,8 +1045,8 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     rx_source_state_t *state = get_source_state(source_node, true);
     assert(state != NULL);
 
-    state->count_p_raw += 1;
-    state->count_b_raw += size;
+    state->stats.count_p_raw += 1;
+    state->stats.count_b_raw += size;
 
     int ring_idx = get_block_ring_idx(state, block_idx);
 
@@ -1129,7 +1119,7 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
                 if(fec_count)
                 {
                     count_p_fec_recovered += fec_count;
-                    state->count_p_fec_recovered += fec_count;
+                    state->stats.count_p_fec_recovered += fec_count;
                     WFB_DBG("FEC recovered %u packets\n", fec_count);
                 }
                 break;
@@ -1163,7 +1153,7 @@ void Aggregator::send_packet(rx_source_state_t *state, int ring_idx, int fragmen
         uint32_t lost_count = packet_seq - state->seq - 1;
         ANDROID_IPC_MSG("PKT_LOST\t%d", lost_count);
         count_p_lost += lost_count;
-        state->count_p_lost += lost_count;
+        state->stats.count_p_lost += lost_count;
 
         WFB_ERR("PACKET_LOSS source_node=%u previous_seq=%" PRIu32 " current_seq=%" PRIu32 " lost_count=%" PRIu32 "\n",
                 static_cast<unsigned>(state->source_node),
@@ -1188,8 +1178,8 @@ void Aggregator::send_packet(rx_source_state_t *state, int ring_idx, int fragmen
         send_to_socket(payload, packet_size);
         count_p_outgoing += 1;
         count_b_outgoing += packet_size;
-        state->count_p_outgoing += 1;
-        state->count_b_outgoing += packet_size;
+        state->stats.count_p_outgoing += 1;
+        state->stats.count_b_outgoing += packet_size;
     }
 }
 
