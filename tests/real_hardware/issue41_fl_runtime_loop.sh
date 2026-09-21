@@ -1068,6 +1068,7 @@ PY
         [ $? -eq 0 ] || die "Gate 周期 $cycle UFTP 下行校验未通过"
 
         # 3. 两个 client 各一次 4 MiB HTTP PUT 上行
+        > "$server_dir/server-put-events.jsonl"
         t_ul_start="$(python3 -c 'import time; print(time.monotonic())')"
         for role in client1 client2; do
             local nid="${role#client}"
@@ -1095,9 +1096,10 @@ PY"
         done
         t_ul_end="$(python3 -c 'import time; print(time.monotonic())')"
         ul_dur="$(python3 -c "print($t_ul_end - $t_ul_start)")"
+        cp "$server_dir/server-put-events.jsonl" "$server_dir/server-put-events-cycle$cycle.jsonl"
 
         # 上行结果验证
-        python3 - "$server_dir/server-put-events.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" <<'PY'
+        python3 - "$server_dir/server-put-events-cycle$cycle.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" <<'PY'
 import json, sys
 events_file, c1_res_path, c2_res_path, duration_str, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import verify_uplink_cycle, GateConfig
