@@ -95,16 +95,15 @@ case "$cmd" in
 esac
 
 init_envelope() {
-    if [ -d "$ARCHIVE_DIR" ] && [ -n "$(ls -A "$ARCHIVE_DIR" 2>/dev/null)" ]; then
-        die "归档目录已存在且非空，拒绝覆盖：$ARCHIVE_DIR"
+    if [ -d "$ARCHIVE_DIR" ]; then
+        die "归档目录已存在，拒绝覆盖：$ARCHIVE_DIR"
     fi
-    mkdir -p "$ARCHIVE_DIR/orchestration" "$ARCHIVE_DIR/raw"
     python3 "$SCRIPT_DIR/issue41_envelope.py" init \
         --archive-dir "$ARCHIVE_DIR" \
         --run-id "$RUN_ID" \
         --branch "$BRANCH" \
         --commit "$(git -C "$PROJECT_ROOT" rev-parse HEAD 2>/dev/null || echo '')" \
-        --mode "${ISSUE41_MODE:-formal}" >/dev/null 2>&1 || true
+        --mode "${ISSUE41_MODE:-formal}" || die "运行包络初始化失败"
 }
 
 record_preflight_failure() {
