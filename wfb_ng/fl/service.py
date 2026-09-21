@@ -305,8 +305,14 @@ def _read_config(path):
         config.setdefault('io_timeout_seconds', 10)
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
-    if role not in ('server', 'client') or set(config) != allowed:
+    optional = {'channel', 'channel_width'}
+    config_keys = set(config)
+    if role not in ('server', 'client') or not (allowed <= config_keys <= (allowed | optional)):
         raise FLRuntimeError('invalid_configuration', '角色服务配置字段无效')
+    if 'channel' in config and (type(config['channel']) is not int or config['channel'] <= 0):
+        raise FLRuntimeError('invalid_configuration', '角色服务 channel 配置无效')
+    if 'channel_width' in config and (not isinstance(config['channel_width'], str) or not config['channel_width']):
+        raise FLRuntimeError('invalid_configuration', '角色服务 channel_width 配置无效')
     if config.get('schema_version') != 1:
         raise FLRuntimeError('invalid_configuration', '角色服务配置版本无效')
     if type(config['live_observation']) is not bool:
