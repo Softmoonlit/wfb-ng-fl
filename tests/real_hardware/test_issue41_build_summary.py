@@ -30,7 +30,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual(0, ret)
         summary = json.loads(buf.getvalue())
         self.assertEqual('passed', summary['status'])
-        self.assertEqual('一轮 4 MiB 严格同步确定性场景证据完整', summary['reason'])
+        self.assertEqual('1 轮 4 MiB 严格同步场景证据完整', summary['reason'])
         self.assertEqual(1, summary['scenario']['round_count'])
         self.assertEqual(4 * 1024 * 1024, summary['scenario']['artifact_size_bytes'])
         self.assertEqual({'1': 0, '2': 3000}, summary['scenario']['training_delay_ms_by_node'])
@@ -51,7 +51,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual(0, ret)
         summary = json.loads(buf.getvalue())
         self.assertEqual('failed', summary['status'])
-        self.assertIn('server 算法结果必须恰好包含一轮', summary['reason'])
+        self.assertIn('server 算法结果必须恰好包含 1 轮', summary['reason'])
 
     def test_build_summary_rejects_client2_delay_zero(self):
         self.write_fixtures(client2_delay=0)
@@ -397,12 +397,20 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
             c1_obs.append({'event': 'upload_phase', 'round': r_id, 'node_id': 1, 'transport_outcome': 'created'})
             c2_obs.append({'event': 'upload_phase', 'round': r_id, 'node_id': 2, 'transport_outcome': 'created'})
 
+        server_events = []
+        for r in range(1, rounds_count + 1):
+            server_events.extend([
+                {'name': 'publish_model_start', 'round_index': r, 'monotonic_time': 100.0 * r},
+                {'name': 'aggregate_done', 'round_index': r, 'monotonic_time': 100.0 * r + 50.0},
+            ])
+
         self.write_json(
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json'),
             {
                 'schema_version': 1,
                 'role': 'server',
                 'rounds': server_rounds,
+                'events': server_events,
                 'initial_model_size_bytes': size,
                 'conclusion': 'succeeded',
             })

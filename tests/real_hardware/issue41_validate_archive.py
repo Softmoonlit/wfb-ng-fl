@@ -408,21 +408,27 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             errors.append('%s node %d 未复用对应 update 模板' % (prefix, node_id))
         if not _is_interval(upload.get('client_put_interval')) or not _is_interval(upload.get('server_put_interval')):
             errors.append('%s node %d 缺少 PUT 时间区间' % (prefix, node_id))
-        if upload.get('client_http_status') != 201 or upload.get('server_http_status') != 201 or upload.get('server_outcome') != 'committed':
+        srv_status = upload.get('server_http_status')
+        if srv_status == 409:
+            errors.append('%s node %d 检测到 upload-in-progress 冲突 (HTTP 409)' % (prefix, node_id))
+        elif srv_status in (408, 504):
+            errors.append('%s node %d 检测到 HTTP timeout (HTTP %s)' % (prefix, node_id, srv_status))
+        if upload.get('client_http_status') != 201 or srv_status != 201 or upload.get('server_outcome') != 'committed':
             errors.append('%s node %d 客户端与服务端提交事实不一致或包含 upload_in_progress' % (prefix, node_id))
 
     downlink_matrix = value.get('downlink_matrix')
-    if downlink_matrix is not None:
-        if not isinstance(downlink_matrix, dict) or downlink_matrix.get('status') != 'passed':
-            errors.append('%s UFTP 下行逐 client 逐文件完成矩阵未通过' % prefix)
-        else:
-            conn = downlink_matrix.get('uftp_connect_matrix', {})
-            files = downlink_matrix.get('uftp_result_matrix', {})
-            if conn.get('1') != 'success' or conn.get('2') != 'success':
-                errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
-            if (files.get('1', {}).get('model.bin') != 'copy' or
-                    files.get('2', {}).get('model.bin') != 'copy'):
-                errors.append('%s UFTP 文件接收矩阵未全部 copy' % prefix)
+    if downlink_matrix is None:
+        errors.append('%s 缺少 downlink_matrix 下行证据' % prefix)
+    elif not isinstance(downlink_matrix, dict) or downlink_matrix.get('status') != 'passed':
+        errors.append('%s UFTP 下行逐 client 逐文件完成矩阵未通过' % prefix)
+    else:
+        conn = downlink_matrix.get('uftp_connect_matrix', {})
+        files = downlink_matrix.get('uftp_result_matrix', {})
+        if conn.get('1') != 'success' or conn.get('2') != 'success':
+            errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
+        if (files.get('1', {}).get('model.bin') != 'copy' or
+                files.get('2', {}).get('model.bin') != 'copy'):
+            errors.append('%s UFTP 文件接收矩阵未全部 copy' % prefix)
 
     concurrent_put = value.get('concurrent_put')
     if concurrent_put is None or not isinstance(concurrent_put, dict):

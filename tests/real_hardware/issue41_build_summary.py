@@ -93,10 +93,7 @@ def main(argv=None):
         value.get('server_wait_returned_node_ids') == [1, 2]
         for value in rounds) else []
     status = 'passed' if not errors else 'failed'
-    if expected_rounds == 1 and expected_size == 4 * 1024 * 1024:
-        success_reason = '一轮 4 MiB 严格同步确定性场景证据完整'
-    else:
-        success_reason = f'{expected_rounds} 轮 {expected_size // (1024 * 1024)} MiB 严格同步场景证据完整'
+    success_reason = f'{expected_rounds} 轮 {expected_size // (1024 * 1024)} MiB 严格同步场景证据完整'
     summary = {
         'status': status,
         'reason': '; '.join(errors) if errors else success_reason,
@@ -146,11 +143,8 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         return []
     server_rounds = server.get('rounds')
     if not isinstance(server_rounds, list) or len(server_rounds) != expected_rounds:
-        if expected_rounds == 1:
-            errors.append('server 算法结果必须恰好包含一轮')
-        else:
-            errors.append('server 算法结果必须恰好包含 %d 轮 (实际: %d)' % (
-                expected_rounds, len(server_rounds) if isinstance(server_rounds, list) else 0))
+        errors.append('server 算法结果必须恰好包含 %d 轮 (实际: %d)' % (
+            expected_rounds, len(server_rounds) if isinstance(server_rounds, list) else 0))
         return []
     output = []
     seen_round_ids = set()
@@ -295,8 +289,6 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             isinstance(value.get('active_node_ids'), list)
         ]
         concurrent_active_observed = any(set(s) == {1, 2} for s in active_sets)
-        if concurrent_active_observed:
-            natural_overlap = True
 
         concurrent_put = {
             'natural_overlap': natural_overlap,
@@ -434,8 +426,6 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     round_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'rounds', round_id)
     if os.path.isdir(round_dir):
         candidates.extend(sorted(glob.glob(os.path.join(round_dir, 'uftp-*.status'))))
-        if not candidates:
-            candidates.extend(sorted(glob.glob(os.path.join(round_dir, '*.status'))))
 
     connect_matrix = {}
     result_matrix = {'1': {}, '2': {}}
@@ -492,21 +482,21 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
 
 def _filter_log_by_time_ms(log_text, start_ms, end_ms):
     if not log_text or start_ms is None or end_ms is None:
-        return log_text
+        return ''
     filtered = []
     pattern = re.compile(r'(\d+)[\t ]+PKT')
     for line in log_text.splitlines():
         m = pattern.search(line)
         if m:
             ts = int(m.group(1))
-            if start_ms - 500 <= ts <= end_ms + 1000:
+            if start_ms <= ts <= end_ms + 1000:
                 filtered.append(line)
-        else:
-            filtered.append(line)
     return '\n'.join(filtered)
 
 
 def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None):
+    if round_start_ms is None or round_end_ms is None:
+        errors.append('缺少轮次有效起止时间戳，无法切片提取遥测数据')
     s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
     c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
     c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
@@ -517,8 +507,7 @@ def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None
     c2_log = _read_file_text(c2_log_path) or _read_file_text(
         os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
 
-    if round_start_ms is not None and round_end_ms is not None:
-        s_log = _filter_log_by_time_ms(s_log, round_start_ms, round_end_ms)
+    s_log = _filter_log_by_time_ms(s_log, round_start_ms, round_end_ms)
 
     s_queue_path = os.path.join(
         archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')

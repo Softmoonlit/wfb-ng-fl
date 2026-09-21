@@ -1053,6 +1053,14 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 '1': {'start': 1.0, 'end': 2.0},
                 '2': {'start': 1.0, 'end': 2.0},
             },
+            'downlink_matrix': {
+                'status': 'passed',
+                'uftp_connect_matrix': {'1': 'success', '2': 'success'},
+                'uftp_result_matrix': {
+                    '1': {'model.bin': 'copy', 'model.manifest.json': 'copy'},
+                    '2': {'model.bin': 'copy', 'model.manifest.json': 'copy'},
+                },
+            },
             'uploads': uploads,
             'active_upload_sets': [[1], [1, 2], [2], []],
             'concurrent_put': {
