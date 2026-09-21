@@ -374,13 +374,14 @@ EOF
 
 cmd_generate_fixtures() {
     log_info "生成确定性验收 fixture (4 MiB)..."
+    sudo install -d -m 0777 "$(dirname "$INITIAL_MODEL_PATH")"
     python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir "$(dirname "$INITIAL_MODEL_PATH")" --role model --output "$INITIAL_MODEL_PATH" --size "$INPUT_SIZE_BYTES"
     log_ok "server 初始模型生成完成：$INITIAL_MODEL_PATH"
 
-    remote client1 "python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' --role client1 --output '$CLIENT1_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
+    remote client1 "sudo install -d -m 0777 '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' && cd '$REMOTE_REPO' && python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' --role client1 --output '$CLIENT1_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
     log_ok "client1 update 模板生成完成：$CLIENT1_UPDATE_TEMPLATE_PATH"
 
-    remote client2 "python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' --role client2 --output '$CLIENT2_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
+    remote client2 "sudo install -d -m 0777 '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' && cd '$REMOTE_REPO' && python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' --role client2 --output '$CLIENT2_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
     log_ok "client2 update 模板生成完成：$CLIENT2_UPDATE_TEMPLATE_PATH"
 }
 
