@@ -610,6 +610,276 @@ class Issue41GateTestCase(unittest.TestCase):
             'io_timeout_seconds': 120,
         }
 
+    def test_parse_link_args_extracts_all_parameters(self):
+        from tests.real_hardware.issue41_gate import parse_link_args
+        args = [
+            '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
+            '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+            '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+            '--radio-mcs-index', '3', '--radio-short-gi', '--air-interface', 'wlx1',
+            '--known-clients', '1,2', '--client-target', '1:10.80.0.11:127.0.0.1:1',
+            '--grant-duration-ms', '120', '--guard-interval-ms', '20',
+            '--downlink-pause-threshold-bytes', '131072',
+            '--downlink-resume-threshold-bytes', '65536',
+            '--downlink-queue-packets-limit', '64',
+            '--feedback-window-period-ms', '500',
+            '--feedback-window-duration-ms', '15',
+            '--log-interval', '200',
+        ]
+        parsed = parse_link_args(args)
+        self.assertEqual('v8i41s0', parsed['tun_name'])
+        self.assertEqual('10.80.0.1/24', parsed['tun_addr'])
+        self.assertEqual(406, parsed['link_id'])
+        self.assertEqual(32, parsed['uplink_stream'])
+        self.assertEqual(33, parsed['downlink_stream'])
+        self.assertEqual(8, parsed['fec_k'])
+        self.assertEqual(12, parsed['fec_n'])
+        self.assertEqual(40, parsed['radio_bandwidth'])
+        self.assertEqual(3, parsed['radio_mcs_index'])
+        self.assertTrue(parsed['radio_short_gi'])
+        self.assertEqual(131072, parsed['downlink_pause_threshold_bytes'])
+        self.assertEqual(65536, parsed['downlink_resume_threshold_bytes'])
+        self.assertEqual(64, parsed['downlink_queue_packets_limit'])
+        self.assertEqual(500, parsed['feedback_window_period_ms'])
+        self.assertEqual(15, parsed['feedback_window_duration_ms'])
+        self.assertFalse(parsed['feedback_window_start_immediately'])
+
+    def test_verify_config_equivalence_success(self):
+        from tests.real_hardware.issue41_gate import (
+            GateConfig, verify_config_equivalence,
+        )
+        cfg = GateConfig()
+        gate_configs = {
+            'server': cfg.get_expected_link_config('server', 255),
+            'client1': cfg.get_expected_link_config('client', 1),
+            'client2': cfg.get_expected_link_config('client', 2),
+        }
+        runtime_configs = {
+            'server': {
+                'role': 'server',
+                'node_id': 255,
+                'link_args': [
+                    '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
+                    '--downlink-pause-threshold-bytes', '131072',
+                    '--downlink-resume-threshold-bytes', '65536',
+                    '--downlink-queue-packets-limit', '64',
+                    '--feedback-window-period-ms', '500',
+                    '--feedback-window-duration-ms', '15',
+                ],
+            },
+            'client1': {
+                'role': 'client',
+                'node_id': 1,
+                'link_args': [
+                    '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+            'client2': {
+                'role': 'client',
+                'node_id': 2,
+                'link_args': [
+                    '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+        }
+        errors = verify_config_equivalence(gate_configs, runtime_configs)
+        self.assertEqual([], errors)
+
+    def test_verify_config_equivalence_rejects_mismatch(self):
+        from tests.real_hardware.issue41_gate import (
+            GateConfig, verify_config_equivalence,
+        )
+        cfg = GateConfig()
+        gate_configs = {
+            'server': cfg.get_expected_link_config('server', 255),
+            'client1': cfg.get_expected_link_config('client', 1),
+            'client2': cfg.get_expected_link_config('client', 2),
+        }
+        # client1 MCS differs (2 vs 3), server bandwidth differs (20 vs 40)
+        runtime_configs = {
+            'server': {
+                'role': 'server',
+                'node_id': 255,
+                'link_args': [
+                    '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '20',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--downlink-pause-threshold-bytes', '131072',
+                    '--downlink-resume-threshold-bytes', '65536',
+                    '--downlink-queue-packets-limit', '64',
+                    '--feedback-window-period-ms', '500',
+                    '--feedback-window-duration-ms', '15',
+                ],
+            },
+            'client1': {
+                'role': 'client',
+                'node_id': 1,
+                'link_args': [
+                    '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '2', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+            'client2': {
+                'role': 'client',
+                'node_id': 2,
+                'link_args': [
+                    '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+        }
+        errors = verify_config_equivalence(gate_configs, runtime_configs)
+        self.assertTrue(any('radio_bandwidth' in e for e in errors))
+        self.assertTrue(any('radio_mcs_index' in e for e in errors))
+
+    def test_verify_config_equivalence_rejects_immediate_feedback(self):
+        from tests.real_hardware.issue41_gate import (
+            GateConfig, verify_config_equivalence,
+        )
+        cfg = GateConfig()
+        gate_configs = {
+            'server': cfg.get_expected_link_config('server', 255),
+            'client1': cfg.get_expected_link_config('client', 1),
+            'client2': cfg.get_expected_link_config('client', 2),
+        }
+        runtime_configs = {
+            'server': {
+                'role': 'server',
+                'node_id': 255,
+                'link_args': [
+                    '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--downlink-pause-threshold-bytes', '131072',
+                    '--downlink-resume-threshold-bytes', '65536',
+                    '--downlink-queue-packets-limit', '64',
+                    '--feedback-window-period-ms', '500',
+                    '--feedback-window-duration-ms', '15',
+                    '--feedback-window-start-immediately',
+                ],
+            },
+            'client1': {
+                'role': 'client',
+                'node_id': 1,
+                'link_args': [
+                    '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+            'client2': {
+                'role': 'client',
+                'node_id': 2,
+                'link_args': [
+                    '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ],
+            },
+        }
+        errors = verify_config_equivalence(gate_configs, runtime_configs)
+        self.assertTrue(any('--feedback-window-start-immediately' in e for e in errors))
+
+    def test_cli_verify_config_equivalence(self):
+        from tests.real_hardware.issue41_gate import main
+        d = tempfile.mkdtemp(prefix='issue41-eq-test-')
+        self.addCleanup(shutil.rmtree, d, True)
+        s_path = os.path.join(d, 'fl-server.json')
+        c1_path = os.path.join(d, 'fl-client1.json')
+        c2_path = os.path.join(d, 'fl-client2.json')
+        out_path = os.path.join(d, 'eq-out.json')
+        with open(s_path, 'w') as fh:
+            json.dump({
+                'role': 'server',
+                'link_args': [
+                    '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--downlink-pause-threshold-bytes', '131072',
+                    '--downlink-resume-threshold-bytes', '65536',
+                    '--downlink-queue-packets-limit', '64',
+                    '--feedback-window-period-ms', '500',
+                    '--feedback-window-duration-ms', '15',
+                ]
+            }, fh)
+        with open(c1_path, 'w') as fh:
+            json.dump({
+                'role': 'client',
+                'node_id': 1,
+                'link_args': [
+                    '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ]
+            }, fh)
+        with open(c2_path, 'w') as fh:
+            json.dump({
+                'role': 'client',
+                'node_id': 2,
+                'link_args': [
+                    '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
+                    '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
+                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--uplink-pause-threshold-bytes', '131072',
+                    '--uplink-resume-threshold-bytes', '65536',
+                    '--uplink-queue-packets-limit', '64',
+                ]
+            }, fh)
+        ret = main([
+            'verify-config-equivalence',
+            '--server-fl', s_path,
+            '--client1-fl', c1_path,
+            '--client2-fl', c2_path,
+            '--out', out_path,
+        ])
+        self.assertEqual(0, ret)
+        self.assertTrue(os.path.isfile(out_path))
+        with open(out_path, 'r') as fh:
+            res = json.load(fh)
+        self.assertEqual('passed', res['status'])
+
 
 if __name__ == '__main__':
     unittest.main()

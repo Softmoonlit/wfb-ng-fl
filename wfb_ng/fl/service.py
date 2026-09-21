@@ -99,6 +99,19 @@ def _is_ipv4_multicast(host):
     return isinstance(address, ipaddress.IPv4Address) and address.is_multicast
 
 
+def _is_tun_ready(tun_path):
+    if not os.path.isdir(tun_path):
+        return False
+    flags_path = os.path.join(tun_path, 'flags')
+    if os.path.isfile(flags_path):
+        try:
+            with open(flags_path, 'r') as fh:
+                return bool(int(fh.read().strip(), 16) & 1)
+        except (OSError, ValueError):
+            return False
+    return True
+
+
 class MulticastRoute(object):
     """管理 UFTP 公共和私有组播地址到角色 TUN 的主机路由。"""
 
@@ -231,7 +244,7 @@ def load_role_service(path, expected_role=None):
         executables['wfb_v6_uplink'],
         '--role', role_name,
         '--node-id', str(config['node_id']),
-    ] + link_args, readiness_probe=lambda: os.path.isdir(tun_path))
+    ] + link_args, readiness_probe=lambda: _is_tun_ready(tun_path))
     try:
         if role_name == 'server':
             role = ServerRole(

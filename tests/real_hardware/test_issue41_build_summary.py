@@ -83,6 +83,93 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual('failed', summary['status'])
         self.assertIn('两个 client update 模板 SHA-256 相同', summary['reason'])
 
+    def test_build_summary_downlink_matrix_and_telemetry_included(self):
+        self.write_fixtures()
+        # Also write an explicit uftp status file in server rounds dir
+        r_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', 'round-1')
+        os.makedirs(r_dir, exist_ok=True)
+        with open(os.path.join(r_dir, 'uftp-1.status'), 'w', encoding='utf-8') as fh:
+            fh.write('CONNECT;success;0x00000001\n')
+            fh.write('CONNECT;success;0x00000002\n')
+            fh.write('RESULT;0x00000001;model.bin;4194304;copy\n')
+            fh.write('RESULT;0x00000001;model.manifest.json;120;copy\n')
+            fh.write('RESULT;0x00000002;model.bin;4194304;copy\n')
+            fh.write('RESULT;0x00000002;model.manifest.json;120;copy\n')
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('passed', summary['status'])
+        round1 = summary['rounds'][0]
+        self.assertIn('downlink_matrix', round1)
+        self.assertEqual('passed', round1['downlink_matrix']['status'])
+        self.assertEqual('success', round1['downlink_matrix']['uftp_connect_matrix']['1'])
+        self.assertEqual('success', round1['downlink_matrix']['uftp_connect_matrix']['2'])
+        self.assertEqual('copy', round1['downlink_matrix']['uftp_result_matrix']['1']['model.bin'])
+        self.assertIn('telemetry', round1)
+        self.assertIn('ready_accepted_total', round1['telemetry'])
+        self.assertIn('queue', round1['telemetry'])
+        self.assertIn('config_equivalence', summary)
+        self.assertEqual('passed', summary['config_equivalence']['status'])
+        self.assertIn('controlled_stop', summary)
+        self.assertEqual('passed', summary['controlled_stop']['status'])
+
+    def test_build_summary_detects_unrecovered_queue_pause(self):
+        self.write_fixtures()
+        # Write server queue summary indicating pause not recovered
+        q_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')
+        with open(q_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'tun_read_pause_total': 3,
+                'tun_read_resume_total': 2,
+                'currently_paused': True,
+                'pause_recovered': False,
+                'tun_read_pause_total_by_reason': {'queued_bytes_threshold': 3, 'queued_packets_limit': 0},
+                'queued_bytes_max': 200000,
+                'queued_packets_max': 50,
+            }, fh)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('Runtime 队列自然暂停后未成功恢复', summary['reason'])
+
+    def test_build_summary_detects_config_equivalence_failure(self):
+        self.write_fixtures()
+        eq_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'config_equivalence.json')
+        with open(eq_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'status': 'failed',
+                'errors': ['角色 client1 配置项 radio_mcs_index 不等价: gate=3, runtime=2'],
+            }, fh)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('链路配置等价性失败', summary['reason'])
+
+    def test_build_summary_detects_controlled_stop_failure(self):
+        self.write_fixtures()
+        cs_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'controlled_stop.json')
+        with open(cs_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'status': 'failed',
+                'server_stopped': False,
+            }, fh)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('角色服务受控停止未通过', summary['reason'])
+
     def write_fixtures(self, rounds_count=1, client2_delay=3000,
                        returned_node_ids=None, same_template_hash=False):
         size = 4 * 1024 * 1024

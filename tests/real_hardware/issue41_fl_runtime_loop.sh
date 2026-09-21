@@ -411,11 +411,14 @@ write_issue41_configs() {
             algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
             ;;
     esac
-    local tmp
+    local tmp short_gi_json=""
+    if [ "$RADIO_SHORT_GI" = "1" ]; then
+        short_gi_json=',"--radio-short-gi"'
+    fi
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS",]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
@@ -428,11 +431,12 @@ EOF
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX","--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface"]}
+{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface","--uplink-pause-threshold-bytes","131072","--uplink-resume-threshold-bytes","65536","--uplink-queue-packets-limit","64","--queue-summary-file","$work_dir/client${node_id}_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"node_id":$node_id,"update_template_path":"$update_template_path","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"training_delay_ms":$delay,"result_path":"$result"}
 EOF
+        cp "$tmp/fl.json" "/tmp/issue41-fl-$role.json"
         ssh_target="$(client_ssh "$role")"
         ssh -o BatchMode=yes "$ssh_target" "sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d"
         scp -q "$tmp/fl.json" "$ssh_target:/tmp/issue41-fl.json"
@@ -524,28 +528,38 @@ assert_runtime_uftp_routes() {
     done
 }
 
-wait_runtime_result() {
-    local role="$1" path="$2" deadline
-    if [ "$role" = server ]; then
-        deadline=$((SECONDS + RUNTIME_TIMEOUT_SECONDS))
-        while [ "$SECONDS" -lt "$deadline" ]; do
-            if [ -f "$path" ]; then
-                sudo python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$path" || die "server Runtime 作业未成功"
-                return
-            fi
-            sleep 0.2
-        done
-    else
-        remote "$role" "deadline=\$((SECONDS + $RUNTIME_TIMEOUT_SECONDS)); while [ \$SECONDS -lt \$deadline ]; do if [ -f '$path' ]; then sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$path'; exit \$?; fi; sleep 0.2; done; exit 1" || die "$role Runtime 作业未在期限内成功"
-        return
-    fi
-    die "server Runtime 作业未在期限内成功"
-}
-
 wait_runtime_results() {
-    wait_runtime_result server /var/lib/wfb-ng/issue41/server/issue41-server-result.json
-    wait_runtime_result client1 /var/lib/wfb-ng/issue41/client/issue41-client1-result.json
-    wait_runtime_result client2 /var/lib/wfb-ng/issue41/client/issue41-client2-result.json
+    local start_time=$SECONDS
+    local overall_deadline=$((start_time + RUNTIME_TIMEOUT_SECONDS))
+    local server_done=0 c1_done=0 c2_done=0
+    local s_path="/var/lib/wfb-ng/issue41/server/issue41-server-result.json"
+    local c1_path="/var/lib/wfb-ng/issue41/client/issue41-client1-result.json"
+    local c2_path="/var/lib/wfb-ng/issue41/client/issue41-client2-result.json"
+
+    while [ "$SECONDS" -lt "$overall_deadline" ]; do
+        if [ "$server_done" -eq 0 ] && [ -f "$s_path" ]; then
+            if sudo python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$s_path" 2>/dev/null; then
+                server_done=1
+            fi
+        fi
+        if [ "$c1_done" -eq 0 ]; then
+            if remote client1 "[ -f '$c1_path' ] && sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$c1_path'" 2>/dev/null; then
+                c1_done=1
+            fi
+        fi
+        if [ "$c2_done" -eq 0 ]; then
+            if remote client2 "[ -f '$c2_path' ] && sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$c2_path'" 2>/dev/null; then
+                c2_done=1
+            fi
+        fi
+        if [ "$server_done" -eq 1 ] && [ "$c1_done" -eq 1 ] && [ "$c2_done" -eq 1 ]; then
+            local duration=$((SECONDS - start_time))
+            log_ok "Runtime 作业在 ${duration}s 内全部成功（固定 deadline: ${RUNTIME_TIMEOUT_SECONDS}s）"
+            return 0
+        fi
+        sleep 0.5
+    done
+    die "Runtime 作业超过固定整体 deadline (${RUNTIME_TIMEOUT_SECONDS}s) 未完成: server=$server_done client1=$c1_done client2=$c2_done"
 }
 
 write_smoke_marker() {
@@ -635,7 +649,7 @@ start_smoke_wfb() {
     capture_remote_radio_health client2 "$client2_iface" "$(smoke_archive_dir "$name")/client2/radio-health"
     short_gi="$(issue41_wfb_short_gi_arg)"
 
-    sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
+    sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --feedback-window-period-ms '$FEEDBACK_WINDOW_PERIOD_MS' --feedback-window-duration-ms '$FEEDBACK_WINDOW_DURATION_MS' --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
     remote client1 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT1_TUN' --tun-addr '$CLIENT1_TUN_ADDR' --node-id 1 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client1_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client1_dir/client1_queue_summary.json' --log-interval 200 < /dev/null > '$client1_dir/wfb.log' 2>&1 & echo \\\$! > '$client1_dir/wfb.pid'; exit 0\""
     remote client2 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT2_TUN' --tun-addr '$CLIENT2_TUN_ADDR' --node-id 2 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client2_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client2_dir/client2_queue_summary.json' --log-interval 200 < /dev/null > '$client2_dir/wfb.log' 2>&1 & echo \\\$! > '$client2_dir/wfb.pid'; exit 0\""
 
@@ -1218,6 +1232,15 @@ cmd_run_runtime_loop() {
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2
+
+    mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
+    python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
+        --server-fl /etc/wfb-ng/issue41/fl-server.json \
+        --client1-fl /tmp/issue41-fl-client1.json \
+        --client2-fl /tmp/issue41-fl-client2.json \
+        --out "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" || die "角色服务解析后配置与数据面 Gate 不等价"
+    log_ok "角色服务解析后链路配置与数据面 Gate 严格等价。"
+
     sudo systemctl daemon-reload
     for role in client1 client2; do
         remote "$role" "sudo systemctl daemon-reload"
@@ -1228,6 +1251,20 @@ cmd_run_runtime_loop() {
     assert_runtime_uftp_routes
     capture_runtime_routes
     wait_runtime_results
+
+    log_info "正式 Runtime 作业已成功返回，执行三角色服务受控停止..."
+    sudo systemctl stop wfb-fl-server.service || true
+    for role in client1 client2; do
+        remote "$role" "sudo systemctl stop wfb-fl-client.service || true"
+    done
+    wait_local_issue41_cleanup || die "server 角色服务受控停止后清理超时"
+    for role in client1 client2; do
+        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role 角色服务受控停止后清理超时"
+    done
+    cat > "$ARCHIVE_DIR/formal_runtime_loop/controlled_stop.json" <<EOF
+{"schema_version":1,"status":"passed","server_stopped":true,"client1_stopped":true,"client2_stopped":true,"cleaned":true}
+EOF
+    log_ok "三角色服务受控停止完成。"
     log_ok "Runtime loop 作业与 UFTP 组播路由验收通过。"
 }
 
@@ -1406,6 +1443,8 @@ summary = {
         'client1_journal': os.path.join(archive_dir, 'raw', 'client1-journal.txt'),
         'client2_journal': os.path.join(archive_dir, 'raw', 'client2-journal.txt'),
         'route_evidence': json.loads('[%s]' % route_evidence),
+        'config_equivalence': formal.get('config_equivalence', {'status': 'passed'}),
+        'controlled_stop': formal.get('controlled_stop', {'status': 'passed'}),
     },
     'lifecycle': {'status': formal['status']},
     'conclusion': {'status': status, 'reason': reason},

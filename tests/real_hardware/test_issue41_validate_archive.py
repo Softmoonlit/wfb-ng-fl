@@ -244,6 +244,73 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         errors = validate_archive(self.root)
         self.assertTrue(any('client1 先于 client2' in error for error in errors))
 
+    def test_rejects_downlink_matrix_failure(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['downlink_matrix'] = {
+            'status': 'failed',
+            'uftp_connect_matrix': {'1': 'success', '2': 'failed'},
+        }
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('UFTP' in error for error in errors))
+
+    def test_rejects_unrecovered_queue_pause(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['telemetry'] = {
+            'queue': {
+                'tun_read_pause_total': 2,
+                'tun_read_resume_total': 1,
+                'pause_recovered': False,
+            }
+        }
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('队列自然暂停' in error for error in errors))
+
+    def test_rejects_config_equivalence_failure(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['config_equivalence'] = {
+            'status': 'failed',
+            'errors': ['mismatch'],
+        }
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('配置等价性' in error for error in errors))
+
+    def test_rejects_controlled_stop_failure(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['controlled_stop'] = {
+            'status': 'failed',
+            'server_stopped': False,
+        }
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('受控停止' in error for error in errors))
+
     def write_runtime_evidence(self):
         for name in ('server-journal.txt', 'client1-journal.txt', 'client2-journal.txt'):
             self.write_text(name, 'evidence\n')

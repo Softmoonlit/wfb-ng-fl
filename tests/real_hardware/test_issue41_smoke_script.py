@@ -133,6 +133,26 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_runtime_disables_role_journal_rate_limiting_for_observations(self):
         self.assertEqual(2, self.script.count('LogRateLimitIntervalSec=0'))
 
+    def test_formal_runtime_enforces_config_equivalence_and_controlled_stop(self):
+        for fragment in (
+                'issue41_gate.py" verify-config-equivalence',
+                '--server-fl /etc/wfb-ng/issue41/fl-server.json',
+                '--client1-fl /tmp/issue41-fl-client1.json',
+                '--client2-fl /tmp/issue41-fl-client2.json',
+                'config_equivalence.json',
+                '角色服务解析后配置与数据面 Gate 不等价',
+                '执行三角色服务受控停止',
+                'controlled_stop.json',
+                '三角色服务受控停止完成'):
+            self.assertIn(fragment, self.script)
+
+    def test_formal_runtime_fixed_deadline_loop(self):
+        for fragment in (
+                'local start_time=$SECONDS',
+                'local overall_deadline=$((start_time + RUNTIME_TIMEOUT_SECONDS))',
+                'Runtime 作业超过固定整体 deadline'):
+            self.assertIn(fragment, self.script)
+
     def test_runtime_starts_clients_ready_before_server_and_disables_restarts(self):
         for fragment in (
                 'wait_remote_service_ready "$role" wfb-fl-client.service',

@@ -37,7 +37,24 @@ class GateConfig:
                  fec_n: int = 12,
                  radio_bandwidth: int = 40,
                  radio_mcs_index: int = 3,
-                 radio_short_gi: int = 1):
+                 radio_short_gi: int = 1,
+                 uplink_stream: int = 32,
+                 downlink_stream: int = 33,
+                 server_tun: str = 'v8i41s0',
+                 server_tun_addr: str = '10.80.0.1/24',
+                 client1_tun: str = 'v8i41c1',
+                 client1_tun_addr: str = '10.80.0.11/24',
+                 client2_tun: str = 'v8i41c2',
+                 client2_tun_addr: str = '10.80.0.12/24',
+                 downlink_pause_threshold_bytes: int = 131072,
+                 downlink_resume_threshold_bytes: int = 65536,
+                 downlink_queue_packets_limit: int = 64,
+                 uplink_pause_threshold_bytes: int = 131072,
+                 uplink_resume_threshold_bytes: int = 65536,
+                 uplink_queue_packets_limit: int = 64,
+                 feedback_window_period_ms: int = 500,
+                 feedback_window_duration_ms: int = 15,
+                 round_deadline_seconds: int = 240):
         self.cycle_count = cycle_count
         self.artifact_size_bytes = artifact_size_bytes
         self.io_timeout_seconds = io_timeout_seconds
@@ -50,6 +67,23 @@ class GateConfig:
         self.radio_bandwidth = radio_bandwidth
         self.radio_mcs_index = radio_mcs_index
         self.radio_short_gi = radio_short_gi
+        self.uplink_stream = uplink_stream
+        self.downlink_stream = downlink_stream
+        self.server_tun = server_tun
+        self.server_tun_addr = server_tun_addr
+        self.client1_tun = client1_tun
+        self.client1_tun_addr = client1_tun_addr
+        self.client2_tun = client2_tun
+        self.client2_tun_addr = client2_tun_addr
+        self.downlink_pause_threshold_bytes = downlink_pause_threshold_bytes
+        self.downlink_resume_threshold_bytes = downlink_resume_threshold_bytes
+        self.downlink_queue_packets_limit = downlink_queue_packets_limit
+        self.uplink_pause_threshold_bytes = uplink_pause_threshold_bytes
+        self.uplink_resume_threshold_bytes = uplink_resume_threshold_bytes
+        self.uplink_queue_packets_limit = uplink_queue_packets_limit
+        self.feedback_window_period_ms = feedback_window_period_ms
+        self.feedback_window_duration_ms = feedback_window_duration_ms
+        self.round_deadline_seconds = round_deadline_seconds
 
     @staticmethod
     def validate_link_args(args: List[str]) -> None:
@@ -57,6 +91,224 @@ class GateConfig:
         for arg in args:
             if '--feedback-window-start-immediately' in arg:
                 raise ValueError("严禁使用 --feedback-window-start-immediately 候选行为")
+
+    def get_expected_link_config(self, role: str, node_id: int = 255) -> Dict[str, Any]:
+        """根据 GateConfig 生成对应角色的期望解析后链路配置字典。"""
+        if role == 'server':
+            return {
+                'role': 'server',
+                'node_id': 255,
+                'channel': self.channel,
+                'channel_width': self.channel_width,
+                'radio_bandwidth': self.radio_bandwidth,
+                'radio_mcs_index': self.radio_mcs_index,
+                'radio_short_gi': bool(self.radio_short_gi),
+                'fec_k': self.fec_k,
+                'fec_n': self.fec_n,
+                'link_id': self.link_id,
+                'uplink_stream': self.uplink_stream,
+                'downlink_stream': self.downlink_stream,
+                'tun_name': self.server_tun,
+                'tun_addr': self.server_tun_addr,
+                'grant_duration_ms': 120,
+                'guard_interval_ms': 20,
+                'downlink_pause_threshold_bytes': self.downlink_pause_threshold_bytes,
+                'downlink_resume_threshold_bytes': self.downlink_resume_threshold_bytes,
+                'downlink_queue_packets_limit': self.downlink_queue_packets_limit,
+                'feedback_window_period_ms': self.feedback_window_period_ms,
+                'feedback_window_duration_ms': self.feedback_window_duration_ms,
+                'feedback_window_start_immediately': False,
+            }
+        tun = self.client1_tun if node_id == 1 else self.client2_tun
+        tun_addr = self.client1_tun_addr if node_id == 1 else self.client2_tun_addr
+        return {
+            'role': 'client',
+            'node_id': node_id,
+            'channel': self.channel,
+            'channel_width': self.channel_width,
+            'radio_bandwidth': self.radio_bandwidth,
+            'radio_mcs_index': self.radio_mcs_index,
+            'radio_short_gi': bool(self.radio_short_gi),
+            'fec_k': self.fec_k,
+            'fec_n': self.fec_n,
+            'link_id': self.link_id,
+            'uplink_stream': self.uplink_stream,
+            'downlink_stream': self.downlink_stream,
+            'tun_name': tun,
+            'tun_addr': tun_addr,
+            'uplink_pause_threshold_bytes': self.uplink_pause_threshold_bytes,
+            'uplink_resume_threshold_bytes': self.uplink_resume_threshold_bytes,
+            'uplink_queue_packets_limit': self.uplink_queue_packets_limit,
+            'feedback_window_start_immediately': False,
+        }
+
+
+def parse_link_args(args: List[str]) -> Dict[str, Any]:
+    """解析 wfb_v6_uplink 命令行参数或 link_args 列表为规范字典。"""
+    parsed: Dict[str, Any] = {
+        'role': None,
+        'tun_name': None,
+        'tun_addr': None,
+        'node_id': None,
+        'link_id': None,
+        'uplink_stream': None,
+        'downlink_stream': None,
+        'fec_k': None,
+        'fec_n': None,
+        'radio_bandwidth': None,
+        'radio_mcs_index': None,
+        'radio_short_gi': False,
+        'air_interface': None,
+        'known_clients': None,
+        'client_targets': [],
+        'grant_duration_ms': None,
+        'guard_interval_ms': None,
+        'downlink_pause_threshold_bytes': None,
+        'downlink_resume_threshold_bytes': None,
+        'downlink_queue_packets_limit': None,
+        'uplink_pause_threshold_bytes': None,
+        'uplink_resume_threshold_bytes': None,
+        'uplink_queue_packets_limit': None,
+        'feedback_window_period_ms': None,
+        'feedback_window_duration_ms': None,
+        'feedback_window_start_immediately': False,
+        'log_interval': None,
+        'queue_summary_file': None,
+    }
+    int_keys = {
+        'node_id', 'link_id', 'uplink_stream', 'downlink_stream',
+        'fec_k', 'fec_n', 'radio_bandwidth', 'radio_mcs_index',
+        'grant_duration_ms', 'guard_interval_ms',
+        'downlink_pause_threshold_bytes', 'downlink_resume_threshold_bytes',
+        'downlink_queue_packets_limit',
+        'uplink_pause_threshold_bytes', 'uplink_resume_threshold_bytes',
+        'uplink_queue_packets_limit',
+        'feedback_window_period_ms', 'feedback_window_duration_ms',
+        'log_interval',
+    }
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        if arg == '--radio-short-gi':
+            parsed['radio_short_gi'] = True
+            i += 1
+        elif arg == '--feedback-window-start-immediately':
+            parsed['feedback_window_start_immediately'] = True
+            i += 1
+        elif arg.startswith('--') and i + 1 < len(args):
+            key = arg[2:].replace('-', '_')
+            val = args[i + 1]
+            if key == 'client_target':
+                parsed['client_targets'].append(val)
+            elif key in parsed:
+                if key in int_keys:
+                    try:
+                        parsed[key] = int(val)
+                    except ValueError:
+                        parsed[key] = val
+                else:
+                    parsed[key] = val
+            i += 2
+        else:
+            i += 1
+    return parsed
+
+
+def verify_config_equivalence(gate_configs: Dict[str, Any],
+                              runtime_configs: Dict[str, Any]) -> List[str]:
+    """校验数据面 Gate 与 Runtime 角色服务解析后配置在各维度上的严格等价性。"""
+    errors: List[str] = []
+    server_fields = [
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
+        'tun_name', 'tun_addr',
+        'downlink_pause_threshold_bytes', 'downlink_resume_threshold_bytes',
+        'downlink_queue_packets_limit',
+        'feedback_window_period_ms', 'feedback_window_duration_ms',
+    ]
+    client_fields = [
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
+        'tun_name', 'tun_addr',
+        'uplink_pause_threshold_bytes', 'uplink_resume_threshold_bytes',
+        'uplink_queue_packets_limit',
+    ]
+
+    for role_key in ('server', 'client1', 'client2'):
+        gate_raw = gate_configs.get(role_key, {})
+        runtime_raw = runtime_configs.get(role_key, {})
+        if not gate_raw:
+            errors.append(f"缺少 Gate 端角色配置: {role_key}")
+            continue
+        if not runtime_raw:
+            errors.append(f"缺少 Runtime 端角色配置: {role_key}")
+            continue
+
+        gate_parsed = dict(gate_raw)
+        if 'link_args' in gate_raw and isinstance(gate_raw['link_args'], list):
+            gate_parsed.update(parse_link_args(gate_raw['link_args']))
+
+        runtime_parsed = dict(runtime_raw)
+        if 'link_args' in runtime_raw and isinstance(runtime_raw['link_args'], list):
+            runtime_parsed.update(parse_link_args(runtime_raw['link_args']))
+
+        if gate_parsed.get('feedback_window_start_immediately') or runtime_parsed.get('feedback_window_start_immediately'):
+            errors.append(f"角色 {role_key} 违规包含未接受的 --feedback-window-start-immediately 候选行为")
+
+        fields = server_fields if role_key == 'server' else client_fields
+        for f in fields:
+            g_val = gate_parsed.get(f)
+            r_val = runtime_parsed.get(f)
+            if g_val is None or r_val is None or g_val != r_val:
+                errors.append(f"角色 {role_key} 配置项 {f} 不等价: gate={g_val}, runtime={r_val}")
+
+        for opt_f in ('channel', 'channel_width'):
+            g_opt = gate_parsed.get(opt_f)
+            r_opt = runtime_parsed.get(opt_f)
+            if g_opt is not None and r_opt is not None and g_opt != r_opt:
+                errors.append(f"角色 {role_key} 配置项 {opt_f} 不等价: gate={g_opt}, runtime={r_opt}")
+
+    return errors
+
+
+def check_role_configs_equivalence(gate_config: GateConfig,
+                                   server_fl_path: str,
+                                   client1_fl_path: str,
+                                   client2_fl_path: str) -> Dict[str, Any]:
+    """读取三角色服务配置并校验与 GateConfig 的等价性。"""
+    runtime_configs = {}
+    paths = {'server': server_fl_path, 'client1': client1_fl_path, 'client2': client2_fl_path}
+    for role, path in paths.items():
+        if not os.path.isfile(path):
+            return {
+                'status': 'failed',
+                'errors': [f"角色服务配置文件不存在: {path}"],
+                'gate_config': {},
+                'runtime_configs': {},
+            }
+        with open(path, 'r', encoding='utf-8') as fh:
+            runtime_configs[role] = json.load(fh)
+
+    gate_configs = {
+        'server': gate_config.get_expected_link_config('server', 255),
+        'client1': gate_config.get_expected_link_config('client', 1),
+        'client2': gate_config.get_expected_link_config('client', 2),
+    }
+
+    errors = verify_config_equivalence(gate_configs, runtime_configs)
+    return {
+        'status': 'passed' if not errors else 'failed',
+        'errors': errors,
+        'gate_configs': gate_configs,
+        'runtime_configs': {
+            k: {
+                'parsed': parse_link_args(v.get('link_args', [])),
+                'role': v.get('role'),
+                'node_id': v.get('node_id'),
+            }
+            for k, v in runtime_configs.items()
+        },
+    }
 
 
 def _compute_file_sha256(path: str) -> str:
@@ -916,6 +1168,12 @@ def main(argv=None) -> int:
     p_val = subparsers.add_parser("validate")
     p_val.add_argument("--summary-path", required=True)
 
+    p_eq = subparsers.add_parser("verify-config-equivalence")
+    p_eq.add_argument("--server-fl", required=True)
+    p_eq.add_argument("--client1-fl", required=True)
+    p_eq.add_argument("--client2-fl", required=True)
+    p_eq.add_argument("--out", default=None)
+
     args = parser.parse_args(argv)
     config = GateConfig()
 
@@ -1074,6 +1332,23 @@ def main(argv=None) -> int:
         if errors:
             for err in errors:
                 print(f"GATE_VALIDATION_ERROR: {err}", file=sys.stderr)
+            return 1
+        return 0
+
+    if args.command == "verify-config-equivalence":
+        res = check_role_configs_equivalence(
+            gate_config=config,
+            server_fl_path=args.server_fl,
+            client1_fl_path=args.client1_fl,
+            client2_fl_path=args.client2_fl,
+        )
+        if args.out:
+            os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+            with open(args.out, "w", encoding="utf-8") as fh:
+                json.dump(res, fh, indent=2)
+        if res["status"] != "passed":
+            for err in res["errors"]:
+                print(f"CONFIG_EQUIVALENCE_ERROR: {err}", file=sys.stderr)
             return 1
         return 0
 

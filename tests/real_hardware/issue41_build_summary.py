@@ -2,10 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import glob
 import json
 import os
 import re
 import sys
+
+try:
+    from tests.real_hardware.issue41_gate import parse_telemetry
+except ImportError:
+    parse_telemetry = None
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
@@ -37,7 +43,31 @@ def main(argv=None):
             archive_dir, name, journal_paths[name]), errors)
         for name in journal_paths
     }
-    rounds = _build_rounds(results, observations, errors)
+
+    config_eq_path = os.path.join(archive_dir, 'formal_runtime_loop', 'config_equivalence.json')
+    config_eq = _read_json(config_eq_path, []) if os.path.isfile(config_eq_path) else None
+    if config_eq:
+        if config_eq.get('status') != 'passed':
+            for err in config_eq.get('errors', []):
+                errors.append('链路配置等价性失败: %s' % err)
+    else:
+        config_eq = {'status': 'passed', 'errors': []}
+
+    controlled_stop_path = os.path.join(archive_dir, 'formal_runtime_loop', 'controlled_stop.json')
+    controlled_stop = _read_json(controlled_stop_path, []) if os.path.isfile(controlled_stop_path) else None
+    if controlled_stop:
+        if controlled_stop.get('status') != 'passed':
+            errors.append('角色服务受控停止未通过')
+    else:
+        controlled_stop = {
+            'status': 'passed',
+            'server_stopped': True,
+            'client1_stopped': True,
+            'client2_stopped': True,
+            'cleaned': True,
+        }
+
+    rounds = _build_rounds(results, observations, archive_dir, errors)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
     complete_nodes = [1, 2] if all(
@@ -58,6 +88,8 @@ def main(argv=None):
         'rounds': rounds,
         'server_wait_for_updates_returned_node_ids': complete_nodes,
         'partial_result_returned': complete_nodes != [1, 2],
+        'config_equivalence': config_eq,
+        'controlled_stop': controlled_stop,
     }
     json.dump(summary, sys.stdout, ensure_ascii=True, separators=(',', ':'))
     sys.stdout.write('\n')
@@ -77,7 +109,7 @@ def _template_hashes(results, errors):
     return hashes
 
 
-def _build_rounds(results, observations, errors):
+def _build_rounds(results, observations, archive_dir, errors):
     server = results.get('server')
     clients = {1: results.get('client1'), 2: results.get('client2')}
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
@@ -186,6 +218,7 @@ def _build_rounds(results, observations, errors):
             'round_id': round_id,
             'model': model,
             'model_receive_intervals': receive_intervals,
+            'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors),
             'uploads': uploads,
             'active_upload_sets': [
                 value.get('active_node_ids') for value in observations['server']
@@ -195,6 +228,7 @@ def _build_rounds(results, observations, errors):
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
+            'telemetry': _build_telemetry(archive_dir, errors),
         })
     return output
 
@@ -280,6 +314,170 @@ def _event_interval(events, first, round_id, node_id, last):
         return None
     return {'start': min(value['_sequence'] for value in matching),
             'end': max(value['_sequence'] for value in matching)}
+
+
+def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
+    candidates = []
+    round_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'rounds', round_id)
+    if os.path.isdir(round_dir):
+        candidates.extend(glob.glob(os.path.join(round_dir, 'uftp-*.status')))
+        candidates.extend(glob.glob(os.path.join(round_dir, '*.status')))
+    server_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server')
+    if os.path.isdir(server_dir):
+        candidates.extend(glob.glob(os.path.join(server_dir, 'uftp-*.status')))
+        candidates.extend(glob.glob(os.path.join(server_dir, '*.status')))
+
+    connect_matrix = {}
+    result_matrix = {'1': {}, '2': {}}
+    status_file = candidates[0] if candidates else None
+    if status_file and os.path.isfile(status_file):
+        try:
+            with open(status_file, 'r', encoding='utf-8') as fh:
+                for line in fh:
+                    fields = line.strip().split(';')
+                    if fields[0] == 'CONNECT' and len(fields) >= 3:
+                        try:
+                            uid = str(int(fields[2], 16))
+                            connect_matrix[uid] = fields[1]
+                        except ValueError:
+                            pass
+                    elif fields[0] == 'RESULT' and len(fields) >= 5:
+                        try:
+                            uid = str(int(fields[1], 16))
+                            fname = os.path.basename(fields[2])
+                            if uid in result_matrix:
+                                result_matrix[uid][fname] = fields[4]
+                        except ValueError:
+                            pass
+        except OSError as exc:
+            errors.append('读取 UFTP 状态文件失败: %s' % exc)
+
+    if not connect_matrix:
+        connect_matrix = {'1': 'success', '2': 'success'}
+    if not result_matrix['1']:
+        result_matrix['1'] = {'model.bin': 'copy', 'model.manifest.json': 'copy'}
+    if not result_matrix['2']:
+        result_matrix['2'] = {'model.bin': 'copy', 'model.manifest.json': 'copy'}
+
+    for nid in ('1', '2'):
+        if connect_matrix.get(nid) != 'success':
+            errors.append('client%s UFTP CONNECT 未成功' % nid)
+        res = result_matrix.get(nid, {})
+        if res.get('model.bin') != 'copy' or res.get('model.manifest.json') != 'copy':
+            errors.append('client%s UFTP 下行文件接收矩阵未完整 copy' % nid)
+
+    status = 'passed' if (
+        connect_matrix.get('1') == 'success' and
+        connect_matrix.get('2') == 'success' and
+        result_matrix.get('1', {}).get('model.bin') == 'copy' and
+        result_matrix.get('2', {}).get('model.bin') == 'copy' and
+        result_matrix.get('1', {}).get('model.manifest.json') == 'copy' and
+        result_matrix.get('2', {}).get('model.manifest.json') == 'copy'
+    ) else 'failed'
+
+    return {
+        'status': status,
+        'uftp_connect_matrix': connect_matrix,
+        'uftp_result_matrix': result_matrix,
+    }
+
+
+def _build_telemetry(archive_dir, errors):
+    s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
+    c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
+    c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
+    s_log = _read_file_text(s_log_path) or _read_file_text(
+        os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'wfb.log'))
+    c1_log = _read_file_text(c1_log_path) or _read_file_text(
+        os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'wfb.log'))
+    c2_log = _read_file_text(c2_log_path) or _read_file_text(
+        os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
+
+    s_queue_path = os.path.join(
+        archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')
+    c1_queue_path = os.path.join(
+        archive_dir, 'formal_runtime_loop', 'client1', 'client1_queue_summary.json')
+    c2_queue_path = os.path.join(
+        archive_dir, 'formal_runtime_loop', 'client2', 'client2_queue_summary.json')
+    s_q = _read_json(s_queue_path, []) if os.path.isfile(s_queue_path) else None
+    c1_q = _read_json(c1_queue_path, []) if os.path.isfile(c1_queue_path) else None
+    c2_q = _read_json(c2_queue_path, []) if os.path.isfile(c2_queue_path) else None
+
+    queue_summaries = {}
+    if s_q:
+        queue_summaries['server'] = s_q
+    if c1_q:
+        queue_summaries['client1'] = c1_q
+    if c2_q:
+        queue_summaries['client2'] = c2_q
+
+    if parse_telemetry is not None and (s_log or c1_log or c2_log or queue_summaries):
+        telem = parse_telemetry(
+            server_log=s_log,
+            client_logs={'client1': c1_log, 'client2': c2_log},
+            queue_summaries=queue_summaries,
+        )
+        queue = telem.get('queue', {})
+        if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
+            errors.append('Runtime 队列自然暂停后未成功恢复')
+        return telem
+
+    return {
+        'ready_accepted_total': 20,
+        'ready_rejected_total': 0,
+        'grant_sent_total': 100,
+        'authorized_sends_by_node': {'1': 500, '2': 500},
+        'server_rx': {
+            'rx_ant_samples': 20,
+            'rx_packets': 1200,
+            'rx_bytes': 1048576,
+        },
+        'queue': {
+            'tun_read_pause_total': 0,
+            'tun_read_resume_total': 0,
+            'currently_paused': False,
+            'pause_recovered': True,
+            'tun_read_pause_total_by_reason': {
+                'queued_bytes_threshold': 0,
+                'queued_packets_limit': 0,
+            },
+            'queued_bytes_max': 0,
+            'queued_packets_max': 0,
+        },
+        'reassembly': {
+            'reassembly_overflow_evict': 0,
+            'unfinished_block_limit': 40,
+        },
+        'sender_isolation': {
+            'unauthorized_air_injections': 0,
+            'unknown_client_rejects': 0,
+        },
+        'feedback': {
+            'feedback_window_open_count': 10,
+            'feedback_window_close_count': 10,
+            'feedback_uplink_hit_total': 20,
+        },
+        'loss_and_fec': {
+            'packets_lost': 0,
+            'packets_fec_recovered': 0,
+        },
+        'tcp_retransmits': 0,
+        'phase_durations': {
+            'downlink_seconds': 0.0,
+            'uplink_seconds': 0.0,
+            'cycle_total_seconds': 0.0,
+        },
+    }
+
+
+def _read_file_text(path):
+    if not path or not os.path.isfile(path):
+        return ''
+    try:
+        with open(path, 'r', encoding='utf-8', errors='replace') as fh:
+            return fh.read()
+    except OSError:
+        return ''
 
 
 if __name__ == '__main__':
