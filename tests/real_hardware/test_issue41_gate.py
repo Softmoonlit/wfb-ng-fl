@@ -894,6 +894,33 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(240, ev['deadline_seconds'])
         self.assertEqual(120, ev['io_timeout_seconds'])
 
+    def test_gate_config_from_env_defaults_and_overrides(self):
+        # 默认无环境变量情况
+        old_env = os.environ.copy()
+        try:
+            for k in ('ISSUE41_SMOKE_CYCLE_COUNT', 'ISSUE41_INPUT_SIZE_BYTES',
+                      'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'):
+                os.environ.pop(k, None)
+            cfg = GateConfig.from_env()
+            self.assertEqual(3, cfg.cycle_count)
+            self.assertEqual(4 * 1024 * 1024, cfg.artifact_size_bytes)
+            self.assertEqual(120, cfg.io_timeout_seconds)
+            self.assertEqual(240, cfg.cycle_deadline_seconds)
+
+            # 环境变量覆盖
+            os.environ['ISSUE41_SMOKE_CYCLE_COUNT'] = '1'
+            os.environ['ISSUE41_INPUT_SIZE_BYTES'] = str(40 * 1024 * 1024)
+            os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'] = '120'
+            os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'] = '300'
+            cfg2 = GateConfig.from_env()
+            self.assertEqual(1, cfg2.cycle_count)
+            self.assertEqual(40 * 1024 * 1024, cfg2.artifact_size_bytes)
+            self.assertEqual(120, cfg2.io_timeout_seconds)
+            self.assertEqual(300, cfg2.cycle_deadline_seconds)
+        finally:
+            os.environ.clear()
+            os.environ.update(old_env)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -92,6 +92,16 @@ class GateConfig:
         self.feedback_window_duration_ms = feedback_window_duration_ms
         self.round_deadline_seconds = round_deadline_seconds
 
+    @classmethod
+    def from_env(cls) -> 'GateConfig':
+        """从环境变量解析当前门禁参数，默认保持 3 周期 4 MiB 契约。"""
+        return cls(
+            cycle_count=int(os.getenv('ISSUE41_SMOKE_CYCLE_COUNT', '3')),
+            artifact_size_bytes=int(os.getenv('ISSUE41_INPUT_SIZE_BYTES', str(4 * 1024 * 1024))),
+            io_timeout_seconds=int(os.getenv('ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', '120')),
+            cycle_deadline_seconds=int(os.getenv('ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS', '240')),
+        )
+
     @staticmethod
     def validate_link_args(args: List[str]) -> None:
         """拒绝未接受的立即 feedback window 候选行为。"""

@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 export PYTHONPATH="$PROJECT_ROOT:${PYTHONPATH:-}"
-BRANCH="${ISSUE41_BRANCH:-$(git -C "$PROJECT_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo feat/stage1-link-throughput-and-40mib-loop)}"
+BRANCH="${ISSUE41_BRANCH:-feat/stage1-link-throughput-and-40mib-loop}"
 ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
@@ -41,8 +41,7 @@ FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
 ROUNDS="${ISSUE41_ROUNDS:-1}"
-INPUT_SIZE_BYTES=$((4 * 1024 * 1024))
-INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$INPUT_SIZE_BYTES}"
+INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((4 * 1024 * 1024))}"
 INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-4mib.bin}"
 CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-4mib.bin}"
 CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-4mib.bin}"
@@ -987,6 +986,11 @@ cmd_smoke_gate() {
     init_envelope
     trap 'stop_smoke_gate_processes; collect_smoke_evidence "$name" || true; handle_smoke_gate_failure' ERR
 
+    export ISSUE41_INPUT_SIZE_BYTES="$INPUT_SIZE_BYTES"
+    export ISSUE41_SMOKE_CYCLE_COUNT="$SMOKE_CYCLE_COUNT"
+    export ISSUE41_SMOKE_IO_TIMEOUT_SECONDS="$SMOKE_IO_TIMEOUT_SECONDS"
+    export ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS="$SMOKE_CYCLE_DEADLINE_SECONDS"
+
     log_info "开始数据面 Gate 验收 (共 $SMOKE_CYCLE_COUNT 周期，单载荷 $((INPUT_SIZE_BYTES / 1024 / 1024)) MiB)..."
     start_smoke_gate_environment
 
@@ -1047,16 +1051,11 @@ PY"
             scp -rq "$(client_ssh "$role"):$(smoke_dir "$name")/$role/inbox/$src" "$server_dir/$role-inbox-$src"
         done
 
-        python3 - "$work" "$server_dir/client1-inbox-$src" "$server_dir/client2-inbox-$src" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" "$SMOKE_CYCLE_COUNT" "$INPUT_SIZE_BYTES" "$SMOKE_IO_TIMEOUT_SECONDS" "$SMOKE_CYCLE_DEADLINE_SECONDS" <<'PY'
+        python3 - "$work" "$server_dir/client1-inbox-$src" "$server_dir/client2-inbox-$src" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" <<'PY'
 import json, os, sys
-server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path, cycle_count_str, size_str, io_to_str, deadline_str = sys.argv[1:]
+server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import verify_downlink_artifacts, GateConfig
-cfg = GateConfig(
-    cycle_count=int(cycle_count_str),
-    artifact_size_bytes=int(size_str),
-    io_timeout_seconds=int(io_to_str),
-    cycle_deadline_seconds=int(deadline_str),
-)
+cfg = GateConfig.from_env()
 res = verify_downlink_artifacts(
     server_cycle_dir=server_cycle_dir,
     client_inboxes={'1': c1_inbox, '2': c2_inbox},
@@ -1113,9 +1112,9 @@ PY" &
         cp "$server_dir/server-put-events.jsonl" "$server_dir/server-put-events-cycle$cycle.jsonl"
 
         # 上行结果验证
-        python3 - "$server_dir/server-put-events-cycle$cycle.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" "$SMOKE_CYCLE_COUNT" "$INPUT_SIZE_BYTES" "$SMOKE_IO_TIMEOUT_SECONDS" "$SMOKE_CYCLE_DEADLINE_SECONDS" <<'PY'
+        python3 - "$server_dir/server-put-events-cycle$cycle.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" <<'PY'
 import json, sys
-events_file, c1_res_path, c2_res_path, duration_str, out_path, cycle_count_str, size_str, io_to_str, deadline_str = sys.argv[1:]
+events_file, c1_res_path, c2_res_path, duration_str, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import verify_uplink_cycle, GateConfig
 events = []
 with open(events_file, 'r', encoding='utf-8') as fh:
@@ -1136,12 +1135,7 @@ for role, expected_addr in (('1', '10.80.0.11'), ('2', '10.80.0.12')):
     if ev and ev.get('client_address') != expected_addr:
         if event['client_address'] != expected_addr:
             raise SystemExit('client address mismatch')
-cfg = GateConfig(
-    cycle_count=int(cycle_count_str),
-    artifact_size_bytes=int(size_str),
-    io_timeout_seconds=int(io_to_str),
-    cycle_deadline_seconds=int(deadline_str),
-)
+cfg = GateConfig.from_env()
 res = verify_uplink_cycle(events, c_res, cfg, float(duration_str))
 with open(out_path, 'w', encoding='utf-8') as fh:
     json.dump(res, fh, indent=2)
@@ -1156,9 +1150,9 @@ PY
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
         done
 
-        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/wfb.log" "$server_dir/$role-wfb.log" "$server_dir/client1-wfb.log" "$server_dir/client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" "$SMOKE_CYCLE_COUNT" "$INPUT_SIZE_BYTES" "$SMOKE_IO_TIMEOUT_SECONDS" "$SMOKE_CYCLE_DEADLINE_SECONDS" <<'PY'
+        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/wfb.log" "$server_dir/$role-wfb.log" "$server_dir/client1-wfb.log" "$server_dir/client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
 import json, os, sys
-cycle_idx, dl_path, ul_path, s_log_p, _, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path, cycle_count_str, size_str, io_to_str, deadline_str = sys.argv[1:]
+cycle_idx, dl_path, ul_path, s_log_p, _, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import parse_telemetry, build_cycle_evidence, validate_cycle_evidence, GateConfig
 with open(dl_path, 'r', encoding='utf-8') as fh:
     dl = json.load(fh)
@@ -1183,12 +1177,7 @@ telem = parse_telemetry(
     queue_summaries={'server': sq, 'client1': c1q, 'client2': c2q},
     phase_durations=durations,
 )
-cfg = GateConfig(
-    cycle_count=int(cycle_count_str),
-    artifact_size_bytes=int(size_str),
-    io_timeout_seconds=int(io_to_str),
-    cycle_deadline_seconds=int(deadline_str),
-)
+cfg = GateConfig.from_env()
 cycle_ev = build_cycle_evidence(
     cycle_index=int(cycle_idx),
     status='passed',
@@ -1224,20 +1213,15 @@ PY
     collect_smoke_evidence "$name"
 
     mkdir -p "$archive"
-    python3 - "$archive/gate_summary.json" "$RUN_ID" "$server_dir/reused_processes.json" "$SMOKE_CYCLE_COUNT" "$INPUT_SIZE_BYTES" "$SMOKE_IO_TIMEOUT_SECONDS" "$SMOKE_CYCLE_DEADLINE_SECONDS" "${cycle_files[@]}" <<'PY'
+    python3 - "$archive/gate_summary.json" "$RUN_ID" "$server_dir/reused_processes.json" "${cycle_files[@]}" <<'PY'
 import json, sys
-out_path, run_id, pids_path, cycle_count_str, size_str, io_to_str, deadline_str = sys.argv[1:8]
-cycle_paths = sys.argv[8:]
+out_path, run_id, pids_path = sys.argv[1:4]
+cycle_paths = sys.argv[4:]
 from tests.real_hardware.issue41_gate import build_gate_summary, validate_gate_summary, GateConfig
 with open(pids_path, 'r', encoding='utf-8') as fh:
     pids = json.load(fh)
 cycles = [json.load(open(cp, 'r', encoding='utf-8')) for cp in cycle_paths]
-cfg = GateConfig(
-    cycle_count=int(cycle_count_str),
-    artifact_size_bytes=int(size_str),
-    io_timeout_seconds=int(io_to_str),
-    cycle_deadline_seconds=int(deadline_str),
-)
+cfg = GateConfig.from_env()
 summary = build_gate_summary(
     run_id=run_id,
     status='passed',

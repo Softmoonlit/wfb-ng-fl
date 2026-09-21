@@ -77,7 +77,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_defaults_to_single_4mib_round_with_delayed_client2(self):
         for fragment in (
                 'ROUNDS="${ISSUE41_ROUNDS:-1}"',
-                'INPUT_SIZE_BYTES=$((4 * 1024 * 1024))',
+                'INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((4 * 1024 * 1024))}"',
                 'update-client1-4mib.bin',
                 'update-client2-4mib.bin',
                 'required_artifact_size_bytes',
