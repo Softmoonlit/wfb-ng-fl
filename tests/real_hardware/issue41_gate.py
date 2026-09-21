@@ -21,6 +21,8 @@ import threading
 import time
 from typing import Any, Dict, List, Optional, Set
 
+from wfb_ng.fl.issue41_fixtures import file_sha256, generate_deterministic_file
+
 
 class GateConfig:
     """数据面 Gate 配置与契约约束。"""
@@ -317,14 +319,7 @@ def check_role_configs_equivalence(gate_config: GateConfig,
 def _compute_file_sha256(path: str) -> str:
     if not os.path.isfile(path):
         return ''
-    h = hashlib.sha256()
-    with open(path, 'rb') as fh:
-        while True:
-            chunk = fh.read(65536)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.hexdigest()
+    return file_sha256(path)
 
 
 def generate_cycle_fixtures(cycle: int,
@@ -341,36 +336,28 @@ def generate_cycle_fixtures(cycle: int,
     c1_pat = f'wfb-ng-issue41-cycle{cycle}-client1-update-4mib\n'.encode('utf-8')
     c2_pat = f'wfb-ng-issue41-cycle{cycle}-client2-update-4mib\n'.encode('utf-8')
 
-    model_bytes = (model_pat * (size // len(model_pat) + 1))[:size]
-    c1_bytes = (c1_pat * (size // len(c1_pat) + 1))[:size]
-    c2_bytes = (c2_pat * (size // len(c2_pat) + 1))[:size]
-
     model_path = os.path.join(server_dir, 'model.bin')
     manifest_path = os.path.join(server_dir, 'model.manifest.json')
     c1_path = os.path.join(client1_dir, 'update.bin')
     c2_path = os.path.join(client2_dir, 'update.bin')
 
-    with open(model_path, 'wb') as fh:
-        fh.write(model_bytes)
-    h_model = hashlib.sha256(model_bytes).hexdigest()
+    model_info = generate_deterministic_file(model_path, size_bytes=size, pattern=model_pat)
     with open(manifest_path, 'w', encoding='utf-8') as fh:
         json.dump({
             'schema_version': 1,
             'artifact_type': 'model',
-            'sha256': h_model,
+            'sha256': model_info['sha256'],
             'size_bytes': size,
             'cycle': cycle,
         }, fh, indent=2)
 
-    with open(c1_path, 'wb') as fh:
-        fh.write(c1_bytes)
-    with open(c2_path, 'wb') as fh:
-        fh.write(c2_bytes)
+    c1_info = generate_deterministic_file(c1_path, size_bytes=size, pattern=c1_pat)
+    c2_info = generate_deterministic_file(c2_path, size_bytes=size, pattern=c2_pat)
 
     return {
-        'model_sha256': h_model,
-        'client1_sha256': hashlib.sha256(c1_bytes).hexdigest(),
-        'client2_sha256': hashlib.sha256(c2_bytes).hexdigest(),
+        'model_sha256': model_info['sha256'],
+        'client1_sha256': c1_info['sha256'],
+        'client2_sha256': c2_info['sha256'],
     }
 
 

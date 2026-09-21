@@ -16,17 +16,16 @@ class LiveObservation(object):
         self._lock = threading.Lock()
         self._owned_writer = None
         if enabled and path is not None:
-            try:
-                directory = os.path.dirname(path)
-                if directory:
-                    os.makedirs(directory, exist_ok=True)
-                self._owned_writer = open(path, 'a', encoding='utf-8')
-            except OSError:
-                pass
-        self.writer = self._owned_writer or writer or sys.stdout
+            directory = os.path.dirname(path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+            self._owned_writer = open(path, 'a', encoding='utf-8')
+            self.writer = self._owned_writer
+        else:
+            self.writer = writer or sys.stdout
 
     def emit(self, event, **fields):
-        if not self.enabled:
+        if not self.enabled or self.writer is None:
             return
         value = {'event': event}
         value.update(fields)
@@ -41,8 +40,5 @@ class LiveObservation(object):
 
     def close(self):
         if self._owned_writer is not None:
-            try:
-                self._owned_writer.close()
-            except OSError:
-                pass
+            self._owned_writer.close()
             self._owned_writer = None

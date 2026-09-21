@@ -21,7 +21,7 @@ from .role import ClientRole, ServerRole
 _COMMON_FIELDS = {
     'schema_version', 'role', 'work_dir', 'node_id', 'uftp_port',
     'max_update_size_bytes', 'link_args', 'live_observation',
-    'observation_path', 'io_timeout_seconds',
+    'observation_path', 'io_timeout_seconds', 'channel', 'channel_width',
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
@@ -298,20 +298,13 @@ def _read_config(path):
     if not isinstance(config, dict):
         raise FLRuntimeError('invalid_configuration', '角色服务配置结构无效')
     role = config.get('role')
-    if role in ('server', 'client'):
-        config.setdefault('uftp_bind_host', '127.0.0.1')
-        config.setdefault('live_observation', False)
-        config.setdefault('observation_path', None)
-        config.setdefault('io_timeout_seconds', 10)
     allowed = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
-    optional = {'channel', 'channel_width'}
-    config_keys = set(config)
-    if role not in ('server', 'client') or not (allowed <= config_keys <= (allowed | optional)):
+    if role not in ('server', 'client') or set(config) != allowed:
         raise FLRuntimeError('invalid_configuration', '角色服务配置字段无效')
-    if 'channel' in config and (type(config['channel']) is not int or config['channel'] <= 0):
+    if type(config['channel']) is not int or config['channel'] <= 0:
         raise FLRuntimeError('invalid_configuration', '角色服务 channel 配置无效')
-    if 'channel_width' in config and (not isinstance(config['channel_width'], str) or not config['channel_width']):
+    if not isinstance(config['channel_width'], str) or not config['channel_width']:
         raise FLRuntimeError('invalid_configuration', '角色服务 channel_width 配置无效')
     if config.get('schema_version') != 1:
         raise FLRuntimeError('invalid_configuration', '角色服务配置版本无效')
@@ -447,8 +440,10 @@ def main(role=None):
     algorithm_thread = None
     algorithm_error = []
     stop_event = threading.Event()
+    signal_received = threading.Event()
 
     def stop(signum, frame):
+        signal_received.set()
         stop_event.set()
 
     previous_sigterm = signal.getsignal(signal.SIGTERM)
@@ -474,10 +469,10 @@ def main(role=None):
             service.wait(0.2)
         if algorithm_thread is not None:
             algorithm_thread.join(0)
-            if not stop_event.is_set() and algorithm_error:
+            if algorithm_error:
                 raise algorithm_error[0]
     except FLRuntimeError as exc:
-        if stop_event.is_set():
+        if signal_received.is_set():
             return 0
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1

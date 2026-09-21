@@ -221,9 +221,15 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_bind_host': '10.0.0.1',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
                 'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
                 'link_args': [
                     '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
                     '--known-clients', '1,2'],
@@ -386,7 +392,12 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_bind_host': '10.80.0.11',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
                 'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
                 'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
             }, fh)
 
@@ -442,6 +453,26 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 load_role_service(config_path, expected_role='client')
 
         self.assertEqual('invalid_configuration', raised.exception.error_code)
+
+    def test_config_rejects_missing_mandatory_fields_without_fallback(self):
+        config_path = self.write_server_config(
+            participant_node_ids=[1],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1'])
+        with open(config_path, 'r', encoding='utf-8') as fh:
+            base_config = json.load(fh)
+
+        for field in ('channel', 'channel_width', 'uftp_bind_host',
+                      'live_observation', 'observation_path', 'io_timeout_seconds'):
+            with self.subTest(missing_field=field):
+                candidate = dict(base_config)
+                candidate.pop(field)
+                with open(config_path, 'w', encoding='utf-8') as fh:
+                    json.dump(candidate, fh)
+                with mock.patch('wfb_ng.fl.service.shutil.which',
+                                side_effect=lambda name: '/usr/bin/' + name):
+                    with self.assertRaises(FLRuntimeError) as raised:
+                        load_role_service(config_path, expected_role='server')
+                self.assertEqual('invalid_configuration', raised.exception.error_code)
 
     def test_algorithm_entry_runs_after_service_ready(self):
         events = []
@@ -532,9 +563,15 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'server_http_host': '10.0.0.1',
                 'server_http_port': 8080,
+                'uftp_bind_host': '10.80.0.11',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
                 'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
                 'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
             }, fh)
 
@@ -604,9 +641,15 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_bind_host': '10.0.0.1',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
                 'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
                 'link_args': [
                     '--tun-name', 'wfb0', '--known-clients', '1'],
             }, fh)
@@ -666,9 +709,15 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'uftp_port': 9000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
+                'uftp_bind_host': '10.0.0.1',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
                 'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
                 'link_args': link_args,
             }, fh)
         return config_path

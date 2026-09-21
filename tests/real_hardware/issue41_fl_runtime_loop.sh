@@ -540,15 +540,15 @@ cmd_verify_config_equivalence() {
 }
 
 smoke_dir() {
-    if [ -n "${1:-}" ]; then
-        printf '/var/tmp/wfb-ng-issue41-smoke/%s' "$1"
-    else
-        printf '/var/tmp/wfb-ng-issue41-smoke'
-    fi
+    local name="${1:-}"
+    [ -n "$name" ] || die "smoke_dir 必须指定名称参数"
+    printf '/var/tmp/wfb-ng-issue41-smoke/%s' "$name"
 }
 smoke_archive_dir() {
-    if [ -n "${1:-}" ] && [ "$1" != "gate" ]; then
-        printf '%s/pre_runtime_smoke/%s' "$ARCHIVE_DIR" "$1"
+    local name="${1:-}"
+    [ -n "$name" ] || die "smoke_archive_dir 必须指定名称参数"
+    if [ "$name" != "gate" ]; then
+        printf '%s/pre_runtime_smoke/%s' "$ARCHIVE_DIR" "$name"
     else
         printf '%s/pre_runtime_smoke' "$ARCHIVE_DIR"
     fi
@@ -980,7 +980,7 @@ PY
 
 cmd_smoke_gate() {
     local name=gate archive server_dir
-    archive="$(smoke_archive_dir)"
+    archive="$(smoke_archive_dir "$name")"
     server_dir="$(smoke_dir "$name")/server"
 
     trap 'stop_smoke_gate_processes; collect_smoke_evidence "$name" || true; handle_smoke_gate_failure' ERR
@@ -1007,31 +1007,29 @@ cmd_smoke_gate() {
         manifest="$work/model.manifest.json"
 
         # 生成 server 端下行 model 和 manifest
-        sudo python3 - "$model" "$manifest" "$INPUT_SIZE_BYTES" "$cycle" <<'PY'
-import hashlib, json, sys
+        sudo env PYTHONPATH="$PROJECT_ROOT" python3 - "$model" "$manifest" "$INPUT_SIZE_BYTES" "$cycle" <<'PY'
+import json, sys
+from wfb_ng.fl.issue41_fixtures import generate_deterministic_file
 model, manifest, size_str, cycle_str = sys.argv[1:]
 size = int(size_str)
 pat = ('wfb-ng-issue41-cycle%s-model-4mib\n' % cycle_str).encode('utf-8')
-data = (pat * (size // len(pat) + 1))[:size]
-with open(model, 'wb') as fh:
-    fh.write(data)
+meta = generate_deterministic_file(model, size_bytes=size, pattern=pat)
 with open(manifest, 'w', encoding='utf-8') as fh:
-    json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': hashlib.sha256(data).hexdigest()}, fh, separators=(',', ':'))
+    json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': meta['sha256']}, fh, separators=(',', ':'))
 PY
 
         # 生成两 client 不同的 4 MiB update 文件
         for role in client1 client2; do
             local nid="${role#client}"
-            remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
-import hashlib, json, sys
+            remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo env PYTHONPATH='$REMOTE_REPO' python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
+import sys
+from wfb_ng.fl.issue41_fixtures import generate_deterministic_file
 path, size_str, cycle_str, nid = sys.argv[1:]
 size = int(size_str)
 pat = ('wfb-ng-issue41-cycle%s-client%s-update-4mib\n' % (cycle_str, nid)).encode('utf-8')
-data = (pat * (size // len(pat) + 1))[:size]
-with open(path, 'wb') as fh:
-    fh.write(data)
+meta = generate_deterministic_file(path, size_bytes=size, pattern=pat)
 with open(path + '.sha256', 'w', encoding='utf-8') as fh:
-    fh.write(hashlib.sha256(data).hexdigest())
+    fh.write(meta['sha256'])
 PY"
         done
 
@@ -1050,7 +1048,7 @@ PY"
         done
 
         python3 - "$work" "$server_dir/client1-inbox-$src" "$server_dir/client2-inbox-$src" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" <<'PY'
-import hashlib, json, os, sys
+import json, os, sys
 server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import verify_downlink_artifacts, GateConfig
 res = verify_downlink_artifacts(
@@ -1072,13 +1070,14 @@ PY
         t_ul_start="$(python3 -c 'import time; print(time.monotonic())')"
         for role in client1 client2; do
             local nid="${role#client}"
-            remote "$role" "sudo timeout '$SMOKE_IO_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role/cycle$cycle' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' '$nid' <<'PY'
-import hashlib, http.client, json, os, sys, time
+            remote "$role" "sudo env PYTHONPATH='$REMOTE_REPO' timeout '$SMOKE_IO_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role/cycle$cycle' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' '$nid' <<'PY'
+import http.client, json, os, sys, time
+from wfb_ng.fl.issue41_fixtures import file_sha256
 work, source_ip, host, port, role, nid = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5], int(sys.argv[6])
 update_file = os.path.join(work, 'update.bin')
 with open(update_file, 'rb') as fh:
     body = fh.read()
-digest = hashlib.sha256(body).hexdigest()
+digest = file_sha256(update_file)
 path = '/client%d' % nid
 start = time.monotonic()
 conn = http.client.HTTPConnection(host, port, timeout=120, source_address=(source_ip, 0))
@@ -1237,7 +1236,7 @@ PY
 handle_smoke_gate_failure() {
     log_warn "Gate 运行发生失败，正在进行受控停止与现场诊断归档..."
     local name=gate archive server_dir
-    archive="$(smoke_archive_dir)"
+    archive="$(smoke_archive_dir "$name")"
     server_dir="$(smoke_dir "$name")/server"
     stop_smoke_gate_processes || true
     collect_smoke_evidence "$name" || true
