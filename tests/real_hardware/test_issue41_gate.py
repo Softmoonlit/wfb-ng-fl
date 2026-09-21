@@ -880,6 +880,20 @@ class Issue41GateTestCase(unittest.TestCase):
             res = json.load(fh)
         self.assertEqual('passed', res['status'])
 
+    def test_build_cycle_evidence_defaults_and_config(self):
+        ev = build_cycle_evidence(
+            cycle_index=1,
+            downlink={'status': 'passed'},
+            uplink={'status': 'passed'},
+            telemetry={'phase_durations': {'cycle_total_seconds': 12.5}},
+            config=self.config,
+        )
+        self.assertEqual(1, ev['cycle_index'])
+        self.assertEqual('passed', ev['status'])
+        self.assertEqual(12.5, ev['total_duration_seconds'])
+        self.assertEqual(240, ev['deadline_seconds'])
+        self.assertEqual(120, ev['io_timeout_seconds'])
+
 
 if __name__ == '__main__':
     unittest.main()

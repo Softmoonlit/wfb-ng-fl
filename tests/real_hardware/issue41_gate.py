@@ -814,20 +814,32 @@ def parse_telemetry(server_log: str,
 
 
 def build_cycle_evidence(cycle_index: int,
-                         status: str,
-                         downlink: Dict[str, Any],
-                         uplink: Dict[str, Any],
-                         telemetry: Dict[str, Any],
-                         total_duration_seconds: float,
-                         deadline_seconds: int = 240,
-                         io_timeout_seconds: int = 120) -> Dict[str, Any]:
+                         status: str = 'passed',
+                         downlink: Optional[Dict[str, Any]] = None,
+                         uplink: Optional[Dict[str, Any]] = None,
+                         telemetry: Optional[Dict[str, Any]] = None,
+                         total_duration_seconds: Optional[float] = None,
+                         deadline_seconds: Optional[int] = None,
+                         io_timeout_seconds: Optional[int] = None,
+                         config: Optional[GateConfig] = None) -> Dict[str, Any]:
     """构建单周期数据面证据字典。"""
+    cfg = config or GateConfig()
+    dl = downlink or {}
+    ul = uplink or {}
+    telem = telemetry or {}
+    if total_duration_seconds is None:
+        phase_dur = telem.get('phase_durations', {})
+        total_duration_seconds = float(phase_dur.get('cycle_total_seconds', 0.0))
+    if deadline_seconds is None:
+        deadline_seconds = cfg.cycle_deadline_seconds
+    if io_timeout_seconds is None:
+        io_timeout_seconds = cfg.io_timeout_seconds
     return {
         'cycle_index': cycle_index,
         'status': status,
-        'downlink': downlink,
-        'uplink': uplink,
-        'telemetry': telemetry,
+        'downlink': dl,
+        'uplink': ul,
+        'telemetry': telem,
         'total_duration_seconds': total_duration_seconds,
         'deadline_seconds': deadline_seconds,
         'io_timeout_seconds': io_timeout_seconds,

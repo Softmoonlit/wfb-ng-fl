@@ -1162,9 +1162,11 @@ telem = parse_telemetry(
 )
 cycle_ev = build_cycle_evidence(
     cycle_index=int(cycle_idx),
+    status='passed',
     downlink=dl,
     uplink=ul,
     telemetry=telem,
+    total_duration_seconds=float(dl_dur) + float(ul_dur),
     config=GateConfig(),
 )
 errors = validate_cycle_evidence(cycle_ev, GateConfig())
