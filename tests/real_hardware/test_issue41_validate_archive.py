@@ -117,7 +117,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
 
         errors = validate_archive(self.root)
 
-        self.assertTrue(any('一轮' in error for error in errors))
+        self.assertTrue(any('轮完整证据' in error for error in errors))
 
     def test_rejects_update_not_matching_its_reused_template(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -212,7 +212,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 0}
+        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 3000}
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
@@ -225,7 +225,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 40 * 1024 * 1024
+        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 4 * 1024 * 1024
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
@@ -238,6 +238,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 3000}
         summary['formal_runtime_loop']['rounds'][0]['strict_sync']['client1_committed_before_client2'] = False
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
@@ -396,7 +397,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'schema_version': 1,
             'run_id': 'test-run',
             'resolved_config': {
-                'rounds': 2,
+                'rounds': 3,
                 'artifact_size_bytes': 40 * 1024 * 1024,
             }
         })
@@ -935,7 +936,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
     def complete_summary(self, conclusion):
         return {
             'orchestration': {'status': 'passed'},
-            'pre_runtime_smoke': self.smoke_gate_evidence(),
+            'pre_runtime_smoke': self.smoke_gate_evidence(artifact_size=40 * 1024 * 1024),
             'formal_runtime_loop': {
                 'status': 'passed',
                 'runtime_interfaces': [
@@ -945,9 +946,9 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'server_wait_for_updates_returned_node_ids': [1, 2],
                 'partial_result_returned': False,
                 'scenario': {
-                    'round_count': 1,
-                    'artifact_size_bytes': 4 * 1024 * 1024,
-                    'training_delay_ms_by_node': {'1': 0, '2': 3000},
+                    'round_count': 2,
+                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'training_delay_ms_by_node': {'1': 0, '2': 0},
                     'placeholder_training': 'template_copy',
                     'placeholder_aggregation': 'model_copy',
                     'update_template_sha256_by_node': {
@@ -955,7 +956,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         '2': 'c'.ljust(64, '0'),
                     },
                 },
-                'rounds': [self.round_evidence(1)],
+                'rounds': [
+                    self.round_evidence(1, size=40 * 1024 * 1024, model_sha='a' * 64),
+                    self.round_evidence(2, size=40 * 1024 * 1024, model_sha='a' * 64),
+                ],
                 'server_result': os.path.join(self.root, 'server-result.json'),
                 'client1_result': os.path.join(self.root, 'client1-result.json'),
                 'client2_result': os.path.join(self.root, 'client2-result.json'),

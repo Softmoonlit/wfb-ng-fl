@@ -103,6 +103,12 @@ init_envelope() {
     if [ -d "$ARCHIVE_DIR" ]; then
         die "归档目录已存在，拒绝覆盖：$ARCHIVE_DIR"
     fi
+    if [ "$RUNTIME_TIMEOUT_SECONDS" -gt 400 ]; then
+        die "formal 验收严格要求 RUNTIME_TIMEOUT_SECONDS <= 400 秒，禁止通过增大超时掩盖停滞"
+    fi
+    if [ "$IO_TIMEOUT_SECONDS" -gt 120 ]; then
+        die "formal 验收严格要求 IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
+    fi
     local cfg_tmp
     cfg_tmp="$(mktemp)"
     cat > "$cfg_tmp" <<EOF

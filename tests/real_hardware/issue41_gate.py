@@ -679,9 +679,9 @@ def verify_uplink_cycle(events: List[Dict[str, Any]],
 
 def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
     """解析单行 PKT_SRC 统计，若格式不合法或节点编号不在有效范围 [1, 255] 则返回 None。"""
-    if '\tPKT_SRC\t' not in line:
+    if 'PKT_SRC' not in line:
         return None
-    m = re.match(r'^\s*(\d+)\tPKT_SRC\t(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)\s*$', line)
+    m = re.search(r'(\d+)[\t ]+PKT_SRC[\t ]+(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)\s*$', line)
     if not m:
         return None
     try:

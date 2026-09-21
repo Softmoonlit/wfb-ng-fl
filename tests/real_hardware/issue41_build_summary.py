@@ -243,16 +243,11 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         commit_seq_2 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 2, 'committed')
 
-        first_committed_node = None
-        if commit_seq_1 is not None and commit_seq_2 is not None:
-            first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
+        if commit_seq_1 is None or commit_seq_2 is None:
+            errors.append('第 %d 轮 server observation 缺少 upload_committed 事件' % index)
+            first_committed_node = None
         else:
-            up1 = next((u for u in uploads if u['node_id'] == 1), None)
-            up2 = next((u for u in uploads if u['node_id'] == 2), None)
-            if (up1 and up2 and up1.get('server_put_interval') and up2.get('server_put_interval')):
-                first_committed_node = 1 if up1['server_put_interval']['end'] <= up2['server_put_interval']['end'] else 2
-            elif (up1 and up2 and up1.get('client_put_interval') and up2.get('client_put_interval')):
-                first_committed_node = 1 if up1['client_put_interval']['end'] <= up2['client_put_interval']['end'] else 2
+            first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
 
         client1_committed_first = (first_committed_node == 1)
         returned_nodes = server_round.get('update_node_ids')
@@ -268,7 +263,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         strict_sync = {
             'client1_committed_before_client2': client1_committed_first,
             'server_waited_after_first_commit': server_waited,
-            'server_waited_after_client1': server_waited if client1_committed_first else True,
+            'server_waited_after_client1': server_waited and client1_committed_first,
             'first_committed_node_id': first_committed_node,
             'intermediate_committed_node_ids': [first_committed_node] if first_committed_node else [],
             'intermediate_pending_node_ids': [2 if first_committed_node == 1 else 1] if first_committed_node else [],
@@ -318,22 +313,16 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         }
 
         # 确定本轮时间区间用于分轮遥测过滤
-        all_starts = []
-        all_ends = []
-        for r_int in receive_intervals.values():
-            if isinstance(r_int, dict) and 'start' in r_int:
-                all_starts.append(r_int['start'])
-            if isinstance(r_int, dict) and 'end' in r_int:
-                all_ends.append(r_int['end'])
-        for u in uploads:
-            c_int = u.get('client_put_interval')
-            if isinstance(c_int, dict) and 'start' in c_int:
-                all_starts.append(c_int['start'])
-            if isinstance(c_int, dict) and 'end' in c_int:
-                all_ends.append(c_int['end'])
-
-        r_start = min(all_starts) if all_starts else None
-        r_end = max(all_ends) if all_ends else None
+        start_ev = next(
+            (e for e in results.get('server', {}).get('events', [])
+             if e.get('name') == 'publish_model_start' and e.get('round_index') == index),
+            None)
+        end_ev = next(
+            (e for e in results.get('server', {}).get('events', [])
+             if e.get('name') == 'aggregate_done' and e.get('round_index') == index),
+            None)
+        r_start_ms = int(start_ev['monotonic_time'] * 1000) if start_ev and 'monotonic_time' in start_ev else None
+        r_end_ms = int(end_ev['monotonic_time'] * 1000) if end_ev and 'monotonic_time' in end_ev else None
 
         output.append({
             'round_index': index,
@@ -347,7 +336,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
-            'telemetry': _build_telemetry(archive_dir, errors, round_start=r_start, round_end=r_end),
+            'telemetry': _build_telemetry(archive_dir, errors, round_start_ms=r_start_ms, round_end_ms=r_end_ms),
             'deadline_seconds': round_deadline,
             'io_timeout_seconds': io_timeout,
         })
@@ -444,15 +433,9 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     candidates = []
     round_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'rounds', round_id)
     if os.path.isdir(round_dir):
-        candidates.extend(glob.glob(os.path.join(round_dir, 'uftp-*.status')))
-        candidates.extend(glob.glob(os.path.join(round_dir, '*.status')))
-    server_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server')
-    if os.path.isdir(server_dir):
-        round_suffix = round_id.split('-')[-1] if '-' in round_id else round_id
-        candidates.extend(glob.glob(os.path.join(server_dir, f'uftp-{round_suffix}.status')))
-        candidates.extend(glob.glob(os.path.join(server_dir, f'uftp-{round_id}.status')))
-        candidates.extend(glob.glob(os.path.join(server_dir, 'uftp-*.status')))
-        candidates.extend(glob.glob(os.path.join(server_dir, '*.status')))
+        candidates.extend(sorted(glob.glob(os.path.join(round_dir, 'uftp-*.status'))))
+        if not candidates:
+            candidates.extend(sorted(glob.glob(os.path.join(round_dir, '*.status'))))
 
     connect_matrix = {}
     result_matrix = {'1': {}, '2': {}}
@@ -507,25 +490,23 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     }
 
 
-def _filter_log_by_time(log_text, start_time, end_time):
-    if not log_text or start_time is None or end_time is None:
+def _filter_log_by_time_ms(log_text, start_ms, end_ms):
+    if not log_text or start_ms is None or end_ms is None:
         return log_text
     filtered = []
+    pattern = re.compile(r'(\d+)[\t ]+PKT')
     for line in log_text.splitlines():
-        parts = line.split('\t', 1)
-        if parts:
-            try:
-                ts = float(parts[0])
-                if start_time <= ts <= end_time:
-                    filtered.append(line)
-                continue
-            except (ValueError, TypeError):
-                pass
-        filtered.append(line)
+        m = pattern.search(line)
+        if m:
+            ts = int(m.group(1))
+            if start_ms - 500 <= ts <= end_ms + 1000:
+                filtered.append(line)
+        else:
+            filtered.append(line)
     return '\n'.join(filtered)
 
 
-def _build_telemetry(archive_dir, errors, round_start=None, round_end=None):
+def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None):
     s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
     c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
     c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
@@ -536,10 +517,8 @@ def _build_telemetry(archive_dir, errors, round_start=None, round_end=None):
     c2_log = _read_file_text(c2_log_path) or _read_file_text(
         os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
 
-    if round_start is not None and round_end is not None:
-        s_log = _filter_log_by_time(s_log, round_start, round_end)
-        c1_log = _filter_log_by_time(c1_log, round_start, round_end)
-        c2_log = _filter_log_by_time(c2_log, round_start, round_end)
+    if round_start_ms is not None and round_end_ms is not None:
+        s_log = _filter_log_by_time_ms(s_log, round_start_ms, round_end_ms)
 
     s_queue_path = os.path.join(
         archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')

@@ -65,14 +65,7 @@ def validate_archive(archive_dir):
         return errors
     _validate_smoke_gate(archive_dir, smoke, summary, errors)
 
-    env_path = os.path.join(archive_dir, 'envelope.json')
-    is_formal_mode = False
-    if os.path.isfile(env_path):
-        env_obj = _read_json_file(env_path, 'envelope.json', [])
-        if isinstance(env_obj, dict) and env_obj.get('mode') == 'formal':
-            is_formal_mode = True
-
-    _validate_runtime(summary['formal_runtime_loop'], errors, is_formal_mode=is_formal_mode)
+    _validate_runtime(summary['formal_runtime_loop'], errors)
     _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
     _validate_envelope(archive_dir, summary, errors)
@@ -147,6 +140,9 @@ def _validate_envelope(archive_dir, summary, errors):
             io_timeout_cfg = resolved.get('io_timeout_seconds')
             if isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and envelope.get('mode') == 'formal':
                 errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 不得大于 120 秒')
+            rt_timeout_cfg = resolved.get('runtime_timeout_seconds')
+            if isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and envelope.get('mode') == 'formal':
+                errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 不得大于 400 秒')
             smoke = summary.get('pre_runtime_smoke', {})
             if isinstance(smoke, dict):
                 if 'cycle_deadline_seconds' in smoke and smoke['cycle_deadline_seconds'] != resolved.get('smoke_cycle_deadline_seconds'):
@@ -256,7 +252,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         errors.append('pre_runtime_smoke 校验失败：%s' % ge)
 
 
-def _validate_runtime(value, errors, is_formal_mode=False):
+def _validate_runtime(value, errors):
     _require_status(value, 'formal_runtime_loop', errors)
     if not isinstance(value, dict):
         return
@@ -272,7 +268,7 @@ def _validate_runtime(value, errors, is_formal_mode=False):
     for key, expected in required.items():
         if value.get(key) != expected:
             errors.append('formal_runtime_loop.%s 不满足通过条件' % key)
-    _validate_formal_scenario(value, errors, is_formal_mode=is_formal_mode)
+    _validate_formal_scenario(value, errors)
     if value.get('partial_result_returned') is not False:
         errors.append('formal_runtime_loop 必须证明 server 未返回 partial result')
     for role in ('server_result', 'client1_result', 'client2_result',
@@ -294,7 +290,7 @@ def _validate_runtime(value, errors, is_formal_mode=False):
         errors.append('formal_runtime_loop 角色服务受控停止未通过')
 
 
-def _validate_formal_scenario(value, errors, is_formal_mode=False):
+def _validate_formal_scenario(value, errors):
     scenario = value.get('scenario')
     if not isinstance(scenario, dict):
         errors.append('formal_runtime_loop 缺少正式场景配置')
@@ -304,30 +300,12 @@ def _validate_formal_scenario(value, errors, is_formal_mode=False):
     artifact_size = scenario.get('artifact_size_bytes')
     delays = scenario.get('training_delay_ms_by_node')
 
-    if is_formal_mode:
-        if (round_count, artifact_size) != (2, 40 * 1024 * 1024):
-            errors.append('formal 模式下必须执行 2 轮 40 MiB 正式场景')
-            return
-        expected_delays = {'1': 0, '2': 0}
-        if delays != expected_delays:
-            errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
-    else:
-        if round_count not in (1, 2):
-            errors.append('formal_runtime_loop.scenario.round_count 不满足通过条件')
-        if (round_count == 1 and artifact_size != 4 * 1024 * 1024) or (round_count == 2 and artifact_size != 40 * 1024 * 1024) or (round_count not in (1, 2) and artifact_size not in (4 * 1024 * 1024, 40 * 1024 * 1024)):
-            errors.append('formal_runtime_loop.scenario.artifact_size_bytes 不满足通过条件')
-
-        # 场景合法性判定：合法的 2 轮 40 MiB 正式场景，或合法的 1 轮 4 MiB 回归场景
-        if (round_count, artifact_size) == (2, 40 * 1024 * 1024):
-            expected_delays = {'1': 0, '2': 0}
-            if delays != expected_delays:
-                errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
-        elif (round_count, artifact_size) == (1, 4 * 1024 * 1024):
-            expected_delays = {'1': 0, '2': 3000}
-            if delays != expected_delays:
-                errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
-        else:
-            return
+    if round_count != 2:
+        errors.append('formal_runtime_loop.scenario.round_count 必须为 2 轮')
+    if artifact_size != 40 * 1024 * 1024:
+        errors.append('formal_runtime_loop.scenario.artifact_size_bytes 必须为 40 MiB (41943040 字节)')
+    if delays != {'1': 0, '2': 0}:
+        errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 必须全为 0 延时并发')
 
     if scenario.get('placeholder_training') != 'template_copy':
         errors.append('formal_runtime_loop.scenario.placeholder_training 不满足通过条件')
@@ -457,6 +435,14 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         client_intervals = concurrent_put.get('client_intervals')
         if not isinstance(client_intervals, dict) or set(client_intervals) != {'1', '2'}:
             errors.append('%s.concurrent_put 缺少客户端 PUT 区间' % prefix)
+        else:
+            c1_int = client_intervals.get('1')
+            c2_int = client_intervals.get('2')
+            if _is_interval(c1_int) and _is_interval(c2_int):
+                calc_overlap = min(c1_int['end'], c2_int['end']) - max(c1_int['start'], c2_int['start'])
+                expected_overlap = calc_overlap > 0
+                if concurrent_put.get('natural_overlap') != expected_overlap:
+                    errors.append('%s.concurrent_put natural_overlap 标记与实际时间区间矛盾' % prefix)
 
     telem = value.get('telemetry')
     if telem is None:
