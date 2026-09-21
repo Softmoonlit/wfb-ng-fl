@@ -499,6 +499,26 @@ class RunEnvelope:
 
         return clean
 
+    def record_stage_failure(self, partition_name, partition_data, category,
+                             last_successful=None, first_failing=None, reason=None):
+        """记录阶段执行失败，产生包含失败分类与层级的 failed 归档。"""
+        if self.state == 'closed':
+            raise RuntimeError("包络已关闭，拒绝修改")
+        if self.state == 'preflight_failed':
+            raise RuntimeError("preflight 失败，禁止追加后续数据面分区")
+
+        if not isinstance(partition_data, dict):
+            raise TypeError("分区数据必须为字典")
+
+        self.partitions[partition_name] = partition_data
+        self._write_summary_and_result(
+            conclusion_status='failed',
+            reason=reason or f'{partition_name} 阶段失败',
+            category=category,
+            last_successful=last_successful,
+            first_failing=first_failing,
+        )
+
     def append_partition(self, name, partition_data, artifacts=None):
         """供后续阶段追加独立证据分区的单一接口。"""
         if self.state == 'closed':
@@ -552,8 +572,7 @@ class RunEnvelope:
             # 自动推导
             all_parts = [orch]
             if 'pre_runtime_smoke' in self.partitions:
-                all_parts.append(smoke.get('downlink_uftp', {}))
-                all_parts.append(smoke.get('uplink_http_put', {}))
+                all_parts.append(smoke)
             if 'formal_runtime_loop' in self.partitions:
                 all_parts.append(formal)
             if 'lifecycle' in self.partitions:
@@ -594,8 +613,7 @@ class RunEnvelope:
                 'first_failing_layer': orch.get('first_failing_layer'),
             },
             'pre_runtime_smoke': smoke if smoke else {
-                'downlink_uftp': {'status': 'skipped'},
-                'uplink_http_put': {'status': 'skipped'},
+                'status': 'skipped',
             },
             'formal_runtime_loop': formal if formal else {
                 'status': 'skipped',

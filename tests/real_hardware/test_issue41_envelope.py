@@ -571,11 +571,12 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
         self.assertNotIn('pre_runtime_smoke', envelope.partitions)
         self.assertNotIn('formal_runtime_loop', envelope.partitions)
 
-        # 追加 pre_runtime_smoke 分区
+        # 追加 pre_runtime_smoke 分区 (数据面 Gate)
         smoke_data = {
             'run_id': envelope.run_id,
-            'downlink_uftp': {'status': 'passed'},
-            'uplink_http_put': {'status': 'passed'},
+            'status': 'passed',
+            'gate_type': 'three_cycle_bidirectional',
+            'cycle_count': 3,
         }
         envelope.append_partition('pre_runtime_smoke', smoke_data)
 
@@ -585,7 +586,38 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
         with open(summary_path, 'r', encoding='utf-8') as fh:
             summary = json.load(fh)
         self.assertIn('pre_runtime_smoke', summary)
-        self.assertEqual('passed', summary['pre_runtime_smoke']['downlink_uftp']['status'])
+        self.assertEqual('passed', summary['pre_runtime_smoke']['status'])
+
+    def test_record_stage_failure_classifies_and_updates_summary(self):
+        envelope = RunEnvelope(
+            run_id='v8_issue41_stage_fail',
+            archive_root=self.archive_root,
+            branch='feat/41-real-hardware-fl-runtime-redo',
+            commit='0123456789abcdef0123456789abcdef01234567',
+            resolved_config=self.default_config,
+        )
+        envelope.initialize()
+        gate_failure_data = {
+            'run_id': envelope.run_id,
+            'status': 'failed',
+            'gate_type': 'three_cycle_bidirectional',
+        }
+        envelope.record_stage_failure(
+            partition_name='pre_runtime_smoke',
+            partition_data=gate_failure_data,
+            category='link_capability',
+            last_successful='tun_and_route',
+            first_failing='uftp_feedback_and_status',
+            reason='UFTP 注册超时未命中',
+        )
+        summary_path = os.path.join(envelope.archive_dir, 'issue41_summary.json')
+        with open(summary_path, 'r', encoding='utf-8') as fh:
+            summary = json.load(fh)
+        self.assertEqual('failed', summary['conclusion']['status'])
+        self.assertEqual('link_capability', summary['conclusion']['category'])
+        self.assertEqual('tun_and_route', summary['conclusion']['last_successful_layer'])
+        self.assertEqual('uftp_feedback_and_status', summary['conclusion']['first_failing_layer'])
+        self.assertEqual('failed', summary['pre_runtime_smoke']['status'])
 
     def test_append_partition_rejects_mixed_run_id(self):
         envelope = RunEnvelope(

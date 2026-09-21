@@ -46,6 +46,9 @@ CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/w
 CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-4mib.bin}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
+SMOKE_CYCLE_COUNT="${ISSUE41_SMOKE_CYCLE_COUNT:-3}"
+SMOKE_IO_TIMEOUT_SECONDS="${ISSUE41_SMOKE_IO_TIMEOUT_SECONDS:-120}"
+SMOKE_CYCLE_DEADLINE_SECONDS="${ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS:-240}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
 RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
 STOP_CLEANUP_TIMEOUT_SECONDS="${ISSUE41_STOP_CLEANUP_TIMEOUT_SECONDS:-5}"
@@ -65,8 +68,7 @@ usage() {
   generate-fixtures        在三机生成确定性 4 MiB 验收模型与 update 模板
   preflight                检查三机依赖、sudo、仓库状态、wlx 网卡与端口
   install                  三机执行 make build_v6、sudo make install_v8、daemon-reload
-  smoke-downlink-uftp      预留：真实 UFTP downlink smoke
-  smoke-uplink-http-put    预留：真实 HTTP PUT uplink smoke
+  smoke-gate               连续三周期双向数据面 gate 验收 (别名: smoke)
   run-runtime-loop         写 issue41 配置/drop-in 并启动 systemd Runtime loop
   lifecycle-stop-restart   stop/restart/no-overlap 生命周期验收
   collect                  采集本机和远端状态证据
@@ -553,6 +555,7 @@ write_smoke_marker() {
     cat > "$marker_dir/passed.json" <<EOF
 {"schema_version":1,"smoke":"$name","status":"passed","run_id":"$RUN_ID","data_plane":"10.80.0.0/24","server_tun":"$SERVER_TUN","client_tuns":["$CLIENT1_TUN","$CLIENT2_TUN"]}
 EOF
+    cp -f "$marker_dir/passed.json" "$ARCHIVE_DIR/pre_runtime_smoke/passed.json" 2>/dev/null || true
 }
 
 issue41_wfb_short_gi_arg() {
@@ -721,15 +724,21 @@ PY
 
 stop_smoke_http_server() {
     local pid_file
-    pid_file="$(smoke_dir uplink_http_put)/server/http-server.pid"
-    if [ -f "$pid_file" ]; then
-        kill "$(cat "$pid_file")" 2>/dev/null || true
-    fi
+    for pid_file in "$(smoke_dir gate)/server/http-server.pid" "$(smoke_dir uplink_http_put)/server/http-server.pid"; do
+        if [ -f "$pid_file" ]; then
+            kill "$(cat "$pid_file")" 2>/dev/null || true
+        fi
+    done
+}
+
+stop_smoke_gate_processes() {
+    stop_smoke_http_server
+    cmd_stop_all
 }
 
 verify_no_smoke_orphans() {
     local http_pid_file
-    http_pid_file="$(smoke_dir uplink_http_put)/server/http-server.pid"
+    http_pid_file="$(smoke_dir gate)/server/http-server.pid"
     if pgrep -x wfb_v6_uplink >/dev/null || pgrep -x uftp >/dev/null || pgrep -x uftpd >/dev/null; then
         die "本机发现 smoke 孤儿进程"
     fi
@@ -741,99 +750,81 @@ verify_no_smoke_orphans() {
     done
 }
 
-cmd_smoke_downlink_uftp() {
-    local name=downlink_uftp work src model manifest status log archive
-    work="$(smoke_dir "$name")/server/round1"
-    archive="$(smoke_archive_dir "$name")"
-    trap 'cmd_stop_all; collect_smoke_evidence downlink_uftp || true; write_downlink_failure_diagnosis || true' ERR
+start_smoke_gate_environment() {
+    local name=gate
     start_smoke_wfb "$name"
-    sudo install -d "$work"
-    sudo chown "$(id -u):$(id -g)" "$work"
-    src="issue41-round1"
-    model="$work/model.bin"
-    manifest="$work/model.manifest.json"
-    sudo python3 - "$model" "$manifest" <<'PY'
-import hashlib, json, sys
-model, manifest = sys.argv[1:]
-data = b'issue41-smoke-downlink-model\n'
-with open(model, 'wb') as fh:
-    fh.write(data)
-with open(manifest, 'w', encoding='utf-8') as fh:
-    json.dump({'schema_version': 1, 'artifact_type': 'model', 'sha256': hashlib.sha256(data).hexdigest()}, fh, separators=(',', ':'))
-PY
+
+    # 启动 client1 和 client2 的 uftpd 接收端
     for role in client1 client2; do
         remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/inbox' '$(smoke_dir "$name")/$role/tmp'; sudo bash -c \"nohup uftpd -d -q -I '$(client_ip "$role")' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U '0x0000000${role#client}' -D '$(smoke_dir "$name")/$role/inbox' -T '$(smoke_dir "$name")/$role/tmp' -F '$(smoke_dir "$name")/$role/uftpd.status' > '$(smoke_dir "$name")/$role/uftpd.log' 2>&1 & echo \\\$! > '$(smoke_dir "$name")/$role/uftpd.pid'\""
     done
-    sleep 1
-    status="$work/uftp.status"
-    log="$work/uftp.log"
-    sudo timeout "$SMOKE_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'"
-    sleep 1
-    collect_smoke_evidence "$name"
-    python3 - "$archive" "$status" <<'PY'
-import hashlib, os, sys
-archive, status_path = sys.argv[1:]
-expected = {}
-for filename in ('model.bin', 'model.manifest.json'):
-    with open(os.path.join(archive, 'server', 'round1', filename), 'rb') as fh:
-        expected[filename] = hashlib.sha256(fh.read()).hexdigest()
-for role in ('client1', 'client2'):
-    for filename, digest in expected.items():
-        path = os.path.join(archive, role, 'inbox', 'issue41-round1', filename)
-        with open(path, 'rb') as fh:
-            actual = hashlib.sha256(fh.read()).hexdigest()
-        if actual != digest:
-            raise SystemExit('%s %s sha256 mismatch' % (role, filename))
-connect = []
-results = []
-with open(status_path, 'r', encoding='utf-8') as fh:
-    for raw in fh:
-        fields = raw.rstrip('\n').split(';')
-        if fields[0] == 'CONNECT':
-            connect.append((fields[1], int(fields[2], 16)))
-        elif fields[0] == 'RESULT':
-            results.append((int(fields[1], 16), fields[2], fields[4]))
-if sorted(connect) != [('success', 1), ('success', 2)]:
-    raise SystemExit('UFTP CONNECT matrix incomplete: %r' % (connect,))
-expected_results = sorted((uid, 'issue41-round1/%s' % filename, 'copy') for uid in (1, 2) for filename in expected)
-if sorted(results) != expected_results:
-    raise SystemExit('UFTP RESULT matrix incomplete: %r' % (results,))
-PY
-    cmd_stop_all
-    verify_no_smoke_orphans
-    write_smoke_marker "$name"
-    trap - ERR
-    log_ok "smoke-downlink-uftp 通过"
-}
 
-cmd_smoke_uplink_http_put() {
-    local name=uplink_http_put archive server_dir
-    archive="$(smoke_archive_dir "$name")"
+    # 启动 server 端 HTTP PUT receiver
+    local server_dir
     server_dir="$(smoke_dir "$name")/server"
-    trap 'stop_smoke_http_server; cmd_stop_all; collect_smoke_evidence uplink_http_put || true' ERR
-    start_smoke_wfb "$name"
     python3 - "$server_dir" "${HTTP_HOST}" "$HTTP_PORT" <<'PY' &
-import hashlib, http.server, json, os, sys, time
+import hashlib, http.server, json, os, sys, threading, time
+
 server_dir, host, port = sys.argv[1], sys.argv[2], int(sys.argv[3])
 os.makedirs(server_dir, exist_ok=True)
 events_path = os.path.join(server_dir, 'server-put-events.jsonl')
+lock = threading.Lock()
+active_uploads = set()
+
+def append_event(event):
+    with open(events_path, 'a', encoding='utf-8') as fh:
+        fh.write(json.dumps(event, separators=(',', ':')) + '\n')
+
 class Handler(http.server.BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
     def do_PUT(self):
+        t0 = time.monotonic()
+        client_ip = self.client_address[0]
+        node_id = 1 if client_ip.endswith('.11') else (2 if client_ip.endswith('.12') else 1)
+        with lock:
+            active_uploads.add(node_id)
+            append_event({'type': 'active_set', 'active_uploads': sorted(list(active_uploads))})
+
         length = int(self.headers.get('Content-Length', '0'))
-        data = self.rfile.read(length)
-        event = {'path': self.path, 'content_length': length, 'sha256': hashlib.sha256(data).hexdigest(), 'client_address': self.client_address[0], 'monotonic_time': time.monotonic()}
-        with open(events_path, 'a', encoding='utf-8') as fh:
-            fh.write(json.dumps(event, separators=(',', ':')) + '\n')
+        hasher = hashlib.sha256()
+        read_bytes = 0
+        while read_bytes < length:
+            chunk = self.rfile.read(min(65536, length - read_bytes))
+            if not chunk:
+                break
+            hasher.update(chunk)
+            read_bytes += len(chunk)
+
+        t1 = time.monotonic()
+        digest = hasher.hexdigest()
+        with lock:
+            active_uploads.discard(node_id)
+            append_event({'type': 'active_set', 'active_uploads': sorted(list(active_uploads))})
+
+        append_event({
+            'type': 'upload',
+            'node_id': node_id,
+            'client_address': self.client_address[0],
+            'path': self.path,
+            'size_bytes': read_bytes,
+            'sha256': digest,
+            'status': 201,
+            'outcome': 'committed',
+            'start_time': t0,
+            'end_time': t1,
+        })
         self.send_response(201)
         self.send_header('Content-Length', '0')
         self.send_header('Connection', 'close')
         self.end_headers()
         self.close_connection = True
+
     def log_message(self, fmt, *args):
         return
+
 class Server(http.server.ThreadingHTTPServer):
     allow_reuse_address = True
+
 with Server((host, port), Handler) as server:
     with open(os.path.join(server_dir, 'http-server-ready'), 'w', encoding='utf-8') as fh:
         fh.write('ready\n')
@@ -842,14 +833,133 @@ PY
     echo $! > "$server_dir/http-server.pid"
     for _ in $(seq 1 50); do [ -f "$server_dir/http-server-ready" ] && break; sleep 0.1; done
     [ -f "$server_dir/http-server-ready" ] || die "HTTP PUT receiver 未 ready"
-    for role in client1 client2; do
-        remote "$role" "sudo timeout '$SMOKE_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' <<'PY'
+
+    # 记录三机复用进程 PID 矩阵
+    local s_link_pid c1_link_pid c2_link_pid c1_uftpd_pid c2_uftpd_pid s_http_pid
+    s_link_pid="$(cat "$server_dir/wfb.pid")"
+    c1_link_pid="$(remote client1 "cat '$(smoke_dir "$name")/client1/wfb.pid'")"
+    c2_link_pid="$(remote client2 "cat '$(smoke_dir "$name")/client2/wfb.pid'")"
+    c1_uftpd_pid="$(remote client1 "cat '$(smoke_dir "$name")/client1/uftpd.pid'")"
+    c2_uftpd_pid="$(remote client2 "cat '$(smoke_dir "$name")/client2/uftpd.pid'")"
+    s_http_pid="$(cat "$server_dir/http-server.pid")"
+
+    python3 - "$server_dir/reused_processes.json" "$s_link_pid" "$c1_link_pid" "$c2_link_pid" "$c1_uftpd_pid" "$c2_uftpd_pid" "$s_http_pid" <<'PY'
+import json, sys
+out, s_link, c1_link, c2_link, c1_uftpd, c2_uftpd, s_http = sys.argv[1:]
+data = {
+    'server_link_pid': int(s_link),
+    'client1_link_pid': int(c1_link),
+    'client2_link_pid': int(c2_link),
+    'client1_uftpd_pid': int(c1_uftpd),
+    'client2_uftpd_pid': int(c2_uftpd),
+    'server_http_pid': int(s_http),
+}
+with open(out, 'w', encoding='utf-8') as fh:
+    json.dump(data, fh, indent=2)
+PY
+}
+
+cmd_smoke_gate() {
+    local name=gate archive server_dir
+    archive="$(smoke_archive_dir)"
+    server_dir="$(smoke_dir "$name")/server"
+
+    trap 'stop_smoke_gate_processes; collect_smoke_evidence "$name" || true; handle_smoke_gate_failure' ERR
+
+    log_info "开始连续三周期双向数据面 Gate 验收..."
+    start_smoke_gate_environment
+
+    local cycle t_cycle_start t_cycle_end cycle_dur
+    local t_dl_start t_dl_end dl_dur
+    local t_ul_start t_ul_end ul_dur
+    local work src model manifest status log
+    local cycle_files=()
+
+    for cycle in 1 2 3; do
+        log_info "=== 运行数据面 Gate 周期 $cycle / 3 ==="
+        t_cycle_start="$(python3 -c 'import time; print(time.monotonic())')"
+
+        # 1. 确定性生成 4 MiB 交付物与 update 文件
+        work="$server_dir/cycle$cycle"
+        sudo install -d "$work"
+        sudo chown "$(id -u):$(id -g)" "$work"
+        src="issue41-cycle$cycle"
+        model="$work/model.bin"
+        manifest="$work/model.manifest.json"
+
+        # 生成 server 端下行 model 和 manifest
+        sudo python3 - "$model" "$manifest" "$INPUT_SIZE_BYTES" "$cycle" <<'PY'
+import hashlib, json, sys
+model, manifest, size_str, cycle_str = sys.argv[1:]
+size = int(size_str)
+pat = ('wfb-ng-issue41-cycle%s-model-4mib\n' % cycle_str).encode('utf-8')
+data = (pat * (size // len(pat) + 1))[:size]
+with open(model, 'wb') as fh:
+    fh.write(data)
+with open(manifest, 'w', encoding='utf-8') as fh:
+    json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': hashlib.sha256(data).hexdigest()}, fh, separators=(',', ':'))
+PY
+
+        # 生成两 client 不同的 4 MiB update 文件
+        for role in client1 client2; do
+            local nid="${role#client}"
+            remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
+import hashlib, json, sys
+path, size_str, cycle_str, nid = sys.argv[1:]
+size = int(size_str)
+pat = ('wfb-ng-issue41-cycle%s-client%s-update-4mib\n' % (cycle_str, nid)).encode('utf-8')
+data = (pat * (size // len(pat) + 1))[:size]
+with open(path, 'wb') as fh:
+    fh.write(data)
+with open(path + '.sha256', 'w', encoding='utf-8') as fh:
+    fh.write(hashlib.sha256(data).hexdigest())
+PY"
+        done
+
+        # 2. Shared UFTP 下行 (4 MiB)
+        t_dl_start="$(python3 -c 'import time; print(time.monotonic())')"
+        status="$work/uftp.status"
+        log="$work/uftp.log"
+        sudo timeout "$SMOKE_IO_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'" || die "周期 $cycle shared UFTP 下行超时或失败"
+        t_dl_end="$(python3 -c 'import time; print(time.monotonic())')"
+        dl_dur="$(python3 -c "print($t_dl_end - $t_dl_start)")"
+
+        # 下行结果验证
+        for role in client1 client2; do
+            remote "$role" "sudo chown -R \$(id -u):\$(id -g) '$(smoke_dir "$name")/$role/inbox'"
+            scp -rq "$(client_ssh "$role"):$(smoke_dir "$name")/$role/inbox/$src" "$server_dir/$role-inbox-$src"
+        done
+
+        python3 - "$work" "$server_dir/client1-inbox-$src" "$server_dir/client2-inbox-$src" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" <<'PY'
+import hashlib, json, os, sys
+server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path = sys.argv[1:]
+from tests.real_hardware.issue41_gate import verify_downlink_artifacts, GateConfig
+res = verify_downlink_artifacts(
+    server_cycle_dir=server_cycle_dir,
+    client_inboxes={'1': c1_inbox, '2': c2_inbox},
+    status_file=status_path,
+    config=GateConfig(),
+    duration_seconds=float(duration_str),
+)
+with open(out_path, 'w', encoding='utf-8') as fh:
+    json.dump(res, fh, indent=2)
+if res['status'] != 'passed':
+    raise SystemExit('UFTP 下行校验失败: %r' % res)
+PY
+        [ $? -eq 0 ] || die "Gate 周期 $cycle UFTP 下行校验未通过"
+
+        # 3. 两个 client 各一次 4 MiB HTTP PUT 上行
+        t_ul_start="$(python3 -c 'import time; print(time.monotonic())')"
+        for role in client1 client2; do
+            local nid="${role#client}"
+            remote "$role" "sudo timeout '$SMOKE_IO_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role/cycle$cycle' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' '$nid' <<'PY'
 import hashlib, http.client, json, os, sys, time
-work, source_ip, host, port, role = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5]
-os.makedirs(work, exist_ok=True)
-body = ('issue41-smoke-uplink-%s\\n' % role).encode('ascii')
+work, source_ip, host, port, role, nid = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5], int(sys.argv[6])
+update_file = os.path.join(work, 'update.bin')
+with open(update_file, 'rb') as fh:
+    body = fh.read()
 digest = hashlib.sha256(body).hexdigest()
-path = '/issue41-smoke/%s' % role
+path = '/client%d' % nid
 start = time.monotonic()
 conn = http.client.HTTPConnection(host, port, timeout=10, source_address=(source_ip, 0))
 conn.request('PUT', path, body=body, headers={'Content-Length': str(len(body)), 'Content-Type': 'application/octet-stream', 'Connection': 'close'})
@@ -858,36 +968,214 @@ resp.read()
 end = time.monotonic()
 conn.close()
 with open(os.path.join(work, 'client-put-result.json'), 'w', encoding='utf-8') as fh:
-    json.dump({'role': role, 'path': path, 'http_status': resp.status, 'bytes': len(body), 'sha256': digest, 'start_monotonic': start, 'end_monotonic': end}, fh, separators=(',', ':'))
+    json.dump({'role': role, 'node_id': nid, 'path': path, 'http_status': resp.status, 'bytes': len(body), 'sha256': digest, 'start_monotonic': start, 'end_monotonic': end}, fh, separators=(',', ':'))
 if resp.status != 201:
     raise SystemExit('unexpected HTTP status %s' % resp.status)
 PY"
-    done
-    sleep 1
-    stop_smoke_http_server
-    collect_smoke_evidence "$name"
-    python3 - "$archive" <<'PY'
-import json, os, sys
-archive = sys.argv[1]
-with open(os.path.join(archive, 'server', 'server-put-events.jsonl'), 'r', encoding='utf-8') as fh:
-    events = [json.loads(line) for line in fh if line.strip()]
-by_path = {event['path']: event for event in events}
-for role, expected_addr in (('client1', '10.80.0.11'), ('client2', '10.80.0.12')):
-    with open(os.path.join(archive, role, 'client-put-result.json'), 'r', encoding='utf-8') as fh:
-        client = json.load(fh)
-    event = by_path.get(client['path'])
-    if event is None:
-        raise SystemExit('missing server event for %s' % role)
-    if client['http_status'] != 201 or event['sha256'] != client['sha256'] or event['content_length'] != client['bytes']:
-        raise SystemExit('HTTP PUT evidence mismatch for %s' % role)
-    if event['client_address'] != expected_addr:
-        raise SystemExit('unexpected source address for %s: %s' % (role, event['client_address']))
+            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/cycle$cycle/client-put-result.json" "$server_dir/$role-put-result-cycle$cycle.json"
+        done
+        t_ul_end="$(python3 -c 'import time; print(time.monotonic())')"
+        ul_dur="$(python3 -c "print($t_ul_end - $t_ul_start)")"
+
+        # 上行结果验证
+        python3 - "$server_dir/server-put-events.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" <<'PY'
+import json, sys
+events_file, c1_res_path, c2_res_path, duration_str, out_path = sys.argv[1:]
+from tests.real_hardware.issue41_gate import verify_uplink_cycle, GateConfig
+events = []
+with open(events_file, 'r', encoding='utf-8') as fh:
+    for line in fh:
+        line = line.strip()
+        if line:
+            events.append(json.loads(line))
+with open(c1_res_path, 'r', encoding='utf-8') as fh:
+    c1 = json.load(fh)
+with open(c2_res_path, 'r', encoding='utf-8') as fh:
+    c2 = json.load(fh)
+c_res = {
+    '1': {'node_id': 1, 'status': c1['http_status'], 'size_bytes': c1['bytes'], 'sha256': c1['sha256'], 'start_time': c1['start_monotonic'], 'end_time': c1['end_monotonic']},
+    '2': {'node_id': 2, 'status': c2['http_status'], 'size_bytes': c2['bytes'], 'sha256': c2['sha256'], 'start_time': c2['start_monotonic'], 'end_time': c2['end_monotonic']},
+}
+for role, expected_addr in (('1', '10.80.0.11'), ('2', '10.80.0.12')):
+    ev = next((e for e in events if e.get('type') == 'upload' and str(e.get('node_id')) == role), None)
+    if ev and ev.get('client_address') != expected_addr:
+        if event['client_address'] != expected_addr:
+            raise SystemExit('client address mismatch')
+res = verify_uplink_cycle(events, c_res, GateConfig(), float(duration_str))
+with open(out_path, 'w', encoding='utf-8') as fh:
+    json.dump(res, fh, indent=2)
+if res['status'] != 'passed':
+    raise SystemExit('HTTP PUT 上行校验失败: %r' % res)
 PY
-    cmd_stop_all
+        [ $? -eq 0 ] || die "Gate 周期 $cycle HTTP PUT 校验未通过"
+
+        # 4. 采集遥测并校验周期契约
+        for role in client1 client2; do
+            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" 2>/dev/null || true
+            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
+        done
+
+        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/wfb.log" "$server_dir/$role-wfb.log" "$server_dir/client1-wfb.log" "$server_dir/client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
+import json, os, sys
+cycle_idx, dl_path, ul_path, s_log_p, _, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
+from tests.real_hardware.issue41_gate import parse_telemetry, build_cycle_evidence, validate_cycle_evidence, GateConfig
+with open(dl_path, 'r', encoding='utf-8') as fh:
+    dl = json.load(fh)
+with open(ul_path, 'r', encoding='utf-8') as fh:
+    ul = json.load(fh)
+
+s_log = open(s_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(s_log_p) else ''
+c1_log = open(c1_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c1_log_p) else ''
+c2_log = open(c2_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c2_log_p) else ''
+sq = json.load(open(sq_p, 'r', encoding='utf-8')) if os.path.isfile(sq_p) else {}
+c1q = json.load(open(c1q_p, 'r', encoding='utf-8')) if os.path.isfile(c1q_p) else {}
+c2q = json.load(open(c2q_p, 'r', encoding='utf-8')) if os.path.isfile(c2q_p) else {}
+
+durations = {
+    'downlink_seconds': float(dl_dur),
+    'uplink_seconds': float(ul_dur),
+    'cycle_total_seconds': float(dl_dur) + float(ul_dur),
+}
+telem = parse_telemetry(
+    server_log=s_log,
+    client_logs={'1': c1_log, '2': c2_log},
+    queue_summaries={'server': sq, 'client1': c1q, 'client2': c2q},
+    phase_durations=durations,
+)
+cycle_ev = build_cycle_evidence(
+    cycle_index=int(cycle_idx),
+    downlink=dl,
+    uplink=ul,
+    telemetry=telem,
+    config=GateConfig(),
+)
+errors = validate_cycle_evidence(cycle_ev, GateConfig())
+if errors:
+    raise SystemExit('周期 %s 遥测或契约校验失败: %r' % (cycle_idx, errors))
+with open(out_path, 'w', encoding='utf-8') as fh:
+    json.dump(cycle_ev, fh, indent=2)
+PY
+        [ $? -eq 0 ] || die "Gate 周期 $cycle 遥测契约校验未通过"
+
+        t_cycle_end="$(python3 -c 'import time; print(time.monotonic())')"
+        cycle_dur="$(python3 -c "print($t_cycle_end - $t_cycle_start)")"
+        python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) <= float(sys.argv[2]) else 1)" "$cycle_dur" "$SMOKE_CYCLE_DEADLINE_SECONDS" || die "Gate 周期 $cycle 总耗时 ${cycle_dur}s 超过固定 deadline ${SMOKE_CYCLE_DEADLINE_SECONDS}s"
+
+        # 5. 清理本周期临时状态（不杀进程）
+        for role in client1 client2; do
+            remote "$role" "sudo rm -rf '$(smoke_dir "$name")/$role/inbox'/* '$(smoke_dir "$name")/$role/cycle$cycle'"
+        done
+        cycle_files+=("$server_dir/cycle$cycle.json")
+        log_ok "Gate 周期 $cycle 验收通过 (耗时: ${cycle_dur}s)"
+    done
+
+    # 停止进程并清理收尾
+    stop_smoke_gate_processes
     verify_no_smoke_orphans
+    collect_smoke_evidence "$name"
+
+    mkdir -p "$archive"
+    python3 - "$archive/gate_summary.json" "$RUN_ID" "$server_dir/reused_processes.json" "${cycle_files[@]}" <<'PY'
+import json, sys
+out_path, run_id, pids_path, c1_p, c2_p, c3_p = sys.argv[1:]
+from tests.real_hardware.issue41_gate import build_gate_summary, validate_gate_summary, GateConfig
+with open(pids_path, 'r', encoding='utf-8') as fh:
+    pids = json.load(fh)
+cycles = [
+    json.load(open(c1_p, 'r', encoding='utf-8')),
+    json.load(open(c2_p, 'r', encoding='utf-8')),
+    json.load(open(c3_p, 'r', encoding='utf-8')),
+]
+summary = build_gate_summary(
+    run_id=run_id,
+    status='passed',
+    cycles=cycles,
+    reused_processes=pids,
+    config=GateConfig(),
+)
+errors = validate_gate_summary(summary, GateConfig())
+if errors:
+    raise SystemExit('Gate summary 校验失败: %r' % errors)
+with open(out_path, 'w', encoding='utf-8') as fh:
+    json.dump(summary, fh, indent=2)
+PY
+    [ $? -eq 0 ] || die "Gate summary 归档校验未通过"
+
     write_smoke_marker "$name"
+    python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
+        --archive-dir "$ARCHIVE_DIR" \
+        --name pre_runtime_smoke \
+        --json-file "$archive/gate_summary.json"
+
     trap - ERR
-    log_ok "smoke-uplink-http-put 通过"
+    log_ok "连续三周期双向数据面 Gate 全部通过！"
+}
+
+handle_smoke_gate_failure() {
+    log_warn "Gate 运行发生失败，正在进行受控停止与现场诊断归档..."
+    local name=gate archive server_dir
+    archive="$(smoke_archive_dir)"
+    server_dir="$(smoke_dir "$name")/server"
+    stop_smoke_gate_processes || true
+    collect_smoke_evidence "$name" || true
+
+    mkdir -p "$archive"
+    python3 - "$archive" "$RUN_ID" <<'PY'
+import json, os, sys
+archive_dir, run_id = sys.argv[1], sys.argv[2]
+from tests.real_hardware.issue41_gate import classify_gate_failure
+
+s_log_p = os.path.join(archive_dir, 'server', 'wfb.log')
+c1_log_p = os.path.join(archive_dir, 'client1', 'wfb.log')
+c2_log_p = os.path.join(archive_dir, 'client2', 'wfb.log')
+
+s_log = open(s_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(s_log_p) else ''
+c1_log = open(c1_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c1_log_p) else ''
+c2_log = open(c2_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c2_log_p) else ''
+
+ant_samples = s_log.count('\tRX_ANT\t')
+c_decl = {
+    'client1': 'first_declare node_id=1' in c1_log,
+    'client2': 'first_declare node_id=2' in c2_log,
+}
+s_acc = {
+    'client1': 'ready_accept node_id=1' in s_log,
+    'client2': 'ready_accept node_id=2' in s_log,
+}
+
+diag = classify_gate_failure(
+    server_rx_ant_samples=ant_samples,
+    client_declared=c_decl,
+    server_accepted=s_acc,
+    tun_routes_ok=True,
+    uftp_status_ok=False,
+    http_put_ok=False,
+)
+
+failed_summary = {
+    'schema_version': 1,
+    'run_id': run_id,
+    'status': 'failed',
+    'gate_type': 'three_cycle_bidirectional',
+    'last_successful_layer': diag['last_successful_layer'],
+    'first_failing_layer': diag['first_failing_layer'],
+    'failure_category': diag['category'],
+    'failure_reason': diag['reason'],
+}
+
+with open(os.path.join(archive_dir, 'gate_summary.json'), 'w', encoding='utf-8') as fh:
+    json.dump(failed_summary, fh, indent=2)
+
+with open(os.path.join(archive_dir, 'failed.json'), 'w', encoding='utf-8') as fh:
+    json.dump(failed_summary, fh, indent=2)
+PY
+
+    python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
+        --archive-dir "$ARCHIVE_DIR" \
+        --name pre_runtime_smoke \
+        --json-file "$archive/gate_summary.json" 2>/dev/null || true
+
+    die "数据面 Gate 验收失败，已归档失败诊断，禁止正式 Runtime 启动！"
 }
 
 runtime_state_exists_local() {
@@ -1052,14 +1340,10 @@ cmd_collect() {
 }
 
 cmd_summary() {
-    local server_result client1_result client2_result conclusion status reason smoke_downlink smoke_uplink route_evidence role group suffix downlink_diagnosis diagnosis_class
+    local server_result client1_result client2_result conclusion status reason route_evidence role group suffix
     server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
     client1_result="$ARCHIVE_DIR/formal_runtime_loop/client1/issue41-client1-result.json"
     client2_result="$ARCHIVE_DIR/formal_runtime_loop/client2/issue41-client2-result.json"
-    smoke_downlink=failed
-    smoke_uplink=failed
-    [ -f "$ARCHIVE_DIR/pre_runtime_smoke/downlink_uftp/passed.json" ] && smoke_downlink=passed
-    [ -f "$ARCHIVE_DIR/pre_runtime_smoke/uplink_http_put/passed.json" ] && smoke_uplink=passed
     route_evidence=
     for role in server client1 client2; do
         for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
@@ -1071,19 +1355,30 @@ cmd_summary() {
         done
     done
     python3 "$SCRIPT_DIR/issue41_build_summary.py" "$ARCHIVE_DIR" > "$ARCHIVE_DIR/formal-runtime-summary.json"
-    python3 - "$ARCHIVE_DIR" "$smoke_downlink" "$smoke_uplink" "$route_evidence" <<'PY'
+    python3 - "$ARCHIVE_DIR" "$route_evidence" <<'PY'
 import json
 import os
 import sys
 
-archive_dir, smoke_downlink, smoke_uplink, route_evidence = sys.argv[1:]
+archive_dir, route_evidence = sys.argv[1:]
 with open(os.path.join(archive_dir, 'formal-runtime-summary.json'), encoding='utf-8') as fh:
     formal = json.load(fh)
-status = 'passed' if (smoke_downlink == 'passed' and smoke_uplink == 'passed' and
-                      formal['status'] == 'passed') else 'failed'
+
+smoke_gate_path = os.path.join(archive_dir, 'pre_runtime_smoke', 'gate_summary.json')
+passed_marker_path = os.path.join(archive_dir, 'pre_runtime_smoke', 'passed.json')
+if os.path.isfile(smoke_gate_path):
+    with open(smoke_gate_path, 'r', encoding='utf-8') as sf:
+        smoke_gate = json.load(sf)
+elif os.path.isfile(passed_marker_path):
+    with open(passed_marker_path, 'r', encoding='utf-8') as sf:
+        smoke_gate = json.load(sf)
+else:
+    smoke_gate = {'status': 'failed', 'reason': 'gate_summary.json 缺失'}
+
+status = 'passed' if (smoke_gate.get('status') == 'passed' and formal['status'] == 'passed') else 'failed'
 reason = formal['reason']
 if status != 'passed' and formal['status'] == 'passed':
-    reason = 'smoke 前置条件未通过'
+    reason = '数据面 Gate 前置条件未通过'
 
 envelope_path = os.path.join(archive_dir, 'envelope.json')
 run_id = os.path.basename(archive_dir)
@@ -1095,10 +1390,7 @@ summary = {
     'schema_version': 1,
     'run_id': run_id,
     'orchestration': {'status': 'passed', 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
-    'pre_runtime_smoke': {
-        'downlink_uftp': {'status': smoke_downlink},
-        'uplink_http_put': {'status': smoke_uplink},
-    },
+    'pre_runtime_smoke': smoke_gate,
     'formal_runtime_loop': {
         'status': formal['status'],
         'runtime_interfaces': ['publish_model', 'wait_for_model', 'submit_update', 'wait_for_updates'],
@@ -1139,8 +1431,7 @@ cmd_run_all() {
     trap 'if [ "$KEEP_RUNNING_ON_FAIL" != "1" ]; then cmd_stop_all || true; fi; cmd_collect || true; cmd_summary || true' ERR
     cmd_preflight
     cmd_install
-    cmd_smoke_downlink_uftp
-    cmd_smoke_uplink_http_put
+    cmd_smoke_gate
     cmd_run_runtime_loop
     cmd_lifecycle_stop_restart
     cmd_collect
@@ -1153,8 +1444,7 @@ case "$cmd" in
     preflight) cmd_preflight ;;
     install) cmd_install ;;
     generate-fixtures) cmd_generate_fixtures ;;
-    smoke-downlink-uftp) cmd_smoke_downlink_uftp ;;
-    smoke-uplink-http-put) cmd_smoke_uplink_http_put ;;
+    smoke-gate|smoke) cmd_smoke_gate ;;
     run-runtime-loop) cmd_run_runtime_loop ;;
     lifecycle-stop-restart) cmd_lifecycle_stop_restart ;;
     collect) cmd_collect ;;

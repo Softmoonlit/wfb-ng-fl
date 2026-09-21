@@ -6,6 +6,8 @@ import json
 import os
 import sys
 
+from tests.real_hardware.issue41_gate import GateConfig, validate_gate_summary
+
 
 REQUIRED_TOP_LEVEL = (
     'orchestration',
@@ -50,10 +52,7 @@ def validate_archive(archive_dir):
     if not isinstance(smoke, dict):
         errors.append('pre_runtime_smoke 必须是对象')
         return errors
-    _validate_smoke_section(archive_dir, smoke.get('downlink_uftp'),
-                            'downlink_uftp', errors)
-    _validate_smoke_section(archive_dir, smoke.get('uplink_http_put'),
-                            'uplink_http_put', errors)
+    _validate_smoke_gate(archive_dir, smoke, errors)
     _validate_runtime(summary['formal_runtime_loop'], errors)
     _require_status(summary['lifecycle'], 'lifecycle', errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
@@ -104,22 +103,26 @@ def _require_status(value, name, errors):
         errors.append('%s.status 无效' % name)
 
 
-def _validate_smoke_section(archive_dir, value, name, errors):
-    section_name = 'pre_runtime_smoke.%s' % name
-    _require_status(value, section_name, errors)
+def _validate_smoke_gate(archive_dir, value, errors):
+    _require_status(value, 'pre_runtime_smoke', errors)
     if not isinstance(value, dict):
         return
     if value.get('status') != 'passed':
         return
     marker_path = os.path.join(
-        archive_dir, 'pre_runtime_smoke', name, 'passed.json')
-    marker = _read_json_file(marker_path, 'smoke marker %s' % name, errors)
-    if marker is None:
-        return
-    if marker.get('schema_version') != 1:
-        errors.append('%s marker schema_version 无效' % section_name)
-    if marker.get('smoke') != name or marker.get('status') != 'passed':
-        errors.append('%s marker 内容与通过状态不一致' % section_name)
+        archive_dir, 'pre_runtime_smoke', 'passed.json')
+    marker = _read_json_file(marker_path, 'smoke gate marker', errors)
+    if marker is not None:
+        if marker.get('schema_version') != 1:
+            errors.append('pre_runtime_smoke marker schema_version 无效')
+        if (marker.get('gate_type') != 'three_cycle_bidirectional' or
+                marker.get('status') != 'passed'):
+            errors.append('pre_runtime_smoke marker 内容与通过状态不一致')
+
+    config = GateConfig()
+    gate_errors = validate_gate_summary(value, config)
+    for ge in gate_errors:
+        errors.append('pre_runtime_smoke 校验失败：%s' % ge)
 
 
 def _validate_runtime(value, errors):
@@ -268,10 +271,7 @@ def _validate_conclusion(conclusion, summary, errors):
         return
     sections = [
         summary.get('orchestration'),
-        summary.get('pre_runtime_smoke', {}).get('downlink_uftp')
-        if isinstance(summary.get('pre_runtime_smoke'), dict) else None,
-        summary.get('pre_runtime_smoke', {}).get('uplink_http_put')
-        if isinstance(summary.get('pre_runtime_smoke'), dict) else None,
+        summary.get('pre_runtime_smoke'),
         summary.get('formal_runtime_loop'),
         summary.get('lifecycle'),
     ]
