@@ -296,9 +296,12 @@ def _reject_upload_in_progress(observations, errors):
                 return
 
 
-def _is_sha256(value):
+def is_sha256(value):
     return (isinstance(value, str) and len(value) == 64 and
             all(character in '0123456789abcdef' for character in value))
+
+
+_is_sha256 = is_sha256
 
 
 def _has_event(events, event, round_id, node_id, outcome):
@@ -363,11 +366,9 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
             errors.append('读取 UFTP 状态文件失败: %s' % exc)
 
     if not connect_matrix:
-        connect_matrix = {'1': 'success', '2': 'success'}
-    if not result_matrix['1']:
-        result_matrix['1'] = {'model.bin': 'copy', 'model.manifest.json': 'copy'}
-    if not result_matrix['2']:
-        result_matrix['2'] = {'model.bin': 'copy', 'model.manifest.json': 'copy'}
+        errors.append('缺少 UFTP CONNECT 状态')
+    if not result_matrix.get('1') or not result_matrix.get('2'):
+        errors.append('缺少 UFTP 下行文件接收矩阵')
 
     for nid in ('1', '2'):
         if connect_matrix.get(nid) != 'success':
@@ -421,10 +422,10 @@ def _build_telemetry(archive_dir, errors):
     if c2_q:
         queue_summaries['client2'] = c2_q
 
-    if parse_telemetry is not None and (s_log or c1_log or c2_log or queue_summaries):
+    if parse_telemetry is not None:
         telem = parse_telemetry(
-            server_log=s_log,
-            client_logs={'client1': c1_log, 'client2': c2_log},
+            server_log=s_log or '',
+            client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
             queue_summaries=queue_summaries,
         )
         queue = telem.get('queue', {})
@@ -433,14 +434,14 @@ def _build_telemetry(archive_dir, errors):
         return telem
 
     return {
-        'ready_accepted_total': 20,
+        'ready_accepted_total': 0,
         'ready_rejected_total': 0,
-        'grant_sent_total': 100,
-        'authorized_sends_by_node': {'1': 500, '2': 500},
+        'grant_sent_total': 0,
+        'authorized_sends_by_node': {'1': 0, '2': 0},
         'server_rx': {
-            'rx_ant_samples': 20,
-            'rx_packets': 1200,
-            'rx_bytes': 1048576,
+            'rx_ant_samples': 0,
+            'rx_packets': 0,
+            'rx_bytes': 0,
         },
         'queue': {
             'tun_read_pause_total': 0,
@@ -456,16 +457,16 @@ def _build_telemetry(archive_dir, errors):
         },
         'reassembly': {
             'reassembly_overflow_evict': 0,
-            'unfinished_block_limit': 40,
+            'unfinished_block_limit': 0,
         },
         'sender_isolation': {
             'unauthorized_air_injections': 0,
             'unknown_client_rejects': 0,
         },
         'feedback': {
-            'feedback_window_open_count': 10,
-            'feedback_window_close_count': 10,
-            'feedback_uplink_hit_total': 20,
+            'feedback_window_open_count': 0,
+            'feedback_window_close_count': 0,
+            'feedback_uplink_hit_total': 0,
         },
         'loss_and_fec': {
             'packets_lost': 0,

@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: resolved
 
 # Issue 41：真实硬件 FL Runtime 严格同步闭环
 

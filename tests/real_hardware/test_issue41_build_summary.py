@@ -170,6 +170,20 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual('failed', summary['status'])
         self.assertIn('角色服务受控停止未通过', summary['reason'])
 
+    def test_build_summary_detects_missing_uftp_status(self):
+        self.write_fixtures()
+        r_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', 'round-1')
+        for f in os.listdir(r_dir):
+            if f.endswith('.status'):
+                os.remove(os.path.join(r_dir, f))
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('UFTP', summary['reason'])
+
     def write_fixtures(self, rounds_count=1, client2_delay=3000,
                        returned_node_ids=None, same_template_hash=False):
         size = 4 * 1024 * 1024
@@ -181,6 +195,15 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
 
         server_rounds = []
         for r in range(1, rounds_count + 1):
+            r_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', f'round-{r}')
+            os.makedirs(r_dir, exist_ok=True)
+            with open(os.path.join(r_dir, f'uftp-{r}.status'), 'w', encoding='utf-8') as fh:
+                fh.write('CONNECT;success;0x00000001\n')
+                fh.write('CONNECT;success;0x00000002\n')
+                fh.write(f'RESULT;0x00000001;round-{r}/model.bin;4194304;copy\n')
+                fh.write(f'RESULT;0x00000001;round-{r}/model.manifest.json;120;copy\n')
+                fh.write(f'RESULT;0x00000002;round-{r}/model.bin;4194304;copy\n')
+                fh.write(f'RESULT;0x00000002;round-{r}/model.manifest.json;120;copy\n')
             updates = []
             for nid in returned_node_ids:
                 updates.append({

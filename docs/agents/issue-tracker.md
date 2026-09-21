@@ -26,5 +26,5 @@
 - Child ticket 使用 `Type:` 记录 `research`、`prototype`、`grilling` 或 `task`
 - `Blocked by: NN, NN` 记录前置任务
 - 所有前置任务为 `resolved` 后，任务才算解除阻塞
-- 领取任务时将 `Status:` 设为 `claimed` 并先保存
+- 领取任务并开始执行（状态保持 `ready-for-agent` 或按 `docs/agents/triage-labels.md` 流转）
 - 解决任务时，在 `## Answer` 下追加答案，将 `Status:` 设为 `resolved`，再把结论摘要追加到 `map.md` 的 Decisions-so-far

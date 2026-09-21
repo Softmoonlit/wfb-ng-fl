@@ -4,7 +4,7 @@
 
 **Blocked by:** 06 组装唯一的 Issue 41 fail-closed 正式入口
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 本次运行重新发现并归档三机主机身份、管理地址、仓库位置和实际无线接口，不使用旧现场值。
 - [x] 三台机器运行同一分支和 commit，工作区干净，安装产物和角色配置可追溯。
@@ -32,3 +32,8 @@
   3. `formal_runtime_loop`: `passed`（角色服务配置与 Gate 链路配置严格等价核验通过；单轮 4 MiB 严格同步闭环在 10s 内完成，shared UFTP downlink 一次交付两 client，双 4 MiB HTTP PUT 上行返回 HTTP 201 且 digest 一致）
   4. `lifecycle`: `passed`（first_stop 全部 inactive/cgroup clean/无孤儿；restart 后 PID 不复用 server: 225981 vs 225360, client1: 160780 vs 159375, client2: 161745 vs 160098，cgroup 无重叠且 TUN 均恢复 UP；second_stop 再次全部 inactive/cgroup clean/无孤儿）
   5. `conclusion`: `passed`（reason: "一轮 4 MiB 严格同步确定性场景证据完整"）
+
+## 审查与收尾结论
+
+- **审查时间**: 2026-09-21
+- **审查结论**: 经双轴（Standards 与 Spec）审查，收尾清理任务 Tickets 08~10 与回归验证 Ticket 11 全部达成。Ticket 07 正式流转为 `resolved`。

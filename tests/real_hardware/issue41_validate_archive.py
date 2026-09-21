@@ -11,6 +11,7 @@ _PROJECT_ROOT = os.path.abspath(os.path.join(_CUR_DIR, '..', '..'))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
+from tests.real_hardware.issue41_build_summary import is_sha256 as _is_sha256
 from tests.real_hardware.issue41_gate import GateConfig, validate_gate_summary
 from tests.real_hardware.issue41_lifecycle import validate_lifecycle_summary
 
@@ -365,11 +366,6 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             queue = telem.get('queue', {})
             if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
                 errors.append('%s 队列自然暂停后未成功恢复' % prefix)
-
-
-def _is_sha256(value):
-    return (isinstance(value, str) and len(value) == 64 and
-            all(char in '0123456789abcdef' for char in value))
 
 
 def _is_interval(value):
