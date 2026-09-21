@@ -13,6 +13,7 @@ from tests.real_hardware.issue41_gate import (
     build_cycle_evidence,
     build_gate_summary,
     classify_gate_failure,
+    parse_pkt_src_line,
     parse_telemetry,
     validate_cycle_evidence,
     validate_gate_summary,
@@ -49,6 +50,8 @@ class Issue41GateTestCase(unittest.TestCase):
         server_log = (
             "1000\tRX_ANT\t5785:3:40\t1\t100:-60:-60:-60:25:25:25\n"
             "1000\tPKT\t100:10000:0:10:90:50:5:2:0:90:9000\n"
+            "1000\tPKT_SRC\t1:50:5000:3:1:45:4500\n"
+            "1000\tPKT_SRC\t2:50:5000:2:1:45:4500\n"
             "1000\tGRANT_FILTER\t50:50:0:0:0:0:0\n"
             "1000\tREADY_FILTER\t20:20:0:0:0\n"
             "1000\tREASSEMBLY\t0:40\n"
@@ -135,8 +138,74 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(11, telemetry['feedback']['feedback_uplink_hit_total'])
         self.assertEqual(2, telemetry['loss_and_fec']['packets_lost'])
         self.assertEqual(5, telemetry['loss_and_fec']['packets_fec_recovered'])
+        self.assertEqual(1, telemetry['loss_and_fec_by_node']['1']['packets_lost'])
+        self.assertEqual(3, telemetry['loss_and_fec_by_node']['1']['packets_fec_recovered'])
+        self.assertEqual(1, telemetry['loss_and_fec_by_node']['2']['packets_lost'])
+        self.assertEqual(2, telemetry['loss_and_fec_by_node']['2']['packets_fec_recovered'])
         self.assertEqual(1, telemetry['tcp_retransmits'])
         self.assertEqual(10.7, telemetry['phase_durations']['cycle_total_seconds'])
+
+    def test_parse_pkt_src_line_valid_and_malformed(self):
+        # 合法行
+        line = "1000\tPKT_SRC\t1:50:5000:3:1:49:4900\n"
+        res = parse_pkt_src_line(line)
+        self.assertIsNotNone(res)
+        self.assertEqual("1", res['node_id'])
+        self.assertEqual(50, res['rx_packets'])
+        self.assertEqual(5000, res['rx_bytes'])
+        self.assertEqual(3, res['packets_fec_recovered'])
+        self.assertEqual(1, res['packets_lost'])
+        self.assertEqual(49, res['out_packets'])
+        self.assertEqual(4900, res['out_bytes'])
+
+        # 缺少 PKT_SRC 标签
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT\t100:10000:0:10:90:50:5:2:0:90:9000\n"))
+        # 字段数不足
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49\n"))
+        # 包含非数字字段
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:bad:3:1:49:4900\n"))
+        # 空行与随机文本
+        self.assertIsNone(parse_pkt_src_line(""))
+        self.assertIsNone(parse_pkt_src_line("corrupted line without tab"))
+
+    def test_parse_telemetry_extracts_per_node_loss_and_fec(self):
+        server_log = (
+            "1000\tPKT\t150:15000:0:10:140:100:3:1:0:140:14000\n"
+            "1000\tPKT_SRC\t1:100:10000:2:1:99:9900\n"
+            "1000\tPKT_SRC\t2:50:5000:1:0:50:5000\n"
+            "1000\tPKT_SRC\tbad_format_line\n"
+            "1000\tPKT_SRC\t1:incomplete:field\n"
+            "2000\tPKT_SRC\t1:100:10000:3:0:100:10000\n"
+            "2000\tPKT_SRC\t2:50:5000:0:1:49:4900\n"
+        )
+        telemetry = parse_telemetry(
+            server_log=server_log,
+            client_logs={},
+            queue_summaries={},
+        )
+        by_node = telemetry.get('loss_and_fec_by_node', {})
+        self.assertIn('1', by_node)
+        self.assertIn('2', by_node)
+
+        n1 = by_node['1']
+        self.assertEqual(200, n1['rx_packets'])
+        self.assertEqual(20000, n1['rx_bytes'])
+        self.assertEqual(5, n1['packets_fec_recovered'])
+        self.assertEqual(1, n1['packets_lost'])
+        self.assertEqual(199, n1['out_packets'])
+        self.assertEqual(19900, n1['out_bytes'])
+        self.assertAlmostEqual(0.005, n1['loss_rate'], places=5)
+        self.assertAlmostEqual(0.025, n1['fec_recovery_rate'], places=5)
+
+        n2 = by_node['2']
+        self.assertEqual(100, n2['rx_packets'])
+        self.assertEqual(10000, n2['rx_bytes'])
+        self.assertEqual(1, n2['packets_fec_recovered'])
+        self.assertEqual(1, n2['packets_lost'])
+        self.assertEqual(99, n2['out_packets'])
+        self.assertEqual(9900, n2['out_bytes'])
+        self.assertAlmostEqual(0.01, n2['loss_rate'], places=5)
+        self.assertAlmostEqual(0.01, n2['fec_recovery_rate'], places=5)
 
     def test_queue_pause_without_resume_fails_validation(self):
         cycle = self._make_valid_cycle(1)

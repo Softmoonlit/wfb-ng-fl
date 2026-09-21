@@ -29,7 +29,7 @@ _LDFLAGS := $(LDFLAGS) -lrt -lsodium
 _CFLAGS := $(CFLAGS) -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"$(VERSION)-$(shell /bin/bash -c '_tmp=$(COMMIT); echo $${_tmp::8}')"'
 
 V6_DEFAULT_BIN := wfb_v6_uplink
-V6_DEFAULT_TESTS := fec_test libsodium_test control_envelope_test v6_uplink_queue_test v6_uplink_downlink_nonce_test
+V6_DEFAULT_TESTS := fec_test libsodium_test control_envelope_test v6_uplink_queue_test v6_uplink_downlink_nonce_test rx_source_telemetry_test
 
 all: build_v6 test_v6
 
@@ -140,6 +140,9 @@ rx_token_ipc_test: src/rx_token_ipc_test.cpp src/token_event_ipc.cpp src/wifibro
 rx_token_listener_test: src/rx_token_listener_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o
 	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
 
+rx_source_telemetry_test: src/rx_source_telemetry_test.cpp src/rx.rx_test.o src/radiotap.rx_test.o src/zfex.rx_test.o src/wifibroadcast.rx_test.o src/control_envelope.rx_test.o src/token_event_ipc.rx_test.o src/token_authorization_ipc.rx_test.o
+	$(CXX) $(_CFLAGS) -o $@ $^ $(_LDFLAGS) -lpcap $(shell pkg-config --libs catch2-with-main)
+
 v6_uplink_queue_test: src/v6_uplink_queue_test.cpp
 	$(CXX) $(_CFLAGS) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs catch2-with-main)
 
@@ -195,6 +198,7 @@ test_v6: build_v6 $(V6_DEFAULT_TESTS)
 	./control_envelope_test
 	./v6_uplink_queue_test
 	./v6_uplink_downlink_nonce_test
+	./rx_source_telemetry_test
 
 acceptance_v6_realhw:
 	@echo "v6 正式三机入口已切换到手动手册：tests/real_hardware/v6新底座无SSH手动上行演示手册.md"
@@ -225,7 +229,7 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink v6_uplink_downlink_nonce_test kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test control_envelope_test rx_token_listener_test tx_data_source_gate_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test v6_uplink_queue_test src/*.rx_test.o src/*.rx_gate_test.o src/*.v6_test.o
+	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink v6_uplink_downlink_nonce_test rx_source_telemetry_test kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info wfb_ng-*.tar.gz _trial_temp *~ src/*.o fec_test libsodium_test token_scheduler_test control_envelope_test rx_token_listener_test tx_data_source_gate_test token_authorization_test tx_token_gate_test token_authorization_ipc_test token_namespace_bridge_test tx_authorization_integration_test v6_uplink_queue_test src/*.rx_test.o src/*.rx_gate_test.o src/*.v6_test.o
 
 deb_docker:  /opt/qemu/bin
 	@if ! [ -d /opt/qemu ]; then echo "Docker cross build requires patched QEMU!\nApply ./scripts/qemu/qemu.patch to qemu-7.2.0 and build it:\n  ./configure --prefix=/opt/qemu --static --disable-system && make && sudo make install"; exit 1; fi

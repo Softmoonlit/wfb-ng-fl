@@ -1205,6 +1205,21 @@ PY
         done
         cycle_files+=("$server_dir/cycle$cycle.json")
         log_ok "Gate 周期 $cycle 验收通过 (耗时: ${cycle_dur}s)"
+        python3 - "$server_dir/cycle$cycle.json" <<'PY'
+import json, sys
+cycle_ev = json.load(open(sys.argv[1], 'r', encoding='utf-8'))
+telem = cycle_ev.get('telemetry', {})
+by_node = telem.get('loss_and_fec_by_node', {})
+for nid in sorted(by_node.keys()):
+    data = by_node[nid]
+    rx_p = data.get('rx_packets', 0)
+    lost_p = data.get('packets_lost', 0)
+    fec_p = data.get('packets_fec_recovered', 0)
+    out_p = data.get('out_packets', 0)
+    loss_r = data.get('loss_rate', 0.0) * 100
+    fec_r = data.get('fec_recovery_rate', 0.0) * 100
+    print(f"       [分源遥测 Client{nid}] raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts")
+PY
     done
 
     # 停止进程并清理收尾
@@ -1242,6 +1257,26 @@ PY
         --archive-dir "$ARCHIVE_DIR" \
         --name pre_runtime_smoke \
         --json-file "$archive/gate_summary.json"
+
+    python3 - "$archive/gate_summary.json" <<'PY'
+import json, sys
+summary = json.load(open(sys.argv[1], 'r', encoding='utf-8'))
+cycles = summary.get('cycles', [])
+print("       ==== 分源遥测汇总 ====")
+for c in cycles:
+    c_idx = c.get('cycle_index')
+    telem = c.get('telemetry', {})
+    by_node = telem.get('loss_and_fec_by_node', {})
+    for nid in sorted(by_node.keys()):
+        data = by_node[nid]
+        rx_p = data.get('rx_packets', 0)
+        lost_p = data.get('packets_lost', 0)
+        fec_p = data.get('packets_fec_recovered', 0)
+        out_p = data.get('out_packets', 0)
+        loss_r = data.get('loss_rate', 0.0) * 100
+        fec_r = data.get('fec_recovery_rate', 0.0) * 100
+        print(f"       Cycle {c_idx} Client{nid}: raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts")
+PY
 
     trap - ERR
     log_ok "数据面 Gate 全部通过 (共 $SMOKE_CYCLE_COUNT 周期)！"

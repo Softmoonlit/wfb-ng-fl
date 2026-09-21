@@ -661,6 +661,27 @@ def verify_uplink_cycle(events: List[Dict[str, Any]],
         'duration_seconds': duration_seconds,
     }
 
+def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
+    """解析单行 PKT_SRC 统计，若格式不合法则返回 None。"""
+    if '\tPKT_SRC\t' not in line:
+        return None
+    m = re.search(r'\tPKT_SRC\t(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)(?:\s|$)', line)
+    if not m:
+        return None
+    try:
+        return {
+            'node_id': str(int(m.group(1))),
+            'rx_packets': int(m.group(2)),
+            'rx_bytes': int(m.group(3)),
+            'packets_fec_recovered': int(m.group(4)),
+            'packets_lost': int(m.group(5)),
+            'out_packets': int(m.group(6)),
+            'out_bytes': int(m.group(7)),
+        }
+    except (ValueError, IndexError):
+        return None
+
+
 def parse_telemetry(server_log: str,
                     client_logs: Dict[str, str],
                     queue_summaries: Dict[str, Dict[str, Any]],
@@ -702,6 +723,28 @@ def parse_telemetry(server_log: str,
     rx_bytes = 0
     packets_lost = 0
     packets_fec_recovered = 0
+    loss_and_fec_by_node: Dict[str, Dict[str, Any]] = {
+        '1': {
+            'rx_packets': 0,
+            'rx_bytes': 0,
+            'packets_fec_recovered': 0,
+            'packets_lost': 0,
+            'out_packets': 0,
+            'out_bytes': 0,
+            'loss_rate': 0.0,
+            'fec_recovery_rate': 0.0,
+        },
+        '2': {
+            'rx_packets': 0,
+            'rx_bytes': 0,
+            'packets_fec_recovered': 0,
+            'packets_lost': 0,
+            'out_packets': 0,
+            'out_bytes': 0,
+            'loss_rate': 0.0,
+            'fec_recovery_rate': 0.0,
+        },
+    }
     for line in server_log.splitlines():
         if '\tRX_ANT\t' in line:
             rx_ant_samples += 1
@@ -711,6 +754,35 @@ def parse_telemetry(server_log: str,
             rx_bytes += int(m_pkt.group(2))
             packets_fec_recovered += int(m_pkt.group(7))
             packets_lost += int(m_pkt.group(8))
+        src_entry = parse_pkt_src_line(line)
+        if src_entry:
+            nid = src_entry['node_id']
+            if nid not in loss_and_fec_by_node:
+                loss_and_fec_by_node[nid] = {
+                    'rx_packets': 0,
+                    'rx_bytes': 0,
+                    'packets_fec_recovered': 0,
+                    'packets_lost': 0,
+                    'out_packets': 0,
+                    'out_bytes': 0,
+                    'loss_rate': 0.0,
+                    'fec_recovery_rate': 0.0,
+                }
+            loss_and_fec_by_node[nid]['rx_packets'] += src_entry['rx_packets']
+            loss_and_fec_by_node[nid]['rx_bytes'] += src_entry['rx_bytes']
+            loss_and_fec_by_node[nid]['packets_fec_recovered'] += src_entry['packets_fec_recovered']
+            loss_and_fec_by_node[nid]['packets_lost'] += src_entry['packets_lost']
+            loss_and_fec_by_node[nid]['out_packets'] += src_entry['out_packets']
+            loss_and_fec_by_node[nid]['out_bytes'] += src_entry['out_bytes']
+
+    for node_data in loss_and_fec_by_node.values():
+        total_delivered_or_lost = node_data['out_packets'] + node_data['packets_lost']
+        if total_delivered_or_lost > 0:
+            node_data['loss_rate'] = round(node_data['packets_lost'] / total_delivered_or_lost, 6)
+            node_data['fec_recovery_rate'] = round(node_data['packets_fec_recovered'] / total_delivered_or_lost, 6)
+        else:
+            node_data['loss_rate'] = 0.0
+            node_data['fec_recovery_rate'] = 0.0
 
     # 4. queue / backpressure
     tun_pause = 0
@@ -814,6 +886,7 @@ def parse_telemetry(server_log: str,
             'packets_lost': packets_lost,
             'packets_fec_recovered': packets_fec_recovered,
         },
+        'loss_and_fec_by_node': loss_and_fec_by_node,
         'tcp_retransmits': tcp_retransmits,
         'phase_durations': durations,
     }
