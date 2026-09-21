@@ -6,6 +6,11 @@ import json
 import os
 import sys
 
+_CUR_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.abspath(os.path.join(_CUR_DIR, '..', '..'))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from tests.real_hardware.issue41_gate import GateConfig, validate_gate_summary
 from tests.real_hardware.issue41_lifecycle import validate_lifecycle_summary
 

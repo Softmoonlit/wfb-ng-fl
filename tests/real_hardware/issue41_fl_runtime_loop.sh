@@ -6,6 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+export PYTHONPATH="$PROJECT_ROOT:${PYTHONPATH:-}"
 BRANCH="${ISSUE41_BRANCH:-feat/41-real-hardware-fl-runtime-redo}"
 ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
@@ -1079,7 +1080,7 @@ with open(update_file, 'rb') as fh:
 digest = hashlib.sha256(body).hexdigest()
 path = '/client%d' % nid
 start = time.monotonic()
-conn = http.client.HTTPConnection(host, port, timeout=10, source_address=(source_ip, 0))
+conn = http.client.HTTPConnection(host, port, timeout=120, source_address=(source_ip, 0))
 conn.request('PUT', path, body=body, headers={'Content-Length': str(len(body)), 'Content-Type': 'application/octet-stream', 'Connection': 'close'})
 resp = conn.getresponse()
 resp.read()

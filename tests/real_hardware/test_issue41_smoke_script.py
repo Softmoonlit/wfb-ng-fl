@@ -44,7 +44,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_uplink_smoke_uses_tun_bound_python_put(self):
         for fragment in (
                 "with Server((host, port), Handler) as server:",
-                "HTTPConnection(host, port, timeout=10, source_address=(source_ip, 0))",
+                "HTTPConnection(host, port, timeout=120, source_address=(source_ip, 0))",
                 "conn.request('PUT', path, body=body",
                 "'client_address': self.client_address[0]",
                 "if event['client_address'] != expected_addr:",
