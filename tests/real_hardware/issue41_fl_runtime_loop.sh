@@ -1152,14 +1152,17 @@ PY
 
         # 4. 采集遥测并校验周期契约
         for role in client1 client2; do
-            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" 2>/dev/null || true
+            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" || die "scp 采集 $role wfb.log 失败"
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
         done
 
-        # 截取本周期的日志切片
-        tail -n +"$((s_lines_before + 1))" "$server_dir/wfb.log" > "$server_dir/cycle${cycle}_server-wfb.log" 2>/dev/null || true
-        tail -n +"$((c1_lines_before + 1))" "$server_dir/client1-wfb.log" > "$server_dir/cycle${cycle}_client1-wfb.log" 2>/dev/null || true
-        tail -n +"$((c2_lines_before + 1))" "$server_dir/client2-wfb.log" > "$server_dir/cycle${cycle}_client2-wfb.log" 2>/dev/null || true
+        # 截取本周期的日志切片（fail-closed，无容错回退）
+        [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
+        [ -f "$server_dir/client1-wfb.log" ] || die "缺少 client1 wfb.log"
+        [ -f "$server_dir/client2-wfb.log" ] || die "缺少 client2 wfb.log"
+        tail -n +"$((s_lines_before + 1))" "$server_dir/wfb.log" > "$server_dir/cycle${cycle}_server-wfb.log"
+        tail -n +"$((c1_lines_before + 1))" "$server_dir/client1-wfb.log" > "$server_dir/cycle${cycle}_client1-wfb.log"
+        tail -n +"$((c2_lines_before + 1))" "$server_dir/client2-wfb.log" > "$server_dir/cycle${cycle}_client2-wfb.log"
 
         python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/cycle${cycle}_server-wfb.log" "$server_dir/cycle${cycle}_client1-wfb.log" "$server_dir/cycle${cycle}_client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
 import json, os, sys

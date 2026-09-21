@@ -662,16 +662,19 @@ def verify_uplink_cycle(events: List[Dict[str, Any]],
     }
 
 def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
-    """解析单行 PKT_SRC 统计，若格式不合法则返回 None。"""
+    """解析单行 PKT_SRC 统计，若格式不合法或节点编号不在有效范围 [1, 255] 则返回 None。"""
     if '\tPKT_SRC\t' not in line:
         return None
     m = re.match(r'^\s*(\d+)\tPKT_SRC\t(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)\s*$', line)
     if not m:
         return None
     try:
+        node_id_int = int(m.group(2))
+        if not (1 <= node_id_int <= 255):
+            return None
         return {
             'timestamp_ms': int(m.group(1)),
-            'node_id': str(int(m.group(2))),
+            'node_id': str(node_id_int),
             'rx_packets': int(m.group(3)),
             'rx_bytes': int(m.group(4)),
             'packets_fec_recovered': int(m.group(5)),
@@ -686,6 +689,7 @@ def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
 def make_empty_node_telemetry() -> Dict[str, Any]:
     """生成初始化的单节点丢包与 FEC 遥测结构。"""
     return {
+        'sample_count': 0,
         'rx_packets': 0,
         'rx_bytes': 0,
         'packets_fec_recovered': 0,
@@ -775,6 +779,7 @@ def parse_telemetry(server_log: str,
             nid = src_entry['node_id']
             if nid not in loss_and_fec_by_node:
                 loss_and_fec_by_node[nid] = make_empty_node_telemetry()
+            loss_and_fec_by_node[nid]['sample_count'] += 1
             loss_and_fec_by_node[nid]['rx_packets'] += src_entry['rx_packets']
             loss_and_fec_by_node[nid]['rx_bytes'] += src_entry['rx_bytes']
             loss_and_fec_by_node[nid]['packets_fec_recovered'] += src_entry['packets_fec_recovered']
@@ -1058,11 +1063,19 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
     required_telem_keys = [
         'ready_accepted_total', 'grant_sent_total', 'authorized_sends_by_node',
         'server_rx', 'queue', 'reassembly', 'sender_isolation', 'feedback',
-        'loss_and_fec', 'tcp_retransmits', 'phase_durations',
+        'loss_and_fec', 'loss_and_fec_by_node', 'tcp_retransmits', 'phase_durations',
     ]
     for rk in required_telem_keys:
         if rk not in telem:
             errors.append(f'{prefix} 缺少遥测事实：{rk}')
+
+    by_node = telem.get('loss_and_fec_by_node')
+    if isinstance(by_node, dict):
+        for nid in ('1', '2'):
+            if nid not in by_node:
+                errors.append(f'{prefix} telemetry loss_and_fec_by_node 缺少 client {nid}')
+            elif by_node[nid].get('sample_count', 0) <= 0:
+                errors.append(f'{prefix} telemetry client {nid} 缺少有效 PKT_SRC 遥测采样')
 
     return errors
 

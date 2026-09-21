@@ -172,6 +172,9 @@ class Issue41GateTestCase(unittest.TestCase):
         # 行尾追加多余字段或文本（行锚定保护）
         self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900:extra\n"))
         self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900 garbage\n"))
+        # 节点编号越界（必须在 1..255 范围内）
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t0:50:5000:3:1:49:4900\n"))
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t256:50:5000:3:1:49:4900\n"))
 
     def test_format_node_telemetry_lines(self):
         by_node = {
@@ -282,6 +285,19 @@ class Issue41GateTestCase(unittest.TestCase):
         cycle['total_duration_seconds'] = 241.0
         errors = validate_cycle_evidence(cycle, self.config)
         self.assertTrue(any('deadline' in e for e in errors))
+
+    def test_cycle_rejects_missing_or_empty_node_telemetry_samples(self):
+        # 缺少 Client1 样本
+        cycle = self._make_valid_cycle(1)
+        cycle['telemetry']['loss_and_fec_by_node']['1']['sample_count'] = 0
+        errors = validate_cycle_evidence(cycle, self.config)
+        self.assertTrue(any('client 1 缺少有效 PKT_SRC 遥测采样' in e for e in errors))
+
+        # 缺少 Client2 键
+        cycle = self._make_valid_cycle(1)
+        del cycle['telemetry']['loss_and_fec_by_node']['2']
+        errors = validate_cycle_evidence(cycle, self.config)
+        self.assertTrue(any('缺少 client 2' in e for e in errors))
 
     def test_gate_summary_validates_three_cycles_and_process_reuse(self):
         cycles = [self._make_valid_cycle(i) for i in (1, 2, 3)]
@@ -690,6 +706,30 @@ class Issue41GateTestCase(unittest.TestCase):
                 'loss_and_fec': {
                     'packets_lost': 2,
                     'packets_fec_recovered': 2,
+                },
+                'loss_and_fec_by_node': {
+                    '1': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
+                    '2': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
                 },
                 'tcp_retransmits': 1,
                 'phase_durations': {
