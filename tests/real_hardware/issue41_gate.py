@@ -21,7 +21,12 @@ import threading
 import time
 from typing import Any, Dict, List, Optional, Set
 
-from wfb_ng.fl.issue41_fixtures import file_sha256, generate_deterministic_file
+from wfb_ng.fl.issue41_fixtures import (
+    cycle_client_pattern,
+    cycle_model_pattern,
+    file_sha256,
+    generate_deterministic_file,
+)
 
 
 class GateConfig:
@@ -332,9 +337,9 @@ def generate_cycle_fixtures(cycle: int,
     os.makedirs(client1_dir, exist_ok=True)
     os.makedirs(client2_dir, exist_ok=True)
 
-    model_pat = f'wfb-ng-issue41-cycle{cycle}-model-4mib\n'.encode('utf-8')
-    c1_pat = f'wfb-ng-issue41-cycle{cycle}-client1-update-4mib\n'.encode('utf-8')
-    c2_pat = f'wfb-ng-issue41-cycle{cycle}-client2-update-4mib\n'.encode('utf-8')
+    model_pat = cycle_model_pattern(cycle)
+    c1_pat = cycle_client_pattern(cycle, 1)
+    c2_pat = cycle_client_pattern(cycle, 2)
 
     model_path = os.path.join(server_dir, 'model.bin')
     manifest_path = os.path.join(server_dir, 'model.manifest.json')

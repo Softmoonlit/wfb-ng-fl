@@ -33,6 +33,17 @@ FILENAMES_BY_ROLE = {
 }
 
 
+def cycle_model_pattern(cycle):
+    """返回指定数据面 Gate 周期的 model 填充 pattern。"""
+    return ('wfb-ng-issue41-cycle%s-model-4mib\n' % cycle).encode('utf-8')
+
+
+def cycle_client_pattern(cycle, node_id):
+    """返回指定数据面 Gate 周期和节点 ID 的 update 填充 pattern。"""
+    return ('wfb-ng-issue41-cycle%s-client%s-update-4mib\n' % (
+        cycle, node_id)).encode('utf-8')
+
+
 def generate_deterministic_file(path, size_bytes=DEFAULT_ARTIFACT_SIZE_BYTES,
                                 pattern=MODEL_PATTERN):
     """原子化确定性写入指定大小的二进制测试数据，并返回元数据。"""

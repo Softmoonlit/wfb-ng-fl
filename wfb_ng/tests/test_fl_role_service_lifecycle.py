@@ -208,32 +208,11 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertFalse(result.is_alive())
 
     def test_config_builds_role_and_exact_link_command(self):
-        config_path = os.path.join(self.root, 'server.json')
-        with open(config_path, 'w', encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'role': 'server',
-                'work_dir': os.path.join(self.root, 'work'),
-                'node_id': 10,
-                'participant_node_ids': [1, 2],
-                'participant_uftp_uids': [101, 102],
-                'server_uftp_uid': 100,
-                'uftp_port': 9000,
-                'http_host': '10.0.0.1',
-                'http_port': 8080,
-                'uftp_bind_host': '10.0.0.1',
-                'uftp_multicast_host': '239.80.41.1',
-                'uftp_private_multicast_host': '239.80.41.2',
-                'channel': 149,
-                'channel_width': 'HT40+',
-                'max_update_size_bytes': 4096,
-                'live_observation': False,
-                'observation_path': None,
-                'io_timeout_seconds': 10,
-                'link_args': [
-                    '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
-                    '--known-clients', '1,2'],
-            }, fh)
+        config_path = self.write_server_config(
+            participant_node_ids=[1, 2],
+            link_args=[
+                '--tun-name', 'wfb0', '--tun-addr', '10.0.0.1/24',
+                '--known-clients', '1,2'])
 
         with mock.patch('wfb_ng.fl.service.shutil.which',
                         side_effect=lambda name: '/usr/bin/' + name):
@@ -378,28 +357,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
             '239.80.41.2', service.role.transport.uftp_private_multicast_host)
 
     def test_client_config_passes_uftp_bind_and_multicast_hosts(self):
-        config_path = os.path.join(self.root, 'client.json')
-        with open(config_path, 'w', encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'role': 'client',
-                'work_dir': os.path.join(self.root, 'work'),
-                'node_id': 1,
-                'uftp_uid': 1,
-                'uftp_port': 9000,
-                'server_http_host': '10.0.0.1',
-                'server_http_port': 8080,
-                'uftp_bind_host': '10.80.0.11',
-                'uftp_multicast_host': '239.80.41.1',
-                'uftp_private_multicast_host': '239.80.41.2',
-                'channel': 149,
-                'channel_width': 'HT40+',
-                'max_update_size_bytes': 4096,
-                'live_observation': False,
-                'observation_path': None,
-                'io_timeout_seconds': 10,
-                'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
-            }, fh)
+        config_path = self.write_client_config(
+            link_args=['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'])
 
         with mock.patch('wfb_ng.fl.service.shutil.which',
                         side_effect=lambda name: '/usr/bin/' + name):
@@ -552,28 +511,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
                     'invalid_configuration', raised.exception.error_code)
 
     def test_config_rejects_missing_runtime_dependencies(self):
-        config_path = os.path.join(self.root, 'client.json')
-        with open(config_path, 'w', encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'role': 'client',
-                'work_dir': os.path.join(self.root, 'work'),
-                'node_id': 1,
-                'uftp_uid': 1,
-                'uftp_port': 9000,
-                'server_http_host': '10.0.0.1',
-                'server_http_port': 8080,
-                'uftp_bind_host': '10.80.0.11',
-                'uftp_multicast_host': '239.80.41.1',
-                'uftp_private_multicast_host': '239.80.41.2',
-                'channel': 149,
-                'channel_width': 'HT40+',
-                'max_update_size_bytes': 4096,
-                'live_observation': False,
-                'observation_path': None,
-                'io_timeout_seconds': 10,
-                'link_args': ['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'],
-            }, fh)
+        config_path = self.write_client_config(
+            link_args=['--tun-name', 'wfb0', '--tun-addr', '10.0.0.2/24'])
 
         def which(name):
             return None if name == 'uftpd' else '/usr/bin/' + name
@@ -628,31 +567,10 @@ class RoleLifecycleTestCase(unittest.TestCase):
         self.assertFalse(transport.ready)
 
     def test_config_rejects_existing_tun_before_role_creation(self):
-        config_path = os.path.join(self.root, 'server-existing-tun.json')
-        with open(config_path, 'w', encoding='utf-8') as fh:
-            json.dump({
-                'schema_version': 1,
-                'role': 'server',
-                'work_dir': os.path.join(self.root, 'work'),
-                'node_id': 10,
-                'participant_node_ids': [1],
-                'participant_uftp_uids': [101],
-                'server_uftp_uid': 100,
-                'uftp_port': 9000,
-                'http_host': '10.0.0.1',
-                'http_port': 8080,
-                'uftp_bind_host': '10.0.0.1',
-                'uftp_multicast_host': '239.80.41.1',
-                'uftp_private_multicast_host': '239.80.41.2',
-                'channel': 149,
-                'channel_width': 'HT40+',
-                'max_update_size_bytes': 4096,
-                'live_observation': False,
-                'observation_path': None,
-                'io_timeout_seconds': 10,
-                'link_args': [
-                    '--tun-name', 'wfb0', '--known-clients', '1'],
-            }, fh)
+        config_path = self.write_server_config(
+            participant_node_ids=[1],
+            link_args=['--tun-name', 'wfb0', '--known-clients', '1'],
+            name='server-existing-tun.json')
         with mock.patch('wfb_ng.fl.service.shutil.which',
                         side_effect=lambda name: '/usr/bin/' + name), mock.patch(
                             'wfb_ng.fl.service.os.path.exists', return_value=True):
@@ -710,6 +628,31 @@ class RoleLifecycleTestCase(unittest.TestCase):
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'uftp_bind_host': '10.0.0.1',
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
+                'channel': 149,
+                'channel_width': 'HT40+',
+                'max_update_size_bytes': 4096,
+                'live_observation': False,
+                'observation_path': None,
+                'io_timeout_seconds': 10,
+                'link_args': link_args,
+            }, fh)
+        return config_path
+
+    def write_client_config(self, link_args, name='client.json'):
+        config_path = os.path.join(self.root, name)
+        with open(config_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'role': 'client',
+                'work_dir': os.path.join(self.root, 'work'),
+                'node_id': 1,
+                'uftp_uid': 1,
+                'uftp_port': 9000,
+                'server_http_host': '10.0.0.1',
+                'server_http_port': 8080,
+                'uftp_bind_host': '10.80.0.11',
                 'uftp_multicast_host': '239.80.41.1',
                 'uftp_private_multicast_host': '239.80.41.2',
                 'channel': 149,

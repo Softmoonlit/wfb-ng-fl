@@ -1009,11 +1009,10 @@ cmd_smoke_gate() {
         # 生成 server 端下行 model 和 manifest
         sudo env PYTHONPATH="$PROJECT_ROOT" python3 - "$model" "$manifest" "$INPUT_SIZE_BYTES" "$cycle" <<'PY'
 import json, sys
-from wfb_ng.fl.issue41_fixtures import generate_deterministic_file
+from wfb_ng.fl.issue41_fixtures import cycle_model_pattern, generate_deterministic_file
 model, manifest, size_str, cycle_str = sys.argv[1:]
 size = int(size_str)
-pat = ('wfb-ng-issue41-cycle%s-model-4mib\n' % cycle_str).encode('utf-8')
-meta = generate_deterministic_file(model, size_bytes=size, pattern=pat)
+meta = generate_deterministic_file(model, size_bytes=size, pattern=cycle_model_pattern(cycle_str))
 with open(manifest, 'w', encoding='utf-8') as fh:
     json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': meta['sha256']}, fh, separators=(',', ':'))
 PY
@@ -1023,11 +1022,10 @@ PY
             local nid="${role#client}"
             remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo env PYTHONPATH='$REMOTE_REPO' python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
 import sys
-from wfb_ng.fl.issue41_fixtures import generate_deterministic_file
+from wfb_ng.fl.issue41_fixtures import cycle_client_pattern, generate_deterministic_file
 path, size_str, cycle_str, nid = sys.argv[1:]
 size = int(size_str)
-pat = ('wfb-ng-issue41-cycle%s-client%s-update-4mib\n' % (cycle_str, nid)).encode('utf-8')
-meta = generate_deterministic_file(path, size_bytes=size, pattern=pat)
+meta = generate_deterministic_file(path, size_bytes=size, pattern=cycle_client_pattern(cycle_str, nid))
 with open(path + '.sha256', 'w', encoding='utf-8') as fh:
     fh.write(meta['sha256'])
 PY"
