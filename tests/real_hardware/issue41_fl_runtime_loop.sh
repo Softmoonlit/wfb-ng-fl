@@ -672,7 +672,7 @@ write_smoke_marker() {
     marker_dir="$(smoke_archive_dir "$name")"
     mkdir -p "$marker_dir"
     cat > "$marker_dir/passed.json" <<EOF
-{"schema_version":1,"smoke":"$name","status":"passed","run_id":"$RUN_ID","data_plane":"10.80.0.0/24","server_tun":"$SERVER_TUN","client_tuns":["$CLIENT1_TUN","$CLIENT2_TUN"]}
+{"schema_version":1,"smoke":"$name","gate_type":"three_cycle_bidirectional","status":"passed","run_id":"$RUN_ID","data_plane":"10.80.0.0/24","server_tun":"$SERVER_TUN","client_tuns":["$CLIENT1_TUN","$CLIENT2_TUN"]}
 EOF
     cp -f "$marker_dir/passed.json" "$ARCHIVE_DIR/pre_runtime_smoke/passed.json" 2>/dev/null || true
 }
