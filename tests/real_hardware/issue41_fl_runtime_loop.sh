@@ -538,8 +538,20 @@ cmd_verify_config_equivalence() {
     log_ok "角色服务解析后链路配置与数据面 Gate 严格等价。"
 }
 
-smoke_dir() { printf '/var/tmp/wfb-ng-issue41-smoke/%s' "$1"; }
-smoke_archive_dir() { printf '%s/pre_runtime_smoke/%s' "$ARCHIVE_DIR" "$1"; }
+smoke_dir() {
+    if [ -n "${1:-}" ]; then
+        printf '/var/tmp/wfb-ng-issue41-smoke/%s' "$1"
+    else
+        printf '/var/tmp/wfb-ng-issue41-smoke'
+    fi
+}
+smoke_archive_dir() {
+    if [ -n "${1:-}" ] && [ "$1" != "gate" ]; then
+        printf '%s/pre_runtime_smoke/%s' "$ARCHIVE_DIR" "$1"
+    else
+        printf '%s/pre_runtime_smoke' "$ARCHIVE_DIR"
+    fi
+}
 
 wait_local_tun() {
     local tun="$1" deadline=$((SECONDS + 15))
