@@ -140,6 +140,7 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             'initial_model_path': os.path.join(self.temp_dir, 'model-4mib.bin'),
             'client1_update_template_path': os.path.join(self.temp_dir, 'update-client1.bin'),
             'client2_update_template_path': os.path.join(self.temp_dir, 'update-client2.bin'),
+            'artifact_size_bytes': 4 * 1024 * 1024,
         }
         # 创建 4 MiB 虚拟输入文件
         self._write_file(self.default_config['initial_model_path'], b'm' * (4 * 1024 * 1024))

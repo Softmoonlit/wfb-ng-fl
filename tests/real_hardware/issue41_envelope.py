@@ -289,10 +289,7 @@ class RunEnvelope:
                                                  f"{role} 缺少必要命令依赖：{cmd}")
 
             # 输入模型和 update 模板检查（支持 40 MiB 或配置化大小）
-            expected_size = int(self.resolved_config.get(
-                'artifact_size_bytes',
-                4 * 1024 * 1024 if '4mib' in str(self.resolved_config.get('initial_model_path', '')) else 40 * 1024 * 1024
-            ))
+            expected_size = int(self.resolved_config.get('artifact_size_bytes', 40 * 1024 * 1024))
             expected_size_desc = f"{expected_size // (1024 * 1024)} MiB" if expected_size % (1024 * 1024) == 0 else f"{expected_size} 字节"
             initial_model = self.resolved_config.get('initial_model_path')
             if initial_model:

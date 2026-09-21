@@ -150,8 +150,6 @@ init_envelope() {
     "1": $CLIENT1_TRAINING_DELAY_MS,
     "2": $CLIENT2_TRAINING_DELAY_MS
   },
-  "client1_training_delay_ms": $CLIENT1_TRAINING_DELAY_MS,
-  "client2_training_delay_ms": $CLIENT2_TRAINING_DELAY_MS,
   "initial_model_path": "$INITIAL_MODEL_PATH",
   "client1_update_template_path": "$CLIENT1_UPDATE_TEMPLATE_PATH",
   "client2_update_template_path": "$CLIENT2_UPDATE_TEMPLATE_PATH"

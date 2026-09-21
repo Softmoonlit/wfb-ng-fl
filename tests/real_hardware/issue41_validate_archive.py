@@ -64,7 +64,15 @@ def validate_archive(archive_dir):
         errors.append('pre_runtime_smoke 必须是对象')
         return errors
     _validate_smoke_gate(archive_dir, smoke, summary, errors)
-    _validate_runtime(summary['formal_runtime_loop'], errors)
+
+    env_path = os.path.join(archive_dir, 'envelope.json')
+    is_formal_mode = False
+    if os.path.isfile(env_path):
+        env_obj = _read_json_file(env_path, 'envelope.json', [])
+        if isinstance(env_obj, dict) and env_obj.get('mode') == 'formal':
+            is_formal_mode = True
+
+    _validate_runtime(summary['formal_runtime_loop'], errors, is_formal_mode=is_formal_mode)
     _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
     _validate_envelope(archive_dir, summary, errors)
@@ -225,11 +233,13 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
     first_cycle_size = 4 * 1024 * 1024
     if isinstance(cycles, list) and cycles and isinstance(cycles[0], dict):
         downlink = cycles[0].get('downlink', {})
+        if isinstance(downlink.get('file'), dict) and downlink['file'].get('size_bytes'):
+            first_cycle_size = downlink['file']['size_bytes']
         files = downlink.get('files', [])
         if files and isinstance(files[0], dict) and files[0].get('size_bytes'):
             first_cycle_size = files[0]['size_bytes']
 
-    artifact_size = int(resolved_cfg.get('artifact_size_bytes', first_cycle_size))
+    artifact_size = int(resolved_cfg.get('artifact_size_bytes', value.get('artifact_size_bytes', first_cycle_size)))
     cycle_count = int(resolved_cfg.get('smoke_cycle_count', 3))
     io_timeout = int(resolved_cfg.get('smoke_io_timeout_seconds', resolved_cfg.get('io_timeout_seconds', 120)))
     cycle_deadline = int(resolved_cfg.get('smoke_cycle_deadline_seconds', 240))
@@ -253,7 +263,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         errors.append('pre_runtime_smoke 校验失败：%s' % ge)
 
 
-def _validate_runtime(value, errors):
+def _validate_runtime(value, errors, is_formal_mode=False):
     _require_status(value, 'formal_runtime_loop', errors)
     if not isinstance(value, dict):
         return
@@ -269,7 +279,7 @@ def _validate_runtime(value, errors):
     for key, expected in required.items():
         if value.get(key) != expected:
             errors.append('formal_runtime_loop.%s 不满足通过条件' % key)
-    _validate_formal_scenario(value, errors)
+    _validate_formal_scenario(value, errors, is_formal_mode=is_formal_mode)
     if value.get('partial_result_returned') is not False:
         errors.append('formal_runtime_loop 必须证明 server 未返回 partial result')
     for role in ('server_result', 'client1_result', 'client2_result',
@@ -291,7 +301,7 @@ def _validate_runtime(value, errors):
         errors.append('formal_runtime_loop 角色服务受控停止未通过')
 
 
-def _validate_formal_scenario(value, errors):
+def _validate_formal_scenario(value, errors, is_formal_mode=False):
     scenario = value.get('scenario')
     if not isinstance(scenario, dict):
         errors.append('formal_runtime_loop 缺少正式场景配置')
@@ -301,22 +311,30 @@ def _validate_formal_scenario(value, errors):
     artifact_size = scenario.get('artifact_size_bytes')
     delays = scenario.get('training_delay_ms_by_node')
 
-    if round_count not in (1, 2):
-        errors.append('formal_runtime_loop.scenario.round_count 不满足通过条件')
-    if (round_count == 1 and artifact_size != 4 * 1024 * 1024) or (round_count == 2 and artifact_size != 40 * 1024 * 1024) or (round_count not in (1, 2) and artifact_size not in (4 * 1024 * 1024, 40 * 1024 * 1024)):
-        errors.append('formal_runtime_loop.scenario.artifact_size_bytes 不满足通过条件')
-
-    # 场景合法性判定：合法的 2 轮 40 MiB 正式场景，或合法的 1 轮 4 MiB 回归场景
-    if (round_count, artifact_size) == (2, 40 * 1024 * 1024):
+    if is_formal_mode:
+        if (round_count, artifact_size) != (2, 40 * 1024 * 1024):
+            errors.append('formal 模式下必须执行 2 轮 40 MiB 正式场景')
+            return
         expected_delays = {'1': 0, '2': 0}
         if delays != expected_delays:
             errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
-    elif (round_count, artifact_size) == (1, 4 * 1024 * 1024):
-        expected_delays = {'1': 0, '2': 3000}
-        if delays != expected_delays:
-            errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
     else:
-        return
+        if round_count not in (1, 2):
+            errors.append('formal_runtime_loop.scenario.round_count 不满足通过条件')
+        if (round_count == 1 and artifact_size != 4 * 1024 * 1024) or (round_count == 2 and artifact_size != 40 * 1024 * 1024) or (round_count not in (1, 2) and artifact_size not in (4 * 1024 * 1024, 40 * 1024 * 1024)):
+            errors.append('formal_runtime_loop.scenario.artifact_size_bytes 不满足通过条件')
+
+        # 场景合法性判定：合法的 2 轮 40 MiB 正式场景，或合法的 1 轮 4 MiB 回归场景
+        if (round_count, artifact_size) == (2, 40 * 1024 * 1024):
+            expected_delays = {'1': 0, '2': 0}
+            if delays != expected_delays:
+                errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
+        elif (round_count, artifact_size) == (1, 4 * 1024 * 1024):
+            expected_delays = {'1': 0, '2': 3000}
+            if delays != expected_delays:
+                errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 不满足通过条件')
+        else:
+            return
 
     if scenario.get('placeholder_training') != 'template_copy':
         errors.append('formal_runtime_loop.scenario.placeholder_training 不满足通过条件')
@@ -391,7 +409,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             if strict_sync.get('server_waited_after_client1') is not True:
                 errors.append('%s.strict_sync 必须证明 client1 提交后 server 保持等待' % prefix)
         else:
-            if strict_sync.get('server_waited_after_first_commit', strict_sync.get('server_waited_after_client1')) is not True:
+            if strict_sync.get('server_waited_after_first_commit') is not True:
                 errors.append('%s.strict_sync 必须证明首个客户端提交后 server 保持等待' % prefix)
     active_upload_sets = value.get('active_upload_sets')
     if (not isinstance(active_upload_sets, list) or not active_upload_sets or
@@ -446,27 +464,29 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
                 errors.append('%s.concurrent_put 缺少 overlap_duration_seconds' % prefix)
 
     telem = value.get('telemetry')
-    if telem is not None:
-        if not isinstance(telem, dict):
-            errors.append('%s.telemetry 必须是对象' % prefix)
+    if telem is None:
+        errors.append('%s 缺少 telemetry 遥测事实' % prefix)
+    elif not isinstance(telem, dict):
+        errors.append('%s.telemetry 必须是对象' % prefix)
+    else:
+        queue = telem.get('queue', {})
+        if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
+            errors.append('%s 队列自然暂停后未成功恢复' % prefix)
+        by_node = telem.get('loss_and_fec_by_node')
+        if by_node is None:
+            errors.append('%s telemetry 缺少 loss_and_fec_by_node 分源遥测' % prefix)
+        elif not isinstance(by_node, dict):
+            errors.append('%s.loss_and_fec_by_node 必须是对象' % prefix)
         else:
-            queue = telem.get('queue', {})
-            if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
-                errors.append('%s 队列自然暂停后未成功恢复' % prefix)
-            by_node = telem.get('loss_and_fec_by_node')
-            if by_node is not None:
-                if not isinstance(by_node, dict):
-                    errors.append('%s.loss_and_fec_by_node 必须是对象' % prefix)
-                else:
-                    for nid in ('1', '2'):
-                        if nid not in by_node:
-                            errors.append('%s telemetry loss_and_fec_by_node 缺少 client %s' % (prefix, nid))
-                        elif not isinstance(by_node[nid], dict):
-                            errors.append('%s telemetry client %s 遥测数据无效' % (prefix, nid))
-                        elif by_node[nid].get('sample_count', 0) <= 0:
-                            errors.append('%s telemetry client %s 缺少有效 PKT_SRC 遥测采样' % (prefix, nid))
-                        elif by_node[nid].get('out_packets', 0) <= 0:
-                            errors.append('%s telemetry client %s 交付包数 (out_packets) 必须大于 0' % (prefix, nid))
+            for nid in ('1', '2'):
+                if nid not in by_node:
+                    errors.append('%s telemetry loss_and_fec_by_node 缺少 client %s' % (prefix, nid))
+                elif not isinstance(by_node[nid], dict):
+                    errors.append('%s telemetry client %s 遥测数据无效' % (prefix, nid))
+                elif by_node[nid].get('sample_count', 0) <= 0:
+                    errors.append('%s telemetry client %s 缺少有效 PKT_SRC 遥测采样' % (prefix, nid))
+                elif by_node[nid].get('out_packets', 0) <= 0:
+                    errors.append('%s telemetry client %s 交付包数 (out_packets) 必须大于 0' % (prefix, nid))
 
 
 def _is_interval(value):

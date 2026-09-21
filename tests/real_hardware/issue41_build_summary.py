@@ -85,11 +85,6 @@ def main(argv=None):
 
     if 'training_delay_ms_by_node' in resolved_cfg:
         expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
-    elif 'client1_training_delay_ms' in resolved_cfg or 'client2_training_delay_ms' in resolved_cfg:
-        expected_delays = {
-            1: int(resolved_cfg.get('client1_training_delay_ms', 0)),
-            2: int(resolved_cfg.get('client2_training_delay_ms', 0)),
-        }
     else:
         if expected_rounds == 1 and expected_size == 4 * 1024 * 1024:
             expected_delays = {1: 0, 2: 3000}
@@ -284,16 +279,18 @@ def _build_rounds(results, observations, archive_dir, errors, expected_rounds, e
         # 计算 HTTP PUT 活动时间区间与自然重叠
         up1 = next((u for u in uploads if u['node_id'] == 1), None)
         up2 = next((u for u in uploads if u['node_id'] == 2), None)
-        server_overlap_seconds = 0.0
+        overlap_seconds = 0.0
         natural_overlap = False
-        if up1 and up2 and up1.get('server_put_interval') and up2.get('server_put_interval'):
-            s1 = up1['server_put_interval']['start']
-            e1 = up1['server_put_interval']['end']
-            s2 = up2['server_put_interval']['start']
-            e2 = up2['server_put_interval']['end']
+
+        # 优先使用客户端真实时间戳区间（秒）计算重叠时长
+        if up1 and up2 and up1.get('client_put_interval') and up2.get('client_put_interval'):
+            s1 = up1['client_put_interval']['start']
+            e1 = up1['client_put_interval']['end']
+            s2 = up2['client_put_interval']['start']
+            e2 = up2['client_put_interval']['end']
             overlap = min(e1, e2) - max(s1, s2)
             if overlap > 0:
-                server_overlap_seconds = round(overlap, 3)
+                overlap_seconds = round(overlap, 3)
                 natural_overlap = True
 
         active_sets = [
@@ -308,7 +305,7 @@ def _build_rounds(results, observations, archive_dir, errors, expected_rounds, e
 
         concurrent_put = {
             'natural_overlap': natural_overlap,
-            'overlap_duration_seconds': server_overlap_seconds,
+            'overlap_duration_seconds': overlap_seconds,
             'concurrent_active_observed': concurrent_active_observed,
             'server_intervals': {
                 '1': up1.get('server_put_interval') if up1 else None,
