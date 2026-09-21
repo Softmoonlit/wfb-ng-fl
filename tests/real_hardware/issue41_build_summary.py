@@ -46,11 +46,11 @@ def main(argv=None):
     status = 'passed' if not errors else 'failed'
     summary = {
         'status': status,
-        'reason': '; '.join(errors) if errors else '两轮 40 MiB 正式 Runtime 闭环证据完整',
+        'reason': '; '.join(errors) if errors else '一轮 4 MiB 严格同步确定性场景证据完整',
         'scenario': {
             'round_count': 1,
             'artifact_size_bytes': EXPECTED_SIZE,
-            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'training_delay_ms_by_node': {'1': 0, '2': 3000},
             'placeholder_training': 'template_copy',
             'placeholder_aggregation': 'model_copy',
             'update_template_sha256_by_node': template_hashes,
@@ -84,7 +84,7 @@ def _build_rounds(results, observations, errors):
         return []
     server_rounds = server.get('rounds')
     if not isinstance(server_rounds, list) or len(server_rounds) != 1:
-        errors.append('server 算法结果必须包含两轮')
+        errors.append('server 算法结果必须恰好包含一轮')
         return []
     output = []
     for index, server_round in enumerate(server_rounds, 1):
@@ -97,16 +97,18 @@ def _build_rounds(results, observations, errors):
             'sha256': server_round.get('input_model_sha256'),
         }
         if model['size_bytes'] != EXPECTED_SIZE:
-            errors.append('server 第 %d 轮模型不是 40 MiB' % index)
+            errors.append('server 第 %d 轮模型不是 4 MiB' % index)
         uploads = []
         receive_intervals = {}
+        expected_delays = {1: 0, 2: 3000}
         for node_id, client in clients.items():
             client_round = _find_round(client, index, round_id)
             if client_round is None:
                 errors.append('client%d 缺少第 %d 轮 %s' % (node_id, index, round_id))
                 continue
-            if client_round.get('training_delay_ms') != 0:
-                errors.append('client%d 第 %d 轮训练延时不是零' % (node_id, index))
+            if client_round.get('training_delay_ms') != expected_delays[node_id]:
+                errors.append('client%d 第 %d 轮训练延时不是 %d ms' % (
+                    node_id, index, expected_delays[node_id]))
             if (client_round.get('model_size_bytes') != EXPECTED_SIZE or
                     client_round.get('model_sha256') != model['sha256']):
                 errors.append('client%d 第 %d 轮模型事实不一致' % (node_id, index))
@@ -130,7 +132,7 @@ def _build_rounds(results, observations, errors):
                     node_id, 'committed') else None,
             }
             if upload['size_bytes'] != EXPECTED_SIZE:
-                errors.append('client%d 第 %d 轮 update 不是 40 MiB' % (node_id, index))
+                errors.append('client%d 第 %d 轮 update 不是 4 MiB' % (node_id, index))
             if upload['sha256'] != client.get('update_template_sha256'):
                 errors.append('client%d 第 %d 轮未复用同一 update 模板' % (node_id, index))
             uploads.append(upload)
@@ -145,6 +147,40 @@ def _build_rounds(results, observations, errors):
                         update.get('sha256') != client_upload['sha256']):
                     errors.append('第 %d 轮 node %d 端到端 SHA 或大小不一致' %
                                   (index, update['node_id']))
+        commit_seq_1 = _event_sequence(
+            observations['server'], 'upload_committed', round_id, 1, 'committed')
+        commit_seq_2 = _event_sequence(
+            observations['server'], 'upload_committed', round_id, 2, 'committed')
+
+        client1_committed_first = False
+        if commit_seq_1 is not None and commit_seq_2 is not None:
+            client1_committed_first = commit_seq_1 < commit_seq_2
+        else:
+            up1 = next((u for u in uploads if u['node_id'] == 1), None)
+            up2 = next((u for u in uploads if u['node_id'] == 2), None)
+            if (up1 and up2 and up1.get('client_put_interval') and
+                    up2.get('client_put_interval')):
+                client1_committed_first = (
+                    up1['client_put_interval']['end'] <= up2['client_put_interval']['end'])
+
+        returned_nodes = server_round.get('update_node_ids')
+        server_waited = client1_committed_first and (returned_nodes == [1, 2])
+        partial_result = returned_nodes != [1, 2]
+
+        if not client1_committed_first:
+            errors.append('第 %d 轮 client1 未先于 client2 完成提交' % index)
+        if partial_result:
+            errors.append('第 %d 轮 server 返回了 partial result' % index)
+
+        strict_sync = {
+            'client1_committed_before_client2': client1_committed_first,
+            'server_waited_after_client1': server_waited,
+            'intermediate_committed_node_ids': [1] if client1_committed_first else [],
+            'intermediate_pending_node_ids': [2] if client1_committed_first else [],
+            'server_wait_returned_node_ids': returned_nodes,
+            'partial_result_returned': partial_result,
+        }
+
         output.append({
             'round_index': index,
             'round_id': round_id,
@@ -156,6 +192,7 @@ def _build_rounds(results, observations, errors):
                 if value.get('event') == 'active_uploads' and
                 value.get('round') == round_id and
                 isinstance(value.get('active_node_ids'), list)],
+            'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
         })
@@ -224,6 +261,15 @@ def _has_event(events, event, round_id, node_id, outcome):
     return any(value.get('event') == event and value.get('round') == round_id and
                value.get('node_id') == node_id and
                value.get('transport_outcome') == outcome for value in events)
+
+
+def _event_sequence(events, event, round_id, node_id, outcome):
+    for value in events:
+        if (value.get('event') == event and value.get('round') == round_id and
+                value.get('node_id') == node_id and
+                value.get('transport_outcome') == outcome):
+            return value.get('_sequence')
+    return None
 
 
 def _event_interval(events, first, round_id, node_id, last):

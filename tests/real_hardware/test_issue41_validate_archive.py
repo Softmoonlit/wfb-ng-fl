@@ -138,6 +138,76 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         errors = validate_archive(self.root)
         self.assertTrue(any('明确限制管理网' in error for error in errors))
 
+    def test_rejects_partial_result_returned(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['partial_result_returned'] = True
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('partial result' in error for error in errors))
+
+    def test_rejects_incomplete_server_wait_returned_node_ids(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['server_wait_for_updates_returned_node_ids'] = [1]
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('server_wait_for_updates_returned_node_ids' in error for error in errors))
+
+    def test_rejects_incorrect_training_delay(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 0}
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('training_delay_ms_by_node' in error for error in errors))
+
+    def test_rejects_wrong_artifact_size_40mib(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 40 * 1024 * 1024
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('artifact_size_bytes' in error for error in errors))
+
+    def test_rejects_strict_sync_client1_not_before_client2(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_json('pre_runtime_smoke/downlink_uftp/passed.json', self.smoke_marker('downlink_uftp'))
+        self.write_json('pre_runtime_smoke/uplink_http_put/passed.json', self.smoke_marker('uplink_http_put'))
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['strict_sync']['client1_committed_before_client2'] = False
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('client1 先于 client2' in error for error in errors))
+
     def write_runtime_evidence(self):
         for name in ('server-journal.txt', 'client1-journal.txt', 'client2-journal.txt'):
             self.write_text(name, 'evidence\n')
@@ -162,7 +232,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'scenario': {
                     'round_count': 1,
                     'artifact_size_bytes': 4 * 1024 * 1024,
-                    'training_delay_ms_by_node': {'1': 0, '2': 0},
+                    'training_delay_ms_by_node': {'1': 0, '2': 3000},
                     'placeholder_training': 'template_copy',
                     'placeholder_aggregation': 'model_copy',
                     'update_template_sha256_by_node': {
@@ -213,6 +283,14 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             },
             'uploads': uploads,
             'active_upload_sets': [[1], [1, 2], [2], []],
+            'strict_sync': {
+                'client1_committed_before_client2': True,
+                'server_waited_after_client1': True,
+                'intermediate_committed_node_ids': [1],
+                'intermediate_pending_node_ids': [2],
+                'server_wait_returned_node_ids': [1, 2],
+                'partial_result_returned': False,
+            },
             'server_committed_node_ids': [1, 2],
             'server_wait_returned_node_ids': [1, 2],
         }

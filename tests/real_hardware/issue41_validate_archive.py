@@ -161,7 +161,7 @@ def _validate_formal_scenario(value, errors):
     expected = {
         'round_count': 1,
         'artifact_size_bytes': expected_size,
-        'training_delay_ms_by_node': {'1': 0, '2': 0},
+        'training_delay_ms_by_node': {'1': 0, '2': 3000},
         'placeholder_training': 'template_copy',
         'placeholder_aggregation': 'model_copy',
     }
@@ -199,7 +199,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         seen_round_ids.add(round_id)
     model = value.get('model')
     if not isinstance(model, dict) or model.get('size_bytes') != expected_size or not _is_sha256(model.get('sha256')):
-        errors.append('%s.model 必须是 40 MiB 且含 SHA-256' % prefix)
+        errors.append('%s.model 必须是 4 MiB 且含 SHA-256' % prefix)
     intervals = value.get('model_receive_intervals')
     if not isinstance(intervals, dict) or set(intervals) != {'1', '2'} or any(not _is_interval(intervals[node]) for node in intervals):
         errors.append('%s 缺少两个节点的模型接收时间区间' % prefix)
@@ -207,6 +207,18 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         errors.append('%s.server_committed_node_ids 必须为 [1, 2]' % prefix)
     if value.get('server_wait_returned_node_ids') != [1, 2]:
         errors.append('%s.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
+    strict_sync = value.get('strict_sync')
+    if not isinstance(strict_sync, dict):
+        errors.append('%s 缺少 strict_sync 严格同步事实' % prefix)
+    else:
+        if strict_sync.get('server_wait_returned_node_ids') != [1, 2]:
+            errors.append('%s.strict_sync.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
+        if strict_sync.get('partial_result_returned') is not False:
+            errors.append('%s.strict_sync 必须证明未返回 partial result' % prefix)
+        if strict_sync.get('client1_committed_before_client2') is not True:
+            errors.append('%s.strict_sync 必须证明 client1 先于 client2 完成提交' % prefix)
+        if strict_sync.get('server_waited_after_client1') is not True:
+            errors.append('%s.strict_sync 必须证明 client1 提交后 server 保持等待' % prefix)
     active_upload_sets = value.get('active_upload_sets')
     if (not isinstance(active_upload_sets, list) or not active_upload_sets or
             any(not isinstance(node_ids, list) or
@@ -225,7 +237,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
     for node_id in (1, 2):
         upload = uploads_by_node[node_id]
         if upload.get('size_bytes') != expected_size or not _is_sha256(upload.get('sha256')):
-            errors.append('%s node %d update 必须是 40 MiB 且含 SHA-256' % (prefix, node_id))
+            errors.append('%s node %d update 必须是 4 MiB 且含 SHA-256' % (prefix, node_id))
         if upload.get('sha256') != template_hashes[str(node_id)]:
             errors.append('%s node %d 未复用对应 update 模板' % (prefix, node_id))
         if not _is_interval(upload.get('client_put_interval')) or not _is_interval(upload.get('server_put_interval')):

@@ -48,6 +48,18 @@ def server_main(runtime, config):
         if ordered_nodes != expected_nodes:
             raise FLRuntimeError(
                 'algorithm_failed', 'server 收到的 update 集合不完整或顺序错误')
+        for node_id in ordered_nodes:
+            _require_size(
+                updates_by_node[node_id], required_size,
+                'update for node %d' % node_id)
+        if len(ordered_nodes) >= 2:
+            seen_hashes = set()
+            for node_id in ordered_nodes:
+                digest = file_sha256(updates_by_node[node_id])
+                if digest in seen_hashes:
+                    raise FLRuntimeError(
+                        'algorithm_failed', '参与节点的 update SHA-256 意外相同')
+                seen_hashes.add(digest)
         events.append(_event(
             'wait_for_updates_done', round_index=round_index,
             round_id=round_id, update_node_ids=list(ordered_nodes)))
@@ -84,6 +96,8 @@ def server_main(runtime, config):
                 for node_id in ordered_nodes
             ],
             'aggregation_delay_ms': _aggregation_delay_ms(config),
+            'server_wait_returned_node_ids': list(ordered_nodes),
+            'partial_result_returned': False,
             'output_model_path': model_path,
             'output_model_size_bytes': os.path.getsize(model_path),
             'output_model_sha256': output_model_sha256,
@@ -96,6 +110,8 @@ def server_main(runtime, config):
         'initial_model_path': initial_model_path,
         'initial_model_size_bytes': os.path.getsize(initial_model_path),
         'initial_model_sha256': file_sha256(initial_model_path),
+        'server_wait_for_updates_returned_node_ids': list(expected_nodes),
+        'partial_result_returned': False,
         'rounds': rounds_result,
         'final_model_path': model_path,
         'final_model_sha256': file_sha256(model_path),

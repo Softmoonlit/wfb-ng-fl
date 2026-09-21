@@ -13,7 +13,7 @@ from wfb_ng.fl import issue41_algorithm
 from wfb_ng.fl.issue41_algorithm import client_main, server_main
 
 
-MODEL_SIZE_BYTES = 40 * 1024 * 1024
+MODEL_SIZE_BYTES = 4 * 1024 * 1024
 
 
 class Issue41AlgorithmTestCase(unittest.TestCase):
@@ -21,44 +21,62 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
         self.root = tempfile.mkdtemp(prefix='wfb-v8-issue41-algorithm-')
         self.addCleanup(shutil.rmtree, self.root, True)
 
-    def test_server_republishes_unchanged_model_after_placeholder_aggregation(self):
+    def test_server_aggregates_single_round_4mib_with_distinct_client_updates(self):
         initial_model = self.make_binary_file(
             'input/model.bin', MODEL_SIZE_BYTES, b'model-content')
         runtime = ServerOpaqueRuntime(
-            os.path.join(self.root, 'server'), (1, 2))
+            os.path.join(self.root, 'server'), (1, 2),
+            update_size_bytes=MODEL_SIZE_BYTES)
         result_path = os.path.join(self.root, 'server-result.json')
 
         with mock.patch.object(issue41_algorithm.time, 'sleep') as sleep:
             server_main(runtime, {
-                'rounds': 2,
+                'rounds': 1,
                 'participant_node_ids': [1, 2],
                 'initial_model_path': initial_model,
+                'required_artifact_size_bytes': MODEL_SIZE_BYTES,
                 'aggregation_delay_ms': 25,
                 'result_path': result_path,
             })
 
         self.assertEqual(
-            ['publish_model', 'wait_for_updates'] * 2,
+            ['publish_model', 'wait_for_updates'],
             runtime.events)
-        self.assertEqual(2, len(runtime.published_models))
+        self.assertEqual(1, len(runtime.published_models))
         self.assertEqual(MODEL_SIZE_BYTES, os.path.getsize(runtime.published_models[0]))
-        self.assertEqual(
-            sha256(runtime.published_models[0]),
-            sha256(runtime.published_models[1]))
-        self.assertEqual([mock.call(0.025), mock.call(0.025)], sleep.call_args_list)
+        self.assertEqual([mock.call(0.025)], sleep.call_args_list)
 
         result = read_json(result_path)
         self.assertEqual('succeeded', result['conclusion'])
         self.assertEqual(MODEL_SIZE_BYTES, result['initial_model_size_bytes'])
+        self.assertEqual([1, 2], result['server_wait_for_updates_returned_node_ids'])
+        self.assertFalse(result['partial_result_returned'])
         self.assertEqual([1, 2], result['rounds'][0]['update_node_ids'])
+        self.assertEqual([1, 2], result['rounds'][0]['server_wait_returned_node_ids'])
+        self.assertFalse(result['rounds'][0]['partial_result_returned'])
         self.assertEqual(
             result['rounds'][0]['input_model_sha256'],
             result['rounds'][0]['output_model_sha256'])
-        self.assertEqual(
-            result['rounds'][0]['output_model_path'],
-            result['rounds'][1]['input_model_path'])
         self.assertIn('aggregate_start', event_names(result))
         self.assertIn('aggregate_done', event_names(result))
+
+    def test_server_rejects_identical_client_update_hashes(self):
+        initial_model = self.make_binary_file(
+            'input/model.bin', MODEL_SIZE_BYTES, b'model-content')
+        runtime = ServerOpaqueRuntime(
+            os.path.join(self.root, 'server'), (1, 2),
+            update_size_bytes=MODEL_SIZE_BYTES, identical_updates=True)
+        result_path = os.path.join(self.root, 'server-result.json')
+
+        with self.assertRaises(issue41_algorithm.FLRuntimeError) as ctx:
+            server_main(runtime, {
+                'rounds': 1,
+                'participant_node_ids': [1, 2],
+                'initial_model_path': initial_model,
+                'required_artifact_size_bytes': MODEL_SIZE_BYTES,
+                'result_path': result_path,
+            })
+        self.assertIn('update SHA-256 意外相同', ctx.exception.error_message)
 
     def test_client_submits_opaque_update_template_after_training_delay(self):
         model_path = self.make_binary_file(
@@ -95,7 +113,7 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
              'submit_update_start', 'submit_update_done'],
             event_names(result))
 
-    def test_client_records_round_identity_and_immediate_40mib_template_copy(self):
+    def test_client_records_round_identity_and_immediate_4mib_template_copy(self):
         model_path = self.make_binary_file(
             'candidate/model.bin', MODEL_SIZE_BYTES, b'opaque-model')
         update_template = self.make_binary_file(
@@ -106,7 +124,7 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
 
         with mock.patch.object(issue41_algorithm.time, 'sleep') as sleep:
             client_main(runtime, {
-                'rounds': 2,
+                'rounds': 1,
                 'node_id': 1,
                 'training_delay_ms': 0,
                 'required_artifact_size_bytes': MODEL_SIZE_BYTES,
@@ -116,9 +134,7 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
 
         sleep.assert_not_called()
         result = read_json(result_path)
-        self.assertEqual(2, len(result['rounds']))
-        self.assertNotEqual(
-            result['rounds'][0]['round_id'], result['rounds'][1]['round_id'])
+        self.assertEqual(1, len(result['rounds']))
         self.assertEqual(MODEL_SIZE_BYTES, result['rounds'][0]['model_size_bytes'])
         self.assertEqual(MODEL_SIZE_BYTES, result['rounds'][0]['update_size_bytes'])
         self.assertLessEqual(
@@ -159,9 +175,12 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
 
 
 class ServerOpaqueRuntime(object):
-    def __init__(self, work_dir, participant_node_ids):
+    def __init__(self, work_dir, participant_node_ids, update_size_bytes=0,
+                 identical_updates=False):
         self.work_dir = work_dir
         self.participant_node_ids = tuple(participant_node_ids)
+        self.update_size_bytes = update_size_bytes
+        self.identical_updates = identical_updates
         self.events = []
         self.published_models = []
         self.round_index = 0
@@ -179,9 +198,18 @@ class ServerOpaqueRuntime(object):
                 self.work_dir, 'updates', str(self.round_index),
                 str(node_id), 'update.bin')
             os.makedirs(os.path.dirname(path), exist_ok=True)
+            if self.identical_updates:
+                pattern = b'identical-update-data\n'
+            else:
+                pattern = b'opaque-update-node-' + str(node_id).encode('ascii') + b'\n'
+            size = self.update_size_bytes if self.update_size_bytes > 0 else len(pattern)
+            chunk = (pattern * ((64 * 1024 // len(pattern)) + 1))[:64 * 1024]
             with open(path, 'wb') as fh:
-                fh.write(
-                    b'opaque-update-node-' + str(node_id).encode('ascii'))
+                remaining = size
+                while remaining:
+                    current = chunk[:remaining]
+                    fh.write(current)
+                    remaining -= len(current)
             with open(os.path.join(os.path.dirname(path), 'update.manifest.json'), 'w', encoding='utf-8') as fh:
                 json.dump({'round_id': 'test-server-round-%d' % self.round_index}, fh)
             updates[node_id] = path

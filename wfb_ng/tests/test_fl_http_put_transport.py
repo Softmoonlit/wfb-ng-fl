@@ -403,7 +403,8 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             round_id, 1, update_path, len(body),
             hashlib.sha256(body).hexdigest())
 
-        server_values = server_events.values()
+        server_values = server_events.wait_for_predicate(
+            lambda vals: len(vals) >= 5)
         self.assertEqual(
             ['upload_accepted', 'active_uploads', 'upload_committed',
              'response_write_completed', 'active_uploads'],
@@ -453,6 +454,10 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         second_sock.sendall(body_two)
         self.assertEqual(201, read_response(second_response)[0])
 
+        events.wait_for_predicate(
+            lambda vals: any(
+                v.get('event') == 'active_uploads' and v.get('active_node_ids') == []
+                for v in vals))
         self.assertEqual(
             [[1], [1, 2], [2], []],
             [value['active_node_ids'] for value in events.values()
@@ -902,17 +907,35 @@ class FailingWriter(object):
 
 class EventBuffer(object):
     def __init__(self):
+        self._lock = threading.Lock()
+        self._cond = threading.Condition(self._lock)
         self.lines = []
 
     def write(self, value):
-        self.lines.append(value)
+        with self._cond:
+            self.lines.append(value)
+            self._cond.notify_all()
 
     def flush(self):
         pass
 
     def values(self):
-        return [json.loads(line.removeprefix('WFB_FL_EVENT '))
-                for line in self.lines]
+        with self._cond:
+            return [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                    for line in self.lines]
+
+    def wait_for_predicate(self, predicate, timeout=5.0):
+        deadline = time.monotonic() + timeout
+        with self._cond:
+            while True:
+                vals = [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                        for line in self.lines]
+                if predicate(vals):
+                    return vals
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return vals
+                self._cond.wait(remaining)
 
 
 def read_response(response):

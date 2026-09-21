@@ -133,6 +133,46 @@ class V8MultiClientSyncTestCase(unittest.TestCase):
         clients[2].submit_update(self.write_file('last-update.input', b'last'))
         self.assertEqual([1, 2], list(waiting.join()))
 
+    def test_deterministic_strict_sync_client1_immediate_client2_delayed_contract(self):
+        server, clients, transport = self.make_round((1, 2))
+        model_path = self.write_file('model-4mib.input', b'model-4mib-data')
+        c1_update = self.write_file('c1-4mib.input', b'update-client1-4mib-data')
+        c2_update = self.write_file('c2-4mib.input', b'update-client2-4mib-data')
+
+        publishing = ThreadResult(lambda: server.publish_model(model_path))
+        publishing.start()
+        transport.wait_until_publishing()
+        waiting = ThreadResult(server.wait_for_updates)
+        waiting.start()
+
+        # Both clients receive model via shared downlink
+        c1_model = clients[1].wait_for_model()
+        c2_model = clients[2].wait_for_model()
+        transport.complete_downlink()
+        self.assertIsNone(publishing.join())
+        self.assertEqual(b'model-4mib-data', self.read_file(c1_model))
+        self.assertEqual(b'model-4mib-data', self.read_file(c2_model))
+
+        # Client 1 submits immediately (delay 0)
+        clients[1].submit_update(c1_update)
+
+        # Server must still be waiting, no partial result returned
+        time.sleep(0.05)
+        self.assertTrue(waiting.is_alive())
+        # Intermediate state: node 1 committed, node 2 pending
+        round_dir = server._round_dir
+        self.assertTrue(os.path.isfile(os.path.join(round_dir, 'updates', '1', 'update.bin')))
+        self.assertFalse(os.path.isfile(os.path.join(round_dir, 'updates', '2', 'update.bin')))
+
+        # Client 2 submits after delay
+        clients[2].submit_update(c2_update)
+
+        # Server unblocks and returns strictly ordered [1, 2]
+        result = waiting.join()
+        self.assertEqual([1, 2], list(result))
+        self.assertEqual(b'update-client1-4mib-data', self.read_file(result[1]))
+        self.assertEqual(b'update-client2-4mib-data', self.read_file(result[2]))
+
     def test_cancel_failure_does_not_replace_participant_submit_failure(self):
         server, _, transport = self.make_round((1, 2))
         transport.cancel_error = OSError('cancel failed')

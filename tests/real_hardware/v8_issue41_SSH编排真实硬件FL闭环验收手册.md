@@ -1,6 +1,6 @@
 # V8 issue #41 SSH 编排真实硬件 FL Runtime 闭环验收手册
 
-本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）及 issue #53（双 4 MiB 单轮正式场景）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
+本文是 GitHub issue #41（“v8: 补齐真实硬件 downlink 并验收完整 FL Runtime 闭环”）的专用验收规格和现场 runbook。它复用 v6 真实三机基线的无线、TUN、证据和归档经验，但本手册不是 v6 无 SSH 手动上行流程的改名版。
 
 ## 0. 定位与边界
 
@@ -376,14 +376,14 @@ sudo install -d /var/lib/wfb-ng/issue41-input
 sudo install -m 0644 /path/to/model-4mib.bin \
   /var/lib/wfb-ng/issue41-input/model-4mib.bin
 
-# client1：操作者提供的 4 MiB synthetic update 模板
+# client1：4 MiB synthetic update 模板（可由 generate-fixtures 确定性生成）
 sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/client1-update-40mib.bin \
+sudo install -m 0644 /path/to/update-client1-4mib.bin \
   /var/lib/wfb-ng/issue41-input/update-client1-4mib.bin
 
-# client2：内容必须不同于 client1 的 4 MiB synthetic update 模板
+# client2：内容必须不同于 client1 的 4 MiB synthetic update 模板（可由 generate-fixtures 确定性生成）
 sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/client2-update-40mib.bin \
+sudo install -m 0644 /path/to/update-client2-4mib.bin \
   /var/lib/wfb-ng/issue41-input/update-client2-4mib.bin
 ```
 

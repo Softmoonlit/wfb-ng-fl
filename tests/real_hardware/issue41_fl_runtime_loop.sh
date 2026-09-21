@@ -62,6 +62,7 @@ usage() {
 子命令：
   push-branch              显式 push 当前干净分支到 origin
   sync-remotes             SSH 同步 client1/client2 到 origin/<branch>
+  generate-fixtures        在三机生成确定性 4 MiB 验收模型与 update 模板
   preflight                检查三机依赖、sudo、仓库状态、wlx 网卡与端口
   install                  三机执行 make build_v6、sudo make install_v8、daemon-reload
   smoke-downlink-uftp      预留：真实 UFTP downlink smoke
@@ -369,6 +370,18 @@ EOF
     log_ok "preflight 通过"
 }
 
+cmd_generate_fixtures() {
+    log_info "生成确定性验收 fixture (4 MiB)..."
+    python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir "$(dirname "$INITIAL_MODEL_PATH")" --role model --output "$INITIAL_MODEL_PATH" --size "$INPUT_SIZE_BYTES"
+    log_ok "server 初始模型生成完成：$INITIAL_MODEL_PATH"
+
+    remote client1 "python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' --role client1 --output '$CLIENT1_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
+    log_ok "client1 update 模板生成完成：$CLIENT1_UPDATE_TEMPLATE_PATH"
+
+    remote client2 "python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' --role client2 --output '$CLIENT2_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
+    log_ok "client2 update 模板生成完成：$CLIENT2_UPDATE_TEMPLATE_PATH"
+}
+
 cmd_install() {
     make -C "$PROJECT_ROOT" build_v6
     sudo make -C "$PROJECT_ROOT" install_v8
@@ -377,6 +390,7 @@ cmd_install() {
         remote "$role" "cd '$REMOTE_REPO' && make build_v6 && sudo make install_v8 && sudo systemctl daemon-reload"
         log_ok "$role 安装完成"
     done
+    cmd_generate_fixtures
 }
 
 write_issue41_configs() {
@@ -1138,6 +1152,7 @@ case "$cmd" in
     sync-remotes) cmd_sync_remotes ;;
     preflight) cmd_preflight ;;
     install) cmd_install ;;
+    generate-fixtures) cmd_generate_fixtures ;;
     smoke-downlink-uftp) cmd_smoke_downlink_uftp ;;
     smoke-uplink-http-put) cmd_smoke_uplink_http_put ;;
     run-runtime-loop) cmd_run_runtime_loop ;;
