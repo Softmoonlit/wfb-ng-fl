@@ -41,7 +41,7 @@ class GateConfig:
                  channel_width: str = 'HT40+',
                  link_id: int = 406,
                  fec_k: int = 8,
-                 fec_n: int = 12,
+                 fec_n: int = 14,
                  radio_bandwidth: int = 40,
                  radio_mcs_index: int = 3,
                  radio_short_gi: int = 1,
@@ -104,6 +104,22 @@ class GateConfig:
             kwargs['io_timeout_seconds'] = int(os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'])
         if 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS' in os.environ:
             kwargs['cycle_deadline_seconds'] = int(os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'])
+        if 'ISSUE41_CHANNEL' in os.environ:
+            kwargs['channel'] = int(os.environ['ISSUE41_CHANNEL'])
+        if 'ISSUE41_CHANNEL_WIDTH' in os.environ:
+            kwargs['channel_width'] = os.environ['ISSUE41_CHANNEL_WIDTH']
+        if 'ISSUE41_LINK_ID' in os.environ:
+            kwargs['link_id'] = int(os.environ['ISSUE41_LINK_ID'])
+        if 'ISSUE41_FEC_K' in os.environ:
+            kwargs['fec_k'] = int(os.environ['ISSUE41_FEC_K'])
+        if 'ISSUE41_FEC_N' in os.environ:
+            kwargs['fec_n'] = int(os.environ['ISSUE41_FEC_N'])
+        if 'ISSUE41_RADIO_BANDWIDTH' in os.environ:
+            kwargs['radio_bandwidth'] = int(os.environ['ISSUE41_RADIO_BANDWIDTH'])
+        if 'ISSUE41_RADIO_MCS_INDEX' in os.environ:
+            kwargs['radio_mcs_index'] = int(os.environ['ISSUE41_RADIO_MCS_INDEX'])
+        if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
+            kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
         return cls(**kwargs)
 
     @staticmethod
@@ -1297,7 +1313,14 @@ def main(argv=None) -> int:
     p_fst.add_argument("--summary-json", required=True)
 
     args = parser.parse_args(argv)
-    config = GateConfig()
+    config = (
+        GateConfig.from_env()
+        if args.command in (
+            "verify-downlink", "verify-uplink", "build-cycle",
+            "build-gate-summary", "validate-summary", "verify-config-equivalence"
+        )
+        else None
+    )
 
     if args.command == "generate-fixtures":
         res = generate_cycle_fixtures(

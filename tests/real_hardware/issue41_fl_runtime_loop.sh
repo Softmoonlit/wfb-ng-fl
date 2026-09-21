@@ -31,7 +31,7 @@ LINK_ID="${ISSUE41_LINK_ID:-406}"
 UPLINK_STREAM="${ISSUE41_UPLINK_STREAM:-32}"
 DOWNLINK_STREAM="${ISSUE41_DOWNLINK_STREAM:-33}"
 FEC_K="${ISSUE41_FEC_K:-8}"
-FEC_N="${ISSUE41_FEC_N:-12}"
+FEC_N="${ISSUE41_FEC_N:-14}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
@@ -521,12 +521,25 @@ EOF
     rm -rf "$tmp"
 }
 
+export_rf_gate_env() {
+    export ISSUE41_CHANNEL="$CHANNEL"
+    export ISSUE41_CHANNEL_WIDTH="$CHANNEL_WIDTH"
+    export ISSUE41_LINK_ID="$LINK_ID"
+    export ISSUE41_FEC_K="$FEC_K"
+    export ISSUE41_FEC_N="$FEC_N"
+    export ISSUE41_RADIO_BANDWIDTH="$RADIO_BANDWIDTH"
+    export ISSUE41_RADIO_MCS_INDEX="$RADIO_MCS_INDEX"
+    export ISSUE41_RADIO_SHORT_GI="$RADIO_SHORT_GI"
+}
+
 cmd_verify_config_equivalence() {
     log_info "执行角色服务与数据面 Gate 严格链路配置等价性比较..."
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2
+
+    export_rf_gate_env
 
     python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
         --server-fl /etc/wfb-ng/issue41/fl-server.json \
@@ -990,6 +1003,7 @@ cmd_smoke_gate() {
     export ISSUE41_SMOKE_CYCLE_COUNT="$SMOKE_CYCLE_COUNT"
     export ISSUE41_SMOKE_IO_TIMEOUT_SECONDS="$SMOKE_IO_TIMEOUT_SECONDS"
     export ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS="$SMOKE_CYCLE_DEADLINE_SECONDS"
+    export_rf_gate_env
 
     log_info "开始数据面 Gate 验收 (共 $SMOKE_CYCLE_COUNT 周期，单载荷 $((INPUT_SIZE_BYTES / 1024 / 1024)) MiB)..."
     start_smoke_gate_environment

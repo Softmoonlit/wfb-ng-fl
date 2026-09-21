@@ -121,7 +121,7 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             'uplink_stream': '32',
             'downlink_stream': '33',
             'fec_k': '8',
-            'fec_n': '12',
+            'fec_n': '14',
             'radio_bandwidth': '40',
             'radio_mcs_index': '3',
             'server_tun': 'v8i41s0',

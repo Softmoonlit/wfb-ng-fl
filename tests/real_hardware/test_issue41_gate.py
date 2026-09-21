@@ -37,7 +37,7 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual('HT40+', self.config.channel_width)
         self.assertEqual(3, self.config.radio_mcs_index)
         self.assertEqual(8, self.config.fec_k)
-        self.assertEqual(12, self.config.fec_n)
+        self.assertEqual(14, self.config.fec_n)
 
     def test_config_rejects_immediate_feedback_candidate(self):
         bad_args = ['--role', 'server', '--feedback-window-start-immediately']
@@ -794,7 +794,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--grant-duration-ms', '120', '--guard-interval-ms', '20',
                     '--downlink-pause-threshold-bytes', '131072',
@@ -810,7 +810,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -823,7 +823,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -852,7 +852,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '20',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '20',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -867,7 +867,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '2', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -880,7 +880,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -909,7 +909,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -925,7 +925,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -938,7 +938,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -963,7 +963,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -979,7 +979,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -993,7 +993,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -1032,24 +1032,51 @@ class Issue41GateTestCase(unittest.TestCase):
         old_env = os.environ.copy()
         try:
             for k in ('ISSUE41_SMOKE_CYCLE_COUNT', 'ISSUE41_INPUT_SIZE_BYTES',
-                      'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'):
+                      'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS',
+                      'ISSUE41_CHANNEL', 'ISSUE41_CHANNEL_WIDTH', 'ISSUE41_LINK_ID',
+                      'ISSUE41_FEC_K', 'ISSUE41_FEC_N', 'ISSUE41_RADIO_BANDWIDTH',
+                      'ISSUE41_RADIO_MCS_INDEX', 'ISSUE41_RADIO_SHORT_GI'):
                 os.environ.pop(k, None)
             cfg = GateConfig.from_env()
             self.assertEqual(3, cfg.cycle_count)
             self.assertEqual(4 * 1024 * 1024, cfg.artifact_size_bytes)
             self.assertEqual(120, cfg.io_timeout_seconds)
             self.assertEqual(240, cfg.cycle_deadline_seconds)
+            self.assertEqual(157, cfg.channel)
+            self.assertEqual('HT40+', cfg.channel_width)
+            self.assertEqual(406, cfg.link_id)
+            self.assertEqual(8, cfg.fec_k)
+            self.assertEqual(14, cfg.fec_n)
+            self.assertEqual(40, cfg.radio_bandwidth)
+            self.assertEqual(3, cfg.radio_mcs_index)
+            self.assertEqual(1, cfg.radio_short_gi)
 
             # 环境变量覆盖
             os.environ['ISSUE41_SMOKE_CYCLE_COUNT'] = '1'
             os.environ['ISSUE41_INPUT_SIZE_BYTES'] = str(40 * 1024 * 1024)
             os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'] = '120'
             os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'] = '300'
+            os.environ['ISSUE41_CHANNEL'] = '149'
+            os.environ['ISSUE41_CHANNEL_WIDTH'] = 'HT40+'
+            os.environ['ISSUE41_LINK_ID'] = '410'
+            os.environ['ISSUE41_FEC_K'] = '8'
+            os.environ['ISSUE41_FEC_N'] = '14'
+            os.environ['ISSUE41_RADIO_BANDWIDTH'] = '40'
+            os.environ['ISSUE41_RADIO_MCS_INDEX'] = '2'
+            os.environ['ISSUE41_RADIO_SHORT_GI'] = '0'
             cfg2 = GateConfig.from_env()
             self.assertEqual(1, cfg2.cycle_count)
             self.assertEqual(40 * 1024 * 1024, cfg2.artifact_size_bytes)
             self.assertEqual(120, cfg2.io_timeout_seconds)
             self.assertEqual(300, cfg2.cycle_deadline_seconds)
+            self.assertEqual(149, cfg2.channel)
+            self.assertEqual('HT40+', cfg2.channel_width)
+            self.assertEqual(410, cfg2.link_id)
+            self.assertEqual(8, cfg2.fec_k)
+            self.assertEqual(14, cfg2.fec_n)
+            self.assertEqual(40, cfg2.radio_bandwidth)
+            self.assertEqual(2, cfg2.radio_mcs_index)
+            self.assertEqual(0, cfg2.radio_short_gi)
         finally:
             os.environ.clear()
             os.environ.update(old_env)
