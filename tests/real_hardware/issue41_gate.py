@@ -94,13 +94,17 @@ class GateConfig:
 
     @classmethod
     def from_env(cls) -> 'GateConfig':
-        """从环境变量解析当前门禁参数，默认保持 3 周期 4 MiB 契约。"""
-        return cls(
-            cycle_count=int(os.getenv('ISSUE41_SMOKE_CYCLE_COUNT', '3')),
-            artifact_size_bytes=int(os.getenv('ISSUE41_INPUT_SIZE_BYTES', str(4 * 1024 * 1024))),
-            io_timeout_seconds=int(os.getenv('ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', '120')),
-            cycle_deadline_seconds=int(os.getenv('ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS', '240')),
-        )
+        """从环境变量解析当前门禁参数，缺省时由 __init__ 形参默认值维护单一真相来源。"""
+        kwargs = {}
+        if 'ISSUE41_SMOKE_CYCLE_COUNT' in os.environ:
+            kwargs['cycle_count'] = int(os.environ['ISSUE41_SMOKE_CYCLE_COUNT'])
+        if 'ISSUE41_INPUT_SIZE_BYTES' in os.environ:
+            kwargs['artifact_size_bytes'] = int(os.environ['ISSUE41_INPUT_SIZE_BYTES'])
+        if 'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS' in os.environ:
+            kwargs['io_timeout_seconds'] = int(os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'])
+        if 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS' in os.environ:
+            kwargs['cycle_deadline_seconds'] = int(os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'])
+        return cls(**kwargs)
 
     @staticmethod
     def validate_link_args(args: List[str]) -> None:
