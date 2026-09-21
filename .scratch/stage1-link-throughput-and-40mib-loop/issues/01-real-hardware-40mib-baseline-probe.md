@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 三台机器使用最新主线代码，无线网卡处于正常工作状态。
 - [x] 参数化执行 40 MiB 单周期数据面探路，不修改核心生产代码。
