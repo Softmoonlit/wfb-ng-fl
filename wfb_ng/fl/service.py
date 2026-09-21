@@ -474,9 +474,11 @@ def main(role=None):
             service.wait(0.2)
         if algorithm_thread is not None:
             algorithm_thread.join(0)
-            if algorithm_error:
+            if not stop_event.is_set() and algorithm_error:
                 raise algorithm_error[0]
     except FLRuntimeError as exc:
+        if stop_event.is_set():
+            return 0
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1
     finally:

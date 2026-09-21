@@ -201,7 +201,7 @@ def audit_restart_node(executor, role: str, old_main_pid: Optional[int],
     if old_main_pid is not None and old_main_pid > 0:
         if new_main_pid == old_main_pid or old_main_pid in new_cgroup_pids:
             pid_reused = True
-        rc_kill, _, _ = executor.run(role, f"kill -0 {old_main_pid} 2>/dev/null")
+        rc_kill, _, _ = executor.run(role, f"sudo kill -0 {old_main_pid} 2>/dev/null")
         if rc_kill == 0:
             old_pid_still_running = True
 
@@ -220,7 +220,7 @@ def audit_restart_node(executor, role: str, old_main_pid: Optional[int],
     # 6. 验证新 PID 存活
     new_pid_alive = False
     if new_main_pid > 0:
-        rc_new_alive, _, _ = executor.run(role, f"kill -0 {new_main_pid} 2>/dev/null")
+        rc_new_alive, _, _ = executor.run(role, f"sudo kill -0 {new_main_pid} 2>/dev/null")
         new_pid_alive = (rc_new_alive == 0)
 
     is_active = (active_state == 'active')

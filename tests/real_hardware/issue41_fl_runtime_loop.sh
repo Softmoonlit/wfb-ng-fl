@@ -1375,14 +1375,8 @@ cmd_run_runtime_loop() {
         record_stage_failure "formal_runtime_loop" "implementation" "server 角色服务启动失败" "pre_runtime_smoke"
         die "server 角色服务启动失败"
     }
-    assert_runtime_uftp_routes
-    capture_runtime_routes
-    wait_runtime_results || {
-        record_stage_failure "formal_runtime_loop" "implementation" "Runtime 结果超时或未完成" "pre_runtime_smoke"
-        die "Runtime 结果超时或未完成"
-    }
 
-    log_info "记录三角色服务运行 MainPID 以备生命周期 no-overlap 验证..."
+    log_info "记录三角色服务首次运行 MainPID 以备生命周期 no-overlap 验证..."
     mkdir -p "$ARCHIVE_DIR/lifecycle"
     server_main_pid="$(sudo systemctl show -p MainPID --value wfb-fl-server.service 2>/dev/null || echo 0)"
     client1_main_pid="$(remote client1 "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
@@ -1390,6 +1384,13 @@ cmd_run_runtime_loop() {
     cat > "$ARCHIVE_DIR/lifecycle/initial_pids.json" <<EOF
 {"server": $server_main_pid, "client1": $client1_main_pid, "client2": $client2_main_pid}
 EOF
+
+    assert_runtime_uftp_routes
+    capture_runtime_routes
+    wait_runtime_results || {
+        record_stage_failure "formal_runtime_loop" "implementation" "Runtime 结果超时或未完成" "pre_runtime_smoke"
+        die "Runtime 结果超时或未完成"
+    }
 
     log_info "正式 Runtime 作业已成功返回，执行三角色服务受控停止..."
     sudo systemctl stop wfb-fl-server.service || true
