@@ -1076,6 +1076,8 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
                 errors.append(f'{prefix} telemetry loss_and_fec_by_node 缺少 client {nid}')
             elif by_node[nid].get('sample_count', 0) <= 0:
                 errors.append(f'{prefix} telemetry client {nid} 缺少有效 PKT_SRC 遥测采样')
+            elif by_node[nid].get('out_packets', 0) <= 0:
+                errors.append(f'{prefix} telemetry client {nid} 交付包数 (out_packets) 必须大于 0')
 
     return errors
 

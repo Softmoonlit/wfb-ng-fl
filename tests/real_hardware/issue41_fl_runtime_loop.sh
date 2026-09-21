@@ -1005,10 +1005,11 @@ cmd_smoke_gate() {
         log_info "=== 运行数据面 Gate 周期 $cycle / $SMOKE_CYCLE_COUNT ==="
         t_cycle_start="$(python3 -c 'import time; print(time.monotonic())')"
 
-        # 记录本周期启动前各节点日志行数，用于准确截取单周期遥测
-        s_lines_before=$(wc -l < "$server_dir/wfb.log" 2>/dev/null || echo 0)
-        c1_lines_before=$(remote client1 "wc -l < '$(smoke_dir "$name")/client1/wfb.log' 2>/dev/null || echo 0")
-        c2_lines_before=$(remote client2 "wc -l < '$(smoke_dir "$name")/client2/wfb.log' 2>/dev/null || echo 0")
+        # 记录本周期启动前各节点日志行数，用于准确截取单周期遥测 (fail-closed，拒绝容错回退)
+        [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
+        s_lines_before=$(wc -l < "$server_dir/wfb.log")
+        c1_lines_before=$(remote client1 "test -f '$(smoke_dir "$name")/client1/wfb.log' && wc -l < '$(smoke_dir "$name")/client1/wfb.log'") || die "读取 client1 wfb.log 行数失败"
+        c2_lines_before=$(remote client2 "test -f '$(smoke_dir "$name")/client2/wfb.log' && wc -l < '$(smoke_dir "$name")/client2/wfb.log'") || die "读取 client2 wfb.log 行数失败"
 
         # 1. 确定性生成交付物与 update 文件
         work="$server_dir/cycle$cycle"

@@ -8,7 +8,7 @@ import os
 import re
 import sys
 
-from tests.real_hardware.issue41_gate import parse_telemetry, make_empty_node_telemetry
+from tests.real_hardware.issue41_gate import parse_telemetry
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
@@ -419,67 +419,15 @@ def _build_telemetry(archive_dir, errors):
     if c2_q:
         queue_summaries['client2'] = c2_q
 
-    if parse_telemetry is not None:
-        telem = parse_telemetry(
-            server_log=s_log or '',
-            client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
-            queue_summaries=queue_summaries,
-        )
-        queue = telem.get('queue', {})
-        if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
-            errors.append('Runtime 队列自然暂停后未成功恢复')
-        return telem
-
-    return {
-        'ready_accepted_total': 0,
-        'ready_rejected_total': 0,
-        'grant_sent_total': 0,
-        'authorized_sends_by_node': {'1': 0, '2': 0},
-        'server_rx': {
-            'rx_ant_samples': 0,
-            'rx_packets': 0,
-            'rx_bytes': 0,
-        },
-        'queue': {
-            'tun_read_pause_total': 0,
-            'tun_read_resume_total': 0,
-            'currently_paused': False,
-            'pause_recovered': True,
-            'tun_read_pause_total_by_reason': {
-                'queued_bytes_threshold': 0,
-                'queued_packets_limit': 0,
-            },
-            'queued_bytes_max': 0,
-            'queued_packets_max': 0,
-        },
-        'reassembly': {
-            'reassembly_overflow_evict': 0,
-            'unfinished_block_limit': 0,
-        },
-        'sender_isolation': {
-            'unauthorized_air_injections': 0,
-            'unknown_client_rejects': 0,
-        },
-        'feedback': {
-            'feedback_window_open_count': 0,
-            'feedback_window_close_count': 0,
-            'feedback_uplink_hit_total': 0,
-        },
-        'loss_and_fec': {
-            'packets_lost': 0,
-            'packets_fec_recovered': 0,
-        },
-        'loss_and_fec_by_node': {
-            '1': make_empty_node_telemetry(),
-            '2': make_empty_node_telemetry(),
-        },
-        'tcp_retransmits': 0,
-        'phase_durations': {
-            'downlink_seconds': 0.0,
-            'uplink_seconds': 0.0,
-            'cycle_total_seconds': 0.0,
-        },
-    }
+    telem = parse_telemetry(
+        server_log=s_log or '',
+        client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
+        queue_summaries=queue_summaries,
+    )
+    queue = telem.get('queue', {})
+    if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
+        errors.append('Runtime 队列自然暂停后未成功恢复')
+    return telem
 
 
 def _read_file_text(path):
