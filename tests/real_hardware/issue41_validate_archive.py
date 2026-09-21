@@ -48,17 +48,59 @@ def validate_archive(archive_dir):
     if errors:
         return errors
 
+    _check_candidate_feedback(summary, errors, 'summary')
+    _validate_run_ids(summary, errors)
+    _validate_phase_dependencies(summary, errors)
+
     _require_status(summary['orchestration'], 'orchestration', errors)
     smoke = summary['pre_runtime_smoke']
     if not isinstance(smoke, dict):
         errors.append('pre_runtime_smoke 必须是对象')
         return errors
-    _validate_smoke_gate(archive_dir, smoke, errors)
+    _validate_smoke_gate(archive_dir, smoke, summary, errors)
     _validate_runtime(summary['formal_runtime_loop'], errors)
     _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
     _validate_envelope(archive_dir, summary, errors)
     return errors
+
+
+def _check_candidate_feedback(val, errors, path='summary'):
+    if isinstance(val, str):
+        if '--feedback-window-start-immediately' in val:
+            errors.append('%s 违规包含未接受的 --feedback-window-start-immediately 候选行为' % path)
+    elif isinstance(val, dict):
+        if val.get('feedback_window_start_immediately') is True:
+            errors.append('%s 违规包含未接受的 feedback_window_start_immediately 候选行为' % path)
+        for k, v in val.items():
+            _check_candidate_feedback(v, errors, f'{path}.{k}')
+    elif isinstance(val, (list, tuple)):
+        for i, item in enumerate(val):
+            _check_candidate_feedback(item, errors, f'{path}[{i}]')
+
+
+def _validate_run_ids(summary, errors):
+    run_id = summary.get('run_id')
+    if not run_id:
+        return
+    for part_name in ('pre_runtime_smoke', 'formal_runtime_loop', 'lifecycle'):
+        part = summary.get(part_name)
+        if isinstance(part, dict) and 'run_id' in part and part['run_id'] != run_id:
+            errors.append('%s 与 summary 的 run_id 不一致' % part_name)
+
+
+def _validate_phase_dependencies(summary, errors):
+    smoke = summary.get('pre_runtime_smoke', {})
+    formal = summary.get('formal_runtime_loop', {})
+    lifecycle = summary.get('lifecycle', {})
+
+    if isinstance(smoke, dict) and isinstance(formal, dict):
+        if smoke.get('status') != 'passed' and formal.get('status') == 'passed':
+            errors.append('数据面 Gate 未通过时 formal_runtime_loop 不得标记为 passed')
+
+    if isinstance(formal, dict) and isinstance(lifecycle, dict):
+        if formal.get('status') != 'passed' and lifecycle.get('status') == 'passed':
+            errors.append('formal_runtime_loop 未通过时 lifecycle 不得标记为 passed')
 
 
 def _validate_envelope(archive_dir, summary, errors):
@@ -68,15 +110,44 @@ def _validate_envelope(archive_dir, summary, errors):
     envelope = _read_json_file(envelope_path, 'envelope.json', errors)
     if envelope is None:
         return
+    _check_candidate_feedback(envelope, errors, 'envelope.json')
     if 'run_id' in summary and envelope.get('run_id') != summary.get('run_id'):
         errors.append('envelope.json 与 summary 的 run_id 不一致')
+    if envelope.get('overwritten') is True:
+        errors.append('归档目录被覆盖，不可作为有效证据')
+    mode = envelope.get('mode', 'formal')
+    if mode != 'formal' and summary.get('conclusion', {}).get('status') == 'passed':
+        errors.append('非 formal 模式（%s）归档不可标记为 passed' % mode)
     isolation = envelope.get('network_isolation')
     if not isinstance(isolation, dict) or not isolation.get('prohibit_management_as_data_plane'):
         errors.append('envelope.json 必须明确限制管理网不可作为数据平面')
+    resolved = envelope.get('resolved_config')
+    if resolved is not None:
+        if not isinstance(resolved, dict) or not resolved:
+            errors.append('envelope.json 缺少 resolved_config 解析配置')
+        else:
+            for deadline_key in ('smoke_cycle_deadline_seconds', 'runtime_timeout_seconds', 'io_timeout_seconds'):
+                val = resolved.get(deadline_key)
+                if not isinstance(val, (int, float)) or val <= 0:
+                    errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            smoke = summary.get('pre_runtime_smoke', {})
+            if isinstance(smoke, dict):
+                if 'cycle_deadline_seconds' in smoke and smoke['cycle_deadline_seconds'] != resolved.get('smoke_cycle_deadline_seconds'):
+                    errors.append('运行中修改配置：pre_runtime_smoke cycle_deadline_seconds 与 envelope 不一致')
+                if 'io_timeout_seconds' in smoke and smoke['io_timeout_seconds'] != resolved.get('io_timeout_seconds'):
+                    errors.append('运行中修改配置：pre_runtime_smoke io_timeout_seconds 与 envelope 不一致')
+            formal = summary.get('formal_runtime_loop', {})
+            if isinstance(formal, dict) and 'scenario' in formal and isinstance(formal['scenario'], dict):
+                sc = formal['scenario']
+                if 'round_deadline_seconds' in sc and sc['round_deadline_seconds'] != resolved.get('runtime_timeout_seconds'):
+                    errors.append('运行中修改配置：formal_runtime_loop round_deadline_seconds 与 envelope 不一致')
+                if 'io_timeout_seconds' in sc and sc['io_timeout_seconds'] != resolved.get('io_timeout_seconds'):
+                    errors.append('运行中修改配置：formal_runtime_loop io_timeout_seconds 与 envelope 不一致')
     conclusion = summary.get('conclusion', {})
     category = conclusion.get('category')
     if category and category not in ('environment', 'tooling', 'implementation', 'link_capability'):
         errors.append('conclusion.category 无效：%s' % category)
+
 
 
 def _read_json(path, errors):
@@ -113,7 +184,7 @@ def _require_status(value, name, errors):
         errors.append('%s.status 无效' % name)
 
 
-def _validate_smoke_gate(archive_dir, value, errors):
+def _validate_smoke_gate(archive_dir, value, summary, errors):
     _require_status(value, 'pre_runtime_smoke', errors)
     if not isinstance(value, dict):
         return
@@ -128,6 +199,8 @@ def _validate_smoke_gate(archive_dir, value, errors):
         if (marker.get('gate_type') != 'three_cycle_bidirectional' or
                 marker.get('status') != 'passed'):
             errors.append('pre_runtime_smoke marker 内容与通过状态不一致')
+        if summary and 'run_id' in summary and marker.get('run_id') and marker.get('run_id') != summary.get('run_id'):
+            errors.append('pre_runtime_smoke marker 与 summary 的 run_id 不一致')
 
     config = GateConfig()
     gate_errors = validate_gate_summary(value, config)
@@ -165,14 +238,12 @@ def _validate_runtime(value, errors):
         errors.append('formal_runtime_loop 缺少六组双向 UFTP 路由证据')
 
     config_eq = value.get('config_equivalence')
-    if config_eq is not None:
-        if not isinstance(config_eq, dict) or config_eq.get('status') != 'passed':
-            errors.append('formal_runtime_loop 角色服务配置等价性未通过')
+    if config_eq is None or not isinstance(config_eq, dict) or config_eq.get('status') != 'passed' or config_eq.get('errors'):
+        errors.append('formal_runtime_loop 角色服务配置等价性未通过')
 
     controlled_stop = value.get('controlled_stop')
-    if controlled_stop is not None:
-        if not isinstance(controlled_stop, dict) or controlled_stop.get('status') != 'passed':
-            errors.append('formal_runtime_loop 角色服务受控停止未通过')
+    if controlled_stop is None or not isinstance(controlled_stop, dict) or controlled_stop.get('status') != 'passed':
+        errors.append('formal_runtime_loop 角色服务受控停止未通过')
 
 
 def _validate_formal_scenario(value, errors):

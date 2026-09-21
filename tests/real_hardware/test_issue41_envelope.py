@@ -720,6 +720,56 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             summary = json.load(fh)
         self.assertEqual('passed', summary['lifecycle']['status'])
 
+    def test_cli_record_stage_failure_preserves_completed_partitions(self):
+        from tests.real_hardware.issue41_envelope import main
+        run_id = 'v8_issue41_cli_stage_fail'
+        archive_dir = os.path.join(self.archive_root, run_id)
+        main(['init', '--archive-dir', archive_dir, '--run-id', run_id])
+
+        # 先追加一个 passed 的 pre_runtime_smoke
+        smoke_file = os.path.join(self.temp_dir, 'smoke.json')
+        with open(smoke_file, 'w', encoding='utf-8') as fh:
+            json.dump({'run_id': run_id, 'status': 'passed', 'data': 'gate_ok'}, fh)
+        main(['append-partition', '--archive-dir', archive_dir, '--name', 'pre_runtime_smoke', '--json-file', smoke_file])
+
+        # 记录 formal_runtime_loop 失败
+        runtime_fail_file = os.path.join(self.temp_dir, 'runtime_fail.json')
+        with open(runtime_fail_file, 'w', encoding='utf-8') as fh:
+            json.dump({'run_id': run_id, 'status': 'failed', 'reason': 'client2 timeout'}, fh)
+
+        rc = main([
+            'record-stage-failure',
+            '--archive-dir', archive_dir,
+            '--partition-name', 'formal_runtime_loop',
+            '--json-file', runtime_fail_file,
+            '--category', FailureCategory.IMPLEMENTATION,
+            '--reason', 'client2 timeout',
+            '--last-successful-layer', 'pre_runtime_smoke',
+            '--first-failing-layer', 'formal_runtime_loop',
+        ])
+        self.assertEqual(0, rc)
+
+        summary_path = os.path.join(archive_dir, 'issue41_summary.json')
+        with open(summary_path, 'r', encoding='utf-8') as fh:
+            summary = json.load(fh)
+        self.assertEqual('failed', summary['conclusion']['status'])
+        self.assertEqual('client2 timeout', summary['conclusion']['reason'])
+        self.assertEqual('passed', summary['pre_runtime_smoke']['status'])
+        self.assertEqual('failed', summary['formal_runtime_loop']['status'])
+
+    def test_initialize_rejects_candidate_feedback_in_resolved_config(self):
+        bad_cfg = dict(self.default_config)
+        bad_cfg['feedback_window_start_immediately'] = True
+        envelope = RunEnvelope(
+            run_id='v8_issue41_bad_feedback',
+            archive_root=self.archive_root,
+            resolved_config=bad_cfg,
+        )
+        with self.assertRaises(ValueError) as ctx:
+            envelope.initialize()
+        self.assertIn('严禁使用 --feedback-window-start-immediately', str(ctx.exception))
+
+
 
 
 if __name__ == '__main__':

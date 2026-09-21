@@ -28,12 +28,13 @@
 
 `v6新底座无SSH手动上行演示手册.md` 是 v6 阶段的三机无 SSH 手动 uplink 基线手册，仍然有参考价值：无线配置、TUN 规划、READY/GRANT、queue summary、正式摘要和归档思路都应复用。
 
-本手册是 V8 issue #41 专用 SSH 编排验收手册。V8 #41 不把旧手册改造成 SSH/Runtime 手册，而是在新脚本中复用可用经验，并在最终 `result.md` 中明确区分：
+本手册是 V8 issue #41 专用 SSH 编排验收手册。V8 #41 不把旧手册改造成 SSH/Runtime 手册，而是在新脚本中复用可用经验，并在最终 `result.md` 与 `issue41_summary.json` 中统一管理五个分区：
 
-- `baseline_uplink`：v6 旧手册/旧脚本定义的成熟基线口径，本次不重跑普通 TCP 探针。
-- `pre_runtime_smoke`：本次新增的 UFTP downlink 与 HTTP PUT uplink 基础设施冒烟。
-- `formal_runtime_loop`：本次正式 Runtime 四接口闭环。
-- `lifecycle`：systemd stop/restart、cgroup 和无孤儿进程证据。
+- `orchestration`：动态拓扑扫描、版本与环境一致性、8 层 fail-closed 预检。
+- `pre_runtime_smoke`：同组常驻进程下的连续三周期双向数据面 Gate 验收事实。
+- `formal_runtime_loop`：严格等价链路配置下的正式 Runtime 四接口严格同步单轮闭环。
+- `lifecycle`：systemd 角色服务 stop/restart/no-overlap、cgroup 及资源清理生命周期审计。
+- `conclusion`：全流程不可篡改的最终判定结论（包含失败分类与分层定位）。
 
 ## 1. 现场拓扑
 
@@ -218,109 +219,80 @@ client 类似，使用 `wfb_ng.fl.issue41_algorithm:client_main`。
 
 ## 4. 验收阶段
 
-脚本以分阶段为主，`run-all` 只串联阶段，不隐藏额外动作，不自动 push。
+脚本以分阶段为主，`run-all` 严格按序串联全部阶段，不隐藏额外动作，不自动 push。
 
-推荐阶段：
+推荐阶段执行顺序：
 
 ```bash
 bash tests/real_hardware/issue41_fl_runtime_loop.sh push-branch
 bash tests/real_hardware/issue41_fl_runtime_loop.sh sync-remotes
 bash tests/real_hardware/issue41_fl_runtime_loop.sh preflight
 bash tests/real_hardware/issue41_fl_runtime_loop.sh install
-bash tests/real_hardware/issue41_fl_runtime_loop.sh smoke-downlink-uftp
-bash tests/real_hardware/issue41_fl_runtime_loop.sh smoke-uplink-http-put
+bash tests/real_hardware/issue41_fl_runtime_loop.sh smoke-gate
+bash tests/real_hardware/issue41_fl_runtime_loop.sh verify-config-equivalence
 bash tests/real_hardware/issue41_fl_runtime_loop.sh run-runtime-loop
 bash tests/real_hardware/issue41_fl_runtime_loop.sh lifecycle-stop-restart
 bash tests/real_hardware/issue41_fl_runtime_loop.sh collect
 bash tests/real_hardware/issue41_fl_runtime_loop.sh summary
 ```
 
-稳定环境可使用：
+稳定环境可使用唯一正式总入口：
 
 ```bash
 bash tests/real_hardware/issue41_fl_runtime_loop.sh run-all
 ```
 
-`run-all` 默认失败时进入 fail-closed 收尾；显式排障模式可用：
+`run-all` 默认在任意阶段发生失败时进入 fail-closed 受控停止收尾并完整保留归档；显式排障模式可用：
 
 ```bash
 ISSUE41_KEEP_RUNNING_ON_FAIL=1 bash tests/real_hardware/issue41_fl_runtime_loop.sh run-all
 ```
 
-排障模式尽量保留现场进程，但该归档必须标记为 debug mode，不作为正式通过证据。
+排障模式尽量保留现场进程，但该归档在 envelope 中记录 mode 为 diagnostic，归档校验器拒绝将其实施 formal 验收标记。
 
 ### 4.1 preflight
 
-preflight 检查：
+preflight 检查（执行 8 层 fail-closed 预检）：
 
-- SSH 免密或凭据方式可用。
+- SSH 免密或凭据方式可用（`ssh_and_sudo` 层）。
 - 三台机器 sudo 可用。
-- 三台机器仓库 branch/commit/status 一致。
-- 每台机器恰好一个 `wlx*` 接口，或显式指定。
+- 三台机器仓库 branch/commit/status 一致，无工作区污染（`repo_and_version` 层）。
+- 每台机器恰好一个 `wlx*` 接口，或显式指定（`wireless_usb` 层）。
 - 三个角色统一归档无线接口 sysfs path、驱动、USB speed、USB 拓扑、接口统计和相关 kernel journal；该规则不依赖 client 是 VM USB passthrough 还是真实机器。
 - USB speed 默认建议至少为 `480 Mbit/s`。低于建议值时默认明确告警并继续，现场 USB 受限时仍可验收，但结论必须保留硬件风险证据；设置 `ISSUE41_STRICT_USB_SPEED=1` 后低于 `ISSUE41_RADIO_MIN_USB_SPEED`（默认 `480`）才 fail-closed。
 - 脚本不默认自动 reset 或重新枚举 USB 网卡，避免 VM passthrough 或真实机器设备身份被意外改变；需要时由操作者显式处理硬件后重跑。
-- `rfkill` 未 soft blocked。
-- `ip`、`iw`、`systemctl`、`journalctl`、`make`、`python3`、`uftp`、`uftpd` 等依赖存在。
-- TUN 名称不存在。
-- `10.80.0.1:8080`、UFTP port 未被未知进程占用。
-- `/var/lib/wfb-ng/issue41/*` 和 `/var/tmp/wfb-ng-issue41-smoke` 清理边界可确认。
-- 没有旧 `wfb-fl-*`、`wfb_v6_uplink`、`uftp`、`uftpd` 残留进程；若是上次 issue41 残留，可由 stop/clean 子命令处理。
+- `rfkill` 未 soft blocked，信道支持 monitor（`radio_monitor_channel` 层）。
+- `ip`、`iw`、`systemctl`、`journalctl`、`make`、`python3`、`uftp`、`uftpd` 等依赖存在（`dependencies` 层）。
+- TUN 名称不存在，端口未占用（`network_ports_and_tun` 层）。
+- `/var/lib/wfb-ng/issue41/*` 和 `/var/tmp/wfb-ng-issue41-smoke` 清理边界可确认（`managed_directory_boundary` 层）。
+- 没有旧 `wfb-fl-*`、`wfb_v6_uplink`、`uftp`、`uftpd` 残留进程（`residual_processes` 层）；若是上次 issue41 残留，由安全停止与受控重置处理。
+- 预检失败时自动归类为 `environment`、`tooling`、`implementation` 或 `link_capability` 失败分类并写入审计归档。
 
-USB 严格检查示例：
+### 4.2 smoke-gate（连续三周期双向数据面 Gate 验收）
 
-```bash
-ISSUE41_STRICT_USB_SPEED=1 ISSUE41_RADIO_MIN_USB_SPEED=480 \
-  bash tests/real_hardware/issue41_fl_runtime_loop.sh preflight
-```
+目的：在正式 Runtime 启动前，以同一组常驻数据面进程连续运行 3 个双向数据传输周期，证明无线链路、TUN 与传输栈具备承载 FL 闭环的直接传输能力与遥测事实。
 
-READY 诊断必须区分两个事实：client 日志中的 `first_declare` 只表示本地尝试发送 READY，server 日志中的 `ready_accept` 才表示声明已送达并进入普通活跃队列。当前正式实现只有单层活跃队列；未送达的 READY 不是一次“降为睡眠节点”的状态转换。对于 issue #41 固定参与集合 `[1,2]`，链路层暂时不活跃不能改变 Runtime 严格同步参与集合。
+边界与原则：
+- 三机上的 `wfb_v6_uplink`、client1/client2 的 `uftpd` 和 server 的 HTTP PUT receiver 进程必须常驻，严禁在周期之间重启进程、重置网卡或修改链路参数。
+- 每个周期均包含：一次 shared UFTP 下行 4 MiB 载荷到两客户端，以及两个客户端各发起一次独立的 4 MiB HTTP PUT 上行。
+- 单次 I/O 无进展超时固定为 120 秒（`SMOKE_IO_TIMEOUT_SECONDS=120`），单周期完成总耗时必须严格在 240 秒固定 deadline 内（`SMOKE_CYCLE_DEADLINE_SECONDS=240`）。
+- 成功准则包含双端直接事实：UFTP CONNECT 矩阵 `success`、model/manifest 均成功 `copy` 且 SHA-256 匹配；HTTP PUT 上行均返回 HTTP 201 且 committed SHA-256 匹配；活动上传集合（active uploads）收敛为空；遥测事实（READY/GRANT、queue pause/resume 恢复、反压无丢弃、重组无溢出、隔离无注入）完整。
+- 失败时 fail-closed 受控停止进程，采集诊断证据，并生成记录 `last_successful_layer` 与 `first_failing_layer` 的 failed 归档，绝对禁止启动正式 Runtime。
 
-Issue #41 P0 的正式 Runtime server 额外启用立即开始的静态 feedback window：它按 `[1,2]` 轮发短 GRANT，不以 `ready_accept` 为 UFTP REGISTER 的前提。client 仍可能发出 READY，且 server 仍可记录它，但 UFTP downlink 失败不能仅因缺少 `ready_accept` 归类为链路健康失败；必须同时检查 UFTP status matrix、feedback window、短 GRANT 和 `feedback_uplink_hit` 证据。
+### 4.3 verify-config-equivalence（严格链路配置等价性核验）
 
-### 4.2 smoke-downlink-uftp
+目的：确保将要在正式 Runtime 使用的 systemd 角色服务配置（`/etc/wfb-ng/issue41/fl-server.json`、`fl-client.json`）与通过 Gate 验收的链路配置严格等价。
 
-目的：只验证真实 TUN/无线上的 shared UFTP downlink 和 feedback 基础设施。
+等价性比对维度：
+- 无线参数：channel、channel_width、MCS index、FEC K/N、short GI。
+- 数据平面与 TUN：IP 地址段、TUN 名称、MTU。
+- 队列与流控：pause threshold、resume threshold、packets limit。
+- 反馈窗口：feedback window period、duration。
+- 运行时超时期望：smoke cycle deadline（240s）、runtime timeout（180s/400s）、io timeout（120s）。
+- 严禁携带候选行为参数（如 `--feedback-window-start-immediately`）。
+- 比对不通过时立即 fail-closed 终止，禁止启动正式 Runtime。
 
-边界：
-
-- 使用临时进程，不使用 systemd 角色服务。
-- 可直接调用原生 `uftp`/`uftpd`。
-- 不经过 Runtime 四接口。
-- 成功不能替代正式 Runtime 验收。
-
-行为：
-
-1. 三台机器启动临时 `wfb_v6_uplink` 链路进程。
-2. client1/client2 启动临时 `uftpd -I <client_tun_ip> -M 239.80.41.1`，加入与 server 一致的公共组播地址。
-3. server 执行一次原生 `uftp -I 10.80.0.1 -M 239.80.41.1 -p 1044 -U 0x000000ff -H 0x00000001,0x00000002 ...`。
-4. 下发小模型样例和 manifest。
-5. 校验两个 client 文件 SHA-256 与 server 源文件一致。
-6. 校验 UFTP status matrix：两个 client、两个文件均为 `copy`，且每个 client 有 `CONNECT;success`。
-7. 采集 feedback window open/close/hit、queue/reassembly、原始日志。
-8. 停止临时进程并确认无孤儿。
-
-### 4.3 smoke-uplink-http-put
-
-目的：只验证真实 TUN/无线上的 HTTP PUT over TCP uplink 基础设施。
-
-边界：
-
-- 使用临时进程，不使用 systemd 角色服务。
-- 可使用最小 HTTP PUT receiver/client。
-- 不经过 Runtime 四接口。
-- 成功不能替代正式 Runtime 验收。
-
-行为：
-
-1. 三台机器启动临时 `wfb_v6_uplink` 链路进程。
-2. server 在 `10.80.0.1:8080` 启动最小 HTTP PUT receiver。
-3. client1/client2 分别通过 TUN 地址发起单连接 PUT。
-4. 每个 client 记录 HTTP status；server 记录路径、长度、SHA-256。
-5. 采集 READY/GRANT、authorized sends、server packets、queue/reassembly。
-6. 停止临时进程并确认无孤儿。
-
-### 4.4 run-runtime-loop
+### 4.4 run-runtime-loop（正式 Runtime 闭环）
 
 目的：通过安装后的 systemd 角色服务运行正式 Runtime 四接口闭环。
 
@@ -444,50 +416,96 @@ tests/logs/v8_issue41_<timestamp>/
 建议结构：
 
 ```text
-tests/logs/v8_issue41_<timestamp>/
+tests/logs/v8_issue41_<timestamp>_<token>/
+  envelope.json
   orchestration/
+    topology.json
+    preflight_result.json
+    radio-health/
   pre_runtime_smoke/
-    downlink_uftp/
-    uplink_http_put/
-  formal_runtime_loop/
+    gate_summary.json
+    passed.json (或 failed.json)
     server/
     client1/
     client2/
+  formal_runtime_loop/
+    config_equivalence.json
+    controlled_stop.json
+    server/
+      issue41-server-result.json
+    client1/
+      issue41-client1-result.json
+    client2/
+      issue41-client2-result.json
   lifecycle/
+    initial_pids.json
+    lifecycle_summary.json
+    first_stop_evidence.json
+    restart_evidence.json
+    second_stop_evidence.json
   raw/
+    server-journal.txt
+    client1-journal.txt
+    client2-journal.txt
+    *-route-*.txt
   result.md
   issue41_summary.json
 ```
 
 ### 5.2 summary 分区
 
-结构化 summary 至少分区：
+结构化 `issue41_summary.json` 严格包含五个分区，且顶层 `run_id` 必须与 `envelope.json` 严格一致：
 
 ```json
 {
-  "orchestration": {},
-  "pre_runtime_smoke": {
-    "downlink_uftp": {},
-    "uplink_http_put": {}
+  "schema_version": 1,
+  "run_id": "v8_issue41_<timestamp>_<token>",
+  "orchestration": {
+    "status": "passed",
+    "radio_health_dir": "..."
   },
-  "formal_runtime_loop": {},
-  "lifecycle": {},
-  "conclusion": {}
+  "pre_runtime_smoke": {
+    "schema_version": 1,
+    "run_id": "v8_issue41_<timestamp>_<token>",
+    "gate_type": "three_cycle_bidirectional",
+    "status": "passed",
+    "reused_processes": {...},
+    "cycles": [...]
+  },
+  "formal_runtime_loop": {
+    "status": "passed",
+    "runtime_interfaces": ["publish_model", "wait_for_model", "submit_update", "wait_for_updates"],
+    "data_plane": "10.80.0.0/24",
+    "config_equivalence": {"status": "passed"},
+    "controlled_stop": {"status": "passed"},
+    "scenario": {...},
+    "rounds": [...]
+  },
+  "lifecycle": {
+    "schema_version": 1,
+    "run_id": "v8_issue41_<timestamp>_<token>",
+    "status": "passed",
+    "first_stop": {...},
+    "restart": {...},
+    "second_stop": {...}
+  },
+  "conclusion": {
+    "status": "passed",
+    "reason": "..."
+  }
 }
 ```
 
 管理面日志可以进入归档，但必须只作为编排证据。任何 `192.168.122.*` 管理网传输不得计入 FL 数据面成功事实。
 
-### 5.3 fail-closed
+### 5.3 fail-closed 与阶段证据保留
 
-任何关键证据缺失都不能报告成功。失败时默认执行：
-
-1. 停止本机和远端服务。
-2. 停止 smoke 临时进程。
-3. 收集失败现场证据。
-4. 检查无孤儿进程。
-5. 生成 failed `result.md` 和 `issue41_summary.json`。
-6. 不删除 work_dir，留待排障。
+任何关键证据缺失都不能报告成功。在任一阶段失败时，必须保证：
+1. 立即受控停止本机和远端服务及临时进程。
+2. 完整保留此前已成功执行阶段的证据分区（如 Gate 成功证据、前序遥测与日志）。
+3. 记录第一失败层（`first_failing_layer`）、最后成功层（`last_successful_layer`）、失败分类（`failure_category`）与具体原因（`failure_reason`）。
+4. 生成标记为 `failed` 的 `result.md` 与 `issue41_summary.json`，且保证生成的失败归档自身可被 `issue41_validate_archive.py` 完整审计。
+5. 不删除 Runtime work_dir 与 raw 日志，留待排障。
 
 显式 `clean` 子命令才允许清理脚本管理的目录，并且必须先停止服务、确认无相关 PID，再列出并删除：
 
@@ -505,13 +523,15 @@ tests/logs/v8_issue41_<timestamp>/
 
 1. 三台机器运行同一 branch、同一 commit，工作区干净。
 2. 三台机器通过安装后的产物和 systemd 角色服务运行正式 Runtime loop。
-3. `smoke-downlink-uftp` 通过，但它只作为诊断前置。
-4. `smoke-uplink-http-put` 通过，但它只作为诊断前置。
-5. Runtime 正式闭环通过：`publish_model`、两个 `wait_for_model`、两个 `submit_update`、`wait_for_updates` 全部经正式接口完成。
-6. shared UFTP downlink 每轮一次，两个 client 的 model 和 manifest status matrix 完整。
-7. 单轮中两个 client 的模型 SHA 均与 server 一致；每个 4 MiB update 的 SHA、大小、客户端 HTTP 201 与 server committed 事实一致。
-8. 每轮均记录独立轮次标识、模型接收和 PUT 时间区间、活动上传集合及最终 HTTP 结果；不得出现 `upload_in_progress`，server 不返回 partial result，最终返回 `[1, 2]` 完整映射。
-9. v6 直接依赖证据完整：READY/GRANT、authorized sends、server 接收、queue pause/resume、bytes/packets 反压、reassembly、sender isolation、feedback window。
-10. lifecycle stop/restart 和无孤儿进程验证通过。
-11. `result.md` 和 `issue41_summary.json` 明确区分 baseline、smoke、formal runtime loop、lifecycle。
-12. 任何失败均生成 failed 结论，而不是缺证据成功。
+3. 8 层 fail-closed 预检通过，拓扑与版本信息完整入库。
+4. 连续三周期双向数据面 Gate 验收在同一组常驻进程下全部通过，单周期完成时间在 240s deadline 内，单次 I/O 无 120s stall。
+5. 角色服务配置与 Gate 链路配置严格等价核验通过，参数未被中途修改，且未携带任何候选 feedback 特性。
+6. Runtime 正式闭环通过：`publish_model`、两个 `wait_for_model`、两个 `submit_update`、`wait_for_updates` 全部经正式接口完成。
+7. shared UFTP downlink 每轮一次，两个 client 的 model 和 manifest status matrix 完整。
+8. 单轮中两个 client 的模型 SHA 均与 server 一致；每个 4 MiB update 的 SHA、大小、客户端 HTTP 201 与 server committed 事实一致。
+9. 每轮均记录独立轮次标识、模型接收和 PUT 时间区间、活动上传集合及最终 HTTP 结果；不得出现 `upload_in_progress`，server 不返回 partial result，最终返回 `[1, 2]` 完整映射。
+10. v6 直接依赖证据完整：READY/GRANT、authorized sends、server 接收、queue pause/resume 恢复、bytes/packets 反压、reassembly、sender isolation、feedback window。
+11. lifecycle stop/restart/no-overlap（PID 不复用、cgroup 无交集）和无孤儿进程验证通过。
+12. 归档目录未被覆盖，非 diagnostic 模式，顶层及各阶段 run_id 一致。
+13. `result.md` 和 `issue41_summary.json` 完整包含全部五个分区，并通过 `issue41_validate_archive.py` 严格校验。
+14. 任何失败均生成 failed 结论并准确分类，严禁缺证据或降级报告成功。

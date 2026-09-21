@@ -69,11 +69,12 @@ usage() {
   preflight                检查三机依赖、sudo、仓库状态、wlx 网卡与端口
   install                  三机执行 make build_v6、sudo make install_v8、daemon-reload
   smoke-gate               连续三周期双向数据面 gate 验收 (别名: smoke)
+  verify-config-equivalence 角色服务与数据面 Gate 严格链路配置等价性比较
   run-runtime-loop         写 issue41 配置/drop-in 并启动 systemd Runtime loop
   lifecycle-stop-restart   stop/restart/no-overlap 生命周期验收
   collect                  采集本机和远端状态证据
   summary                  生成 issue41_summary.json、result.md 并运行归档校验器
-  run-all                  串联 preflight/install/smoke/runtime/lifecycle/collect/summary；不自动 push
+  run-all                  唯一正式入口：严格串联 preflight/install/smoke-gate/verify-config-equivalence/runtime/lifecycle/collect/summary；不自动 push
   stop-all                 停止三机 issue41 相关服务和临时进程
   clean                    停止后清理 issue41 明确管理路径
 
@@ -95,15 +96,66 @@ case "$cmd" in
 esac
 
 init_envelope() {
+    [ -f "$ARCHIVE_DIR/envelope.json" ] && return 0
     if [ -d "$ARCHIVE_DIR" ]; then
         die "归档目录已存在，拒绝覆盖：$ARCHIVE_DIR"
     fi
+    local cfg_tmp
+    cfg_tmp="$(mktemp)"
+    cat > "$cfg_tmp" <<EOF
+{
+  "schema_version": 1,
+  "channel": $CHANNEL,
+  "channel_width": "$CHANNEL_WIDTH",
+  "link_id": $LINK_ID,
+  "uplink_stream": $UPLINK_STREAM,
+  "downlink_stream": $DOWNLINK_STREAM,
+  "fec_k": $FEC_K,
+  "fec_n": $FEC_N,
+  "radio_bandwidth": $RADIO_BANDWIDTH,
+  "radio_mcs_index": $RADIO_MCS_INDEX,
+  "radio_short_gi": $RADIO_SHORT_GI,
+  "server_tun": "$SERVER_TUN",
+  "client1_tun": "$CLIENT1_TUN",
+  "client2_tun": "$CLIENT2_TUN",
+  "server_tun_addr": "$SERVER_TUN_ADDR",
+  "client1_tun_addr": "$CLIENT1_TUN_ADDR",
+  "client2_tun_addr": "$CLIENT2_TUN_ADDR",
+  "uftp_group": "$UFTP_GROUP",
+  "uftp_private_group": "$UFTP_PRIVATE_GROUP",
+  "uftp_port": $UFTP_PORT,
+  "http_host": "$HTTP_HOST",
+  "http_port": $HTTP_PORT,
+  "feedback_window_period_ms": $FEEDBACK_WINDOW_PERIOD_MS,
+  "feedback_window_duration_ms": $FEEDBACK_WINDOW_DURATION_MS,
+  "downlink_pause_threshold_bytes": 131072,
+  "downlink_resume_threshold_bytes": 65536,
+  "downlink_queue_packets_limit": 64,
+  "uplink_pause_threshold_bytes": 131072,
+  "uplink_resume_threshold_bytes": 65536,
+  "uplink_queue_packets_limit": 64,
+  "smoke_cycle_count": $SMOKE_CYCLE_COUNT,
+  "smoke_io_timeout_seconds": $SMOKE_IO_TIMEOUT_SECONDS,
+  "smoke_cycle_deadline_seconds": $SMOKE_CYCLE_DEADLINE_SECONDS,
+  "smoke_timeout_seconds": $SMOKE_TIMEOUT_SECONDS,
+  "runtime_timeout_seconds": $RUNTIME_TIMEOUT_SECONDS,
+  "io_timeout_seconds": $IO_TIMEOUT_SECONDS,
+  "stop_cleanup_timeout_seconds": $STOP_CLEANUP_TIMEOUT_SECONDS,
+  "rounds": $ROUNDS,
+  "artifact_size_bytes": $INPUT_SIZE_BYTES,
+  "initial_model_path": "$INITIAL_MODEL_PATH",
+  "client1_update_template_path": "$CLIENT1_UPDATE_TEMPLATE_PATH",
+  "client2_update_template_path": "$CLIENT2_UPDATE_TEMPLATE_PATH"
+}
+EOF
     python3 "$SCRIPT_DIR/issue41_envelope.py" init \
         --archive-dir "$ARCHIVE_DIR" \
         --run-id "$RUN_ID" \
         --branch "$BRANCH" \
         --commit "$(git -C "$PROJECT_ROOT" rev-parse HEAD 2>/dev/null || echo '')" \
-        --mode "${ISSUE41_MODE:-formal}" || die "运行包络初始化失败"
+        --mode "${ISSUE41_MODE:-formal}" \
+        --config-json "$cfg_tmp" || { rm -f "$cfg_tmp"; die "运行包络初始化失败"; }
+    rm -f "$cfg_tmp"
 }
 
 record_preflight_failure() {
@@ -115,7 +167,29 @@ record_preflight_failure() {
         --reason "$reason" \
         --last-successful-layer "$last_layer" >/dev/null 2>&1 || true
     cmd_stop_all 2>/dev/null || true
+    cmd_collect 2>/dev/null || true
+    cmd_summary 2>/dev/null || true
     die "preflight 失败 [$layer / $category]：$reason"
+}
+
+record_stage_failure() {
+    local partition="$1" category="$2" reason="$3" last_layer="${4:-}"
+    local fail_json="$ARCHIVE_DIR/$partition/failure_info.json"
+    mkdir -p "$(dirname "$fail_json")"
+    cat > "$fail_json" <<EOF
+{"schema_version":1,"status":"failed","partition":"$partition","category":"$category","reason":"$reason","last_successful_layer":"$last_layer","run_id":"$RUN_ID"}
+EOF
+    python3 "$SCRIPT_DIR/issue41_envelope.py" record-stage-failure \
+        --archive-dir "$ARCHIVE_DIR" \
+        --partition-name "$partition" \
+        --json-file "$fail_json" \
+        --category "$category" \
+        --reason "$reason" \
+        --last-successful-layer "$last_layer" \
+        --first-failing-layer "$partition" >/dev/null 2>&1 || true
+    cmd_stop_all 2>/dev/null || true
+    cmd_collect 2>/dev/null || true
+    cmd_summary 2>/dev/null || true
 }
 
 client_ssh() {
@@ -418,7 +492,7 @@ write_issue41_configs() {
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
@@ -431,7 +505,7 @@ EOF
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface","--uplink-pause-threshold-bytes","131072","--uplink-resume-threshold-bytes","65536","--uplink-queue-packets-limit","64","--queue-summary-file","$work_dir/client${node_id}_queue_summary.json"]}
+{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface","--uplink-pause-threshold-bytes","131072","--uplink-resume-threshold-bytes","65536","--uplink-queue-packets-limit","64","--queue-summary-file","$work_dir/client${node_id}_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"node_id":$node_id,"update_template_path":"$update_template_path","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"training_delay_ms":$delay,"result_path":"$result"}
@@ -444,6 +518,24 @@ EOF
         ssh -o BatchMode=yes "$ssh_target" "sudo install -m 0644 /tmp/issue41-fl.json /etc/wfb-ng/issue41/fl-client.json && sudo install -m 0644 /tmp/issue41-algorithm.json /etc/wfb-ng/issue41/client-algorithm.json && printf '[Service]\nRestart=no\nLogRateLimitIntervalSec=0\nExecStart=\nExecStart=/usr/bin/wfb-fl-client --config /etc/wfb-ng/issue41/fl-client.json --algorithm $algorithm --algorithm-config /etc/wfb-ng/issue41/client-algorithm.json\n' | sudo tee /etc/systemd/system/wfb-fl-client.service.d/issue41.conf >/dev/null"
     fi
     rm -rf "$tmp"
+}
+
+cmd_verify_config_equivalence() {
+    log_info "执行角色服务与数据面 Gate 严格链路配置等价性比较..."
+    mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
+    write_issue41_configs server
+    write_issue41_configs client1
+    write_issue41_configs client2
+
+    python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
+        --server-fl /etc/wfb-ng/issue41/fl-server.json \
+        --client1-fl /tmp/issue41-fl-client1.json \
+        --client2-fl /tmp/issue41-fl-client2.json \
+        --out "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" || {
+            record_stage_failure "formal_runtime_loop" "implementation" "角色服务解析后配置与数据面 Gate 不等价" "pre_runtime_smoke"
+            die "角色服务解析后配置与数据面 Gate 不等价"
+        }
+    log_ok "角色服务解析后链路配置与数据面 Gate 严格等价。"
 }
 
 smoke_dir() { printf '/var/tmp/wfb-ng-issue41-smoke/%s' "$1"; }
@@ -1184,10 +1276,24 @@ with open(os.path.join(archive_dir, 'failed.json'), 'w', encoding='utf-8') as fh
     json.dump(failed_summary, fh, indent=2)
 PY
 
-    python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
+    local fail_cat fail_reason last_layer first_layer
+    fail_cat="$(python3 -c "import json; print(json.load(open('$archive/gate_summary.json'))['failure_category'])" 2>/dev/null || echo 'link_capability')"
+    fail_reason="$(python3 -c "import json; print(json.load(open('$archive/gate_summary.json'))['failure_reason'])" 2>/dev/null || echo '数据面 Gate 验收失败')"
+    last_layer="$(python3 -c "import json; print(json.load(open('$archive/gate_summary.json'))['last_successful_layer'])" 2>/dev/null || echo 'orchestration')"
+    first_layer="$(python3 -c "import json; print(json.load(open('$archive/gate_summary.json'))['first_failing_layer'])" 2>/dev/null || echo 'pre_runtime_smoke')"
+
+    python3 "$SCRIPT_DIR/issue41_envelope.py" record-stage-failure \
         --archive-dir "$ARCHIVE_DIR" \
-        --name pre_runtime_smoke \
-        --json-file "$archive/gate_summary.json" 2>/dev/null || true
+        --partition-name pre_runtime_smoke \
+        --json-file "$archive/gate_summary.json" \
+        --category "$fail_cat" \
+        --reason "$fail_reason" \
+        --last-successful-layer "$last_layer" \
+        --first-failing-layer "$first_layer" >/dev/null 2>&1 || true
+
+    cmd_stop_all 2>/dev/null || true
+    cmd_collect 2>/dev/null || true
+    cmd_summary 2>/dev/null || true
 
     die "数据面 Gate 验收失败，已归档失败诊断，禁止正式 Runtime 启动！"
 }
@@ -1232,25 +1338,32 @@ cmd_run_runtime_loop() {
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2
-
-    mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
-    python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
-        --server-fl /etc/wfb-ng/issue41/fl-server.json \
-        --client1-fl /tmp/issue41-fl-client1.json \
-        --client2-fl /tmp/issue41-fl-client2.json \
-        --out "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" || die "角色服务解析后配置与数据面 Gate 不等价"
-    log_ok "角色服务解析后链路配置与数据面 Gate 严格等价。"
+    if [ ! -f "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" ]; then
+        cmd_verify_config_equivalence
+    fi
 
     sudo systemctl daemon-reload
     for role in client1 client2; do
         remote "$role" "sudo systemctl daemon-reload"
-        wait_remote_service_ready "$role" wfb-fl-client.service
-        assert_remote_service_active "$role" wfb-fl-client.service
+        wait_remote_service_ready "$role" wfb-fl-client.service || {
+            record_stage_failure "formal_runtime_loop" "implementation" "$role 角色服务就绪超时" "pre_runtime_smoke"
+            die "$role 角色服务就绪超时"
+        }
+        assert_remote_service_active "$role" wfb-fl-client.service || {
+            record_stage_failure "formal_runtime_loop" "implementation" "$role 角色服务未激活" "pre_runtime_smoke"
+            die "$role 角色服务未激活"
+        }
     done
-    sudo systemctl restart wfb-fl-server.service
+    sudo systemctl restart wfb-fl-server.service || {
+        record_stage_failure "formal_runtime_loop" "implementation" "server 角色服务启动失败" "pre_runtime_smoke"
+        die "server 角色服务启动失败"
+    }
     assert_runtime_uftp_routes
     capture_runtime_routes
-    wait_runtime_results
+    wait_runtime_results || {
+        record_stage_failure "formal_runtime_loop" "implementation" "Runtime 结果超时或未完成" "pre_runtime_smoke"
+        die "Runtime 结果超时或未完成"
+    }
 
     log_info "记录三角色服务运行 MainPID 以备生命周期 no-overlap 验证..."
     mkdir -p "$ARCHIVE_DIR/lifecycle"
@@ -1266,9 +1379,15 @@ EOF
     for role in client1 client2; do
         remote "$role" "sudo systemctl stop wfb-fl-client.service || true"
     done
-    wait_local_issue41_cleanup || die "server 角色服务受控停止后清理超时"
+    wait_local_issue41_cleanup || {
+        record_stage_failure "formal_runtime_loop" "implementation" "server 角色服务受控停止后清理超时" "pre_runtime_smoke"
+        die "server 角色服务受控停止后清理超时"
+    }
     for role in client1 client2; do
-        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role 角色服务受控停止后清理超时"
+        wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || {
+            record_stage_failure "formal_runtime_loop" "implementation" "$role 角色服务受控停止后清理超时" "pre_runtime_smoke"
+            die "$role 角色服务受控停止后清理超时"
+        }
     done
     cat > "$ARCHIVE_DIR/formal_runtime_loop/controlled_stop.json" <<EOF
 {"schema_version":1,"status":"passed","server_stopped":true,"client1_stopped":true,"client2_stopped":true,"cleaned":true}
@@ -1287,7 +1406,10 @@ cmd_lifecycle_stop_restart() {
         --client1-ssh "$(client_ssh client1)" \
         --client2-ssh "$(client_ssh client2)" \
         --initial-pids "$ARCHIVE_DIR/lifecycle/initial_pids.json" \
-        --timeout "$STOP_CLEANUP_TIMEOUT_SECONDS" || die "三角色服务 stop/restart 及资源生命周期审计未通过"
+        --timeout "$STOP_CLEANUP_TIMEOUT_SECONDS" || {
+            record_stage_failure "lifecycle" "implementation" "三角色服务 stop/restart 及资源生命周期审计未通过" "formal_runtime_loop"
+            die "三角色服务 stop/restart 及资源生命周期审计未通过"
+        }
     if [ -f "$ARCHIVE_DIR/envelope.json" ]; then
         python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
             --archive-dir "$ARCHIVE_DIR" \
@@ -1393,6 +1515,17 @@ archive_dir, route_evidence = sys.argv[1:]
 with open(os.path.join(archive_dir, 'formal-runtime-summary.json'), encoding='utf-8') as fh:
     formal = json.load(fh)
 
+preflight_res_path = os.path.join(archive_dir, 'orchestration', 'preflight_result.json')
+orch_status = 'passed'
+orch_reason = None
+orch_category = None
+if os.path.isfile(preflight_res_path):
+    with open(preflight_res_path, 'r', encoding='utf-8') as pf:
+        p_res = json.load(pf)
+        orch_status = p_res.get('status', 'passed')
+        orch_reason = p_res.get('failure_reason')
+        orch_category = p_res.get('failure_category')
+
 smoke_gate_path = os.path.join(archive_dir, 'pre_runtime_smoke', 'gate_summary.json')
 passed_marker_path = os.path.join(archive_dir, 'pre_runtime_smoke', 'passed.json')
 if os.path.isfile(smoke_gate_path):
@@ -1402,28 +1535,51 @@ elif os.path.isfile(passed_marker_path):
     with open(passed_marker_path, 'r', encoding='utf-8') as sf:
         smoke_gate = json.load(sf)
 else:
-    smoke_gate = {'status': 'failed', 'reason': 'gate_summary.json 缺失'}
+    if orch_status != 'passed':
+        smoke_gate = {'status': 'skipped', 'reason': 'preflight 检查未通过，跳过数据面 Gate'}
+    else:
+        smoke_gate = {'status': 'failed', 'reason': 'gate_summary.json 缺失'}
+
+if smoke_gate.get('status') != 'passed' and not os.path.isfile(os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json')):
+    formal['status'] = 'skipped'
+    formal['reason'] = '前序阶段未通过，formal_runtime_loop 跳过'
 
 lifecycle_path = os.path.join(archive_dir, 'lifecycle', 'lifecycle_summary.json')
 if os.path.isfile(lifecycle_path):
     with open(lifecycle_path, 'r', encoding='utf-8') as lf:
         lifecycle_data = json.load(lf)
 else:
-    lifecycle_data = {'status': 'failed', 'reason': 'lifecycle_summary.json 缺失'}
+    if formal.get('status') != 'passed' or smoke_gate.get('status') != 'passed' or orch_status != 'passed':
+        lifecycle_data = {'status': 'skipped', 'reason': '前序阶段未通过，lifecycle 跳过'}
+    else:
+        lifecycle_data = {'status': 'failed', 'reason': 'lifecycle_summary.json 缺失'}
 
-status = 'passed' if (smoke_gate.get('status') == 'passed' and
+status = 'passed' if (orch_status == 'passed' and
+                     smoke_gate.get('status') == 'passed' and
                      formal.get('status') == 'passed' and
                      lifecycle_data.get('status') == 'passed') else 'failed'
+category = None
 reason = formal.get('reason', '')
 if status != 'passed':
-    if smoke_gate.get('status') != 'passed':
+    if orch_status != 'passed':
+        reason = orch_reason or 'preflight 检查未通过'
+        category = orch_category or 'environment'
+    elif smoke_gate.get('status') != 'passed':
         reason = smoke_gate.get('reason', '数据面 Gate 前置条件未通过')
+        category = smoke_gate.get('failure_category', 'link_capability')
     elif formal.get('status') != 'passed':
         reason = formal.get('reason', '正式一轮 Runtime 闭环未通过')
+        category = formal.get('failure_category', 'implementation')
     elif lifecycle_data.get('status') != 'passed':
         reason = lifecycle_data.get('reason', '生命周期 stop/restart 审计未通过')
+        category = lifecycle_data.get('failure_category', 'implementation')
     else:
         reason = '存在未通过的阶段'
+        category = 'implementation'
+
+conclusion = {'status': status, 'reason': reason}
+if category:
+    conclusion['category'] = category
 
 envelope_path = os.path.join(archive_dir, 'envelope.json')
 run_id = os.path.basename(archive_dir)
@@ -1434,7 +1590,7 @@ if os.path.isfile(envelope_path):
 summary = {
     'schema_version': 1,
     'run_id': run_id,
-    'orchestration': {'status': 'passed', 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
+    'orchestration': {'status': orch_status, 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
     'pre_runtime_smoke': smoke_gate,
     'formal_runtime_loop': {
         'status': formal['status'],
@@ -1455,18 +1611,20 @@ summary = {
         'controlled_stop': formal.get('controlled_stop', {'status': 'passed'}),
     },
     'lifecycle': lifecycle_data,
-    'conclusion': {'status': status, 'reason': reason},
+    'conclusion': conclusion,
 }
 with open(os.path.join(archive_dir, 'issue41_summary.json'), 'w', encoding='utf-8') as fh:
     json.dump(summary, fh, ensure_ascii=True, separators=(',', ':'))
 PY
     status="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['conclusion']['status'])" "$ARCHIVE_DIR/issue41_summary.json")"
     reason="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['conclusion']['reason'])" "$ARCHIVE_DIR/issue41_summary.json")"
+    category="$(python3 -c "import json, sys; print(json.load(open(sys.argv[1], encoding='utf-8'))['conclusion'].get('category', 'none'))" "$ARCHIVE_DIR/issue41_summary.json")"
     cat > "$ARCHIVE_DIR/result.md" <<EOF
 # issue41 真实硬件 FL Runtime 闭环结果
 
 - conclusion: $status
 - reason: $reason
+- failure_category: $category
 - archive: $ARCHIVE_DIR
 EOF
     python3 "$SCRIPT_DIR/issue41_validate_archive.py" "$ARCHIVE_DIR"
@@ -1479,6 +1637,7 @@ cmd_run_all() {
     cmd_preflight
     cmd_install
     cmd_smoke_gate
+    cmd_verify_config_equivalence
     cmd_run_runtime_loop
     cmd_lifecycle_stop_restart
     cmd_collect
@@ -1492,6 +1651,7 @@ case "$cmd" in
     install) cmd_install ;;
     generate-fixtures) cmd_generate_fixtures ;;
     smoke-gate|smoke) cmd_smoke_gate ;;
+    verify-config-equivalence) cmd_verify_config_equivalence ;;
     run-runtime-loop) cmd_run_runtime_loop ;;
     lifecycle-stop-restart) cmd_lifecycle_stop_restart ;;
     collect) cmd_collect ;;

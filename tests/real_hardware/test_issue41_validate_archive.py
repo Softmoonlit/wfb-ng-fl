@@ -461,6 +461,201 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         errors = validate_archive(self.root)
         self.assertTrue(any('存在未通过分区时 conclusion 不能 passed' in error for error in errors))
 
+    def test_rejects_diagnostic_mode_when_passed(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'diagnostic',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 180,
+                'io_timeout_seconds': 120,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('diagnostic' in error or '非 formal 模式' in error for error in errors))
+
+    def test_rejects_candidate_feedback_start_immediately(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['link_args'] = ['--feedback-window-start-immediately']
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('--feedback-window-start-immediately' in error for error in errors))
+
+    def test_rejects_mismatched_run_id_in_smoke(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-main'
+        summary['pre_runtime_smoke']['run_id'] = 'run-other'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('pre_runtime_smoke 与 summary 的 run_id 不一致' in error for error in errors))
+
+    def test_rejects_mismatched_run_id_in_lifecycle(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-main'
+        summary['lifecycle']['run_id'] = 'run-other'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('lifecycle 与 summary 的 run_id 不一致' in error for error in errors))
+
+    def test_rejects_overwritten_archive(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'overwritten': True,
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('覆盖' in error for error in errors))
+
+    def test_rejects_runtime_passed_when_gate_failed(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('failed')
+        summary['pre_runtime_smoke']['status'] = 'failed'
+        summary['pre_runtime_smoke']['reason'] = 'Gate 周期 1 丢包'
+        summary['formal_runtime_loop']['status'] = 'passed'
+        summary['conclusion']['reason'] = 'Gate 周期 1 丢包'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('Gate 未通过' in error for error in errors))
+
+    def test_rejects_lifecycle_passed_when_runtime_failed(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('failed')
+        summary['formal_runtime_loop']['status'] = 'failed'
+        summary['conclusion']['reason'] = 'Runtime 失败'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('formal_runtime_loop 未通过时 lifecycle 不得标记为 passed' in error for error in errors))
+
+    def test_rejects_missing_partitions(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        for key in ('orchestration', 'pre_runtime_smoke', 'formal_runtime_loop', 'lifecycle', 'conclusion'):
+            summary = self.complete_summary('passed')
+            del summary[key]
+            self.write_json('issue41_summary.json', summary)
+            self.write_text('result.md', '# result\n')
+            errors = validate_archive(self.root)
+            self.assertTrue(any('缺少分区' in error and key in error for error in errors))
+
+
+    def test_envelope_requires_deadlines_in_resolved_config(self):
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'channel': 157,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('deadline' in error.lower() or '超时' in error for error in errors))
+
+    def test_accepts_valid_failed_archive_preserving_completed_stages(self):
+        self.write_smoke_marker('run-123')
+        summary = self.complete_summary('failed')
+        summary['formal_runtime_loop'] = {
+            'status': 'failed',
+            'reason': 'client2 提交超时',
+        }
+        summary['lifecycle'] = {
+            'status': 'skipped',
+            'reason': '前序阶段失败，跳过生命周期测试',
+        }
+        summary['conclusion'] = {
+            'status': 'failed',
+            'reason': 'client2 提交超时',
+            'category': 'implementation',
+        }
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 180,
+                'io_timeout_seconds': 120,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertEqual([], errors)
+
+
     def smoke_gate_evidence(self):
         cycles = [self.cycle_evidence(i) for i in (1, 2, 3)]
         return {
@@ -623,6 +818,8 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'route_evidence': [
                     os.path.join(self.root, 'route-%d.txt' % index)
                     for index in range(12)],
+                'config_equivalence': {'status': 'passed', 'errors': []},
+                'controlled_stop': {'status': 'passed', 'server_stopped': True, 'client1_stopped': True, 'client2_stopped': True, 'cleaned': True},
             },
             'lifecycle': self.lifecycle_evidence(),
             'conclusion': {
@@ -719,12 +916,12 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'server_wait_returned_node_ids': [1, 2],
         }
 
-    def write_smoke_marker(self):
+    def write_smoke_marker(self, run_id='test-run'):
         marker = {
             'schema_version': 1,
             'gate_type': 'three_cycle_bidirectional',
             'status': 'passed',
-            'run_id': 'test-run',
+            'run_id': run_id,
             'data_plane': '10.80.0.0/24',
         }
         self.write_json('pre_runtime_smoke/passed.json', marker)

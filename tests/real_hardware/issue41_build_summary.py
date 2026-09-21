@@ -67,7 +67,13 @@ def main(argv=None):
             'cleaned': True,
         }
 
-    rounds = _build_rounds(results, observations, archive_dir, errors)
+    env_path = os.path.join(archive_dir, 'envelope.json')
+    env_meta = _read_json(env_path, []) if os.path.isfile(env_path) else {}
+    resolved_cfg = env_meta.get('resolved_config', {}) if isinstance(env_meta, dict) else {}
+    round_deadline = resolved_cfg.get('runtime_timeout_seconds', 180)
+    io_timeout = resolved_cfg.get('io_timeout_seconds', 120)
+
+    rounds = _build_rounds(results, observations, archive_dir, errors, round_deadline, io_timeout)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
     complete_nodes = [1, 2] if all(
@@ -84,6 +90,8 @@ def main(argv=None):
             'placeholder_training': 'template_copy',
             'placeholder_aggregation': 'model_copy',
             'update_template_sha256_by_node': template_hashes,
+            'round_deadline_seconds': round_deadline,
+            'io_timeout_seconds': io_timeout,
         },
         'rounds': rounds,
         'server_wait_for_updates_returned_node_ids': complete_nodes,
@@ -109,7 +117,7 @@ def _template_hashes(results, errors):
     return hashes
 
 
-def _build_rounds(results, observations, archive_dir, errors):
+def _build_rounds(results, observations, archive_dir, errors, round_deadline=180, io_timeout=120):
     server = results.get('server')
     clients = {1: results.get('client1'), 2: results.get('client2')}
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
@@ -229,6 +237,8 @@ def _build_rounds(results, observations, archive_dir, errors):
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
             'telemetry': _build_telemetry(archive_dir, errors),
+            'deadline_seconds': round_deadline,
+            'io_timeout_seconds': io_timeout,
         })
     return output
 

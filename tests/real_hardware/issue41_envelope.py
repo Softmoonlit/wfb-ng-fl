@@ -129,6 +129,11 @@ class RunEnvelope:
         if os.path.exists(self.archive_dir):
             raise FileExistsError(f"归档目录已存在，不可覆盖：{self.archive_dir}")
 
+        if self.resolved_config:
+            raw_cfg = json.dumps(self.resolved_config)
+            if '--feedback-window-start-immediately' in raw_cfg or self.resolved_config.get('feedback_window_start_immediately') is True:
+                raise ValueError("严禁使用 --feedback-window-start-immediately 候选行为")
+
         for subdir in ('orchestration', 'pre_runtime_smoke', 'formal_runtime_loop',
                        'lifecycle', 'raw'):
             os.makedirs(os.path.join(self.archive_dir, subdir), exist_ok=True)
@@ -680,6 +685,16 @@ def main(argv=None):
     part_parser.add_argument('--name', required=True)
     part_parser.add_argument('--json-file', required=True)
 
+    # record-stage-failure
+    stage_fail_parser = subparsers.add_parser('record-stage-failure')
+    stage_fail_parser.add_argument('--archive-dir', required=True)
+    stage_fail_parser.add_argument('--partition-name', required=True)
+    stage_fail_parser.add_argument('--json-file', required=True)
+    stage_fail_parser.add_argument('--category', choices=FAILURE_CATEGORIES, required=True)
+    stage_fail_parser.add_argument('--reason', required=True)
+    stage_fail_parser.add_argument('--last-successful-layer', default=None)
+    stage_fail_parser.add_argument('--first-failing-layer', default=None)
+
     args = parser.parse_args(argv)
 
     if args.command == 'init':
@@ -786,6 +801,48 @@ def main(argv=None):
             part_data = json.load(fh)
         envelope.append_partition(args.name, part_data)
         print(f"PARTITION_APPENDED: {args.name}")
+        return 0
+
+    if args.command == 'record-stage-failure':
+        archive_dir = os.path.abspath(args.archive_dir)
+        env_path = os.path.join(archive_dir, 'envelope.json')
+        env_meta = {}
+        if os.path.isfile(env_path):
+            with open(env_path, 'r', encoding='utf-8') as fh:
+                env_meta = json.load(fh)
+        envelope = RunEnvelope(
+            run_id=env_meta.get('run_id', os.path.basename(archive_dir)),
+            archive_dir=archive_dir,
+            branch=env_meta.get('branch'),
+            commit=env_meta.get('commit'),
+            mode=env_meta.get('mode', 'formal'),
+            resolved_config=env_meta.get('resolved_config', {}),
+        )
+        topo_path = os.path.join(archive_dir, 'orchestration', 'topology.json')
+        if os.path.isfile(topo_path):
+            with open(topo_path, 'r', encoding='utf-8') as fh:
+                envelope.topology = json.load(fh)
+        summary_path = os.path.join(archive_dir, 'issue41_summary.json')
+        if os.path.isfile(summary_path):
+            with open(summary_path, 'r', encoding='utf-8') as fh:
+                existing_summary = json.load(fh)
+                envelope.partitions = {
+                    k: v for k, v in existing_summary.items()
+                    if k in ('orchestration', 'pre_runtime_smoke', 'formal_runtime_loop', 'lifecycle')
+                }
+        part_data = {}
+        if os.path.isfile(args.json_file):
+            with open(args.json_file, 'r', encoding='utf-8') as fh:
+                part_data = json.load(fh)
+        envelope.partitions[args.partition_name] = part_data
+        envelope._write_summary_and_result(
+            conclusion_status='failed',
+            reason=args.reason,
+            category=args.category,
+            last_successful=args.last_successful_layer,
+            first_failing=args.first_failing_layer or args.partition_name,
+        )
+        print(f"STAGE_FAILURE_RECORDED: {args.partition_name} ({args.category}): {args.reason}")
         return 0
 
     return 0

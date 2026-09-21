@@ -155,6 +155,8 @@ def parse_link_args(args: List[str]) -> Dict[str, Any]:
         'downlink_stream': None,
         'fec_k': None,
         'fec_n': None,
+        'channel': None,
+        'channel_width': None,
         'radio_bandwidth': None,
         'radio_mcs_index': None,
         'radio_short_gi': False,
@@ -177,6 +179,7 @@ def parse_link_args(args: List[str]) -> Dict[str, Any]:
     }
     int_keys = {
         'node_id', 'link_id', 'uplink_stream', 'downlink_stream',
+        'channel',
         'fec_k', 'fec_n', 'radio_bandwidth', 'radio_mcs_index',
         'grant_duration_ms', 'guard_interval_ms',
         'downlink_pause_threshold_bytes', 'downlink_resume_threshold_bytes',
