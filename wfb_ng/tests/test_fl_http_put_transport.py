@@ -55,6 +55,12 @@ class OneShotHttpPeer(object):
                     time.sleep(0.2)
                     self.body = remainder
                     return
+                if self.behavior == 'reject_partial_body':
+                    connection.sendall(
+                        b'HTTP/1.1 409 Conflict\r\nContent-Length: 10\r\n'
+                        b'Connection: close\r\n\r\n{')
+                    time.sleep(0.2)
+                    return
                 if self.behavior == 'hold_body':
                     connection.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 4096)
                     connection.sendall(b'HTTP/1.1 100 Continue\r\n\r\n')
@@ -149,7 +155,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         }, json.loads(body.decode('utf-8')))
         self.assertEqual([], self.failures)
 
-    def test_installing_new_round_does_not_release_accepted_old_round_body(self):
+    def test_installing_new_round_keeps_accepted_upload_contexts_independent(self):
         old_body = b'old-round-update'
         old_sock, old_response = self.send_headers(
             self.make_request(self.round_id, 1, old_body))
@@ -164,23 +170,31 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
             lambda *args: self.failures.append(args))
         new_sock, new_response = self.send_headers(
             self.make_request(new_round_id, 2, b'new-round-update'))
-        status, _, body = read_response(new_response)
+        self.addCleanup(new_response.close)
+        self.addCleanup(new_sock.close)
+        self.assertEqual(100, read_response(new_response)[0])
+
+        old_sock.sendall(b'old-round-error!')
+        status, _, body = read_response(old_response)
+        self.assertEqual(422, status)
+        self.assertEqual(
+            'digest_mismatch', json.loads(body.decode('utf-8'))['error_code'])
+        self.assertEqual([
+            (self.round_id, 1, 'digest_mismatch', 'update 摘要不匹配'),
+        ], self.failures)
+
+        new_sock.sendall(b'new-round-update')
+        self.assertEqual(201, read_response(new_response)[0])
+
+        duplicate_sock, duplicate_response = self.send_headers(
+            self.make_request(new_round_id, 2, b'accepted'))
+        self.addCleanup(duplicate_response.close)
+        self.addCleanup(duplicate_sock.close)
+        status, _, body = read_response(duplicate_response)
         self.assertEqual(409, status)
         self.assertEqual(
-            'upload_in_progress', json.loads(body.decode('utf-8'))['error_code'])
-        new_response.close()
-        new_sock.close()
-
-        old_sock.sendall(old_body)
-        self.assertEqual(201, read_response(old_response)[0])
-
-        accepted_sock, accepted_response = self.send_headers(
-            self.make_request(new_round_id, 2, b'accepted'))
-        self.addCleanup(accepted_response.close)
-        self.addCleanup(accepted_sock.close)
-        self.assertEqual(100, read_response(accepted_response)[0])
-        accepted_sock.sendall(b'accepted')
-        self.assertEqual(201, read_response(accepted_response)[0])
+            'update_already_submitted',
+            json.loads(body.decode('utf-8'))['error_code'])
 
     def test_accepted_storage_failure_returns_507_and_reports_runtime_failure(self):
         body = b'update'
@@ -314,7 +328,7 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         self.assertEqual(self.transport.round_id, raised.exception.round_id)
         self.assertEqual(1, raised.exception.node_id)
 
-    def test_only_one_body_is_accepted_and_success_is_streamed_to_final_files(self):
+    def test_different_nodes_overlap_and_same_node_competition_is_rejected(self):
         first_body = b'node-1-update' * 50
         first_request = self.make_request(self.round_id, 1, first_body)
         first_sock, first_response = self.send_headers(first_request)
@@ -322,14 +336,21 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         self.addCleanup(first_sock.close)
         self.assertEqual(100, read_response(first_response)[0])
 
-        second_request = self.make_request(self.round_id, 2, b'node-2-update')
-        second_sock, second_response = self.send_headers(second_request)
-        status, _, body = read_response(second_response)
+        second_body = b'node-2-update'
+        second_sock, second_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        competing_sock, competing_response = self.send_headers(first_request)
+        status, _, body = read_response(competing_response)
         self.assertEqual(409, status)
         self.assertEqual(
-            'upload_in_progress', json.loads(body.decode('utf-8'))['error_code'])
-        second_response.close()
-        second_sock.close()
+            'upload_in_progress',
+            json.loads(body.decode('utf-8'))['error_code'])
+        competing_response.close()
+        competing_sock.close()
 
         first_sock.sendall(first_body)
         status, headers, body = read_response(first_response)
@@ -339,21 +360,232 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         first_response.close()
         first_sock.close()
 
-        update_dir = os.path.join(self.round_dir, 'updates', '1')
-        with open(os.path.join(update_dir, 'update.bin'), 'rb') as fh:
-            self.assertEqual(first_body, fh.read())
-        with open(os.path.join(update_dir, 'update.manifest.json'),
-                  'r', encoding='utf-8') as fh:
-            manifest = json.load(fh)
-        self.assertEqual({
-            'schema_version': 1,
-            'artifact_type': 'update',
-            'round_id': self.round_id,
-            'node_id': 1,
-            'size_bytes': len(first_body),
-            'sha256': hashlib.sha256(first_body).hexdigest(),
-        }, manifest)
+        second_sock.sendall(second_body)
+        self.assertEqual(201, read_response(second_response)[0])
+
+        for node_id, update_body in ((1, first_body), (2, second_body)):
+            update_dir = os.path.join(self.round_dir, 'updates', str(node_id))
+            with open(os.path.join(update_dir, 'update.bin'), 'rb') as fh:
+                self.assertEqual(update_body, fh.read())
+            with open(os.path.join(update_dir, 'update.manifest.json'),
+                      'r', encoding='utf-8') as fh:
+                manifest = json.load(fh)
+            self.assertEqual({
+                'schema_version': 1,
+                'artifact_type': 'update',
+                'round_id': self.round_id,
+                'node_id': node_id,
+                'size_bytes': len(update_body),
+                'sha256': hashlib.sha256(update_body).hexdigest(),
+            }, manifest)
         self.assertEqual([], self.failures)
+
+    def test_live_events_report_upload_boundaries_and_client_phases(self):
+        server_events = EventBuffer()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=server_events, role_node_id=9)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'observed-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'observed-update'
+        update_path = self.write_update('observed-update.bin', body)
+        client_events = EventBuffer()
+        client = ClientTransport(
+            os.path.join(self.root, 'observed-client'), 1, 9000,
+            server.http_address, live_observation=True,
+            observation_writer=client_events)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        server_values = server_events.wait_for_predicate(
+            lambda vals: len(vals) >= 5)
+        self.assertEqual(
+            ['upload_accepted', 'active_uploads', 'upload_committed',
+             'response_write_completed', 'active_uploads'],
+            [value['event'] for value in server_values])
+        self.assertEqual([1], server_values[1]['active_node_ids'])
+        self.assertEqual([], server_values[-1]['active_node_ids'])
+        self.assertTrue(all(value['role'] == 'server' for value in server_values))
+        self.assertTrue(all(value['role_node_id'] == 9 for value in server_values))
+        self.assertTrue(all(value['round'] == round_id for value in server_values))
+        self.assertTrue(all(value['size_bytes'] == len(body) for value in server_values))
+        self.assertTrue(all(value['sha256'] == hashlib.sha256(body).hexdigest()
+                            for value in server_values))
+        self.assertEqual(
+            ['connect', 'continue', 'body', 'final_response'],
+            [value['phase'] for value in client_events.values()])
+        self.assertTrue(all(value['role'] == 'client'
+                            for value in client_events.values()))
+        self.assertTrue(all(value['node_id'] == 1
+                            for value in client_events.values()))
+
+    def test_live_events_capture_each_concurrent_active_set_snapshot(self):
+        events = EventBuffer()
+        server = ServerTransport(
+            (1, 2), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=events)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'concurrent-observed-round')
+        server.install_round(round_id, (1, 2), round_dir, 1024, lambda *args: None)
+        body_one = b'node-one'
+        body_two = b'node-two'
+        first_sock, first_response = self.send_headers(
+            self.make_request(round_id, 1, body_one), server.http_address)
+        self.addCleanup(first_response.close)
+        self.addCleanup(first_sock.close)
+        self.assertEqual(100, read_response(first_response)[0])
+        second_sock, second_response = self.send_headers(
+            self.make_request(round_id, 2, body_two), server.http_address)
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        first_sock.sendall(body_one)
+        self.assertEqual(201, read_response(first_response)[0])
+        second_sock.sendall(body_two)
+        self.assertEqual(201, read_response(second_response)[0])
+
+        events.wait_for_predicate(
+            lambda vals: any(
+                v.get('event') == 'active_uploads' and v.get('active_node_ids') == []
+                for v in vals))
+        self.assertEqual(
+            [[1], [1, 2], [2], []],
+            [value['active_node_ids'] for value in events.values()
+             if value['event'] == 'active_uploads'])
+
+    def test_disabled_observation_writes_no_events(self):
+        events = EventBuffer()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, observation_writer=events)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'silent-observation-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'silent-observation-update'
+        update_path = self.write_update('silent-observation-update.bin', body)
+        client = ClientTransport(
+            os.path.join(self.root, 'silent-observation-client'), 1, 9000,
+            server.http_address, observation_writer=events)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        self.assertEqual([], events.lines)
+
+    def test_observation_write_failures_do_not_change_upload_result(self):
+        failing_writer = FailingWriter()
+        server = ServerTransport(
+            (1,), 3, 9000, http_port=0, live_observation=True,
+            observation_writer=failing_writer)
+        with mock.patch('wfb_ng.fl.transport.shutil.which', return_value='/bin/true'):
+            server.start()
+        self.addCleanup(server.close)
+        round_id = str(uuid.uuid4())
+        round_dir = os.path.join(self.root, 'failing-observation-round')
+        server.install_round(round_id, (1,), round_dir, 1024, lambda *args: None)
+        body = b'observation-failure-update'
+        update_path = self.write_update('observation-failure-update.bin', body)
+        client = ClientTransport(
+            os.path.join(self.root, 'failing-observation-client'), 1, 9000,
+            server.http_address, live_observation=True,
+            observation_writer=failing_writer)
+
+        client.submit_update(
+            round_id, 1, update_path, len(body),
+            hashlib.sha256(body).hexdigest())
+
+        with open(os.path.join(
+                round_dir, 'updates', '1', 'update.manifest.json'),
+                'r', encoding='utf-8') as fh:
+            self.assertEqual(hashlib.sha256(body).hexdigest(), json.load(fh)['sha256'])
+
+    def test_client_transports_submit_different_nodes(self):
+        update_one = self.write_update('client-node-1.bin', b'client-node-1')
+        update_two = self.write_update('client-node-2.bin', b'client-node-2')
+        clients = (
+            (1, update_one, b'client-node-1'),
+            (2, update_two, b'client-node-2'),
+        )
+        barrier = threading.Barrier(len(clients) + 1)
+        failures = []
+
+        def submit(node_id, update_path, body):
+            client = ClientTransport(
+                os.path.join(self.root, 'client-%d' % node_id), node_id, 9000,
+                self.transport.http_address, io_timeout=2)
+            try:
+                barrier.wait()
+                client.submit_update(
+                    self.round_id, node_id, update_path, len(body),
+                    hashlib.sha256(body).hexdigest())
+            except BaseException as exc:
+                failures.append(exc)
+
+        threads = [threading.Thread(target=submit, args=client)
+                   for client in clients]
+        for thread in threads:
+            thread.start()
+        barrier.wait()
+        for thread in threads:
+            thread.join(2)
+            self.assertFalse(thread.is_alive())
+        self.assertEqual([], failures)
+        for node_id, _, body in clients:
+            with open(os.path.join(
+                    self.round_dir, 'updates', str(node_id), 'update.bin'),
+                    'rb') as fh:
+                self.assertEqual(body, fh.read())
+
+    def test_one_accepted_failure_does_not_cancel_another_node_upload(self):
+        first_sock, first_response = self.send_headers(
+            self.make_request(self.round_id, 1, b'expected-node-1'))
+        self.addCleanup(first_response.close)
+        self.addCleanup(first_sock.close)
+        self.assertEqual(100, read_response(first_response)[0])
+
+        second_body = b'node-2-update'
+        second_sock, second_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        self.addCleanup(second_response.close)
+        self.addCleanup(second_sock.close)
+        self.assertEqual(100, read_response(second_response)[0])
+
+        first_sock.sendall(b'corrupt-node-1!')
+        status, _, body = read_response(first_response)
+        self.assertEqual(422, status)
+        self.assertEqual(
+            'digest_mismatch', json.loads(body.decode('utf-8'))['error_code'])
+        self.assertEqual([
+            (self.round_id, 1, 'digest_mismatch', 'update 摘要不匹配'),
+        ], self.failures)
+
+        competing_sock, competing_response = self.send_headers(
+            self.make_request(self.round_id, 2, second_body))
+        status, _, body = read_response(competing_response)
+        self.assertEqual(409, status)
+        self.assertEqual(
+            'upload_in_progress',
+            json.loads(body.decode('utf-8'))['error_code'])
+        competing_response.close()
+        competing_sock.close()
+
+        second_sock.sendall(second_body)
+        self.assertEqual(201, read_response(second_response)[0])
+        self.assertTrue(os.path.isfile(os.path.join(
+            self.round_dir, 'updates', '2', 'update.manifest.json')))
 
     def write_update(self, name, body):
         update_path = os.path.join(self.root, name)
@@ -451,9 +683,11 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         update_path = os.path.join(self.root, 'timeout-update.bin')
         with open(update_path, 'wb') as fh:
             fh.write(body)
+        events = EventBuffer()
         client = ClientTransport(
             os.path.join(self.root, 'timeout-client'), 1, 9000,
-            peer.address, io_timeout=0.1)
+            peer.address, io_timeout=0.1, live_observation=True,
+            observation_writer=events)
 
         started = time.monotonic()
         with self.assertRaises(FLRuntimeError) as raised:
@@ -463,9 +697,35 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
 
         self.assertLess(time.monotonic() - started, 1)
         self.assertEqual('update_submit_failed', raised.exception.error_code)
+        self.assertIn('continue', raised.exception.error_message)
+        self.assertEqual('continue', events.values()[-1]['phase'])
+        self.assertEqual('timeout', events.values()[-1]['transport_outcome'])
         peer.wait()
         self.assertEqual(1, peer.connection_count)
         self.assertEqual(b'', peer.body)
+
+    def test_client_error_body_timeout_names_continue_phase(self):
+        peer = OneShotHttpPeer('reject_partial_body')
+        self.addCleanup(peer.close)
+        body = b'update-body'
+        update_path = self.write_update('partial-error-body.bin', body)
+        events = EventBuffer()
+        client = ClientTransport(
+            os.path.join(self.root, 'partial-error-body-client'), 1, 9000,
+            peer.address, io_timeout=0.05, live_observation=True,
+            observation_writer=events)
+
+        with self.assertRaises(FLRuntimeError) as raised:
+            client.submit_update(
+                self.round_id, 1, update_path, len(body),
+                hashlib.sha256(body).hexdigest())
+
+        self.assertEqual('update_submit_failed', raised.exception.error_code)
+        self.assertIn('continue', raised.exception.error_message)
+        self.assertEqual('continue', events.values()[-1]['phase'])
+        self.assertEqual('timeout', events.values()[-1]['transport_outcome'])
+        peer.wait()
+        self.assertEqual(1, peer.connection_count)
 
     def test_client_does_not_retry_when_final_response_is_lost(self):
         peer = OneShotHttpPeer('drop_final')
@@ -627,13 +887,55 @@ class V8HttpPutTransportTestCase(unittest.TestCase):
         headers.extend(extra_headers)
         return ('\r\n'.join(headers) + '\r\n\r\n').encode('ascii')
 
-    def send_headers(self, request):
-        sock = socket.create_connection(self.transport.http_address, timeout=2)
+    def send_headers(self, request, address=None):
+        sock = socket.create_connection(
+            self.transport.http_address if address is None else address, timeout=2)
         sock.settimeout(2)
         response = sock.makefile('rb')
         self.addCleanup(response.close)
         sock.sendall(request)
         return sock, response
+
+
+class FailingWriter(object):
+    def write(self, value):
+        raise OSError('observation unavailable')
+
+    def flush(self):
+        raise OSError('observation unavailable')
+
+
+class EventBuffer(object):
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._cond = threading.Condition(self._lock)
+        self.lines = []
+
+    def write(self, value):
+        with self._cond:
+            self.lines.append(value)
+            self._cond.notify_all()
+
+    def flush(self):
+        pass
+
+    def values(self):
+        with self._cond:
+            return [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                    for line in self.lines]
+
+    def wait_for_predicate(self, predicate, timeout=5.0):
+        deadline = time.monotonic() + timeout
+        with self._cond:
+            while True:
+                vals = [json.loads(line.removeprefix('WFB_FL_EVENT '))
+                        for line in self.lines]
+                if predicate(vals):
+                    return vals
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    return vals
+                self._cond.wait(remaining)
 
 
 def read_response(response):

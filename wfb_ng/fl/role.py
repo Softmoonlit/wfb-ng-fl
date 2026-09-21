@@ -13,8 +13,12 @@ def _as_tuple(value):
 
 class ServerRole(object):
     def __init__(self, work_dir, participant_node_id, participant_uftp_uid,
-                 server_uftp_uid, uftp_port, http_port,
-                 max_update_size_bytes, http_host='127.0.0.1'):
+                 server_uftp_uid, uftp_port, http_port, max_update_size_bytes,
+                 http_host='127.0.0.1', uftp_bind_host='127.0.0.1',
+                 uftp_multicast_host='127.0.0.1',
+                 uftp_private_multicast_host='239.255.0.1',
+                 live_observation=False, observation_path=None, io_timeout=10,
+                 role_node_id=None):
         participant_node_ids = _as_tuple(participant_node_id)
         participant_uftp_uids = _as_tuple(participant_uftp_uid)
         if len(participant_node_ids) != len(participant_uftp_uids):
@@ -28,6 +32,13 @@ class ServerRole(object):
             uftp_port=uftp_port,
             http_host=http_host,
             http_port=http_port,
+            uftp_bind_host=uftp_bind_host,
+            uftp_multicast_host=uftp_multicast_host,
+            uftp_private_multicast_host=uftp_private_multicast_host,
+            live_observation=live_observation,
+            observation_path=observation_path,
+            io_timeout=io_timeout,
+            role_node_id=role_node_id,
         )
         self.runtime = ServerRuntime(
             work_dir=work_dir,
@@ -73,12 +84,20 @@ class ServerRole(object):
 
 class ClientRole(object):
     def __init__(self, work_dir, node_id, uftp_uid, uftp_port,
-                 server_http_address, max_update_size_bytes):
+                 server_http_address, max_update_size_bytes,
+                 uftp_bind_host='127.0.0.1',
+                 uftp_multicast_host='127.0.0.1', live_observation=False,
+                 observation_path=None, io_timeout=10):
         self.transport = ClientTransport(
             work_dir=work_dir,
             uftp_uid=uftp_uid,
             uftp_port=uftp_port,
             server_http_address=server_http_address,
+            uftp_bind_host=uftp_bind_host,
+            uftp_multicast_host=uftp_multicast_host,
+            live_observation=live_observation,
+            observation_path=observation_path,
+            io_timeout=io_timeout,
         )
         self.runtime = ClientRuntime(
             work_dir=work_dir,

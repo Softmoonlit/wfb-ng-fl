@@ -1,15 +1,17 @@
-# 分流标签
+# 分流与完成状态
 
-这些技能内部使用五个标准分流角色；本文件将这些角色映射到本仓库实际使用的标签字符串。
+本仓库采用本地 Markdown 工作流，只使用以下五个状态：
 
-| 技能中的标签 | 本仓库中的标签 | 含义 |
-| --- | --- | --- |
-| `needs-triage` | `needs-triage` | 维护者需要评估该问题 |
-| `needs-info` | `needs-info` | 等待提单人补充信息 |
-| `ready-for-agent` | `ready-for-agent` | 规格已完整，可交给 AFK agent |
-| `ready-for-human` | `ready-for-human` | 需要人工实现 |
-| `wontfix` | `wontfix` | 不打算处理 |
+| 状态 | 含义 |
+| --- | --- |
+| `ready-for-agent` | 规格完整，可交给 AFK agent 执行 |
+| `ready-for-human` | 需要人工实现、判断或外部操作 |
+| `wontfix` | 不计划处理 |
+| `need-for-review` | 实现已完成，等待 code review |
+| `resolved` | 实现已完成，且 code review 已完成 |
 
-当技能提到某个分流角色时，使用右侧这一列的实际标签字符串。
+## triage skill 边界
 
-如果以后你修改了 GitHub 标签命名，只需要更新右侧这一列即可。
+本仓库不使用 `triage` skill 的 `needs-triage` 和 `needs-info` 状态，也不创建这两个标签。
+
+新任务应直接根据当前处理结果使用上述状态之一。实现完成后使用 `need-for-review`；code review 完成后使用 `resolved`。

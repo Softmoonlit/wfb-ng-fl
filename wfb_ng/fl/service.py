@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import importlib
+import ipaddress
 import json
 import os
 import shutil
@@ -18,14 +20,17 @@ from .role import ClientRole, ServerRole
 
 _COMMON_FIELDS = {
     'schema_version', 'role', 'work_dir', 'node_id', 'uftp_port',
-    'max_update_size_bytes', 'link_args',
+    'max_update_size_bytes', 'link_args', 'live_observation',
+    'observation_path', 'io_timeout_seconds', 'channel', 'channel_width',
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
-    'http_host', 'http_port',
+    'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
+    'uftp_private_multicast_host',
 }
 _CLIENT_FIELDS = {
-    'uftp_uid', 'server_http_host', 'server_http_port',
+    'uftp_uid', 'server_http_host', 'server_http_port', 'uftp_bind_host',
+    'uftp_multicast_host', 'uftp_private_multicast_host',
 }
 
 
@@ -86,10 +91,63 @@ class LinkProcess(object):
             process.wait()
 
 
+def _is_ipv4_multicast(host):
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return isinstance(address, ipaddress.IPv4Address) and address.is_multicast
+
+
+def _is_tun_ready(tun_path):
+    if not os.path.isdir(tun_path):
+        return False
+    flags_path = os.path.join(tun_path, 'flags')
+    if os.path.isfile(flags_path):
+        try:
+            with open(flags_path, 'r') as fh:
+                return bool(int(fh.read().strip(), 16) & 1)
+        except (OSError, ValueError):
+            return False
+    return True
+
+
+class MulticastRoute(object):
+    """管理 UFTP 公共和私有组播地址到角色 TUN 的主机路由。"""
+
+    def __init__(self, ip_executable, multicast_hosts, tun_name):
+        self.ip_executable = ip_executable
+        self.multicast_hosts = tuple(multicast_hosts)
+        self.tun_name = tun_name
+        self._installed = False
+
+    def setup(self):
+        if not all(_is_ipv4_multicast(host) for host in self.multicast_hosts):
+            return
+        try:
+            for multicast_host in self.multicast_hosts:
+                subprocess.run(
+                    [
+                        self.ip_executable, 'route', 'replace',
+                        '%s/32' % multicast_host, 'dev', self.tun_name,
+                    ], check=True, stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE, text=True)
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise FLRuntimeError(
+                'network_route_setup_failed',
+                'UFTP 组播路由安装失败') from exc
+        self._installed = True
+
+    def close(self):
+        # 路由绑定的 TUN 由 LinkProcess 负责销毁，内核会同步移除该路由。
+        self._installed = False
+
+
 class RoleService(object):
-    def __init__(self, role, link):
+    def __init__(self, role, link, multicast_route=None):
         self.role = role
         self.link = link
+        self.multicast_route = multicast_route
         self.ready = False
         self._started = False
         self._closed = False
@@ -105,6 +163,8 @@ class RoleService(object):
         self._started = True
         try:
             self.link.start()
+            if self.multicast_route is not None:
+                self.multicast_route.setup()
             runtime = self.role.start()
         except Exception:
             self.close()
@@ -136,9 +196,13 @@ class RoleService(object):
             self.role.close_transport()
         finally:
             try:
-                self.link.close()
+                if self.multicast_route is not None:
+                    self.multicast_route.close()
             finally:
-                self.role.close_runtime()
+                try:
+                    self.link.close()
+                finally:
+                    self.role.close_runtime()
 
 
 def load_role_service(path, expected_role=None):
@@ -169,22 +233,37 @@ def load_role_service(path, expected_role=None):
     if os.path.exists(tun_path):
         raise FLRuntimeError(
             'link_interface_exists', '链路 TUN 已存在，拒绝复用旧接口')
+    ip_executable = shutil.which('ip')
+    if not ip_executable:
+        raise FLRuntimeError('transport_unavailable', '缺少 ip 可执行文件')
+    multicast_route = MulticastRoute(
+        ip_executable,
+        (config['uftp_multicast_host'],
+         config['uftp_private_multicast_host']), tun_name)
     link = LinkProcess([
         executables['wfb_v6_uplink'],
         '--role', role_name,
         '--node-id', str(config['node_id']),
-    ] + link_args, readiness_probe=lambda: os.path.isdir(tun_path))
+    ] + link_args, readiness_probe=lambda: _is_tun_ready(tun_path))
     try:
         if role_name == 'server':
             role = ServerRole(
                 work_dir=config['work_dir'],
+                role_node_id=config['node_id'],
                 participant_node_id=config['participant_node_ids'],
                 participant_uftp_uid=config['participant_uftp_uids'],
                 server_uftp_uid=config['server_uftp_uid'],
                 uftp_port=config['uftp_port'],
                 http_host=config['http_host'],
                 http_port=config['http_port'],
+                uftp_bind_host=config['uftp_bind_host'],
+                uftp_multicast_host=config['uftp_multicast_host'],
+                uftp_private_multicast_host=(
+                    config['uftp_private_multicast_host']),
                 max_update_size_bytes=config['max_update_size_bytes'],
+                live_observation=config['live_observation'],
+                observation_path=config['observation_path'],
+                io_timeout=config['io_timeout_seconds'],
             )
         else:
             role = ClientRole(
@@ -195,13 +274,18 @@ def load_role_service(path, expected_role=None):
                 server_http_address=(
                     config['server_http_host'], config['server_http_port']),
                 max_update_size_bytes=config['max_update_size_bytes'],
+                uftp_bind_host=config['uftp_bind_host'],
+                uftp_multicast_host=config['uftp_multicast_host'],
+                live_observation=config['live_observation'],
+                observation_path=config['observation_path'],
+                io_timeout=config['io_timeout_seconds'],
             )
     except FLRuntimeError:
         raise
     except (TypeError, ValueError) as exc:
         raise FLRuntimeError(
             'invalid_configuration', '角色专属配置无效') from exc
-    return RoleService(role, link)
+    return RoleService(role, link, multicast_route)
 
 
 def _read_config(path):
@@ -218,15 +302,37 @@ def _read_config(path):
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
     if role not in ('server', 'client') or set(config) != allowed:
         raise FLRuntimeError('invalid_configuration', '角色服务配置字段无效')
+    if type(config['channel']) is not int or config['channel'] <= 0:
+        raise FLRuntimeError('invalid_configuration', '角色服务 channel 配置无效')
+    if not isinstance(config['channel_width'], str) or not config['channel_width']:
+        raise FLRuntimeError('invalid_configuration', '角色服务 channel_width 配置无效')
     if config.get('schema_version') != 1:
         raise FLRuntimeError('invalid_configuration', '角色服务配置版本无效')
+    if type(config['live_observation']) is not bool:
+        raise FLRuntimeError('invalid_configuration', '实时观测配置无效')
+    if (config['observation_path'] is not None and
+            (not isinstance(config['observation_path'], str) or
+             not os.path.isabs(config['observation_path']))):
+        raise FLRuntimeError('invalid_configuration', '实时观测路径无效')
     if (not isinstance(config.get('work_dir'), str) or
             not os.path.isabs(config['work_dir'])):
         raise FLRuntimeError('invalid_configuration', '工作目录必须是绝对路径')
-    for name in ('node_id', 'uftp_port', 'max_update_size_bytes'):
+    for name in ('node_id', 'uftp_port', 'max_update_size_bytes',
+                 'io_timeout_seconds'):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
+    for name in ('uftp_bind_host', 'uftp_multicast_host',
+                 'uftp_private_multicast_host'):
+        if not isinstance(config.get(name), str) or not config[name]:
+            raise FLRuntimeError(
+                'invalid_configuration', 'UFTP 地址配置无效')
+    if (not _is_ipv4_multicast(config['uftp_multicast_host']) or
+            not _is_ipv4_multicast(config['uftp_private_multicast_host']) or
+            config['uftp_multicast_host'] ==
+            config['uftp_private_multicast_host']):
+        raise FLRuntimeError(
+            'invalid_configuration', 'UFTP 组播地址配置无效')
     link_args = config.get('link_args')
     if (not isinstance(link_args, list) or not link_args or
             any(not isinstance(value, str) or not value for value in link_args)):
@@ -262,6 +368,54 @@ def _parse_known_client_node_ids(value):
     return set(node_ids)
 
 
+def _run_algorithm(algorithm, runtime, config, errors, stop_event):
+    try:
+        algorithm(runtime, config)
+    except FLRuntimeError as exc:
+        errors.append(exc)
+    except Exception:
+        errors.append(FLRuntimeError(
+            'algorithm_failed', '算法入口执行失败'))
+    finally:
+        stop_event.set()
+
+
+def _read_algorithm_config(path):
+    if path is None:
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            config = json.load(fh)
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '算法配置无法读取') from exc
+    if not isinstance(config, dict):
+        raise FLRuntimeError('invalid_configuration', '算法配置结构无效')
+    return config
+
+
+def _load_algorithm(spec):
+    if spec is None:
+        return None
+    if ':' not in spec:
+        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
+    module_name, callable_name = spec.split(':', 1)
+    if not module_name or not callable_name:
+        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
+    try:
+        module = importlib.import_module(module_name)
+        target = module
+        for part in callable_name.split('.'):
+            if not part:
+                raise AttributeError(part)
+            target = getattr(target, part)
+    except (ImportError, AttributeError) as exc:
+        raise FLRuntimeError('invalid_configuration', '算法入口无法导入') from exc
+    if not callable(target):
+        raise FLRuntimeError('invalid_configuration', '算法入口不可调用')
+    return target
+
+
 def _notify_ready():
     address = os.environ.get('NOTIFY_SOCKET')
     if not address:
@@ -279,25 +433,52 @@ def _notify_ready():
 def main(role=None):
     parser = argparse.ArgumentParser(description='WFB-ng FL 角色服务')
     parser.add_argument('--config', required=True, help='角色服务 JSON 配置')
+    parser.add_argument('--algorithm', help='算法入口，格式为 package.module:callable')
+    parser.add_argument('--algorithm-config', help='算法 JSON object 配置')
     args = parser.parse_args()
     service = None
+    algorithm_thread = None
+    algorithm_error = []
     stop_event = threading.Event()
+    signal_received = threading.Event()
 
     def stop(signum, frame):
+        signal_received.set()
         stop_event.set()
 
+    previous_sigterm = signal.getsignal(signal.SIGTERM)
+    previous_sigint = signal.getsignal(signal.SIGINT)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
+        algorithm = _load_algorithm(args.algorithm)
+        algorithm_config = _read_algorithm_config(args.algorithm_config)
         service = load_role_service(args.config, expected_role=role)
-        service.start()
+        runtime = service.start()
         _notify_ready()
+        if algorithm is not None:
+            algorithm_thread = threading.Thread(
+                target=_run_algorithm,
+                args=(algorithm, runtime, algorithm_config, algorithm_error, stop_event),
+                name='fl-algorithm', daemon=True)
+            algorithm_thread.start()
         while not stop_event.is_set():
+            if algorithm_thread is not None and not algorithm_thread.is_alive():
+                stop_event.set()
+                break
             service.wait(0.2)
+        if algorithm_thread is not None:
+            algorithm_thread.join(0)
+            if algorithm_error:
+                raise algorithm_error[0]
     except FLRuntimeError as exc:
+        if signal_received.is_set():
+            return 0
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1
     finally:
+        signal.signal(signal.SIGTERM, previous_sigterm)
+        signal.signal(signal.SIGINT, previous_sigint)
         if service is not None:
             service.close()
     return 0

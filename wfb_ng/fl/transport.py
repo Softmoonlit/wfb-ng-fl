@@ -17,6 +17,7 @@ from dataclasses import dataclass
 
 from .artifacts import write_json_atomic
 from .errors import FLRuntimeError
+from .observation import LiveObservation
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,24 @@ class RoundContext:
     round_dir: str
     max_update_size_bytes: int
     failure_callback: object
+
+
+@dataclass(frozen=True)
+class _UploadContext:
+    round_context: RoundContext
+    node_id: int
+    content_length: int
+    expected_digest: bytes
+    started_at: float
+
+
+@dataclass(frozen=True)
+class _ClientUploadObservation:
+    round_id: str
+    node_id: int
+    size_bytes: int
+    digest_hex: str
+    started_at: float
 
 
 class _DownlinkHandle(object):
@@ -44,8 +63,12 @@ class _DownlinkOperation:
 
 class ServerTransport(object):
     def __init__(self, participant_uftp_uids, server_uftp_uid, uftp_port,
-                 http_host='127.0.0.1', http_port=0, io_timeout=10,
-                 cancel_grace_period=2):
+                 http_host='127.0.0.1', http_port=0,
+                 uftp_bind_host='127.0.0.1',
+                 uftp_multicast_host='127.0.0.1',
+                 uftp_private_multicast_host='239.255.0.1', io_timeout=10,
+                 cancel_grace_period=2, live_observation=False,
+                 observation_writer=None, observation_path=None, role_node_id=None):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
         self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
@@ -53,13 +76,20 @@ class ServerTransport(object):
         self.uftp_port = uftp_port
         self.http_host = http_host
         self.http_port = http_port
+        self.uftp_bind_host = uftp_bind_host
+        self.uftp_multicast_host = uftp_multicast_host
+        self.uftp_private_multicast_host = uftp_private_multicast_host
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
+        self.live_observation = live_observation
+        self.role_node_id = role_node_id
+        self._observation = LiveObservation(
+            live_observation, observation_writer, observation_path)
         self.ready = False
         self._state = 'new'
         self._context = None
         self._context_lock = threading.Lock()
-        self._upload_active = False
+        self._active_uploads = set()
         self._used_uploads = set()
         self._update_event = threading.Event()
         self._http_server = None
@@ -114,7 +144,7 @@ class ServerTransport(object):
                 try:
                     transport._receive_update(self, self._upload_context)
                 finally:
-                    transport._release_upload()
+                    transport._release_upload(self._upload_context)
 
             def do_GET(self):
                 self._send_error(400, 'method_not_allowed', '只允许 PUT 请求')
@@ -175,7 +205,6 @@ class ServerTransport(object):
             self._context = RoundContext(
                 round_id, tuple(sorted(participant_node_ids)), round_dir,
                 max_update_size_bytes, failure_callback)
-            self._used_uploads = set()
             self._update_event.clear()
 
     def publish_model(self, round_id, model_path, manifest_path):
@@ -198,15 +227,16 @@ class ServerTransport(object):
         command = [
             shutil.which('uftp'),
             '-q',
-            '-I', '127.0.0.1',
-            '-M', '127.0.0.1',
+            '-I', self.uftp_bind_host,
+            '-M', self.uftp_multicast_host,
+            '-P', self.uftp_private_multicast_host,
             '-p', str(self.uftp_port),
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
-            '-R', '10000',
+            '-R', '15000',
             '-r', '0.1:0.01:2.0',
-            '-s', '10',
+            '-s', '20',
             '-L', log_path,
             '-S', status_path,
             '-D', round_id,
@@ -307,6 +337,7 @@ class ServerTransport(object):
         if self._http_thread is not None:
             self._http_thread.join(2)
             self._http_thread = None
+        self._observation.close()
         self._state = 'closed'
 
     def _reserve_upload(self, handler):
@@ -334,10 +365,10 @@ class ServerTransport(object):
             update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
             if os.path.isfile(os.path.join(update_dir, 'update.manifest.json')):
                 return 409, 'update_already_submitted', 'update 已提交'
+            if update_key in self._active_uploads:
+                return 409, 'upload_in_progress', 'update 正在上传'
             if update_key in self._used_uploads:
                 return 409, 'update_submission_used', 'update 提交机会已占用'
-            if self._upload_active:
-                return 409, 'upload_in_progress', '已有 update 正在上传'
             if _header_values(handler.headers, 'Transfer-Encoding'):
                 return 400, 'invalid_request_headers', '请求 headers 无效'
             expect_values = _header_values(handler.headers, 'Expect')
@@ -375,25 +406,66 @@ class ServerTransport(object):
                     pass
             except OSError:
                 return 507, 'storage_unavailable', 'update 目标存储不可用'
-            self._upload_active = True
+            self._active_uploads.add(update_key)
             self._used_uploads.add(update_key)
-            handler._upload_context = (context, node_id, content_length, digest)
-            return None
+            handler._upload_context = _UploadContext(
+                context, node_id, content_length, digest, time.monotonic())
+            upload_context = handler._upload_context
+            active_node_ids = sorted(
+                active_node_id for active_round_id, active_node_id
+                in self._active_uploads
+                if active_round_id == context.round_id)
+        self._emit_upload_event(
+            'upload_accepted', upload_context, 'accepted')
+        self._emit_active_uploads(upload_context, active_node_ids)
+        return None
 
-    def _release_upload(self):
+    def _release_upload(self, upload_context):
         with self._context_lock:
-            self._upload_active = False
+            self._active_uploads.discard((
+                upload_context.round_context.round_id, upload_context.node_id))
+            active_node_ids = sorted(
+                node_id for round_id, node_id in self._active_uploads
+                if round_id == upload_context.round_context.round_id)
+        self._emit_upload_event(
+            'active_uploads', upload_context, 'active_set_changed',
+            active_node_ids=active_node_ids)
 
     def _fail_accepted_upload(self, upload_context, error_code, error_message):
-        context, node_id, _, _ = upload_context
+        context = upload_context.round_context
+        self._emit_upload_event(
+            'upload_failed', upload_context, 'failed', error_code=error_code)
         try:
             context.failure_callback(
-                context.round_id, node_id, error_code, error_message)
+                context.round_id, upload_context.node_id, error_code, error_message)
         finally:
-            self._release_upload()
+            self._release_upload(upload_context)
+
+    def _emit_active_uploads(self, upload_context, active_node_ids):
+        self._emit_upload_event(
+            'active_uploads', upload_context, 'active_set_changed',
+            active_node_ids=active_node_ids)
+
+    def _emit_upload_event(
+            self, event, upload_context, transport_outcome, **extra_fields):
+        self._observation.emit(
+            event,
+            role='server',
+            role_node_id=self.role_node_id,
+            node_id=upload_context.node_id,
+            round=upload_context.round_context.round_id,
+            phase='upload',
+            size_bytes=upload_context.content_length,
+            sha256=upload_context.expected_digest.hex(),
+            elapsed_ms=int((time.monotonic() - upload_context.started_at) * 1000),
+            transport_outcome=transport_outcome,
+            **extra_fields)
 
     def _receive_update(self, handler, upload_context):
-        context, node_id, content_length, expected_digest = upload_context
+        context = upload_context.round_context
+        node_id = upload_context.node_id
+        content_length = upload_context.content_length
+        expected_digest = upload_context.expected_digest
         update_dir = os.path.join(context.round_dir, 'updates', str(node_id))
         update_path = os.path.join(update_dir, 'update.bin')
         temp_path = None
@@ -477,13 +549,20 @@ class ServerTransport(object):
                 return
             committed = True
             self._update_event.set()
+            self._emit_upload_event(
+                'upload_committed', upload_context, 'committed')
             handler.send_response(201)
             handler.send_header('Content-Length', '0')
             handler.send_header('Connection', 'close')
             handler.end_headers()
+            self._emit_upload_event(
+                'response_write_completed', upload_context, 'response_written')
             handler.close_connection = True
         except OSError:
             if committed:
+                self._emit_upload_event(
+                    'response_write_failed_after_commit', upload_context,
+                    'response_write_failed')
                 handler.close_connection = True
                 return
             self._reject_accepted_upload(
@@ -503,6 +582,10 @@ class ServerTransport(object):
 
     def _reject_accepted_upload(
             self, handler, context, node_id, status, error_code, error_message):
+        upload_context = getattr(handler, '_upload_context', None)
+        if upload_context is not None:
+            self._emit_upload_event(
+                'upload_failed', upload_context, 'failed', error_code=error_code)
         try:
             context.failure_callback(
                 context.round_id, node_id, error_code, error_message)
@@ -518,12 +601,19 @@ class ServerTransport(object):
 
 class ClientTransport(object):
     def __init__(self, work_dir, uftp_uid, uftp_port, server_http_address,
-                 io_timeout=10):
+                 uftp_bind_host='127.0.0.1', io_timeout=10,
+                 uftp_multicast_host='127.0.0.1', live_observation=False,
+                 observation_writer=None, observation_path=None):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
         self.server_http_address = server_http_address
+        self.uftp_bind_host = uftp_bind_host
+        self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
+        self.live_observation = live_observation
+        self._observation = LiveObservation(
+            live_observation, observation_writer, observation_path)
         self.ready = False
         self._state = 'new'
         self._operation_condition = threading.Condition()
@@ -553,7 +643,8 @@ class ClientTransport(object):
                 executable,
                 '-d',
                 '-q',
-                '-I', '127.0.0.1',
+                '-I', self.uftp_bind_host,
+                '-M', self.uftp_multicast_host,
                 '-p', str(self.uftp_port),
                 '-U', _format_uid(self.uftp_uid),
                 '-D', self._inbox_dir,
@@ -619,11 +710,26 @@ class ClientTransport(object):
             if self._operation_active:
                 raise RuntimeError('已有活动 HTTP PUT operation')
             self._operation_active = True
+        observation = _ClientUploadObservation(
+            round_id, node_id, size_bytes, digest_hex, time.monotonic())
         host, port = self.server_http_address
         sock = None
         response_file = None
+        phase = 'connect'
         try:
-            sock = socket.create_connection((host, port), timeout=self.io_timeout)
+            try:
+                sock = socket.create_connection(
+                    (host, port), timeout=self.io_timeout)
+            except (OSError, socket.timeout) as exc:
+                self._emit_upload_phase(
+                    phase, observation,
+                    'timeout' if isinstance(exc, socket.timeout) else 'failed')
+                raise FLRuntimeError(
+                    'update_submit_failed', 'update HTTP connect 阶段失败',
+                    round_id=round_id, node_id=node_id) from exc
+            self._emit_upload_phase(
+                phase, observation,
+                'connected')
             with self._operation_condition:
                 self._operation_socket = sock
                 if self._state == 'stopping':
@@ -644,36 +750,67 @@ class ClientTransport(object):
                 'Expect: 100-continue\r\n'
                 'Connection: close\r\n\r\n'
             ) % (path, host, port, size_bytes, digest)
-            sock.sendall(headers.encode('ascii'))
-            status, response_headers = _read_http_response(response_file)
+            phase = 'continue'
+            try:
+                sock.sendall(headers.encode('ascii'))
+            except (OSError, socket.timeout) as exc:
+                self._raise_upload_io_failure(phase, observation, exc)
+            status, response_headers = self._read_upload_response(
+                response_file, phase, observation)
             if status != 100:
-                raise _read_http_error(
+                error = self._read_upload_error(
                     response_file, status, response_headers,
                     'update_rejected', 'server 在 body 前拒绝 update',
-                    round_id, node_id)
-            with open(update_path, 'rb') as fh:
-                while True:
-                    chunk = fh.read(64 * 1024)
-                    if not chunk:
-                        break
-                    sock.sendall(chunk)
-            status, response_headers = _read_http_response(response_file)
+                    phase, observation)
+                self._emit_upload_phase(
+                    phase, observation,
+                    'rejected', error_code=error.error_code)
+                raise error
+            self._emit_upload_phase(
+                phase, observation,
+                'continued')
+            phase = 'body'
+            try:
+                with open(update_path, 'rb') as fh:
+                    while True:
+                        chunk = fh.read(64 * 1024)
+                        if not chunk:
+                            break
+                        sock.sendall(chunk)
+            except (OSError, socket.timeout) as exc:
+                self._emit_upload_phase(
+                    phase, observation,
+                    'timeout' if isinstance(exc, socket.timeout) else 'failed')
+                raise FLRuntimeError(
+                    'update_submit_failed', 'update HTTP body 阶段失败',
+                    round_id=round_id, node_id=node_id) from exc
+            self._emit_upload_phase(
+                phase, observation,
+                'sent')
+            phase = 'final_response'
+            status, response_headers = self._read_upload_response(
+                response_file, phase, observation)
             if status != 201:
-                raise _read_http_error(
+                error = self._read_upload_error(
                     response_file, status, response_headers,
                     'update_submit_failed', 'server 拒绝 update 提交',
-                    round_id, node_id)
+                    phase, observation)
+                self._emit_upload_phase(
+                    phase, observation,
+                    'rejected', error_code=error.error_code)
+                raise error
             content_lengths = response_headers.get('content-length', [])
             if content_lengths != ['0']:
-                raise FLRuntimeError(
+                error = FLRuntimeError(
                     'update_submit_failed', 'server 最终响应不是空 body 201',
                     round_id=round_id, node_id=node_id)
-        except FLRuntimeError:
-            raise
-        except (OSError, socket.timeout) as exc:
-            raise FLRuntimeError(
-                'update_submit_failed', 'update HTTP 提交失败',
-                round_id=round_id, node_id=node_id) from exc
+                self._emit_upload_phase(
+                    phase, observation,
+                    'invalid_response', error_code=error.error_code)
+                raise error
+            self._emit_upload_phase(
+                phase, observation,
+                'created')
         finally:
             if response_file is not None:
                 response_file.close()
@@ -683,6 +820,51 @@ class ClientTransport(object):
                 self._operation_socket = None
                 self._operation_active = False
                 self._operation_condition.notify_all()
+
+    def _read_upload_response(self, response_file, phase, observation):
+        try:
+            return _read_http_response(response_file)
+        except (OSError, socket.timeout) as exc:
+            self._raise_upload_io_failure(phase, observation, exc)
+        except FLRuntimeError as exc:
+            self._emit_upload_phase(
+                phase, observation, 'failed', error_code=exc.error_code)
+            raise
+
+    def _read_upload_error(
+            self, response_file, status, response_headers, default_code,
+            default_message, phase, observation):
+        try:
+            return _read_http_error(
+                response_file, status, response_headers, default_code,
+                default_message, observation.round_id, observation.node_id)
+        except (OSError, socket.timeout) as exc:
+            self._raise_upload_io_failure(phase, observation, exc)
+
+    def _raise_upload_io_failure(self, phase, observation, exc):
+        self._emit_upload_phase(
+            phase, observation,
+            'timeout' if isinstance(exc, socket.timeout) else 'failed')
+        raise FLRuntimeError(
+            'update_submit_failed', 'update HTTP %s 阶段失败' % phase,
+            round_id=observation.round_id,
+            node_id=observation.node_id) from exc
+
+    def _emit_upload_phase(
+            self, phase, observation,
+            transport_outcome, **extra_fields):
+        self._observation.emit(
+            'upload_phase',
+            role='client',
+            node_id=observation.node_id,
+            round=observation.round_id,
+            phase=phase,
+            size_bytes=observation.size_bytes,
+            sha256=observation.digest_hex,
+            elapsed_ms=int((
+                time.monotonic() - observation.started_at) * 1000),
+            transport_outcome=transport_outcome,
+            **extra_fields)
 
     def close(self):
         if self._state == 'closed':
@@ -703,6 +885,7 @@ class ClientTransport(object):
         if self._uftpd_stderr is not None:
             self._uftpd_stderr.close()
             self._uftpd_stderr = None
+        self._observation.close()
         self._state = 'closed'
 
 

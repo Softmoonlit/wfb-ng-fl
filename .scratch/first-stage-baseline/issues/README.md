@@ -70,7 +70,7 @@
 ## 依赖关系摘要
 
 ```text
-Issue 6 (PRD)
+Issue 6（规格）
 └── Issue 7 边界固化
     └── Issue 8 独立 scheduler
         └── Issue 9 Token 格式与解析

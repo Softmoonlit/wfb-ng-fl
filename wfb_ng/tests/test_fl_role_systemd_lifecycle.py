@@ -174,6 +174,8 @@ class RoleSystemdLifecycleTestCase(unittest.TestCase):
                 'server_uftp_uid': 255,
                 'http_host': '127.0.0.1',
                 'http_port': 0,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
             })
             config['link_args'] += ['--known-clients', '1']
         else:
@@ -181,6 +183,8 @@ class RoleSystemdLifecycleTestCase(unittest.TestCase):
                 'uftp_uid': 1,
                 'server_http_host': '127.0.0.1',
                 'server_http_port': self.http_server.port,
+                'uftp_multicast_host': '239.80.41.1',
+                'uftp_private_multicast_host': '239.80.41.2',
             })
         path = os.path.join(self.root, name or '%s.json' % role)
         with open(path, 'w', encoding='utf-8') as fh:
@@ -254,6 +258,8 @@ if generation > 1:
             output.write("put %d" % (generation - 1))
 tun = os.open("/dev/net/tun", os.O_RDWR)
 fcntl.ioctl(tun, 0x400454ca, struct.pack("16sH", name.encode("ascii"), 0x1001))
+import subprocess
+subprocess.run(["ip", "link", "set", "dev", name, "up"], check=True)
 with open(os.path.join(root, "link-%d.pid" % generation), "w") as output:
     output.write(str(os.getpid()))
 while True:

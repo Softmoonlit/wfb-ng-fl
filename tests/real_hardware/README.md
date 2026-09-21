@@ -15,6 +15,15 @@
 
 仓库根目录 `Makefile` 的 `acceptance_v6_realhw` 也会把操作者引导到这套入口。
 
+当前 Issue #41 真实硬件 FL Runtime 闭环的 canonical 规格由本地 tracker 管理：
+
+- Canonical 规格：`.scratch/issue-41-real-hardware-runtime-loop/spec.md`
+- 阶段子任务：`.scratch/issue-41-real-hardware-runtime-loop/issues/` (01-07)
+- 现场验收手册：`v8_issue41_SSH编排真实硬件FL闭环验收手册.md`
+- 配套编排脚本：`issue41_fl_runtime_loop.sh`
+
+三机现场基线当前采用 SSH 别名 `vm1` / `vm2` 控制两个客户端，三端仓库统一位于 `/home/virt/projects/wfb-ng-fl`，空口网卡通过唯一 `wlx*` 动态发现。验收场景固定为 4 MiB 单轮闭环（client2 延迟 3 秒），正式配置严禁携带立即 feedback window 候选行为。
+
 ## 当前有效的辅助文件
 
 - `v6_formal_2a_summary.py`：生成 real-hardware 统一 2A 摘要
