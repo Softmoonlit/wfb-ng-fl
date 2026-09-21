@@ -67,23 +67,53 @@ def main(argv=None):
     env_path = os.path.join(archive_dir, 'envelope.json')
     env_meta = _read_json(env_path, []) if os.path.isfile(env_path) else {}
     resolved_cfg = env_meta.get('resolved_config', {}) if isinstance(env_meta, dict) else {}
-    round_deadline = resolved_cfg.get('runtime_timeout_seconds', 180)
+    round_deadline = resolved_cfg.get('runtime_timeout_seconds', 400)
     io_timeout = resolved_cfg.get('io_timeout_seconds', 120)
 
-    rounds = _build_rounds(results, observations, archive_dir, errors, round_deadline, io_timeout)
+    # 场景参数解析（从 envelope.json 的 resolved_config 获取；若未配置 envelope，则默认 1 轮 4 MiB 回归配置）
+    if 'rounds' in resolved_cfg:
+        expected_rounds = int(resolved_cfg['rounds'])
+    else:
+        expected_rounds = 1
+
+    if 'artifact_size_bytes' in resolved_cfg:
+        expected_size = int(resolved_cfg['artifact_size_bytes'])
+    elif expected_rounds == 1:
+        expected_size = 4 * 1024 * 1024
+    else:
+        expected_size = 40 * 1024 * 1024
+
+    if 'training_delay_ms_by_node' in resolved_cfg:
+        expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
+    elif 'client1_training_delay_ms' in resolved_cfg or 'client2_training_delay_ms' in resolved_cfg:
+        expected_delays = {
+            1: int(resolved_cfg.get('client1_training_delay_ms', 0)),
+            2: int(resolved_cfg.get('client2_training_delay_ms', 0)),
+        }
+    else:
+        if expected_rounds == 1 and expected_size == 4 * 1024 * 1024:
+            expected_delays = {1: 0, 2: 3000}
+        else:
+            expected_delays = {1: 0, 2: 0}
+
+    rounds = _build_rounds(results, observations, archive_dir, errors, expected_rounds, expected_size, expected_delays, round_deadline, io_timeout)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
     complete_nodes = [1, 2] if all(
         value.get('server_wait_returned_node_ids') == [1, 2]
         for value in rounds) else []
     status = 'passed' if not errors else 'failed'
+    if expected_rounds == 1 and expected_size == 4 * 1024 * 1024:
+        success_reason = '一轮 4 MiB 严格同步确定性场景证据完整'
+    else:
+        success_reason = f'{expected_rounds} 轮 {expected_size // (1024 * 1024)} MiB 严格同步场景证据完整'
     summary = {
         'status': status,
-        'reason': '; '.join(errors) if errors else '一轮 4 MiB 严格同步确定性场景证据完整',
+        'reason': '; '.join(errors) if errors else success_reason,
         'scenario': {
-            'round_count': 1,
-            'artifact_size_bytes': EXPECTED_SIZE,
-            'training_delay_ms_by_node': {'1': 0, '2': 3000},
+            'round_count': expected_rounds,
+            'artifact_size_bytes': expected_size,
+            'training_delay_ms_by_node': {str(k): v for k, v in expected_delays.items()},
             'placeholder_training': 'template_copy',
             'placeholder_aggregation': 'model_copy',
             'update_template_sha256_by_node': template_hashes,
@@ -114,30 +144,53 @@ def _template_hashes(results, errors):
     return hashes
 
 
-def _build_rounds(results, observations, archive_dir, errors, round_deadline=180, io_timeout=120):
+def _build_rounds(results, observations, archive_dir, errors, expected_rounds, expected_size, expected_delays, round_deadline=400, io_timeout=120):
     server = results.get('server')
     clients = {1: results.get('client1'), 2: results.get('client2')}
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
         return []
     server_rounds = server.get('rounds')
-    if not isinstance(server_rounds, list) or len(server_rounds) != 1:
-        errors.append('server 算法结果必须恰好包含一轮')
+    if not isinstance(server_rounds, list) or len(server_rounds) != expected_rounds:
+        if expected_rounds == 1:
+            errors.append('server 算法结果必须恰好包含一轮')
+        else:
+            errors.append('server 算法结果必须恰好包含 %d 轮 (实际: %d)' % (
+                expected_rounds, len(server_rounds) if isinstance(server_rounds, list) else 0))
         return []
     output = []
+    seen_round_ids = set()
+    prev_output_model_sha = None
+
     for index, server_round in enumerate(server_rounds, 1):
         round_id = server_round.get('round_id')
-        if server_round.get('round_index') != index or not isinstance(round_id, str):
+        if server_round.get('round_index') != index or not isinstance(round_id, str) or not round_id:
             errors.append('server 第 %d 轮身份无效' % index)
             continue
+        if round_id in seen_round_ids:
+            errors.append('server 第 %d 轮 round_id 重复：%s' % (index, round_id))
+        seen_round_ids.add(round_id)
+
         model = {
             'size_bytes': server_round.get('input_model_size_bytes'),
             'sha256': server_round.get('input_model_sha256'),
         }
-        if model['size_bytes'] != EXPECTED_SIZE:
-            errors.append('server 第 %d 轮模型不是 4 MiB' % index)
+        if model['size_bytes'] != expected_size:
+            if expected_size == 4 * 1024 * 1024:
+                errors.append('server 第 %d 轮模型不是 4 MiB' % index)
+            else:
+                errors.append('server 第 %d 轮模型不是 %d 字节' % (index, expected_size))
+
+        # 验证跨轮占位聚合的一致性 (model_copy)
+        if index > 1 and prev_output_model_sha is not None:
+            if model['sha256'] != prev_output_model_sha:
+                errors.append('server 第 %d 轮输入模型与上一轮占位聚合输出不一致' % index)
+        out_model_sha = server_round.get('output_model_sha256')
+        if out_model_sha != model['sha256']:
+            errors.append('server 第 %d 轮占位聚合模型输出 SHA-256 与输入不一致' % index)
+        prev_output_model_sha = out_model_sha
+
         uploads = []
         receive_intervals = {}
-        expected_delays = {1: 0, 2: 3000}
         for node_id, client in clients.items():
             client_round = _find_round(client, index, round_id)
             if client_round is None:
@@ -146,7 +199,7 @@ def _build_rounds(results, observations, archive_dir, errors, round_deadline=180
             if client_round.get('training_delay_ms') != expected_delays[node_id]:
                 errors.append('client%d 第 %d 轮训练延时不是 %d ms' % (
                     node_id, index, expected_delays[node_id]))
-            if (client_round.get('model_size_bytes') != EXPECTED_SIZE or
+            if (client_round.get('model_size_bytes') != expected_size or
                     client_round.get('model_sha256') != model['sha256']):
                 errors.append('client%d 第 %d 轮模型事实不一致' % (node_id, index))
             receive_intervals[str(node_id)] = client_round.get('model_receive_interval')
@@ -168,54 +221,103 @@ def _build_rounds(results, observations, archive_dir, errors, round_deadline=180
                     observations['server'], 'upload_committed', round_id,
                     node_id, 'committed') else None,
             }
-            if upload['size_bytes'] != EXPECTED_SIZE:
-                errors.append('client%d 第 %d 轮 update 不是 4 MiB' % (node_id, index))
+            if upload['size_bytes'] != expected_size:
+                if expected_size == 4 * 1024 * 1024:
+                    errors.append('client%d 第 %d 轮 update 不是 4 MiB' % (node_id, index))
+                else:
+                    errors.append('client%d 第 %d 轮 update 不是 %d 字节' % (node_id, index, expected_size))
             if upload['sha256'] != client.get('update_template_sha256'):
-                errors.append('client%d 第 %d 轮未复用同一 update 模板' % (node_id, index))
+                errors.append('client%d 第 %d 轮未复用对应 update 模板' % (node_id, index))
             uploads.append(upload)
+
         server_updates = server_round.get('updates')
         if not isinstance(server_updates, list) or sorted(
                 item.get('node_id') for item in server_updates if isinstance(item, dict)) != [1, 2]:
             errors.append('server 第 %d 轮未收齐 [1, 2]' % index)
         else:
             for update in server_updates:
-                client_upload = next(item for item in uploads if item['node_id'] == update['node_id'])
-                if (update.get('size_bytes') != client_upload['size_bytes'] or
+                client_upload = next((item for item in uploads if item['node_id'] == update['node_id']), None)
+                if client_upload and (
+                        update.get('size_bytes') != client_upload['size_bytes'] or
                         update.get('sha256') != client_upload['sha256']):
                     errors.append('第 %d 轮 node %d 端到端 SHA 或大小不一致' %
                                   (index, update['node_id']))
+
         commit_seq_1 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 1, 'committed')
         commit_seq_2 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 2, 'committed')
 
-        client1_committed_first = False
+        first_committed_node = None
         if commit_seq_1 is not None and commit_seq_2 is not None:
-            client1_committed_first = commit_seq_1 < commit_seq_2
+            first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
         else:
             up1 = next((u for u in uploads if u['node_id'] == 1), None)
             up2 = next((u for u in uploads if u['node_id'] == 2), None)
-            if (up1 and up2 and up1.get('client_put_interval') and
-                    up2.get('client_put_interval')):
-                client1_committed_first = (
-                    up1['client_put_interval']['end'] <= up2['client_put_interval']['end'])
+            if (up1 and up2 and up1.get('server_put_interval') and up2.get('server_put_interval')):
+                first_committed_node = 1 if up1['server_put_interval']['end'] <= up2['server_put_interval']['end'] else 2
+            elif (up1 and up2 and up1.get('client_put_interval') and up2.get('client_put_interval')):
+                first_committed_node = 1 if up1['client_put_interval']['end'] <= up2['client_put_interval']['end'] else 2
 
+        client1_committed_first = (first_committed_node == 1)
         returned_nodes = server_round.get('update_node_ids')
-        server_waited = client1_committed_first and (returned_nodes == [1, 2])
-        partial_result = returned_nodes != [1, 2]
+        server_waited = (returned_nodes == [1, 2])
+        partial_result = (returned_nodes != [1, 2])
 
-        if not client1_committed_first:
-            errors.append('第 %d 轮 client1 未先于 client2 完成提交' % index)
+        if expected_delays.get(2, 0) > expected_delays.get(1, 0):
+            if not client1_committed_first:
+                errors.append('第 %d 轮 client1 未先于 client2 完成提交' % index)
         if partial_result:
             errors.append('第 %d 轮 server 返回了 partial result' % index)
 
         strict_sync = {
             'client1_committed_before_client2': client1_committed_first,
-            'server_waited_after_client1': server_waited,
-            'intermediate_committed_node_ids': [1] if client1_committed_first else [],
-            'intermediate_pending_node_ids': [2] if client1_committed_first else [],
+            'server_waited_after_first_commit': server_waited,
+            'server_waited_after_client1': server_waited if client1_committed_first else True,
+            'first_committed_node_id': first_committed_node,
+            'intermediate_committed_node_ids': [first_committed_node] if first_committed_node else [],
+            'intermediate_pending_node_ids': [2 if first_committed_node == 1 else 1] if first_committed_node else [],
             'server_wait_returned_node_ids': returned_nodes,
             'partial_result_returned': partial_result,
+        }
+
+        # 计算 HTTP PUT 活动时间区间与自然重叠
+        up1 = next((u for u in uploads if u['node_id'] == 1), None)
+        up2 = next((u for u in uploads if u['node_id'] == 2), None)
+        server_overlap_seconds = 0.0
+        natural_overlap = False
+        if up1 and up2 and up1.get('server_put_interval') and up2.get('server_put_interval'):
+            s1 = up1['server_put_interval']['start']
+            e1 = up1['server_put_interval']['end']
+            s2 = up2['server_put_interval']['start']
+            e2 = up2['server_put_interval']['end']
+            overlap = min(e1, e2) - max(s1, s2)
+            if overlap > 0:
+                server_overlap_seconds = round(overlap, 3)
+                natural_overlap = True
+
+        active_sets = [
+            value.get('active_node_ids') for value in observations['server']
+            if value.get('event') == 'active_uploads' and
+            value.get('round') == round_id and
+            isinstance(value.get('active_node_ids'), list)
+        ]
+        concurrent_active_observed = any(set(s) == {1, 2} for s in active_sets)
+        if concurrent_active_observed:
+            natural_overlap = True
+
+        concurrent_put = {
+            'natural_overlap': natural_overlap,
+            'overlap_duration_seconds': server_overlap_seconds,
+            'concurrent_active_observed': concurrent_active_observed,
+            'server_intervals': {
+                '1': up1.get('server_put_interval') if up1 else None,
+                '2': up2.get('server_put_interval') if up2 else None,
+            },
+            'client_intervals': {
+                '1': up1.get('client_put_interval') if up1 else None,
+                '2': up2.get('client_put_interval') if up2 else None,
+            },
         }
 
         output.append({
@@ -225,11 +327,8 @@ def _build_rounds(results, observations, archive_dir, errors, round_deadline=180
             'model_receive_intervals': receive_intervals,
             'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors),
             'uploads': uploads,
-            'active_upload_sets': [
-                value.get('active_node_ids') for value in observations['server']
-                if value.get('event') == 'active_uploads' and
-                value.get('round') == round_id and
-                isinstance(value.get('active_node_ids'), list)],
+            'active_upload_sets': active_sets,
+            'concurrent_put': concurrent_put,
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
@@ -334,6 +433,9 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
         candidates.extend(glob.glob(os.path.join(round_dir, '*.status')))
     server_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server')
     if os.path.isdir(server_dir):
+        round_suffix = round_id.split('-')[-1] if '-' in round_id else round_id
+        candidates.extend(glob.glob(os.path.join(server_dir, f'uftp-{round_suffix}.status')))
+        candidates.extend(glob.glob(os.path.join(server_dir, f'uftp-{round_id}.status')))
         candidates.extend(glob.glob(os.path.join(server_dir, 'uftp-*.status')))
         candidates.extend(glob.glob(os.path.join(server_dir, '*.status')))
 

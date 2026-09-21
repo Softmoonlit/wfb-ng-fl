@@ -4,12 +4,12 @@
 
 **Blocked by:** 03: 基于分源遥测的射频与链路参数调优验证
 
-**Status:** ready-for-agent
+**Status:** need-for-review
 
-- [ ] 运行包络与门禁支持配置化载荷大小（40 MiB）与轮次数（2 轮）。
-- [ ] 正式运行时记录两个 client 的 HTTP PUT 活动时间区间，支持观测并验证自然发生的并发重叠。
-- [ ] server 端严格在每轮完整收齐 `[1, 2]` update 集合后推进下一轮，不返回局部更新。
-- [ ] 端到端验证两轮独立 round identity、占位训练/聚合语义及全量 40 MiB SHA-256 匹配。
-- [ ] 归档校验器全面升级，fail-closed 校验多轮、分源遥测及无 upload-in-progress 冲突。
-- [ ] 编写 Python 单元测试覆盖升级后的包络与校验器成功与失败分支。
-- [ ] 满足 GitHub Issue #53 验收条件并完成对应结算。
+- [x] 运行包络与门禁支持配置化载荷大小（40 MiB）与轮次数（2 轮）。
+- [x] 正式运行时记录两个 client 的 HTTP PUT 活动时间区间，支持观测并验证自然发生的并发重叠。
+- [x] server 端严格在每轮完整收齐 `[1, 2]` update 集合后推进下一轮，不返回局部更新。
+- [x] 端到端验证两轮独立 round identity、占位训练/聚合语义及全量 40 MiB SHA-256 匹配。
+- [x] 归档校验器全面升级，fail-closed 校验多轮、分源遥测及无 upload-in-progress 冲突。
+- [x] 编写 Python 单元测试覆盖升级后的包络与校验器成功与失败分支。
+- [x] 满足 GitHub Issue #53 验收条件并完成对应结算。

@@ -40,18 +40,20 @@ IO_TIMEOUT_SECONDS="${ISSUE41_IO_TIMEOUT_SECONDS:-120}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
-ROUNDS="${ISSUE41_ROUNDS:-1}"
-INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((4 * 1024 * 1024))}"
-INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-4mib.bin}"
-CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-4mib.bin}"
-CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-4mib.bin}"
+ROUNDS="${ISSUE41_ROUNDS:-2}"
+INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((40 * 1024 * 1024))}"
+INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-40mib.bin}"
+CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-40mib.bin}"
+CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-40mib.bin}"
+CLIENT1_TRAINING_DELAY_MS="${ISSUE41_CLIENT1_TRAINING_DELAY_MS:-0}"
+CLIENT2_TRAINING_DELAY_MS="${ISSUE41_CLIENT2_TRAINING_DELAY_MS:-0}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_CYCLE_COUNT="${ISSUE41_SMOKE_CYCLE_COUNT:-3}"
 SMOKE_IO_TIMEOUT_SECONDS="${ISSUE41_SMOKE_IO_TIMEOUT_SECONDS:-120}"
 SMOKE_CYCLE_DEADLINE_SECONDS="${ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS:-240}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
-RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
+RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-400}"
 STOP_CLEANUP_TIMEOUT_SECONDS="${ISSUE41_STOP_CLEANUP_TIMEOUT_SECONDS:-5}"
 RADIO_MIN_USB_SPEED="${ISSUE41_RADIO_MIN_USB_SPEED:-480}"
 STRICT_USB_SPEED="${ISSUE41_STRICT_USB_SPEED:-0}"
@@ -144,6 +146,12 @@ init_envelope() {
   "stop_cleanup_timeout_seconds": $STOP_CLEANUP_TIMEOUT_SECONDS,
   "rounds": $ROUNDS,
   "artifact_size_bytes": $INPUT_SIZE_BYTES,
+  "training_delay_ms_by_node": {
+    "1": $CLIENT1_TRAINING_DELAY_MS,
+    "2": $CLIENT2_TRAINING_DELAY_MS
+  },
+  "client1_training_delay_ms": $CLIENT1_TRAINING_DELAY_MS,
+  "client2_training_delay_ms": $CLIENT2_TRAINING_DELAY_MS,
   "initial_model_path": "$INITIAL_MODEL_PATH",
   "client1_update_template_path": "$CLIENT1_UPDATE_TEMPLATE_PATH",
   "client2_update_template_path": "$CLIENT2_UPDATE_TEMPLATE_PATH"
@@ -447,7 +455,7 @@ EOF
 }
 
 cmd_generate_fixtures() {
-    log_info "生成确定性验收 fixture (4 MiB)..."
+    log_info "生成确定性验收 fixture (${INPUT_SIZE_BYTES} 字节)..."
     sudo install -d -m 0777 "$(dirname "$INITIAL_MODEL_PATH")"
     python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir "$(dirname "$INITIAL_MODEL_PATH")" --role model --output "$INITIAL_MODEL_PATH" --size "$INPUT_SIZE_BYTES"
     log_ok "server 初始模型生成完成：$INITIAL_MODEL_PATH"
@@ -479,11 +487,11 @@ write_issue41_configs() {
             ;;
         client1)
             node_id=1; tun="$CLIENT1_TUN"; addr="$CLIENT1_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client1-result.json"; delay=0; update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client1-result.json"; delay="$CLIENT1_TRAINING_DELAY_MS"; update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH"
             ;;
         client2)
             node_id=2; tun="$CLIENT2_TUN"; addr="$CLIENT2_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay="$CLIENT2_TRAINING_DELAY_MS"; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
             ;;
     esac
     local tmp short_gi_json=""

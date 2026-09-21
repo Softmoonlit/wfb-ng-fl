@@ -265,6 +265,65 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
                          envelope.partitions['orchestration']['last_successful_layer'])
         self.assertIsNone(envelope.partitions['orchestration']['first_failing_layer'])
 
+    def test_preflight_passes_for_40mib_scenario(self):
+        cfg_40m = dict(self.default_config)
+        cfg_40m['rounds'] = 2
+        cfg_40m['artifact_size_bytes'] = 40 * 1024 * 1024
+        cfg_40m['initial_model_path'] = os.path.join(self.temp_dir, 'model-40mib.bin')
+        cfg_40m['client1_update_template_path'] = os.path.join(self.temp_dir, 'update-c1-40mib.bin')
+        cfg_40m['client2_update_template_path'] = os.path.join(self.temp_dir, 'update-c2-40mib.bin')
+        self._write_file(cfg_40m['initial_model_path'], b'm' * (40 * 1024 * 1024))
+        self._write_file(cfg_40m['client1_update_template_path'], b'1' * (40 * 1024 * 1024))
+        self._write_file(cfg_40m['client2_update_template_path'], b'2' * (40 * 1024 * 1024))
+
+        envelope = RunEnvelope(
+            run_id='v8_issue41_preflight_40m_pass',
+            archive_root=self.archive_root,
+            branch='feat/41-real-hardware-fl-runtime-redo',
+            commit='0123456789abcdef0123456789abcdef01234567',
+            resolved_config=cfg_40m,
+        )
+        envelope.initialize()
+        executor = make_mock_topology_executor()
+        executor.set_response('server', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
+        executor.set_response('client1', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
+        executor.set_response('client2', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
+        envelope.discover_topology(executor)
+
+        passed = envelope.run_preflight(executor, expected_branch='feat/41-real-hardware-fl-runtime-redo')
+        self.assertTrue(passed)
+        self.assertEqual('passed', envelope.partitions['orchestration']['status'])
+
+    def test_preflight_fails_on_40mib_size_mismatch(self):
+        cfg_40m = dict(self.default_config)
+        cfg_40m['rounds'] = 2
+        cfg_40m['artifact_size_bytes'] = 40 * 1024 * 1024
+        cfg_40m['initial_model_path'] = os.path.join(self.temp_dir, 'model-40mib-corrupt.bin')
+        cfg_40m['client1_update_template_path'] = os.path.join(self.temp_dir, 'update-c1-40mib.bin')
+        cfg_40m['client2_update_template_path'] = os.path.join(self.temp_dir, 'update-c2-40mib.bin')
+        # 初始模型大小仅为 100 字节，不满足 40 MiB
+        self._write_file(cfg_40m['initial_model_path'], b'short')
+        self._write_file(cfg_40m['client1_update_template_path'], b'1' * (40 * 1024 * 1024))
+        self._write_file(cfg_40m['client2_update_template_path'], b'2' * (40 * 1024 * 1024))
+
+        envelope = RunEnvelope(
+            run_id='v8_issue41_preflight_40m_mismatch',
+            archive_root=self.archive_root,
+            branch='feat/41-real-hardware-fl-runtime-redo',
+            commit='0123456789abcdef0123456789abcdef01234567',
+            resolved_config=cfg_40m,
+        )
+        envelope.initialize()
+        executor = make_mock_topology_executor()
+        envelope.discover_topology(executor)
+
+        passed = envelope.run_preflight(executor, expected_branch='feat/41-real-hardware-fl-runtime-redo')
+        self.assertFalse(passed)
+        self.assertEqual('failed', envelope.partitions['orchestration']['status'])
+        self.assertEqual(PreflightLayer.DEPENDENCIES,
+                         envelope.partitions['orchestration']['first_failing_layer'])
+        self.assertIn('40 MiB', envelope.partitions['orchestration']['failure_reason'])
+
     def test_preflight_fails_on_commit_mismatch(self):
         envelope = RunEnvelope(
             run_id='v8_issue41_commit_mismatch',

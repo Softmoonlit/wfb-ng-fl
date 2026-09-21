@@ -74,15 +74,18 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_fails_on_120_second_io_stall(self):
         self.assertIn('ISSUE41_IO_TIMEOUT_SECONDS:-120', self.script)
 
-    def test_formal_runtime_defaults_to_single_4mib_round_with_delayed_client2(self):
+    def test_formal_runtime_defaults_to_two_40mib_rounds_with_concurrent_clients(self):
         for fragment in (
-                'ROUNDS="${ISSUE41_ROUNDS:-1}"',
-                'INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((4 * 1024 * 1024))}"',
-                'update-client1-4mib.bin',
-                'update-client2-4mib.bin',
+                'ROUNDS="${ISSUE41_ROUNDS:-2}"',
+                'INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((40 * 1024 * 1024))}"',
+                'update-client1-40mib.bin',
+                'update-client2-40mib.bin',
                 'required_artifact_size_bytes',
-                'delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"',
-                '两个 client 的 4 MiB update 模板 SHA-256 必须不同',
+                'delay="$CLIENT1_TRAINING_DELAY_MS"',
+                'delay="$CLIENT2_TRAINING_DELAY_MS"',
+                'RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-400}"',
+                'CLIENT1_TRAINING_DELAY_MS="${ISSUE41_CLIENT1_TRAINING_DELAY_MS:-0}"',
+                'CLIENT2_TRAINING_DELAY_MS="${ISSUE41_CLIENT2_TRAINING_DELAY_MS:-0}"',
                 '"live_observation":true',
                 '"observation_path":"$work_dir/observation.jsonl"',
                 'issue41_build_summary.py',

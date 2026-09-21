@@ -288,36 +288,41 @@ class RunEnvelope:
                         raise PreflightException(l_name, FailureCategory.TOOLING,
                                                  f"{role} 缺少必要命令依赖：{cmd}")
 
-            # 4 MiB 输入模型和 update 模板检查
+            # 输入模型和 update 模板检查（支持 40 MiB 或配置化大小）
+            expected_size = int(self.resolved_config.get(
+                'artifact_size_bytes',
+                4 * 1024 * 1024 if '4mib' in str(self.resolved_config.get('initial_model_path', '')) else 40 * 1024 * 1024
+            ))
+            expected_size_desc = f"{expected_size // (1024 * 1024)} MiB" if expected_size % (1024 * 1024) == 0 else f"{expected_size} 字节"
             initial_model = self.resolved_config.get('initial_model_path')
             if initial_model:
                 rc, out, _ = executor.run('server', f"test -f '{initial_model}' && test -r '{initial_model}' && stat -c %s '{initial_model}'")
-                if rc != 0 or out.strip() != str(4 * 1024 * 1024):
+                if rc != 0 or out.strip() != str(expected_size):
                     raise PreflightException(l_name, FailureCategory.TOOLING,
-                                             f"server 初始模型必须是可读的 4 MiB 文件：{initial_model}")
+                                             f"server 初始模型必须是可读的 {expected_size_desc} 文件：{initial_model}")
 
             c1_tpl = self.resolved_config.get('client1_update_template_path')
             c2_tpl = self.resolved_config.get('client2_update_template_path')
             c1_sha, c2_sha = None, None
             if c1_tpl:
                 rc, out, _ = executor.run('client1', f"sudo test -f '{c1_tpl}' && sudo test -r '{c1_tpl}' && sudo stat -c %s '{c1_tpl}'")
-                if rc != 0 or out.strip() != str(4 * 1024 * 1024):
+                if rc != 0 or out.strip() != str(expected_size):
                     raise PreflightException(l_name, FailureCategory.TOOLING,
-                                             f"client1 update 模板必须是可读的 4 MiB 文件：{c1_tpl}")
+                                             f"client1 update 模板必须是可读的 {expected_size_desc} 文件：{c1_tpl}")
                 rc, out, _ = executor.run('client1', f"sudo sha256sum '{c1_tpl}'")
                 c1_sha = out.split()[0] if rc == 0 else ''
 
             if c2_tpl:
                 rc, out, _ = executor.run('client2', f"sudo test -f '{c2_tpl}' && sudo test -r '{c2_tpl}' && sudo stat -c %s '{c2_tpl}'")
-                if rc != 0 or out.strip() != str(4 * 1024 * 1024):
+                if rc != 0 or out.strip() != str(expected_size):
                     raise PreflightException(l_name, FailureCategory.TOOLING,
-                                             f"client2 update 模板必须是可读的 4 MiB 文件：{c2_tpl}")
+                                             f"client2 update 模板必须是可读的 {expected_size_desc} 文件：{c2_tpl}")
                 rc, out, _ = executor.run('client2', f"sudo sha256sum '{c2_tpl}'")
                 c2_sha = out.split()[0] if rc == 0 else ''
 
             if c1_sha and c2_sha and c1_sha == c2_sha:
                 raise PreflightException(l_name, FailureCategory.TOOLING,
-                                         "client1 与 client2 的 4 MiB update 模板 SHA-256 必须不同")
+                                         "client1 与 client2 的 update 模板 SHA-256 必须不同")
             last_successful = l_name
 
             # Layer 4: wireless_usb

@@ -144,6 +144,70 @@ class Issue41AlgorithmTestCase(unittest.TestCase):
             result['rounds'][0]['put_interval']['start'],
             result['rounds'][0]['put_interval']['end'])
 
+    def test_two_round_execution_with_placeholder_training_and_aggregation(self):
+        initial_model = self.make_binary_file(
+            'models/initial.bin', MODEL_SIZE_BYTES, b'initial-global-weights\n')
+        server_runtime = ServerOpaqueRuntime(
+            os.path.join(self.root, 'server'), (1, 2),
+            update_size_bytes=MODEL_SIZE_BYTES)
+        server_result_path = os.path.join(self.root, 'server/result.json')
+
+        server_main(server_runtime, {
+            'rounds': 2,
+            'participant_node_ids': [1, 2],
+            'initial_model_path': initial_model,
+            'required_artifact_size_bytes': MODEL_SIZE_BYTES,
+            'result_path': server_result_path,
+        })
+
+        server_result = read_json(server_result_path)
+        self.assertEqual('succeeded', server_result['conclusion'])
+        self.assertEqual(2, len(server_result['rounds']))
+        self.assertEqual(2, len(server_runtime.published_models))
+        self.assertNotEqual(
+            server_result['rounds'][0]['round_id'],
+            server_result['rounds'][1]['round_id'])
+        self.assertEqual(
+            sha256(initial_model),
+            server_result['rounds'][0]['input_model_sha256'])
+        self.assertEqual(
+            server_result['rounds'][0]['output_model_sha256'],
+            server_result['rounds'][1]['input_model_sha256'])
+        self.assertEqual(
+            server_result['rounds'][1]['input_model_sha256'],
+            server_result['rounds'][1]['output_model_sha256'])
+
+        update_template = self.make_binary_file(
+            'templates/client1.bin', MODEL_SIZE_BYTES, b'client-1-template-data\n')
+        client_runtime = ClientOpaqueRuntime(
+            os.path.join(self.root, 'client'), 1, initial_model)
+        client_result_path = os.path.join(self.root, 'client/result.json')
+
+        client_main(client_runtime, {
+            'rounds': 2,
+            'node_id': 1,
+            'required_artifact_size_bytes': MODEL_SIZE_BYTES,
+            'update_template_path': update_template,
+            'training_delay_ms': 0,
+            'result_path': client_result_path,
+        })
+
+        client_result = read_json(client_result_path)
+        self.assertEqual('succeeded', client_result['conclusion'])
+        self.assertEqual(2, len(client_result['rounds']))
+        self.assertEqual(2, client_runtime.wait_count)
+        self.assertEqual(2, len(client_runtime.submitted_updates))
+        self.assertEqual(sha256(update_template), client_result['update_template_sha256'])
+        self.assertEqual(
+            client_result['rounds'][0]['update_sha256'],
+            client_result['rounds'][1]['update_sha256'])
+        self.assertEqual(
+            sha256(update_template),
+            client_result['rounds'][0]['update_sha256'])
+        self.assertNotEqual(
+            client_result['rounds'][0]['round_id'],
+            client_result['rounds'][1]['round_id'])
+
     def test_required_input_files_fail_before_runtime_operations(self):
         server_runtime = ServerOpaqueRuntime(
             os.path.join(self.root, 'server'), (1, 2))
