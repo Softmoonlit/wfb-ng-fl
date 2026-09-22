@@ -6,152 +6,171 @@ Status: ready-for-agent
 
 在现有的三机联邦学习实现中，Server 依赖集中的 SSH 远程网络编排（通过带外以太网管理网）来探测客户端硬件、下发运行配置、拉起角色服务以及收集日志。然而在真实的无外网现场演示和物理仿真环境中，节点之间根本没有管理以太网，Server 无法通过 SSH 连接 Client1 与 Client2。
 
-操作者若在每台机器终端上重复手动输入网卡名称、信道、MCS、TUN IP 及复杂的启动参数，极易因参数不一致或配置错漏（如误设具有驱动致命越界缺陷的信道 161、配错带宽导致解调失败、或将 UFTP 发送速率设得过高击穿内核 TUN 缓冲导致丢包雪崩）而使演示中断。同时，由于底层通信采用 Monitor 模式且没有 AP 关联心跳，一旦信道切换失败或发生空口丢包，客户端极易永久失联进入“脑裂”锁死状态。
+操作者若在每台机器终端上手动执行脚本、配置网卡与启动服务，极易因参数不一致（如误设具有驱动致命越界缺陷的信道 161、配错带宽导致解调失败、或将 UFTP 发送速率设得过高击穿内核 TUN 缓冲导致静默丢包与重传雪崩）而使演示中断。在没有任务运行的空闲期，Server 缺乏常驻进程持续监听心跳，导致外部 Web 面板或 CLI 无法获知客户端实时在线拓扑；而在信道切换过程中，若部分客户端丢包未完成切换，极易引发信道脑裂（部分节点在目标信道，部分节点在原信道），导致节点永久孤儿化失联。此外，原架构将任务收齐语义死锁在全员必须同时在线的强同步模式，无法支持半异步或异步联邦学习实验。
 
-因此，系统急需在脱离 SSH 依赖的前提下，在 Server 侧提供全自动的 Headless 核心协同引擎，在 Client 侧提供开机自启的常驻守护服务，并在启动前具备空口射频质量感知探路与分级预设能力，通过带内虚拟网络信令实现全自治、防锁死的协同闭环。
+因此，系统急需在脱离 SSH 依赖的前提下：
+1. 在 Server 侧提供开机常驻的协同守护引擎（`wfb-fl-server-daemon`）并暴露统一本地 IPC；
+2. 在 Client 侧提供开机自启的常驻守护服务（`wfb-fl-client-daemon`），采用子进程沙箱隔离每一次算法作业生命周期；
+3. 建立纯粹、极轻量的对称 UDP 控制信令平面（下行广播、上行单播），与大文件数据平面（UFTP 下行、HTTP PUT 上行）正交解耦；
+4. 建立防信道脑裂的租约式看门狗自愈协议；
+5. 建立面向用户的三种联邦学习协同范式（同步、半异步、异步）及纯底层网卡预设与速率区间保护。
 
 ## Solution
 
-1. **启动前主动扫频探路（Spectrum Survey）**：
-   在启动角色服务前，操作者可主动触发无 GUI 依赖的扫频探路工具。工具对合法 5 GHz 信道池（149、153、157、165）进行快速空口监听，统计外来 802.11 帧密度并输出质量排行；坚决将已知引发内核 UBSAN 越界崩溃的 Channel 161 列为系统级硬黑名单永久禁选。当全信道拥堵时输出显著风险警告并联动建议切换至抗干扰模式。
+1. **服务端常驻协同守护引擎与统一本地 IPC (Server Daemon & Local IPC)**：
+   Server 部署开机常驻守护服务 `wfb-fl-server-daemon`，开机后独占纳管无线网卡并持续在后台监听客户端心跳，维护全局客户端实时在线拓扑视界（`NodeHorizonRegistry`）。对外暴露本地 Unix Domain Socket 或 Localhost 接口，为 CLI 工具与 Web 后端提供无冲突的常态化状态推流、扫频触发与任务下发通道。
 
-2. **纯底层网卡参数预设分级（Radio Presets）**：
-   将 FEC 纠错参数作为物理底座基准全局固化为 8/14（不向普通用户暴露），针对底层网卡参数提供三档明确的语义化预设：
-   - `robust`（抗干扰/穿透）：MCS 2, HT20, Long GI, TxPower 20dBm；
-   - `standard`（标准推荐/默认）：MCS 3, HT40+, Short GI, TxPower 20dBm；
-   - `performance`（高速洁净）：MCS 5, HT40+, Short GI, TxPower 20dBm。
+2. **客户端常驻守护服务与子进程沙箱隔离 (Client Daemon & RoleService Sandbox)**：
+   Client 部署开机自启 systemd 常驻守护服务 `wfb-fl-client-daemon`。基于本机固化配置文件（`/etc/wfb-ng-fl/node.json`）确定身份与 TUN IP，开机后将无线网卡置为 Monitor 模式并在默认 Channel 157 待命；收到 Server 任务配置后，Daemon 派生独立的 `RoleService` 子进程执行本轮模型接收、占位/模拟训练与参数上传闭环；任务结束后干净回收子进程并恢复待命，严格符合 ADR-0010 单作业生命周期隔离契约。
 
-3. **下行传输速率区间与强告警保护（Downlink Rate Envelope）**：
-   基于固化 FEC 8/14 开销与所选 MCS 物理速率，建立应用层 UFTP 安全注入速率上下限字典。选择网卡预设时自动带出黄金中值（如 `standard` 对应 15 Mbps）；用户手动输入越界时触发强风险警示与交互式确认（自动化测试需加 `--force`），杜绝内核 TUN 缓冲溢出与丢包雪崩。
+3. **控制信令面与数据面正交分离的双平面架构 (Dual-Plane Protocol)**：
+   - **控制信令面（小 JSON，对称轻量 UDP）**：下行由 Server 向 `10.80.0.255:9000` 广播（任务宣告、信道切换、心跳探针），上行由各 Client 向 `10.80.0.1:9001` 单播（心跳保活、状态汇报、切换回执），零 HTTP/TCP 握手延迟，享底层 FEC 8/14 保护；
+   - **数据传输面（40 MiB 大文件）**：保持下行 UFTP 多播分发模型、上行 HTTP PUT 单播上传 update，确保大文件传输的可靠性与流控。
 
-4. **Client 侧开机自启常驻守护服务（Client Daemon Agent）**：
-   客户端部署为开机自启的 systemd 服务。开机后自动扫描并接管唯一的 `wlx*` 真实网卡，将其置为 Monitor 模式并监听默认基准信道（Channel 157），拉起 TUN 网络与带内信令接收器，进入待命状态，无需现场人员登录终端。
+4. **防脑裂租约式看门狗自愈机制 (Lease-based Anti-Lockup Watchdog)**：
+   射频信道切换采用“两阶段准备 + 租约式看门狗”协议。Client 切换至目标信道后启用 15 秒心跳租约看门狗；若 Server 发现有节点未上线而放弃切换并退回 157，Server 在目标信道停止发心跳，被孤立 Client 租约耗尽后由看门狗触发硬件回滚，自动切回默认 Channel 157，确保全集群在任何断网异常下均整齐汇合，彻底杜绝信道脑裂。
 
-5. **基于 TUN 带内仿真控制信令与失联防锁死看门狗（In-Band Signaling & Watchdog）**：
-   Server 核心协同引擎与 Client 常驻守护服务之间，所有任务配置、参数同步、状态汇报与心跳保活消息均作为普通应用层数据包，通过具备 WFB FEC 纠错保护的 TUN 虚拟网络承载。射频参数切换采用两阶段确认协议；Client 在切换信道后若在看门狗超时窗口内未收到 Server 的带内心跳，自动回退至默认信道（Channel 157），彻底杜绝空口节点孤儿化。
+5. **纯底层网卡参数预设分级与扫频探路 (Radio Presets & Spectrum Survey)**：
+   - 固化 FEC 为全局基准 `8/14`；提供 `robust`（MCS 2 HT20）、`standard`（MCS 3 HT40+，默认）、`performance`（MCS 5 HT40+）三档纯网卡参数预设；
+   - 扫频探路扫描合法 5 GHz 信道池 `[149, 153, 157, 165]`，**Channel 161 因驱动内核越界致命缺陷作为系统级硬黑名单永久禁选与剔除**；
+   - 依据 MCS 承载力标定 UFTP 速率区间（MCS 3 默认 15 Mbps），越界强告警需确认（自动化测试需加 `--force`）。
+
+6. **三位一体联邦学习协同范式 (FL Collaboration Paradigms)**：
+   统一支持 `sync`（同步，默认要求全员收齐）、`semi_async`（半异步，设置最小配额 `min_updates`，支持抗掉队者）与 `async`（完全异步，单节点随练随交流水线聚合）。
 
 ## User Stories
 
-1. 作为 现场操作者，我希望在启动仿真前主动执行扫频探路，以便了解当前场地的 5 GHz 频段外来干扰情况。
-2. 作为 现场操作者，我希望扫频探路输出直观的信道质量排行与推荐，以便我能够一目了然地确认最优信道。
+1. 作为 现场操作者，我希望无论是否有任务正在运行，都能在 CLI 或 Web 上实时查看各客户端的在线状态与信号质量，以便在开始仿真前确认硬件就绪。
+2. 作为 现场操作者，我希望在启动仿真前主动执行扫频探路，以便获知当前场地 5 GHz 频段的信道干扰情况与推荐排行。
 3. 作为 现场操作者，我希望系统坚决屏蔽已知有驱动致命崩溃缺陷的 Channel 161，以便我绝不会因误选该信道而引发射频失效。
 4. 作为 现场操作者，我希望在全频段皆有较强外部干扰时系统输出醒目的风险警告并联动建议 `robust` 预设，以便我在复杂环境下提前做好抗干扰防范。
 5. 作为 仿真操作者，我希望只需指定 `robust`、`standard` 或 `performance` 预设名称即可完成网卡射频配置，以便无经验用户无需记忆复杂的 MCS、频宽与 GI 组合。
 6. 作为 仿真操作者，我希望选择 `standard` 预设时系统自动带出 15 Mbps 的默认下行速率，以便无需手动反复核算 UFTP 参数。
 7. 作为 算法开发人员，我希望能够在推荐区间内微调下行发送速率，以便探索不同发送速度对模型交付效率的影响。
-8. 作为 架构维护者，我希望当用户输入的下行速率超出当前 MCS 安全区间时系统输出强风险告警，以便阻止内核 TUN 缓冲被静默打满。
-9. 作为 自动化测试执行者，我希望在非交互式脚本中必须显式传入强制标记才允许越界速率运行，以便在无人工确认时严格 fail-closed。
+8. 作为 架构维护者，我希望当用户输入的下行速率超出当前 MCS 安全区间时系统输出强风险告警，以便阻止内核 TUN 缓冲被静默打满导致丢包雪崩。
+9. 作为 自动化测试执行者，我希望在非交互式脚本中必须显式传入 `--force` 标记才允许越界速率运行，以便在无人工确认时严格 fail-closed。
 10. 作为 现场维护人员，我希望两台 Client 物理机开机后能自动启动常驻守护服务，以便无需通过 SSH 或接显示器即可完成客户端初始化。
-11. 作为 Client 守护进程，我希望在开机后自动完成真实无线网卡的发现与 Monitor 模式配置，以便及时进入默认信道待命。
-12. 作为 Server 协同引擎，我希望通过 TUN 虚拟网络向各客户端广播仿真任务与参数，以便摆脱对以太网 SSH 的依赖。
-13. 作为 系统诊断者，我希望仿真控制信令与业务心跳享有 WFB FEC 纠错保护，以便在空口存在突发丢包时控制消息不丢失。
-14. 作为 链路调度器，我希望微秒级的 GRANT 与 READY 调度帧严格留在链路层，不与应用层仿真控制信令混淆，以便保持底层机制的极简与高效。
-15. 作为 仿真操作者，我希望 Server 核心引擎能够向常驻客户端下发新的射频参数（如切换信道），以便根据扫频推荐动态应用最优配置。
-16. 作为 Client 守护进程，我希望在收到射频重配信令后执行两阶段确认，以便向 Server 证明本机已准备好同步切换。
-17. 作为 Client 守护进程，我希望在切换信道后启动失联防锁死看门狗计时器，以便在未收到 Server 心跳时自动自愈。
-18. 作为 Client 守护进程，我希望当看门狗超时时自动将射频还原为默认 Channel 157，以便随时恢复与 Server 的可达性。
-19. 作为 Server 协同引擎，我希望在发起信道切换后若发现有 Client 未在规定时间内同步上线，能够安全回滚至原信道，以便避免集群脑裂。
-20. 作为 运行维护者，我希望 Client 守护进程支持清晰的状态机跃迁（IDLE -> PREPARING -> WAITING_MODEL -> TRAINING -> COMMITTING -> COMPLETED），以便随时查询节点所处阶段。
-21. 作为 运行维护者，我希望 Client 守护进程在单次仿真结束后自动恢复到 IDLE 状态，以便无需重启机器即可连续承接下一项仿真任务。
-22. 作为 仿真操作者，我希望 Server 核心协同引擎在检测到所有参与客户端在线就绪后自动启动 FL 轮次，以便实现真正的无缝自治推进。
-23. 作为 审计人员，我希望所有带内信令交互、状态跃迁与看门狗回退事件均记录结构化带内日志，以便在无网测试后提取审计。
+11. 作为 Client 守护进程，我希望在开机后自动读取本地 `/etc/wfb-ng-fl/node.json` 确定 Node ID 与 TUN IP，以便免去脆弱的动态 IP 申请握手。
+12. 作为 Client 守护进程，我希望在开机后自动完成真实无线网卡的发现与 Monitor 模式配置，并在默认 Channel 157 上待命。
+13. 作为 Client 守护进程，我希望收到仿真任务时派生独立的 `RoleService` 子进程执行训练与数据交换，以便在任务结束后干净释放资源，防止内存残留。
+14. 作为 Server 协同守护引擎，我希望开机常驻并在后台持续收集 Client 心跳，以便随时维护全局节点的在线拓扑视界。
+15. 作为 Server 协同守护引擎，我希望对外暴露统一本地 IPC 接口，以便 CLI 工具与 Web 后端能无冲突地发起查询与任务控制。
+16. 作为 链路控制面，我希望所有心跳、状态汇报与任务信令采用轻量 UDP 报文承载，以便消除 TCP 连接建立延迟并复用空口物理广播红利。
+17. 作为 仿真操作者，我希望在发布任务时能够在“同步（sync）”、“半异步（semi_async）”与“异步（async）”三种协同范式间自由选择，以便进行不同算法特性的科研对比。
+18. 作为 算法研究者，我希望在选择“半异步”模式时指定最小收齐节点数（`min_updates`），以便在部分慢节点掉队或超时时不中断轮次推进。
+19. 作为 算法研究者，我希望在选择“同步”模式时引擎严格等待全部目标客户端，以便确保基线实验数据的严谨性。
+20. 作为 仿真操作者，我希望 Server 核心引擎能够向常驻客户端下发新的射频参数（如切换信道），以便根据扫频推荐动态应用最优配置。
+21. 作为 Client 守护进程，我希望在收到射频重配信令后执行两阶段确认，以便向 Server 证明本机已准备好同步切换。
+22. 作为 Client 守护进程，我希望在切换信道后启用 15 秒心跳租约看门狗，以便在未收到 Server 持续心跳时自动回滚至基准 Channel 157。
+23. 作为 Server 协同守护引擎，我希望在新信道未全员上线时停止发送心跳并安全退回原信道，以便让孤立客户端由看门狗触发回退，杜绝信道脑裂。
+24. 作为 Server 协同守护引擎，我希望在新信道全员上线后广播 `RADIO_SWITCH_FINALIZED` 终审指令，以便客户端正式锁定新信道。
+25. 作为 审计人员，我希望所有带内信令交互、状态跃迁、看门狗回退事件与分源遥测均记录结构化带内日志，以便在无网测试后提取审计。
 
 ## Implementation Decisions
 
-- **扫频探路模块契约 (Spectrum Survey Module)**：
-  - 扫频探路作为无 GUI 依赖的底层工具实现，接收网卡接口名与监听时长（默认单信道 1~2 秒）；
-  - 扫描范围限定为中国及通用法规允许的 5 GHz 免许可信道池：`[149, 153, 157, 165]`，默认排除 2.4 GHz；
-  - **信道 161 驱动硬黑名单**：驱动源码硬编码排除了 163 频点，导致 161 (HT40+) 触发内核越界 UBSAN 崩溃。该信道必须在常量层设为系统级硬黑名单，禁止扫描、禁止推荐、禁止启动；
-  - 扫描通过轻量 pcap/radiotap 监听，解析并统计外来 802.11 数据帧与管理帧频次，输出结构化 JSON，包含各信道帧计数、底噪预估、质量评分与降序排行；
-  - 若所有信道帧密度均超过拥堵阈值，在输出中注入 `warning: high_interference` 标志，并附带 `recommended_preset: "robust"`。
+- **服务端常驻守护引擎与本地 IPC 契约 (Server Daemon & Local IPC)**：
+  - 常驻服务名为 `wfb-fl-server-daemon`，以 systemd 单元运行；
+  - 启动后独占纳管服务端的 `wlx*` 真实网卡，绑定 TUN `10.80.0.1`，常驻监听 UDP 端口 `9001` 接收客户端心跳；
+  - 维护内存级 `NodeHorizonRegistry`，记录参与节点 ID、IP、当前状态机阶段（`IDLE`、`RUNNING` 等）、最后心跳时间戳（毫秒）与当前信道；
+  - 对外提供统一的本地 Unix Domain Socket（`/run/wfb-fl/server.sock`）或本地专用 REST API（`http://127.0.0.1:9090`），支持的 IPC 动作：
+    - `GET /status`：返回所有已知节点的实时拓扑、信道与状态；
+    - `POST /survey`：触发底层网卡执行 5 GHz 频段快速扫频探路并返回排行；
+    - `POST /jobs/start`：提交包含预设、模式、参与节点与模型路径的仿真作业；
+    - `POST /jobs/abort`：强制中止当前作业并重置集群；
+    - `GET /logs/stream`：流式输出带内控制信令与协同推进日志。
 
-- **射频预设与速率区间契约 (Radio Presets & Rate Envelope)**：
-  - 遵循 ADR-0011，FEC 参数全局固化为 `8/14`，彻底与上层网卡预设解耦；
-  - 系统内置三档网卡预设：
-    - `robust`: MCS 2, HT20, Long GI, TxPower 20dBm
-    - `standard`: MCS 3, HT40+, Short GI, TxPower 20dBm (系统默认)
-    - `performance`: MCS 5, HT40+, Short GI, TxPower 20dBm
-  - 下行速率区间对照字典：
-    - MCS 2 (HT20): 5 ~ 8 Mbps (默认推荐中值: 6 Mbps)
-    - MCS 2 (HT40+): 8 ~ 14 Mbps (默认推荐中值: 10 Mbps)
-    - MCS 3 (HT40+): 12 ~ 18 Mbps (默认推荐中值: 15 Mbps)
-    - MCS 4 (HT40+): 18 ~ 26 Mbps (默认推荐中值: 22 Mbps)
-    - MCS 5 (HT40+): 24 ~ 35 Mbps (默认推荐中值: 28 Mbps)
-  - 校验器逻辑：未显式传速率时自动填入当前预设的中值；传参超出区间时，交互式模式下提示风险并要求回车确认，非交互式模式下若未带 `--force` 立即抛出配置错误并退出。
+- **客户端常驻守护与子进程沙箱生命周期 (Client Daemon & Subprocess Sandbox)**：
+  - 常驻服务名为 `wfb-fl-client-daemon`，以 systemd 单元运行；
+  - 读取本地固化配置 `/etc/wfb-ng-fl/node.json`（包含 `node_id` 与 `tun_ip`）；
+  - 开机后自动将 `wlx*` 网卡置为 Monitor 模式，信道设为默认 157，配置 TUN IP 并启动 UDP 客户端；
+  - 每 2 秒向 `10.80.0.1:9001` 单播发送心跳 `NODE_HEARTBEAT`；
+  - 收到 Server 的 `TASK_ANNOUNCE` 时，状态机从 `IDLE` 跃迁至 `PREPARING`，并在本地隔离的工作目录下通过 `subprocess.Popen` 动态派生独立的 `RoleService(role='client')` 执行本轮任务；
+  - 任务正常完成或异常中止后，Daemon 负责 `terminate/kill` 子进程、清理临时接收区并回收资源，重新切回 `IDLE` 状态，坚决不驻留脏数据。
 
-- **Client 常驻守护服务与状态机 (Client Daemon)**：
-  - 注册为开机自启 systemd 单元 `wfb-fl-client-daemon.service`；
-  - 状态机包含如下严格单向与自愈跃迁状态：
-    - `UNINITIALIZED`: 正在扫描本地 `wlx*` 网卡并验证依赖；
-    - `IDLE`: 网卡已就绪并置于默认 Channel 157，TUN 已配置，带内心令监听服务已启动；
-    - `CONFIGURING`: 收到 Server 任务配置，正在准备本地工作目录与模板；
-    - `WAITING_MODEL`: 本地环境就绪，UFTP 接收进程常驻监听，等待 Server 模型下发；
-    - `TRAINING`: 模型校验通过，执行本地占位/模拟训练；
-    - `COMMITTING`: 训练完成，通过 HTTP PUT 向 Server 提交 update；
-    - `ROUND_COMPLETED`: 本轮传输闭环完成，清理临时状态；
-    - `ERROR`: 出现不可逆物理或配置错误，记录日志后安全回退至 `IDLE`。
-  - 单次任务结束后，守护进程自动释放本轮临时资源并回到 `IDLE`，保持长驻监听。
+- **轻量对称 UDP 控制信令平面 (Symmetric UDP Control Plane)**：
+  - **下行方向（Server -> Clients，广播）**：Server 向 `10.80.0.255:9000` 广播 JSON 数据报：
+    - `SERVER_HEARTBEAT`：Server 在线状态与当前时间戳；
+    - `TASK_ANNOUNCE`：宣布新任务（轮次数、参与节点名单、协同模式、模型大小与 SHA-256）；
+    - `CONFIG_RADIO_PREPARE`：两阶段信道切换预备请求；
+    - `CONFIG_RADIO_COMMIT`：两阶段信道切换生效指令（带 2s 延时）；
+    - `RADIO_SWITCH_FINALIZED`：新信道全员上线终审定案；
+    - `JOB_ABORT`：紧急中止指令。
+  - **上行方向（Client -> Server，单播）**：Client 向 `10.80.0.1:9001` 发送 JSON 数据报：
+    - `NODE_HEARTBEAT`：汇报本机 ID、状态机阶段、当前信道与错误码；
+    - `PREPARE_ACK`：信道切换预备就绪回执（带 seq_id 幂等重发）；
+    - `COMMIT_SUCCESS`：新信道上线打卡汇报。
 
-- **带内仿真控制信令协议 (In-Band Control Protocol)**：
-  - 位于应用层，跑在 TUN 虚拟网卡分配的 `10.80.0.0/24` 数据面网段上，享受底层 C++ 底座的 FEC 8/14 纠错保护；
-  - 采用轻量 JSON-RPC / REST 机制（Server 提供信令控制服务，Client 提供状态汇报端点）；
-  - 信令类型明确划分为：
-    - `TASK_ANNOUNCE`: Server 宣告仿真任务、轮次数、参与客户端集合与模型规模；
-    - `NODE_HELLO / HEARTBEAT`: Client 向 Server 汇报本机在线状态、版本号、网卡状态与当前信道；
-    - `CONFIG_RADIO`: Server 请求切换射频参数（信道、预设）；
-    - `CONFIG_COMMIT`: 两阶段确认后最终执行射频生效；
-    - `NODE_STATUS`: 客户端状态跃迁与性能遥测汇报。
+- **两阶段防脑裂租约式看门狗自愈协议 (Lease-based Anti-Lockup Watchdog)**：
+  1. **Phase 1 (Prepare)**：Server 广播 `CONFIG_RADIO_PREPARE(target_ch=149, preset="standard")`；
+     - 客户端校验硬件支持度，回复 `PREPARE_ACK`；
+     - **全员门禁**：Server 必须在 5 秒内收齐全部目标客户端的 `PREPARE_ACK`；若有任一节点超时，Server 广播取消，集群停留在原信道。
+  2. **Phase 2 (Commit & Arm Lease)**：Server 广播 `CONFIG_RADIO_COMMIT(delay_ms=2000)`；
+     - 客户端启动 **15 秒租约式看门狗**，延时 2 秒将网卡置为 Channel 149；
+     - Server 延时 2 秒将网卡置为 Channel 149，并在新信道上以 1 秒周期广播 `NEW_CHANNEL_PING`；
+  3. **租约刷新与终审定案**：
+     - Client 在 149 收到 Ping 后回复 `COMMIT_SUCCESS`，同时将看门狗租约刷新为 15 秒（不关闭看门狗）；
+     - **全员上线**：Server 在 10 秒内收齐全部客户端的 `COMMIT_SUCCESS`，广播 `RADIO_SWITCH_FINALIZED`；客户端收到终审定案，正式解除看门狗并锁定 Channel 149；
+     - **局部失败自愈（防脑裂）**：若 Server 在 10 秒内未收齐，Server 立即停止在 149 上发心跳并退回 Channel 157；新信道上的客户端由于 Server 消失，15 秒租约耗尽，看门狗强制将物理网卡切回 Channel 157。三机最终整齐汇合于基准信道 157！
 
-- **两阶段射频重配与看门狗自愈协议 (Anti-Lockup Watchdog)**：
-  - **第一阶段（预备）**：Server 发送 `CONFIG_RADIO`，包含目标信道与预设；Client 校验参数合法性并返回 `PREPARED_OK`；
-  - **第二阶段（生效与看门狗）**：Server 确认收齐所有 Client 的确认后，广播 `CONFIG_COMMIT(effective_delay_ms=2000)`；
-  - Client 启动看门狗计时器（默认 15 秒），切换物理网卡信道至目标频点并重启带内心令监听；
-  - Server 切换信道并在新信道上立即发送 `HEARTBEAT` 信令；
-  - Client 在新信道收到有效心跳后，重置看门狗并标记信道切换成功；
-  - 若 Client 在 15 秒内未收到心跳，看门狗触发硬件回滚，自动将无线网卡还原至基准 Channel 157 并回到 `IDLE`。
+- **联邦学习协同范式 Schema 与行为契约 (FL Collaboration Paradigms)**：
+  - 作业配置 `job.json` 核心字段：
+    ```json
+    {
+      "mode": "sync", // 可选: "sync", "semi_async", "async"
+      "target_nodes": [1, 2],
+      "min_updates": 2, // 当 mode 为 semi_async 时必须指定，sync 模式自动等同于 len(target_nodes)
+      "max_staleness": 0, // 当 mode 为 async 时支持落后版本聚合
+      "round_timeout_seconds": 120
+    }
+    ```
+  - `sync` 模式下任一节点超时触发全局中止与自愈；`semi_async` 模式下达到 `min_updates` 即完成本轮聚合推进下一轮，未提交节点记为 `dropped_out`。
+
+- **扫频探路、预设与速率安全区间 (Radio Presets & Spectrum Survey)**：
+  - 继承 ADR-0011：固化 FEC 8/14；内置 `robust`、`standard`（默认）、`performance` 三档底层网卡预设；
+  - 扫频探路扫描 `[149, 153, 157, 165]`，**Channel 161 硬黑名单禁选**，全拥堵时警示并推荐 `robust`；
+  - 下行速率字典强校验（MCS 3 默认 15 Mbps，区间 12~18 Mbps），越界需 `--force` 否则拒绝启动。
 
 ## Testing Decisions
 
 - **测试设计原则 (Seams at the highest level)**：
-  - 优先在最高层级的可执行程序、CLI 子进程和真实网络套接字边界建立测试接缝，严禁对私有变量、内部锁或内部微步函数进行脆弱断言；
-  - 保证业务状态机、协议信令与校验逻辑在无真实物理网卡的虚拟环境下（如虚拟 TUN/TAP 或 Mock 接口）具有 100% 可测试性。
+  - 遵循深模块与高接缝原则，在可执行 CLI、本地 IPC 套接字与虚拟网络设备层构建端到端测试，严禁对内部私有变量或中间状态进行脆弱断言；
+  - 保证在无物理无线网卡的开发与 CI 环境中，通过虚拟 TAP/TUN 与 Mock 套接字能够完整测试协议、状态机与看门狗逻辑。
 
-- **四大核心测试接缝 (Primary Testing Seams)**：
-  1. **扫频探路命令行接缝 (Spectrum Survey Seam)**：
-     - 测试 `SpectrumSurvey` 命令行与模块接口；
-     - 注入虚拟 pcap 流量包与各种信道背景噪声，验证帧解析、信道排序算法及拥堵告警逻辑；
-     - 严格断言：尝试传入或扫描 Channel 161 时，必须被硬黑名单拦截。
-  2. **射频预设与速率区间校验接缝 (Preset & Rate Envelope Seam)**：
-     - 测试参数解析与校验引擎；
-     - 断言 `robust`、`standard`、`performance` 各档位映射的物理参数完全符合 ADR-0011 规范；
-     - 断言默认下行速率联动赋值；
-     - 断言越界速率在交互式与非交互式（`--force`）场景下的强告警与拦截行为。
-  3. **虚拟 TUN 带内信令与心跳接缝 (In-Band Signaling Seam)**：
-     - 在本地环回创建虚拟 TUN 设备对，拉起 Server 协同引擎信令端与 Client 守护信令客户端；
-     - 验证任务广播、客户端 Hello、状态汇报与心跳周期的编解码与时序推进。
-  4. **两阶段射频切换与看门狗超时回滚接缝 (Watchdog Anti-Lockup Seam)**：
-     - 模拟信道切换流程：正常握手时断言看门狗被心跳成功解除；
-     - 注入空口丢包（丢弃心跳包），断言 Client 守护进程在超时后触发自愈动作，安全将配置回滚为 Channel 157 并重置状态机。
-  5. **Client 守护进程状态机生命周期接缝 (Daemon State Machine Seam)**：
-     - 模拟从 `IDLE` 到 `COMMITTING` 再回到 `IDLE` 的完整仿真周期，断言多轮任务间无资源泄漏。
+- **五大核心测试接缝 (Primary Testing Seams)**：
+  1. **Server 常驻守护与 Local IPC 接缝 (Server Daemon IPC Seam)**：
+     - 测试 `wfb-fl-server-daemon` 的 Unix Domain Socket / REST 接口；
+     - 断言 `GET /status` 能正确反映从模拟 UDP 心跳中解析出的客户端拓扑与信噪比；
+     - 断言 `POST /jobs/start` 能够正确生成任务广播并推进协同状态。
+  2. **对称 UDP 控制信令编解码与通信接缝 (Symmetric UDP Protocol Seam)**：
+     - 在虚拟 TUN 接口对之间收发下行广播（9000 端口）与上行单播（9001 端口）；
+     - 注入高频乱序与重发，验证 `PREPARE_ACK` 幂等性、心跳包丢弃容忍度与毫秒级时间戳单调性。
+  3. **防脑裂租约式看门狗自愈接缝 (Lease Watchdog Anti-Split-Brain Seam)**：
+     - 模拟信道切换场景：Server 与 Client 1 成功切换，但人为丢弃 Client 2 的所有心跳模拟掉队；
+     - 断言 Server 超时未集齐后停止在新信道发心跳并退回 Channel 157；
+     - 断言 Client 1 在 15 秒租约耗尽后，看门狗成功触发物理网卡回退，最终两端均回到 Channel 157，无任何节点孤立。
+  4. **Client 常驻守护子进程生命周期接缝 (Client Daemon Sandbox Seam)**：
+     - 测试 `wfb-fl-client-daemon` 收到任务后派生 `RoleService` 子进程并监控其 PID；
+     - 模拟任务正常完成、被 Server `JOB_ABORT` 中止，以及子进程异常退出等场景；
+     - 严格断言子进程完全销毁、TUN 设备释放、无残留僵尸进程，守护进程安全恢复至 `IDLE`。
+  5. **协同范式参数解析与收齐接缝 (Collaboration Paradigm Seam)**：
+     - 测试 `sync` 与 `semi_async` 模式；
+     - 断言 `sync` 模式在任一节点缺失时 fail-closed；
+     - 断言 `semi_async` 模式在满足 `min_updates` 时即使有节点缺失亦能成功触发聚合并标记落选节点。
 
-- **既有先验实现借鉴 (Prior Art)**：
-  - 既有 `tests/real_hardware/test_issue41_envelope.py` 提供了网卡参数与环境校验的最佳实践；
-  - 既有 `wfb_ng/tests/test_fl_http_put_transport.py` 提供了基于真实套接字与无锁事件观测的测试接缝参考；
-  - 既有 `tests/real_hardware/test_issue41_lifecycle.py` 提供了服务停止、重启与 cgroup 回收审计的标准。
+- **既有实现借鉴 (Prior Art)**：
+  - 借鉴 `tests/real_hardware/test_issue41_lifecycle.py` 建立无残留进程与 cgroup 审计断言；
+  - 借鉴 `wfb_ng/tests/test_fl_role_service_lifecycle.py` 建立子进程生命周期监管；
+  - 借鉴 `tests/real_hardware/test_issue41_validate_archive.py` 建立机械化强校验。
 
 ## Out of Scope
 
-- 浏览器 Web 可视化面板与完整的前端界面（明确归属 Stage 4）。
-- 高级复杂的 CLI TUI 动画与终端仪表盘（明确归属 Stage 4）。
-- 真实的物理完全断网拔线全流程验收（明确归属 Stage 3）。
-- 运行时空口自适应动态跳频（已由 ADR-0011 彻底否决）。
-- 动态自适应 FEC 调节算法（FEC 8/14 保持全局基准固化）。
-- 复杂的分布式机器学习训练（保持占位训练与占位聚合语义）。
-- 2.4 GHz 频段支持（仅聚焦 5 GHz 合法免许可频段）。
+- 浏览器 Web 前端单页应用与 SSE 推流可视化界面（明确归属 Stage 4）。
+- 面向用户的终端丰富交互 TUI（明确归属 Stage 4）。
+- 真实的拔掉以太网网线纯物理闭环验证（明确归属 Stage 3）。
+- 运行时空口动态自适应跳频（已由 ADR-0011 彻底否决）。
+- 2.4 GHz 频段支持（仅聚焦 5 GHz 合法频段）。
 
 ## Further Notes
 
-- Stage 2 是系统脱离以太网 SSH 编排网的转折性阶段。完成 Stage 2 后，系统将具备在无外网环境下自主拉起、射频自愈与全自动两轮 FL 闭环的完整能力，为 Stage 3 的纯物理断网终极验收奠定坚实底座。
-- 扫频探路模块的设计必须确保输出的 JSON 结构与 Stage 4 的 Web 仪表盘及 CLI 前端天然契合，避免在 Stage 4 二次重构底层接口。
-- 所有带内仿真控制信令与状态汇报统一采用毫秒级时间戳，保证与链路底座的遥测日志具备精确的可对齐性。
+- Stage 2 是本项目从“测试脚本编排”迈向“自治分布式系统”的最关键 Seam。
+- 完成 Stage 2 后，系统无需 SSH 即可在三台机器上自主完成网卡发现、拓扑组网、信道重配与两轮 FL 闭环，Stage 3 的物理断网闭环与 Stage 4 的 Web 界面只需作为上层消费端直接接入。
