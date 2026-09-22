@@ -43,7 +43,17 @@ FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
 ROUNDS="${ISSUE41_ROUNDS:-2}"
 INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((40 * 1024 * 1024))}"
-INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-40mib.bin}"
+if [ -n "$ISSUE41_INITIAL_MODEL_PATH" ]; then
+    INITIAL_MODEL_PATH="$ISSUE41_INITIAL_MODEL_PATH"
+elif [ "$INPUT_SIZE_BYTES" -eq $((40 * 1024 * 1024)) ] && [ -f "/var/lib/wfb-ng/issue41-input/model-40mib.bin" ]; then
+    INITIAL_MODEL_PATH="/var/lib/wfb-ng/issue41-input/model-40mib.bin"
+elif [ -f "/var/lib/wfb-ng/issue41-input/model-${INPUT_SIZE_BYTES}b.bin" ]; then
+    INITIAL_MODEL_PATH="/var/lib/wfb-ng/issue41-input/model-${INPUT_SIZE_BYTES}b.bin"
+elif [ "$INPUT_SIZE_BYTES" -eq 4194304 ] && [ -f "/var/lib/wfb-ng/issue41-input/model-4mib.bin" ]; then
+    INITIAL_MODEL_PATH="/var/lib/wfb-ng/issue41-input/model-4mib.bin"
+else
+    INITIAL_MODEL_PATH="/var/lib/wfb-ng/issue41-input/model-40mib.bin"
+fi
 CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-40mib.bin}"
 CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-40mib.bin}"
 CLIENT1_TRAINING_DELAY_MS="${ISSUE41_CLIENT1_TRAINING_DELAY_MS:-0}"
