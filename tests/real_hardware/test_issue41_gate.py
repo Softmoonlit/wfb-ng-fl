@@ -36,8 +36,17 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(157, self.config.channel)
         self.assertEqual('HT40+', self.config.channel_width)
         self.assertEqual(3, self.config.radio_mcs_index)
+        self.assertEqual(3, self.config.server_radio_mcs_index)
+        self.assertEqual(3, self.config.client_radio_mcs_index)
         self.assertEqual(8, self.config.fec_k)
         self.assertEqual(14, self.config.fec_n)
+
+    def test_asymmetric_mcs_config(self):
+        cfg = GateConfig(server_radio_mcs_index=2, client_radio_mcs_index=3)
+        server_cfg = cfg.expected_server_config()
+        client_cfg = cfg.expected_client_config('1')
+        self.assertEqual(2, server_cfg['radio_mcs_index'])
+        self.assertEqual(3, client_cfg['radio_mcs_index'])
 
     def test_config_rejects_immediate_feedback_candidate(self):
         bad_args = ['--role', 'server', '--feedback-window-start-immediately']
@@ -873,6 +882,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '20',
                     '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
                     '--downlink-queue-packets-limit', '64',
@@ -935,6 +945,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
                     '--downlink-queue-packets-limit', '64',
@@ -990,6 +1001,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
                     '--downlink-queue-packets-limit', '64',

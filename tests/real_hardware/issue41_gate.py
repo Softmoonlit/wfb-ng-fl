@@ -55,8 +55,12 @@ class GateConfig:
                  fec_n: int = 14,
                  radio_bandwidth: int = 40,
                  radio_mcs_index: int = 3,
+                 server_radio_mcs_index: Optional[int] = None,
+                 client_radio_mcs_index: Optional[int] = None,
                  radio_short_gi: int = 1,
                  uftp_rate_kbps: int = 15000,
+                 grant_duration_ms: int = 120,
+                 guard_interval_ms: int = 20,
                  uplink_stream: int = 32,
                  downlink_stream: int = 33,
                  server_tun: str = 'v8i41s0',
@@ -83,8 +87,12 @@ class GateConfig:
         self.fec_n = fec_n
         self.radio_bandwidth = radio_bandwidth
         self.radio_mcs_index = radio_mcs_index
+        self.server_radio_mcs_index = server_radio_mcs_index if server_radio_mcs_index is not None else radio_mcs_index
+        self.client_radio_mcs_index = client_radio_mcs_index if client_radio_mcs_index is not None else radio_mcs_index
         self.radio_short_gi = radio_short_gi
         self.uftp_rate_kbps = uftp_rate_kbps
+        self.grant_duration_ms = grant_duration_ms
+        self.guard_interval_ms = guard_interval_ms
         self.uplink_stream = uplink_stream
         self.downlink_stream = downlink_stream
         self.server_tun = server_tun
@@ -133,10 +141,18 @@ class GateConfig:
             kwargs['radio_bandwidth'] = int(os.environ['ISSUE41_RADIO_BANDWIDTH'])
         if 'ISSUE41_RADIO_MCS_INDEX' in os.environ:
             kwargs['radio_mcs_index'] = int(os.environ['ISSUE41_RADIO_MCS_INDEX'])
+        if 'ISSUE41_SERVER_RADIO_MCS_INDEX' in os.environ:
+            kwargs['server_radio_mcs_index'] = int(os.environ['ISSUE41_SERVER_RADIO_MCS_INDEX'])
+        if 'ISSUE41_CLIENT_RADIO_MCS_INDEX' in os.environ:
+            kwargs['client_radio_mcs_index'] = int(os.environ['ISSUE41_CLIENT_RADIO_MCS_INDEX'])
         if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
             kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
         if 'ISSUE41_UFTP_RATE_KBPS' in os.environ:
             kwargs['uftp_rate_kbps'] = int(os.environ['ISSUE41_UFTP_RATE_KBPS'])
+        if 'ISSUE41_GRANT_DURATION_MS' in os.environ:
+            kwargs['grant_duration_ms'] = int(os.environ['ISSUE41_GRANT_DURATION_MS'])
+        if 'ISSUE41_GUARD_INTERVAL_MS' in os.environ:
+            kwargs['guard_interval_ms'] = int(os.environ['ISSUE41_GUARD_INTERVAL_MS'])
         return cls(**kwargs)
 
     @staticmethod
@@ -156,7 +172,7 @@ class GateConfig:
                 'channel': self.channel,
                 'channel_width': self.channel_width,
                 'radio_bandwidth': self.radio_bandwidth,
-                'radio_mcs_index': self.radio_mcs_index,
+                'radio_mcs_index': self.server_radio_mcs_index,
                 'radio_short_gi': bool(self.radio_short_gi),
                 'fec_k': self.fec_k,
                 'fec_n': self.fec_n,
@@ -165,8 +181,8 @@ class GateConfig:
                 'downlink_stream': self.downlink_stream,
                 'tun_name': self.server_tun,
                 'tun_addr': self.server_tun_addr,
-                'grant_duration_ms': 120,
-                'guard_interval_ms': 20,
+                'grant_duration_ms': self.grant_duration_ms,
+                'guard_interval_ms': self.guard_interval_ms,
                 'downlink_pause_threshold_bytes': self.downlink_pause_threshold_bytes,
                 'downlink_resume_threshold_bytes': self.downlink_resume_threshold_bytes,
                 'downlink_queue_packets_limit': self.downlink_queue_packets_limit,
@@ -182,7 +198,7 @@ class GateConfig:
             'channel': self.channel,
             'channel_width': self.channel_width,
             'radio_bandwidth': self.radio_bandwidth,
-            'radio_mcs_index': self.radio_mcs_index,
+            'radio_mcs_index': self.client_radio_mcs_index,
             'radio_short_gi': bool(self.radio_short_gi),
             'fec_k': self.fec_k,
             'fec_n': self.fec_n,
@@ -277,7 +293,7 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
     """校验数据面 Gate 与 Runtime 角色服务解析后配置在各维度上的严格等价性。"""
     errors: List[str] = []
     server_fields = [
-        'uftp_rate_kbps',
+        'uftp_rate_kbps', 'grant_duration_ms', 'guard_interval_ms',
         'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
         'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
         'tun_name', 'tun_addr',

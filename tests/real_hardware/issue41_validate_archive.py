@@ -137,12 +137,18 @@ def _validate_envelope(archive_dir, summary, errors):
                 val = resolved.get(deadline_key)
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            for scheduling_key, allow_zero in (
+                    ('grant_duration_ms', False), ('guard_interval_ms', True)):
+                value = resolved.get(scheduling_key)
+                if type(value) is not int or value < 0 or (not allow_zero and value == 0):
+                    errors.append('envelope.json resolved_config 缺少有效调度参数：%s' % scheduling_key)
             rate = resolved.get('uftp_rate_kbps')
             if type(rate) is not int or rate <= 0:
                 errors.append('envelope.json resolved_config 缺少有效 UFTP 速率')
             else:
+                mcs_idx = resolved.get('server_radio_mcs_index', resolved.get('radio_mcs_index'))
                 safe_range = safe_uftp_rate_range(
-                    resolved.get('radio_mcs_index'), resolved.get('radio_bandwidth'),
+                    mcs_idx, resolved.get('radio_bandwidth'),
                     resolved.get('channel_width'))
                 if safe_range is None or not safe_range[0] <= rate <= safe_range[1]:
                     errors.append('envelope.json UFTP 速率超出射频安全区间')
@@ -264,7 +270,9 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
     gate_kwargs = {}
     config_keys = [
         'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
-        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi', 'uftp_rate_kbps',
+        'radio_bandwidth', 'radio_mcs_index', 'server_radio_mcs_index', 'client_radio_mcs_index',
+        'radio_short_gi', 'uftp_rate_kbps',
+        'grant_duration_ms', 'guard_interval_ms',
         'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
     ]
     for i in range(1, 11):

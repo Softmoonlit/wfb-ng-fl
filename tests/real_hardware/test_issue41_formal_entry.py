@@ -24,6 +24,8 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         cfg = {
             'rounds': 2,
             'uftp_rate_kbps': 15000,
+            'grant_duration_ms': 120,
+            'guard_interval_ms': 20,
             'radio_mcs_index': 3,
             'radio_bandwidth': 40,
             'channel_width': 'HT40+',

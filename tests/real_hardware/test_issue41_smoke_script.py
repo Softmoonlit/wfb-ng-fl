@@ -109,7 +109,10 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
     def test_formal_runtime_uses_mcs3_by_default(self):
         self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
         self.assertIn('ISSUE41_UFTP_RATE_KBPS:-15000', self.script)
+        self.assertIn('ISSUE41_GRANT_DURATION_MS:-120', self.script)
+        self.assertIn('ISSUE41_GUARD_INTERVAL_MS:-20', self.script)
         self.assertIn('"uftp_rate_kbps":$UFTP_RATE_KBPS', self.script)
+        self.assertIn('"--grant-duration-ms","$GRANT_DURATION_MS"', self.script)
 
     def test_rejects_uftp_rate_outside_radio_envelope_before_preflight(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -132,7 +135,9 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 json.dump({'resolved_config': {'uftp_rate_kbps': 15000,
                                                'radio_mcs_index': 3,
                                                'radio_bandwidth': 40,
-                                               'channel_width': 'HT40+'}}, fh)
+                                               'channel_width': 'HT40+',
+                                               'grant_duration_ms': 120,
+                                               'guard_interval_ms': 20}}, fh)
             env = dict(os.environ, ISSUE41_ARCHIVE_DIR=archive,
                        ISSUE41_UFTP_RATE_KBPS='12000')
             result = subprocess.run(['bash', SCRIPT, 'preflight'], env=env,
