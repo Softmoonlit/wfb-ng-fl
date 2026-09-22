@@ -322,10 +322,12 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             None)
         r_start_ms = int(start_ev['monotonic_time'] * 1000) if start_ev and 'monotonic_time' in start_ev else None
         r_end_ms = int(end_ev['monotonic_time'] * 1000) if end_ev and 'monotonic_time' in end_ev else None
+        duration_sec = round((r_end_ms - r_start_ms) / 1000.0, 3) if r_start_ms is not None and r_end_ms is not None else None
 
         output.append({
             'round_index': index,
             'round_id': round_id,
+            'duration_seconds': duration_sec,
             'model': model,
             'model_receive_intervals': receive_intervals,
             'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors),

@@ -1196,6 +1196,34 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             }
         }
 
+    def test_rejects_runtime_exceeding_round_deadline(self):
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['duration_seconds'] = 250.0
+        summary['formal_runtime_loop']['rounds'][1]['duration_seconds'] = 200.0
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
+        errors = validate_archive(self.root)
+        self.assertTrue(any('formal_runtime_loop 实际总耗时' in e for e in errors))
+
     def write_smoke_marker(self, run_id='test-run'):
         marker = {
             'schema_version': 1,
