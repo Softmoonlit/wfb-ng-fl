@@ -468,22 +468,37 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         if not isinstance(concurrent_put.get('overlap_duration_seconds'), (int, float)):
             errors.append('%s.concurrent_put 缺少 overlap_duration_seconds' % prefix)
         client_intervals = concurrent_put.get('client_intervals')
-        if not isinstance(client_intervals, dict) or set(client_intervals) != {'1', '2'}:
+        expected_client_str_ids = {str(nid) for nid in expected_node_ids}
+        if not isinstance(client_intervals, dict) or set(client_intervals) != expected_client_str_ids:
             errors.append('%s.concurrent_put 缺少客户端 PUT 区间' % prefix)
         else:
-            c1_int = client_intervals.get('1')
-            c2_int = client_intervals.get('2')
-            if _is_interval(c1_int) and _is_interval(c2_int):
-                if uploads_by_node.get(1) and c1_int != uploads_by_node[1].get('client_put_interval'):
-                    errors.append('%s.concurrent_put node 1 区间与 uploads 不一致' % prefix)
-                if uploads_by_node.get(2) and c2_int != uploads_by_node[2].get('client_put_interval'):
-                    errors.append('%s.concurrent_put node 2 区间与 uploads 不一致' % prefix)
+            for nid in expected_node_ids:
+                s_nid = str(nid)
+                c_int = client_intervals.get(s_nid)
+                if _is_interval(c_int):
+                    if uploads_by_node.get(nid) and c_int != uploads_by_node[nid].get('client_put_interval'):
+                        errors.append('%s.concurrent_put node %s 区间与 uploads 不一致' % (prefix, nid))
 
-                calc_overlap = min(c1_int['end'], c2_int['end']) - max(c1_int['start'], c2_int['start'])
-                expected_overlap = calc_overlap > 0
+            valid_ints = [client_intervals[str(nid)] for nid in expected_node_ids if _is_interval(client_intervals.get(str(nid)))]
+            if len(valid_ints) >= 2:
+                max_start = max(item['start'] for item in valid_ints)
+                min_end = min(item['end'] for item in valid_ints)
+                calc_overlap = min_end - max_start
+                if calc_overlap > 0:
+                    expected_overlap = True
+                    expected_dur = round(calc_overlap, 3)
+                else:
+                    max_ov = 0.0
+                    for i in range(len(valid_ints)):
+                        for j in range(i + 1, len(valid_ints)):
+                            ov = min(valid_ints[i]['end'], valid_ints[j]['end']) - max(valid_ints[i]['start'], valid_ints[j]['start'])
+                            if ov > max_ov:
+                                max_ov = ov
+                    expected_overlap = max_ov > 0
+                    expected_dur = round(max_ov, 3) if expected_overlap else 0.0
+
                 if concurrent_put.get('natural_overlap') != expected_overlap:
                     errors.append('%s.concurrent_put natural_overlap 标记与实际时间区间矛盾' % prefix)
-                expected_dur = round(calc_overlap, 3) if expected_overlap else 0.0
                 actual_dur = concurrent_put.get('overlap_duration_seconds')
                 if not isinstance(actual_dur, (int, float)) or abs(actual_dur - expected_dur) > 0.001:
                     errors.append('%s.concurrent_put overlap_duration_seconds 与时间区间计算不符 (报告: %s, 期望: %s)' %

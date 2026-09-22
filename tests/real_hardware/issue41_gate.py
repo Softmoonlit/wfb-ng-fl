@@ -1336,8 +1336,9 @@ def main(argv=None) -> int:
 
     p_eq = subparsers.add_parser("verify-config-equivalence")
     p_eq.add_argument("--server-fl", required=True)
-    p_eq.add_argument("--client1-fl", required=True)
-    p_eq.add_argument("--client2-fl", required=True)
+    p_eq.add_argument("--client1-fl", required=False, default=None)
+    p_eq.add_argument("--client2-fl", required=False, default=None)
+    p_eq.add_argument("--client-fls", action="append", default=[])
     p_eq.add_argument("--out", default=None)
 
     p_fct = subparsers.add_parser("format-cycle-telemetry")
@@ -1515,11 +1516,17 @@ def main(argv=None) -> int:
         return 0
 
     if args.command == "verify-config-equivalence":
+        client_fl_paths = {}
+        for item in (args.client_fls or []):
+            if ":" in item:
+                role, path = item.split(":", 1)
+                client_fl_paths[role] = path
         res = check_role_configs_equivalence(
             gate_config=config,
             server_fl_path=args.server_fl,
             client1_fl_path=args.client1_fl,
             client2_fl_path=args.client2_fl,
+            client_fl_paths=client_fl_paths or None,
         )
         if args.out:
             os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
