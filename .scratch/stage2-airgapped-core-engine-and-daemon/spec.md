@@ -88,17 +88,21 @@ Status: ready-for-agent
   - 任务正常完成或异常中止后，Daemon 负责 `terminate/kill` 子进程、清理临时接收区并回收资源，重新切回 `IDLE` 状态，坚决不驻留脏数据。
 
 - **轻量对称 UDP 控制信令平面 (Symmetric UDP Control Plane)**：
-  - **下行方向（Server -> Clients，广播）**：Server 向 `10.80.0.255:9000` 广播 JSON 数据报：
-    - `SERVER_HEARTBEAT`：Server 在线状态与当前时间戳；
-    - `TASK_ANNOUNCE`：宣布新任务（轮次数、参与节点名单、协同模式、模型大小与 SHA-256）；
-    - `CONFIG_RADIO_PREPARE`：两阶段信道切换预备请求；
-    - `CONFIG_RADIO_COMMIT`：两阶段信道切换生效指令（带 2s 延时）；
-    - `RADIO_SWITCH_FINALIZED`：新信道全员上线终审定案；
-    - `JOB_ABORT`：紧急中止指令。
+  - **下行方向（Server -> Clients）**：
+    - 单播回复：收到任一客户端心跳后，即刻单播回复极简 `HEARTBEAT_ACK`（仅包含 `{"ack": true}`，空口不足 20 字节）；若检测到该客户端预设与集群当前生效预设不一致，自动下发对齐指令；
+    - 广播通知：向 `10.80.0.255:9000` 广播任务级指令：
+      - `TASK_ANNOUNCE`：宣布新任务（轮次数、参与节点名单、协同模式、模型大小与 SHA-256）；
+      - `CONFIG_RADIO_PREPARE`：两阶段信道切换预备请求；
+      - `CONFIG_RADIO_COMMIT`：两阶段信道切换生效指令（带 2s 延时）；
+      - `RADIO_SWITCH_FINALIZED`：新信道全员上线终审定案；
+      - `JOB_ABORT`：紧急中止指令。
   - **上行方向（Client -> Server，单播）**：Client 向 `10.80.0.1:9001` 发送 JSON 数据报：
-    - `NODE_HEARTBEAT`：汇报本机 ID、状态机阶段、当前信道与错误码；
+    - `NODE_HEARTBEAT`：全流程细粒度状态载体（携带 `node_id`、`state`、`elapsed_ms`、`current_channel`、`preset` 与错误码）；状态跃迁时即刻抢跑发送，常态每 5 秒保活；
     - `PREPARE_ACK`：信道切换预备就绪回执（带 seq_id 幂等重发）；
     - `COMMIT_SUCCESS`：新信道上线打卡汇报。
+  - **三级寻频自愈与全自动热发现 (Three-Tier Hunting & Auto-Discovery)**：
+    - 客户端通电后，按“本地缓存信道 -> 基准信道 157 -> 候选池 [149, 153, 165]”顺序逐频发送 `NODE_HEARTBEAT`；
+    - 收到 `HEARTBEAT_ACK` 即刻锁定频点；服务端自动在内存注册该节点并在 Web 实时点亮绿灯，全程零广播发射，Web 零手动扫描操作。
 
 - **两阶段防脑裂租约式看门狗自愈协议 (Lease-based Anti-Lockup Watchdog)**：
   1. **Phase 1 (Prepare)**：Server 广播 `CONFIG_RADIO_PREPARE(target_ch=149, preset="standard")`；
