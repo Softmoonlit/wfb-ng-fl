@@ -621,8 +621,10 @@ def main(argv=None):
     run_parser.add_argument('--server-tun', default='v8i41s0', help='server TUN 设备名')
     run_parser.add_argument('--client1-tun', default='v8i41c1', help='client1 TUN 设备名')
     run_parser.add_argument('--client2-tun', default='v8i41c2', help='client2 TUN 设备名')
+    run_parser.add_argument('--client-tuns', action='append', default=[], help='角色TUN映射 (role:tun)')
     run_parser.add_argument('--client1-ssh', default=None, help='client1 SSH 主机')
     run_parser.add_argument('--client2-ssh', default=None, help='client2 SSH 主机')
+    run_parser.add_argument('--client-sshs', action='append', default=[], help='角色SSH映射 (role:ssh_host)')
     run_parser.add_argument('--timeout', type=float, default=15.0, help='超时时间（秒）')
 
     val_parser = subparsers.add_parser('validate', help='校验已生成的 lifecycle 结果')
@@ -631,19 +633,35 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     if args.subcmd == 'run':
-        client_ssh_map = {}
+        client_tun_map = {}
+        for item in args.client_tuns:
+            if ':' in item:
+                r, t = item.split(':', 1)
+                client_tun_map[r] = t
+
+        client_ssh_map = dict(DEFAULT_CLIENT_SSH_MAP)
+        for item in args.client_sshs:
+            if ':' in item:
+                r, s = item.split(':', 1)
+                client_ssh_map[r] = s
         if args.client1_ssh:
             client_ssh_map['client1'] = args.client1_ssh
         if args.client2_ssh:
             client_ssh_map['client2'] = args.client2_ssh
+
+        active_roles = ('server',) + tuple(sorted(client_ssh_map.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x))
+
         executor = RealExecutor(client_ssh_map=client_ssh_map or None)
         config = LifecycleConfig(
+            roles=active_roles,
             server_tun=args.server_tun,
-            client1_tun=args.client1_tun,
-            client2_tun=args.client2_tun,
+            client1_tun=client_tun_map.get('client1', args.client1_tun),
+            client2_tun=client_tun_map.get('client2', args.client2_tun),
             timeout_seconds=args.timeout,
             client_ssh_map=executor.client_ssh_map,
         )
+        for r, t in client_tun_map.items():
+            setattr(config, f'{r}_tun', t)
         initial_pids = None
         if args.initial_pids:
             if os.path.isfile(args.initial_pids):
