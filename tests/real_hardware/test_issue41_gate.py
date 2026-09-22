@@ -393,7 +393,7 @@ class Issue41GateTestCase(unittest.TestCase):
         server_dir = os.path.join(self.tmp_dir, 'server_c1')
         c1_dir = os.path.join(self.tmp_dir, 'c1_c1')
         c2_dir = os.path.join(self.tmp_dir, 'c2_c1')
-        generate_cycle_fixtures(1, server_dir, c1_dir, c2_dir)
+        generate_cycle_fixtures(1, server_dir, {1: c1_dir, 2: c2_dir})
 
         model_path = os.path.join(server_dir, 'model.bin')
         c1_update = os.path.join(c1_dir, 'update.bin')
@@ -425,8 +425,8 @@ class Issue41GateTestCase(unittest.TestCase):
             'generate-fixtures',
             '--cycle', '1',
             '--server-dir', server_dir,
-            '--client1-dir', c1_dir,
-            '--client2-dir', c2_dir,
+            '--client-dirs', f'1:{c1_dir}',
+            '--client-dirs', f'2:{c2_dir}',
             '--size', '1024',
         ])
         self.assertEqual(0, rc)
@@ -437,10 +437,10 @@ class Issue41GateTestCase(unittest.TestCase):
         rc = main([
             'classify-failure',
             '--server-rx-ant-samples', '0',
-            '--client1-declared', '1',
-            '--client2-declared', '1',
-            '--client1-accepted', '0',
-            '--client2-accepted', '0',
+            '--client-declared', 'client1:1',
+            '--client-declared', 'client2:1',
+            '--client-accepted', 'client1:0',
+            '--client-accepted', 'client2:0',
             '--tun-routes-ok', '1',
             '--uftp-ok', '0',
             '--http-ok', '0',
@@ -1003,8 +1003,8 @@ class Issue41GateTestCase(unittest.TestCase):
         ret = main([
             'verify-config-equivalence',
             '--server-fl', s_path,
-            '--client1-fl', c1_path,
-            '--client2-fl', c2_path,
+            '--client-fls', f'client1:{c1_path}',
+            '--client-fls', f'client2:{c2_path}',
             '--out', out_path,
         ])
         self.assertEqual(0, ret)

@@ -49,10 +49,8 @@ class GateConfig:
                  downlink_stream: int = 33,
                  server_tun: str = 'v8i41s0',
                  server_tun_addr: str = '10.80.0.1/24',
-                 client1_tun: str = 'v8i41c1',
-                 client1_tun_addr: str = '10.80.0.11/24',
-                 client2_tun: str = 'v8i41c2',
-                 client2_tun_addr: str = '10.80.0.12/24',
+                 client_tuns: Optional[Dict[str, str]] = None,
+                 client_tun_addrs: Optional[Dict[str, str]] = None,
                  downlink_pause_threshold_bytes: int = 131072,
                  downlink_resume_threshold_bytes: int = 65536,
                  downlink_queue_packets_limit: int = 64,
@@ -78,13 +76,14 @@ class GateConfig:
         self.downlink_stream = downlink_stream
         self.server_tun = server_tun
         self.server_tun_addr = server_tun_addr
+        self.client_tuns = dict(client_tuns) if client_tuns else {}
+        self.client_tun_addrs = dict(client_tun_addrs) if client_tun_addrs else {}
         for i in range(1, 11):
-            setattr(self, f'client{i}_tun', f'v8i41c{i}')
-            setattr(self, f'client{i}_tun_addr', f'10.80.0.{10+i}/24')
-        self.client1_tun = client1_tun
-        self.client1_tun_addr = client1_tun_addr
-        self.client2_tun = client2_tun
-        self.client2_tun_addr = client2_tun_addr
+            c_key = f'client{i}'
+            if c_key not in self.client_tuns:
+                self.client_tuns[c_key] = f'v8i41c{i}'
+            if c_key not in self.client_tun_addrs:
+                self.client_tun_addrs[c_key] = f'10.80.0.{10+i}/24'
         self.downlink_pause_threshold_bytes = downlink_pause_threshold_bytes
         self.downlink_resume_threshold_bytes = downlink_resume_threshold_bytes
         self.downlink_queue_packets_limit = downlink_queue_packets_limit
@@ -159,8 +158,8 @@ class GateConfig:
                 'feedback_window_duration_ms': self.feedback_window_duration_ms,
                 'feedback_window_start_immediately': False,
             }
-        tun = getattr(self, f'client{node_id}_tun', f'v8i41c{node_id}')
-        tun_addr = getattr(self, f'client{node_id}_tun_addr', f'10.80.0.{10+node_id}/24')
+        tun = self.client_tuns.get(f'client{node_id}', f'v8i41c{node_id}')
+        tun_addr = self.client_tun_addrs.get(f'client{node_id}', f'10.80.0.{10+node_id}/24')
         return {
             'role': 'client',
             'node_id': node_id,
@@ -320,19 +319,11 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
 
 def check_role_configs_equivalence(gate_config: GateConfig,
                                    server_fl_path: str,
-                                   client1_fl_path: Optional[str] = None,
-                                   client2_fl_path: Optional[str] = None,
-                                   client_fl_paths: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+                                   client_fl_paths: Dict[str, str]) -> Dict[str, Any]:
     """读取多角色服务配置并校验与 GateConfig 的等价性。"""
     runtime_configs = {}
     paths = {'server': server_fl_path}
-    if client_fl_paths:
-        paths.update(client_fl_paths)
-    else:
-        if client1_fl_path:
-            paths['client1'] = client1_fl_path
-        if client2_fl_path:
-            paths['client2'] = client2_fl_path
+    paths.update(client_fl_paths)
 
     for role, path in paths.items():
         if not os.path.isfile(path):
@@ -376,21 +367,11 @@ def _compute_file_sha256(path: str) -> str:
 
 def generate_cycle_fixtures(cycle: int,
                             server_dir: str,
-                            client1_dir: Optional[str] = None,
-                            client2_dir: Optional[str] = None,
-                            size: int = 4 * 1024 * 1024,
-                            client_dirs: Optional[Dict[int, str]] = None) -> Dict[str, str]:
+                            client_dirs: Dict[int, str],
+                            size: int = 4 * 1024 * 1024) -> Dict[str, str]:
     """确定性生成本周期的 model, manifest 以及各 client 不同的 update。"""
     os.makedirs(server_dir, exist_ok=True)
-    c_dirs: Dict[int, str] = {}
-    if client_dirs:
-        c_dirs.update(client_dirs)
-    else:
-        if client1_dir:
-            c_dirs[1] = client1_dir
-        if client2_dir:
-            c_dirs[2] = client2_dir
-
+    c_dirs = dict(client_dirs)
     for cdir in c_dirs.values():
         os.makedirs(cdir, exist_ok=True)
 
@@ -1265,9 +1246,7 @@ def main(argv=None) -> int:
     p_gen = subparsers.add_parser("generate-fixtures")
     p_gen.add_argument("--cycle", type=int, required=True)
     p_gen.add_argument("--server-dir", required=True)
-    p_gen.add_argument("--client1-dir", default=None)
-    p_gen.add_argument("--client2-dir", default=None)
-    p_gen.add_argument("--client-dirs", action="append", default=[], help="node_id:dir")
+    p_gen.add_argument("--client-dirs", action="append", default=[], required=True, help="node_id:dir")
     p_gen.add_argument("--size", type=int, default=4 * 1024 * 1024)
 
     p_rec = subparsers.add_parser("start-http-receiver")
@@ -1287,29 +1266,21 @@ def main(argv=None) -> int:
 
     p_vd = subparsers.add_parser("verify-downlink")
     p_vd.add_argument("--server-cycle-dir", required=True)
-    p_vd.add_argument("--client1-inbox", default=None)
-    p_vd.add_argument("--client2-inbox", default=None)
-    p_vd.add_argument("--client-inboxes", action="append", default=[], help="node_id:inbox_dir")
+    p_vd.add_argument("--client-inboxes", action="append", default=[], required=True, help="node_id:inbox_dir")
     p_vd.add_argument("--status-file", required=True)
     p_vd.add_argument("--duration", type=float, default=0.0)
     p_vd.add_argument("--out", required=True)
 
     p_vu = subparsers.add_parser("verify-uplink")
     p_vu.add_argument("--events-file", required=True)
-    p_vu.add_argument("--client1-result", default=None)
-    p_vu.add_argument("--client2-result", default=None)
-    p_vu.add_argument("--client-results", action="append", default=[], help="node_id:result_file")
+    p_vu.add_argument("--client-results", action="append", default=[], required=True, help="node_id:result_file")
     p_vu.add_argument("--duration", type=float, default=0.0)
     p_vu.add_argument("--out", required=True)
 
     p_pt = subparsers.add_parser("parse-telemetry")
     p_pt.add_argument("--server-log", required=True)
-    p_pt.add_argument("--client1-log", default="")
-    p_pt.add_argument("--client2-log", default="")
     p_pt.add_argument("--client-logs", action="append", default=[], help="role:log_path")
     p_pt.add_argument("--server-queue", default="")
-    p_pt.add_argument("--client1-queue", default="")
-    p_pt.add_argument("--client2-queue", default="")
     p_pt.add_argument("--client-queues", action="append", default=[], help="role:queue_path")
     p_pt.add_argument("--downlink-seconds", type=float, default=0.0)
     p_pt.add_argument("--uplink-seconds", type=float, default=0.0)
@@ -1331,12 +1302,8 @@ def main(argv=None) -> int:
 
     p_cf = subparsers.add_parser("classify-failure")
     p_cf.add_argument("--server-rx-ant-samples", type=int, default=0)
-    p_cf.add_argument("--client1-declared", type=int, default=1)
-    p_cf.add_argument("--client2-declared", type=int, default=1)
-    p_cf.add_argument("--client-declared", action="append", default=[], help="role:0/1")
-    p_cf.add_argument("--client1-accepted", type=int, default=1)
-    p_cf.add_argument("--client2-accepted", type=int, default=1)
-    p_cf.add_argument("--client-accepted", action="append", default=[], help="role:0/1")
+    p_cf.add_argument("--client-declared", action="append", default=[], required=True, help="role:0/1")
+    p_cf.add_argument("--client-accepted", action="append", default=[], required=True, help="role:0/1")
     p_cf.add_argument("--tun-routes-ok", type=int, default=1)
     p_cf.add_argument("--uftp-ok", type=int, default=1)
     p_cf.add_argument("--http-ok", type=int, default=1)
@@ -1347,9 +1314,7 @@ def main(argv=None) -> int:
 
     p_eq = subparsers.add_parser("verify-config-equivalence")
     p_eq.add_argument("--server-fl", required=True)
-    p_eq.add_argument("--client1-fl", required=False, default=None)
-    p_eq.add_argument("--client2-fl", required=False, default=None)
-    p_eq.add_argument("--client-fls", action="append", default=[])
+    p_eq.add_argument("--client-fls", action="append", default=[], required=True, help="role:fl_path")
     p_eq.add_argument("--out", default=None)
 
     p_fct = subparsers.add_parser("format-cycle-telemetry")
@@ -1374,14 +1339,10 @@ def main(argv=None) -> int:
             if ":" in item:
                 nid, d = item.split(":", 1)
                 c_dirs[int(nid)] = d
-        if args.client1_dir:
-            c_dirs[1] = args.client1_dir
-        if args.client2_dir:
-            c_dirs[2] = args.client2_dir
         res = generate_cycle_fixtures(
             cycle=args.cycle,
             server_dir=args.server_dir,
-            client_dirs=c_dirs if c_dirs else None,
+            client_dirs=c_dirs,
             size=args.size,
         )
         print(f"FIXTURES_GENERATED: cycle={args.cycle} model={res['model_sha256'][:8]}")
@@ -1414,10 +1375,6 @@ def main(argv=None) -> int:
             if ":" in item:
                 nid, path = item.split(":", 1)
                 c_inboxes[nid] = path
-        if args.client1_inbox:
-            c_inboxes["1"] = args.client1_inbox
-        if args.client2_inbox:
-            c_inboxes["2"] = args.client2_inbox
 
         res = verify_downlink_artifacts(
             server_cycle_dir=args.server_cycle_dir,
@@ -1446,12 +1403,6 @@ def main(argv=None) -> int:
                 if os.path.isfile(path):
                     with open(path, "r", encoding="utf-8") as fh:
                         c_res[nid] = json.load(fh)
-        if args.client1_result and os.path.isfile(args.client1_result):
-            with open(args.client1_result, "r", encoding="utf-8") as fh:
-                c_res["1"] = json.load(fh)
-        if args.client2_result and os.path.isfile(args.client2_result):
-            with open(args.client2_result, "r", encoding="utf-8") as fh:
-                c_res["2"] = json.load(fh)
         res = verify_uplink_cycle(
             events=events,
             client_results=c_res,
@@ -1470,10 +1421,6 @@ def main(argv=None) -> int:
             if ":" in item:
                 r, p = item.split(":", 1)
                 client_logs[r] = open(p, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(p) else ""
-        if args.client1_log:
-            client_logs["client1"] = open(args.client1_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client1_log) else ""
-        if args.client2_log:
-            client_logs["client2"] = open(args.client2_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client2_log) else ""
 
         queue_summaries = {}
         if args.server_queue and os.path.isfile(args.server_queue):
@@ -1483,10 +1430,6 @@ def main(argv=None) -> int:
                 r, p = item.split(":", 1)
                 if os.path.isfile(p):
                     queue_summaries[r] = json.load(open(p, "r", encoding="utf-8"))
-        if args.client1_queue and os.path.isfile(args.client1_queue):
-            queue_summaries["client1"] = json.load(open(args.client1_queue, "r", encoding="utf-8"))
-        if args.client2_queue and os.path.isfile(args.client2_queue):
-            queue_summaries["client2"] = json.load(open(args.client2_queue, "r", encoding="utf-8"))
 
         durations = {
             "downlink_seconds": args.downlink_seconds,
@@ -1495,8 +1438,8 @@ def main(argv=None) -> int:
         }
         res = parse_telemetry(
             server_log=server_log,
-            client_logs={"1": c1_log, "2": c2_log},
-            queue_summaries={"server": sq, "client1": c1q, "client2": c2q},
+            client_logs=client_logs,
+            queue_summaries=queue_summaries,
             phase_durations=durations,
         )
         os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
@@ -1552,16 +1495,12 @@ def main(argv=None) -> int:
             if ":" in item:
                 r, v = item.split(":", 1)
                 c_decl[r] = bool(int(v))
-        if not c_decl:
-            c_decl = {"client1": bool(args.client1_declared), "client2": bool(args.client2_declared)}
 
         s_acc = {}
         for item in args.client_accepted:
             if ":" in item:
                 r, v = item.split(":", 1)
                 s_acc[r] = bool(int(v))
-        if not s_acc:
-            s_acc = {"client1": bool(args.client1_accepted), "client2": bool(args.client2_accepted)}
 
         diag = classify_gate_failure(
             server_rx_ant_samples=args.server_rx_ant_samples,
@@ -1588,16 +1527,14 @@ def main(argv=None) -> int:
 
     if args.command == "verify-config-equivalence":
         client_fl_paths = {}
-        for item in (args.client_fls or []):
+        for item in args.client_fls:
             if ":" in item:
                 role, path = item.split(":", 1)
                 client_fl_paths[role] = path
         res = check_role_configs_equivalence(
             gate_config=config,
             server_fl_path=args.server_fl,
-            client1_fl_path=args.client1_fl,
-            client2_fl_path=args.client2_fl,
-            client_fl_paths=client_fl_paths or None,
+            client_fl_paths=client_fl_paths,
         )
         if args.out:
             os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
