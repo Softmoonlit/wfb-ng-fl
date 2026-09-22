@@ -64,6 +64,7 @@ def validate_archive(archive_dir):
         errors.append('pre_runtime_smoke 必须是对象')
         return errors
     _validate_smoke_gate(archive_dir, smoke, summary, errors)
+
     _validate_runtime(summary['formal_runtime_loop'], errors)
     _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
@@ -136,6 +137,24 @@ def _validate_envelope(archive_dir, summary, errors):
                 val = resolved.get(deadline_key)
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            is_passed = summary.get('conclusion', {}).get('status') == 'passed'
+            io_timeout_cfg = resolved.get('io_timeout_seconds')
+            if isinstance(io_timeout_cfg, (int, float)) and is_passed and io_timeout_cfg != 120 and mode == 'formal':
+                errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 必须严格锁定为 120 秒')
+            elif isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and mode == 'formal':
+                errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 不得大于 120 秒')
+
+            smoke_io_cfg = resolved.get('smoke_io_timeout_seconds')
+            if isinstance(smoke_io_cfg, (int, float)) and is_passed and smoke_io_cfg != 120 and mode == 'formal':
+                errors.append('formal 模式下门禁单次 I/O 超时 (smoke_io_timeout_seconds) 必须严格锁定为 120 秒')
+            elif isinstance(smoke_io_cfg, (int, float)) and smoke_io_cfg > 120 and mode == 'formal':
+                errors.append('formal 模式下门禁单次 I/O 超时 (smoke_io_timeout_seconds) 不得大于 120 秒')
+
+            rt_timeout_cfg = resolved.get('runtime_timeout_seconds')
+            if isinstance(rt_timeout_cfg, (int, float)) and is_passed and rt_timeout_cfg != 400 and mode == 'formal':
+                errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 必须严格锁定为 400 秒')
+            elif isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and mode == 'formal':
+                errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 不得大于 400 秒')
             smoke = summary.get('pre_runtime_smoke', {})
             if isinstance(smoke, dict):
                 if 'cycle_deadline_seconds' in smoke and smoke['cycle_deadline_seconds'] != resolved.get('smoke_cycle_deadline_seconds'):
@@ -149,6 +168,12 @@ def _validate_envelope(archive_dir, summary, errors):
                     errors.append('运行中修改配置：formal_runtime_loop round_deadline_seconds 与 envelope 不一致')
                 if 'io_timeout_seconds' in sc and sc['io_timeout_seconds'] != resolved.get('io_timeout_seconds'):
                     errors.append('运行中修改配置：formal_runtime_loop io_timeout_seconds 与 envelope 不一致')
+                if 'rounds' in resolved and 'round_count' in sc and sc['round_count'] != resolved.get('rounds'):
+                    errors.append('运行中修改配置：formal_runtime_loop round_count 与 envelope 不一致')
+                if 'artifact_size_bytes' in resolved and 'artifact_size_bytes' in sc and sc['artifact_size_bytes'] != resolved.get('artifact_size_bytes'):
+                    errors.append('运行中修改配置：formal_runtime_loop artifact_size_bytes 与 envelope 不一致')
+                if 'training_delay_ms_by_node' in resolved and 'training_delay_ms_by_node' in sc and sc['training_delay_ms_by_node'] != resolved.get('training_delay_ms_by_node'):
+                    errors.append('运行中修改配置：formal_runtime_loop training_delay_ms_by_node 与 envelope 不一致')
     conclusion = summary.get('conclusion', {})
     category = conclusion.get('category')
     if category and category not in ('environment', 'tooling', 'implementation', 'link_capability'):
@@ -208,7 +233,40 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         if summary and 'run_id' in summary and marker.get('run_id') and marker.get('run_id') != summary.get('run_id'):
             errors.append('pre_runtime_smoke marker 与 summary 的 run_id 不一致')
 
-    config = GateConfig()
+    env_path = os.path.join(archive_dir, 'envelope.json')
+    resolved_cfg = {}
+    if os.path.isfile(env_path):
+        env_obj = _read_json_file(env_path, 'envelope.json', [])
+        if isinstance(env_obj, dict):
+            resolved_cfg = env_obj.get('resolved_config', {})
+
+    gate_kwargs = {}
+    config_keys = (
+        'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
+        'client1_tun', 'client1_tun_addr', 'client2_tun', 'client2_tun_addr',
+    )
+    for k in config_keys:
+        if k in resolved_cfg:
+            gate_kwargs[k] = resolved_cfg[k]
+
+    if not resolved_cfg:
+        errors.append('缺少 envelope.json 或 resolved_config')
+        return
+
+    for req_key, gate_arg in (
+        ('smoke_cycle_count', 'cycle_count'),
+        ('smoke_io_timeout_seconds', 'io_timeout_seconds'),
+        ('smoke_cycle_deadline_seconds', 'cycle_deadline_seconds'),
+        ('artifact_size_bytes', 'artifact_size_bytes'),
+    ):
+        if req_key in resolved_cfg:
+            gate_kwargs[gate_arg] = int(resolved_cfg[req_key])
+        else:
+            errors.append('envelope.json resolved_config 缺少门禁参数：%s' % req_key)
+
+    config = GateConfig(**gate_kwargs)
     gate_errors = validate_gate_summary(value, config)
     for ge in gate_errors:
         errors.append('pre_runtime_smoke 校验失败：%s' % ge)
@@ -254,20 +312,26 @@ def _validate_runtime(value, errors):
 
 def _validate_formal_scenario(value, errors):
     scenario = value.get('scenario')
-    expected_size = 4 * 1024 * 1024
     if not isinstance(scenario, dict):
         errors.append('formal_runtime_loop 缺少正式场景配置')
         return
-    expected = {
-        'round_count': 1,
-        'artifact_size_bytes': expected_size,
-        'training_delay_ms_by_node': {'1': 0, '2': 3000},
-        'placeholder_training': 'template_copy',
-        'placeholder_aggregation': 'model_copy',
-    }
-    for key, expected_value in expected.items():
-        if scenario.get(key) != expected_value:
-            errors.append('formal_runtime_loop.scenario.%s 不满足通过条件' % key)
+
+    round_count = scenario.get('round_count')
+    artifact_size = scenario.get('artifact_size_bytes')
+    delays = scenario.get('training_delay_ms_by_node')
+
+    if round_count != 2:
+        errors.append('formal_runtime_loop.scenario.round_count 必须为 2 轮')
+    if artifact_size != 40 * 1024 * 1024:
+        errors.append('formal_runtime_loop.scenario.artifact_size_bytes 必须为 40 MiB (41943040 字节)')
+    if delays != {'1': 0, '2': 0}:
+        errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 必须全为 0 延时并发')
+
+    if scenario.get('placeholder_training') != 'template_copy':
+        errors.append('formal_runtime_loop.scenario.placeholder_training 不满足通过条件')
+    if scenario.get('placeholder_aggregation') != 'model_copy':
+        errors.append('formal_runtime_loop.scenario.placeholder_aggregation 不满足通过条件')
+
     template_hashes = scenario.get('update_template_sha256_by_node')
     if (not isinstance(template_hashes, dict) or set(template_hashes) != {'1', '2'} or
             not all(_is_sha256(digest) for digest in template_hashes.values()) or
@@ -275,17 +339,30 @@ def _validate_formal_scenario(value, errors):
         errors.append('formal_runtime_loop.scenario 必须包含不同的 client 模板 SHA-256')
 
     rounds = value.get('rounds')
-    if not isinstance(rounds, list) or len(rounds) != 1:
-        errors.append('formal_runtime_loop 必须包含一轮完整证据')
+    if not isinstance(rounds, list) or len(rounds) != 2:
+        errors.append('formal_runtime_loop 必须包含 2 轮完整证据')
         return
+
     seen_round_ids = set()
+    prev_output_model_sha = None
     for index, round_value in enumerate(rounds, 1):
         _validate_round(
-            round_value, index, expected_size, template_hashes,
-            seen_round_ids, errors)
+            round_value, index, artifact_size, template_hashes,
+            seen_round_ids, errors,
+            prev_output_model_sha=prev_output_model_sha)
+        if isinstance(round_value, dict) and isinstance(round_value.get('model'), dict):
+            prev_output_model_sha = round_value['model'].get('sha256')
+
+    total_runtime_seconds = sum(
+        float(r.get('duration_seconds') or 0.0) for r in rounds if isinstance(r, dict)
+    )
+    max_allowed_runtime = float(scenario.get('round_deadline_seconds', 400))
+    if total_runtime_seconds > max_allowed_runtime:
+        errors.append('formal_runtime_loop 实际总耗时 (%.2fs) 超过上限 (%.2fs)' % (
+            total_runtime_seconds, max_allowed_runtime))
 
 
-def _validate_round(value, index, expected_size, template_hashes, seen_round_ids, errors):
+def _validate_round(value, index, expected_size, template_hashes, seen_round_ids, errors, prev_output_model_sha=None):
     prefix = 'formal_runtime_loop.rounds[%d]' % (index - 1)
     if not isinstance(value, dict):
         errors.append('%s 必须是对象' % prefix)
@@ -299,7 +376,11 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         seen_round_ids.add(round_id)
     model = value.get('model')
     if not isinstance(model, dict) or model.get('size_bytes') != expected_size or not _is_sha256(model.get('sha256')):
-        errors.append('%s.model 必须是 4 MiB 且含 SHA-256' % prefix)
+        errors.append('%s.model 必须是 %d 字节且含 SHA-256' % (prefix, expected_size))
+    if index > 1 and prev_output_model_sha is not None:
+        if isinstance(model, dict) and model.get('sha256') != prev_output_model_sha:
+            errors.append('%s 占位聚合模型 SHA-256 与前一轮输出不匹配' % prefix)
+
     intervals = value.get('model_receive_intervals')
     if not isinstance(intervals, dict) or set(intervals) != {'1', '2'} or any(not _is_interval(intervals[node]) for node in intervals):
         errors.append('%s 缺少两个节点的模型接收时间区间' % prefix)
@@ -315,10 +396,8 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             errors.append('%s.strict_sync.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
         if strict_sync.get('partial_result_returned') is not False:
             errors.append('%s.strict_sync 必须证明未返回 partial result' % prefix)
-        if strict_sync.get('client1_committed_before_client2') is not True:
-            errors.append('%s.strict_sync 必须证明 client1 先于 client2 完成提交' % prefix)
-        if strict_sync.get('server_waited_after_client1') is not True:
-            errors.append('%s.strict_sync 必须证明 client1 提交后 server 保持等待' % prefix)
+        if strict_sync.get('server_waited_after_first_commit') is not True:
+            errors.append('%s.strict_sync 必须证明首个客户端提交后 server 保持等待' % prefix)
     active_upload_sets = value.get('active_upload_sets')
     if (not isinstance(active_upload_sets, list) or not active_upload_sets or
             any(not isinstance(node_ids, list) or
@@ -337,35 +416,90 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
     for node_id in (1, 2):
         upload = uploads_by_node[node_id]
         if upload.get('size_bytes') != expected_size or not _is_sha256(upload.get('sha256')):
-            errors.append('%s node %d update 必须是 4 MiB 且含 SHA-256' % (prefix, node_id))
+            errors.append('%s node %d update 必须是 %d 字节且含 SHA-256' % (prefix, node_id, expected_size))
         if upload.get('sha256') != template_hashes[str(node_id)]:
             errors.append('%s node %d 未复用对应 update 模板' % (prefix, node_id))
         if not _is_interval(upload.get('client_put_interval')) or not _is_interval(upload.get('server_put_interval')):
             errors.append('%s node %d 缺少 PUT 时间区间' % (prefix, node_id))
-        if upload.get('client_http_status') != 201 or upload.get('server_http_status') != 201 or upload.get('server_outcome') != 'committed':
+        srv_status = upload.get('server_http_status')
+        if srv_status == 409:
+            errors.append('%s node %d 检测到 upload-in-progress 冲突 (HTTP 409)' % (prefix, node_id))
+        elif srv_status in (408, 504):
+            errors.append('%s node %d 检测到 HTTP timeout (HTTP %s)' % (prefix, node_id, srv_status))
+        if upload.get('client_http_status') != 201 or srv_status != 201 or upload.get('server_outcome') != 'committed':
             errors.append('%s node %d 客户端与服务端提交事实不一致或包含 upload_in_progress' % (prefix, node_id))
 
     downlink_matrix = value.get('downlink_matrix')
-    if downlink_matrix is not None:
-        if not isinstance(downlink_matrix, dict) or downlink_matrix.get('status') != 'passed':
-            errors.append('%s UFTP 下行逐 client 逐文件完成矩阵未通过' % prefix)
+    if downlink_matrix is None:
+        errors.append('%s 缺少 downlink_matrix 下行证据' % prefix)
+    elif not isinstance(downlink_matrix, dict) or downlink_matrix.get('status') != 'passed':
+        errors.append('%s UFTP 下行逐 client 逐文件完成矩阵未通过' % prefix)
+    else:
+        conn = downlink_matrix.get('uftp_connect_matrix', {})
+        files = downlink_matrix.get('uftp_result_matrix', {})
+        if conn.get('1') != 'success' or conn.get('2') != 'success':
+            errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
+        for nid in ('1', '2'):
+            node_files = files.get(nid, {})
+            if node_files.get('model.bin') != 'copy':
+                errors.append('%s client %s UFTP model.bin 接收未成功' % (prefix, nid))
+            if node_files.get('model.manifest.json') != 'copy':
+                errors.append('%s client %s UFTP model.manifest.json 接收未成功' % (prefix, nid))
+
+    concurrent_put = value.get('concurrent_put')
+    if concurrent_put is None or not isinstance(concurrent_put, dict):
+        errors.append('%s 缺少 concurrent_put 并发观测事实' % prefix)
+    else:
+        if not isinstance(concurrent_put.get('natural_overlap'), bool):
+            errors.append('%s.concurrent_put 缺少 natural_overlap 标记' % prefix)
+        if not isinstance(concurrent_put.get('overlap_duration_seconds'), (int, float)):
+            errors.append('%s.concurrent_put 缺少 overlap_duration_seconds' % prefix)
+        client_intervals = concurrent_put.get('client_intervals')
+        if not isinstance(client_intervals, dict) or set(client_intervals) != {'1', '2'}:
+            errors.append('%s.concurrent_put 缺少客户端 PUT 区间' % prefix)
         else:
-            conn = downlink_matrix.get('uftp_connect_matrix', {})
-            files = downlink_matrix.get('uftp_result_matrix', {})
-            if conn.get('1') != 'success' or conn.get('2') != 'success':
-                errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
-            if (files.get('1', {}).get('model.bin') != 'copy' or
-                    files.get('2', {}).get('model.bin') != 'copy'):
-                errors.append('%s UFTP 文件接收矩阵未全部 copy' % prefix)
+            c1_int = client_intervals.get('1')
+            c2_int = client_intervals.get('2')
+            if _is_interval(c1_int) and _is_interval(c2_int):
+                if uploads_by_node.get(1) and c1_int != uploads_by_node[1].get('client_put_interval'):
+                    errors.append('%s.concurrent_put node 1 区间与 uploads 不一致' % prefix)
+                if uploads_by_node.get(2) and c2_int != uploads_by_node[2].get('client_put_interval'):
+                    errors.append('%s.concurrent_put node 2 区间与 uploads 不一致' % prefix)
+
+                calc_overlap = min(c1_int['end'], c2_int['end']) - max(c1_int['start'], c2_int['start'])
+                expected_overlap = calc_overlap > 0
+                if concurrent_put.get('natural_overlap') != expected_overlap:
+                    errors.append('%s.concurrent_put natural_overlap 标记与实际时间区间矛盾' % prefix)
+                expected_dur = round(calc_overlap, 3) if expected_overlap else 0.0
+                actual_dur = concurrent_put.get('overlap_duration_seconds')
+                if not isinstance(actual_dur, (int, float)) or abs(actual_dur - expected_dur) > 0.001:
+                    errors.append('%s.concurrent_put overlap_duration_seconds 与时间区间计算不符 (报告: %s, 期望: %s)' %
+                                  (prefix, actual_dur, expected_dur))
 
     telem = value.get('telemetry')
-    if telem is not None:
-        if not isinstance(telem, dict):
-            errors.append('%s.telemetry 必须是对象' % prefix)
+    if telem is None:
+        errors.append('%s 缺少 telemetry 遥测事实' % prefix)
+    elif not isinstance(telem, dict):
+        errors.append('%s.telemetry 必须是对象' % prefix)
+    else:
+        queue = telem.get('queue', {})
+        if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
+            errors.append('%s 队列自然暂停后未成功恢复' % prefix)
+        by_node = telem.get('loss_and_fec_by_node')
+        if by_node is None:
+            errors.append('%s telemetry 缺少 loss_and_fec_by_node 分源遥测' % prefix)
+        elif not isinstance(by_node, dict):
+            errors.append('%s.loss_and_fec_by_node 必须是对象' % prefix)
         else:
-            queue = telem.get('queue', {})
-            if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
-                errors.append('%s 队列自然暂停后未成功恢复' % prefix)
+            for nid in ('1', '2'):
+                if nid not in by_node:
+                    errors.append('%s telemetry loss_and_fec_by_node 缺少 client %s' % (prefix, nid))
+                elif not isinstance(by_node[nid], dict):
+                    errors.append('%s telemetry client %s 遥测数据无效' % (prefix, nid))
+                elif by_node[nid].get('sample_count', 0) <= 0:
+                    errors.append('%s telemetry client %s 缺少有效 PKT_SRC 遥测采样' % (prefix, nid))
+                elif by_node[nid].get('out_packets', 0) <= 0:
+                    errors.append('%s telemetry client %s 交付包数 (out_packets) 必须大于 0' % (prefix, nid))
 
 
 def _is_interval(value):

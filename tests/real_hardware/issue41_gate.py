@@ -41,7 +41,7 @@ class GateConfig:
                  channel_width: str = 'HT40+',
                  link_id: int = 406,
                  fec_k: int = 8,
-                 fec_n: int = 12,
+                 fec_n: int = 14,
                  radio_bandwidth: int = 40,
                  radio_mcs_index: int = 3,
                  radio_short_gi: int = 1,
@@ -91,6 +91,36 @@ class GateConfig:
         self.feedback_window_period_ms = feedback_window_period_ms
         self.feedback_window_duration_ms = feedback_window_duration_ms
         self.round_deadline_seconds = round_deadline_seconds
+
+    @classmethod
+    def from_env(cls) -> 'GateConfig':
+        """从环境变量解析当前门禁参数，缺省时由 __init__ 形参默认值维护单一真相来源。"""
+        kwargs = {}
+        if 'ISSUE41_SMOKE_CYCLE_COUNT' in os.environ:
+            kwargs['cycle_count'] = int(os.environ['ISSUE41_SMOKE_CYCLE_COUNT'])
+        if 'ISSUE41_INPUT_SIZE_BYTES' in os.environ:
+            kwargs['artifact_size_bytes'] = int(os.environ['ISSUE41_INPUT_SIZE_BYTES'])
+        if 'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS' in os.environ:
+            kwargs['io_timeout_seconds'] = int(os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'])
+        if 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS' in os.environ:
+            kwargs['cycle_deadline_seconds'] = int(os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'])
+        if 'ISSUE41_CHANNEL' in os.environ:
+            kwargs['channel'] = int(os.environ['ISSUE41_CHANNEL'])
+        if 'ISSUE41_CHANNEL_WIDTH' in os.environ:
+            kwargs['channel_width'] = os.environ['ISSUE41_CHANNEL_WIDTH']
+        if 'ISSUE41_LINK_ID' in os.environ:
+            kwargs['link_id'] = int(os.environ['ISSUE41_LINK_ID'])
+        if 'ISSUE41_FEC_K' in os.environ:
+            kwargs['fec_k'] = int(os.environ['ISSUE41_FEC_K'])
+        if 'ISSUE41_FEC_N' in os.environ:
+            kwargs['fec_n'] = int(os.environ['ISSUE41_FEC_N'])
+        if 'ISSUE41_RADIO_BANDWIDTH' in os.environ:
+            kwargs['radio_bandwidth'] = int(os.environ['ISSUE41_RADIO_BANDWIDTH'])
+        if 'ISSUE41_RADIO_MCS_INDEX' in os.environ:
+            kwargs['radio_mcs_index'] = int(os.environ['ISSUE41_RADIO_MCS_INDEX'])
+        if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
+            kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
+        return cls(**kwargs)
 
     @staticmethod
     def validate_link_args(args: List[str]) -> None:
@@ -647,6 +677,65 @@ def verify_uplink_cycle(events: List[Dict[str, Any]],
         'duration_seconds': duration_seconds,
     }
 
+def parse_pkt_src_line(line: str) -> Optional[Dict[str, Any]]:
+    """解析单行 PKT_SRC 统计，若格式不合法或节点编号不在有效范围 [1, 255] 则返回 None。"""
+    if 'PKT_SRC' not in line:
+        return None
+    m = re.search(r'(\d+)[\t ]+PKT_SRC[\t ]+(\d+):(\d+):(\d+):(\d+):(\d+):(\d+):(\d+)\s*$', line)
+    if not m:
+        return None
+    try:
+        node_id_int = int(m.group(2))
+        if not (1 <= node_id_int <= 255):
+            return None
+        return {
+            'timestamp_ms': int(m.group(1)),
+            'node_id': str(node_id_int),
+            'rx_packets': int(m.group(3)),
+            'rx_bytes': int(m.group(4)),
+            'packets_fec_recovered': int(m.group(5)),
+            'packets_lost': int(m.group(6)),
+            'out_packets': int(m.group(7)),
+            'out_bytes': int(m.group(8)),
+        }
+    except (ValueError, IndexError):
+        return None
+
+
+def make_empty_node_telemetry() -> Dict[str, Any]:
+    """生成初始化的单节点丢包与 FEC 遥测结构。"""
+    return {
+        'sample_count': 0,
+        'rx_packets': 0,
+        'rx_bytes': 0,
+        'packets_fec_recovered': 0,
+        'packets_lost': 0,
+        'out_packets': 0,
+        'out_bytes': 0,
+        'loss_rate': 0.0,
+        'fec_recovery_rate': 0.0,
+    }
+
+
+def format_node_telemetry_lines(loss_and_fec_by_node: Dict[str, Dict[str, Any]],
+                                label_prefix: str = "") -> List[str]:
+    """格式化各节点分源遥测文本行。"""
+    lines = []
+    for nid in sorted(loss_and_fec_by_node.keys(), key=lambda x: int(x) if str(x).isdigit() else str(x)):
+        data = loss_and_fec_by_node[nid]
+        rx_p = data.get('rx_packets', 0)
+        lost_p = data.get('packets_lost', 0)
+        fec_p = data.get('packets_fec_recovered', 0)
+        out_p = data.get('out_packets', 0)
+        loss_r = data.get('loss_rate', 0.0) * 100
+        fec_r = data.get('fec_recovery_rate', 0.0) * 100
+        lines.append(
+            f"{label_prefix}Client{nid}: raw={rx_p} pkts, lost={lost_p} ({loss_r:.2f}%), "
+            f"fec_recovered={fec_p} ({fec_r:.2f}%), out={out_p} pkts"
+        )
+    return lines
+
+
 def parse_telemetry(server_log: str,
                     client_logs: Dict[str, str],
                     queue_summaries: Dict[str, Dict[str, Any]],
@@ -688,6 +777,10 @@ def parse_telemetry(server_log: str,
     rx_bytes = 0
     packets_lost = 0
     packets_fec_recovered = 0
+    loss_and_fec_by_node: Dict[str, Dict[str, Any]] = {
+        '1': make_empty_node_telemetry(),
+        '2': make_empty_node_telemetry(),
+    }
     for line in server_log.splitlines():
         if '\tRX_ANT\t' in line:
             rx_ant_samples += 1
@@ -697,6 +790,27 @@ def parse_telemetry(server_log: str,
             rx_bytes += int(m_pkt.group(2))
             packets_fec_recovered += int(m_pkt.group(7))
             packets_lost += int(m_pkt.group(8))
+        src_entry = parse_pkt_src_line(line)
+        if src_entry:
+            nid = src_entry['node_id']
+            if nid not in loss_and_fec_by_node:
+                loss_and_fec_by_node[nid] = make_empty_node_telemetry()
+            loss_and_fec_by_node[nid]['sample_count'] += 1
+            loss_and_fec_by_node[nid]['rx_packets'] += src_entry['rx_packets']
+            loss_and_fec_by_node[nid]['rx_bytes'] += src_entry['rx_bytes']
+            loss_and_fec_by_node[nid]['packets_fec_recovered'] += src_entry['packets_fec_recovered']
+            loss_and_fec_by_node[nid]['packets_lost'] += src_entry['packets_lost']
+            loss_and_fec_by_node[nid]['out_packets'] += src_entry['out_packets']
+            loss_and_fec_by_node[nid]['out_bytes'] += src_entry['out_bytes']
+
+    for node_data in loss_and_fec_by_node.values():
+        total_delivered_or_lost = node_data['out_packets'] + node_data['packets_lost']
+        if total_delivered_or_lost > 0:
+            node_data['loss_rate'] = round(node_data['packets_lost'] / total_delivered_or_lost, 6)
+            node_data['fec_recovery_rate'] = round(node_data['packets_fec_recovered'] / total_delivered_or_lost, 6)
+        else:
+            node_data['loss_rate'] = 0.0
+            node_data['fec_recovery_rate'] = 0.0
 
     # 4. queue / backpressure
     tun_pause = 0
@@ -800,6 +914,7 @@ def parse_telemetry(server_log: str,
             'packets_lost': packets_lost,
             'packets_fec_recovered': packets_fec_recovered,
         },
+        'loss_and_fec_by_node': loss_and_fec_by_node,
         'tcp_retransmits': tcp_retransmits,
         'phase_durations': durations,
     }
@@ -964,11 +1079,21 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
     required_telem_keys = [
         'ready_accepted_total', 'grant_sent_total', 'authorized_sends_by_node',
         'server_rx', 'queue', 'reassembly', 'sender_isolation', 'feedback',
-        'loss_and_fec', 'tcp_retransmits', 'phase_durations',
+        'loss_and_fec', 'loss_and_fec_by_node', 'tcp_retransmits', 'phase_durations',
     ]
     for rk in required_telem_keys:
         if rk not in telem:
             errors.append(f'{prefix} 缺少遥测事实：{rk}')
+
+    by_node = telem.get('loss_and_fec_by_node')
+    if isinstance(by_node, dict):
+        for nid in ('1', '2'):
+            if nid not in by_node:
+                errors.append(f'{prefix} telemetry loss_and_fec_by_node 缺少 client {nid}')
+            elif by_node[nid].get('sample_count', 0) <= 0:
+                errors.append(f'{prefix} telemetry client {nid} 缺少有效 PKT_SRC 遥测采样')
+            elif by_node[nid].get('out_packets', 0) <= 0:
+                errors.append(f'{prefix} telemetry client {nid} 交付包数 (out_packets) 必须大于 0')
 
     return errors
 
@@ -1181,8 +1306,21 @@ def main(argv=None) -> int:
     p_eq.add_argument("--client2-fl", required=True)
     p_eq.add_argument("--out", default=None)
 
+    p_fct = subparsers.add_parser("format-cycle-telemetry")
+    p_fct.add_argument("--cycle-json", required=True)
+
+    p_fst = subparsers.add_parser("format-summary-telemetry")
+    p_fst.add_argument("--summary-json", required=True)
+
     args = parser.parse_args(argv)
-    config = GateConfig()
+    config = (
+        GateConfig.from_env()
+        if args.command in (
+            "verify-downlink", "verify-uplink", "build-cycle",
+            "build-gate-summary", "validate-summary", "verify-config-equivalence"
+        )
+        else None
+    )
 
     if args.command == "generate-fixtures":
         res = generate_cycle_fixtures(
@@ -1357,6 +1495,25 @@ def main(argv=None) -> int:
             for err in res["errors"]:
                 print(f"CONFIG_EQUIVALENCE_ERROR: {err}", file=sys.stderr)
             return 1
+        return 0
+
+    if args.command == "format-cycle-telemetry":
+        with open(args.cycle_json, "r", encoding="utf-8") as fh:
+            cycle_ev = json.load(fh)
+        by_node = cycle_ev.get("telemetry", {}).get("loss_and_fec_by_node", {})
+        for line in format_node_telemetry_lines(by_node, label_prefix="       [分源遥测 "):
+            print(f"{line}]")
+        return 0
+
+    if args.command == "format-summary-telemetry":
+        with open(args.summary_json, "r", encoding="utf-8") as fh:
+            summary = json.load(fh)
+        print("       ==== 分源遥测汇总 ====")
+        for c in summary.get("cycles", []):
+            c_idx = c.get("cycle_index")
+            by_node = c.get("telemetry", {}).get("loss_and_fec_by_node", {})
+            for line in format_node_telemetry_lines(by_node, label_prefix=f"       Cycle {c_idx} "):
+                print(line)
         return 0
 
     return 0

@@ -14,6 +14,22 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp(prefix='wfb-issue41-archive-')
         self.addCleanup(shutil.rmtree, self.root, True)
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
 
     def test_accepts_complete_passed_summary(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -117,7 +133,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
 
         errors = validate_archive(self.root)
 
-        self.assertTrue(any('一轮' in error for error in errors))
+        self.assertTrue(any('轮完整证据' in error for error in errors))
 
     def test_rejects_update_not_matching_its_reused_template(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -212,7 +228,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 0}
+        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 3000}
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
@@ -225,25 +241,38 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 40 * 1024 * 1024
+        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 4 * 1024 * 1024
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
         errors = validate_archive(self.root)
         self.assertTrue(any('artifact_size_bytes' in error for error in errors))
 
-    def test_rejects_strict_sync_client1_not_before_client2(self):
+    def test_rejects_missing_or_non_integer_round_count(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
             self.write_json(name, {'conclusion': 'succeeded'})
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['rounds'][0]['strict_sync']['client1_committed_before_client2'] = False
+        summary['formal_runtime_loop']['scenario']['round_count'] = None
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
         errors = validate_archive(self.root)
-        self.assertTrue(any('client1 先于 client2' in error for error in errors))
+        self.assertTrue(any('round_count 必须为 2 轮' in error for error in errors))
+
+    def test_rejects_strict_sync_server_not_waiting_after_first_commit(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['strict_sync']['server_waited_after_first_commit'] = False
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('首个客户端提交后 server 保持等待' in error for error in errors))
 
     def test_rejects_downlink_matrix_failure(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -279,6 +308,217 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
 
         errors = validate_archive(self.root)
         self.assertTrue(any('队列自然暂停' in error for error in errors))
+
+    def test_rejects_concurrent_put_interval_mismatch_with_uploads(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['client_intervals']['1'] = {'start': 5.0, 'end': 6.0}
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('concurrent_put node 1 区间与 uploads 不一致' in error for error in errors))
+
+    def test_rejects_concurrent_put_overlap_duration_mismatch(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['overlap_duration_seconds'] = 3.5
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('overlap_duration_seconds 与时间区间计算不符' in error for error in errors))
+
+    def test_rejects_concurrent_put_natural_overlap_contradiction(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['natural_overlap'] = False
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('natural_overlap 标记与实际时间区间矛盾' in error for error in errors))
+
+    def test_rejects_smoke_io_timeout_exceeding_120_in_formal(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'smoke_io_timeout_seconds': 130,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('smoke_io_timeout_seconds' in error for error in errors))
+
+    def test_rejects_io_timeout_exceeding_120_in_formal(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'io_timeout_seconds': 130,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('io_timeout_seconds' in error for error in errors))
+
+    def test_validates_archive_passed_two_rounds_40mib(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+
+        shared_sha = 'a' * 64
+        r1 = self.round_evidence(1, size=40 * 1024 * 1024, model_sha=shared_sha)
+        r2 = self.round_evidence(2, size=40 * 1024 * 1024, model_sha=shared_sha)
+        summary = self.complete_summary('passed')
+        summary['pre_runtime_smoke'] = self.smoke_gate_evidence(artifact_size=40 * 1024 * 1024)
+        summary['formal_runtime_loop']['scenario'] = {
+            'round_count': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'placeholder_training': 'template_copy',
+            'placeholder_aggregation': 'model_copy',
+            'update_template_sha256_by_node': {
+                '1': 'b'.ljust(64, '0'),
+                '2': 'c'.ljust(64, '0'),
+            },
+        }
+        summary['formal_runtime_loop']['rounds'] = [r1, r2]
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'test-run',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            }
+        })
+
+        errors = validate_archive(self.root)
+        self.assertEqual([], errors)
+
+    def test_rejects_round_2_aggregation_model_mismatch(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+
+        r1 = self.round_evidence(1, size=40 * 1024 * 1024, model_sha='1' * 64)
+        r2 = self.round_evidence(2, size=40 * 1024 * 1024, model_sha='2' * 64)
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['scenario'] = {
+            'round_count': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'placeholder_training': 'template_copy',
+            'placeholder_aggregation': 'model_copy',
+            'update_template_sha256_by_node': {
+                '1': 'b'.ljust(64, '0'),
+                '2': 'c'.ljust(64, '0'),
+            },
+        }
+        summary['formal_runtime_loop']['rounds'] = [r1, r2]
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('占位聚合模型 SHA-256 与前一轮输出不匹配' in error for error in errors))
+
+    def test_rejects_missing_client_in_pkt_src_telemetry(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+
+        shared_sha = 'a' * 64
+        r1 = self.round_evidence(1, size=40 * 1024 * 1024, model_sha=shared_sha)
+        r2 = self.round_evidence(2, size=40 * 1024 * 1024, model_sha=shared_sha)
+        # Remove client 2 from loss_and_fec_by_node in round 2
+        del r2['telemetry']['loss_and_fec_by_node']['2']
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['scenario'] = {
+            'round_count': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'placeholder_training': 'template_copy',
+            'placeholder_aggregation': 'model_copy',
+            'update_template_sha256_by_node': {
+                '1': 'b'.ljust(64, '0'),
+                '2': 'c'.ljust(64, '0'),
+            },
+        }
+        summary['formal_runtime_loop']['rounds'] = [r1, r2]
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('loss_and_fec_by_node 缺少 client 2' in error for error in errors))
+
+    def test_rejects_mismatch_with_envelope_rounds_count(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+
+        summary = self.complete_summary('passed')
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'test-run',
+            'resolved_config': {
+                'rounds': 3,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+            }
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('round_count 与 envelope 不一致' in error for error in errors))
 
     def test_rejects_config_equivalence_failure(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -646,7 +886,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
                 'smoke_cycle_deadline_seconds': 240,
+                'artifact_size_bytes': 40 * 1024 * 1024,
                 'runtime_timeout_seconds': 180,
                 'io_timeout_seconds': 120,
             },
@@ -656,14 +899,14 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.assertEqual([], errors)
 
 
-    def smoke_gate_evidence(self):
-        cycles = [self.cycle_evidence(i) for i in (1, 2, 3)]
+    def smoke_gate_evidence(self, artifact_size=4 * 1024 * 1024):
+        cycles = [self.cycle_evidence(i, size=artifact_size) for i in (1, 2, 3)]
         return {
             'schema_version': 1,
             'status': 'passed',
             'gate_type': 'three_cycle_bidirectional',
             'cycle_count': 3,
-            'artifact_size_bytes': 4 * 1024 * 1024,
+            'artifact_size_bytes': artifact_size,
             'io_timeout_seconds': 120,
             'cycle_deadline_seconds': 240,
             'reused_processes': {
@@ -677,8 +920,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'cycles': cycles,
         }
 
-    def cycle_evidence(self, index):
-        size = 4 * 1024 * 1024
+    def cycle_evidence(self, index, size=4 * 1024 * 1024):
         model_sha = ('a%d' % index).ljust(64, '0')
         manifest_sha = ('m%d' % index).ljust(64, '0')
         c1_sha = ('b%d' % index).ljust(64, '0')
@@ -773,6 +1015,30 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                     'packets_lost': 2,
                     'packets_fec_recovered': 2,
                 },
+                'loss_and_fec_by_node': {
+                    '1': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
+                    '2': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
+                },
                 'tcp_retransmits': 1,
                 'phase_durations': {
                     'downlink_seconds': 3.5,
@@ -788,7 +1054,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
     def complete_summary(self, conclusion):
         return {
             'orchestration': {'status': 'passed'},
-            'pre_runtime_smoke': self.smoke_gate_evidence(),
+            'pre_runtime_smoke': self.smoke_gate_evidence(artifact_size=40 * 1024 * 1024),
             'formal_runtime_loop': {
                 'status': 'passed',
                 'runtime_interfaces': [
@@ -798,9 +1064,9 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'server_wait_for_updates_returned_node_ids': [1, 2],
                 'partial_result_returned': False,
                 'scenario': {
-                    'round_count': 1,
-                    'artifact_size_bytes': 4 * 1024 * 1024,
-                    'training_delay_ms_by_node': {'1': 0, '2': 3000},
+                    'round_count': 2,
+                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'training_delay_ms_by_node': {'1': 0, '2': 0},
                     'placeholder_training': 'template_copy',
                     'placeholder_aggregation': 'model_copy',
                     'update_template_sha256_by_node': {
@@ -808,7 +1074,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         '2': 'c'.ljust(64, '0'),
                     },
                 },
-                'rounds': [self.round_evidence(1)],
+                'rounds': [
+                    self.round_evidence(1, size=40 * 1024 * 1024, model_sha='a' * 64),
+                    self.round_evidence(2, size=40 * 1024 * 1024, model_sha='a' * 64),
+                ],
                 'server_result': os.path.join(self.root, 'server-result.json'),
                 'client1_result': os.path.join(self.root, 'client1-result.json'),
                 'client2_result': os.path.join(self.root, 'client2-result.json'),
@@ -879,9 +1148,9 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_json('lifecycle/restart_evidence.json', {'status': 'passed'})
         self.write_json('lifecycle/second_stop_evidence.json', {'status': 'passed'})
 
-    def round_evidence(self, index):
-        size = 4 * 1024 * 1024
-        model_sha = ('a%d' % index).ljust(64, '0')
+    def round_evidence(self, index, size=4 * 1024 * 1024, model_sha=None):
+        if model_sha is None:
+            model_sha = ('a%d' % index).ljust(64, '0')
         uploads = []
         for node_id, sha in ((1, 'b'), (2, 'c')):
             uploads.append({
@@ -902,11 +1171,32 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 '1': {'start': 1.0, 'end': 2.0},
                 '2': {'start': 1.0, 'end': 2.0},
             },
+            'downlink_matrix': {
+                'status': 'passed',
+                'uftp_connect_matrix': {'1': 'success', '2': 'success'},
+                'uftp_result_matrix': {
+                    '1': {'model.bin': 'copy', 'model.manifest.json': 'copy'},
+                    '2': {'model.bin': 'copy', 'model.manifest.json': 'copy'},
+                },
+            },
             'uploads': uploads,
             'active_upload_sets': [[1], [1, 2], [2], []],
+            'concurrent_put': {
+                'natural_overlap': True,
+                'overlap_duration_seconds': 1.0,
+                'concurrent_active_observed': True,
+                'client_intervals': {
+                    '1': {'start': 1.0, 'end': 2.0},
+                    '2': {'start': 1.0, 'end': 2.0},
+                },
+                'server_intervals': {
+                    '1': {'start': 1.0, 'end': 2.0},
+                    '2': {'start': 1.0, 'end': 2.0},
+                },
+            },
             'strict_sync': {
                 'client1_committed_before_client2': True,
-                'server_waited_after_client1': True,
+                'server_waited_after_first_commit': True,
                 'intermediate_committed_node_ids': [1],
                 'intermediate_pending_node_ids': [2],
                 'server_wait_returned_node_ids': [1, 2],
@@ -914,7 +1204,41 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             },
             'server_committed_node_ids': [1, 2],
             'server_wait_returned_node_ids': [1, 2],
+            'telemetry': {
+                'loss_and_fec_by_node': {
+                    '1': {'rx_packets': 1000, 'out_packets': 980, 'packets_lost': 20, 'packets_fec_recovered': 5, 'sample_count': 10},
+                    '2': {'rx_packets': 1000, 'out_packets': 975, 'packets_lost': 25, 'packets_fec_recovered': 6, 'sample_count': 10},
+                }
+            }
         }
+
+    def test_rejects_runtime_exceeding_round_deadline(self):
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['duration_seconds'] = 250.0
+        summary['formal_runtime_loop']['rounds'][1]['duration_seconds'] = 200.0
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
+        errors = validate_archive(self.root)
+        self.assertTrue(any('formal_runtime_loop 实际总耗时' in e for e in errors))
 
     def write_smoke_marker(self, run_id='test-run'):
         marker = {

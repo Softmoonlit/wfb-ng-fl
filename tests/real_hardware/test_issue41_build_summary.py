@@ -9,7 +9,11 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
-from tests.real_hardware.issue41_build_summary import EVENT_PREFIX, main
+from tests.real_hardware.issue41_build_summary import (
+    EVENT_PREFIX,
+    main,
+    _filter_log_by_time_ms,
+)
 
 
 class Issue41BuildSummaryTestCase(unittest.TestCase):
@@ -30,7 +34,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual(0, ret)
         summary = json.loads(buf.getvalue())
         self.assertEqual('passed', summary['status'])
-        self.assertEqual('一轮 4 MiB 严格同步确定性场景证据完整', summary['reason'])
+        self.assertEqual('1 轮 4 MiB 严格同步场景证据完整', summary['reason'])
         self.assertEqual(1, summary['scenario']['round_count'])
         self.assertEqual(4 * 1024 * 1024, summary['scenario']['artifact_size_bytes'])
         self.assertEqual({'1': 0, '2': 3000}, summary['scenario']['training_delay_ms_by_node'])
@@ -40,7 +44,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         round1 = summary['rounds'][0]
         self.assertEqual([1, 2], round1['strict_sync']['server_wait_returned_node_ids'])
         self.assertTrue(round1['strict_sync']['client1_committed_before_client2'])
-        self.assertTrue(round1['strict_sync']['server_waited_after_client1'])
+        self.assertTrue(round1['strict_sync']['server_waited_after_first_commit'])
         self.assertFalse(round1['strict_sync']['partial_result_returned'])
 
     def test_build_summary_rejects_two_rounds(self):
@@ -51,7 +55,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual(0, ret)
         summary = json.loads(buf.getvalue())
         self.assertEqual('failed', summary['status'])
-        self.assertIn('server 算法结果必须恰好包含一轮', summary['reason'])
+        self.assertIn('server 算法结果必须恰好包含 1 轮', summary['reason'])
 
     def test_build_summary_rejects_client2_delay_zero(self):
         self.write_fixtures(client2_delay=0)
@@ -184,9 +188,143 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         self.assertEqual('failed', summary['status'])
         self.assertIn('UFTP', summary['reason'])
 
+    def test_build_summary_passed_two_rounds_40mib_concurrent(self):
+        env_path = os.path.join(self.archive_dir, 'envelope.json')
+        with open(env_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'run_id': 'stage1_two_round_40m_test',
+                'resolved_config': {
+                    'rounds': 2,
+                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'training_delay_ms_by_node': {'1': 0, '2': 0},
+                    'runtime_timeout_seconds': 400,
+                    'io_timeout_seconds': 120,
+                }
+            }, fh)
+        self.write_fixtures(rounds_count=2, client2_delay=0, size=40 * 1024 * 1024, concurrent_obs=True)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('passed', summary['status'])
+        self.assertEqual('2 轮 40 MiB 严格同步场景证据完整', summary['reason'])
+        self.assertEqual(2, summary['scenario']['round_count'])
+        self.assertEqual(40 * 1024 * 1024, summary['scenario']['artifact_size_bytes'])
+        self.assertEqual({'1': 0, '2': 0}, summary['scenario']['training_delay_ms_by_node'])
+        self.assertEqual(2, len(summary['rounds']))
+        for r in summary['rounds']:
+            self.assertEqual([1, 2], r['strict_sync']['server_wait_returned_node_ids'])
+            self.assertFalse(r['strict_sync']['partial_result_returned'])
+            self.assertTrue(r['concurrent_put']['natural_overlap'])
+            self.assertTrue(r['concurrent_put']['concurrent_active_observed'])
+            self.assertGreater(r['concurrent_put']['overlap_duration_seconds'], 0.0)
+
+    def test_build_summary_rejects_duplicate_round_id(self):
+        env_path = os.path.join(self.archive_dir, 'envelope.json')
+        with open(env_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'run_id': 'stage1_dup_round_test',
+                'resolved_config': {
+                    'rounds': 2,
+                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'training_delay_ms_by_node': {'1': 0, '2': 0},
+                }
+            }, fh)
+        self.write_fixtures(rounds_count=2, client2_delay=0, size=40 * 1024 * 1024, duplicate_round_id=True)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('round_id 重复', summary['reason'])
+
+    def test_build_summary_rejects_client_mismatched_template_in_round_2(self):
+        env_path = os.path.join(self.archive_dir, 'envelope.json')
+        with open(env_path, 'w', encoding='utf-8') as fh:
+            json.dump({
+                'schema_version': 1,
+                'run_id': 'stage1_mismatch_tpl_test',
+                'resolved_config': {
+                    'rounds': 2,
+                    'artifact_size_bytes': 40 * 1024 * 1024,
+                    'training_delay_ms_by_node': {'1': 0, '2': 0},
+                }
+            }, fh)
+        self.write_fixtures(rounds_count=2, client2_delay=0, size=40 * 1024 * 1024, client_mismatched_template=True)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('未复用对应 update 模板', summary['reason'])
+
+    def test_build_summary_rejects_upload_in_progress(self):
+        self.write_fixtures()
+        # Append upload_in_progress event to server observations
+        obs_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'observation.jsonl')
+        with open(obs_path, 'a', encoding='utf-8') as fh:
+            fh.write(EVENT_PREFIX + json.dumps({'event': 'upload_phase', 'round': 'round-1', 'node_id': 1, 'error_code': 'upload_in_progress'}) + '\n')
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('upload_in_progress', summary['reason'])
+
+    def test_build_summary_rejects_missing_upload_committed_events(self):
+        self.write_fixtures()
+        obs_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'observation.jsonl')
+        with open(obs_path, 'r', encoding='utf-8') as fh:
+            lines = [line for line in fh if not ('upload_committed' in line and '"node_id": 2' in line)]
+        with open(obs_path, 'w', encoding='utf-8') as fh:
+            fh.writelines(lines)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('缺少 upload_committed 事件', summary['reason'])
+        self.assertFalse(summary['rounds'][0]['strict_sync']['server_waited_after_first_commit'])
+
+    def test_filter_log_by_time_ms_strict_window(self):
+        log = (
+            "999\tPKT_SRC\t1:10:100:0:0:10:100\n"
+            "1000\tPKT_SRC\t1:20:200:0:0:20:200\n"
+            "1500\tPKT_SRC\t2:30:300:0:0:30:300\n"
+            "2000\tPKT_SRC\t1:40:400:0:0:40:400\n"
+            "2001\tPKT_SRC\t2:50:500:0:0:50:500\n"
+        )
+        filtered = _filter_log_by_time_ms(log, 1000, 2000)
+        self.assertNotIn("999\tPKT_SRC", filtered)
+        self.assertIn("1000\tPKT_SRC", filtered)
+        self.assertIn("1500\tPKT_SRC", filtered)
+        self.assertIn("2000\tPKT_SRC", filtered)
+        self.assertNotIn("2001\tPKT_SRC", filtered)
+
     def write_fixtures(self, rounds_count=1, client2_delay=3000,
-                       returned_node_ids=None, same_template_hash=False):
-        size = 4 * 1024 * 1024
+                       returned_node_ids=None, same_template_hash=False,
+                       size=4 * 1024 * 1024, concurrent_obs=False,
+                       duplicate_round_id=False, client_mismatched_template=False):
+        env_path = os.path.join(self.archive_dir, 'envelope.json')
+        if not os.path.exists(env_path):
+            with open(env_path, 'w', encoding='utf-8') as fh:
+                json.dump({
+                    'schema_version': 1,
+                    'run_id': 'test-run',
+                    'resolved_config': {
+                        'rounds': 1,
+                        'artifact_size_bytes': 4 * 1024 * 1024,
+                        'training_delay_ms_by_node': {'1': 0, '2': 3000},
+                    }
+                }, fh)
+
         model_sha = 'a' * 64
         c1_sha = '1' * 64
         c2_sha = '1' * 64 if same_template_hash else '2' * 64
@@ -194,27 +332,37 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
             returned_node_ids = [1, 2]
 
         server_rounds = []
+        c1_rounds = []
+        c2_rounds = []
+        server_obs = []
+        c1_obs = []
+        c2_obs = []
+
         for r in range(1, rounds_count + 1):
-            r_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', f'round-{r}')
+            r_id = 'round-1' if (duplicate_round_id and r > 1) else f'round-{r}'
+            r_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', r_id)
             os.makedirs(r_dir, exist_ok=True)
             with open(os.path.join(r_dir, f'uftp-{r}.status'), 'w', encoding='utf-8') as fh:
                 fh.write('CONNECT;success;0x00000001\n')
                 fh.write('CONNECT;success;0x00000002\n')
-                fh.write(f'RESULT;0x00000001;round-{r}/model.bin;4194304;copy\n')
-                fh.write(f'RESULT;0x00000001;round-{r}/model.manifest.json;120;copy\n')
-                fh.write(f'RESULT;0x00000002;round-{r}/model.bin;4194304;copy\n')
-                fh.write(f'RESULT;0x00000002;round-{r}/model.manifest.json;120;copy\n')
+                fh.write(f'RESULT;0x00000001;{r_id}/model.bin;{size};copy\n')
+                fh.write(f'RESULT;0x00000001;{r_id}/model.manifest.json;120;copy\n')
+                fh.write(f'RESULT;0x00000002;{r_id}/model.bin;{size};copy\n')
+                fh.write(f'RESULT;0x00000002;{r_id}/model.manifest.json;120;copy\n')
             updates = []
             for nid in returned_node_ids:
+                u_sha = c1_sha if nid == 1 else c2_sha
+                if client_mismatched_template and r > 1 and nid == 1:
+                    u_sha = '9' * 64
                 updates.append({
                     'node_id': nid,
                     'path': f'/var/lib/wfb-ng/issue41/server/updates/{r}/{nid}/update.bin',
                     'size_bytes': size,
-                    'sha256': c1_sha if nid == 1 else c2_sha,
+                    'sha256': u_sha,
                 })
             server_rounds.append({
                 'round_index': r,
-                'round_id': f'round-{r}',
+                'round_id': r_id,
                 'input_model_path': f'/var/lib/wfb-ng/issue41/server/model-{r}.bin',
                 'input_model_size_bytes': size,
                 'input_model_sha256': model_sha,
@@ -226,12 +374,79 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
                 'output_model_sha256': model_sha,
             })
 
+            c1_round_sha = ('9' * 64) if (client_mismatched_template and r > 1) else c1_sha
+            c1_rounds.append({
+                'round_index': r,
+                'round_id': r_id,
+                'node_id': 1,
+                'model_path': f'/var/lib/wfb-ng/issue41/client/rounds/{r_id}/model.bin',
+                'model_size_bytes': size,
+                'model_sha256': model_sha,
+                'model_receive_interval': {'start': 1.0 * r, 'end': 1.0 * r + 0.5},
+                'update_path': '/var/lib/wfb-ng/issue41/client/update.bin',
+                'update_size_bytes': size,
+                'update_sha256': c1_round_sha,
+                'put_interval': {'start': 1.0 * r + 0.6, 'end': 1.0 * r + 2.0},
+                'training_delay_ms': 0,
+            })
+
+            c2_rounds.append({
+                'round_index': r,
+                'round_id': r_id,
+                'node_id': 2,
+                'model_path': f'/var/lib/wfb-ng/issue41/client/rounds/{r_id}/model.bin',
+                'model_size_bytes': size,
+                'model_sha256': model_sha,
+                'model_receive_interval': {'start': 1.0 * r, 'end': 1.0 * r + 0.5},
+                'update_path': '/var/lib/wfb-ng/issue41/client/update.bin',
+                'update_size_bytes': size,
+                'update_sha256': c2_sha,
+                'put_interval': {'start': 1.0 * r + 0.8 if concurrent_obs else 1.0 * r + 4.6,
+                                 'end': 1.0 * r + 2.5 if concurrent_obs else 1.0 * r + 5.0},
+                'training_delay_ms': client2_delay,
+            })
+
+            if concurrent_obs:
+                server_obs.extend([
+                    {'event': 'upload_accepted', 'round': r_id, 'node_id': 1, 'transport_outcome': 'accepted'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 1, 'active_node_ids': [1]},
+                    {'event': 'upload_accepted', 'round': r_id, 'node_id': 2, 'transport_outcome': 'accepted'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 2, 'active_node_ids': [1, 2]},
+                    {'event': 'upload_committed', 'round': r_id, 'node_id': 1, 'transport_outcome': 'committed'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 1, 'active_node_ids': [2]},
+                    {'event': 'upload_committed', 'round': r_id, 'node_id': 2, 'transport_outcome': 'committed'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 2, 'active_node_ids': []},
+                ])
+            else:
+                server_obs.extend([
+                    {'event': 'upload_accepted', 'round': r_id, 'node_id': 1, 'transport_outcome': 'accepted'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 1, 'active_node_ids': [1]},
+                    {'event': 'upload_committed', 'round': r_id, 'node_id': 1, 'transport_outcome': 'committed'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 1, 'active_node_ids': []},
+                    {'event': 'upload_accepted', 'round': r_id, 'node_id': 2, 'transport_outcome': 'accepted'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 2, 'active_node_ids': [2]},
+                    {'event': 'upload_committed', 'round': r_id, 'node_id': 2, 'transport_outcome': 'committed'},
+                    {'event': 'active_uploads', 'round': r_id, 'node_id': 2, 'active_node_ids': []},
+                ])
+
+            c1_obs.append({'event': 'upload_phase', 'round': r_id, 'node_id': 1, 'transport_outcome': 'created'})
+            c2_obs.append({'event': 'upload_phase', 'round': r_id, 'node_id': 2, 'transport_outcome': 'created'})
+
+        server_events = []
+        for r in range(1, rounds_count + 1):
+            server_events.extend([
+                {'name': 'publish_model_start', 'round_index': r, 'monotonic_time': 100.0 * r},
+                {'name': 'aggregate_done', 'round_index': r, 'monotonic_time': 100.0 * r + 50.0},
+            ])
+
         self.write_json(
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json'),
             {
                 'schema_version': 1,
                 'role': 'server',
                 'rounds': server_rounds,
+                'events': server_events,
+                'initial_model_size_bytes': size,
                 'conclusion': 'succeeded',
             })
 
@@ -242,20 +457,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
                 'role': 'client',
                 'node_id': 1,
                 'update_template_sha256': c1_sha,
-                'rounds': [{
-                    'round_index': 1,
-                    'round_id': 'round-1',
-                    'node_id': 1,
-                    'model_path': '/var/lib/wfb-ng/issue41/client/rounds/round-1/model.bin',
-                    'model_size_bytes': size,
-                    'model_sha256': model_sha,
-                    'model_receive_interval': {'start': 1.0, 'end': 1.5},
-                    'update_path': '/var/lib/wfb-ng/issue41/client/update.bin',
-                    'update_size_bytes': size,
-                    'update_sha256': c1_sha,
-                    'put_interval': {'start': 1.6, 'end': 2.0},
-                    'training_delay_ms': 0,
-                }],
+                'rounds': c1_rounds,
                 'conclusion': 'succeeded',
             })
 
@@ -266,47 +468,18 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
                 'role': 'client',
                 'node_id': 2,
                 'update_template_sha256': c2_sha,
-                'rounds': [{
-                    'round_index': 1,
-                    'round_id': 'round-1',
-                    'node_id': 2,
-                    'model_path': '/var/lib/wfb-ng/issue41/client/rounds/round-1/model.bin',
-                    'model_size_bytes': size,
-                    'model_sha256': model_sha,
-                    'model_receive_interval': {'start': 1.0, 'end': 1.5},
-                    'update_path': '/var/lib/wfb-ng/issue41/client/update.bin',
-                    'update_size_bytes': size,
-                    'update_sha256': c2_sha,
-                    'put_interval': {'start': 4.6, 'end': 5.0},
-                    'training_delay_ms': client2_delay,
-                }],
+                'rounds': c2_rounds,
                 'conclusion': 'succeeded',
             })
 
-        server_obs = [
-            {'event': 'upload_accepted', 'round': 'round-1', 'node_id': 1, 'transport_outcome': 'accepted'},
-            {'event': 'active_uploads', 'round': 'round-1', 'node_id': 1, 'active_node_ids': [1]},
-            {'event': 'upload_committed', 'round': 'round-1', 'node_id': 1, 'transport_outcome': 'committed'},
-            {'event': 'active_uploads', 'round': 'round-1', 'node_id': 1, 'active_node_ids': []},
-            {'event': 'upload_accepted', 'round': 'round-1', 'node_id': 2, 'transport_outcome': 'accepted'},
-            {'event': 'active_uploads', 'round': 'round-1', 'node_id': 2, 'active_node_ids': [2]},
-            {'event': 'upload_committed', 'round': 'round-1', 'node_id': 2, 'transport_outcome': 'committed'},
-            {'event': 'active_uploads', 'round': 'round-1', 'node_id': 2, 'active_node_ids': []},
-        ]
         self.write_obs(
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'observation.jsonl'),
             server_obs)
 
-        c1_obs = [
-            {'event': 'upload_phase', 'round': 'round-1', 'node_id': 1, 'transport_outcome': 'created'},
-        ]
         self.write_obs(
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'client1', 'observation.jsonl'),
             c1_obs)
 
-        c2_obs = [
-            {'event': 'upload_phase', 'round': 'round-1', 'node_id': 2, 'transport_outcome': 'created'},
-        ]
         self.write_obs(
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'client2', 'observation.jsonl'),
             c2_obs)

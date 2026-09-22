@@ -8,14 +8,10 @@ import os
 import re
 import sys
 
-try:
-    from tests.real_hardware.issue41_gate import parse_telemetry
-except ImportError:
-    parse_telemetry = None
+from tests.real_hardware.issue41_gate import parse_telemetry
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
-EXPECTED_SIZE = 4 * 1024 * 1024
 
 
 def main(argv=None):
@@ -70,23 +66,51 @@ def main(argv=None):
     env_path = os.path.join(archive_dir, 'envelope.json')
     env_meta = _read_json(env_path, []) if os.path.isfile(env_path) else {}
     resolved_cfg = env_meta.get('resolved_config', {}) if isinstance(env_meta, dict) else {}
-    round_deadline = resolved_cfg.get('runtime_timeout_seconds', 180)
+    round_deadline = resolved_cfg.get('runtime_timeout_seconds', 400)
     io_timeout = resolved_cfg.get('io_timeout_seconds', 120)
 
-    rounds = _build_rounds(results, observations, archive_dir, errors, round_deadline, io_timeout)
+    # 场景参数解析（从 envelope.json 的 resolved_config 获取）
+    if 'rounds' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 rounds')
+        expected_rounds = 2
+    else:
+        expected_rounds = int(resolved_cfg['rounds'])
+
+    if 'artifact_size_bytes' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 artifact_size_bytes')
+        expected_size = 40 * 1024 * 1024
+    else:
+        expected_size = int(resolved_cfg['artifact_size_bytes'])
+
+    if 'training_delay_ms_by_node' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 training_delay_ms_by_node')
+        expected_delays = {1: 0, 2: 0}
+    else:
+        expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
+
+    scenario_cfg = {
+        'rounds': expected_rounds,
+        'artifact_size_bytes': expected_size,
+        'training_delays': expected_delays,
+        'round_deadline': round_deadline,
+        'io_timeout': io_timeout,
+    }
+
+    rounds = _build_rounds(results, observations, archive_dir, errors, scenario_cfg)
     template_hashes = _template_hashes(results, errors)
     _reject_upload_in_progress(observations, errors)
     complete_nodes = [1, 2] if all(
         value.get('server_wait_returned_node_ids') == [1, 2]
         for value in rounds) else []
     status = 'passed' if not errors else 'failed'
+    success_reason = f'{expected_rounds} 轮 {expected_size // (1024 * 1024)} MiB 严格同步场景证据完整'
     summary = {
         'status': status,
-        'reason': '; '.join(errors) if errors else '一轮 4 MiB 严格同步确定性场景证据完整',
+        'reason': '; '.join(errors) if errors else success_reason,
         'scenario': {
-            'round_count': 1,
-            'artifact_size_bytes': EXPECTED_SIZE,
-            'training_delay_ms_by_node': {'1': 0, '2': 3000},
+            'round_count': expected_rounds,
+            'artifact_size_bytes': expected_size,
+            'training_delay_ms_by_node': {str(k): v for k, v in expected_delays.items()},
             'placeholder_training': 'template_copy',
             'placeholder_aggregation': 'model_copy',
             'update_template_sha256_by_node': template_hashes,
@@ -117,30 +141,52 @@ def _template_hashes(results, errors):
     return hashes
 
 
-def _build_rounds(results, observations, archive_dir, errors, round_deadline=180, io_timeout=120):
+def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
+    expected_rounds = scenario_cfg['rounds']
+    expected_size = scenario_cfg['artifact_size_bytes']
+    expected_delays = scenario_cfg['training_delays']
+    round_deadline = scenario_cfg.get('round_deadline', 400)
+    io_timeout = scenario_cfg.get('io_timeout', 120)
     server = results.get('server')
     clients = {1: results.get('client1'), 2: results.get('client2')}
     if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
         return []
     server_rounds = server.get('rounds')
-    if not isinstance(server_rounds, list) or len(server_rounds) != 1:
-        errors.append('server 算法结果必须恰好包含一轮')
+    if not isinstance(server_rounds, list) or len(server_rounds) != expected_rounds:
+        errors.append('server 算法结果必须恰好包含 %d 轮 (实际: %d)' % (
+            expected_rounds, len(server_rounds) if isinstance(server_rounds, list) else 0))
         return []
     output = []
+    seen_round_ids = set()
+    prev_output_model_sha = None
+
     for index, server_round in enumerate(server_rounds, 1):
         round_id = server_round.get('round_id')
-        if server_round.get('round_index') != index or not isinstance(round_id, str):
+        if server_round.get('round_index') != index or not isinstance(round_id, str) or not round_id:
             errors.append('server 第 %d 轮身份无效' % index)
             continue
+        if round_id in seen_round_ids:
+            errors.append('server 第 %d 轮 round_id 重复：%s' % (index, round_id))
+        seen_round_ids.add(round_id)
+
         model = {
             'size_bytes': server_round.get('input_model_size_bytes'),
             'sha256': server_round.get('input_model_sha256'),
         }
-        if model['size_bytes'] != EXPECTED_SIZE:
-            errors.append('server 第 %d 轮模型不是 4 MiB' % index)
+        if model['size_bytes'] != expected_size:
+            errors.append('server 第 %d 轮模型不是 %d 字节' % (index, expected_size))
+
+        # 验证跨轮占位聚合的一致性 (model_copy)
+        if index > 1 and prev_output_model_sha is not None:
+            if model['sha256'] != prev_output_model_sha:
+                errors.append('server 第 %d 轮输入模型与上一轮占位聚合输出不一致' % index)
+        out_model_sha = server_round.get('output_model_sha256')
+        if out_model_sha != model['sha256']:
+            errors.append('server 第 %d 轮占位聚合模型输出 SHA-256 与输入不一致' % index)
+        prev_output_model_sha = out_model_sha
+
         uploads = []
         receive_intervals = {}
-        expected_delays = {1: 0, 2: 3000}
         for node_id, client in clients.items():
             client_round = _find_round(client, index, round_id)
             if client_round is None:
@@ -149,7 +195,7 @@ def _build_rounds(results, observations, archive_dir, errors, round_deadline=180
             if client_round.get('training_delay_ms') != expected_delays[node_id]:
                 errors.append('client%d 第 %d 轮训练延时不是 %d ms' % (
                     node_id, index, expected_delays[node_id]))
-            if (client_round.get('model_size_bytes') != EXPECTED_SIZE or
+            if (client_round.get('model_size_bytes') != expected_size or
                     client_round.get('model_sha256') != model['sha256']):
                 errors.append('client%d 第 %d 轮模型事实不一致' % (node_id, index))
             receive_intervals[str(node_id)] = client_round.get('model_receive_interval')
@@ -171,72 +217,127 @@ def _build_rounds(results, observations, archive_dir, errors, round_deadline=180
                     observations['server'], 'upload_committed', round_id,
                     node_id, 'committed') else None,
             }
-            if upload['size_bytes'] != EXPECTED_SIZE:
-                errors.append('client%d 第 %d 轮 update 不是 4 MiB' % (node_id, index))
+            if upload['size_bytes'] != expected_size:
+                errors.append('client%d 第 %d 轮 update 不是 %d 字节' % (node_id, index, expected_size))
             if upload['sha256'] != client.get('update_template_sha256'):
-                errors.append('client%d 第 %d 轮未复用同一 update 模板' % (node_id, index))
+                errors.append('client%d 第 %d 轮未复用对应 update 模板' % (node_id, index))
             uploads.append(upload)
+
         server_updates = server_round.get('updates')
         if not isinstance(server_updates, list) or sorted(
                 item.get('node_id') for item in server_updates if isinstance(item, dict)) != [1, 2]:
             errors.append('server 第 %d 轮未收齐 [1, 2]' % index)
         else:
             for update in server_updates:
-                client_upload = next(item for item in uploads if item['node_id'] == update['node_id'])
-                if (update.get('size_bytes') != client_upload['size_bytes'] or
+                client_upload = next((item for item in uploads if item['node_id'] == update['node_id']), None)
+                if client_upload and (
+                        update.get('size_bytes') != client_upload['size_bytes'] or
                         update.get('sha256') != client_upload['sha256']):
                     errors.append('第 %d 轮 node %d 端到端 SHA 或大小不一致' %
                                   (index, update['node_id']))
+
         commit_seq_1 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 1, 'committed')
         commit_seq_2 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 2, 'committed')
 
-        client1_committed_first = False
-        if commit_seq_1 is not None and commit_seq_2 is not None:
-            client1_committed_first = commit_seq_1 < commit_seq_2
-        else:
-            up1 = next((u for u in uploads if u['node_id'] == 1), None)
-            up2 = next((u for u in uploads if u['node_id'] == 2), None)
-            if (up1 and up2 and up1.get('client_put_interval') and
-                    up2.get('client_put_interval')):
-                client1_committed_first = (
-                    up1['client_put_interval']['end'] <= up2['client_put_interval']['end'])
-
         returned_nodes = server_round.get('update_node_ids')
-        server_waited = client1_committed_first and (returned_nodes == [1, 2])
-        partial_result = returned_nodes != [1, 2]
+        partial_result = (returned_nodes != [1, 2])
 
-        if not client1_committed_first:
-            errors.append('第 %d 轮 client1 未先于 client2 完成提交' % index)
+        if commit_seq_1 is None or commit_seq_2 is None:
+            errors.append('第 %d 轮 server observation 缺少 upload_committed 事件' % index)
+            first_committed_node = None
+            client1_committed_first = False
+            server_waited = False
+        else:
+            first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
+            first_seq = min(commit_seq_1, commit_seq_2)
+            second_seq = max(commit_seq_1, commit_seq_2)
+            client1_committed_first = (first_committed_node == 1)
+            server_waited = (first_seq < second_seq and returned_nodes == [1, 2])
+
+        if expected_delays.get(2, 0) > expected_delays.get(1, 0):
+            if not client1_committed_first:
+                errors.append('第 %d 轮 client1 未先于 client2 完成提交' % index)
         if partial_result:
             errors.append('第 %d 轮 server 返回了 partial result' % index)
 
         strict_sync = {
             'client1_committed_before_client2': client1_committed_first,
-            'server_waited_after_client1': server_waited,
-            'intermediate_committed_node_ids': [1] if client1_committed_first else [],
-            'intermediate_pending_node_ids': [2] if client1_committed_first else [],
+            'server_waited_after_first_commit': server_waited,
+            'first_committed_node_id': first_committed_node,
+            'intermediate_committed_node_ids': [first_committed_node] if first_committed_node else [],
+            'intermediate_pending_node_ids': [2 if first_committed_node == 1 else 1] if first_committed_node else [],
             'server_wait_returned_node_ids': returned_nodes,
             'partial_result_returned': partial_result,
         }
 
+        # 计算 HTTP PUT 活动时间区间与自然重叠
+        up1 = next((u for u in uploads if u['node_id'] == 1), None)
+        up2 = next((u for u in uploads if u['node_id'] == 2), None)
+        overlap_seconds = 0.0
+        natural_overlap = False
+
+        # 优先使用客户端真实时间戳区间（秒）计算重叠时长
+        if up1 and up2 and up1.get('client_put_interval') and up2.get('client_put_interval'):
+            s1 = up1['client_put_interval']['start']
+            e1 = up1['client_put_interval']['end']
+            s2 = up2['client_put_interval']['start']
+            e2 = up2['client_put_interval']['end']
+            overlap = min(e1, e2) - max(s1, s2)
+            if overlap > 0:
+                overlap_seconds = round(overlap, 3)
+                natural_overlap = True
+
+        active_sets = [
+            value.get('active_node_ids') for value in observations['server']
+            if value.get('event') == 'active_uploads' and
+            value.get('round') == round_id and
+            isinstance(value.get('active_node_ids'), list)
+        ]
+        concurrent_active_observed = any(set(s) == {1, 2} for s in active_sets)
+
+        concurrent_put = {
+            'natural_overlap': natural_overlap,
+            'overlap_duration_seconds': overlap_seconds,
+            'concurrent_active_observed': concurrent_active_observed,
+            'server_intervals': {
+                '1': up1.get('server_put_interval') if up1 else None,
+                '2': up2.get('server_put_interval') if up2 else None,
+            },
+            'client_intervals': {
+                '1': up1.get('client_put_interval') if up1 else None,
+                '2': up2.get('client_put_interval') if up2 else None,
+            },
+        }
+
+        # 确定本轮时间区间用于分轮遥测过滤
+        start_ev = next(
+            (e for e in results.get('server', {}).get('events', [])
+             if e.get('name') == 'publish_model_start' and e.get('round_index') == index),
+            None)
+        end_ev = next(
+            (e for e in results.get('server', {}).get('events', [])
+             if e.get('name') == 'aggregate_done' and e.get('round_index') == index),
+            None)
+        r_start_ms = int(start_ev['monotonic_time'] * 1000) if start_ev and 'monotonic_time' in start_ev else None
+        r_end_ms = int(end_ev['monotonic_time'] * 1000) if end_ev and 'monotonic_time' in end_ev else None
+        duration_sec = round((r_end_ms - r_start_ms) / 1000.0, 3) if r_start_ms is not None and r_end_ms is not None else None
+
         output.append({
             'round_index': index,
             'round_id': round_id,
+            'duration_seconds': duration_sec,
             'model': model,
             'model_receive_intervals': receive_intervals,
             'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors),
             'uploads': uploads,
-            'active_upload_sets': [
-                value.get('active_node_ids') for value in observations['server']
-                if value.get('event') == 'active_uploads' and
-                value.get('round') == round_id and
-                isinstance(value.get('active_node_ids'), list)],
+            'active_upload_sets': active_sets,
+            'concurrent_put': concurrent_put,
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
-            'telemetry': _build_telemetry(archive_dir, errors),
+            'telemetry': _build_telemetry(archive_dir, errors, round_start_ms=r_start_ms, round_end_ms=r_end_ms),
             'deadline_seconds': round_deadline,
             'io_timeout_seconds': io_timeout,
         })
@@ -333,12 +434,7 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     candidates = []
     round_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'rounds', round_id)
     if os.path.isdir(round_dir):
-        candidates.extend(glob.glob(os.path.join(round_dir, 'uftp-*.status')))
-        candidates.extend(glob.glob(os.path.join(round_dir, '*.status')))
-    server_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server')
-    if os.path.isdir(server_dir):
-        candidates.extend(glob.glob(os.path.join(server_dir, 'uftp-*.status')))
-        candidates.extend(glob.glob(os.path.join(server_dir, '*.status')))
+        candidates.extend(sorted(glob.glob(os.path.join(round_dir, 'uftp-*.status'))))
 
     connect_matrix = {}
     result_matrix = {'1': {}, '2': {}}
@@ -393,7 +489,23 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
     }
 
 
-def _build_telemetry(archive_dir, errors):
+def _filter_log_by_time_ms(log_text, start_ms, end_ms):
+    if not log_text or start_ms is None or end_ms is None:
+        return ''
+    filtered = []
+    pattern = re.compile(r'(\d+)[\t ]+PKT')
+    for line in log_text.splitlines():
+        m = pattern.search(line)
+        if m:
+            ts = int(m.group(1))
+            if start_ms <= ts <= end_ms:
+                filtered.append(line)
+    return '\n'.join(filtered)
+
+
+def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None):
+    if round_start_ms is None or round_end_ms is None:
+        errors.append('缺少轮次有效起止时间戳，无法切片提取遥测数据')
     s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
     c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
     c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
@@ -403,6 +515,8 @@ def _build_telemetry(archive_dir, errors):
         os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'wfb.log'))
     c2_log = _read_file_text(c2_log_path) or _read_file_text(
         os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
+
+    s_log = _filter_log_by_time_ms(s_log, round_start_ms, round_end_ms)
 
     s_queue_path = os.path.join(
         archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')
@@ -422,63 +536,15 @@ def _build_telemetry(archive_dir, errors):
     if c2_q:
         queue_summaries['client2'] = c2_q
 
-    if parse_telemetry is not None:
-        telem = parse_telemetry(
-            server_log=s_log or '',
-            client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
-            queue_summaries=queue_summaries,
-        )
-        queue = telem.get('queue', {})
-        if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
-            errors.append('Runtime 队列自然暂停后未成功恢复')
-        return telem
-
-    return {
-        'ready_accepted_total': 0,
-        'ready_rejected_total': 0,
-        'grant_sent_total': 0,
-        'authorized_sends_by_node': {'1': 0, '2': 0},
-        'server_rx': {
-            'rx_ant_samples': 0,
-            'rx_packets': 0,
-            'rx_bytes': 0,
-        },
-        'queue': {
-            'tun_read_pause_total': 0,
-            'tun_read_resume_total': 0,
-            'currently_paused': False,
-            'pause_recovered': True,
-            'tun_read_pause_total_by_reason': {
-                'queued_bytes_threshold': 0,
-                'queued_packets_limit': 0,
-            },
-            'queued_bytes_max': 0,
-            'queued_packets_max': 0,
-        },
-        'reassembly': {
-            'reassembly_overflow_evict': 0,
-            'unfinished_block_limit': 0,
-        },
-        'sender_isolation': {
-            'unauthorized_air_injections': 0,
-            'unknown_client_rejects': 0,
-        },
-        'feedback': {
-            'feedback_window_open_count': 0,
-            'feedback_window_close_count': 0,
-            'feedback_uplink_hit_total': 0,
-        },
-        'loss_and_fec': {
-            'packets_lost': 0,
-            'packets_fec_recovered': 0,
-        },
-        'tcp_retransmits': 0,
-        'phase_durations': {
-            'downlink_seconds': 0.0,
-            'uplink_seconds': 0.0,
-            'cycle_total_seconds': 0.0,
-        },
-    }
+    telem = parse_telemetry(
+        server_log=s_log or '',
+        client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
+        queue_summaries=queue_summaries,
+    )
+    queue = telem.get('queue', {})
+    if queue.get('tun_read_pause_total', 0) > 0 and not queue.get('pause_recovered', False):
+        errors.append('Runtime 队列自然暂停后未成功恢复')
+    return telem
 
 
 def _read_file_text(path):

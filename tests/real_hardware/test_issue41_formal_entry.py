@@ -22,8 +22,13 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
 
     def write_test_envelope(self, run_id='test-run', mode='formal', resolved_overrides=None):
         cfg = {
+            'rounds': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'smoke_cycle_count': 3,
+            'smoke_io_timeout_seconds': 120,
             'smoke_cycle_deadline_seconds': 240,
-            'runtime_timeout_seconds': 180,
+            'runtime_timeout_seconds': 400,
             'io_timeout_seconds': 120,
         }
         if resolved_overrides:
@@ -36,18 +41,80 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
             'resolved_config': cfg,
         })
 
+    def formal_summary(self, conclusion):
+        summary = super().complete_summary(conclusion)
+        summary['pre_runtime_smoke'] = self.smoke_gate_evidence(artifact_size=40 * 1024 * 1024)
+        summary['formal_runtime_loop']['scenario'] = {
+            'round_count': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'placeholder_training': 'template_copy',
+            'placeholder_aggregation': 'model_copy',
+            'round_deadline_seconds': 400,
+            'io_timeout_seconds': 120,
+            'update_template_sha256_by_node': {
+                '1': 'b'.ljust(64, '0'),
+                '2': 'c'.ljust(64, '0'),
+            },
+        }
+        r1 = self.round_evidence(1, size=40 * 1024 * 1024, model_sha='a' * 64)
+        r2 = self.round_evidence(2, size=40 * 1024 * 1024, model_sha='a' * 64)
+        summary['formal_runtime_loop']['rounds'] = [r1, r2]
+        return summary
+
     def write_dummy_files(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
             self.write_json(name, {'conclusion': 'succeeded'})
         self.write_runtime_evidence()
         self.write_lifecycle_evidence()
 
+    def test_complete_passed_archive_two_rounds_40mib_validates_successfully(self):
+        run_id = 'test-run-40m-2r'
+        self.write_test_envelope(run_id=run_id, mode='formal', resolved_overrides={
+            'rounds': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'runtime_timeout_seconds': 400,
+        })
+        self.write_smoke_marker(run_id)
+        self.write_dummy_files()
+
+        summary = self.formal_summary('passed')
+        summary['run_id'] = run_id
+        summary['pre_runtime_smoke']['run_id'] = run_id
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# issue41 result\n- conclusion: passed\n- reason: all ok\n')
+
+        errors = validate_archive(self.root)
+        self.assertEqual([], errors, f"完整 2 轮 40 MiB 通过归档应通过校验: {errors}")
+
+    def test_rejects_config_modification_rounds_or_artifact_size(self):
+        run_id = 'test-run'
+        self.write_test_envelope(run_id=run_id, mode='formal', resolved_overrides={
+            'rounds': 2,
+            'artifact_size_bytes': 40 * 1024 * 1024,
+            'training_delay_ms_by_node': {'1': 0, '2': 0},
+        })
+        self.write_smoke_marker(run_id)
+        self.write_dummy_files()
+        summary = self.formal_summary('passed')
+        summary['run_id'] = run_id
+        # 篡改 Runtime 阶段中的 artifact_size_bytes
+        summary['formal_runtime_loop']['scenario']['artifact_size_bytes'] = 4 * 1024 * 1024
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# issue41 result\n- conclusion: passed\n- reason: ok\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(len(errors) > 0)
+        self.assertTrue(any('artifact_size_bytes 与 envelope 不一致' in e for e in errors),
+                        f"未捕获 artifact_size_bytes 与 envelope 不一致: {errors}")
+
     def test_complete_passed_archive_validates_successfully(self):
         run_id = 'test-run'
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# issue41 result\n- conclusion: passed\n- reason: all ok\n')
@@ -58,7 +125,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
     def test_stage_failure_gate_preserves_orchestration_and_is_auditable(self):
         run_id = 'test-run'
         self.write_test_envelope(run_id=run_id, mode='formal')
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         summary['pre_runtime_smoke'] = {
             'schema_version': 1,
@@ -89,7 +156,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         run_id = 'test-run'
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         summary['formal_runtime_loop']['status'] = 'failed'
         summary['formal_runtime_loop']['failure_reason'] = 'client2 训练延时超时未在 deadline 内完成'
@@ -112,7 +179,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         summary['lifecycle'] = {
             'schema_version': 1,
@@ -139,7 +206,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         # 篡改 Runtime 阶段中的 deadline
         summary['formal_runtime_loop']['scenario']['round_deadline_seconds'] = 999
@@ -155,7 +222,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         self.write_test_envelope(run_id=run_id, mode='diagnostic')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# issue41 result\n- conclusion: passed\n- reason: ok\n')
@@ -169,7 +236,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         summary['formal_runtime_loop']['feedback_window_start_immediately'] = True
         self.write_json('issue41_summary.json', summary)
@@ -184,7 +251,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
         self.write_test_envelope(run_id=run_id, mode='formal')
         self.write_smoke_marker(run_id)
         self.write_dummy_files()
-        summary = self.complete_summary('passed')
+        summary = self.formal_summary('passed')
         summary['run_id'] = run_id
         summary['pre_runtime_smoke']['run_id'] = 'test-run-other'
         self.write_json('issue41_summary.json', summary)

@@ -13,6 +13,9 @@ from tests.real_hardware.issue41_gate import (
     build_cycle_evidence,
     build_gate_summary,
     classify_gate_failure,
+    format_node_telemetry_lines,
+    make_empty_node_telemetry,
+    parse_pkt_src_line,
     parse_telemetry,
     validate_cycle_evidence,
     validate_gate_summary,
@@ -34,7 +37,7 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual('HT40+', self.config.channel_width)
         self.assertEqual(3, self.config.radio_mcs_index)
         self.assertEqual(8, self.config.fec_k)
-        self.assertEqual(12, self.config.fec_n)
+        self.assertEqual(14, self.config.fec_n)
 
     def test_config_rejects_immediate_feedback_candidate(self):
         bad_args = ['--role', 'server', '--feedback-window-start-immediately']
@@ -49,6 +52,8 @@ class Issue41GateTestCase(unittest.TestCase):
         server_log = (
             "1000\tRX_ANT\t5785:3:40\t1\t100:-60:-60:-60:25:25:25\n"
             "1000\tPKT\t100:10000:0:10:90:50:5:2:0:90:9000\n"
+            "1000\tPKT_SRC\t1:50:5000:3:1:45:4500\n"
+            "1000\tPKT_SRC\t2:50:5000:2:1:45:4500\n"
             "1000\tGRANT_FILTER\t50:50:0:0:0:0:0\n"
             "1000\tREADY_FILTER\t20:20:0:0:0\n"
             "1000\tREASSEMBLY\t0:40\n"
@@ -135,8 +140,99 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(11, telemetry['feedback']['feedback_uplink_hit_total'])
         self.assertEqual(2, telemetry['loss_and_fec']['packets_lost'])
         self.assertEqual(5, telemetry['loss_and_fec']['packets_fec_recovered'])
+        self.assertEqual(1, telemetry['loss_and_fec_by_node']['1']['packets_lost'])
+        self.assertEqual(3, telemetry['loss_and_fec_by_node']['1']['packets_fec_recovered'])
+        self.assertEqual(1, telemetry['loss_and_fec_by_node']['2']['packets_lost'])
+        self.assertEqual(2, telemetry['loss_and_fec_by_node']['2']['packets_fec_recovered'])
         self.assertEqual(1, telemetry['tcp_retransmits'])
         self.assertEqual(10.7, telemetry['phase_durations']['cycle_total_seconds'])
+
+    def test_parse_pkt_src_line_valid_and_malformed(self):
+        # 合法行
+        line = "1000\tPKT_SRC\t1:50:5000:3:1:49:4900\n"
+        res = parse_pkt_src_line(line)
+        self.assertIsNotNone(res)
+        self.assertEqual("1", res['node_id'])
+        self.assertEqual(50, res['rx_packets'])
+        self.assertEqual(5000, res['rx_bytes'])
+        self.assertEqual(3, res['packets_fec_recovered'])
+        self.assertEqual(1, res['packets_lost'])
+        self.assertEqual(49, res['out_packets'])
+        self.assertEqual(4900, res['out_bytes'])
+
+        # 缺少 PKT_SRC 标签
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT\t100:10000:0:10:90:50:5:2:0:90:9000\n"))
+        # 字段数不足
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49\n"))
+        # 包含非数字字段
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:bad:3:1:49:4900\n"))
+        # 空行与随机文本
+        self.assertIsNone(parse_pkt_src_line(""))
+        self.assertIsNone(parse_pkt_src_line("corrupted line without tab"))
+        # 行尾追加多余字段或文本（行锚定保护）
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900:extra\n"))
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t1:50:5000:3:1:49:4900 garbage\n"))
+        # 节点编号越界（必须在 1..255 范围内）
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t0:50:5000:3:1:49:4900\n"))
+        self.assertIsNone(parse_pkt_src_line("1000\tPKT_SRC\t256:50:5000:3:1:49:4900\n"))
+
+    def test_format_node_telemetry_lines(self):
+        by_node = {
+            '1': {
+                'rx_packets': 100,
+                'rx_bytes': 10000,
+                'packets_fec_recovered': 5,
+                'packets_lost': 2,
+                'out_packets': 98,
+                'out_bytes': 9800,
+                'loss_rate': 0.02,
+                'fec_recovery_rate': 0.05,
+            }
+        }
+        lines = format_node_telemetry_lines(by_node, label_prefix="[前缀] ")
+        self.assertEqual(1, len(lines))
+        self.assertIn("Client1", lines[0])
+        self.assertIn("lost=2 (2.00%)", lines[0])
+        self.assertIn("fec_recovered=5 (5.00%)", lines[0])
+
+    def test_parse_telemetry_extracts_per_node_loss_and_fec(self):
+        server_log = (
+            "1000\tPKT\t150:15000:0:10:140:100:3:1:0:140:14000\n"
+            "1000\tPKT_SRC\t1:100:10000:2:1:99:9900\n"
+            "1000\tPKT_SRC\t2:50:5000:1:0:50:5000\n"
+            "1000\tPKT_SRC\tbad_format_line\n"
+            "1000\tPKT_SRC\t1:incomplete:field\n"
+            "2000\tPKT_SRC\t1:100:10000:3:0:100:10000\n"
+            "2000\tPKT_SRC\t2:50:5000:0:1:49:4900\n"
+        )
+        telemetry = parse_telemetry(
+            server_log=server_log,
+            client_logs={},
+            queue_summaries={},
+        )
+        by_node = telemetry.get('loss_and_fec_by_node', {})
+        self.assertIn('1', by_node)
+        self.assertIn('2', by_node)
+
+        n1 = by_node['1']
+        self.assertEqual(200, n1['rx_packets'])
+        self.assertEqual(20000, n1['rx_bytes'])
+        self.assertEqual(5, n1['packets_fec_recovered'])
+        self.assertEqual(1, n1['packets_lost'])
+        self.assertEqual(199, n1['out_packets'])
+        self.assertEqual(19900, n1['out_bytes'])
+        self.assertAlmostEqual(0.005, n1['loss_rate'], places=5)
+        self.assertAlmostEqual(0.025, n1['fec_recovery_rate'], places=5)
+
+        n2 = by_node['2']
+        self.assertEqual(100, n2['rx_packets'])
+        self.assertEqual(10000, n2['rx_bytes'])
+        self.assertEqual(1, n2['packets_fec_recovered'])
+        self.assertEqual(1, n2['packets_lost'])
+        self.assertEqual(99, n2['out_packets'])
+        self.assertEqual(9900, n2['out_bytes'])
+        self.assertAlmostEqual(0.01, n2['loss_rate'], places=5)
+        self.assertAlmostEqual(0.01, n2['fec_recovery_rate'], places=5)
 
     def test_queue_pause_without_resume_fails_validation(self):
         cycle = self._make_valid_cycle(1)
@@ -189,6 +285,19 @@ class Issue41GateTestCase(unittest.TestCase):
         cycle['total_duration_seconds'] = 241.0
         errors = validate_cycle_evidence(cycle, self.config)
         self.assertTrue(any('deadline' in e for e in errors))
+
+    def test_cycle_rejects_missing_or_empty_node_telemetry_samples(self):
+        # 缺少 Client1 样本
+        cycle = self._make_valid_cycle(1)
+        cycle['telemetry']['loss_and_fec_by_node']['1']['sample_count'] = 0
+        errors = validate_cycle_evidence(cycle, self.config)
+        self.assertTrue(any('client 1 缺少有效 PKT_SRC 遥测采样' in e for e in errors))
+
+        # 缺少 Client2 键
+        cycle = self._make_valid_cycle(1)
+        del cycle['telemetry']['loss_and_fec_by_node']['2']
+        errors = validate_cycle_evidence(cycle, self.config)
+        self.assertTrue(any('缺少 client 2' in e for e in errors))
 
     def test_gate_summary_validates_three_cycles_and_process_reuse(self):
         cycles = [self._make_valid_cycle(i) for i in (1, 2, 3)]
@@ -598,6 +707,30 @@ class Issue41GateTestCase(unittest.TestCase):
                     'packets_lost': 2,
                     'packets_fec_recovered': 2,
                 },
+                'loss_and_fec_by_node': {
+                    '1': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
+                    '2': {
+                        'sample_count': 1,
+                        'rx_packets': 600,
+                        'rx_bytes': 524288,
+                        'packets_fec_recovered': 1,
+                        'packets_lost': 1,
+                        'out_packets': 550,
+                        'out_bytes': 500000,
+                        'loss_rate': 0.0016,
+                        'fec_recovery_rate': 0.0016,
+                    },
+                },
                 'tcp_retransmits': 1,
                 'phase_durations': {
                     'downlink_seconds': 3.5,
@@ -661,7 +794,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--grant-duration-ms', '120', '--guard-interval-ms', '20',
                     '--downlink-pause-threshold-bytes', '131072',
@@ -677,7 +810,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -690,7 +823,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -719,7 +852,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '20',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '20',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -734,7 +867,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '2', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -747,7 +880,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -776,7 +909,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -792,7 +925,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -805,7 +938,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -830,7 +963,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
@@ -846,7 +979,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -860,7 +993,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
-                    '--fec-k', '8', '--fec-n', '12', '--radio-bandwidth', '40',
+                    '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
@@ -893,6 +1026,60 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(12.5, ev['total_duration_seconds'])
         self.assertEqual(240, ev['deadline_seconds'])
         self.assertEqual(120, ev['io_timeout_seconds'])
+
+    def test_gate_config_from_env_defaults_and_overrides(self):
+        # 默认无环境变量情况
+        old_env = os.environ.copy()
+        try:
+            for k in ('ISSUE41_SMOKE_CYCLE_COUNT', 'ISSUE41_INPUT_SIZE_BYTES',
+                      'ISSUE41_SMOKE_IO_TIMEOUT_SECONDS', 'ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS',
+                      'ISSUE41_CHANNEL', 'ISSUE41_CHANNEL_WIDTH', 'ISSUE41_LINK_ID',
+                      'ISSUE41_FEC_K', 'ISSUE41_FEC_N', 'ISSUE41_RADIO_BANDWIDTH',
+                      'ISSUE41_RADIO_MCS_INDEX', 'ISSUE41_RADIO_SHORT_GI'):
+                os.environ.pop(k, None)
+            cfg = GateConfig.from_env()
+            self.assertEqual(3, cfg.cycle_count)
+            self.assertEqual(4 * 1024 * 1024, cfg.artifact_size_bytes)
+            self.assertEqual(120, cfg.io_timeout_seconds)
+            self.assertEqual(240, cfg.cycle_deadline_seconds)
+            self.assertEqual(157, cfg.channel)
+            self.assertEqual('HT40+', cfg.channel_width)
+            self.assertEqual(406, cfg.link_id)
+            self.assertEqual(8, cfg.fec_k)
+            self.assertEqual(14, cfg.fec_n)
+            self.assertEqual(40, cfg.radio_bandwidth)
+            self.assertEqual(3, cfg.radio_mcs_index)
+            self.assertEqual(1, cfg.radio_short_gi)
+
+            # 环境变量覆盖
+            os.environ['ISSUE41_SMOKE_CYCLE_COUNT'] = '1'
+            os.environ['ISSUE41_INPUT_SIZE_BYTES'] = str(40 * 1024 * 1024)
+            os.environ['ISSUE41_SMOKE_IO_TIMEOUT_SECONDS'] = '120'
+            os.environ['ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS'] = '300'
+            os.environ['ISSUE41_CHANNEL'] = '149'
+            os.environ['ISSUE41_CHANNEL_WIDTH'] = 'HT40+'
+            os.environ['ISSUE41_LINK_ID'] = '410'
+            os.environ['ISSUE41_FEC_K'] = '8'
+            os.environ['ISSUE41_FEC_N'] = '14'
+            os.environ['ISSUE41_RADIO_BANDWIDTH'] = '40'
+            os.environ['ISSUE41_RADIO_MCS_INDEX'] = '2'
+            os.environ['ISSUE41_RADIO_SHORT_GI'] = '0'
+            cfg2 = GateConfig.from_env()
+            self.assertEqual(1, cfg2.cycle_count)
+            self.assertEqual(40 * 1024 * 1024, cfg2.artifact_size_bytes)
+            self.assertEqual(120, cfg2.io_timeout_seconds)
+            self.assertEqual(300, cfg2.cycle_deadline_seconds)
+            self.assertEqual(149, cfg2.channel)
+            self.assertEqual('HT40+', cfg2.channel_width)
+            self.assertEqual(410, cfg2.link_id)
+            self.assertEqual(8, cfg2.fec_k)
+            self.assertEqual(14, cfg2.fec_n)
+            self.assertEqual(40, cfg2.radio_bandwidth)
+            self.assertEqual(2, cfg2.radio_mcs_index)
+            self.assertEqual(0, cfg2.radio_short_gi)
+        finally:
+            os.environ.clear()
+            os.environ.update(old_env)
 
 
 if __name__ == '__main__':

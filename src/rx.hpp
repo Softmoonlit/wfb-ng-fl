@@ -129,6 +129,15 @@ typedef struct {
 
 #define RX_RING_SIZE 40
 
+struct RxSourceStats {
+    uint32_t count_p_raw;
+    uint32_t count_b_raw;
+    uint32_t count_p_fec_recovered;
+    uint32_t count_p_lost;
+    uint32_t count_p_outgoing;
+    uint32_t count_b_outgoing;
+};
+
 typedef struct {
     uint8_t source_node;
     uint32_t seq;
@@ -136,6 +145,7 @@ typedef struct {
     int rx_ring_front;
     int rx_ring_alloc;
     uint64_t last_known_block;
+    RxSourceStats stats;
 } rx_source_state_t;
 
 static inline int modN(int x, int base)
@@ -237,22 +247,8 @@ public:
     uint32_t unfinished_block_limit(void) const { return RX_RING_SIZE; }
 
     // Make stats public for android userspace receiver
-    void clear_stats(void)
-    {
-        antenna_stat.clear();
-        count_p_all = 0;
-        count_b_all = 0;
-        count_p_dec_err = 0;
-        count_p_session = 0;
-        count_p_data = 0;
-        count_p_uniq.clear();
-        count_p_fec_recovered = 0;
-        count_p_lost = 0;
-        count_p_bad = 0;
-        count_p_override = 0;
-        count_p_outgoing = 0;
-        count_b_outgoing = 0;
-    }
+    void clear_stats(void);
+    bool get_source_stats(uint8_t source_node, RxSourceStats *stats) const;
 
     rx_antenna_stat_t antenna_stat;
     uint32_t count_p_all;

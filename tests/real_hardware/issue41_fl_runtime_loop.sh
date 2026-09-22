@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 export PYTHONPATH="$PROJECT_ROOT:${PYTHONPATH:-}"
-BRANCH="${ISSUE41_BRANCH:-feat/41-real-hardware-fl-runtime-redo}"
+BRANCH="${ISSUE41_BRANCH:-feat/stage1-link-throughput-and-40mib-loop}"
 ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
@@ -31,7 +31,7 @@ LINK_ID="${ISSUE41_LINK_ID:-406}"
 UPLINK_STREAM="${ISSUE41_UPLINK_STREAM:-32}"
 DOWNLINK_STREAM="${ISSUE41_DOWNLINK_STREAM:-33}"
 FEC_K="${ISSUE41_FEC_K:-8}"
-FEC_N="${ISSUE41_FEC_N:-12}"
+FEC_N="${ISSUE41_FEC_N:-14}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
@@ -40,18 +40,20 @@ IO_TIMEOUT_SECONDS="${ISSUE41_IO_TIMEOUT_SECONDS:-120}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
 FEEDBACK_WINDOW_DURATION_MS="${ISSUE41_FEEDBACK_WINDOW_DURATION_MS:-15}"
 AGGREGATION_DELAY_MS="${ISSUE41_AGGREGATION_DELAY_MS:-0}"
-ROUNDS="${ISSUE41_ROUNDS:-1}"
-INPUT_SIZE_BYTES=$((4 * 1024 * 1024))
-INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-4mib.bin}"
-CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-4mib.bin}"
-CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-4mib.bin}"
+ROUNDS="${ISSUE41_ROUNDS:-2}"
+INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((40 * 1024 * 1024))}"
+INITIAL_MODEL_PATH="${ISSUE41_INITIAL_MODEL_PATH:-/var/lib/wfb-ng/issue41-input/model-40mib.bin}"
+CLIENT1_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT1_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client1-40mib.bin}"
+CLIENT2_UPDATE_TEMPLATE_PATH="${ISSUE41_CLIENT2_UPDATE_TEMPLATE_PATH:-/var/lib/wfb-ng/issue41-input/update-client2-40mib.bin}"
+CLIENT1_TRAINING_DELAY_MS="${ISSUE41_CLIENT1_TRAINING_DELAY_MS:-0}"
+CLIENT2_TRAINING_DELAY_MS="${ISSUE41_CLIENT2_TRAINING_DELAY_MS:-0}"
 KEEP_RUNNING_ON_FAIL="${ISSUE41_KEEP_RUNNING_ON_FAIL:-0}"
 RESET_RUNTIME_STATE="${ISSUE41_RESET_RUNTIME_STATE:-0}"
 SMOKE_CYCLE_COUNT="${ISSUE41_SMOKE_CYCLE_COUNT:-3}"
 SMOKE_IO_TIMEOUT_SECONDS="${ISSUE41_SMOKE_IO_TIMEOUT_SECONDS:-120}"
 SMOKE_CYCLE_DEADLINE_SECONDS="${ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS:-240}"
 SMOKE_TIMEOUT_SECONDS="${ISSUE41_SMOKE_TIMEOUT_SECONDS:-180}"
-RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-180}"
+RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-400}"
 STOP_CLEANUP_TIMEOUT_SECONDS="${ISSUE41_STOP_CLEANUP_TIMEOUT_SECONDS:-5}"
 RADIO_MIN_USB_SPEED="${ISSUE41_RADIO_MIN_USB_SPEED:-480}"
 STRICT_USB_SPEED="${ISSUE41_STRICT_USB_SPEED:-0}"
@@ -101,6 +103,15 @@ init_envelope() {
     if [ -d "$ARCHIVE_DIR" ]; then
         die "归档目录已存在，拒绝覆盖：$ARCHIVE_DIR"
     fi
+    if [ "$RUNTIME_TIMEOUT_SECONDS" -gt 400 ]; then
+        die "formal 验收严格要求 RUNTIME_TIMEOUT_SECONDS <= 400 秒，禁止通过增大超时掩盖停滞"
+    fi
+    if [ "$IO_TIMEOUT_SECONDS" -gt 120 ]; then
+        die "formal 验收严格要求 IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
+    fi
+    if [ "$SMOKE_IO_TIMEOUT_SECONDS" -gt 120 ]; then
+        die "formal 验收严格要求 SMOKE_IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
+    fi
     local cfg_tmp
     cfg_tmp="$(mktemp)"
     cat > "$cfg_tmp" <<EOF
@@ -144,6 +155,10 @@ init_envelope() {
   "stop_cleanup_timeout_seconds": $STOP_CLEANUP_TIMEOUT_SECONDS,
   "rounds": $ROUNDS,
   "artifact_size_bytes": $INPUT_SIZE_BYTES,
+  "training_delay_ms_by_node": {
+    "1": $CLIENT1_TRAINING_DELAY_MS,
+    "2": $CLIENT2_TRAINING_DELAY_MS
+  },
   "initial_model_path": "$INITIAL_MODEL_PATH",
   "client1_update_template_path": "$CLIENT1_UPDATE_TEMPLATE_PATH",
   "client2_update_template_path": "$CLIENT2_UPDATE_TEMPLATE_PATH"
@@ -447,7 +462,7 @@ EOF
 }
 
 cmd_generate_fixtures() {
-    log_info "生成确定性验收 fixture (4 MiB)..."
+    log_info "生成确定性验收 fixture (${INPUT_SIZE_BYTES} 字节)..."
     sudo install -d -m 0777 "$(dirname "$INITIAL_MODEL_PATH")"
     python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir "$(dirname "$INITIAL_MODEL_PATH")" --role model --output "$INITIAL_MODEL_PATH" --size "$INPUT_SIZE_BYTES"
     log_ok "server 初始模型生成完成：$INITIAL_MODEL_PATH"
@@ -479,11 +494,11 @@ write_issue41_configs() {
             ;;
         client1)
             node_id=1; tun="$CLIENT1_TUN"; addr="$CLIENT1_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client1-result.json"; delay=0; update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client1-result.json"; delay="$CLIENT1_TRAINING_DELAY_MS"; update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH"
             ;;
         client2)
             node_id=2; tun="$CLIENT2_TUN"; addr="$CLIENT2_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay=3000; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
+            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay="$CLIENT2_TRAINING_DELAY_MS"; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
             ;;
     esac
     local tmp short_gi_json=""
@@ -521,12 +536,25 @@ EOF
     rm -rf "$tmp"
 }
 
+export_rf_gate_env() {
+    export ISSUE41_CHANNEL="$CHANNEL"
+    export ISSUE41_CHANNEL_WIDTH="$CHANNEL_WIDTH"
+    export ISSUE41_LINK_ID="$LINK_ID"
+    export ISSUE41_FEC_K="$FEC_K"
+    export ISSUE41_FEC_N="$FEC_N"
+    export ISSUE41_RADIO_BANDWIDTH="$RADIO_BANDWIDTH"
+    export ISSUE41_RADIO_MCS_INDEX="$RADIO_MCS_INDEX"
+    export ISSUE41_RADIO_SHORT_GI="$RADIO_SHORT_GI"
+}
+
 cmd_verify_config_equivalence() {
     log_info "执行角色服务与数据面 Gate 严格链路配置等价性比较..."
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
     write_issue41_configs server
     write_issue41_configs client1
     write_issue41_configs client2
+
+    export_rf_gate_env
 
     python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
         --server-fl /etc/wfb-ng/issue41/fl-server.json \
@@ -983,9 +1011,16 @@ cmd_smoke_gate() {
     archive="$(smoke_archive_dir "$name")"
     server_dir="$(smoke_dir "$name")/server"
 
+    init_envelope
     trap 'stop_smoke_gate_processes; collect_smoke_evidence "$name" || true; handle_smoke_gate_failure' ERR
 
-    log_info "开始连续三周期双向数据面 Gate 验收..."
+    export ISSUE41_INPUT_SIZE_BYTES="$INPUT_SIZE_BYTES"
+    export ISSUE41_SMOKE_CYCLE_COUNT="$SMOKE_CYCLE_COUNT"
+    export ISSUE41_SMOKE_IO_TIMEOUT_SECONDS="$SMOKE_IO_TIMEOUT_SECONDS"
+    export ISSUE41_SMOKE_CYCLE_DEADLINE_SECONDS="$SMOKE_CYCLE_DEADLINE_SECONDS"
+    export_rf_gate_env
+
+    log_info "开始数据面 Gate 验收 (共 $SMOKE_CYCLE_COUNT 周期，单载荷 $((INPUT_SIZE_BYTES / 1024 / 1024)) MiB)..."
     start_smoke_gate_environment
 
     local cycle t_cycle_start t_cycle_end cycle_dur
@@ -993,12 +1028,19 @@ cmd_smoke_gate() {
     local t_ul_start t_ul_end ul_dur
     local work src model manifest status log
     local cycle_files=()
+    local s_lines_before=0 c1_lines_before=0 c2_lines_before=0
 
-    for cycle in 1 2 3; do
-        log_info "=== 运行数据面 Gate 周期 $cycle / 3 ==="
+    for cycle in $(seq 1 "$SMOKE_CYCLE_COUNT"); do
+        log_info "=== 运行数据面 Gate 周期 $cycle / $SMOKE_CYCLE_COUNT ==="
         t_cycle_start="$(python3 -c 'import time; print(time.monotonic())')"
 
-        # 1. 确定性生成 4 MiB 交付物与 update 文件
+        # 记录本周期启动前各节点日志行数，用于准确截取单周期遥测 (fail-closed，拒绝容错回退)
+        [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
+        s_lines_before=$(wc -l < "$server_dir/wfb.log")
+        c1_lines_before=$(remote client1 "test -f '$(smoke_dir "$name")/client1/wfb.log' && wc -l < '$(smoke_dir "$name")/client1/wfb.log'") || die "读取 client1 wfb.log 行数失败"
+        c2_lines_before=$(remote client2 "test -f '$(smoke_dir "$name")/client2/wfb.log' && wc -l < '$(smoke_dir "$name")/client2/wfb.log'") || die "读取 client2 wfb.log 行数失败"
+
+        # 1. 确定性生成交付物与 update 文件
         work="$server_dir/cycle$cycle"
         sudo install -d "$work"
         sudo chown "$(id -u):$(id -g)" "$work"
@@ -1017,7 +1059,7 @@ with open(manifest, 'w', encoding='utf-8') as fh:
     json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': meta['sha256']}, fh, separators=(',', ':'))
 PY
 
-        # 生成两 client 不同的 4 MiB update 文件
+        # 生成两 client 不同的 update 文件
         for role in client1 client2; do
             local nid="${role#client}"
             remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo env PYTHONPATH='$REMOTE_REPO' python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
@@ -1031,7 +1073,7 @@ with open(path + '.sha256', 'w', encoding='utf-8') as fh:
 PY"
         done
 
-        # 2. Shared UFTP 下行 (4 MiB)
+        # 2. Shared UFTP 下行
         t_dl_start="$(python3 -c 'import time; print(time.monotonic())')"
         status="$work/uftp.status"
         log="$work/uftp.log"
@@ -1049,11 +1091,12 @@ PY"
 import json, os, sys
 server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import verify_downlink_artifacts, GateConfig
+cfg = GateConfig.from_env()
 res = verify_downlink_artifacts(
     server_cycle_dir=server_cycle_dir,
     client_inboxes={'1': c1_inbox, '2': c2_inbox},
     status_file=status_path,
-    config=GateConfig(),
+    config=cfg,
     duration_seconds=float(duration_str),
 )
 with open(out_path, 'w', encoding='utf-8') as fh:
@@ -1063,9 +1106,10 @@ if res['status'] != 'passed':
 PY
         [ $? -eq 0 ] || die "Gate 周期 $cycle UFTP 下行校验未通过"
 
-        # 3. 两个 client 各一次 4 MiB HTTP PUT 上行
+        # 3. 两个 client 各一次 HTTP PUT 并发上行
         > "$server_dir/server-put-events.jsonl"
         t_ul_start="$(python3 -c 'import time; print(time.monotonic())')"
+        local put_pids=()
         for role in client1 client2; do
             local nid="${role#client}"
             remote "$role" "sudo env PYTHONPATH='$REMOTE_REPO' timeout '$SMOKE_IO_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role/cycle$cycle' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' '$nid' <<'PY'
@@ -1088,7 +1132,15 @@ with open(os.path.join(work, 'client-put-result.json'), 'w', encoding='utf-8') a
     json.dump({'role': role, 'node_id': nid, 'path': path, 'http_status': resp.status, 'bytes': len(body), 'sha256': digest, 'start_monotonic': start, 'end_monotonic': end}, fh, separators=(',', ':'))
 if resp.status != 201:
     raise SystemExit('unexpected HTTP status %s' % resp.status)
-PY"
+PY" &
+            put_pids+=($!)
+        done
+        local put_err=0
+        for pid in "${put_pids[@]}"; do
+            wait "$pid" || put_err=$((put_err + 1))
+        done
+        [ $put_err -eq 0 ] || die "Gate 周期 $cycle HTTP PUT 上行进程失败"
+        for role in client1 client2; do
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/cycle$cycle/client-put-result.json" "$server_dir/$role-put-result-cycle$cycle.json"
         done
         t_ul_end="$(python3 -c 'import time; print(time.monotonic())')"
@@ -1119,7 +1171,8 @@ for role, expected_addr in (('1', '10.80.0.11'), ('2', '10.80.0.12')):
     if ev and ev.get('client_address') != expected_addr:
         if event['client_address'] != expected_addr:
             raise SystemExit('client address mismatch')
-res = verify_uplink_cycle(events, c_res, GateConfig(), float(duration_str))
+cfg = GateConfig.from_env()
+res = verify_uplink_cycle(events, c_res, cfg, float(duration_str))
 with open(out_path, 'w', encoding='utf-8') as fh:
     json.dump(res, fh, indent=2)
 if res['status'] != 'passed':
@@ -1129,13 +1182,21 @@ PY
 
         # 4. 采集遥测并校验周期契约
         for role in client1 client2; do
-            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" 2>/dev/null || true
+            scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" || die "scp 采集 $role wfb.log 失败"
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
         done
 
-        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/wfb.log" "$server_dir/$role-wfb.log" "$server_dir/client1-wfb.log" "$server_dir/client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
+        # 截取本周期的日志切片（fail-closed，无容错回退）
+        [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
+        [ -f "$server_dir/client1-wfb.log" ] || die "缺少 client1 wfb.log"
+        [ -f "$server_dir/client2-wfb.log" ] || die "缺少 client2 wfb.log"
+        tail -n +"$((s_lines_before + 1))" "$server_dir/wfb.log" > "$server_dir/cycle${cycle}_server-wfb.log"
+        tail -n +"$((c1_lines_before + 1))" "$server_dir/client1-wfb.log" > "$server_dir/cycle${cycle}_client1-wfb.log"
+        tail -n +"$((c2_lines_before + 1))" "$server_dir/client2-wfb.log" > "$server_dir/cycle${cycle}_client2-wfb.log"
+
+        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/cycle${cycle}_server-wfb.log" "$server_dir/cycle${cycle}_client1-wfb.log" "$server_dir/cycle${cycle}_client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
 import json, os, sys
-cycle_idx, dl_path, ul_path, s_log_p, _, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
+cycle_idx, dl_path, ul_path, s_log_p, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
 from tests.real_hardware.issue41_gate import parse_telemetry, build_cycle_evidence, validate_cycle_evidence, GateConfig
 with open(dl_path, 'r', encoding='utf-8') as fh:
     dl = json.load(fh)
@@ -1160,6 +1221,7 @@ telem = parse_telemetry(
     queue_summaries={'server': sq, 'client1': c1q, 'client2': c2q},
     phase_durations=durations,
 )
+cfg = GateConfig.from_env()
 cycle_ev = build_cycle_evidence(
     cycle_index=int(cycle_idx),
     status='passed',
@@ -1167,9 +1229,9 @@ cycle_ev = build_cycle_evidence(
     uplink=ul,
     telemetry=telem,
     total_duration_seconds=float(dl_dur) + float(ul_dur),
-    config=GateConfig(),
+    config=cfg,
 )
-errors = validate_cycle_evidence(cycle_ev, GateConfig())
+errors = validate_cycle_evidence(cycle_ev, cfg)
 if errors:
     raise SystemExit('周期 %s 遥测或契约校验失败: %r' % (cycle_idx, errors))
 with open(out_path, 'w', encoding='utf-8') as fh:
@@ -1187,6 +1249,7 @@ PY
         done
         cycle_files+=("$server_dir/cycle$cycle.json")
         log_ok "Gate 周期 $cycle 验收通过 (耗时: ${cycle_dur}s)"
+        python3 "$SCRIPT_DIR/issue41_gate.py" format-cycle-telemetry --cycle-json "$server_dir/cycle$cycle.json"
     done
 
     # 停止进程并清理收尾
@@ -1197,23 +1260,21 @@ PY
     mkdir -p "$archive"
     python3 - "$archive/gate_summary.json" "$RUN_ID" "$server_dir/reused_processes.json" "${cycle_files[@]}" <<'PY'
 import json, sys
-out_path, run_id, pids_path, c1_p, c2_p, c3_p = sys.argv[1:]
+out_path, run_id, pids_path = sys.argv[1:4]
+cycle_paths = sys.argv[4:]
 from tests.real_hardware.issue41_gate import build_gate_summary, validate_gate_summary, GateConfig
 with open(pids_path, 'r', encoding='utf-8') as fh:
     pids = json.load(fh)
-cycles = [
-    json.load(open(c1_p, 'r', encoding='utf-8')),
-    json.load(open(c2_p, 'r', encoding='utf-8')),
-    json.load(open(c3_p, 'r', encoding='utf-8')),
-]
+cycles = [json.load(open(cp, 'r', encoding='utf-8')) for cp in cycle_paths]
+cfg = GateConfig.from_env()
 summary = build_gate_summary(
     run_id=run_id,
     status='passed',
     cycles=cycles,
     reused_processes=pids,
-    config=GateConfig(),
+    config=cfg,
 )
-errors = validate_gate_summary(summary, GateConfig())
+errors = validate_gate_summary(summary, cfg)
 if errors:
     raise SystemExit('Gate summary 校验失败: %r' % errors)
 with open(out_path, 'w', encoding='utf-8') as fh:
@@ -1227,8 +1288,10 @@ PY
         --name pre_runtime_smoke \
         --json-file "$archive/gate_summary.json"
 
+    python3 "$SCRIPT_DIR/issue41_gate.py" format-summary-telemetry --summary-json "$archive/gate_summary.json"
+
     trap - ERR
-    log_ok "连续三周期双向数据面 Gate 全部通过！"
+    log_ok "数据面 Gate 全部通过 (共 $SMOKE_CYCLE_COUNT 周期)！"
 }
 
 handle_smoke_gate_failure() {
