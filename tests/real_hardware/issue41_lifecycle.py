@@ -33,18 +33,12 @@ class LifecycleConfig:
     server_unit: str = 'wfb-fl-server.service'
     client_unit: str = 'wfb-fl-client.service'
     server_tun: str = 'v8i41s0'
-    client1_tun: str = 'v8i41c1'
-    client2_tun: str = 'v8i41c2'
+    client_tuns: Dict[str, str] = field(default_factory=dict)
     server_work_dir: str = '/var/lib/wfb-ng/issue41/server'
     client_work_dir: str = '/var/lib/wfb-ng/issue41/client'
     timeout_seconds: float = 15.0
     poll_interval_seconds: float = 0.2
     client_ssh_map: Dict[str, str] = field(default_factory=lambda: default_client_ssh_map())
-
-    def __post_init__(self):
-        for i in range(1, 11):
-            if not hasattr(self, f'client{i}_tun'):
-                setattr(self, f'client{i}_tun', f'v8i41c{i}')
 
     def unit_for_role(self, role: str) -> str:
         return self.server_unit if role == 'server' else self.client_unit
@@ -52,8 +46,8 @@ class LifecycleConfig:
     def tun_for_role(self, role: str) -> str:
         if role == 'server':
             return self.server_tun
-        if hasattr(self, f'{role}_tun'):
-            return getattr(self, f'{role}_tun')
+        if role in self.client_tuns:
+            return self.client_tuns[role]
         m = re.search(r'\d+', role)
         if m:
             return f'v8i41c{m.group()}'
@@ -619,11 +613,7 @@ def main(argv=None):
     run_parser.add_argument('--initial-pids', help='可选的初始 MainPID JSON 字符串或路径 (如: {"server": 123, ...})')
     run_parser.add_argument('--initial-cgroups', help='可选的初始 cgroup PIDs JSON 字符串或路径')
     run_parser.add_argument('--server-tun', default='v8i41s0', help='server TUN 设备名')
-    run_parser.add_argument('--client1-tun', default='v8i41c1', help='client1 TUN 设备名')
-    run_parser.add_argument('--client2-tun', default='v8i41c2', help='client2 TUN 设备名')
     run_parser.add_argument('--client-tuns', action='append', default=[], help='角色TUN映射 (role:tun)')
-    run_parser.add_argument('--client1-ssh', default=None, help='client1 SSH 主机')
-    run_parser.add_argument('--client2-ssh', default=None, help='client2 SSH 主机')
     run_parser.add_argument('--client-sshs', action='append', default=[], help='角色SSH映射 (role:ssh_host)')
     run_parser.add_argument('--timeout', type=float, default=15.0, help='超时时间（秒）')
 
@@ -644,10 +634,6 @@ def main(argv=None):
             if ':' in item:
                 r, s = item.split(':', 1)
                 client_ssh_map[r] = s
-        if args.client1_ssh:
-            client_ssh_map['client1'] = args.client1_ssh
-        if args.client2_ssh:
-            client_ssh_map['client2'] = args.client2_ssh
 
         active_roles = ('server',) + tuple(sorted(client_ssh_map.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x))
 
@@ -655,13 +641,10 @@ def main(argv=None):
         config = LifecycleConfig(
             roles=active_roles,
             server_tun=args.server_tun,
-            client1_tun=client_tun_map.get('client1', args.client1_tun),
-            client2_tun=client_tun_map.get('client2', args.client2_tun),
+            client_tuns=client_tun_map,
             timeout_seconds=args.timeout,
             client_ssh_map=executor.client_ssh_map,
         )
-        for r, t in client_tun_map.items():
-            setattr(config, f'{r}_tun', t)
         initial_pids = None
         if args.initial_pids:
             if os.path.isfile(args.initial_pids):
