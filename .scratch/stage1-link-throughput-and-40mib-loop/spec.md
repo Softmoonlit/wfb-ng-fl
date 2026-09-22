@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: resolved
 
 # Stage 1: 底层通信与传输极限攻坚（物理链路排查、拆分遥测与双 40 MiB 并发闭环）
 

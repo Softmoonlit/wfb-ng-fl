@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: 验收套件升级为场景驱动的两轮并发架构
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 三台物理机运行相同 commit，工作区干净，网卡配置正常。
 - [x] 执行完整的端到端两轮双 40 MiB 闭环验收流程。
