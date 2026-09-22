@@ -23,7 +23,15 @@ def main(argv=None):
     client_names = sorted([os.path.basename(d) for d in client_dirs],
                           key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
     if not client_names:
-        client_names = ['client1', 'client2']
+        env_path = os.path.join(archive_dir, 'envelope.json')
+        if os.path.isfile(env_path):
+            env_data = _read_json(env_path, [])
+            rc = env_data.get('resolved_config', {})
+            t_delays = rc.get('training_delay_ms_by_node', {})
+            if t_delays:
+                client_names = [f'client{nid}' for nid in sorted(t_delays.keys(), key=lambda x: int(x))]
+    if not client_names:
+        client_names = [f'client{i}' for i in range(1, 8)]
 
     result_paths = {
         'server': os.path.join(archive_dir, 'formal_runtime_loop', 'server',
@@ -65,8 +73,7 @@ def main(argv=None):
         controlled_stop = {
             'status': 'passed',
             'server_stopped': True,
-            'client1_stopped': True,
-            'client2_stopped': True,
+            **{f'{cname}_stopped': True for cname in client_names},
             'cleaned': True,
         }
 
@@ -360,7 +367,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             'strict_sync': strict_sync,
             'server_committed_node_ids': server_round.get('update_node_ids'),
             'server_wait_returned_node_ids': server_round.get('update_node_ids'),
-            'telemetry': _build_telemetry(archive_dir, errors, round_start_ms=r_start_ms, round_end_ms=r_end_ms),
+            'telemetry': _build_telemetry(archive_dir, errors, round_start_ms=r_start_ms, round_end_ms=r_end_ms, client_names=client_names),
             'deadline_seconds': round_deadline,
             'io_timeout_seconds': io_timeout,
         })
@@ -526,42 +533,45 @@ def _filter_log_by_time_ms(log_text, start_ms, end_ms):
     return '\n'.join(filtered)
 
 
-def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None):
+def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None, client_names=None):
+    if client_names is None:
+        client_dirs = glob.glob(os.path.join(archive_dir, 'formal_runtime_loop', 'client*'))
+        client_names = sorted([os.path.basename(d) for d in client_dirs],
+                              key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
+        if not client_names:
+            client_names = [f'client{i}' for i in range(1, 8)]
+
     if round_start_ms is None or round_end_ms is None:
         errors.append('缺少轮次有效起止时间戳，无法切片提取遥测数据')
     s_log_path = os.path.join(archive_dir, 'raw', 'server-journal.txt')
-    c1_log_path = os.path.join(archive_dir, 'raw', 'client1-journal.txt')
-    c2_log_path = os.path.join(archive_dir, 'raw', 'client2-journal.txt')
     s_log = _read_file_text(s_log_path) or _read_file_text(
         os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'wfb.log'))
-    c1_log = _read_file_text(c1_log_path) or _read_file_text(
-        os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'wfb.log'))
-    c2_log = _read_file_text(c2_log_path) or _read_file_text(
-        os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'wfb.log'))
-
     s_log = _filter_log_by_time_ms(s_log, round_start_ms, round_end_ms)
+
+    client_logs = {}
+    queue_summaries = {}
 
     s_queue_path = os.path.join(
         archive_dir, 'formal_runtime_loop', 'server', 'server_queue_summary.json')
-    c1_queue_path = os.path.join(
-        archive_dir, 'formal_runtime_loop', 'client1', 'client1_queue_summary.json')
-    c2_queue_path = os.path.join(
-        archive_dir, 'formal_runtime_loop', 'client2', 'client2_queue_summary.json')
     s_q = _read_json(s_queue_path, []) if os.path.isfile(s_queue_path) else None
-    c1_q = _read_json(c1_queue_path, []) if os.path.isfile(c1_queue_path) else None
-    c2_q = _read_json(c2_queue_path, []) if os.path.isfile(c2_queue_path) else None
-
-    queue_summaries = {}
     if s_q:
         queue_summaries['server'] = s_q
-    if c1_q:
-        queue_summaries['client1'] = c1_q
-    if c2_q:
-        queue_summaries['client2'] = c2_q
+
+    for cname in client_names:
+        c_log_path = os.path.join(archive_dir, 'raw', f'{cname}-journal.txt')
+        c_log = _read_file_text(c_log_path) or _read_file_text(
+            os.path.join(archive_dir, 'formal_runtime_loop', cname, 'wfb.log'))
+        client_logs[cname] = c_log or ''
+
+        c_q_path = os.path.join(
+            archive_dir, 'formal_runtime_loop', cname, f'{cname}_queue_summary.json')
+        c_q = _read_json(c_q_path, []) if os.path.isfile(c_q_path) else None
+        if c_q:
+            queue_summaries[cname] = c_q
 
     telem = parse_telemetry(
         server_log=s_log or '',
-        client_logs={'client1': c1_log or '', 'client2': c2_log or ''},
+        client_logs=client_logs,
         queue_summaries=queue_summaries,
     )
     queue = telem.get('queue', {})

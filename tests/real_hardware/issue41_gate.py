@@ -277,7 +277,11 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
         'uplink_queue_packets_limit',
     ]
 
-    for role_key in ('server', 'client1', 'client2'):
+    roles_to_check = ['server'] + sorted(
+        [k for k in runtime_configs.keys() if k != 'server'],
+        key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x
+    )
+    for role_key in roles_to_check:
         gate_raw = gate_configs.get(role_key, {})
         runtime_raw = runtime_configs.get(role_key, {})
         if not gate_raw:
@@ -1261,8 +1265,9 @@ def main(argv=None) -> int:
     p_gen = subparsers.add_parser("generate-fixtures")
     p_gen.add_argument("--cycle", type=int, required=True)
     p_gen.add_argument("--server-dir", required=True)
-    p_gen.add_argument("--client1-dir", required=True)
-    p_gen.add_argument("--client2-dir", required=True)
+    p_gen.add_argument("--client1-dir", default=None)
+    p_gen.add_argument("--client2-dir", default=None)
+    p_gen.add_argument("--client-dirs", action="append", default=[], help="node_id:dir")
     p_gen.add_argument("--size", type=int, default=4 * 1024 * 1024)
 
     p_rec = subparsers.add_parser("start-http-receiver")
@@ -1282,16 +1287,18 @@ def main(argv=None) -> int:
 
     p_vd = subparsers.add_parser("verify-downlink")
     p_vd.add_argument("--server-cycle-dir", required=True)
-    p_vd.add_argument("--client1-inbox", required=True)
-    p_vd.add_argument("--client2-inbox", required=True)
+    p_vd.add_argument("--client1-inbox", default=None)
+    p_vd.add_argument("--client2-inbox", default=None)
+    p_vd.add_argument("--client-inboxes", action="append", default=[], help="node_id:inbox_dir")
     p_vd.add_argument("--status-file", required=True)
     p_vd.add_argument("--duration", type=float, default=0.0)
     p_vd.add_argument("--out", required=True)
 
     p_vu = subparsers.add_parser("verify-uplink")
     p_vu.add_argument("--events-file", required=True)
-    p_vu.add_argument("--client1-result", required=True)
-    p_vu.add_argument("--client2-result", required=True)
+    p_vu.add_argument("--client1-result", default=None)
+    p_vu.add_argument("--client2-result", default=None)
+    p_vu.add_argument("--client-results", action="append", default=[], help="node_id:result_file")
     p_vu.add_argument("--duration", type=float, default=0.0)
     p_vu.add_argument("--out", required=True)
 
@@ -1299,9 +1306,11 @@ def main(argv=None) -> int:
     p_pt.add_argument("--server-log", required=True)
     p_pt.add_argument("--client1-log", default="")
     p_pt.add_argument("--client2-log", default="")
+    p_pt.add_argument("--client-logs", action="append", default=[], help="role:log_path")
     p_pt.add_argument("--server-queue", default="")
     p_pt.add_argument("--client1-queue", default="")
     p_pt.add_argument("--client2-queue", default="")
+    p_pt.add_argument("--client-queues", action="append", default=[], help="role:queue_path")
     p_pt.add_argument("--downlink-seconds", type=float, default=0.0)
     p_pt.add_argument("--uplink-seconds", type=float, default=0.0)
     p_pt.add_argument("--out", required=True)
@@ -1324,8 +1333,10 @@ def main(argv=None) -> int:
     p_cf.add_argument("--server-rx-ant-samples", type=int, default=0)
     p_cf.add_argument("--client1-declared", type=int, default=1)
     p_cf.add_argument("--client2-declared", type=int, default=1)
+    p_cf.add_argument("--client-declared", action="append", default=[], help="role:0/1")
     p_cf.add_argument("--client1-accepted", type=int, default=1)
     p_cf.add_argument("--client2-accepted", type=int, default=1)
+    p_cf.add_argument("--client-accepted", action="append", default=[], help="role:0/1")
     p_cf.add_argument("--tun-routes-ok", type=int, default=1)
     p_cf.add_argument("--uftp-ok", type=int, default=1)
     p_cf.add_argument("--http-ok", type=int, default=1)
@@ -1358,11 +1369,19 @@ def main(argv=None) -> int:
     )
 
     if args.command == "generate-fixtures":
+        c_dirs = {}
+        for item in args.client_dirs:
+            if ":" in item:
+                nid, d = item.split(":", 1)
+                c_dirs[int(nid)] = d
+        if args.client1_dir:
+            c_dirs[1] = args.client1_dir
+        if args.client2_dir:
+            c_dirs[2] = args.client2_dir
         res = generate_cycle_fixtures(
             cycle=args.cycle,
             server_dir=args.server_dir,
-            client1_dir=args.client1_dir,
-            client2_dir=args.client2_dir,
+            client_dirs=c_dirs if c_dirs else None,
             size=args.size,
         )
         print(f"FIXTURES_GENERATED: cycle={args.cycle} model={res['model_sha256'][:8]}")
@@ -1390,9 +1409,19 @@ def main(argv=None) -> int:
         return 0
 
     if args.command == "verify-downlink":
+        c_inboxes = {}
+        for item in args.client_inboxes:
+            if ":" in item:
+                nid, path = item.split(":", 1)
+                c_inboxes[nid] = path
+        if args.client1_inbox:
+            c_inboxes["1"] = args.client1_inbox
+        if args.client2_inbox:
+            c_inboxes["2"] = args.client2_inbox
+
         res = verify_downlink_artifacts(
             server_cycle_dir=args.server_cycle_dir,
-            client_inboxes={"1": args.client1_inbox, "2": args.client2_inbox},
+            client_inboxes=c_inboxes,
             status_file=args.status_file,
             config=config,
             duration_seconds=args.duration,
@@ -1411,10 +1440,18 @@ def main(argv=None) -> int:
                     if line:
                         events.append(json.loads(line))
         c_res = {}
-        for nid, cpath in (("1", args.client1_result), ("2", args.client2_result)):
-            if os.path.isfile(cpath):
-                with open(cpath, "r", encoding="utf-8") as fh:
-                    c_res[nid] = json.load(fh)
+        for item in args.client_results:
+            if ":" in item:
+                nid, path = item.split(":", 1)
+                if os.path.isfile(path):
+                    with open(path, "r", encoding="utf-8") as fh:
+                        c_res[nid] = json.load(fh)
+        if args.client1_result and os.path.isfile(args.client1_result):
+            with open(args.client1_result, "r", encoding="utf-8") as fh:
+                c_res["1"] = json.load(fh)
+        if args.client2_result and os.path.isfile(args.client2_result):
+            with open(args.client2_result, "r", encoding="utf-8") as fh:
+                c_res["2"] = json.load(fh)
         res = verify_uplink_cycle(
             events=events,
             client_results=c_res,
@@ -1428,11 +1465,29 @@ def main(argv=None) -> int:
 
     if args.command == "parse-telemetry":
         server_log = open(args.server_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.server_log) else ""
-        c1_log = open(args.client1_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client1_log) else ""
-        c2_log = open(args.client2_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client2_log) else ""
-        sq = json.load(open(args.server_queue, "r", encoding="utf-8")) if os.path.isfile(args.server_queue) else {}
-        c1q = json.load(open(args.client1_queue, "r", encoding="utf-8")) if os.path.isfile(args.client1_queue) else {}
-        c2q = json.load(open(args.client2_queue, "r", encoding="utf-8")) if os.path.isfile(args.client2_queue) else {}
+        client_logs = {}
+        for item in args.client_logs:
+            if ":" in item:
+                r, p = item.split(":", 1)
+                client_logs[r] = open(p, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(p) else ""
+        if args.client1_log:
+            client_logs["client1"] = open(args.client1_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client1_log) else ""
+        if args.client2_log:
+            client_logs["client2"] = open(args.client2_log, "r", encoding="utf-8", errors="replace").read() if os.path.isfile(args.client2_log) else ""
+
+        queue_summaries = {}
+        if args.server_queue and os.path.isfile(args.server_queue):
+            queue_summaries["server"] = json.load(open(args.server_queue, "r", encoding="utf-8"))
+        for item in args.client_queues:
+            if ":" in item:
+                r, p = item.split(":", 1)
+                if os.path.isfile(p):
+                    queue_summaries[r] = json.load(open(p, "r", encoding="utf-8"))
+        if args.client1_queue and os.path.isfile(args.client1_queue):
+            queue_summaries["client1"] = json.load(open(args.client1_queue, "r", encoding="utf-8"))
+        if args.client2_queue and os.path.isfile(args.client2_queue):
+            queue_summaries["client2"] = json.load(open(args.client2_queue, "r", encoding="utf-8"))
+
         durations = {
             "downlink_seconds": args.downlink_seconds,
             "uplink_seconds": args.uplink_seconds,
@@ -1492,10 +1547,26 @@ def main(argv=None) -> int:
         return 0 if summary["status"] == "passed" else 1
 
     if args.command == "classify-failure":
+        c_decl = {}
+        for item in args.client_declared:
+            if ":" in item:
+                r, v = item.split(":", 1)
+                c_decl[r] = bool(int(v))
+        if not c_decl:
+            c_decl = {"client1": bool(args.client1_declared), "client2": bool(args.client2_declared)}
+
+        s_acc = {}
+        for item in args.client_accepted:
+            if ":" in item:
+                r, v = item.split(":", 1)
+                s_acc[r] = bool(int(v))
+        if not s_acc:
+            s_acc = {"client1": bool(args.client1_accepted), "client2": bool(args.client2_accepted)}
+
         diag = classify_gate_failure(
             server_rx_ant_samples=args.server_rx_ant_samples,
-            client_declared={"client1": bool(args.client1_declared), "client2": bool(args.client2_declared)},
-            server_accepted={"client1": bool(args.client1_accepted), "client2": bool(args.client2_accepted)},
+            client_declared=c_decl,
+            server_accepted=s_acc,
             tun_routes_ok=bool(args.tun_routes_ok),
             uftp_status_ok=bool(args.uftp_ok),
             http_put_ok=bool(args.http_ok),

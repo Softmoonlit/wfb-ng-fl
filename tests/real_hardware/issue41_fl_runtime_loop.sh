@@ -910,12 +910,14 @@ write_downlink_failure_diagnosis() {
     local archive
     archive="$(smoke_archive_dir downlink_uftp)"
     mkdir -p "$archive"
-    python3 - "$archive" <<'PY'
+    python3 - "$archive" "${CLIENT_ROLES[@]}" <<'PY'
 import json
 import os
+import re
 import sys
 
 archive = sys.argv[1]
+client_roles = sys.argv[2:] if len(sys.argv) > 2 else ['client1', 'client2']
 
 def read_text(path):
     try:
@@ -927,16 +929,15 @@ def read_text(path):
 server_log = read_text(os.path.join(archive, 'server', 'wfb.log'))
 client_logs = {
     role: read_text(os.path.join(archive, role, 'wfb.log'))
-    for role in ('client1', 'client2')
+    for role in client_roles
 }
-client_declared = {
-    role: 'first_declare node_id=%s' % node_id in client_logs[role]
-    for role, node_id in (('client1', 1), ('client2', 2))
-}
-server_accepted = {
-    role: 'ready_accept node_id=%s' % node_id in server_log
-    for role, node_id in (('client1', 1), ('client2', 2))
-}
+client_declared = {}
+server_accepted = {}
+for role in client_roles:
+    m = re.search(r'\d+', role)
+    node_id = m.group() if m else '1'
+    client_declared[role] = ('first_declare node_id=%s' % node_id in client_logs[role])
+    server_accepted[role] = ('ready_accept node_id=%s' % node_id in server_log)
 server_rx_ant_samples = server_log.count('\tRX_ANT\t')
 classification = 'insufficient_evidence'
 if all(client_declared.values()) and not any(server_accepted.values()) and server_rx_ant_samples == 0:

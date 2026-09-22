@@ -335,37 +335,29 @@ ISSUE41_RESET_RUNTIME_STATE=1 \
 正式算法入口与占位算法：
 
 - 模型和 update 对 Runtime 及当前占位算法都是不透明普通文件，不要求 JSON、checkpoint 或特定框架格式。
-- 正式场景固定 `ISSUE41_ROUNDS=1`。server 输入模型、client1 模板和 client2 模板均必须恰好为 4 MiB；`preflight` 在 live run 前检查它们，不生成或修改输入。
-- 两个客户端模板必须具有不同 SHA-256，并各自在单轮中重复使用同一模板。默认路径分别为 `model-4mib.bin`、`update-client1-4mib.bin` 和 `update-client2-4mib.bin`。
-- client1/client2 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验。模型校验完成后两个客户端均以 `training_delay_ms=0` 立即执行占位训练。
+- 正式场景支持单轮/多轮及参数化载荷大小（如 4 MiB 或 40 MiB）。server 输入模型和各 client 模板均必须恰好为指定载荷大小；`preflight` 在 live run 前检查它们，不生成或修改输入。
+- 全部 7 个客户端模板必须具有互不相同的 SHA-256。默认路径为 `model-<size>b.bin` 和 `update-client<N>-<size>b.bin`。
+- 各 client 调用 `wait_for_model()`；模型 manifest、参与集合、大小和 SHA-256 由 Runtime 校验。模型校验完成后客户端执行占位训练。
 - `train(model_path, output_update_path, config)` 的占位训练只复制必填 `update_template_path`，synthetic update 不来自真实训练。server `aggregate(...)` 的占位聚合只复制当前模型，不执行或声称执行 FedAvg。
-- server `wait_for_updates()` 只在两个有效 update 全部收齐后返回完整 `[1, 2]` 映射；单个 update 到达时不返回 partial result。
+- server `wait_for_updates()` 只在所有活跃客户端（如 `[1, 2, 3, 4, 5, 6, 7]`）的有效 update 全部收齐后返回完整映射；部分 update 到达时不返回 partial result。
 - 每轮在算法结果和 systemd journal 中记录独立轮次标识、模型接收及 PUT 时间区间、大小、SHA-256、活动上传集合与最终 HTTP 结果。任何 `upload_in_progress` 或 client/server 提交事实不一致均不能通过。
 - `server_main/client_main` 只负责 Runtime 编排。接入真实算法时保留 `train()`、`aggregate()` 的函数签名和输出文件约定，只替换两个函数内部实现。
 - 结果事件必须包含 client 的 `train_start/train_done` 和 server 的 `aggregate_start/aggregate_done`；模型/update 的路径、大小和 SHA-256 必须进入算法结果 JSON。
 - 本次占位训练与聚合用于证明正式算法执行边界和真实文件体量传输，不代表最终业务模型精度验收。
-- 本次不强制制造“client1 早于 server 下行完成屏障提交”的极端时序；若自然发生，可记录为额外证据。
 
-运行前分别在三台机器准备输入文件。默认路径不位于 Runtime work_dir，`clean` 不会删除这些输入：
+运行前分别在各台机器准备输入文件。可直接使用 `bash tests/real_hardware/issue41_fl_runtime_loop.sh generate-fixtures` 自动在全集群生成各客户端唯一的确定性模板：
 
 ```bash
-# server 本机：操作者提供的 4 MiB 模型
-sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/model-4mib.bin \
-  /var/lib/wfb-ng/issue41-input/model-4mib.bin
+# server 本机：操作者提供的初始模型
+/var/lib/wfb-ng/issue41-input/model-4194304b.bin
 
-# client1：4 MiB synthetic update 模板（可由 generate-fixtures 确定性生成）
-sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/update-client1-4mib.bin \
-  /var/lib/wfb-ng/issue41-input/update-client1-4mib.bin
-
-# client2：内容必须不同于 client1 的 4 MiB synthetic update 模板（可由 generate-fixtures 确定性生成）
-sudo install -d /var/lib/wfb-ng/issue41-input
-sudo install -m 0644 /path/to/update-client2-4mib.bin \
-  /var/lib/wfb-ng/issue41-input/update-client2-4mib.bin
+# client1~client7：各 client 唯一的 synthetic update 模板
+/var/lib/wfb-ng/issue41-input/update-client1-4194304b.bin
+...
+/var/lib/wfb-ng/issue41-input/update-client7-4194304b.bin
 ```
 
-先运行 `preflight`。它会 fail-closed 检查三个输入的普通文件、可读性、恰好 4 MiB 大小，以及两个 client 模板 SHA-256 不同。输入位于 Runtime work_dir 外，live run 和 `clean` 都不会生成、修改或删除它们。
+先运行 `preflight`。它会 fail-closed 检查所有输入的普通文件、可读性、恰好对应大小，以及各 client 模板 SHA-256 互不相同。输入位于 Runtime work_dir 外，live run 和 `clean` 都不会生成、修改或删除它们。
 
 正式单轮运行使用：
 
