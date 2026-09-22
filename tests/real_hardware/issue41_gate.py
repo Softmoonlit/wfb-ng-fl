@@ -628,11 +628,12 @@ def verify_downlink_artifacts(server_cycle_dir: str,
             'verified': verified,
         }
 
+    expected_nodes = set(client_inboxes.keys())
     status = 'passed' if (
-        connect_matrix.get('1') == 'success' and connect_matrix.get('2') == 'success' and
-        all(client_received.get(n, {}).get('verified') for n in ('1', '2')) and
-        result_matrix.get('1', {}).get('model.bin') == 'copy' and
-        result_matrix.get('2', {}).get('model.bin') == 'copy'
+        bool(expected_nodes) and
+        all(connect_matrix.get(n) == 'success' for n in expected_nodes) and
+        all(client_received.get(n, {}).get('verified') for n in expected_nodes) and
+        all(result_matrix.get(n, {}).get('model.bin') == 'copy' for n in expected_nodes)
     ) else 'failed'
 
     return {
@@ -678,14 +679,19 @@ def verify_uplink_cycle(events: List[Dict[str, Any]],
                 },
             })
 
+    expected_nodes = set(str(k) for k in client_results.keys()) if client_results else {str(u.get('node_id')) for u in uploads}
     converged = bool(active_upload_sets and active_upload_sets[-1] == [])
+    upload_nodes = {str(u.get('node_id')) for u in uploads}
     status = 'passed' if (
-        len(uploads) == 2 and converged and
+        bool(expected_nodes) and
+        upload_nodes == expected_nodes and
+        len(uploads) == len(expected_nodes) and
+        converged and
         all(u.get('server_outcome') == 'committed' and
             u.get('client_http_status') == 201 and
             u.get('server_http_status') == 201 and
             u.get('size_bytes') == config.artifact_size_bytes for u in uploads) and
-        uploads[0].get('sha256') != uploads[1].get('sha256')
+        len(set(u.get('sha256') for u in uploads)) == len(uploads)
     ) else 'failed'
 
     return {
