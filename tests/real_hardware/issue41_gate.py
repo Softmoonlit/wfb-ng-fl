@@ -1035,22 +1035,26 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
     if not dl_file.get('sha256') or len(dl_file['sha256']) != 64:
         errors.append(f'{prefix} downlink 文件缺少有效 SHA-256')
 
+    # 确定本周期参与的 clients
+    c_verif = dl.get('client_received_verification', {})
+    expected_clients = tuple(sorted(c_verif.keys(), key=lambda x: int(x))) if c_verif else ('1', '2')
+
     # connect matrix
     connect = dl.get('uftp_connect_matrix', {})
-    if connect.get('1') != 'success' or connect.get('2') != 'success':
-        errors.append(f'{prefix} UFTP CONNECT 矩阵未同时包含 1 和 2 的 success')
+    for node_id in expected_clients:
+        if connect.get(node_id) != 'success':
+            errors.append(f'{prefix} UFTP CONNECT 矩阵未包含 client {node_id} 的 success')
 
     # result matrix
     result_matrix = dl.get('uftp_result_matrix', {})
-    for node_id in ('1', '2'):
+    for node_id in expected_clients:
         node_res = result_matrix.get(node_id, {})
         for fn in ('model.bin', 'model.manifest.json'):
             if node_res.get(fn) != 'copy':
                 errors.append(f'{prefix} client {node_id} UFTP RESULT 未成功 copy {fn}')
 
     # client received verification
-    c_verif = dl.get('client_received_verification', {})
-    for node_id in ('1', '2'):
+    for node_id in expected_clients:
         n_data = c_verif.get(node_id, {})
         if not n_data.get('verified'):
             errors.append(f'{prefix} client {node_id} 本地模型文件校验未通过')
@@ -1067,18 +1071,17 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
         errors.append(f'{prefix} uplink operation 必须为 http_put_over_tcp')
 
     uploads = ul.get('uploads', [])
-    if len(uploads) != 2:
-        errors.append(f'{prefix} uplink 必须恰好包含两个 client 的 upload 记录')
+    if len(uploads) != len(expected_clients):
+        errors.append(f'{prefix} uplink 必须恰好包含全部参与 client 的 upload 记录 (实际: {len(uploads)}, 期望: {len(expected_clients)})')
 
     uploads_by_node = {str(u.get('node_id')): u for u in uploads}
-    if set(uploads_by_node.keys()) != {'1', '2'}:
-        errors.append(f'{prefix} uplink 未包含完整的节点 1 和 2')
+    if set(uploads_by_node.keys()) != set(expected_clients):
+        errors.append(f'{prefix} uplink 参与节点不匹配 (实际: {set(uploads_by_node.keys())}, 期望: {set(expected_clients)})')
     else:
-        u1 = uploads_by_node['1']
-        u2 = uploads_by_node['2']
-        if u1.get('sha256') == u2.get('sha256'):
-            errors.append(f'{prefix} 两个 client 的 4 MiB update SHA-256 必须不同')
-        for node_id, u in (('1', u1), ('2', u2)):
+        upload_shas = [u.get('sha256') for u in uploads]
+        if len(set(upload_shas)) != len(uploads):
+            errors.append(f'{prefix} 所有 client 的 4 MiB update SHA-256 必须彼此不同')
+        for node_id, u in uploads_by_node.items():
             if u.get('client_http_status') != 201:
                 errors.append(f'{prefix} client {node_id} 上报的 client_http_status 不为 201')
             if u.get('server_http_status') != 201 or u.get('server_outcome') != 'committed':
@@ -1116,7 +1119,7 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
 
     by_node = telem.get('loss_and_fec_by_node')
     if isinstance(by_node, dict):
-        for nid in ('1', '2'):
+        for nid in expected_clients:
             if nid not in by_node:
                 errors.append(f'{prefix} telemetry loss_and_fec_by_node 缺少 client {nid}')
             elif by_node[nid].get('sample_count', 0) <= 0:
@@ -1145,16 +1148,17 @@ def validate_gate_summary(summary: Dict[str, Any], config: GateConfig) -> List[s
 
     # 验证进程复用
     reused = summary.get('reused_processes')
-    required_pids = [
-        'server_link_pid', 'client1_link_pid', 'client2_link_pid',
-        'client1_uftpd_pid', 'client2_uftpd_pid', 'server_http_pid',
-    ]
     if not isinstance(reused, dict):
         errors.append('gate 必须包含 reused_processes 对象')
     else:
-        for rp in required_pids:
-            if not isinstance(reused.get(rp), int) or reused.get(rp) <= 0:
-                errors.append(f'reused_processes 缺少有效的 {rp}')
+        if not isinstance(reused.get('server_link_pid'), int) or reused.get('server_link_pid') <= 0:
+            errors.append('reused_processes 缺少有效的 server_link_pid')
+        if not isinstance(reused.get('server_http_pid'), int) or reused.get('server_http_pid') <= 0:
+            errors.append('reused_processes 缺少有效的 server_http_pid')
+        for k, v in reused.items():
+            if k.startswith('client') and (k.endswith('_link_pid') or k.endswith('_uftpd_pid')):
+                if not isinstance(v, int) or v <= 0:
+                    errors.append(f'reused_processes 缺少有效的 {k}')
 
     # 验证 cycles
     cycles = summary.get('cycles')

@@ -1189,6 +1189,7 @@ PY"
 
         # 下行结果验证
         for role in "${CLIENT_ROLES[@]}"; do
+            remote "$role" "for i in \$(seq 1 30); do [ -d '$(smoke_dir "$name")/$role/inbox/$src' ] && break; sleep 0.5; done"
             remote "$role" "sudo chown -R \$(id -u):\$(id -g) '$(smoke_dir "$name")/$role/inbox'"
             scp -rq "$(client_ssh "$role"):$(smoke_dir "$name")/$role/inbox/$src" "$server_dir/$role-inbox-$src"
         done
