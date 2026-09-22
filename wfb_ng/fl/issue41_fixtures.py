@@ -13,23 +13,19 @@ from .errors import FLRuntimeError
 
 DEFAULT_ARTIFACT_SIZE_BYTES = 4 * 1024 * 1024
 DEFAULT_ROUNDS = 1
-DEFAULT_PARTICIPANT_NODE_IDS = (1, 2)
-DEFAULT_TRAINING_DELAY_MS_BY_NODE = {'1': 0, '2': 3000}
+DEFAULT_PARTICIPANT_NODE_IDS = tuple(range(1, 8))
+DEFAULT_TRAINING_DELAY_MS_BY_NODE = {str(i): 0 for i in range(1, 8)}
 
 MODEL_PATTERN = b'wfb-ng-issue41-model-4mib-v1\n'
-CLIENT1_UPDATE_PATTERN = b'wfb-ng-issue41-client1-update-4mib-v1\n'
-CLIENT2_UPDATE_PATTERN = b'wfb-ng-issue41-client2-update-4mib-v1\n'
 
 PATTERNS_BY_ROLE = {
     'model': MODEL_PATTERN,
-    'client1': CLIENT1_UPDATE_PATTERN,
-    'client2': CLIENT2_UPDATE_PATTERN,
+    **{f'client{i}': f'wfb-ng-issue41-client{i}-update-4mib-v1\n'.encode('utf-8') for i in range(1, 11)},
 }
 
 FILENAMES_BY_ROLE = {
     'model': 'model-4mib.bin',
-    'client1': 'update-client1-4mib.bin',
-    'client2': 'update-client2-4mib.bin',
+    **{f'client{i}': f'update-client{i}-4mib.bin' for i in range(1, 11)},
 }
 
 
@@ -109,23 +105,24 @@ def generate_client_fixture(dest_path_or_dir, node_id,
         path, size_bytes=size_bytes, pattern=PATTERNS_BY_ROLE[role_key])
 
 
-def generate_all_fixtures(dest_dir, size_bytes=DEFAULT_ARTIFACT_SIZE_BYTES):
+def generate_all_fixtures(dest_dir, size_bytes=DEFAULT_ARTIFACT_SIZE_BYTES, client_count=7):
     """在指定目录中确定性生成全部模型和 update 模板。"""
     os.makedirs(dest_dir, exist_ok=True)
-    model = generate_model_fixture(dest_dir, size_bytes=size_bytes)
-    client1 = generate_client_fixture(dest_dir, 1, size_bytes=size_bytes)
-    client2 = generate_client_fixture(dest_dir, 2, size_bytes=size_bytes)
-
-    if client1['sha256'] == client2['sha256']:
-        raise FLRuntimeError(
-            'fixture_generation_failed',
-            'client1 与 client2 生成的 update 模板 SHA-256 意外相同')
-
-    return {
-        'model': model,
-        'client1': client1,
-        'client2': client2,
+    results = {
+        'model': generate_model_fixture(dest_dir, size_bytes=size_bytes)
     }
+    shas = set()
+    for node_id in range(1, client_count + 1):
+        role_key = f'client{node_id}'
+        client_fix = generate_client_fixture(dest_dir, node_id, size_bytes=size_bytes)
+        if client_fix['sha256'] in shas:
+            raise FLRuntimeError(
+                'fixture_generation_failed',
+                f'{role_key} 生成的 update 模板 SHA-256 与已有客户端模板意外相同')
+        shas.add(client_fix['sha256'])
+        results[role_key] = client_fix
+
+    return results
 
 
 def verify_fixture_file(path, expected_size=DEFAULT_ARTIFACT_SIZE_BYTES,
@@ -165,8 +162,11 @@ def main(argv=None):
         '--dest-dir', default='/var/lib/wfb-ng/issue41-input',
         help='fixture 输出目录')
     gen_parser.add_argument(
-        '--role', choices=['model', 'client1', 'client2', 'all'],
+        '--role', choices=['model', 'all'] + [f'client{i}' for i in range(1, 11)],
         default='all', help='生成目标角色')
+    gen_parser.add_argument(
+        '--client-count', type=int, default=7,
+        help='生成全部客户端模板时的数量（默认 7）')
     gen_parser.add_argument(
         '--output', default=None,
         help='单个角色生成时的显式输出文件路径')
@@ -186,7 +186,7 @@ def main(argv=None):
 
     if args.subcommand == 'generate':
         if args.role == 'all':
-            results = generate_all_fixtures(args.dest_dir, size_bytes=args.size)
+            results = generate_all_fixtures(args.dest_dir, size_bytes=args.size, client_count=args.client_count)
             for role, info in results.items():
                 print('%s: path=%s size=%d sha256=%s' % (
                     role, info['path'], info['size_bytes'], info['sha256']))
@@ -194,10 +194,9 @@ def main(argv=None):
             dest = args.output or args.dest_dir
             if args.role == 'model':
                 info = generate_model_fixture(dest, size_bytes=args.size)
-            elif args.role == 'client1':
-                info = generate_client_fixture(dest, 1, size_bytes=args.size)
-            elif args.role == 'client2':
-                info = generate_client_fixture(dest, 2, size_bytes=args.size)
+            elif args.role.startswith('client'):
+                node_id = int(args.role.replace('client', ''))
+                info = generate_client_fixture(dest, node_id, size_bytes=args.size)
             print('%s: path=%s size=%d sha256=%s' % (
                 args.role, info['path'], info['size_bytes'], info['sha256']))
         return 0

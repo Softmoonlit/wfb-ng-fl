@@ -31,7 +31,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "-P '$UFTP_PRIVATE_GROUP'",
                 "-p '$UFTP_PORT'",
                 "-U 0x000000ff",
-                "-H 0x00000001,0x00000002",
+                "-H '$uftp_hosts'",
                 "-Y none",
                 "-R 15000",
                 "-S '$status'",
@@ -47,7 +47,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "HTTPConnection(host, port, timeout=120, source_address=(source_ip, 0))",
                 "conn.request('PUT', path, body=body",
                 "'client_address': self.client_address[0]",
-                "if event['client_address'] != expected_addr:",
+                "verify_uplink_cycle(events, c_res, cfg, float(duration_str))",
         ):
             self.assertIn(fragment, self.script)
 
@@ -80,14 +80,11 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 'ROUNDS="${ISSUE41_ROUNDS:-2}"',
                 'INPUT_SIZE_BYTES="${ISSUE41_INPUT_SIZE_BYTES:-$((40 * 1024 * 1024))}"',
-                'update-client1-40mib.bin',
-                'update-client2-40mib.bin',
+                'update-${r}-${INPUT_SIZE_BYTES}b.bin',
                 'required_artifact_size_bytes',
-                'delay="$CLIENT1_TRAINING_DELAY_MS"',
-                'delay="$CLIENT2_TRAINING_DELAY_MS"',
+                'ISSUE41_CLIENT1_TRAINING_DELAY_MS',
+                'ISSUE41_CLIENT2_TRAINING_DELAY_MS',
                 'RUNTIME_TIMEOUT_SECONDS="${ISSUE41_RUNTIME_TIMEOUT_SECONDS:-400}"',
-                'CLIENT1_TRAINING_DELAY_MS="${ISSUE41_CLIENT1_TRAINING_DELAY_MS:-0}"',
-                'CLIENT2_TRAINING_DELAY_MS="${ISSUE41_CLIENT2_TRAINING_DELAY_MS:-0}"',
                 '"live_observation":true',
                 '"observation_path":"$work_dir/observation.jsonl"',
                 'issue41_build_summary.py',
@@ -109,7 +106,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 'assert_runtime_uftp_route server "$SERVER_TUN"',
                 'for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"',
-                'for role in client1 client2',
+                'for role in "${CLIENT_ROLES[@]}"',
                 'ip route show "$group/32"',
                 '*"$group dev $tun"*)',
                 'ip route get "$group" from "$source_ip"',
@@ -121,8 +118,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 'configure_runtime_monitors',
                 'server 空口网卡未进入 monitor 模式',
-                'client1 空口网卡 monitor/UP 验证失败',
-                'client2 空口网卡 monitor/UP 验证失败',
+                '$role 空口网卡 monitor/UP 验证失败',
                 'formal_runtime_loop/server/radio-health'):
             self.assertIn(fragment, self.script)
 
@@ -142,13 +138,11 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 'issue41_gate.py" verify-config-equivalence',
                 '--server-fl /etc/wfb-ng/issue41/fl-server.json',
-                '--client1-fl /tmp/issue41-fl-client1.json',
-                '--client2-fl /tmp/issue41-fl-client2.json',
                 'config_equivalence.json',
                 '角色服务解析后配置与数据面 Gate 不等价',
-                '执行三角色服务受控停止',
+                '执行各角色服务受控停止',
                 'controlled_stop.json',
-                '三角色服务受控停止完成'):
+                '各角色服务受控停止完成'):
             self.assertIn(fragment, self.script)
 
     def test_formal_runtime_fixed_deadline_loop(self):
@@ -237,8 +231,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         for fragment in (
                 'issue41_lifecycle.py" run "$ARCHIVE_DIR"',
                 '--server-tun "$SERVER_TUN"',
-                '--client1-tun "$(client_tun client1)"',
-                '--client2-tun "$(client_tun client2)"',
+                '--client-tuns',
                 "lifecycle_path = os.path.join(archive_dir, 'lifecycle', 'lifecycle_summary.json')",
                 "'lifecycle': lifecycle_data",
                 "lifecycle_data.get('status') == 'passed'"):

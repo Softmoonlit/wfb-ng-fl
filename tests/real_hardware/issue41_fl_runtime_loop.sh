@@ -12,6 +12,7 @@ ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
 REMOTE_REPO="${ISSUE41_REMOTE_REPO:-/home/virt/projects/wfb-ng-fl}"
+read -r -a CLIENT_ROLES <<< "${ISSUE41_CLIENT_ROLES:-client1 client2 client3 client4 client5 client6 client7}"
 CLIENT1_SSH="${ISSUE41_CLIENT1_SSH:-vm1}"
 CLIENT2_SSH="${ISSUE41_CLIENT2_SSH:-vm2}"
 SERVER_TUN="${ISSUE41_SERVER_TUN:-v8i41s0}"
@@ -112,6 +113,29 @@ init_envelope() {
     if [ "$SMOKE_IO_TIMEOUT_SECONDS" -gt 120 ]; then
         die "formal 验收严格要求 SMOKE_IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
     fi
+    local training_delays_json=""
+    local client_templates_json=""
+    local client_tuns_json=""
+    local first=1
+    for r in "${CLIENT_ROLES[@]}"; do
+        local nid="${r#client}"
+        local d_var="ISSUE41_${r^^}_TRAINING_DELAY_MS"
+        local d_val="${!d_var:-0}"
+        local t_var="ISSUE41_${r^^}_UPDATE_TEMPLATE_PATH"
+        local t_val="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${r}-${INPUT_SIZE_BYTES}b.bin}"
+        local tun_name="$(client_tun "$r")"
+        local tun_addr="$(client_addr "$r")"
+        if [ "$first" -eq 1 ]; then
+            first=0
+        else
+            training_delays_json+=", "
+            client_templates_json+=", "
+            client_tuns_json+=", "
+        fi
+        training_delays_json+="\"$nid\": $d_val"
+        client_templates_json+="\"${r}_update_template_path\": \"$t_val\""
+        client_tuns_json+="\"${r}_tun\": \"$tun_name\", \"${r}_tun_addr\": \"$tun_addr\""
+    done
     local cfg_tmp
     cfg_tmp="$(mktemp)"
     cat > "$cfg_tmp" <<EOF
@@ -128,11 +152,8 @@ init_envelope() {
   "radio_mcs_index": $RADIO_MCS_INDEX,
   "radio_short_gi": $RADIO_SHORT_GI,
   "server_tun": "$SERVER_TUN",
-  "client1_tun": "$CLIENT1_TUN",
-  "client2_tun": "$CLIENT2_TUN",
   "server_tun_addr": "$SERVER_TUN_ADDR",
-  "client1_tun_addr": "$CLIENT1_TUN_ADDR",
-  "client2_tun_addr": "$CLIENT2_TUN_ADDR",
+  $client_tuns_json,
   "uftp_group": "$UFTP_GROUP",
   "uftp_private_group": "$UFTP_PRIVATE_GROUP",
   "uftp_port": $UFTP_PORT,
@@ -156,12 +177,10 @@ init_envelope() {
   "rounds": $ROUNDS,
   "artifact_size_bytes": $INPUT_SIZE_BYTES,
   "training_delay_ms_by_node": {
-    "1": $CLIENT1_TRAINING_DELAY_MS,
-    "2": $CLIENT2_TRAINING_DELAY_MS
+    $training_delays_json
   },
   "initial_model_path": "$INITIAL_MODEL_PATH",
-  "client1_update_template_path": "$CLIENT1_UPDATE_TEMPLATE_PATH",
-  "client2_update_template_path": "$CLIENT2_UPDATE_TEMPLATE_PATH"
+  $client_templates_json
 }
 EOF
     python3 "$SCRIPT_DIR/issue41_envelope.py" init \
@@ -209,19 +228,24 @@ EOF
 }
 
 client_ssh() {
-    case "$1" in
-        client1) printf '%s\n' "$CLIENT1_SSH" ;;
-        client2) printf '%s\n' "$CLIENT2_SSH" ;;
-        *) die "未知 client：$1" ;;
-    esac
+    local role="$1"
+    local num="${role#client}"
+    local var_name="ISSUE41_CLIENT${num}_SSH"
+    printf '%s\n' "${!var_name:-vm${num}}"
 }
 
 client_tun() {
-    case "$1" in client1) printf '%s\n' "$CLIENT1_TUN" ;; client2) printf '%s\n' "$CLIENT2_TUN" ;; esac
+    local role="$1"
+    local num="${role#client}"
+    local var_name="ISSUE41_CLIENT${num}_TUN"
+    printf '%s\n' "${!var_name:-v8i41c${num}}"
 }
 
 client_addr() {
-    case "$1" in client1) printf '%s\n' "$CLIENT1_TUN_ADDR" ;; client2) printf '%s\n' "$CLIENT2_TUN_ADDR" ;; esac
+    local role="$1"
+    local num="${role#client}"
+    local var_name="ISSUE41_CLIENT${num}_TUN_ADDR"
+    printf '%s\n' "${!var_name:-10.80.0.$((10 + num))/24}"
 }
 
 client_ip() { client_addr "$1" | cut -d/ -f1; }
@@ -258,7 +282,7 @@ cmd_sync_remotes() {
     git -C "$PROJECT_ROOT" fetch origin "$BRANCH"
     origin_head="$(git -C "$PROJECT_ROOT" rev-parse "origin/$BRANCH")"
     [ "$head" = "$origin_head" ] || die "本机 HEAD 与 origin/$BRANCH 不一致，拒绝同步远端"
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         dirty="$(remote "$role" "cd '$REMOTE_REPO' && git status --short")"
         if [ -n "$dirty" ] && [ "${ISSUE41_FORCE_REMOTE_RESET:-0}" != "1" ]; then
             die "$role 工作区不干净；需 ISSUE41_FORCE_REMOTE_RESET=1 才允许 reset"
@@ -344,7 +368,7 @@ cmd_preflight() {
     local_dirty="$(git -C "$PROJECT_ROOT" status --short)"
     [ -z "$local_dirty" ] || record_preflight_failure "repo_and_version" "implementation" "server 工作区不干净，拒绝继续：$local_dirty" "$last_successful"
     head="$(git -C "$PROJECT_ROOT" rev-parse HEAD)"
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote_head="$(remote "$role" "cd '$REMOTE_REPO' && git rev-parse HEAD" 2>/dev/null || echo '')"
         [ "$remote_head" = "$head" ] || record_preflight_failure "repo_and_version" "implementation" "$role commit 与本机不一致：$remote_head != $head" "$last_successful"
         remote_status="$(remote "$role" "cd '$REMOTE_REPO' && git status --short" 2>/dev/null || echo '')"
@@ -354,7 +378,7 @@ cmd_preflight() {
     last_successful="repo_and_version"
 
     # Layer 2: ssh_and_sudo
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "true" >/dev/null 2>&1 || record_preflight_failure "ssh_and_sudo" "environment" "SSH 到 $role 失败" "$last_successful"
         remote "$role" "sudo -n true" >/dev/null 2>&1 || record_preflight_failure "ssh_and_sudo" "environment" "$role sudo -n true 失败" "$last_successful"
     done
@@ -365,27 +389,27 @@ cmd_preflight() {
     for name in ip iw systemctl journalctl make python3 uftp uftpd; do
         command -v "$name" >/dev/null 2>&1 || record_preflight_failure "dependencies" "tooling" "本机缺少命令：$name" "$last_successful"
     done
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "command -v ip iw systemctl journalctl make python3 uftp uftpd >/dev/null" || record_preflight_failure "dependencies" "tooling" "$role 缺少命令依赖" "$last_successful"
     done
     [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
         record_preflight_failure "dependencies" "tooling" "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH" "$last_successful"
     [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
         record_preflight_failure "dependencies" "tooling" "server 初始模型必须恰好为 4 MiB：$INITIAL_MODEL_PATH" "$last_successful"
-    local update_template_path client1_template_sha256 client2_template_sha256
-    for role in client1 client2; do
-        case "$role" in
-            client1) update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH" ;;
-            client2) update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH" ;;
-        esac
+    local template_shas=()
+    for role in "${CLIENT_ROLES[@]}"; do
+        local nid="${role#client}"
+        local t_var="ISSUE41_${role^^}_UPDATE_TEMPLATE_PATH"
+        local update_template_path="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${role}-${INPUT_SIZE_BYTES}b.bin}"
         remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || record_preflight_failure "dependencies" "tooling" "$role update 模板必须是可读取的 4 MiB 普通文件：$update_template_path" "$last_successful"
-        case "$role" in
-            client1) client1_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
-            client2) client2_template_sha256="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")" ;;
-        esac
+        local t_sha
+        t_sha="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")"
+        template_shas+=("$t_sha")
         log_ok "$role preflight 基础检查通过"
     done
-    [ "$client1_template_sha256" != "$client2_template_sha256" ] || record_preflight_failure "dependencies" "tooling" "两个 client 的 4 MiB update 模板 SHA-256 必须不同" "$last_successful"
+    local unique_shas
+    unique_shas=$(printf '%s\n' "${template_shas[@]}" | sort -u | wc -l)
+    [ "$unique_shas" -eq "${#template_shas[@]}" ] || record_preflight_failure "dependencies" "tooling" "所有 client 的 4 MiB update 模板 SHA-256 必须两两不同" "$last_successful"
     last_successful="dependencies"
 
     # Layer 4: wireless_usb & 重新发现拓扑
@@ -396,7 +420,7 @@ cmd_preflight() {
     capture_local_radio_health server "$ifaces"
     check_radio_usb_speed server
     local remote_ifaces remote_iface_count
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote_ifaces="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         remote_iface_count="$(printf '%s\n' "$remote_ifaces" | grep -c '^wlx' || true)"
         [ "$remote_iface_count" -eq 1 ] || record_preflight_failure "wireless_usb" "environment" "$role 必须恰好发现一个 wlx* 网卡" "$last_successful"
@@ -413,7 +437,7 @@ cmd_preflight() {
         if ss -tuln 2>/dev/null | grep -qE ":${port}\b"; then
             record_preflight_failure "network_ports_and_tun" "environment" "server 端口 $port 已被占用" "$last_successful"
         fi
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             if remote "$role" "ss -tuln 2>/dev/null" | grep -qE ":${port}\b"; then
                 record_preflight_failure "network_ports_and_tun" "environment" "$role 端口 $port 已被占用" "$last_successful"
             fi
@@ -422,7 +446,7 @@ cmd_preflight() {
     if [ -e "/sys/class/net/$SERVER_TUN" ]; then
         record_preflight_failure "network_ports_and_tun" "environment" "server 上预期的 TUN 设备 $SERVER_TUN 已存在" "$last_successful"
     fi
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         local tun
         tun="$(client_tun "$role")"
         if remote "$role" "[ -e '/sys/class/net/$tun' ]"; then
@@ -435,7 +459,7 @@ cmd_preflight() {
     if pgrep -x wfb-fl-server >/dev/null 2>&1 || pgrep -x wfb_v6_uplink >/dev/null 2>&1 || pgrep -x uftp >/dev/null 2>&1 || pgrep -x uftpd >/dev/null 2>&1; then
         record_preflight_failure "residual_processes" "environment" "server 发现残留 issue41 进程" "$last_successful"
     fi
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         if remote "$role" "pgrep -x wfb-fl-client >/dev/null 2>&1 || pgrep -x wfb_v6_uplink >/dev/null 2>&1 || pgrep -x uftp >/dev/null 2>&1 || pgrep -x uftpd >/dev/null 2>&1"; then
             record_preflight_failure "residual_processes" "environment" "$role 发现残留 issue41 进程" "$last_successful"
         fi
@@ -443,12 +467,17 @@ cmd_preflight() {
     last_successful="residual_processes"
 
     # Layer 8: managed_directory_boundary
-    if runtime_state_exists_local || runtime_state_exists_remote client1 || runtime_state_exists_remote client2; then
+    local has_runtime_state=0
+    runtime_state_exists_local && has_runtime_state=1
+    for role in "${CLIENT_ROLES[@]}"; do
+        runtime_state_exists_remote "$role" && has_runtime_state=1
+    done
+    if [ "$has_runtime_state" -eq 1 ]; then
         if [ "$RESET_RUNTIME_STATE" != "1" ]; then
             record_preflight_failure "managed_directory_boundary" "tooling" "检测到上次 Runtime 现场；默认拒绝复用，请先执行 clean，或设置 ISSUE41_RESET_RUNTIME_STATE=1" "$last_successful"
         fi
         sudo rm -rf /var/lib/wfb-ng/issue41/server
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
         done
         log_warn "已按 ISSUE41_RESET_RUNTIME_STATE=1 清理旧 Runtime work_dir"
@@ -467,18 +496,20 @@ cmd_generate_fixtures() {
     python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir "$(dirname "$INITIAL_MODEL_PATH")" --role model --output "$INITIAL_MODEL_PATH" --size "$INPUT_SIZE_BYTES"
     log_ok "server 初始模型生成完成：$INITIAL_MODEL_PATH"
 
-    remote client1 "sudo install -d -m 0777 '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' && cd '$REMOTE_REPO' && python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT1_UPDATE_TEMPLATE_PATH")' --role client1 --output '$CLIENT1_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
-    log_ok "client1 update 模板生成完成：$CLIENT1_UPDATE_TEMPLATE_PATH"
-
-    remote client2 "sudo install -d -m 0777 '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' && cd '$REMOTE_REPO' && python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$CLIENT2_UPDATE_TEMPLATE_PATH")' --role client2 --output '$CLIENT2_UPDATE_TEMPLATE_PATH' --size '$INPUT_SIZE_BYTES'"
-    log_ok "client2 update 模板生成完成：$CLIENT2_UPDATE_TEMPLATE_PATH"
+    for role in "${CLIENT_ROLES[@]}"; do
+        local nid="${role#client}"
+        local t_var="ISSUE41_${role^^}_UPDATE_TEMPLATE_PATH"
+        local update_template_path="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${role}-${INPUT_SIZE_BYTES}b.bin}"
+        remote "$role" "sudo install -d -m 0777 '$(dirname "$update_template_path")' && cd '$REMOTE_REPO' && python3 -m wfb_ng.fl.issue41_fixtures generate --dest-dir '$(dirname "$update_template_path")' --role '$role' --output '$update_template_path' --size '$INPUT_SIZE_BYTES'"
+        log_ok "$role update 模板生成完成：$update_template_path"
+    done
 }
 
 cmd_install() {
     make -C "$PROJECT_ROOT" build_v6
     sudo make -C "$PROJECT_ROOT" install_v8
     sudo systemctl daemon-reload
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "cd '$REMOTE_REPO' && make build_v6 && sudo make install_v8 && sudo systemctl daemon-reload"
         log_ok "$role 安装完成"
     done
@@ -487,31 +518,52 @@ cmd_install() {
 
 write_issue41_configs() {
     local role="$1" node_id tun addr work_dir algorithm result delay update_template_path ssh_target iface
-    case "$role" in
-        server)
-            node_id=255; tun="$SERVER_TUN"; addr="$SERVER_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/server
-            algorithm=wfb_ng.fl.issue41_algorithm:server_main; result="$work_dir/issue41-server-result.json"
-            ;;
-        client1)
-            node_id=1; tun="$CLIENT1_TUN"; addr="$CLIENT1_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client1-result.json"; delay="$CLIENT1_TRAINING_DELAY_MS"; update_template_path="$CLIENT1_UPDATE_TEMPLATE_PATH"
-            ;;
-        client2)
-            node_id=2; tun="$CLIENT2_TUN"; addr="$CLIENT2_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/client
-            algorithm=wfb_ng.fl.issue41_algorithm:client_main; result="$work_dir/issue41-client2-result.json"; delay="$CLIENT2_TRAINING_DELAY_MS"; update_template_path="$CLIENT2_UPDATE_TEMPLATE_PATH"
-            ;;
-    esac
+    if [ "$role" = server ]; then
+        node_id=255; tun="$SERVER_TUN"; addr="$SERVER_TUN_ADDR"; work_dir=/var/lib/wfb-ng/issue41/server
+        algorithm=wfb_ng.fl.issue41_algorithm:server_main; result="$work_dir/issue41-server-result.json"
+    else
+        node_id="${role#client}"
+        tun="$(client_tun "$role")"
+        addr="$(client_addr "$role")"
+        work_dir=/var/lib/wfb-ng/issue41/client
+        algorithm=wfb_ng.fl.issue41_algorithm:client_main
+        result="$work_dir/issue41-${role}-result.json"
+        local d_var="ISSUE41_${role^^}_TRAINING_DELAY_MS"
+        delay="${!d_var:-0}"
+        local t_var="ISSUE41_${role^^}_UPDATE_TEMPLATE_PATH"
+        update_template_path="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${role}-${INPUT_SIZE_BYTES}b.bin}"
+    fi
     local tmp short_gi_json=""
     if [ "$RADIO_SHORT_GI" = "1" ]; then
         short_gi_json=',"--radio-short-gi"'
     fi
     tmp="$(mktemp -d)"
     if [ "$role" = server ]; then
+        local participant_ids=""
+        local known_clients=""
+        local client_targets=()
+        local first=1
+        for r in "${CLIENT_ROLES[@]}"; do
+            local nid="${r#client}"
+            if [ "$first" -eq 1 ]; then
+                first=0
+                participant_ids="$nid"
+                known_clients="$nid"
+            else
+                participant_ids="$participant_ids,$nid"
+                known_clients="$known_clients,$nid"
+            fi
+            client_targets+=(--client-target "$nid:$(client_ip "$r"):127.0.0.1:1")
+        done
+        local client_targets_json=""
+        for ct in "${client_targets[@]}"; do
+            client_targets_json+=',"--client-target","'"$ct"'"'
+        done
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[1,2],"participant_uftp_uids":[1,2],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","1,2","--client-target","1:$(client_ip client1):127.0.0.1:1","--client-target","2:$(client_ip client2):127.0.0.1:1","--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[$participant_ids],"participant_uftp_uids":[$participant_ids],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","$known_clients"$client_targets_json,"--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
-{"rounds":$ROUNDS,"participant_node_ids":[1,2],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
+{"rounds":$ROUNDS,"participant_node_ids":[$participant_ids],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
 EOF
         sudo install -d /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-server.service.d
         sudo install -m 0644 "$tmp/fl.json" /etc/wfb-ng/issue41/fl-server.json
@@ -551,15 +603,17 @@ cmd_verify_config_equivalence() {
     log_info "执行角色服务与数据面 Gate 严格链路配置等价性比较..."
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
     write_issue41_configs server
-    write_issue41_configs client1
-    write_issue41_configs client2
+    local client_fl_args=()
+    for role in "${CLIENT_ROLES[@]}"; do
+        write_issue41_configs "$role"
+        client_fl_args+=(--client-fls "$role:/tmp/issue41-fl-${role}.json")
+    done
 
     export_rf_gate_env
 
     python3 "$SCRIPT_DIR/issue41_gate.py" verify-config-equivalence \
         --server-fl /etc/wfb-ng/issue41/fl-server.json \
-        --client1-fl /tmp/issue41-fl-client1.json \
-        --client2-fl /tmp/issue41-fl-client2.json \
+        "${client_fl_args[@]}" \
         --out "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" || {
             record_stage_failure "formal_runtime_loop" "implementation" "角色服务解析后配置与数据面 Gate 不等价" "pre_runtime_smoke"
             die "角色服务解析后配置与数据面 Gate 不等价"
@@ -653,7 +707,7 @@ assert_runtime_uftp_routes() {
     local role tun source_ip group
     for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
         assert_runtime_uftp_route server "$SERVER_TUN" "${SERVER_TUN_ADDR%/*}" "$group"
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             tun="$(client_tun "$role")"
             source_ip="$(client_ip "$role")"
             assert_runtime_uftp_route "$role" "$tun" "$source_ip" "$group"
@@ -664,43 +718,50 @@ assert_runtime_uftp_routes() {
 wait_runtime_results() {
     local start_time=$SECONDS
     local overall_deadline=$((start_time + RUNTIME_TIMEOUT_SECONDS))
-    local server_done=0 c1_done=0 c2_done=0
     local s_path="/var/lib/wfb-ng/issue41/server/issue41-server-result.json"
-    local c1_path="/var/lib/wfb-ng/issue41/client/issue41-client1-result.json"
-    local c2_path="/var/lib/wfb-ng/issue41/client/issue41-client2-result.json"
 
     while [ "$SECONDS" -lt "$overall_deadline" ]; do
-        if [ "$server_done" -eq 0 ] && [ -f "$s_path" ]; then
+        local server_done=0
+        if [ -f "$s_path" ]; then
             if sudo python3 -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)" "$s_path" 2>/dev/null; then
                 server_done=1
             fi
         fi
-        if [ "$c1_done" -eq 0 ]; then
-            if remote client1 "[ -f '$c1_path' ] && sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$c1_path'" 2>/dev/null; then
-                c1_done=1
+        local all_clients_done=1
+        for role in "${CLIENT_ROLES[@]}"; do
+            local c_path="/var/lib/wfb-ng/issue41/client/issue41-${role}-result.json"
+            if ! remote "$role" "[ -f '$c_path' ] && sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$c_path'" 2>/dev/null; then
+                all_clients_done=0
+                break
             fi
-        fi
-        if [ "$c2_done" -eq 0 ]; then
-            if remote client2 "[ -f '$c2_path' ] && sudo python3 -c \"import json, sys; sys.exit(0 if json.load(open(sys.argv[1], encoding='utf-8')).get('conclusion') == 'succeeded' else 1)\" '$c2_path'" 2>/dev/null; then
-                c2_done=1
-            fi
-        fi
-        if [ "$server_done" -eq 1 ] && [ "$c1_done" -eq 1 ] && [ "$c2_done" -eq 1 ]; then
+        done
+        if [ "$server_done" -eq 1 ] && [ "$all_clients_done" -eq 1 ]; then
             local duration=$((SECONDS - start_time))
             log_ok "Runtime 作业在 ${duration}s 内全部成功（固定 deadline: ${RUNTIME_TIMEOUT_SECONDS}s）"
             return 0
         fi
         sleep 0.5
     done
-    die "Runtime 作业超过固定整体 deadline (${RUNTIME_TIMEOUT_SECONDS}s) 未完成: server=$server_done client1=$c1_done client2=$c2_done"
+    die "Runtime 作业超过固定整体 deadline (${RUNTIME_TIMEOUT_SECONDS}s) 未完成"
 }
 
 write_smoke_marker() {
     local name="$1" marker_dir
     marker_dir="$(smoke_archive_dir "$name")"
     mkdir -p "$marker_dir"
+    local client_tuns_json=""
+    local first=1
+    for r in "${CLIENT_ROLES[@]}"; do
+        local ct="$(client_tun "$r")"
+        if [ "$first" -eq 1 ]; then
+            first=0
+            client_tuns_json="\"$ct\""
+        else
+            client_tuns_json="$client_tuns_json,\"$ct\""
+        fi
+    done
     cat > "$marker_dir/passed.json" <<EOF
-{"schema_version":1,"smoke":"$name","gate_type":"three_cycle_bidirectional","status":"passed","run_id":"$RUN_ID","data_plane":"10.80.0.0/24","server_tun":"$SERVER_TUN","client_tuns":["$CLIENT1_TUN","$CLIENT2_TUN"]}
+{"schema_version":1,"smoke":"$name","gate_type":"three_cycle_bidirectional","status":"passed","run_id":"$RUN_ID","data_plane":"10.80.0.0/24","server_tun":"$SERVER_TUN","client_tuns":[$client_tuns_json]}
 EOF
     cp -f "$marker_dir/passed.json" "$ARCHIVE_DIR/pre_runtime_smoke/passed.json" 2>/dev/null || true
 }
@@ -727,73 +788,97 @@ configure_remote_monitor() {
 }
 
 configure_runtime_monitors() {
-    local server_iface client1_iface client2_iface server_archive client1_archive client2_archive
+    local server_iface server_archive
     server_iface="$(find_wlx)"
-    client1_iface="$(remote client1 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
-    client2_iface="$(remote client2 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
     [ "$(printf '%s\n' "$server_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "server 必须恰好发现一个 wlx* 网卡"
-    [ "$(printf '%s\n' "$client1_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client1 必须恰好发现一个 wlx* 网卡"
-    [ "$(printf '%s\n' "$client2_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client2 必须恰好发现一个 wlx* 网卡"
-
     server_archive="$ARCHIVE_DIR/formal_runtime_loop/server/radio-health"
-    client1_archive="$ARCHIVE_DIR/formal_runtime_loop/client1/radio-health"
-    client2_archive="$ARCHIVE_DIR/formal_runtime_loop/client2/radio-health"
-    mkdir -p "$server_archive" "$client1_archive" "$client2_archive"
-    remote client1 "rm -rf /tmp/issue41-runtime-radio; mkdir -p /tmp/issue41-runtime-radio"
-    remote client2 "rm -rf /tmp/issue41-runtime-radio; mkdir -p /tmp/issue41-runtime-radio"
-
+    mkdir -p "$server_archive"
     configure_local_monitor "$server_iface" "$server_archive"
-    configure_remote_monitor client1 "$client1_iface" /tmp/issue41-runtime-radio
-    configure_remote_monitor client2 "$client2_iface" /tmp/issue41-runtime-radio
-
     iw dev "$server_iface" info | grep -q 'type monitor' || die "server 空口网卡未进入 monitor 模式"
     ip link show "$server_iface" | grep -q '<[^>]*UP' || die "server 空口网卡未启动"
-    remote client1 "iw dev '$client1_iface' info | grep -q 'type monitor' && ip link show '$client1_iface' | grep -q '<[^>]*UP'" || die "client1 空口网卡 monitor/UP 验证失败"
-    remote client2 "iw dev '$client2_iface' info | grep -q 'type monitor' && ip link show '$client2_iface' | grep -q '<[^>]*UP'" || die "client2 空口网卡 monitor/UP 验证失败"
-
     capture_local_radio_health server "$server_iface" "$server_archive"
-    capture_remote_radio_health client1 "$client1_iface" "$client1_archive"
-    capture_remote_radio_health client2 "$client2_iface" "$client2_archive"
+
+    for role in "${CLIENT_ROLES[@]}"; do
+        local client_iface client_archive
+        client_iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+        [ "$(printf '%s\n' "$client_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
+        client_archive="$ARCHIVE_DIR/formal_runtime_loop/$role/radio-health"
+        mkdir -p "$client_archive"
+        remote "$role" "rm -rf /tmp/issue41-runtime-radio; mkdir -p /tmp/issue41-runtime-radio"
+        configure_remote_monitor "$role" "$client_iface" /tmp/issue41-runtime-radio
+        remote "$role" "iw dev '$client_iface' info | grep -q 'type monitor' && ip link show '$client_iface' | grep -q '<[^>]*UP'" || die "$role 空口网卡 monitor/UP 验证失败"
+        capture_remote_radio_health "$role" "$client_iface" "$client_archive"
+    done
 }
 
 start_smoke_wfb() {
-    local name="$1" server_dir client1_dir client2_dir server_iface client1_iface client2_iface short_gi
+    local name="$1" server_dir server_iface short_gi
     server_dir="$(smoke_dir "$name")/server"
-    client1_dir="$(smoke_dir "$name")/client1"
-    client2_dir="$(smoke_dir "$name")/client2"
     cmd_stop_all
     sudo rm -rf "$(smoke_dir "$name")"
     sudo install -d "$server_dir"
     sudo chown "$(id -u):$(id -g)" "$server_dir"
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "sudo rm -rf '$(smoke_dir "$name")' && sudo install -d '$(smoke_dir "$name")/$role' && sudo chown \$(id -u):\$(id -g) '$(smoke_dir "$name")/$role'"
     done
     server_iface="$(find_wlx)"
     [ "$(printf '%s\n' "$server_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "本机必须恰好发现一个 wlx* 网卡"
-    client1_iface="$(remote client1 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
-    client2_iface="$(remote client2 "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
-    [ "$(printf '%s\n' "$client1_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client1 必须恰好发现一个 wlx* 网卡"
-    [ "$(printf '%s\n' "$client2_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "client2 必须恰好发现一个 wlx* 网卡"
     configure_local_monitor "$server_iface" "$server_dir"
-    configure_remote_monitor client1 "$client1_iface" "$client1_dir"
-    configure_remote_monitor client2 "$client2_iface" "$client2_dir"
+
+    local participant_ids=""
+    local known_clients=""
+    local client_targets=()
+    local first=1
+    for role in "${CLIENT_ROLES[@]}"; do
+        local client_iface client_dir
+        client_dir="$(smoke_dir "$name")/$role"
+        client_iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+        [ "$(printf '%s\n' "$client_iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
+        configure_remote_monitor "$role" "$client_iface" "$client_dir"
+        capture_remote_radio_health "$role" "$client_iface" "$(smoke_archive_dir "$name")/$role/radio-health"
+
+        local nid="${role#client}"
+        if [ "$first" -eq 1 ]; then
+            first=0
+            participant_ids="$nid"
+            known_clients="$nid"
+        else
+            participant_ids="$participant_ids,$nid"
+            known_clients="$known_clients,$nid"
+        fi
+        client_targets+=(--client-target "$nid:$(client_ip "$role"):127.0.0.1:1")
+    done
     capture_local_radio_health server "$server_iface" "$(smoke_archive_dir "$name")/server/radio-health"
-    capture_remote_radio_health client1 "$client1_iface" "$(smoke_archive_dir "$name")/client1/radio-health"
-    capture_remote_radio_health client2 "$client2_iface" "$(smoke_archive_dir "$name")/client2/radio-health"
     short_gi="$(issue41_wfb_short_gi_arg)"
 
-    sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '1,2' --client-target '1:$(client_ip client1):127.0.0.1:1' --client-target '2:$(client_ip client2):127.0.0.1:1' --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --feedback-window-period-ms '$FEEDBACK_WINDOW_PERIOD_MS' --feedback-window-duration-ms '$FEEDBACK_WINDOW_DURATION_MS' --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
-    remote client1 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT1_TUN' --tun-addr '$CLIENT1_TUN_ADDR' --node-id 1 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client1_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client1_dir/client1_queue_summary.json' --log-interval 200 < /dev/null > '$client1_dir/wfb.log' 2>&1 & echo \\\$! > '$client1_dir/wfb.pid'; exit 0\""
-    remote client2 "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$CLIENT2_TUN' --tun-addr '$CLIENT2_TUN_ADDR' --node-id 2 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client2_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client2_dir/client2_queue_summary.json' --log-interval 200 < /dev/null > '$client2_dir/wfb.log' 2>&1 & echo \\\$! > '$client2_dir/wfb.pid'; exit 0\""
+    local ct_args=""
+    for ct in "${client_targets[@]}"; do
+        ct_args="$ct_args '$ct'"
+    done
+
+    sudo bash -c "cd '$PROJECT_ROOT' || exit 1; nohup '$PROJECT_ROOT/wfb_v6_uplink' --role server --tun-name '$SERVER_TUN' --tun-addr '$SERVER_TUN_ADDR' --node-id 255 --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$server_iface' --known-clients '$known_clients' $ct_args --grant-duration-ms 120 --guard-interval-ms 20 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 --feedback-window-period-ms '$FEEDBACK_WINDOW_PERIOD_MS' --feedback-window-duration-ms '$FEEDBACK_WINDOW_DURATION_MS' --queue-summary-file '$server_dir/server_queue_summary.json' --log-interval 200 < /dev/null > '$server_dir/wfb.log' 2>&1 & echo \$! > '$server_dir/wfb.pid'; exit 0"
+
+    for role in "${CLIENT_ROLES[@]}"; do
+        local nid="${role#client}"
+        local tun="$(client_tun "$role")"
+        local addr="$(client_addr "$role")"
+        local client_dir="$(smoke_dir "$name")/$role"
+        local client_iface
+        client_iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
+        remote "$role" "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$tun' --tun-addr '$addr' --node-id $nid --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$RADIO_MCS_INDEX' $short_gi --air-interface '$client_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client_dir/${role}_queue_summary.json' --log-interval 200 < /dev/null > '$client_dir/wfb.log' 2>&1 & echo \\\$! > '$client_dir/wfb.pid'; exit 0\""
+    done
 
     wait_local_tun "$SERVER_TUN" || die "server smoke TUN 未出现：$SERVER_TUN"
-    wait_remote_tun client1 "$CLIENT1_TUN" || die "client1 smoke TUN 未出现：$CLIENT1_TUN"
-    wait_remote_tun client2 "$CLIENT2_TUN" || die "client2 smoke TUN 未出现：$CLIENT2_TUN"
+    for role in "${CLIENT_ROLES[@]}"; do
+        wait_remote_tun "$role" "$(client_tun "$role")" || die "$role smoke TUN 未出现：$(client_tun "$role")"
+    done
+
     local group
     for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
         sudo ip route replace "$group/32" dev "$SERVER_TUN"
-        remote client1 "sudo ip route replace '$group/32' dev '$CLIENT1_TUN'"
-        remote client2 "sudo ip route replace '$group/32' dev '$CLIENT2_TUN'"
+        for role in "${CLIENT_ROLES[@]}"; do
+            remote "$role" "sudo ip route replace '$group/32' dev '$(client_tun "$role")'"
+        done
     done
 }
 
@@ -801,12 +886,13 @@ collect_smoke_evidence() {
     local name="$1" archive smoke_root
     archive="$(smoke_archive_dir "$name")"
     smoke_root="$(smoke_dir "$name")"
-    mkdir -p "$archive/server" "$archive/client1" "$archive/client2"
+    mkdir -p "$archive/server"
     sudo tar -C "$smoke_root/server" -czf /tmp/issue41-smoke-server.tgz . 2>/dev/null || true
     if [ -f /tmp/issue41-smoke-server.tgz ]; then
         tar -C "$archive/server" -xzf /tmp/issue41-smoke-server.tgz || true
     fi
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
+        mkdir -p "$archive/$role"
         remote "$role" "sudo tar -C '$smoke_root/$role' -czf /tmp/issue41-smoke-$role.tgz . 2>/dev/null || true"
         if scp -q "$(client_ssh "$role"):/tmp/issue41-smoke-$role.tgz" "$archive/$role/$role.tgz" 2>/dev/null; then
             tar -C "$archive/$role" -xzf "$archive/$role/$role.tgz" || true
@@ -892,7 +978,7 @@ verify_no_smoke_orphans() {
     if [ -f "$http_pid_file" ] && kill -0 "$(cat "$http_pid_file")" 2>/dev/null; then
         die "本机发现 HTTP smoke receiver 孤儿进程"
     fi
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null"
     done
 }
@@ -901,9 +987,11 @@ start_smoke_gate_environment() {
     local name=gate
     start_smoke_wfb "$name"
 
-    # 启动 client1 和 client2 的 uftpd 接收端
-    for role in client1 client2; do
-        remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/inbox' '$(smoke_dir "$name")/$role/tmp'; sudo bash -c \"nohup uftpd -d -q -I '$(client_ip "$role")' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U '0x0000000${role#client}' -D '$(smoke_dir "$name")/$role/inbox' -T '$(smoke_dir "$name")/$role/tmp' -F '$(smoke_dir "$name")/$role/uftpd.status' > '$(smoke_dir "$name")/$role/uftpd.log' 2>&1 & echo \\\$! > '$(smoke_dir "$name")/$role/uftpd.pid'\""
+    # 启动各 client 的 uftpd 接收端
+    for role in "${CLIENT_ROLES[@]}"; do
+        local nid="${role#client}"
+        local hex_uid=$(printf '0x%08x' "$nid")
+        remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/inbox' '$(smoke_dir "$name")/$role/tmp'; sudo bash -c \"nohup uftpd -d -q -I '$(client_ip "$role")' -M '$UFTP_GROUP' -p '$UFTP_PORT' -U '$hex_uid' -D '$(smoke_dir "$name")/$role/inbox' -T '$(smoke_dir "$name")/$role/tmp' -F '$(smoke_dir "$name")/$role/uftpd.status' > '$(smoke_dir "$name")/$role/uftpd.log' 2>&1 & echo \\\$! > '$(smoke_dir "$name")/$role/uftpd.pid'\""
     done
 
     # 启动 server 端 HTTP PUT receiver
@@ -927,7 +1015,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_PUT(self):
         t0 = time.monotonic()
         client_ip = self.client_address[0]
-        node_id = 1 if client_ip.endswith('.11') else (2 if client_ip.endswith('.12') else 1)
+        parts = client_ip.split('.')
+        node_id = int(parts[3]) - 10 if (len(parts) == 4 and parts[0] == '10' and parts[1] == '80' and parts[2] == '0' and 11 <= int(parts[3]) <= 20) else 1
         with lock:
             active_uploads.add(node_id)
             append_event({'type': 'active_set', 'active_uploads': sorted(list(active_uploads))})
@@ -981,26 +1070,33 @@ PY
     for _ in $(seq 1 50); do [ -f "$server_dir/http-server-ready" ] && break; sleep 0.1; done
     [ -f "$server_dir/http-server-ready" ] || die "HTTP PUT receiver 未 ready"
 
-    # 记录三机复用进程 PID 矩阵
-    local s_link_pid c1_link_pid c2_link_pid c1_uftpd_pid c2_uftpd_pid s_http_pid
+    # 记录复用进程 PID 矩阵
+    local s_link_pid s_http_pid
     s_link_pid="$(cat "$server_dir/wfb.pid")"
-    c1_link_pid="$(remote client1 "cat '$(smoke_dir "$name")/client1/wfb.pid'")"
-    c2_link_pid="$(remote client2 "cat '$(smoke_dir "$name")/client2/wfb.pid'")"
-    c1_uftpd_pid="$(remote client1 "cat '$(smoke_dir "$name")/client1/uftpd.pid'")"
-    c2_uftpd_pid="$(remote client2 "cat '$(smoke_dir "$name")/client2/uftpd.pid'")"
     s_http_pid="$(cat "$server_dir/http-server.pid")"
 
-    python3 - "$server_dir/reused_processes.json" "$s_link_pid" "$c1_link_pid" "$c2_link_pid" "$c1_uftpd_pid" "$c2_uftpd_pid" "$s_http_pid" <<'PY'
+    local pids_args=()
+    for role in "${CLIENT_ROLES[@]}"; do
+        local c_link c_uftpd
+        c_link="$(remote "$role" "cat '$(smoke_dir "$name")/$role/wfb.pid'")"
+        c_uftpd="$(remote "$role" "cat '$(smoke_dir "$name")/$role/uftpd.pid'")"
+        pids_args+=("$role" "$c_link" "$c_uftpd")
+    done
+
+    python3 - "$server_dir/reused_processes.json" "$s_link_pid" "$s_http_pid" "${pids_args[@]}" <<'PY'
 import json, sys
-out, s_link, c1_link, c2_link, c1_uftpd, c2_uftpd, s_http = sys.argv[1:]
+out, s_link, s_http = sys.argv[1:4]
+rest = sys.argv[4:]
 data = {
     'server_link_pid': int(s_link),
-    'client1_link_pid': int(c1_link),
-    'client2_link_pid': int(c2_link),
-    'client1_uftpd_pid': int(c1_uftpd),
-    'client2_uftpd_pid': int(c2_uftpd),
     'server_http_pid': int(s_http),
 }
+for i in range(0, len(rest), 3):
+    role = rest[i]
+    c_link = rest[i+1]
+    c_uftpd = rest[i+2]
+    data[f'{role}_link_pid'] = int(c_link)
+    data[f'{role}_uftpd_pid'] = int(c_uftpd)
 with open(out, 'w', encoding='utf-8') as fh:
     json.dump(data, fh, indent=2)
 PY
@@ -1028,7 +1124,8 @@ cmd_smoke_gate() {
     local t_ul_start t_ul_end ul_dur
     local work src model manifest status log
     local cycle_files=()
-    local s_lines_before=0 c1_lines_before=0 c2_lines_before=0
+    local s_lines_before=0
+    local -A c_lines_before
 
     for cycle in $(seq 1 "$SMOKE_CYCLE_COUNT"); do
         log_info "=== 运行数据面 Gate 周期 $cycle / $SMOKE_CYCLE_COUNT ==="
@@ -1037,8 +1134,9 @@ cmd_smoke_gate() {
         # 记录本周期启动前各节点日志行数，用于准确截取单周期遥测 (fail-closed，拒绝容错回退)
         [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
         s_lines_before=$(wc -l < "$server_dir/wfb.log")
-        c1_lines_before=$(remote client1 "test -f '$(smoke_dir "$name")/client1/wfb.log' && wc -l < '$(smoke_dir "$name")/client1/wfb.log'") || die "读取 client1 wfb.log 行数失败"
-        c2_lines_before=$(remote client2 "test -f '$(smoke_dir "$name")/client2/wfb.log' && wc -l < '$(smoke_dir "$name")/client2/wfb.log'") || die "读取 client2 wfb.log 行数失败"
+        for role in "${CLIENT_ROLES[@]}"; do
+            c_lines_before["$role"]=$(remote "$role" "test -f '$(smoke_dir "$name")/$role/wfb.log' && wc -l < '$(smoke_dir "$name")/$role/wfb.log'") || die "读取 $role wfb.log 行数失败"
+        done
 
         # 1. 确定性生成交付物与 update 文件
         work="$server_dir/cycle$cycle"
@@ -1059,8 +1157,8 @@ with open(manifest, 'w', encoding='utf-8') as fh:
     json.dump({'schema_version': 1, 'artifact_type': 'model', 'size_bytes': size, 'sha256': meta['sha256']}, fh, separators=(',', ':'))
 PY
 
-        # 生成两 client 不同的 update 文件
-        for role in client1 client2; do
+        # 生成各 client 不同的 update 文件
+        for role in "${CLIENT_ROLES[@]}"; do
             local nid="${role#client}"
             remote "$role" "sudo install -d '$(smoke_dir "$name")/$role/cycle$cycle' && sudo env PYTHONPATH='$REMOTE_REPO' python3 - '$(smoke_dir "$name")/$role/cycle$cycle/update.bin' '$INPUT_SIZE_BYTES' '$cycle' '$nid' <<'PY'
 import sys
@@ -1077,24 +1175,41 @@ PY"
         t_dl_start="$(python3 -c 'import time; print(time.monotonic())')"
         status="$work/uftp.status"
         log="$work/uftp.log"
-        sudo timeout "$SMOKE_IO_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H 0x00000001,0x00000002 -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'" || die "周期 $cycle shared UFTP 下行超时或失败"
+        local uftp_hosts=""
+        local first=1
+        for role in "${CLIENT_ROLES[@]}"; do
+            local nid="${role#client}"
+            local hex_uid=$(printf '0x%08x' "$nid")
+            if [ "$first" -eq 1 ]; then
+                first=0
+                uftp_hosts="$hex_uid"
+            else
+                uftp_hosts="$uftp_hosts,$hex_uid"
+            fi
+        done
+        sudo timeout "$SMOKE_IO_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H '$uftp_hosts' -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'" || die "周期 $cycle shared UFTP 下行超时或失败"
         t_dl_end="$(python3 -c 'import time; print(time.monotonic())')"
         dl_dur="$(python3 -c "print($t_dl_end - $t_dl_start)")"
 
         # 下行结果验证
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             remote "$role" "sudo chown -R \$(id -u):\$(id -g) '$(smoke_dir "$name")/$role/inbox'"
             scp -rq "$(client_ssh "$role"):$(smoke_dir "$name")/$role/inbox/$src" "$server_dir/$role-inbox-$src"
         done
 
-        python3 - "$work" "$server_dir/client1-inbox-$src" "$server_dir/client2-inbox-$src" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" <<'PY'
+        python3 - "$work" "$status" "$dl_dur" "$server_dir/cycle${cycle}_downlink.json" "$server_dir" "$src" "${CLIENT_ROLES[@]}" <<'PY'
 import json, os, sys
-server_cycle_dir, c1_inbox, c2_inbox, status_path, duration_str, out_path = sys.argv[1:]
+server_cycle_dir, status_path, duration_str, out_path, server_dir, src = sys.argv[1:7]
+client_roles = sys.argv[7:]
 from tests.real_hardware.issue41_gate import verify_downlink_artifacts, GateConfig
 cfg = GateConfig.from_env()
+client_inboxes = {
+    role.replace('client', ''): os.path.join(server_dir, f"{role}-inbox-{src}")
+    for role in client_roles
+}
 res = verify_downlink_artifacts(
     server_cycle_dir=server_cycle_dir,
-    client_inboxes={'1': c1_inbox, '2': c2_inbox},
+    client_inboxes=client_inboxes,
     status_file=status_path,
     config=cfg,
     duration_seconds=float(duration_str),
@@ -1106,11 +1221,11 @@ if res['status'] != 'passed':
 PY
         [ $? -eq 0 ] || die "Gate 周期 $cycle UFTP 下行校验未通过"
 
-        # 3. 两个 client 各一次 HTTP PUT 并发上行
+        # 3. 各 client 并发 HTTP PUT 上行
         > "$server_dir/server-put-events.jsonl"
         t_ul_start="$(python3 -c 'import time; print(time.monotonic())')"
         local put_pids=()
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             local nid="${role#client}"
             remote "$role" "sudo env PYTHONPATH='$REMOTE_REPO' timeout '$SMOKE_IO_TIMEOUT_SECONDS' python3 - '$(smoke_dir "$name")/$role/cycle$cycle' '$(client_ip "$role")' '$HTTP_HOST' '$HTTP_PORT' '$role' '$nid' <<'PY'
 import http.client, json, os, sys, time
@@ -1140,7 +1255,7 @@ PY" &
             wait "$pid" || put_err=$((put_err + 1))
         done
         [ $put_err -eq 0 ] || die "Gate 周期 $cycle HTTP PUT 上行进程失败"
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/cycle$cycle/client-put-result.json" "$server_dir/$role-put-result-cycle$cycle.json"
         done
         t_ul_end="$(python3 -c 'import time; print(time.monotonic())')"
@@ -1148,9 +1263,10 @@ PY" &
         cp "$server_dir/server-put-events.jsonl" "$server_dir/server-put-events-cycle$cycle.jsonl"
 
         # 上行结果验证
-        python3 - "$server_dir/server-put-events-cycle$cycle.jsonl" "$server_dir/client1-put-result-cycle$cycle.json" "$server_dir/client2-put-result-cycle$cycle.json" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" <<'PY'
-import json, sys
-events_file, c1_res_path, c2_res_path, duration_str, out_path = sys.argv[1:]
+        python3 - "$server_dir/server-put-events-cycle$cycle.jsonl" "$ul_dur" "$server_dir/cycle${cycle}_uplink.json" "$server_dir" "$cycle" "${CLIENT_ROLES[@]}" <<'PY'
+import json, os, sys
+events_file, duration_str, out_path, server_dir, cycle_str = sys.argv[1:6]
+client_roles = sys.argv[6:]
 from tests.real_hardware.issue41_gate import verify_uplink_cycle, GateConfig
 events = []
 with open(events_file, 'r', encoding='utf-8') as fh:
@@ -1158,19 +1274,20 @@ with open(events_file, 'r', encoding='utf-8') as fh:
         line = line.strip()
         if line:
             events.append(json.loads(line))
-with open(c1_res_path, 'r', encoding='utf-8') as fh:
-    c1 = json.load(fh)
-with open(c2_res_path, 'r', encoding='utf-8') as fh:
-    c2 = json.load(fh)
-c_res = {
-    '1': {'node_id': 1, 'status': c1['http_status'], 'size_bytes': c1['bytes'], 'sha256': c1['sha256'], 'start_time': c1['start_monotonic'], 'end_time': c1['end_monotonic']},
-    '2': {'node_id': 2, 'status': c2['http_status'], 'size_bytes': c2['bytes'], 'sha256': c2['sha256'], 'start_time': c2['start_monotonic'], 'end_time': c2['end_monotonic']},
-}
-for role, expected_addr in (('1', '10.80.0.11'), ('2', '10.80.0.12')):
-    ev = next((e for e in events if e.get('type') == 'upload' and str(e.get('node_id')) == role), None)
-    if ev and ev.get('client_address') != expected_addr:
-        if event['client_address'] != expected_addr:
-            raise SystemExit('client address mismatch')
+c_res = {}
+for role in client_roles:
+    nid_str = role.replace('client', '')
+    res_path = os.path.join(server_dir, f"{role}-put-result-cycle{cycle_str}.json")
+    with open(res_path, 'r', encoding='utf-8') as fh:
+        c = json.load(fh)
+    c_res[nid_str] = {
+        'node_id': int(nid_str),
+        'status': c['http_status'],
+        'size_bytes': c['bytes'],
+        'sha256': c['sha256'],
+        'start_time': c['start_monotonic'],
+        'end_time': c['end_monotonic'],
+    }
 cfg = GateConfig.from_env()
 res = verify_uplink_cycle(events, c_res, cfg, float(duration_str))
 with open(out_path, 'w', encoding='utf-8') as fh:
@@ -1181,22 +1298,20 @@ PY
         [ $? -eq 0 ] || die "Gate 周期 $cycle HTTP PUT 校验未通过"
 
         # 4. 采集遥测并校验周期契约
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/wfb.log" "$server_dir/$role-wfb.log" || die "scp 采集 $role wfb.log 失败"
             scp -q "$(client_ssh "$role"):$(smoke_dir "$name")/$role/${role}_queue_summary.json" "$server_dir/$role-queue.json" 2>/dev/null || true
+            tail -n +"$((c_lines_before["$role"] + 1))" "$server_dir/$role-wfb.log" > "$server_dir/cycle${cycle}_${role}-wfb.log"
         done
 
         # 截取本周期的日志切片（fail-closed，无容错回退）
         [ -f "$server_dir/wfb.log" ] || die "缺少 server wfb.log"
-        [ -f "$server_dir/client1-wfb.log" ] || die "缺少 client1 wfb.log"
-        [ -f "$server_dir/client2-wfb.log" ] || die "缺少 client2 wfb.log"
         tail -n +"$((s_lines_before + 1))" "$server_dir/wfb.log" > "$server_dir/cycle${cycle}_server-wfb.log"
-        tail -n +"$((c1_lines_before + 1))" "$server_dir/client1-wfb.log" > "$server_dir/cycle${cycle}_client1-wfb.log"
-        tail -n +"$((c2_lines_before + 1))" "$server_dir/client2-wfb.log" > "$server_dir/cycle${cycle}_client2-wfb.log"
 
-        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/cycle${cycle}_server-wfb.log" "$server_dir/cycle${cycle}_client1-wfb.log" "$server_dir/cycle${cycle}_client2-wfb.log" "$server_dir/server_queue_summary.json" "$server_dir/client1-queue.json" "$server_dir/client2-queue.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" <<'PY'
+        python3 - "$cycle" "$server_dir/cycle${cycle}_downlink.json" "$server_dir/cycle${cycle}_uplink.json" "$server_dir/cycle${cycle}_server-wfb.log" "$server_dir/server_queue_summary.json" "$dl_dur" "$ul_dur" "$server_dir/cycle$cycle.json" "$server_dir" "${CLIENT_ROLES[@]}" <<'PY'
 import json, os, sys
-cycle_idx, dl_path, ul_path, s_log_p, c1_log_p, c2_log_p, sq_p, c1q_p, c2q_p, dl_dur, ul_dur, out_path = sys.argv[1:]
+cycle_idx, dl_path, ul_path, s_log_p, sq_p, dl_dur, ul_dur, out_path, server_dir = sys.argv[1:10]
+client_roles = sys.argv[10:]
 from tests.real_hardware.issue41_gate import parse_telemetry, build_cycle_evidence, validate_cycle_evidence, GateConfig
 with open(dl_path, 'r', encoding='utf-8') as fh:
     dl = json.load(fh)
@@ -1204,11 +1319,16 @@ with open(ul_path, 'r', encoding='utf-8') as fh:
     ul = json.load(fh)
 
 s_log = open(s_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(s_log_p) else ''
-c1_log = open(c1_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c1_log_p) else ''
-c2_log = open(c2_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c2_log_p) else ''
 sq = json.load(open(sq_p, 'r', encoding='utf-8')) if os.path.isfile(sq_p) else {}
-c1q = json.load(open(c1q_p, 'r', encoding='utf-8')) if os.path.isfile(c1q_p) else {}
-c2q = json.load(open(c2q_p, 'r', encoding='utf-8')) if os.path.isfile(c2q_p) else {}
+
+client_logs = {}
+queue_summaries = {'server': sq}
+for role in client_roles:
+    nid_str = role.replace('client', '')
+    c_log_p = os.path.join(server_dir, f"cycle{cycle_idx}_{role}-wfb.log")
+    cq_p = os.path.join(server_dir, f"{role}-queue.json")
+    client_logs[nid_str] = open(c_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c_log_p) else ''
+    queue_summaries[role] = json.load(open(cq_p, 'r', encoding='utf-8')) if os.path.isfile(cq_p) else {}
 
 durations = {
     'downlink_seconds': float(dl_dur),
@@ -1217,8 +1337,8 @@ durations = {
 }
 telem = parse_telemetry(
     server_log=s_log,
-    client_logs={'1': c1_log, '2': c2_log},
-    queue_summaries={'server': sq, 'client1': c1q, 'client2': c2q},
+    client_logs=client_logs,
+    queue_summaries=queue_summaries,
     phase_durations=durations,
 )
 cfg = GateConfig.from_env()
@@ -1244,7 +1364,7 @@ PY
         python3 -c "import sys; sys.exit(0 if float(sys.argv[1]) <= float(sys.argv[2]) else 1)" "$cycle_dur" "$SMOKE_CYCLE_DEADLINE_SECONDS" || die "Gate 周期 $cycle 总耗时 ${cycle_dur}s 超过固定 deadline ${SMOKE_CYCLE_DEADLINE_SECONDS}s"
 
         # 5. 清理本周期临时状态（不杀进程）
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             remote "$role" "sudo rm -rf '$(smoke_dir "$name")/$role/inbox'/* '$(smoke_dir "$name")/$role/cycle$cycle'"
         done
         cycle_files+=("$server_dir/cycle$cycle.json")
@@ -1303,28 +1423,24 @@ handle_smoke_gate_failure() {
     collect_smoke_evidence "$name" || true
 
     mkdir -p "$archive"
-    python3 - "$archive" "$RUN_ID" <<'PY'
+    python3 - "$archive" "$RUN_ID" "${CLIENT_ROLES[@]}" <<'PY'
 import json, os, sys
-archive_dir, run_id = sys.argv[1], sys.argv[2]
+archive_dir, run_id = sys.argv[1:3]
+client_roles = sys.argv[3:]
 from tests.real_hardware.issue41_gate import classify_gate_failure
 
 s_log_p = os.path.join(archive_dir, 'server', 'wfb.log')
-c1_log_p = os.path.join(archive_dir, 'client1', 'wfb.log')
-c2_log_p = os.path.join(archive_dir, 'client2', 'wfb.log')
-
 s_log = open(s_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(s_log_p) else ''
-c1_log = open(c1_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c1_log_p) else ''
-c2_log = open(c2_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c2_log_p) else ''
-
 ant_samples = s_log.count('\tRX_ANT\t')
-c_decl = {
-    'client1': 'first_declare node_id=1' in c1_log,
-    'client2': 'first_declare node_id=2' in c2_log,
-}
-s_acc = {
-    'client1': 'ready_accept node_id=1' in s_log,
-    'client2': 'ready_accept node_id=2' in s_log,
-}
+
+c_decl = {}
+s_acc = {}
+for role in client_roles:
+    nid = role.replace('client', '')
+    c_log_p = os.path.join(archive_dir, role, 'wfb.log')
+    c_log = open(c_log_p, 'r', encoding='utf-8', errors='replace').read() if os.path.isfile(c_log_p) else ''
+    c_decl[role] = f'first_declare node_id={nid}' in c_log
+    s_acc[role] = f'ready_accept node_id={nid}' in s_log
 
 diag = classify_gate_failure(
     server_rx_ant_samples=ant_samples,
@@ -1389,7 +1505,7 @@ assert_runtime_processes_stopped() {
     if pgrep -x wfb-fl-server >/dev/null || pgrep -x wfb_v6_uplink >/dev/null || pgrep -x uftp >/dev/null || pgrep -x uftpd >/dev/null; then
         die "启动 Runtime 前本机仍有 issue41 相关进程"
     fi
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "! pgrep -x wfb-fl-client >/dev/null && ! pgrep -x wfb_v6_uplink >/dev/null && ! pgrep -x uftp >/dev/null && ! pgrep -x uftpd >/dev/null" || die "$role 启动 Runtime 前仍有 issue41 相关进程"
     done
 }
@@ -1397,12 +1513,17 @@ assert_runtime_processes_stopped() {
 prepare_runtime_state() {
     cmd_stop_all
     assert_runtime_processes_stopped
-    if runtime_state_exists_local || runtime_state_exists_remote client1 || runtime_state_exists_remote client2; then
+    local has_runtime_state=0
+    runtime_state_exists_local && has_runtime_state=1
+    for role in "${CLIENT_ROLES[@]}"; do
+        runtime_state_exists_remote "$role" && has_runtime_state=1
+    done
+    if [ "$has_runtime_state" -eq 1 ]; then
         if [ "$RESET_RUNTIME_STATE" != "1" ]; then
             die "检测到上次 Runtime 现场；默认拒绝复用，请先执行 clean，或设置 ISSUE41_RESET_RUNTIME_STATE=1"
         fi
         sudo rm -rf /var/lib/wfb-ng/issue41/server
-        for role in client1 client2; do
+        for role in "${CLIENT_ROLES[@]}"; do
             remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client"
         done
         log_warn "已按 ISSUE41_RESET_RUNTIME_STATE=1 清理旧 Runtime work_dir"
@@ -1413,14 +1534,15 @@ cmd_run_runtime_loop() {
     prepare_runtime_state
     configure_runtime_monitors
     write_issue41_configs server
-    write_issue41_configs client1
-    write_issue41_configs client2
+    for role in "${CLIENT_ROLES[@]}"; do
+        write_issue41_configs "$role"
+    done
     if [ ! -f "$ARCHIVE_DIR/formal_runtime_loop/config_equivalence.json" ]; then
         cmd_verify_config_equivalence
     fi
 
     sudo systemctl daemon-reload
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "sudo systemctl daemon-reload"
         wait_remote_service_ready "$role" wfb-fl-client.service || {
             record_stage_failure "formal_runtime_loop" "implementation" "$role 角色服务就绪超时" "pre_runtime_smoke"
@@ -1436,13 +1558,17 @@ cmd_run_runtime_loop() {
         die "server 角色服务启动失败"
     }
 
-    log_info "记录三角色服务首次运行 MainPID 以备生命周期 no-overlap 验证..."
+    log_info "记录各角色服务首次运行 MainPID 以备生命周期 no-overlap 验证..."
     mkdir -p "$ARCHIVE_DIR/lifecycle"
     server_main_pid="$(sudo systemctl show -p MainPID --value wfb-fl-server.service 2>/dev/null || echo 0)"
-    client1_main_pid="$(remote client1 "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
-    client2_main_pid="$(remote client2 "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
+    local initial_pids_json="\"server\": $server_main_pid"
+    for role in "${CLIENT_ROLES[@]}"; do
+        local c_pid
+        c_pid="$(remote "$role" "sudo systemctl show -p MainPID --value wfb-fl-client.service 2>/dev/null || echo 0")"
+        initial_pids_json+=", \"$role\": $c_pid"
+    done
     cat > "$ARCHIVE_DIR/lifecycle/initial_pids.json" <<EOF
-{"server": $server_main_pid, "client1": $client1_main_pid, "client2": $client2_main_pid}
+{$initial_pids_json}
 EOF
 
     assert_runtime_uftp_routes
@@ -1452,41 +1578,47 @@ EOF
         die "Runtime 结果超时或未完成"
     }
 
-    log_info "正式 Runtime 作业已成功返回，执行三角色服务受控停止..."
+    log_info "正式 Runtime 作业已成功返回，执行各角色服务受控停止..."
     sudo systemctl stop wfb-fl-server.service || true
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         remote "$role" "sudo systemctl stop wfb-fl-client.service || true"
     done
     wait_local_issue41_cleanup || {
         record_stage_failure "formal_runtime_loop" "implementation" "server 角色服务受控停止后清理超时" "pre_runtime_smoke"
         die "server 角色服务受控停止后清理超时"
     }
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || {
             record_stage_failure "formal_runtime_loop" "implementation" "$role 角色服务受控停止后清理超时" "pre_runtime_smoke"
             die "$role 角色服务受控停止后清理超时"
         }
     done
+    local client_stops_json=""
+    for role in "${CLIENT_ROLES[@]}"; do
+        client_stops_json+="\"${role}_stopped\":true,"
+    done
     cat > "$ARCHIVE_DIR/formal_runtime_loop/controlled_stop.json" <<EOF
-{"schema_version":1,"status":"passed","server_stopped":true,"client1_stopped":true,"client2_stopped":true,"cleaned":true}
+{"schema_version":1,"status":"passed","server_stopped":true,$client_stops_json"cleaned":true}
 EOF
-    log_ok "三角色服务受控停止完成。"
+    log_ok "各角色服务受控停止完成。"
     log_ok "Runtime loop 作业与 UFTP 组播路由验收通过。"
 }
 
 cmd_lifecycle_stop_restart() {
-    log_info "执行三角色服务 stop/restart/no-overlap 及资源生命周期审计..."
+    log_info "执行角色服务 stop/restart/no-overlap 及资源生命周期审计..."
     cmd_collect
+    local lc_args=()
+    for role in "${CLIENT_ROLES[@]}"; do
+        lc_args+=(--client-tuns "$role:$(client_tun "$role")")
+        lc_args+=(--client-sshs "$role:$(client_ssh "$role")")
+    done
     python3 "$SCRIPT_DIR/issue41_lifecycle.py" run "$ARCHIVE_DIR" \
         --server-tun "$SERVER_TUN" \
-        --client1-tun "$(client_tun client1)" \
-        --client2-tun "$(client_tun client2)" \
-        --client1-ssh "$(client_ssh client1)" \
-        --client2-ssh "$(client_ssh client2)" \
+        "${lc_args[@]}" \
         --initial-pids "$ARCHIVE_DIR/lifecycle/initial_pids.json" \
         --timeout "$STOP_CLEANUP_TIMEOUT_SECONDS" || {
-            record_stage_failure "lifecycle" "implementation" "三角色服务 stop/restart 及资源生命周期审计未通过" "formal_runtime_loop"
-            die "三角色服务 stop/restart 及资源生命周期审计未通过"
+            record_stage_failure "lifecycle" "implementation" "角色服务 stop/restart 及资源生命周期审计未通过" "formal_runtime_loop"
+            die "角色服务 stop/restart 及资源生命周期审计未通过"
         }
     if [ -f "$ARCHIVE_DIR/envelope.json" ]; then
         python3 "$SCRIPT_DIR/issue41_envelope.py" append-partition \
@@ -1494,7 +1626,7 @@ cmd_lifecycle_stop_restart() {
             --name lifecycle \
             --json-file "$ARCHIVE_DIR/lifecycle/lifecycle_summary.json" >/dev/null 2>&1 || true
     fi
-    log_ok "三角色服务 stop/restart 及资源清理审计通过。"
+    log_ok "角色服务 stop/restart 及资源清理审计通过。"
 }
 
 cmd_stop_all() {
@@ -1503,9 +1635,11 @@ cmd_stop_all() {
     sudo pkill -x uftp 2>/dev/null || true
     sudo pkill -x uftpd 2>/dev/null || true
     sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true
-    for role in client1 client2; do remote "$role" "sudo systemctl stop wfb-fl-client.service 2>/dev/null || true; sudo pkill -x wfb_v6_uplink 2>/dev/null || true; sudo pkill -x uftp 2>/dev/null || true; sudo pkill -x uftpd 2>/dev/null || true; sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true" || true; done
+    for role in "${CLIENT_ROLES[@]}"; do
+        remote "$role" "sudo systemctl stop wfb-fl-client.service 2>/dev/null || true; sudo pkill -x wfb_v6_uplink 2>/dev/null || true; sudo pkill -x uftp 2>/dev/null || true; sudo pkill -x uftpd 2>/dev/null || true; sudo pkill -f /var/tmp/wfb-ng-issue41-smoke 2>/dev/null || true" || true
+    done
     wait_local_issue41_cleanup || die "本机 issue41 停止后清理超时"
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         wait_remote_issue41_cleanup "$role" "$(client_tun "$role")" || die "$role issue41 停止后清理超时"
     done
 }
@@ -1513,13 +1647,16 @@ cmd_stop_all() {
 cmd_clean() {
     cmd_stop_all
     sudo rm -rf /var/lib/wfb-ng/issue41/server /var/tmp/wfb-ng-issue41-smoke /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-server.service.d/issue41.conf
-    for role in client1 client2; do remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client /var/tmp/wfb-ng-issue41-smoke /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d/issue41.conf"; done
+    for role in "${CLIENT_ROLES[@]}"; do
+        remote "$role" "sudo rm -rf /var/lib/wfb-ng/issue41/client /var/tmp/wfb-ng-issue41-smoke /etc/wfb-ng/issue41 /etc/systemd/system/wfb-fl-client.service.d/issue41.conf"
+    done
     log_ok "issue41 管理路径已清理"
 }
 
 capture_runtime_routes() {
     local role group tun source_ip prefix
-    for role in server client1 client2; do
+    local all_roles=("server" "${CLIENT_ROLES[@]}")
+    for role in "${all_roles[@]}"; do
         if [ "$role" = server ]; then
             tun="$SERVER_TUN"
             source_ip="${SERVER_TUN_ADDR%/*}"
@@ -1550,7 +1687,7 @@ cmd_collect() {
         sudo cp -a /var/lib/wfb-ng/issue41/server/. "$ARCHIVE_DIR/formal_runtime_loop/server/" 2>/dev/null || true
     fi
     sudo chown -R "$(id -u):$(id -g)" "$ARCHIVE_DIR/formal_runtime_loop/server"
-    for role in client1 client2; do
+    for role in "${CLIENT_ROLES[@]}"; do
         mkdir -p "$ARCHIVE_DIR/formal_runtime_loop/$role"
         remote "$role" "sudo tar -C /var/lib/wfb-ng/issue41/client -czf /tmp/issue41-$role-client.tgz . 2>/dev/null || true; systemctl status wfb-fl-client.service > /tmp/issue41-$role-status.txt 2>&1 || true; journalctl -u wfb-fl-client.service --output=short-precise --no-pager > /tmp/issue41-$role-journal.txt 2>&1 || true"
         client_result="$ARCHIVE_DIR/formal_runtime_loop/$role/issue41-$role-result.json"
@@ -1562,19 +1699,19 @@ cmd_collect() {
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-status.txt" "$ARCHIVE_DIR/raw/$role-systemctl-status.txt" 2>/dev/null || true
         scp -q "$(client_ssh "$role"):/tmp/issue41-$role-journal.txt" "$ARCHIVE_DIR/raw/$role-journal.txt" 2>/dev/null || true
     done
-    if [ "$(find "$ARCHIVE_DIR/raw" -maxdepth 1 -name '*-route-*.txt' -type f | wc -l)" -lt 12 ]; then
+    local expected_route_files=$(( (${#CLIENT_ROLES[@]} + 1) * 4 ))
+    if [ "$(find "$ARCHIVE_DIR/raw" -maxdepth 1 -name '*-route-*.txt' -type f | wc -l)" -lt "$expected_route_files" ]; then
         capture_runtime_routes
     fi
     log_ok "归档采集完成：$ARCHIVE_DIR"
 }
 
 cmd_summary() {
-    local server_result client1_result client2_result conclusion status reason route_evidence role group suffix
+    local server_result conclusion status reason route_evidence role group suffix
     server_result="$ARCHIVE_DIR/formal_runtime_loop/server/issue41-server-result.json"
-    client1_result="$ARCHIVE_DIR/formal_runtime_loop/client1/issue41-client1-result.json"
-    client2_result="$ARCHIVE_DIR/formal_runtime_loop/client2/issue41-client2-result.json"
     route_evidence=
-    for role in server client1 client2; do
+    local all_roles=("server" "${CLIENT_ROLES[@]}")
+    for role in "${all_roles[@]}"; do
         for group in "$UFTP_GROUP" "$UFTP_PRIVATE_GROUP"; do
             suffix="${group//./-}"
             for direction in show get; do
@@ -1584,12 +1721,13 @@ cmd_summary() {
         done
     done
     python3 "$SCRIPT_DIR/issue41_build_summary.py" "$ARCHIVE_DIR" > "$ARCHIVE_DIR/formal-runtime-summary.json"
-    python3 - "$ARCHIVE_DIR" "$route_evidence" <<'PY'
+    python3 - "$ARCHIVE_DIR" "$route_evidence" "${CLIENT_ROLES[@]}" <<'PY'
 import json
 import os
 import sys
 
-archive_dir, route_evidence = sys.argv[1:]
+archive_dir, route_evidence = sys.argv[1:3]
+client_roles = sys.argv[3:]
 with open(os.path.join(archive_dir, 'formal-runtime-summary.json'), encoding='utf-8') as fh:
     formal = json.load(fh)
 
@@ -1665,29 +1803,30 @@ if os.path.isfile(envelope_path):
     with open(envelope_path, 'r', encoding='utf-8') as ef:
         run_id = json.load(ef).get('run_id', run_id)
 
+formal_rt = {
+    'status': formal['status'],
+    'runtime_interfaces': ['publish_model', 'wait_for_model', 'submit_update', 'wait_for_updates'],
+    'data_plane': '10.80.0.0/24',
+    'server_wait_for_updates_returned_node_ids': formal['server_wait_for_updates_returned_node_ids'],
+    'partial_result_returned': formal['partial_result_returned'],
+    'scenario': formal['scenario'],
+    'rounds': formal['rounds'],
+    'server_result': os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json'),
+    'server_journal': os.path.join(archive_dir, 'raw', 'server-journal.txt'),
+    'route_evidence': json.loads('[%s]' % route_evidence),
+    'config_equivalence': formal.get('config_equivalence', {'status': 'passed'}),
+    'controlled_stop': formal.get('controlled_stop', {'status': 'passed'}),
+}
+for role in client_roles:
+    formal_rt[f'{role}_result'] = os.path.join(archive_dir, 'formal_runtime_loop', role, f'issue41-{role}-result.json')
+    formal_rt[f'{role}_journal'] = os.path.join(archive_dir, 'raw', f'{role}-journal.txt')
+
 summary = {
     'schema_version': 1,
     'run_id': run_id,
     'orchestration': {'status': orch_status, 'radio_health_dir': os.path.join(archive_dir, 'orchestration', 'radio-health')},
     'pre_runtime_smoke': smoke_gate,
-    'formal_runtime_loop': {
-        'status': formal['status'],
-        'runtime_interfaces': ['publish_model', 'wait_for_model', 'submit_update', 'wait_for_updates'],
-        'data_plane': '10.80.0.0/24',
-        'server_wait_for_updates_returned_node_ids': formal['server_wait_for_updates_returned_node_ids'],
-        'partial_result_returned': formal['partial_result_returned'],
-        'scenario': formal['scenario'],
-        'rounds': formal['rounds'],
-        'server_result': os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'issue41-server-result.json'),
-        'client1_result': os.path.join(archive_dir, 'formal_runtime_loop', 'client1', 'issue41-client1-result.json'),
-        'client2_result': os.path.join(archive_dir, 'formal_runtime_loop', 'client2', 'issue41-client2-result.json'),
-        'server_journal': os.path.join(archive_dir, 'raw', 'server-journal.txt'),
-        'client1_journal': os.path.join(archive_dir, 'raw', 'client1-journal.txt'),
-        'client2_journal': os.path.join(archive_dir, 'raw', 'client2-journal.txt'),
-        'route_evidence': json.loads('[%s]' % route_evidence),
-        'config_equivalence': formal.get('config_equivalence', {'status': 'passed'}),
-        'controlled_stop': formal.get('controlled_stop', {'status': 'passed'}),
-    },
+    'formal_runtime_loop': formal_rt,
     'lifecycle': lifecycle_data,
     'conclusion': conclusion,
 }

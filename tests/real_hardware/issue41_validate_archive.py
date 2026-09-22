@@ -241,12 +241,13 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
             resolved_cfg = env_obj.get('resolved_config', {})
 
     gate_kwargs = {}
-    config_keys = (
+    config_keys = [
         'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
         'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
         'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
-        'client1_tun', 'client1_tun_addr', 'client2_tun', 'client2_tun_addr',
-    )
+    ]
+    for i in range(1, 11):
+        config_keys.extend([f'client{i}_tun', f'client{i}_tun_addr'])
     for k in config_keys:
         if k in resolved_cfg:
             gate_kwargs[k] = resolved_cfg[k]
@@ -278,12 +279,16 @@ def _validate_runtime(value, errors):
         return
     if value.get('status') != 'passed':
         return
+    scenario = value.get('scenario') if isinstance(value.get('scenario'), dict) else {}
+    template_hashes = scenario.get('update_template_sha256_by_node', {})
+    expected_node_ids = sorted([int(k) for k in template_hashes.keys()]) if template_hashes else [1, 2]
+
     required = {
         'runtime_interfaces': [
             'publish_model', 'wait_for_model', 'submit_update',
             'wait_for_updates'],
         'data_plane': '10.80.0.0/24',
-        'server_wait_for_updates_returned_node_ids': [1, 2],
+        'server_wait_for_updates_returned_node_ids': expected_node_ids,
     }
     for key, expected in required.items():
         if value.get(key) != expected:
@@ -291,13 +296,16 @@ def _validate_runtime(value, errors):
     _validate_formal_scenario(value, errors)
     if value.get('partial_result_returned') is not False:
         errors.append('formal_runtime_loop 必须证明 server 未返回 partial result')
-    for role in ('server_result', 'client1_result', 'client2_result',
-                 'server_journal', 'client1_journal', 'client2_journal'):
-        path = value.get(role)
-        if not _archive_file_exists(path):
-            errors.append('formal_runtime_loop 缺少 %s 文件证据' % role)
+    required_roles = ['server'] + [f'client{nid}' for nid in expected_node_ids]
+    for r in required_roles:
+        for suffix in ('result', 'journal'):
+            key = f'{r}_{suffix}'
+            path = value.get(key)
+            if not _archive_file_exists(path):
+                errors.append(f'formal_runtime_loop 缺少 {key} 文件证据')
     route_evidence = value.get('route_evidence')
-    if (not isinstance(route_evidence, list) or len(route_evidence) != 12 or
+    expected_route_count = 6 * len(expected_node_ids)
+    if (not isinstance(route_evidence, list) or len(route_evidence) != expected_route_count or
             any(not _archive_file_exists(path) for path in route_evidence)):
         errors.append('formal_runtime_loop 缺少六组双向 UFTP 路由证据')
 
@@ -320,11 +328,18 @@ def _validate_formal_scenario(value, errors):
     artifact_size = scenario.get('artifact_size_bytes')
     delays = scenario.get('training_delay_ms_by_node')
 
+    template_hashes = scenario.get('update_template_sha256_by_node')
+    if not isinstance(template_hashes, dict) or len(template_hashes) < 2 or not all(_is_sha256(digest) for digest in template_hashes.values()):
+        errors.append('formal_runtime_loop.scenario 必须包含有效的 client 模板 SHA-256')
+        return
+
+    expected_node_ids = sorted([int(k) for k in template_hashes.keys()])
+
     if round_count != 2:
         errors.append('formal_runtime_loop.scenario.round_count 必须为 2 轮')
     if artifact_size != 40 * 1024 * 1024:
         errors.append('formal_runtime_loop.scenario.artifact_size_bytes 必须为 40 MiB (41943040 字节)')
-    if delays != {'1': 0, '2': 0}:
+    if delays != {str(nid): 0 for nid in expected_node_ids}:
         errors.append('formal_runtime_loop.scenario.training_delay_ms_by_node 必须全为 0 延时并发')
 
     if scenario.get('placeholder_training') != 'template_copy':
@@ -332,10 +347,7 @@ def _validate_formal_scenario(value, errors):
     if scenario.get('placeholder_aggregation') != 'model_copy':
         errors.append('formal_runtime_loop.scenario.placeholder_aggregation 不满足通过条件')
 
-    template_hashes = scenario.get('update_template_sha256_by_node')
-    if (not isinstance(template_hashes, dict) or set(template_hashes) != {'1', '2'} or
-            not all(_is_sha256(digest) for digest in template_hashes.values()) or
-            template_hashes['1'] == template_hashes['2']):
+    if len(template_hashes) != len(set(template_hashes.values())):
         errors.append('formal_runtime_loop.scenario 必须包含不同的 client 模板 SHA-256')
 
     rounds = value.get('rounds')
@@ -381,19 +393,20 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         if isinstance(model, dict) and model.get('sha256') != prev_output_model_sha:
             errors.append('%s 占位聚合模型 SHA-256 与前一轮输出不匹配' % prefix)
 
+    expected_node_ids = sorted([int(k) for k in template_hashes.keys()])
     intervals = value.get('model_receive_intervals')
-    if not isinstance(intervals, dict) or set(intervals) != {'1', '2'} or any(not _is_interval(intervals[node]) for node in intervals):
-        errors.append('%s 缺少两个节点的模型接收时间区间' % prefix)
-    if value.get('server_committed_node_ids') != [1, 2]:
-        errors.append('%s.server_committed_node_ids 必须为 [1, 2]' % prefix)
-    if value.get('server_wait_returned_node_ids') != [1, 2]:
-        errors.append('%s.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
+    if not isinstance(intervals, dict) or set(intervals) != set(template_hashes.keys()) or any(not _is_interval(intervals[node]) for node in intervals):
+        errors.append('%s 缺少所有节点的模型接收时间区间' % prefix)
+    if value.get('server_committed_node_ids') != expected_node_ids:
+        errors.append(f'{prefix}.server_committed_node_ids 必须为 {expected_node_ids}')
+    if value.get('server_wait_returned_node_ids') != expected_node_ids:
+        errors.append(f'{prefix}.server_wait_returned_node_ids 必须为 {expected_node_ids}')
     strict_sync = value.get('strict_sync')
     if not isinstance(strict_sync, dict):
         errors.append('%s 缺少 strict_sync 严格同步事实' % prefix)
     else:
-        if strict_sync.get('server_wait_returned_node_ids') != [1, 2]:
-            errors.append('%s.strict_sync.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
+        if strict_sync.get('server_wait_returned_node_ids') != expected_node_ids:
+            errors.append(f'{prefix}.strict_sync.server_wait_returned_node_ids 必须为 {expected_node_ids}')
         if strict_sync.get('partial_result_returned') is not False:
             errors.append('%s.strict_sync 必须证明未返回 partial result' % prefix)
         if strict_sync.get('server_waited_after_first_commit') is not True:
@@ -401,19 +414,19 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
     active_upload_sets = value.get('active_upload_sets')
     if (not isinstance(active_upload_sets, list) or not active_upload_sets or
             any(not isinstance(node_ids, list) or
-                any(node_id not in (1, 2) for node_id in node_ids)
+                any(node_id not in expected_node_ids for node_id in node_ids)
                 for node_ids in active_upload_sets) or
             active_upload_sets[-1] != []):
         errors.append('%s 缺少活动上传集合或上传未收敛' % prefix)
     uploads = value.get('uploads')
-    if not isinstance(uploads, list) or len(uploads) != 2:
-        errors.append('%s 必须包含两个 update 提交事实' % prefix)
+    if not isinstance(uploads, list) or len(uploads) != len(expected_node_ids):
+        errors.append(f'{prefix} 必须包含 {len(expected_node_ids)} 个 update 提交事实')
         return
     uploads_by_node = {upload.get('node_id'): upload for upload in uploads if isinstance(upload, dict)}
-    if set(uploads_by_node) != {1, 2}:
-        errors.append('%s.update 节点集合必须为 [1, 2]' % prefix)
+    if set(uploads_by_node) != set(expected_node_ids):
+        errors.append(f'{prefix}.update 节点集合必须为 {expected_node_ids}')
         return
-    for node_id in (1, 2):
+    for node_id in expected_node_ids:
         upload = uploads_by_node[node_id]
         if upload.get('size_bytes') != expected_size or not _is_sha256(upload.get('sha256')):
             errors.append('%s node %d update 必须是 %d 字节且含 SHA-256' % (prefix, node_id, expected_size))

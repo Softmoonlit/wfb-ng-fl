@@ -30,4 +30,4 @@
 ## 下一步应该看哪里
 
 - 做 namespace 验收：先看 `tests/acceptance/README.md`
-- 做真实硬件/三机演示：先看 `tests/real_hardware/README.md`
+- 做真实硬件/多机集群演示与验收：先看 `tests/real_hardware/README.md`

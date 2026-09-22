@@ -23,7 +23,7 @@
 ## 与 real-hardware 的边界
 
 - `tests/acceptance/`：namespace/隔离环境验收
-- `tests/real_hardware/`：三机真实硬件/现场演示与正式证据入口
+- `tests/real_hardware/`：真实硬件/多机集群现场演示与正式证据入口
 
 当前 real-hardware 主入口不在本目录，而在 `tests/real_hardware/README.md` 所指向的手册与脚本。
 

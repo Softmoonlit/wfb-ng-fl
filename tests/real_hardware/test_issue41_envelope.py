@@ -46,7 +46,8 @@ def make_mock_topology_executor(server_wlx='wlxfc221c300cbc',
                                 client2_wlx='wlxfc221c500a88',
                                 commit='0123456789abcdef0123456789abcdef01234567',
                                 branch='feat/41-real-hardware-fl-runtime-redo',
-                                clean=True):
+                                clean=True,
+                                client_count=7):
     executor = DummyExecutor()
     status_str = '' if clean else ' M modified_file.py'
 
@@ -68,43 +69,36 @@ def make_mock_topology_executor(server_wlx='wlxfc221c300cbc',
     executor.set_response('server', 'check_work_dir_empty', 0, 'empty\n', '')
     executor.set_response('server', f'ip link show {server_wlx}', 0, f'{server_wlx}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n', '')
 
-    # client1 远端查询
-    executor.set_response('client1', 'hostname', 0, 'client1-vm1\n', '')
-    executor.set_response('client1', 'cat /etc/machine-id', 0, 'c1-mid-123\n', '')
-    executor.set_response('client1', 'git rev-parse HEAD', 0, f'{commit}\n', '')
-    executor.set_response('client1', 'git rev-parse --abbrev-ref HEAD', 0, f'{branch}\n', '')
-    executor.set_response('client1', 'git status --short', 0, f'{status_str}\n', '')
-    executor.set_response('client1', 'iw dev', 0, f'Interface {client1_wlx}\n  type monitor\n', '')
-    executor.set_response('client1', f'cat /sys/class/net/{client1_wlx}/address', 0, 'fc:22:1c:30:0c:bb\n', '')
-    executor.set_response('client1', f'readlink -f /sys/class/net/{client1_wlx}/device/driver', 0, '/sys/bus/usb/drivers/rtl88xxau_wfb\n', '')
-    executor.set_response('client1', f'cat /sys/class/net/{client1_wlx}/device/../speed', 0, '480\n', '')
-    executor.set_response('client1', 'sudo -n true', 0, '', '')
-    executor.set_response('client1', 'stat -c %s', 0, '4194304\n', '')
-    executor.set_response('client1', 'sha256sum', 0, '1111111111111111111111111111111111111111111111111111111111111111  tpl\n', '')
-    executor.set_response('client1', 'ss -tuln', 0, 'tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:*\n', '')
-    executor.set_response('client1', 'ip link show v8i41', 1, 'Device "v8i41c1" does not exist.\n', '')
-    executor.set_response('client1', 'pgrep', 1, '', '')
-    executor.set_response('client1', 'check_work_dir_empty', 0, 'empty\n', '')
-    executor.set_response('client1', f'ip link show {client1_wlx}', 0, f'{client1_wlx}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n', '')
+    wlx_map = {
+        1: client1_wlx,
+        2: client2_wlx,
+        3: 'wlxfc221c300cbb',
+        4: 'wlxfc221c300cbc',
+        5: 'wlxfc221c500bfe',
+        6: 'wlxfc221c300e99',
+        7: 'wlxfc221c500a88',
+    }
 
-    # client2 远端查询
-    executor.set_response('client2', 'hostname', 0, 'client2-vm2\n', '')
-    executor.set_response('client2', 'cat /etc/machine-id', 0, 'c2-mid-123\n', '')
-    executor.set_response('client2', 'git rev-parse HEAD', 0, f'{commit}\n', '')
-    executor.set_response('client2', 'git rev-parse --abbrev-ref HEAD', 0, f'{branch}\n', '')
-    executor.set_response('client2', 'git status --short', 0, f'{status_str}\n', '')
-    executor.set_response('client2', 'iw dev', 0, f'Interface {client2_wlx}\n  type monitor\n', '')
-    executor.set_response('client2', f'cat /sys/class/net/{client2_wlx}/address', 0, 'fc:22:1c:50:0a:88\n', '')
-    executor.set_response('client2', f'readlink -f /sys/class/net/{client2_wlx}/device/driver', 0, '/sys/bus/usb/drivers/rtl88xxau_wfb\n', '')
-    executor.set_response('client2', f'cat /sys/class/net/{client2_wlx}/device/../speed', 0, '480\n', '')
-    executor.set_response('client2', 'sudo -n true', 0, '', '')
-    executor.set_response('client2', 'stat -c %s', 0, '4194304\n', '')
-    executor.set_response('client2', 'sha256sum', 0, '2222222222222222222222222222222222222222222222222222222222222222  tpl\n', '')
-    executor.set_response('client2', 'ss -tuln', 0, 'tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:*\n', '')
-    executor.set_response('client2', 'ip link show v8i41', 1, 'Device "v8i41c2" does not exist.\n', '')
-    executor.set_response('client2', 'pgrep', 1, '', '')
-    executor.set_response('client2', 'check_work_dir_empty', 0, 'empty\n', '')
-    executor.set_response('client2', f'ip link show {client2_wlx}', 0, f'{client2_wlx}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n', '')
+    for i in range(1, client_count + 1):
+        role = f'client{i}'
+        c_wlx = wlx_map.get(i, f'wlxfc221c00000{i}')
+        executor.set_response(role, 'hostname', 0, f'{role}-vm{i}\n', '')
+        executor.set_response(role, 'cat /etc/machine-id', 0, f'c{i}-mid-123\n', '')
+        executor.set_response(role, 'git rev-parse HEAD', 0, f'{commit}\n', '')
+        executor.set_response(role, 'git rev-parse --abbrev-ref HEAD', 0, f'{branch}\n', '')
+        executor.set_response(role, 'git status --short', 0, f'{status_str}\n', '')
+        executor.set_response(role, 'iw dev', 0, f'Interface {c_wlx}\n  type monitor\n', '')
+        executor.set_response(role, f'cat /sys/class/net/{c_wlx}/address', 0, f'fc:22:1c:30:00:0{i}\n', '')
+        executor.set_response(role, f'readlink -f /sys/class/net/{c_wlx}/device/driver', 0, '/sys/bus/usb/drivers/rtl88xxau_wfb\n', '')
+        executor.set_response(role, f'cat /sys/class/net/{c_wlx}/device/../speed', 0, '480\n', '')
+        executor.set_response(role, 'sudo -n true', 0, '', '')
+        executor.set_response(role, 'stat -c %s', 0, '4194304\n', '')
+        executor.set_response(role, 'sha256sum', 0, f'{str(i)*64}  tpl\n', '')
+        executor.set_response(role, 'ss -tuln', 0, 'tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:*\n', '')
+        executor.set_response(role, 'ip link show v8i41', 1, f'Device "v8i41c{i}" does not exist.\n', '')
+        executor.set_response(role, 'pgrep', 1, '', '')
+        executor.set_response(role, 'check_work_dir_empty', 0, 'empty\n', '')
+        executor.set_response(role, f'ip link show {c_wlx}', 0, f'{c_wlx}: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n', '')
 
     return executor
 
@@ -125,11 +119,7 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             'radio_bandwidth': '40',
             'radio_mcs_index': '3',
             'server_tun': 'v8i41s0',
-            'client1_tun': 'v8i41c1',
-            'client2_tun': 'v8i41c2',
             'server_tun_addr': '10.80.0.1/24',
-            'client1_tun_addr': '10.80.0.11/24',
-            'client2_tun_addr': '10.80.0.12/24',
             'uftp_group': '239.80.41.1',
             'uftp_private_group': '239.80.41.2',
             'uftp_port': 1044,
@@ -138,14 +128,17 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             'io_timeout_seconds': 120,
             'rounds': 1,
             'initial_model_path': os.path.join(self.temp_dir, 'model-4mib.bin'),
-            'client1_update_template_path': os.path.join(self.temp_dir, 'update-client1.bin'),
-            'client2_update_template_path': os.path.join(self.temp_dir, 'update-client2.bin'),
             'artifact_size_bytes': 4 * 1024 * 1024,
         }
+        for i in range(1, 8):
+            self.default_config[f'client{i}_tun'] = f'v8i41c{i}'
+            self.default_config[f'client{i}_tun_addr'] = f'10.80.0.{10+i}/24'
+            self.default_config[f'client{i}_update_template_path'] = os.path.join(self.temp_dir, f'update-client{i}.bin')
+
         # 创建 4 MiB 虚拟输入文件
         self._write_file(self.default_config['initial_model_path'], b'm' * (4 * 1024 * 1024))
-        self._write_file(self.default_config['client1_update_template_path'], b'1' * (4 * 1024 * 1024))
-        self._write_file(self.default_config['client2_update_template_path'], b'2' * (4 * 1024 * 1024))
+        for i in range(1, 8):
+            self._write_file(self.default_config[f'client{i}_update_template_path'], str(i).encode('ascii') * (4 * 1024 * 1024))
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
@@ -271,11 +264,10 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
         cfg_40m['rounds'] = 2
         cfg_40m['artifact_size_bytes'] = 40 * 1024 * 1024
         cfg_40m['initial_model_path'] = os.path.join(self.temp_dir, 'model-40mib.bin')
-        cfg_40m['client1_update_template_path'] = os.path.join(self.temp_dir, 'update-c1-40mib.bin')
-        cfg_40m['client2_update_template_path'] = os.path.join(self.temp_dir, 'update-c2-40mib.bin')
         self._write_file(cfg_40m['initial_model_path'], b'm' * (40 * 1024 * 1024))
-        self._write_file(cfg_40m['client1_update_template_path'], b'1' * (40 * 1024 * 1024))
-        self._write_file(cfg_40m['client2_update_template_path'], b'2' * (40 * 1024 * 1024))
+        for i in range(1, 8):
+            cfg_40m[f'client{i}_update_template_path'] = os.path.join(self.temp_dir, f'update-c{i}-40mib.bin')
+            self._write_file(cfg_40m[f'client{i}_update_template_path'], str(i).encode('ascii') * (40 * 1024 * 1024))
 
         envelope = RunEnvelope(
             run_id='v8_issue41_preflight_40m_pass',
@@ -287,8 +279,8 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
         envelope.initialize()
         executor = make_mock_topology_executor()
         executor.set_response('server', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
-        executor.set_response('client1', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
-        executor.set_response('client2', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
+        for i in range(1, 8):
+            executor.set_response(f'client{i}', 'stat -c %s', 0, f'{40 * 1024 * 1024}\n', '')
         envelope.discover_topology(executor)
 
         passed = envelope.run_preflight(executor, expected_branch='feat/41-real-hardware-fl-runtime-redo')

@@ -22,18 +22,13 @@ from tests.real_hardware.test_issue41_envelope import DummyExecutor
 def make_stopped_node_executor(clean=True, unit_active=False, cgroup_dirty=False,
                                tun_exists=False, orphan_proc=None):
     executor = DummyExecutor()
-    # 默认 server, client1, client2 都是 clean
-    for role, tun in (('server', 'v8i41s0'), ('client1', 'v8i41c1'), ('client2', 'v8i41c2')):
-        # is-active: inactive
+    roles = [('server', 'v8i41s0')] + [(f'client{i}', f'v8i41c{i}') for i in range(1, 8)]
+    for role, tun in roles:
         executor.set_response(role, 'is-active', 3, 'inactive\n', '')
-        # show
         show_str = 'ActiveState=inactive\nSubState=dead\nMainPID=0\nExecMainPID=1000\nTasksCurrent=0\nControlGroup=/\n'
         executor.set_response(role, 'systemctl show', 0, show_str, '')
-        # ip link show
         executor.set_response(role, f'ip link show {tun}', 1, f'Device "{tun}" does not exist.\n', '')
-        # pgrep
         executor.set_response(role, 'pgrep -x', 1, '', '')
-        # kill -0
         executor.set_response(role, 'kill -0', 1, '', '')
 
     if unit_active:
@@ -56,8 +51,8 @@ def make_lifecycle_full_executor(first_clean=True, restart_clean=True, second_cl
                                  pid_reused=False, old_pid_alive=False, tun_down=False,
                                  orphan_first=None, orphan_second=None):
     executor = DummyExecutor()
-    pids_old = {'server': 1001, 'client1': 1002, 'client2': 1003}
-    pids_new = {'server': 2001, 'client1': 2002, 'client2': 2003}
+    pids_old = {'server': 1001, **{f'client{i}': 1001 + i for i in range(1, 8)}}
+    pids_new = {'server': 2001, **{f'client{i}': 2001 + i for i in range(1, 8)}}
     if pid_reused:
         pids_new['server'] = pids_old['server']
 
@@ -131,7 +126,11 @@ class Issue41LifecycleTestCase(unittest.TestCase):
 
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp(prefix='issue41_test_lifecycle_')
-        self.config = LifecycleConfig(timeout_seconds=1.0, poll_interval_seconds=0.01)
+        self.config = LifecycleConfig(
+            roles=('server', 'client1', 'client2'),
+            timeout_seconds=1.0,
+            poll_interval_seconds=0.01,
+        )
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir, ignore_errors=True)

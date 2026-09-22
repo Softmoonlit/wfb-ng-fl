@@ -40,41 +40,47 @@
 
 ### 1.1 角色机
 
-| 验证阶段身份 | 正式角色 | SSH 管理地址 | 已探测仓库 | 已探测主机名 |
+Stage 2 现场基准拓扑由 8 台机器构成（1 台 Server 本机 + 7 台 Client 远端机）：
+
+| 验证阶段身份 | 正式角色 | SSH 管理别名 | 远端仓库路径 | 典型 NODE_ID |
 | --- | --- | --- | --- | --- |
-| server / orchestrator / 归档汇总机 | server | 本机 | `/home/kilome/code/wfb-ng-fl` | 本机 hostname 归档时记录 |
-| client1 | client | `vm1` | `/home/virt/projects/wfb-ng-fl` | `virt1` |
-| client2 | client | `vm2` | `/home/virt/projects/wfb-ng-fl` | `virt2` |
+| server / orchestrator / 归档汇总机 | server | 本机 (local) | `/home/virt/projects/wfb-ng-fl` | `255` |
+| client1 | client | `vm1` | `/home/virt/projects/wfb-ng-fl` | `1` |
+| client2 | client | `vm2` | `/home/virt/projects/wfb-ng-fl` | `2` |
+| client3 | client | `vm3` | `/home/virt/projects/wfb-ng-fl` | `3` |
+| client4 | client | `vm4` | `/home/virt/projects/wfb-ng-fl` | `4` |
+| client5 | client | `vm5` | `/home/virt/projects/wfb-ng-fl` | `5` |
+| client6 | client | `vm6` | `/home/virt/projects/wfb-ng-fl` | `6` |
+| client7 | client | `vm7` | `/home/virt/projects/wfb-ng-fl` | `7` |
 
 说明：
 
-- `orchestrator` 和“归档汇总机”只是 issue #41 验证阶段的辅助身份；正式版只把本机视为 server 角色机。
-- `192.168.122.*` 管理网只用于 SSH、远端命令执行和证据拉取，不能作为 FL 数据面成功证据。
-- 密码不写入本文档、脚本、日志模板或归档。脚本优先使用 SSH key；如需密码，必须通过临时环境变量或交互式输入传递，且不得回显。
+- `orchestrator` 和“归档汇总机”只是验证阶段的编排身份；数据面只把本机视为 server 角色机。
+- `192.168.122.*` 管理网只用于 SSH、远端命令执行和证据拉取，严禁作为 FL 数据面成功证据。
+- 脚本支持通过环境变量 `ISSUE41_CLIENT_ROLES` 动态配置客户端集合（默认覆盖 `client1 client2 client3 client4 client5 client6 client7`）。
 
-### 1.2 无线网卡
+### 1.2 无线网卡（动态自动检测）
 
-三台机器的默认网卡选择规则：解析 `iw dev` 输出中 `Interface` 后以 `wlx` 开头的接口。每台机器必须恰好发现一个 `wlx*` 接口；发现 0 个或多个时默认 fail-closed，要求人工显式指定。
-
-本次已探测接口：
-
-| 角色 | `wlx*` 接口 |
-| --- | --- |
-| server | `wlxfc221c300cbb` |
-| client1 | `wlxfc221c500a88` |
-| client2 | `wlxfc221c300cbc` |
-
-issue #41 脚本允许自动接管这一个 `wlx*` 接口：down/up、设置 monitor、固定信道、验证状态。脚本不得操作其他网络接口。
+所有 8 台机器的无线网卡选择规则统一遵循**全自动动态探测**原则：
+- 通过执行 `find_wlx` 解析本机与各远端机器上 `iw dev` 输出中 `Interface` 字段以 `wlx` 开头的接口。
+- **严禁给每个机器硬编码指定网卡名**。每台机器只要接入合法的 `rtl88xxau_wfb` USB 无线网卡（名称动态呈现为 `wlx*`，如 `wlx000f00...` 或 `wlxfc221...`），脚本均通过 `find_wlx` 自动识别、验证、切换 monitor 模式并绑定。
+- 每台机器必须恰好动态发现 1 个 `wlx*` 接口；发现 0 个或多于 1 个时严格 fail-closed 退出。
+- 脚本在预检与启动时自动接管识别出的 `wlx*` 接口（down/up、设置 monitor、固定信道、UP 状态断言），不触碰任何其他非空口网卡。
 
 ### 1.3 TUN 与数据面地址
 
-FL 数据面必须走 WFB/TUN/无线链路：
+FL 数据面必须完全走 WFB/TUN/无线链路：
 
 | 角色 | TUN 名称 | TUN 地址 | NODE_ID | UFTP UID |
 | --- | --- | --- | --- | --- |
-| server | `v8i41s0` | `10.80.0.1/24` | `255` | `255` |
-| client1 | `v8i41c1` | `10.80.0.11/24` | `1` | `1` |
-| client2 | `v8i41c2` | `10.80.0.12/24` | `2` | `2` |
+| server | `v8i41s0` | `10.80.0.1/24` | `255` | `0x000000ff` |
+| client1 | `v8i41c1` | `10.80.0.11/24` | `1` | `0x00000001` |
+| client2 | `v8i41c2` | `10.80.0.12/24` | `2` | `0x00000002` |
+| client3 | `v8i41c3` | `10.80.0.13/24` | `3` | `0x00000003` |
+| client4 | `v8i41c4` | `10.80.0.14/24` | `4` | `0x00000004` |
+| client5 | `v8i41c5` | `10.80.0.15/24` | `5` | `0x00000005` |
+| client6 | `v8i41c6` | `10.80.0.16/24` | `6` | `0x00000006` |
+| client7 | `v8i41c7` | `10.80.0.17/24` | `7` | `0x00000007` |
 
 Transport 参数：
 

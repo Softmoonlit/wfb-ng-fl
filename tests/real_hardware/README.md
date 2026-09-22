@@ -2,7 +2,7 @@
 
 ## 目录角色
 
-`tests/real_hardware/` 用于放置真实硬件、三机演示、正式证据生成与现场排障相关脚本和手册。
+`tests/real_hardware/` 用于放置真实硬件、多机集群（如 8 机：1 本机 server + 7 远端 client vm1~vm7）演示、正式证据生成与现场排障相关脚本和手册。
 
 这是当前最容易混入“现役入口”和“历史脚本”的目录，使用前请先读本文件。
 
@@ -22,7 +22,7 @@
 - 现场验收手册：`v8_issue41_SSH编排真实硬件FL闭环验收手册.md`
 - 配套编排脚本：`issue41_fl_runtime_loop.sh`
 
-三机现场基线当前采用 SSH 别名 `vm1` / `vm2` 控制两个客户端，三端仓库统一位于 `/home/virt/projects/wfb-ng-fl`，空口网卡通过唯一 `wlx*` 动态发现。验收场景固定为 4 MiB 单轮闭环（client2 延迟 3 秒），正式配置严禁携带立即 feedback window 候选行为。
+集群现场基线当前采用 SSH 别名 `vm1` ~ `vm7` 控制各客户端（支持通过 `ISSUE41_CLIENT_ROLES` 灵活配置），三端及远端仓库统一位于 `/home/virt/projects/wfb-ng-fl`，各节点空口网卡均通过唯一 `wlx*` 前缀动态发现，不给每个机器指定或硬编码网卡名。验收场景支持参数化多轮并发闭环，正式配置严禁携带立即 feedback window 候选行为。
 
 ## 当前有效的辅助文件
 

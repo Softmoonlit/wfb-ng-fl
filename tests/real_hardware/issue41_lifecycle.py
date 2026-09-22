@@ -18,16 +18,18 @@ import sys
 import time
 from typing import Dict, List, Optional, Set, Tuple
 
-from tests.real_hardware.issue41_envelope import RealExecutor
+import re
+from tests.real_hardware.issue41_envelope import RealExecutor, default_client_ssh_map
 
 
-ROLES = ('server', 'client1', 'client2')
+DEFAULT_CLIENT_SSH_MAP = default_client_ssh_map()
+ROLES = ('server',) + tuple(sorted(DEFAULT_CLIENT_SSH_MAP.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x))
 PROCS_TO_AUDIT = ('wfb-fl-server', 'wfb-fl-client', 'wfb_v6_uplink', 'uftp', 'uftpd')
 
 
 @dataclass
 class LifecycleConfig:
-    roles: Tuple[str, ...] = ROLES
+    roles: Tuple[str, ...] = field(default_factory=lambda: ROLES)
     server_unit: str = 'wfb-fl-server.service'
     client_unit: str = 'wfb-fl-client.service'
     server_tun: str = 'v8i41s0'
@@ -37,10 +39,12 @@ class LifecycleConfig:
     client_work_dir: str = '/var/lib/wfb-ng/issue41/client'
     timeout_seconds: float = 15.0
     poll_interval_seconds: float = 0.2
-    client_ssh_map: Dict[str, str] = field(default_factory=lambda: {
-        'client1': os.environ.get('ISSUE41_CLIENT1_SSH', 'vm1'),
-        'client2': os.environ.get('ISSUE41_CLIENT2_SSH', 'vm2'),
-    })
+    client_ssh_map: Dict[str, str] = field(default_factory=lambda: default_client_ssh_map())
+
+    def __post_init__(self):
+        for i in range(1, 11):
+            if not hasattr(self, f'client{i}_tun'):
+                setattr(self, f'client{i}_tun', f'v8i41c{i}')
 
     def unit_for_role(self, role: str) -> str:
         return self.server_unit if role == 'server' else self.client_unit
@@ -48,10 +52,11 @@ class LifecycleConfig:
     def tun_for_role(self, role: str) -> str:
         if role == 'server':
             return self.server_tun
-        elif role == 'client1':
-            return self.client1_tun
-        elif role == 'client2':
-            return self.client2_tun
+        if hasattr(self, f'{role}_tun'):
+            return getattr(self, f'{role}_tun')
+        m = re.search(r'\d+', role)
+        if m:
+            return f'v8i41c{m.group()}'
         raise ValueError(f"未知角色: {role}")
 
     def work_dir_for_role(self, role: str) -> str:
@@ -300,8 +305,9 @@ class LifecycleAuditor:
 
     def _execute_stop_all(self):
         self.executor.run('server', f"sudo systemctl stop {self.config.server_unit} 2>/dev/null || true")
-        for role in ('client1', 'client2'):
-            self.executor.run(role, f"sudo systemctl stop {self.config.client_unit} 2>/dev/null || true")
+        for role in self.config.roles:
+            if role != 'server':
+                self.executor.run(role, f"sudo systemctl stop {self.config.client_unit} 2>/dev/null || true")
 
     def _audit_stop_phase(self, phase_name: str, archive_dir: str) -> Tuple[bool, Dict[str, Dict], List[str], List[str]]:
         """通用停止阶段审计（first_stop 与 second_stop 复用）。"""
@@ -377,8 +383,9 @@ class LifecycleAuditor:
         # ==================== 阶段 2: 重启与 no-overlap 审计 (restart) ====================
         # 清理旧工作区并验证干净隔离，确保绝不复用未完成轮次
         self.executor.run('server', f"sudo rm -rf {self.config.server_work_dir}")
-        for role in ('client1', 'client2'):
-            self.executor.run(role, f"sudo rm -rf {self.config.client_work_dir}")
+        for role in self.config.roles:
+            if role != 'server':
+                self.executor.run(role, f"sudo rm -rf {self.config.client_work_dir}")
 
         clean_state_verified = True
         for role in self.config.roles:
@@ -389,8 +396,9 @@ class LifecycleAuditor:
                 all_errors.append(f"restart 阶段 {role} 工作区 {wdir} 清理失败，存在复用未完成状态风险")
 
         # 重新启动服务
-        for role in ('client1', 'client2'):
-            self.executor.run(role, f"sudo systemctl restart {self.config.client_unit}")
+        for role in self.config.roles:
+            if role != 'server':
+                self.executor.run(role, f"sudo systemctl restart {self.config.client_unit}")
         self.executor.run('server', f"sudo systemctl restart {self.config.server_unit}")
 
         restart_ready, restart_results = wait_nodes_restart_ready(
@@ -443,7 +451,8 @@ class LifecycleAuditor:
         summary_data = {
             'schema_version': 1,
             'status': overall_status,
-            'reason': '; '.join(all_errors) if all_errors else '三角色服务 restart 与资源生命周期验证通过',
+            'reason': '; '.join(all_errors) if all_errors else '角色服务 restart 与资源生命周期验证通过',
+            'participant_roles': list(self.config.roles),
             'first_stop': {
                 'status': 'passed' if first_clean else 'failed',
                 'roles': {
@@ -493,12 +502,13 @@ class LifecycleAuditor:
         return summary_data
 
 
-def _validate_stop_phase(phase_data: Dict, phase_name: str, errors: List[str]):
+def _validate_stop_phase(phase_data: Dict, phase_name: str, errors: List[str], roles: Optional[Tuple[str, ...]] = None):
     """校验单个停止阶段（first_stop 与 second_stop 复用）。"""
     if phase_data.get('status') != 'passed':
         errors.append(f'lifecycle.{phase_name} 必须为 passed')
     roles_data = phase_data.get('roles', {})
-    for role in ROLES:
+    target_roles = roles or ROLES
+    for role in target_roles:
         rdata = roles_data.get(role)
         if not isinstance(rdata, dict):
             errors.append(f'{phase_name} 缺少角色 {role} 证据')
@@ -513,7 +523,8 @@ def _validate_stop_phase(phase_data: Dict, phase_name: str, errors: List[str]):
             errors.append(f'{phase_name} {role} 不得残留孤儿进程: {rdata.get("orphan_processes")}')
 
 
-def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = None) -> List[str]:
+def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = None,
+                               expected_roles: Optional[Tuple[str, ...]] = None) -> List[str]:
     """校验 lifecycle 摘要与证据的合法性（供 issue41_validate_archive.py 调用）。"""
     errors: List[str] = []
     if not isinstance(lifecycle, dict):
@@ -531,6 +542,12 @@ def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = Non
     if status == 'skipped':
         return errors
 
+    target_roles = expected_roles or (
+        tuple(lifecycle.get('participant_roles'))
+        if lifecycle.get('participant_roles')
+        else (tuple(lifecycle.get('first_stop', {}).get('roles', {}).keys()) if lifecycle.get('first_stop', {}).get('roles') else ROLES)
+    )
+
     # 针对 passed 状态的严格断言
     for sec in ('first_stop', 'restart', 'second_stop'):
         if sec not in lifecycle or not isinstance(lifecycle[sec], dict):
@@ -540,7 +557,7 @@ def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = Non
         return errors
 
     # 1. 校验 first_stop
-    _validate_stop_phase(lifecycle['first_stop'], 'first_stop', errors)
+    _validate_stop_phase(lifecycle['first_stop'], 'first_stop', errors, roles=target_roles)
 
     # 2. 校验 restart
     restart = lifecycle['restart']
@@ -549,7 +566,7 @@ def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = Non
     if restart.get('clean_state_verified') is not True:
         errors.append('lifecycle.restart 必须证明工作区干净隔离、未复用旧未完成轮次')
     restart_roles = restart.get('roles', {})
-    for role in ROLES:
+    for role in target_roles:
         rdata = restart_roles.get(role)
         if not isinstance(rdata, dict):
             errors.append(f'restart 缺少角色 {role} 证据')
@@ -578,7 +595,7 @@ def validate_lifecycle_summary(lifecycle: Dict, archive_dir: Optional[str] = Non
             errors.append(f'restart {role} TUN 设备必须已建立并处于 UP 状态')
 
     # 3. 校验 second_stop
-    _validate_stop_phase(lifecycle['second_stop'], 'second_stop', errors)
+    _validate_stop_phase(lifecycle['second_stop'], 'second_stop', errors, roles=target_roles)
 
     # 4. 证据文件校验
     evidence_files = lifecycle.get('evidence_files')

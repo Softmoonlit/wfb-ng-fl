@@ -19,19 +19,26 @@ def main(argv=None):
     parser.add_argument('archive_dir')
     args = parser.parse_args(argv)
     archive_dir = os.path.abspath(args.archive_dir)
+    client_dirs = glob.glob(os.path.join(archive_dir, 'formal_runtime_loop', 'client*'))
+    client_names = sorted([os.path.basename(d) for d in client_dirs],
+                          key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
+    if not client_names:
+        client_names = ['client1', 'client2']
+
     result_paths = {
         'server': os.path.join(archive_dir, 'formal_runtime_loop', 'server',
                                'issue41-server-result.json'),
-        'client1': os.path.join(archive_dir, 'formal_runtime_loop', 'client1',
-                                'issue41-client1-result.json'),
-        'client2': os.path.join(archive_dir, 'formal_runtime_loop', 'client2',
-                                'issue41-client2-result.json'),
     }
+    for cname in client_names:
+        result_paths[cname] = os.path.join(archive_dir, 'formal_runtime_loop', cname,
+                                           f'issue41-{cname}-result.json')
+
     journal_paths = {
         'server': os.path.join(archive_dir, 'raw', 'server-journal.txt'),
-        'client1': os.path.join(archive_dir, 'raw', 'client1-journal.txt'),
-        'client2': os.path.join(archive_dir, 'raw', 'client2-journal.txt'),
     }
+    for cname in client_names:
+        journal_paths[cname] = os.path.join(archive_dir, 'raw', f'{cname}-journal.txt')
+
     errors = []
     results = {name: _read_json(path, errors) for name, path in result_paths.items()}
     observations = {
@@ -82,9 +89,10 @@ def main(argv=None):
     else:
         expected_size = int(resolved_cfg['artifact_size_bytes'])
 
+    expected_node_ids = [int(re.search(r'\d+', c).group()) for c in client_names if re.search(r'\d+', c)]
     if 'training_delay_ms_by_node' not in resolved_cfg:
         errors.append('envelope.json resolved_config 缺少 training_delay_ms_by_node')
-        expected_delays = {1: 0, 2: 0}
+        expected_delays = {nid: 0 for nid in expected_node_ids}
     else:
         expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
 
@@ -94,13 +102,15 @@ def main(argv=None):
         'training_delays': expected_delays,
         'round_deadline': round_deadline,
         'io_timeout': io_timeout,
+        'client_names': client_names,
+        'expected_node_ids': expected_node_ids,
     }
 
     rounds = _build_rounds(results, observations, archive_dir, errors, scenario_cfg)
-    template_hashes = _template_hashes(results, errors)
+    template_hashes = _template_hashes(results, errors, client_names)
     _reject_upload_in_progress(observations, errors)
-    complete_nodes = [1, 2] if all(
-        value.get('server_wait_returned_node_ids') == [1, 2]
+    complete_nodes = expected_node_ids if all(
+        value.get('server_wait_returned_node_ids') == expected_node_ids
         for value in rounds) else []
     status = 'passed' if not errors else 'failed'
     success_reason = f'{expected_rounds} 轮 {expected_size // (1024 * 1024)} MiB 严格同步场景证据完整'
@@ -119,7 +129,7 @@ def main(argv=None):
         },
         'rounds': rounds,
         'server_wait_for_updates_returned_node_ids': complete_nodes,
-        'partial_result_returned': complete_nodes != [1, 2],
+        'partial_result_returned': complete_nodes != expected_node_ids,
         'config_equivalence': config_eq,
         'controlled_stop': controlled_stop,
     }
@@ -128,16 +138,23 @@ def main(argv=None):
     return 0
 
 
-def _template_hashes(results, errors):
+def _template_hashes(results, errors, client_names=None):
+    if client_names is None:
+        client_names = ['client1', 'client2']
     hashes = {}
-    for node_id, role in ((1, 'client1'), (2, 'client2')):
+    seen_shas = set()
+    for role in client_names:
+        m = re.search(r'\d+', role)
+        node_id = int(m.group()) if m else 1
         value = results.get(role)
         digest = value.get('update_template_sha256') if isinstance(value, dict) else None
         if not _is_sha256(digest):
-            errors.append('client%d update 模板 SHA-256 无效' % node_id)
+            errors.append(f'{role} update 模板 SHA-256 无效')
+        elif digest in seen_shas:
+            errors.append('两个 client update 模板 SHA-256 相同' if len(client_names) == 2 else f'{role} update 模板 SHA-256 与已有客户端重复')
+        else:
+            seen_shas.add(digest)
         hashes[str(node_id)] = digest
-    if hashes.get('1') == hashes.get('2'):
-        errors.append('两个 client update 模板 SHA-256 相同')
     return hashes
 
 
@@ -147,9 +164,11 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
     expected_delays = scenario_cfg['training_delays']
     round_deadline = scenario_cfg.get('round_deadline', 400)
     io_timeout = scenario_cfg.get('io_timeout', 120)
+    client_names = scenario_cfg.get('client_names', ['client1', 'client2'])
+    expected_node_ids = scenario_cfg.get('expected_node_ids', [1, 2])
     server = results.get('server')
-    clients = {1: results.get('client1'), 2: results.get('client2')}
-    if not all(isinstance(value, dict) for value in (server, clients[1], clients[2])):
+    clients = {int(re.search(r'\d+', c).group()): results.get(c) for c in client_names if re.search(r'\d+', c)}
+    if not isinstance(server, dict) or not all(isinstance(c, dict) for c in clients.values()):
         return []
     server_rounds = server.get('rounds')
     if not isinstance(server_rounds, list) or len(server_rounds) != expected_rounds:
@@ -224,9 +243,10 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             uploads.append(upload)
 
         server_updates = server_round.get('updates')
-        if not isinstance(server_updates, list) or sorted(
-                item.get('node_id') for item in server_updates if isinstance(item, dict)) != [1, 2]:
-            errors.append('server 第 %d 轮未收齐 [1, 2]' % index)
+        actual_update_node_ids = sorted(
+            item.get('node_id') for item in server_updates if isinstance(item, dict)) if isinstance(server_updates, list) else []
+        if actual_update_node_ids != expected_node_ids:
+            errors.append(f'server 第 {index} 轮未收齐 {expected_node_ids} (实际: {actual_update_node_ids})')
         else:
             for update in server_updates:
                 client_upload = next((item for item in uploads if item['node_id'] == update['node_id']), None)
@@ -236,25 +256,27 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
                     errors.append('第 %d 轮 node %d 端到端 SHA 或大小不一致' %
                                   (index, update['node_id']))
 
-        commit_seq_1 = _event_sequence(
-            observations['server'], 'upload_committed', round_id, 1, 'committed')
-        commit_seq_2 = _event_sequence(
-            observations['server'], 'upload_committed', round_id, 2, 'committed')
+        commit_seqs = {}
+        for nid in expected_node_ids:
+            seq = _event_sequence(
+                observations['server'], 'upload_committed', round_id, nid, 'committed')
+            commit_seqs[nid] = seq
 
         returned_nodes = server_round.get('update_node_ids')
-        partial_result = (returned_nodes != [1, 2])
+        partial_result = (returned_nodes != expected_node_ids)
 
-        if commit_seq_1 is None or commit_seq_2 is None:
+        if any(seq is None for seq in commit_seqs.values()):
             errors.append('第 %d 轮 server observation 缺少 upload_committed 事件' % index)
             first_committed_node = None
             client1_committed_first = False
             server_waited = False
         else:
-            first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
-            first_seq = min(commit_seq_1, commit_seq_2)
-            second_seq = max(commit_seq_1, commit_seq_2)
+            sorted_by_seq = sorted(commit_seqs.items(), key=lambda x: x[1])
+            first_committed_node = sorted_by_seq[0][0]
+            first_seq = sorted_by_seq[0][1]
+            last_seq = sorted_by_seq[-1][1]
             client1_committed_first = (first_committed_node == 1)
-            server_waited = (first_seq < second_seq and returned_nodes == [1, 2])
+            server_waited = (first_seq < last_seq and returned_nodes == expected_node_ids)
 
         if expected_delays.get(2, 0) > expected_delays.get(1, 0):
             if not client1_committed_first:
@@ -267,27 +289,34 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             'server_waited_after_first_commit': server_waited,
             'first_committed_node_id': first_committed_node,
             'intermediate_committed_node_ids': [first_committed_node] if first_committed_node else [],
-            'intermediate_pending_node_ids': [2 if first_committed_node == 1 else 1] if first_committed_node else [],
+            'intermediate_pending_node_ids': [nid for nid in expected_node_ids if nid != first_committed_node],
             'server_wait_returned_node_ids': returned_nodes,
             'partial_result_returned': partial_result,
         }
 
         # 计算 HTTP PUT 活动时间区间与自然重叠
-        up1 = next((u for u in uploads if u['node_id'] == 1), None)
-        up2 = next((u for u in uploads if u['node_id'] == 2), None)
+        valid_intervals = [
+            (u['node_id'], u['client_put_interval']['start'], u['client_put_interval']['end'])
+            for u in uploads
+            if u.get('client_put_interval') and 'start' in u['client_put_interval'] and 'end' in u['client_put_interval']
+        ]
         overlap_seconds = 0.0
         natural_overlap = False
-
-        # 优先使用客户端真实时间戳区间（秒）计算重叠时长
-        if up1 and up2 and up1.get('client_put_interval') and up2.get('client_put_interval'):
-            s1 = up1['client_put_interval']['start']
-            e1 = up1['client_put_interval']['end']
-            s2 = up2['client_put_interval']['start']
-            e2 = up2['client_put_interval']['end']
-            overlap = min(e1, e2) - max(s1, s2)
+        if len(valid_intervals) >= 2:
+            max_start = max(item[1] for item in valid_intervals)
+            min_end = min(item[2] for item in valid_intervals)
+            overlap = min_end - max_start
             if overlap > 0:
                 overlap_seconds = round(overlap, 3)
                 natural_overlap = True
+            else:
+                # 寻找任意两两之间的最大重叠
+                for i in range(len(valid_intervals)):
+                    for j in range(i + 1, len(valid_intervals)):
+                        ov = min(valid_intervals[i][2], valid_intervals[j][2]) - max(valid_intervals[i][1], valid_intervals[j][1])
+                        if ov > overlap_seconds:
+                            overlap_seconds = round(ov, 3)
+                            natural_overlap = True
 
         active_sets = [
             value.get('active_node_ids') for value in observations['server']
@@ -295,20 +324,14 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             value.get('round') == round_id and
             isinstance(value.get('active_node_ids'), list)
         ]
-        concurrent_active_observed = any(set(s) == {1, 2} for s in active_sets)
+        concurrent_active_observed = any(len(set(s)) > 1 for s in active_sets)
 
         concurrent_put = {
             'natural_overlap': natural_overlap,
             'overlap_duration_seconds': overlap_seconds,
             'concurrent_active_observed': concurrent_active_observed,
-            'server_intervals': {
-                '1': up1.get('server_put_interval') if up1 else None,
-                '2': up2.get('server_put_interval') if up2 else None,
-            },
-            'client_intervals': {
-                '1': up1.get('client_put_interval') if up1 else None,
-                '2': up2.get('client_put_interval') if up2 else None,
-            },
+            'server_intervals': {str(u['node_id']): u.get('server_put_interval') for u in uploads},
+            'client_intervals': {str(u['node_id']): u.get('client_put_interval') for u in uploads},
         }
 
         # 确定本轮时间区间用于分轮遥测过滤

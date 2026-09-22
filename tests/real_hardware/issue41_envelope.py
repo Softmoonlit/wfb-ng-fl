@@ -70,14 +70,21 @@ def generate_run_id(prefix='v8_issue41_'):
     return f"{prefix}{timestamp}_{token}"
 
 
+def default_client_ssh_map():
+    if 'ISSUE41_CLIENT_ROLES' in os.environ:
+        roles = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
+        return {r: os.environ.get(f"ISSUE41_{r.upper()}_SSH", f"vm{r.replace('client', '')}") for r in roles}
+    return {
+        f'client{i}': os.environ.get(f'ISSUE41_CLIENT{i}_SSH', f'vm{i}')
+        for i in range(1, 8)
+    }
+
+
 class RealExecutor:
-    """真实环境执行器，针对 server 本地执行，针对 client1/client2 通过 SSH 执行。"""
+    """真实环境执行器，针对 server 本地执行，针对各 client 通过 SSH 执行。"""
 
     def __init__(self, client_ssh_map=None):
-        self.client_ssh_map = client_ssh_map or {
-            'client1': os.environ.get('ISSUE41_CLIENT1_SSH', 'vm1'),
-            'client2': os.environ.get('ISSUE41_CLIENT2_SSH', 'vm2'),
-        }
+        self.client_ssh_map = client_ssh_map if client_ssh_map is not None else default_client_ssh_map()
 
     def run(self, target, cmd, timeout=30):
         try:
@@ -115,10 +122,9 @@ class RunEnvelope:
         self.mode = mode
         self.resolved_config = resolved_config or {}
         self.remote_repo = remote_repo or os.environ.get('ISSUE41_REMOTE_REPO', '/home/virt/projects/wfb-ng-fl')
-        self.client_ssh_map = client_ssh_map or {
-            'client1': os.environ.get('ISSUE41_CLIENT1_SSH', 'vm1'),
-            'client2': os.environ.get('ISSUE41_CLIENT2_SSH', 'vm2'),
-        }
+        self.client_ssh_map = client_ssh_map if client_ssh_map is not None else default_client_ssh_map()
+        self.client_roles = tuple(sorted(self.client_ssh_map.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x))
+        self.roles = ('server',) + self.client_roles
         self.topology = {}
         self.partitions = {}
         self.state = 'uninitialized'
@@ -147,8 +153,7 @@ class RunEnvelope:
             'archive_dir': self.archive_dir,
             'network_isolation': {
                 'data_plane': '10.80.0.0/24',
-                'management_network': [self.client_ssh_map.get('client1', 'vm1'),
-                                       self.client_ssh_map.get('client2', 'vm2')],
+                'management_network': [self.client_ssh_map[role] for role in self.client_roles],
                 'prohibit_management_as_data_plane': True,
             },
             'resolved_config': self.resolved_config,
@@ -162,11 +167,11 @@ class RunEnvelope:
         return self.archive_dir
 
     def discover_topology(self, executor):
-        """现场重新发现三机拓扑事实，并归档至 topology.json。"""
+        """现场重新发现集群拓扑事实，并归档至 topology.json。"""
         if self.state == 'closed':
             raise RuntimeError("包络已关闭，无法执行拓扑发现")
 
-        roles = ('server', 'client1', 'client2')
+        roles = self.roles
         topology = {}
 
         for role in roles:
@@ -242,23 +247,23 @@ class RunEnvelope:
             # Layer 1: repo_and_version
             l_name = PreflightLayer.REPO_AND_VERSION
             server_topo = self.topology.get('server', {})
-            c1_topo = self.topology.get('client1', {})
-            c2_topo = self.topology.get('client2', {})
 
             if expected_branch:
-                for role, t in self.topology.items():
+                for role in self.roles:
+                    t = self.topology.get(role, {})
                     if t.get('branch') != expected_branch:
                         raise PreflightException(l_name, FailureCategory.IMPLEMENTATION,
                                                  f"{role} 分支为 {t.get('branch')}，非预期 {expected_branch}")
 
             server_commit = server_topo.get('commit')
-            for role in ('client1', 'client2'):
+            for role in self.client_roles:
                 r_commit = self.topology.get(role, {}).get('commit')
                 if not r_commit or r_commit != server_commit:
                     raise PreflightException(l_name, FailureCategory.IMPLEMENTATION,
                                              f"{role} commit 与本机不一致：{r_commit} != {server_commit}")
 
-            for role, t in self.topology.items():
+            for role in self.roles:
+                t = self.topology.get(role, {})
                 if not t.get('workspace_clean'):
                     raise PreflightException(l_name, FailureCategory.IMPLEMENTATION,
                                              f"{role} 工作区不干净，存在未提交文件")
@@ -266,12 +271,12 @@ class RunEnvelope:
 
             # Layer 2: ssh_and_sudo
             l_name = PreflightLayer.SSH_AND_SUDO
-            for role in ('client1', 'client2'):
+            for role in self.client_roles:
                 rc, _, err = executor.run(role, 'ssh_check echo ok')
                 if rc != 0:
                     raise PreflightException(l_name, FailureCategory.ENVIRONMENT,
                                              f"SSH 到 {role} 失败：{err.strip()}")
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 rc, _, err = executor.run(role, 'sudo -n true')
                 if rc != 0:
                     raise PreflightException(l_name, FailureCategory.ENVIRONMENT,
@@ -281,7 +286,7 @@ class RunEnvelope:
             # Layer 3: dependencies
             l_name = PreflightLayer.DEPENDENCIES
             required_cmds = ('ip', 'iw', 'systemctl', 'journalctl', 'make', 'python3', 'uftp', 'uftpd')
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 for cmd in required_cmds:
                     rc, _, _ = executor.run(role, f"command -v {cmd}")
                     if rc != 0:
@@ -298,33 +303,26 @@ class RunEnvelope:
                     raise PreflightException(l_name, FailureCategory.TOOLING,
                                              f"server 初始模型必须是可读的 {expected_size_desc} 文件：{initial_model}")
 
-            c1_tpl = self.resolved_config.get('client1_update_template_path')
-            c2_tpl = self.resolved_config.get('client2_update_template_path')
-            c1_sha, c2_sha = None, None
-            if c1_tpl:
-                rc, out, _ = executor.run('client1', f"sudo test -f '{c1_tpl}' && sudo test -r '{c1_tpl}' && sudo stat -c %s '{c1_tpl}'")
-                if rc != 0 or out.strip() != str(expected_size):
-                    raise PreflightException(l_name, FailureCategory.TOOLING,
-                                             f"client1 update 模板必须是可读的 {expected_size_desc} 文件：{c1_tpl}")
-                rc, out, _ = executor.run('client1', f"sudo sha256sum '{c1_tpl}'")
-                c1_sha = out.split()[0] if rc == 0 else ''
+            client_shas = {}
+            for role in self.client_roles:
+                tpl_path = self.resolved_config.get(f'{role}_update_template_path')
+                if tpl_path:
+                    rc, out, _ = executor.run(role, f"sudo test -f '{tpl_path}' && sudo test -r '{tpl_path}' && sudo stat -c %s '{tpl_path}'")
+                    if rc != 0 or out.strip() != str(expected_size):
+                        raise PreflightException(l_name, FailureCategory.TOOLING,
+                                                 f"{role} update 模板必须是可读的 {expected_size_desc} 文件：{tpl_path}")
+                    rc, out, _ = executor.run(role, f"sudo sha256sum '{tpl_path}'")
+                    c_sha = out.split()[0] if rc == 0 else ''
+                    client_shas[role] = c_sha
 
-            if c2_tpl:
-                rc, out, _ = executor.run('client2', f"sudo test -f '{c2_tpl}' && sudo test -r '{c2_tpl}' && sudo stat -c %s '{c2_tpl}'")
-                if rc != 0 or out.strip() != str(expected_size):
-                    raise PreflightException(l_name, FailureCategory.TOOLING,
-                                             f"client2 update 模板必须是可读的 {expected_size_desc} 文件：{c2_tpl}")
-                rc, out, _ = executor.run('client2', f"sudo sha256sum '{c2_tpl}'")
-                c2_sha = out.split()[0] if rc == 0 else ''
-
-            if c1_sha and c2_sha and c1_sha == c2_sha:
+            if len(client_shas) > 1 and len(client_shas) != len(set(client_shas.values())):
                 raise PreflightException(l_name, FailureCategory.TOOLING,
-                                         "client1 与 client2 的 update 模板 SHA-256 必须不同")
+                                         "所有客户端 update 模板 SHA-256 必须两两不同")
             last_successful = l_name
 
             # Layer 4: wireless_usb
             l_name = PreflightLayer.WIRELESS_USB
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 w_iface = self.topology.get(role, {}).get('wireless_interface')
                 if not w_iface:
                     raise PreflightException(l_name, FailureCategory.ENVIRONMENT,
@@ -343,7 +341,7 @@ class RunEnvelope:
 
             # Layer 5: radio_monitor_channel
             l_name = PreflightLayer.RADIO_MONITOR_CHANNEL
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 w_iface = self.topology.get(role, {}).get('wireless_interface')
                 rc, out, _ = executor.run(role, f"iw dev {w_iface} info")
                 if rc != 0 or 'type monitor' not in out:
@@ -361,7 +359,7 @@ class RunEnvelope:
                 self.resolved_config.get('uftp_port', 1044),
                 self.resolved_config.get('http_port', 8080),
             ]
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 rc, out, _ = executor.run(role, 'ss -tuln')
                 if rc == 0:
                     for port in ports_to_check:
@@ -370,11 +368,11 @@ class RunEnvelope:
                                                      f"{role} 关键端口 {port} 已被占用：{out.strip()}")
 
             # TUN 设备在 preflight 时不应存在
-            tuns = {
-                'server': self.resolved_config.get('server_tun', 'v8i41s0'),
-                'client1': self.resolved_config.get('client1_tun', 'v8i41c1'),
-                'client2': self.resolved_config.get('client2_tun', 'v8i41c2'),
-            }
+            tuns = {'server': self.resolved_config.get('server_tun', 'v8i41s0')}
+            for role in self.client_roles:
+                idx = re.search(r'\d+', role).group() if re.search(r'\d+', role) else '1'
+                tuns[role] = self.resolved_config.get(f'{role}_tun', f'v8i41c{idx}')
+
             for role, tun in tuns.items():
                 rc, out, _ = executor.run(role, f"ip link show {tun}")
                 if rc == 0 and ('mtu' in out or tun in out):
@@ -385,7 +383,7 @@ class RunEnvelope:
             # Layer 7: residual_processes
             l_name = PreflightLayer.RESIDUAL_PROCESSES
             procs = ('wfb-fl-server', 'wfb-fl-client', 'wfb_v6_uplink', 'uftp', 'uftpd')
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 for proc in procs:
                     rc, out, _ = executor.run(role, f"pgrep -x {proc}")
                     if rc == 0 and out.strip():
@@ -395,11 +393,10 @@ class RunEnvelope:
 
             # Layer 8: managed_directory_boundary
             l_name = PreflightLayer.MANAGED_DIRECTORY_BOUNDARY
-            dirs_to_check = {
-                'server': '/var/lib/wfb-ng/issue41/server',
-                'client1': '/var/lib/wfb-ng/issue41/client',
-                'client2': '/var/lib/wfb-ng/issue41/client',
-            }
+            dirs_to_check = {'server': '/var/lib/wfb-ng/issue41/server'}
+            for role in self.client_roles:
+                dirs_to_check[role] = '/var/lib/wfb-ng/issue41/client'
+
             for role, d in dirs_to_check.items():
                 rc, out, _ = executor.run(role, f"check_work_dir_empty {d} || ([ -d '{d}' ] && [ -n \"$(ls -A '{d}' 2>/dev/null)\" ] && echo non-empty || echo empty)")
                 if 'non-empty' in out:
@@ -456,11 +453,11 @@ class RunEnvelope:
         """受控停止本次运行已经启动的所有资源，带超时轮询与残留审计。"""
         # 1. 停止角色服务
         executor.run('server', 'sudo systemctl stop wfb-fl-server.service 2>/dev/null || true')
-        for role in ('client1', 'client2'):
+        for role in self.client_roles:
             executor.run(role, 'sudo systemctl stop wfb-fl-client.service 2>/dev/null || true')
 
         # 2. 杀掉临时进程
-        for role in ('server', 'client1', 'client2'):
+        for role in self.roles:
             executor.run(role, 'sudo pkill -x wfb_v6_uplink 2>/dev/null || true')
             executor.run(role, 'sudo pkill -x uftp 2>/dev/null || true')
             executor.run(role, 'sudo pkill -x uftpd 2>/dev/null || true')
@@ -472,17 +469,17 @@ class RunEnvelope:
 
         while time.time() < deadline:
             residuals = []
-            for role in ('server', 'client1', 'client2'):
+            for role in self.roles:
                 for proc in ('wfb-fl-server', 'wfb-fl-client', 'wfb_v6_uplink', 'uftp', 'uftpd'):
                     rc, out, _ = executor.run(role, f"pgrep -x {proc}")
                     if rc == 0 and out.strip():
                         residuals.append(f"{role} 停止后仍有残留：进程 {proc} ({out.strip()})")
 
-            tun_map = {
-                'server': self.resolved_config.get('server_tun', 'v8i41s0'),
-                'client1': self.resolved_config.get('client1_tun', 'v8i41c1'),
-                'client2': self.resolved_config.get('client2_tun', 'v8i41c2'),
-            }
+            tun_map = {'server': self.resolved_config.get('server_tun', 'v8i41s0')}
+            for role in self.client_roles:
+                idx = re.search(r'\d+', role).group() if re.search(r'\d+', role) else '1'
+                tun_map[role] = self.resolved_config.get(f'{role}_tun', f'v8i41c{idx}')
+
             for role, tun in tun_map.items():
                 rc, out, _ = executor.run(role, f"ip link show {tun}")
                 if rc == 0 and ('mtu' in out or tun in out):

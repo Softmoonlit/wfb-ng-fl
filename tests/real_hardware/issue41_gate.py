@@ -78,6 +78,9 @@ class GateConfig:
         self.downlink_stream = downlink_stream
         self.server_tun = server_tun
         self.server_tun_addr = server_tun_addr
+        for i in range(1, 11):
+            setattr(self, f'client{i}_tun', f'v8i41c{i}')
+            setattr(self, f'client{i}_tun_addr', f'10.80.0.{10+i}/24')
         self.client1_tun = client1_tun
         self.client1_tun_addr = client1_tun_addr
         self.client2_tun = client2_tun
@@ -156,8 +159,8 @@ class GateConfig:
                 'feedback_window_duration_ms': self.feedback_window_duration_ms,
                 'feedback_window_start_immediately': False,
             }
-        tun = self.client1_tun if node_id == 1 else self.client2_tun
-        tun_addr = self.client1_tun_addr if node_id == 1 else self.client2_tun_addr
+        tun = getattr(self, f'client{node_id}_tun', f'v8i41c{node_id}')
+        tun_addr = getattr(self, f'client{node_id}_tun_addr', f'10.80.0.{10+node_id}/24')
         return {
             'role': 'client',
             'node_id': node_id,
@@ -313,11 +316,20 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
 
 def check_role_configs_equivalence(gate_config: GateConfig,
                                    server_fl_path: str,
-                                   client1_fl_path: str,
-                                   client2_fl_path: str) -> Dict[str, Any]:
-    """读取三角色服务配置并校验与 GateConfig 的等价性。"""
+                                   client1_fl_path: Optional[str] = None,
+                                   client2_fl_path: Optional[str] = None,
+                                   client_fl_paths: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """读取多角色服务配置并校验与 GateConfig 的等价性。"""
     runtime_configs = {}
-    paths = {'server': server_fl_path, 'client1': client1_fl_path, 'client2': client2_fl_path}
+    paths = {'server': server_fl_path}
+    if client_fl_paths:
+        paths.update(client_fl_paths)
+    else:
+        if client1_fl_path:
+            paths['client1'] = client1_fl_path
+        if client2_fl_path:
+            paths['client2'] = client2_fl_path
+
     for role, path in paths.items():
         if not os.path.isfile(path):
             return {
@@ -329,11 +341,12 @@ def check_role_configs_equivalence(gate_config: GateConfig,
         with open(path, 'r', encoding='utf-8') as fh:
             runtime_configs[role] = json.load(fh)
 
-    gate_configs = {
-        'server': gate_config.get_expected_link_config('server', 255),
-        'client1': gate_config.get_expected_link_config('client', 1),
-        'client2': gate_config.get_expected_link_config('client', 2),
-    }
+    gate_configs = {'server': gate_config.get_expected_link_config('server', 255)}
+    for role in paths:
+        if role != 'server':
+            m = re.search(r'\d+', role)
+            nid = int(m.group()) if m else 1
+            gate_configs[role] = gate_config.get_expected_link_config('client', nid)
 
     errors = verify_config_equivalence(gate_configs, runtime_configs)
     return {
@@ -359,22 +372,27 @@ def _compute_file_sha256(path: str) -> str:
 
 def generate_cycle_fixtures(cycle: int,
                             server_dir: str,
-                            client1_dir: str,
-                            client2_dir: str,
-                            size: int = 4 * 1024 * 1024) -> Dict[str, str]:
-    """确定性生成本周期的 4 MiB model, manifest 以及两 client 不同的 4 MiB update。"""
+                            client1_dir: Optional[str] = None,
+                            client2_dir: Optional[str] = None,
+                            size: int = 4 * 1024 * 1024,
+                            client_dirs: Optional[Dict[int, str]] = None) -> Dict[str, str]:
+    """确定性生成本周期的 model, manifest 以及各 client 不同的 update。"""
     os.makedirs(server_dir, exist_ok=True)
-    os.makedirs(client1_dir, exist_ok=True)
-    os.makedirs(client2_dir, exist_ok=True)
+    c_dirs: Dict[int, str] = {}
+    if client_dirs:
+        c_dirs.update(client_dirs)
+    else:
+        if client1_dir:
+            c_dirs[1] = client1_dir
+        if client2_dir:
+            c_dirs[2] = client2_dir
+
+    for cdir in c_dirs.values():
+        os.makedirs(cdir, exist_ok=True)
 
     model_pat = cycle_model_pattern(cycle)
-    c1_pat = cycle_client_pattern(cycle, 1)
-    c2_pat = cycle_client_pattern(cycle, 2)
-
     model_path = os.path.join(server_dir, 'model.bin')
     manifest_path = os.path.join(server_dir, 'model.manifest.json')
-    c1_path = os.path.join(client1_dir, 'update.bin')
-    c2_path = os.path.join(client2_dir, 'update.bin')
 
     model_info = generate_deterministic_file(model_path, size_bytes=size, pattern=model_pat)
     with open(manifest_path, 'w', encoding='utf-8') as fh:
@@ -386,14 +404,14 @@ def generate_cycle_fixtures(cycle: int,
             'cycle': cycle,
         }, fh, indent=2)
 
-    c1_info = generate_deterministic_file(c1_path, size_bytes=size, pattern=c1_pat)
-    c2_info = generate_deterministic_file(c2_path, size_bytes=size, pattern=c2_pat)
+    result = {'model_sha256': model_info['sha256']}
+    for nid, cdir in c_dirs.items():
+        c_pat = cycle_client_pattern(cycle, nid)
+        c_path = os.path.join(cdir, 'update.bin')
+        c_info = generate_deterministic_file(c_path, size_bytes=size, pattern=c_pat)
+        result[f'client{nid}_sha256'] = c_info['sha256']
 
-    return {
-        'model_sha256': model_info['sha256'],
-        'client1_sha256': c1_info['sha256'],
-        'client2_sha256': c2_info['sha256'],
-    }
+    return result
 
 
 class GateHTTPReceiverHandler(http.server.BaseHTTPRequestHandler):
@@ -402,11 +420,14 @@ class GateHTTPReceiverHandler(http.server.BaseHTTPRequestHandler):
     def do_PUT(self):
         t0 = time.monotonic()
         client_ip = self.client_address[0]
-        # 推导 node_id
-        if client_ip.endswith('.11') or client_ip == '10.80.0.11':
-            node_id = 1
-        elif client_ip.endswith('.12') or client_ip == '10.80.0.12':
-            node_id = 2
+        # 推导 node_id (支持 10.80.0.{10+node_id})
+        parts = client_ip.split('.')
+        if len(parts) == 4 and parts[0] == '10' and parts[1] == '80' and parts[2] == '0':
+            last = int(parts[3])
+            if 11 <= last <= 25:
+                node_id = last - 10
+            else:
+                node_id = last
         else:
             m = re.search(r'/client(\d+)', self.path)
             node_id = int(m.group(1)) if m else 1
@@ -762,9 +783,11 @@ def parse_telemetry(server_log: str,
     ready_accepted = max(ready_filter_accepted, ready_accept_events)
 
     # 2. authorized sends
-    authorized_sends_by_node = {'1': 0, '2': 0}
-    for role, node_id in (('client1', '1'), ('client2', '2')):
-        log_text = client_logs.get(role, '')
+    authorized_sends_by_node = {}
+    for role, log_text in client_logs.items():
+        m_nid = re.search(r'\d+', role)
+        node_id = m_nid.group() if m_nid else '1'
+        authorized_sends_by_node[node_id] = 0
         for line in log_text.splitlines():
             m_ta = re.search(r'\tTOKEN_AUTH\t(\d+):(\d+):(\d+):(\d+):(\d+)', line)
             if m_ta and m_ta.group(1) == node_id:
