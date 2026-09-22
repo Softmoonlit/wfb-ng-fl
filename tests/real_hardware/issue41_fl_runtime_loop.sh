@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 export PYTHONPATH="$PROJECT_ROOT:${PYTHONPATH:-}"
-BRANCH="${ISSUE41_BRANCH:-feat/stage1-link-throughput-and-40mib-loop}"
+BRANCH="${ISSUE41_BRANCH:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo feat/stage2-airgapped-core-engine-and-daemon)}"
 ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
