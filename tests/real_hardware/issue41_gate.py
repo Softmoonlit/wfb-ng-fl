@@ -582,7 +582,7 @@ def verify_downlink_artifacts(server_cycle_dir: str,
     manifest_sha = hashlib.sha256(manifest_data).hexdigest()
 
     connect_matrix = {}
-    result_matrix = {'1': {}, '2': {}}
+    result_matrix = {node_id: {} for node_id in client_inboxes.keys()}
     if os.path.exists(status_file):
         with open(status_file, 'r', encoding='utf-8') as fh:
             for line in fh:
@@ -597,8 +597,9 @@ def verify_downlink_artifacts(server_cycle_dir: str,
                     h_id = str(int(fields[1], 16))
                     dest_file = os.path.basename(fields[2])
                     r_status = fields[4]
-                    if h_id in result_matrix:
-                        result_matrix[h_id][dest_file] = r_status
+                    if h_id not in result_matrix:
+                        result_matrix[h_id] = {}
+                    result_matrix[h_id][dest_file] = r_status
 
     client_received = {}
     for node_id, inbox_dir in client_inboxes.items():
