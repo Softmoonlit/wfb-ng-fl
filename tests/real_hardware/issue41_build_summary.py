@@ -147,7 +147,7 @@ def main(argv=None):
 
 def _template_hashes(results, errors, client_names=None):
     if client_names is None:
-        client_names = ['client1', 'client2']
+        client_names = [k for k in sorted(results.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0) if k != 'server']
     hashes = {}
     seen_shas = set()
     for role in client_names:
@@ -171,8 +171,12 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
     expected_delays = scenario_cfg['training_delays']
     round_deadline = scenario_cfg.get('round_deadline', 400)
     io_timeout = scenario_cfg.get('io_timeout', 120)
-    client_names = scenario_cfg.get('client_names', ['client1', 'client2'])
-    expected_node_ids = scenario_cfg.get('expected_node_ids', [1, 2])
+    client_names = scenario_cfg.get('client_names')
+    if client_names is None:
+        client_names = [k for k in sorted(results.keys(), key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0) if k != 'server']
+    expected_node_ids = scenario_cfg.get('expected_node_ids')
+    if expected_node_ids is None:
+        expected_node_ids = sorted([int(re.search(r'\d+', c).group()) for c in client_names if re.search(r'\d+', c)])
     server = results.get('server')
     clients = {int(re.search(r'\d+', c).group()): results.get(c) for c in client_names if re.search(r'\d+', c)}
     if not isinstance(server, dict) or not all(isinstance(c, dict) for c in clients.values()):

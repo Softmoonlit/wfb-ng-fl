@@ -1195,8 +1195,8 @@ def classify_gate_failure(server_rx_ant_samples: int = 0,
             'reason': '无线网卡未处于 UP/monitor 模式或配置失败',
         }
 
-    c_decl = client_declared or {'client1': False, 'client2': False}
-    s_acc = server_accepted or {'client1': False, 'client2': False}
+    c_decl = client_declared if client_declared is not None else {}
+    s_acc = server_accepted if server_accepted is not None else {}
 
     if not tun_routes_ok:
         return {
@@ -1206,7 +1206,7 @@ def classify_gate_failure(server_rx_ant_samples: int = 0,
             'reason': 'TUN 组播或点对点路由缺失或未生效',
         }
 
-    if all(c_decl.values()) and not any(s_acc.values()) and server_rx_ant_samples == 0:
+    if c_decl and all(c_decl.values()) and not any(s_acc.values()) and server_rx_ant_samples == 0:
         return {
             'category': 'link_capability',
             'last_successful_layer': 'radio_device_and_params',
