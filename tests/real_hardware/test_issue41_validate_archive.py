@@ -870,7 +870,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
                 'smoke_cycle_deadline_seconds': 240,
+                'artifact_size_bytes': 40 * 1024 * 1024,
                 'runtime_timeout_seconds': 180,
                 'io_timeout_seconds': 120,
             },

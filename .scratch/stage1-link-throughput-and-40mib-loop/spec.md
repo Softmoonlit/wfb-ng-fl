@@ -24,37 +24,37 @@ Status: resolved
 
 ## User Stories
 
-1. As a 链路维护者, I want to execute a single-cycle 40 MiB exploratory probe on the current hardware topology, so that I can obtain first-hand baseline throughput and loss data without guessing based on outdated hardware evidence.
-2. As a 链路维护者, I want the exploratory probe to be executed via parameterized configuration of existing tools, so that no temporary redundant throwaway test scripts are introduced into the codebase.
-3. As a 系统诊断者, I want the link-layer receiver aggregator to maintain independent packet counters per source node, so that telemetry can clearly distinguish traffic originating from different clients.
-4. As a 系统诊断者, I want the link-layer periodic stats dump to output structured per-source metrics including raw packets, raw bytes, FEC recovered packets, lost packets, and delivered outgoing packets/bytes, so that uplink packet loss can be attributed to specific client transmit paths.
-5. As a 监控解析者, I want the telemetry parser to extract structured per-node loss and recovery metrics from role service logs, so that verification tools and humans do not need to parse unstructured raw text.
-6. As a 测试工程师, I want unit tests to cover the C++ per-source aggregator logic, so that regression in source-node identification and counter accumulation is prevented before deploying to physical nodes.
-7. As a 测试工程师, I want unit tests to cover the Python telemetry parser against per-source log formats, so that malformed or missing fields are detected immediately.
-8. As a 现场操作者, I want to view separate FEC recovery and loss percentages for Client1 and Client2, so that I can determine whether the USB 3.0 adapter outperforms the USB 2.0 adapter.
-9. As a 链路维护者, I want to scan and compare alternative 5 GHz channels when packet loss is elevated, so that external radio frequency interference can be isolated and avoided.
-10. As a 链路维护者, I want to tune the FEC redundancy ratio (such as 8/12 vs 8/14 vs 8/10) based on observed loss rates, so that optimal effective throughput is achieved under the current link capability.
-11. As a 链路维护者, I want to evaluate MCS rates 0 through 3 on the physical link, so that modulation fits the signal-to-noise ratio of all participating test nodes.
-12. As a 架构维护者, I want the single I/O progress stall timeout to remain strictly 120 seconds, so that link stalls and deadlocks are never masked by inflating timeouts.
-13. As a 架构维护者, I want the overall runtime phase timeout to be strictly bounded, so that test runs fail closed if cumulative throughput is insufficient.
-14. As a 验收套件维护者, I want the execution envelope to accept configurable scenario parameters for payload size and round counts, so that a single unified envelope supports both regression small-payload gates and formal large-payload acceptance.
-15. As a 验收套件维护者, I want test payloads and digests to be deterministically generated before the live run, so that live execution does not hide file generation overhead inside transmission measurements.
-16. As a FL 算法开发者, I want the server to publish an operator-provided or deterministically prepared 40 MiB model, so that downlink distribution represents full-scale model artifact delivery.
-17. As a FL 算法开发者, I want Client1 and Client2 to use distinct 40 MiB synthetic update templates, so that the server can verify that submissions from the two clients have unique content and distinct SHA-256 digests.
-18. As a FL 算法开发者, I want Client1 and Client2 to reuse their respective update templates across both rounds, so that template preparation is deterministic while round identity remains distinct.
-19. As a FL 算法开发者, I want both clients to operate with zero artificial training delay, so that updates are submitted immediately following model reception and validation.
-20. As a Transport Backend 维护者, I want the server to admit concurrent HTTP PUT uploads from different participating nodes without rejecting either with upload-in-progress conflicts, so that multi-client concurrent transport is exercised over the radio link.
-21. As a Transport Backend 维护者, I want the execution evidence to record the start and completion timestamps of each client's HTTP PUT, so that whether the uploads naturally overlapped in time is transparently documented.
-22. As a Transport Backend 维护者, I want the acceptance criteria to accept naturally occurring upload overlap without inserting artificial sleeps or delays to force artificial concurrency, so that real-world network behavior is respected.
-23. As a FL Runtime 维护者, I want the server to wait for the complete set of participating updates before advancing to placeholder aggregation, so that strict synchronous round progression is preserved.
-24. As a FL Runtime 维护者, I want the server to advance across two full rounds with distinct round identifiers, so that cross-round state cleanup and round re-initialization are proven on real hardware.
-25. As a 运行维护者, I want the scenario to run through installed systemd role services on all three physical machines, so that production-grade service lifecycles and cgroup isolation are exercised.
-26. As a 运行维护者, I want service stop, restart, and orphan process checks to run after the two-round execution, so that no leaked processes or lingering TUN interfaces remain on any test node.
-27. As a 归档审计者, I want the archive validator to verify evidence across all partitions including orchestration, pre-runtime smoke, formal two-round runtime loop, and lifecycle teardown, so that no stage can be silently skipped.
-28. As a 归档审计者, I want the validator to assert exact 40 MiB sizes and matching SHA-256 digests for all published models and committed updates across both rounds, so that end-to-end data integrity is proven beyond doubt.
-29. As a 归档审计者, I want the validator to assert that no upload-in-progress or HTTP timeout occurred during either round, so that transmission was completely clean.
-30. As a 项目维护者, I want every failed execution to generate an immutable failed archive preserving the first failing stage and raw radio logs, so that failures are debuggable without wiping historical evidence.
-31. As a 项目维护者, I want the successful execution of this stage to formally resolve and close GitHub Issue #60, Issue #53, Issue #54, and Epic Issue #50, so that the GitHub tracker state accurately reflects repository delivery.
+1. 作为 链路维护者，我希望在当前硬件拓扑上执行单周期 40 MiB 探索性摸底探路，以便获取第一手吞吐与丢包基线数据，而非基于过时证据猜测。
+2. 作为 链路维护者，我希望通过现有工具的参数化配置执行摸底探路，以便不向代码库引入临时冗余的试探脚本。
+3. 作为 系统诊断者，我希望链路层接收聚合器按源节点维护独立收包计数，以便遥测能够清晰区分不同客户端发送的流量。
+4. 作为 系统诊断者，我希望链路层周期性状态输出结构化分源指标（含原始包数、字节数、FEC 恢复包数、残余丢包数及交付包数/字节数），以便将上行丢包归因至具体的客户端发射路径。
+5. 作为 监控解析者，我希望遥测解析器能从角色服务日志中提取结构化的分节点丢包与恢复指标，以便验证工具与人工无需解析非结构化原始日志。
+6. 作为 测试工程师，我希望单元测试覆盖 C++ 分源聚合器逻辑，以便在部署到物理节点前防止源节点识别与计数累加出现回归。
+7. 作为 测试工程师，我希望单元测试覆盖 Python 遥测解析器对分源日志格式的解析，以便及时发现畸变或缺失字段。
+8. 作为 现场操作者，我希望分别查看 Client1 与 Client2 的 FEC 恢复率与丢包率，以便判断 USB 3.0 网卡与 USB 2.0 网卡的性能表现差异。
+9. 作为 链路维护者，我希望在丢包较高时扫描并对比备选 5 GHz 信道，以便隔离并避开外部射频干扰。
+10. 作为 链路维护者，我希望根据观测到的丢包率调优 FEC 冗余比例（如对比 8/12、8/14 与 8/10），以便在当前链路能力下达到最优有效吞吐。
+11. 作为 链路维护者，我希望在物理链路上评估 MCS 0 至 MCS 3 各档速率，以便调制方式契合所有参与测试节点的信噪比。
+12. 作为 架构维护者，我希望单次 I/O 停滞超时严格保持 120 秒，以便绝不通过虚增超时掩盖链路停滞或死锁。
+13. 作为 架构维护者，我希望整轮运行阶段超时受到严格有界约束，以便在累积吞吐不足时执行 fail-closed 退出。
+14. 作为 验收套件维护者，我希望运行包络接受可配置的场景载荷大小与轮次计数参数，以便统一套件同时支持回归小载荷门禁与正式大载荷验收。
+15. 作为 验收套件维护者，我希望在实时运行前确定性生成测试载荷与哈希摘要，以便实时执行不会在传输计量中隐藏文件生成开销。
+16. 作为 FL 算法开发者，我希望服务端发布由操作者提供或确定性准备的 40 MiB 模型，以便下行分发代表全量模型交付。
+17. 作为 FL 算法开发者，我希望 Client1 与 Client2 使用不同的 40 MiB 模拟 update 模板，以便服务端能够校验两客户端提交了不同内容与独立 SHA-256。
+18. 作为 FL 算法开发者，我希望 Client1 与 Client2 跨两轮分别复用各自的 update 模板，以便模板准备具备确定性且轮次标识保持独立。
+19. 作为 FL 算法开发者，我希望两客户端以零人为训练延迟运行，以便模型接收与校验完成后立即提交 update。
+20. 作为 Transport Backend 维护者，我希望服务端准入来自不同参与节点的并发 HTTP PUT 上传而不触发 upload-in-progress 冲突，以便在无线电路上检验多客户端并发传输。
+21. 作为 Transport Backend 维护者，我希望执行证据记录每个客户端 HTTP PUT 的起止时间戳，以便真实透明记录上传是否在时间上自然重叠。
+22. 作为 Transport Backend 维护者，我希望验收标准接受自然产生的上传重叠，而不强制插入人为休眠来伪造并发，以便尊重真实网络行为。
+23. 作为 FL Runtime 维护者，我希望服务端在推进至占位聚合前必须收齐完整参与节点的 update，以便维护严格同步的轮次推进。
+24. 作为 FL Runtime 维护者，我希望服务端跨两轮以独立轮次标识推进，以便在真实硬件上验证跨轮状态清理与轮次重新初始化。
+25. 作为 运行维护者，我希望场景通过三台物理机上安装后的 systemd 角色服务运行，以便检验生产级服务生命周期与 cgroup 隔离。
+26. 作为 运行维护者，我希望两轮执行后运行服务 stop、restart 与孤儿进程检查，以便确认测试节点无泄漏进程或残留 TUN 接口。
+27. 作为 归档审计者，我希望归档校验器审计包括 orchestration、pre_runtime_smoke、formal 运行时两轮循环及 lifecycle 拆除在内的所有分区证据，以便任何阶段都无法被静默跳过。
+28. 作为 归档审计者，我希望校验器对两轮中所有发布的模型与提交的 update 严格断言 40 MiB 大小与精确匹配的 SHA-256 摘要，以便端到端数据完整性得到确切证明。
+29. 作为 归档审计者，我希望校验器断言两轮期间均未出现 upload-in-progress 或 HTTP 超时，以便证明传输过程完全正常。
+30. 作为 项目维护者，我希望每次失败执行都生成不可覆盖的失败归档，并保留首个失败阶段与原始射频日志，以便在不抹除历史证据的前提下排查问题。
+31. 作为 项目维护者，我希望本阶段成功执行能正式解决并关闭 GitHub Issue #60、Issue #53、Issue #54 以及总 Epic Issue #50，以便 GitHub 追踪状态准确反映仓库交付进度。
 
 ## Implementation Decisions
 
