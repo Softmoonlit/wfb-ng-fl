@@ -404,14 +404,14 @@ cmd_preflight() {
     done
     [ -f "$INITIAL_MODEL_PATH" ] && [ -r "$INITIAL_MODEL_PATH" ] || \
         record_preflight_failure "dependencies" "tooling" "server 初始模型不是可读取普通文件：$INITIAL_MODEL_PATH" "$last_successful"
-    [ "$(stat -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
-        record_preflight_failure "dependencies" "tooling" "server 初始模型必须恰好为 4 MiB：$INITIAL_MODEL_PATH" "$last_successful"
+    [ "$(stat -L -c %s "$INITIAL_MODEL_PATH")" -eq "$INPUT_SIZE_BYTES" ] || \
+        record_preflight_failure "dependencies" "tooling" "server 初始模型必须恰好为 ${INPUT_SIZE_BYTES} 字节：$INITIAL_MODEL_PATH" "$last_successful"
     local template_shas=()
     for role in "${CLIENT_ROLES[@]}"; do
         local nid="${role#client}"
         local t_var="ISSUE41_${role^^}_UPDATE_TEMPLATE_PATH"
         local update_template_path="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${role}-${INPUT_SIZE_BYTES}b.bin}"
-        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || record_preflight_failure "dependencies" "tooling" "$role update 模板必须是可读取的 4 MiB 普通文件：$update_template_path" "$last_successful"
+        remote "$role" "sudo test -f '$update_template_path' && sudo test -r '$update_template_path' && test \"\$(sudo stat -L -c %s '$update_template_path')\" -eq '$INPUT_SIZE_BYTES'" || record_preflight_failure "dependencies" "tooling" "$role update 模板必须是可读取的 ${INPUT_SIZE_BYTES} 字节普通文件：$update_template_path" "$last_successful"
         local t_sha
         t_sha="$(remote "$role" "sudo sha256sum '$update_template_path' | awk '{print \$1}'")"
         template_shas+=("$t_sha")
