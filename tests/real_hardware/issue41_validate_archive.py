@@ -276,7 +276,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
     ]
     for i in range(1, 11):
-        config_keys.extend([f'client{i}_tun', f'client{i}_tun_addr'])
+        config_keys.extend([f'client{i}_tun', f'client{i}_tun_addr', f'client{i}_radio_mcs_index'])
     for k in config_keys:
         if k in resolved_cfg:
             gate_kwargs[k] = resolved_cfg[k]

@@ -42,11 +42,13 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual(14, self.config.fec_n)
 
     def test_asymmetric_mcs_config(self):
-        cfg = GateConfig(server_radio_mcs_index=2, client_radio_mcs_index=3)
-        server_cfg = cfg.expected_server_config()
-        client_cfg = cfg.expected_client_config('1')
+        cfg = GateConfig(server_radio_mcs_index=2, client_radio_mcs_index=3, client1_radio_mcs_index=2)
+        server_cfg = cfg.get_expected_link_config('server')
+        client1_cfg = cfg.get_expected_link_config('client1', 1)
+        client2_cfg = cfg.get_expected_link_config('client2', 2)
         self.assertEqual(2, server_cfg['radio_mcs_index'])
-        self.assertEqual(3, client_cfg['radio_mcs_index'])
+        self.assertEqual(2, client1_cfg['radio_mcs_index'])
+        self.assertEqual(3, client2_cfg['radio_mcs_index'])
 
     def test_config_rejects_immediate_feedback_candidate(self):
         bad_args = ['--role', 'server', '--feedback-window-start-immediately']

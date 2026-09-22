@@ -177,6 +177,8 @@ PY
         local t_val="${!t_var:-/var/lib/wfb-ng/issue41-input/update-${r}-${INPUT_SIZE_BYTES}b.bin}"
         local tun_name="$(client_tun "$r")"
         local tun_addr="$(client_addr "$r")"
+        local m_var="ISSUE41_${r^^}_RADIO_MCS_INDEX"
+        local m_val="${!m_var:-}"
         if [ "$first" -eq 1 ]; then
             first=0
         else
@@ -187,6 +189,9 @@ PY
         training_delays_json+="\"$nid\": $d_val"
         client_templates_json+="\"${r}_update_template_path\": \"$t_val\""
         client_tuns_json+="\"${r}_tun\": \"$tun_name\", \"${r}_tun_addr\": \"$tun_addr\""
+        if [ -n "$m_val" ]; then
+            client_tuns_json+=", \"${r}_radio_mcs_index\": $m_val"
+        fi
     done
     local cfg_tmp
     cfg_tmp="$(mktemp)"
@@ -625,8 +630,10 @@ EOF
     else
         iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
         [ "$(printf '%s\n' "$iface" | grep -c '^wlx' || true)" -eq 1 ] || die "$role 必须恰好发现一个 wlx* 网卡"
+        local client_mcs_var="ISSUE41_${role^^}_RADIO_MCS_INDEX"
+        local client_mcs="${!client_mcs_var:-$CLIENT_RADIO_MCS_INDEX}"
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$CLIENT_RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface","--uplink-pause-threshold-bytes","131072","--uplink-resume-threshold-bytes","65536","--uplink-queue-packets-limit","64","--queue-summary-file","$work_dir/client${node_id}_queue_summary.json"]}
+{"schema_version":1,"role":"client","work_dir":"$work_dir","node_id":$node_id,"uftp_uid":$node_id,"uftp_port":$UFTP_PORT,"server_http_host":"$HTTP_HOST","server_http_port":$HTTP_PORT,"uftp_bind_host":"${addr%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$client_mcs"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$iface","--uplink-pause-threshold-bytes","131072","--uplink-resume-threshold-bytes","65536","--uplink-queue-packets-limit","64","--queue-summary-file","$work_dir/client${node_id}_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"node_id":$node_id,"update_template_path":"$update_template_path","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"training_delay_ms":$delay,"result_path":"$result"}
@@ -655,6 +662,12 @@ export_rf_gate_env() {
     export ISSUE41_UFTP_RATE_KBPS="$UFTP_RATE_KBPS"
     export ISSUE41_GRANT_DURATION_MS="$GRANT_DURATION_MS"
     export ISSUE41_GUARD_INTERVAL_MS="$GUARD_INTERVAL_MS"
+    for role in "${CLIENT_ROLES[@]}"; do
+        local client_mcs_var="ISSUE41_${role^^}_RADIO_MCS_INDEX"
+        if [ -n "${!client_mcs_var:-}" ]; then
+            export "$client_mcs_var"="${!client_mcs_var}"
+        fi
+    done
 }
 
 cmd_verify_config_equivalence() {
@@ -923,8 +936,10 @@ start_smoke_wfb() {
         local addr="$(client_addr "$role")"
         local client_dir="$(smoke_dir "$name")/$role"
         local client_iface
+        local client_mcs_var="ISSUE41_${role^^}_RADIO_MCS_INDEX"
+        local client_mcs="${!client_mcs_var:-$CLIENT_RADIO_MCS_INDEX}"
         client_iface="$(remote "$role" "iw dev | awk '/Interface / {print \$2}' | grep '^wlx' || true")"
-        remote "$role" "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$tun' --tun-addr '$addr' --node-id $nid --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$CLIENT_RADIO_MCS_INDEX' $short_gi --air-interface '$client_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client_dir/${role}_queue_summary.json' --log-interval 200 < /dev/null > '$client_dir/wfb.log' 2>&1 & echo \\\$! > '$client_dir/wfb.pid'; exit 0\""
+        remote "$role" "sudo bash -c \"cd '$REMOTE_REPO' || exit 1; nohup '$REMOTE_REPO/wfb_v6_uplink' --role client --tun-name '$tun' --tun-addr '$addr' --node-id $nid --link-id '$LINK_ID' --uplink-stream '$UPLINK_STREAM' --downlink-stream '$DOWNLINK_STREAM' --fec-k '$FEC_K' --fec-n '$FEC_N' --radio-bandwidth '$RADIO_BANDWIDTH' --radio-mcs-index '$client_mcs' $short_gi --air-interface '$client_iface' --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 --queue-summary-file '$client_dir/${role}_queue_summary.json' --log-interval 200 < /dev/null > '$client_dir/wfb.log' 2>&1 & echo \\\$! > '$client_dir/wfb.pid'; exit 0\""
     done
 
     wait_local_tun "$SERVER_TUN" || die "server smoke TUN 未出现：$SERVER_TUN"

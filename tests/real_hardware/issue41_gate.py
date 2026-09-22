@@ -57,6 +57,7 @@ class GateConfig:
                  radio_mcs_index: int = 3,
                  server_radio_mcs_index: Optional[int] = None,
                  client_radio_mcs_index: Optional[int] = None,
+                 client_radio_mcs_indices: Optional[Dict[str, int]] = None,
                  radio_short_gi: int = 1,
                  uftp_rate_kbps: int = 15000,
                  grant_duration_ms: int = 120,
@@ -75,7 +76,8 @@ class GateConfig:
                  uplink_queue_packets_limit: int = 64,
                  feedback_window_period_ms: int = 500,
                  feedback_window_duration_ms: int = 15,
-                 round_deadline_seconds: int = 240):
+                 round_deadline_seconds: int = 240,
+                 **kwargs):
         self.cycle_count = cycle_count
         self.artifact_size_bytes = artifact_size_bytes
         self.io_timeout_seconds = io_timeout_seconds
@@ -89,6 +91,11 @@ class GateConfig:
         self.radio_mcs_index = radio_mcs_index
         self.server_radio_mcs_index = server_radio_mcs_index if server_radio_mcs_index is not None else radio_mcs_index
         self.client_radio_mcs_index = client_radio_mcs_index if client_radio_mcs_index is not None else radio_mcs_index
+        self.client_radio_mcs_indices = dict(client_radio_mcs_indices or {})
+        for i in range(1, 11):
+            val = kwargs.get(f'client{i}_radio_mcs_index')
+            if val is not None:
+                self.client_radio_mcs_indices[f'client{i}'] = int(val)
         self.radio_short_gi = radio_short_gi
         self.uftp_rate_kbps = uftp_rate_kbps
         self.grant_duration_ms = grant_duration_ms
@@ -145,6 +152,13 @@ class GateConfig:
             kwargs['server_radio_mcs_index'] = int(os.environ['ISSUE41_SERVER_RADIO_MCS_INDEX'])
         if 'ISSUE41_CLIENT_RADIO_MCS_INDEX' in os.environ:
             kwargs['client_radio_mcs_index'] = int(os.environ['ISSUE41_CLIENT_RADIO_MCS_INDEX'])
+        client_mcs_map = {}
+        for role in ('client1', 'client2', 'client3', 'client4', 'client5', 'client6', 'client7'):
+            env_key = f"ISSUE41_{role.upper()}_RADIO_MCS_INDEX"
+            if env_key in os.environ:
+                client_mcs_map[role] = int(os.environ[env_key])
+        if client_mcs_map:
+            kwargs['client_radio_mcs_indices'] = client_mcs_map
         if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
             kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
         if 'ISSUE41_UFTP_RATE_KBPS' in os.environ:
@@ -192,13 +206,14 @@ class GateConfig:
             }
         tun = self.client_tuns.get(f'client{node_id}', f'v8i41c{node_id}')
         tun_addr = self.client_tun_addrs.get(f'client{node_id}', f'10.80.0.{10+node_id}/24')
+        mcs = self.client_radio_mcs_indices.get(role, self.client_radio_mcs_index)
         return {
             'role': 'client',
             'node_id': node_id,
             'channel': self.channel,
             'channel_width': self.channel_width,
             'radio_bandwidth': self.radio_bandwidth,
-            'radio_mcs_index': self.client_radio_mcs_index,
+            'radio_mcs_index': mcs,
             'radio_short_gi': bool(self.radio_short_gi),
             'fec_k': self.fec_k,
             'fec_n': self.fec_n,
