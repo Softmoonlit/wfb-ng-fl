@@ -100,9 +100,10 @@ Status: ready-for-agent
     - `NODE_HEARTBEAT`：全流程细粒度状态载体（携带 `node_id`、`state`、`elapsed_ms`、`current_channel`、`preset` 与错误码）；状态跃迁时即刻抢跑发送，常态每 5 秒保活；
     - `PREPARE_ACK`：信道切换预备就绪回执（带 seq_id 幂等重发）；
     - `COMMIT_SUCCESS`：新信道上线打卡汇报。
-  - **三级寻频自愈与全自动热发现 (Three-Tier Hunting & Auto-Discovery)**：
-    - 客户端通电后，按“本地缓存信道 -> 基准信道 157 -> 候选池 [149, 153, 165]”顺序逐频发送 `NODE_HEARTBEAT`；
-    - 收到 `HEARTBEAT_ACK` 即刻锁定频点；服务端自动在内存注册该节点并在 Web 实时点亮绿灯，全程零广播发射，Web 零手动扫描操作。
+  - **三级寻频自愈与动态心跳频率策略 (Three-Tier Hunting & Adaptive Frequency)**：
+    - **寻频入网期 (HUNTING)**：客户端未连接时，采用极速探测策略。按“本地缓存信道 -> 基准信道 157 -> 候选池 [149, 153, 165]”轮换，单信道发送 `NODE_HEARTBEAT` 后仅等待 **500ms** 超时，无回执立即切下一信道，**全池 4 信道在 2 秒内瞬时扫完**；收到 `HEARTBEAT_ACK` 即刻锁定频点并转入 IDLE；
+    - **空闲待命期 (IDLE)**：进入低频节能保活，**每 5 秒**发送一次心跳；连续 2 次未收到 ACK（10 秒）判定失联，自动退回寻频期；
+    - **任务执行期 (ACTIVE)**：状态跃迁（如训练完成、开始提交）**0 延迟即刻抢跑**发送；长耗时状态（如本地模型训练）**每 2 秒**发送一次带有 `elapsed_ms` 的进度心跳，持续刷新 Web 进度条并防止假死误判。
 
 - **两阶段防脑裂租约式看门狗自愈协议 (Lease-based Anti-Lockup Watchdog)**：
   1. **Phase 1 (Prepare)**：Server 广播 `CONFIG_RADIO_PREPARE(target_ch=149, preset="standard")`；
