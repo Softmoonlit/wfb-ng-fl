@@ -68,11 +68,15 @@ class ServerTransport(object):
                  uftp_multicast_host='127.0.0.1',
                  uftp_private_multicast_host='239.255.0.1', io_timeout=10,
                  cancel_grace_period=2, live_observation=False,
-                 observation_writer=None, observation_path=None, role_node_id=None):
+                 observation_writer=None, observation_path=None, role_node_id=None,
+                 uftp_rate_kbps=15000):
         if isinstance(participant_uftp_uids, int):
             participant_uftp_uids = (participant_uftp_uids,)
         self.participant_uftp_uids = tuple(sorted(participant_uftp_uids))
         self.server_uftp_uid = server_uftp_uid
+        if type(uftp_rate_kbps) is not int or uftp_rate_kbps <= 0:
+            raise ValueError('UFTP 发送速率必须为正整数 Kbps')
+        self.uftp_rate_kbps = uftp_rate_kbps
         self.uftp_port = uftp_port
         self.http_host = http_host
         self.http_port = http_port
@@ -234,7 +238,7 @@ class ServerTransport(object):
             '-U', _format_uid(self.server_uftp_uid),
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
-            '-R', '15000',
+            '-R', str(self.uftp_rate_kbps),
             '-r', '0.1:0.01:2.0',
             '-s', '20',
             '-L', log_path,

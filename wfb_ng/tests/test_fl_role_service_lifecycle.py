@@ -421,7 +421,8 @@ class RoleLifecycleTestCase(unittest.TestCase):
             base_config = json.load(fh)
 
         for field in ('channel', 'channel_width', 'uftp_bind_host',
-                      'live_observation', 'observation_path', 'io_timeout_seconds'):
+                      'uftp_rate_kbps', 'live_observation', 'observation_path',
+                      'io_timeout_seconds'):
             with self.subTest(missing_field=field):
                 candidate = dict(base_config)
                 candidate.pop(field)
@@ -625,6 +626,7 @@ class RoleLifecycleTestCase(unittest.TestCase):
                                           for node_id in participant_node_ids],
                 'server_uftp_uid': 100,
                 'uftp_port': 9000,
+                'uftp_rate_kbps': 15000,
                 'http_host': '10.0.0.1',
                 'http_port': 8080,
                 'uftp_bind_host': '10.0.0.1',

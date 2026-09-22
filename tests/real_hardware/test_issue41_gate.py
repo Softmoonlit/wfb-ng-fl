@@ -549,6 +549,8 @@ class Issue41GateTestCase(unittest.TestCase):
         shutil.copy2(manifest_path, os.path.join(c2_dir, 'model.manifest.json'))
 
         status_path = os.path.join(cycle_dir, 'uftp.status')
+        with open(os.path.join(cycle_dir, 'uftp.log'), 'w', encoding='utf-8') as fh:
+            fh.write('Transfer rate: 15000 Kbps (1875 KB/s)\n')
         with open(status_path, 'w', encoding='utf-8') as fh:
             fh.write("CONNECT;success;00000001;10.80.0.11\n")
             fh.write("CONNECT;success;00000002;10.80.0.12\n")
@@ -566,10 +568,18 @@ class Issue41GateTestCase(unittest.TestCase):
             duration_seconds=3.0,
         )
         self.assertEqual('passed', dl_res['status'])
+        self.assertEqual(15000, dl_res['uftp_rate_kbps'])
         self.assertEqual('success', dl_res['uftp_connect_matrix']['1'])
         self.assertEqual('success', dl_res['uftp_connect_matrix']['2'])
         self.assertEqual('copy', dl_res['uftp_result_matrix']['1']['model.bin'])
         self.assertTrue(dl_res['client_received_verification']['1']['verified'])
+
+        with open(os.path.join(cycle_dir, 'uftp.log'), 'w', encoding='utf-8') as fh:
+            fh.write('Transfer rate: 6000 Kbps (750 KB/s)\n')
+        dl_res = verify_downlink_artifacts(cycle_dir, {'1': c1_dir, '2': c2_dir},
+                                           status_path, self.config, 3.0)
+        self.assertEqual('failed', dl_res['status'])
+        self.assertEqual(6000, dl_res['uftp_rate_kbps'])
 
     def test_classify_gate_failure_identifies_layers_and_category(self):
         # 场景 1: client declared 但 server 零接收 -> link_capability / server_radio
@@ -623,6 +633,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'downlink': {
                 'status': 'passed',
                 'operation': 'shared_uftp',
+                'uftp_rate_kbps': 15000,
                 'file': {'name': 'model.bin', 'size_bytes': size, 'sha256': model_sha},
                 'manifest': {'name': 'model.manifest.json', 'size_bytes': 120, 'sha256': manifest_sha},
                 'uftp_connect_matrix': {'1': 'success', '2': 'success'},
@@ -743,6 +754,12 @@ class Issue41GateTestCase(unittest.TestCase):
             'io_timeout_seconds': 120,
         }
 
+    def test_gate_rejects_actual_uftp_rate_mismatch(self):
+        cycle = self._make_valid_cycle(1)
+        cycle['downlink']['uftp_rate_kbps'] = 6000
+        errors = validate_cycle_evidence(cycle, self.config)
+        self.assertTrue(any('UFTP 实际速率' in e for e in errors))
+
     def test_parse_link_args_extracts_all_parameters(self):
         from tests.real_hardware.issue41_gate import parse_link_args
         args = [
@@ -791,6 +808,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'server': {
                 'role': 'server',
                 'node_id': 255,
+                'uftp_rate_kbps': 15000,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -849,6 +867,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'server': {
                 'role': 'server',
                 'node_id': 255,
+                'uftp_rate_kbps': 15000,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -892,6 +911,10 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertTrue(any('radio_bandwidth' in e for e in errors))
         self.assertTrue(any('radio_mcs_index' in e for e in errors))
 
+        runtime_configs['server']['uftp_rate_kbps'] = 6000
+        errors = verify_config_equivalence(gate_configs, runtime_configs)
+        self.assertTrue(any('uftp_rate_kbps' in e for e in errors))
+
     def test_verify_config_equivalence_rejects_immediate_feedback(self):
         from tests.real_hardware.issue41_gate import (
             GateConfig, verify_config_equivalence,
@@ -906,6 +929,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'server': {
                 'role': 'server',
                 'node_id': 255,
+                'uftp_rate_kbps': 15000,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -960,6 +984,7 @@ class Issue41GateTestCase(unittest.TestCase):
         with open(s_path, 'w') as fh:
             json.dump({
                 'role': 'server',
+                'uftp_rate_kbps': 15000,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',

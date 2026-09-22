@@ -29,6 +29,17 @@ from wfb_ng.fl.issue41_fixtures import (
 )
 
 
+def safe_uftp_rate_range(mcs_index: int, bandwidth: int, channel_width: str):
+    """ADR-0011 标定的 UFTP 注入速率区间，单位 Kbps。"""
+    return {
+        (2, 20, 'HT20'): (5000, 8000),
+        (2, 40, 'HT40+'): (8000, 14000),
+        (3, 40, 'HT40+'): (12000, 18000),
+        (4, 40, 'HT40+'): (18000, 26000),
+        (5, 40, 'HT40+'): (24000, 35000),
+    }.get((mcs_index, bandwidth, channel_width))
+
+
 class GateConfig:
     """数据面 Gate 配置与契约约束。"""
 
@@ -45,6 +56,7 @@ class GateConfig:
                  radio_bandwidth: int = 40,
                  radio_mcs_index: int = 3,
                  radio_short_gi: int = 1,
+                 uftp_rate_kbps: int = 15000,
                  uplink_stream: int = 32,
                  downlink_stream: int = 33,
                  server_tun: str = 'v8i41s0',
@@ -72,6 +84,7 @@ class GateConfig:
         self.radio_bandwidth = radio_bandwidth
         self.radio_mcs_index = radio_mcs_index
         self.radio_short_gi = radio_short_gi
+        self.uftp_rate_kbps = uftp_rate_kbps
         self.uplink_stream = uplink_stream
         self.downlink_stream = downlink_stream
         self.server_tun = server_tun
@@ -122,6 +135,8 @@ class GateConfig:
             kwargs['radio_mcs_index'] = int(os.environ['ISSUE41_RADIO_MCS_INDEX'])
         if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
             kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
+        if 'ISSUE41_UFTP_RATE_KBPS' in os.environ:
+            kwargs['uftp_rate_kbps'] = int(os.environ['ISSUE41_UFTP_RATE_KBPS'])
         return cls(**kwargs)
 
     @staticmethod
@@ -137,6 +152,7 @@ class GateConfig:
             return {
                 'role': 'server',
                 'node_id': 255,
+                'uftp_rate_kbps': self.uftp_rate_kbps,
                 'channel': self.channel,
                 'channel_width': self.channel_width,
                 'radio_bandwidth': self.radio_bandwidth,
@@ -261,6 +277,7 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
     """校验数据面 Gate 与 Runtime 角色服务解析后配置在各维度上的严格等价性。"""
     errors: List[str] = []
     server_fields = [
+        'uftp_rate_kbps',
         'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
         'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
         'tun_name', 'tun_addr',
@@ -353,6 +370,7 @@ def check_role_configs_equivalence(gate_config: GateConfig,
                 'parsed': parse_link_args(v.get('link_args', [])),
                 'role': v.get('role'),
                 'node_id': v.get('node_id'),
+                'uftp_rate_kbps': v.get('uftp_rate_kbps') if k == 'server' else None,
             }
             for k, v in runtime_configs.items()
         },
@@ -566,6 +584,16 @@ def verify_downlink_artifacts(server_cycle_dir: str,
     model_sha = hashlib.sha256(model_data).hexdigest()
     manifest_sha = hashlib.sha256(manifest_data).hexdigest()
 
+    observed_rates = []
+    log_path = os.path.join(server_cycle_dir, 'uftp.log')
+    if os.path.isfile(log_path):
+        with open(log_path, encoding='utf-8') as fh:
+            for line in fh:
+                match = re.search(r'Transfer rate: (\d+) Kbps', line)
+                if match:
+                    observed_rates.append(int(match.group(1)))
+    observed_rate = observed_rates[0] if len(observed_rates) == 1 else None
+
     connect_matrix = {}
     result_matrix = {node_id: {} for node_id in client_inboxes.keys()}
     if os.path.exists(status_file):
@@ -616,6 +644,7 @@ def verify_downlink_artifacts(server_cycle_dir: str,
 
     expected_nodes = set(client_inboxes.keys())
     status = 'passed' if (
+        observed_rate == config.uftp_rate_kbps and
         bool(expected_nodes) and
         all(connect_matrix.get(n) == 'success' for n in expected_nodes) and
         all(client_received.get(n, {}).get('verified') for n in expected_nodes) and
@@ -625,6 +654,7 @@ def verify_downlink_artifacts(server_cycle_dir: str,
     return {
         'status': status,
         'operation': 'shared_uftp',
+        'uftp_rate_kbps': observed_rate,
         'file': {'name': 'model.bin', 'size_bytes': len(model_data), 'sha256': model_sha},
         'manifest': {'name': 'model.manifest.json', 'size_bytes': len(manifest_data), 'sha256': manifest_sha},
         'uftp_connect_matrix': connect_matrix,
@@ -1013,6 +1043,8 @@ def validate_cycle_evidence(cycle: Dict[str, Any], config: GateConfig) -> List[s
         errors.append(f'{prefix} downlink 状态不为 passed')
     if dl.get('operation') != 'shared_uftp':
         errors.append(f'{prefix} downlink operation 必须为 shared_uftp')
+    if dl.get('uftp_rate_kbps') != config.uftp_rate_kbps:
+        errors.append(f'{prefix} UFTP 实际速率与配置不一致')
 
     # model file & manifest
     dl_file = dl.get('file', {})

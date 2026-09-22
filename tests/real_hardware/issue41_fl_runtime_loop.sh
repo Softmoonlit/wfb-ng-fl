@@ -36,6 +36,7 @@ FEC_N="${ISSUE41_FEC_N:-14}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
+UFTP_RATE_KBPS="${ISSUE41_UFTP_RATE_KBPS:-15000}"
 LINK_LOG_INTERVAL_MS="${ISSUE41_LINK_LOG_INTERVAL_MS:-1000}"
 IO_TIMEOUT_SECONDS="${ISSUE41_IO_TIMEOUT_SECONDS:-120}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
@@ -110,8 +111,7 @@ case "$cmd" in
 esac
 
 init_envelope() {
-    [ -f "$ARCHIVE_DIR/envelope.json" ] && return 0
-    if [ -d "$ARCHIVE_DIR" ]; then
+    if [ -d "$ARCHIVE_DIR" ] && [ ! -f "$ARCHIVE_DIR/envelope.json" ]; then
         die "归档目录已存在，拒绝覆盖：$ARCHIVE_DIR"
     fi
     if [ "$RUNTIME_TIMEOUT_SECONDS" -gt 400 ]; then
@@ -122,6 +122,31 @@ init_envelope() {
     fi
     if [ "$SMOKE_IO_TIMEOUT_SECONDS" -gt 120 ]; then
         die "formal 验收严格要求 SMOKE_IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
+    fi
+    local rate_min rate_max
+    case "$RADIO_MCS_INDEX:$RADIO_BANDWIDTH:$CHANNEL_WIDTH" in
+        2:20:HT20) rate_min=5000; rate_max=8000 ;;
+        2:40:HT40+) rate_min=8000; rate_max=14000 ;;
+        3:40:HT40+) rate_min=12000; rate_max=18000 ;;
+        4:40:HT40+) rate_min=18000; rate_max=26000 ;;
+        5:40:HT40+) rate_min=24000; rate_max=35000 ;;
+        *) die "未标定的射频配置，无法校验 UFTP 安全速率" ;;
+    esac
+    if ! [[ "$UFTP_RATE_KBPS" =~ ^[0-9]+$ ]] ||
+        [ "$UFTP_RATE_KBPS" -lt "$rate_min" ] || [ "$UFTP_RATE_KBPS" -gt "$rate_max" ]; then
+        die "UFTP 速率必须在当前射频配置的安全区间 ${rate_min}~${rate_max} Kbps 内"
+    fi
+    if [ -f "$ARCHIVE_DIR/envelope.json" ]; then
+        python3 - "$ARCHIVE_DIR/envelope.json" "$UFTP_RATE_KBPS" "$RADIO_MCS_INDEX" "$RADIO_BANDWIDTH" "$CHANNEL_WIDTH" <<'PY' || die "本次配置与已有 envelope 不一致"
+import json, sys
+with open(sys.argv[1], encoding='utf-8') as fh:
+    cfg = json.load(fh)['resolved_config']
+for key, value in zip(('uftp_rate_kbps', 'radio_mcs_index', 'radio_bandwidth', 'channel_width'),
+                      (int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5])):
+    if cfg.get(key) != value:
+        raise SystemExit('已有 envelope 配置 %s 不匹配' % key)
+PY
+        return 0
     fi
     local training_delays_json=""
     local client_templates_json=""
@@ -167,6 +192,7 @@ init_envelope() {
   "uftp_group": "$UFTP_GROUP",
   "uftp_private_group": "$UFTP_PRIVATE_GROUP",
   "uftp_port": $UFTP_PORT,
+  "uftp_rate_kbps": $UFTP_RATE_KBPS,
   "http_host": "$HTTP_HOST",
   "http_port": $HTTP_PORT,
   "feedback_window_period_ms": $FEEDBACK_WINDOW_PERIOD_MS,
@@ -566,7 +592,7 @@ write_issue41_configs() {
             client_targets_json+=',"--client-target","'"$nid:$(client_ip "$r"):127.0.0.1:1"'"'
         done
         cat > "$tmp/fl.json" <<EOF
-{"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[$participant_ids],"participant_uftp_uids":[$participant_ids],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","$known_clients"$client_targets_json,"--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
+{"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[$participant_ids],"participant_uftp_uids":[$participant_ids],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"uftp_rate_kbps":$UFTP_RATE_KBPS,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","$known_clients"$client_targets_json,"--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
 EOF
         cat > "$tmp/algorithm.json" <<EOF
 {"rounds":$ROUNDS,"participant_node_ids":[$participant_ids],"initial_model_path":"$INITIAL_MODEL_PATH","required_artifact_size_bytes":$INPUT_SIZE_BYTES,"aggregation_delay_ms":$AGGREGATION_DELAY_MS,"result_path":"$result"}
@@ -603,9 +629,11 @@ export_rf_gate_env() {
     export ISSUE41_RADIO_BANDWIDTH="$RADIO_BANDWIDTH"
     export ISSUE41_RADIO_MCS_INDEX="$RADIO_MCS_INDEX"
     export ISSUE41_RADIO_SHORT_GI="$RADIO_SHORT_GI"
+    export ISSUE41_UFTP_RATE_KBPS="$UFTP_RATE_KBPS"
 }
 
 cmd_verify_config_equivalence() {
+    init_envelope
     log_info "执行角色服务与数据面 Gate 严格链路配置等价性比较..."
     mkdir -p "$ARCHIVE_DIR/formal_runtime_loop"
     write_issue41_configs server
@@ -1197,7 +1225,7 @@ PY"
                 uftp_hosts="$uftp_hosts,$hex_uid"
             fi
         done
-        sudo timeout "$SMOKE_IO_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H '$uftp_hosts' -Y none -R 15000 -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'" || die "周期 $cycle shared UFTP 下行超时或失败"
+        sudo timeout "$SMOKE_IO_TIMEOUT_SECONDS" bash -c "cd '$work' && uftp -q -I '${SERVER_TUN_ADDR%/*}' -M '$UFTP_GROUP' -P '$UFTP_PRIVATE_GROUP' -p '$UFTP_PORT' -U 0x000000ff -H '$uftp_hosts' -Y none -R '$UFTP_RATE_KBPS' -r 0.1:0.01:2.0 -s 20 -L '$log' -S '$status' -D '$src' 'model.bin' 'model.manifest.json'" || die "周期 $cycle shared UFTP 下行超时或失败"
         t_dl_end="$(python3 -c 'import time; print(time.monotonic())')"
         dl_dur="$(python3 -c "print($t_dl_end - $t_dl_start)")"
 

@@ -20,6 +20,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'rounds': 2,
                 'artifact_size_bytes': 40 * 1024 * 1024,
                 'training_delay_ms_by_node': {'1': 0, '2': 0},
@@ -41,6 +45,37 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         self.write_text('result.md', '# result\n')
 
         self.assertEqual([], validate_archive(self.root))
+
+    def test_rejects_uftp_rate_mismatch_in_passed_archive(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['config_equivalence']['runtime_configs']['server']['uftp_rate_kbps'] = 6000
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.assertTrue(any('UFTP 速率' in e for e in validate_archive(self.root)))
+
+    def test_rejects_uftp_rate_outside_radio_envelope(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['config_equivalence']['gate_configs']['server']['uftp_rate_kbps'] = 6000
+        summary['formal_runtime_loop']['config_equivalence']['runtime_configs']['server']['uftp_rate_kbps'] = 6000
+        for cycle in summary['pre_runtime_smoke']['cycles']:
+            cycle['downlink']['uftp_rate_kbps'] = 6000
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        with open(os.path.join(self.root, 'envelope.json'), encoding='utf-8') as fh:
+            envelope = json.load(fh)
+        envelope['resolved_config']['uftp_rate_kbps'] = 6000
+        self.write_json('envelope.json', envelope)
+        self.assertTrue(any('安全区间' in e for e in validate_archive(self.root)))
 
     def test_rejects_missing_runtime_evidence_when_passed(self):
         summary = self.complete_summary('passed')
@@ -364,6 +399,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'smoke_io_timeout_seconds': 130,
             },
         })
@@ -387,6 +426,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'io_timeout_seconds': 130,
             },
         })
@@ -425,6 +468,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'run_id': 'test-run',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'rounds': 2,
                 'artifact_size_bytes': 40 * 1024 * 1024,
                 'training_delay_ms_by_node': {'1': 0, '2': 0},
@@ -512,6 +559,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'schema_version': 1,
             'run_id': 'test-run',
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'rounds': 3,
                 'artifact_size_bytes': 40 * 1024 * 1024,
             }
@@ -717,6 +768,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'diagnostic',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'smoke_cycle_deadline_seconds': 240,
                 'runtime_timeout_seconds': 180,
                 'io_timeout_seconds': 120,
@@ -854,6 +909,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'channel': 157,
             },
         })
@@ -886,6 +945,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'smoke_cycle_count': 3,
                 'smoke_io_timeout_seconds': 120,
                 'smoke_cycle_deadline_seconds': 240,
@@ -931,6 +994,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'downlink': {
                 'status': 'passed',
                 'operation': 'shared_uftp',
+                'uftp_rate_kbps': 15000,
                 'file': {'name': 'model.bin', 'size_bytes': size, 'sha256': model_sha},
                 'manifest': {'name': 'model.manifest.json', 'size_bytes': 120, 'sha256': manifest_sha},
                 'uftp_connect_matrix': {'1': 'success', '2': 'success'},
@@ -1087,7 +1151,11 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'route_evidence': [
                     os.path.join(self.root, 'route-%d.txt' % index)
                     for index in range(12)],
-                'config_equivalence': {'status': 'passed', 'errors': []},
+                'config_equivalence': {
+                    'status': 'passed', 'errors': [],
+                    'gate_configs': {'server': {'uftp_rate_kbps': 15000}},
+                    'runtime_configs': {'server': {'uftp_rate_kbps': 15000}},
+                },
                 'controlled_stop': {'status': 'passed', 'server_stopped': True, 'client1_stopped': True, 'client2_stopped': True, 'cleaned': True},
             },
             'lifecycle': self.lifecycle_evidence(),
@@ -1227,6 +1295,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'mode': 'formal',
             'network_isolation': {'prohibit_management_as_data_plane': True},
             'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
                 'rounds': 2,
                 'artifact_size_bytes': 40 * 1024 * 1024,
                 'training_delay_ms_by_node': {'1': 0, '2': 0},

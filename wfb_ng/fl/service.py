@@ -25,7 +25,7 @@ _COMMON_FIELDS = {
 }
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
-    'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
+    'uftp_rate_kbps', 'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
     'uftp_private_multicast_host',
 }
 _CLIENT_FIELDS = {
@@ -254,6 +254,7 @@ def load_role_service(path, expected_role=None):
                 participant_uftp_uid=config['participant_uftp_uids'],
                 server_uftp_uid=config['server_uftp_uid'],
                 uftp_port=config['uftp_port'],
+                uftp_rate_kbps=config['uftp_rate_kbps'],
                 http_host=config['http_host'],
                 http_port=config['http_port'],
                 uftp_bind_host=config['uftp_bind_host'],
@@ -322,6 +323,9 @@ def _read_config(path):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
+    if role == 'server' and (type(config['uftp_rate_kbps']) is not int or
+                             config['uftp_rate_kbps'] <= 0):
+        raise FLRuntimeError('invalid_configuration', 'UFTP 发送速率配置无效')
     for name in ('uftp_bind_host', 'uftp_multicast_host',
                  'uftp_private_multicast_host'):
         if not isinstance(config.get(name), str) or not config[name]:

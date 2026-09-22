@@ -38,7 +38,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "-U 0x000000ff",
                 "-H '$uftp_hosts'",
                 "-Y none",
-                "-R 15000",
+                "-R '$UFTP_RATE_KBPS'",
                 "-S '$status'",
                 "-D '$src' 'model.bin' 'model.manifest.json'",
                 "uftpd -d -q -I '$(client_ip \"$role\")' -M '$UFTP_GROUP'",
@@ -108,6 +108,38 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
 
     def test_formal_runtime_uses_mcs3_by_default(self):
         self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
+        self.assertIn('ISSUE41_UFTP_RATE_KBPS:-15000', self.script)
+        self.assertIn('"uftp_rate_kbps":$UFTP_RATE_KBPS', self.script)
+
+    def test_rejects_uftp_rate_outside_radio_envelope_before_preflight(self):
+        with tempfile.TemporaryDirectory() as directory:
+            env = dict(os.environ, ISSUE41_ARCHIVE_ROOT=directory,
+                       ISSUE41_RADIO_MCS_INDEX='2', ISSUE41_RADIO_BANDWIDTH='20',
+                       ISSUE41_CHANNEL_WIDTH='HT20', ISSUE41_RADIO_SHORT_GI='0',
+                       ISSUE41_UFTP_RATE_KBPS='15000')
+            result = subprocess.run(['bash', SCRIPT, 'preflight'], env=env,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    text=True, check=False)
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn('5000~8000 Kbps', result.stderr)
+            self.assertEqual([], os.listdir(directory))
+
+    def test_reused_envelope_rejects_changed_uftp_rate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            archive = os.path.join(directory, 'run')
+            os.mkdir(archive)
+            with open(os.path.join(archive, 'envelope.json'), 'w', encoding='utf-8') as fh:
+                json.dump({'resolved_config': {'uftp_rate_kbps': 15000,
+                                               'radio_mcs_index': 3,
+                                               'radio_bandwidth': 40,
+                                               'channel_width': 'HT40+'}}, fh)
+            env = dict(os.environ, ISSUE41_ARCHIVE_DIR=archive,
+                       ISSUE41_UFTP_RATE_KBPS='12000')
+            result = subprocess.run(['bash', SCRIPT, 'preflight'], env=env,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    text=True, check=False)
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn('已有 envelope 配置 uftp_rate_kbps 不匹配', result.stderr)
 
     def test_formal_runtime_fails_on_120_second_io_stall(self):
         self.assertIn('ISSUE41_IO_TIMEOUT_SECONDS:-120', self.script)

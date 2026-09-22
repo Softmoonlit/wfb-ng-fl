@@ -23,6 +23,10 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
     def write_test_envelope(self, run_id='test-run', mode='formal', resolved_overrides=None):
         cfg = {
             'rounds': 2,
+            'uftp_rate_kbps': 15000,
+            'radio_mcs_index': 3,
+            'radio_bandwidth': 40,
+            'channel_width': 'HT40+',
             'artifact_size_bytes': 40 * 1024 * 1024,
             'training_delay_ms_by_node': {'1': 0, '2': 0},
             'smoke_cycle_count': 3,

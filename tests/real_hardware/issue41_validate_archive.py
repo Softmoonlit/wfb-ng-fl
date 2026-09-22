@@ -12,7 +12,7 @@ if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
 from tests.real_hardware.issue41_build_summary import is_sha256 as _is_sha256
-from tests.real_hardware.issue41_gate import GateConfig, validate_gate_summary
+from tests.real_hardware.issue41_gate import GateConfig, safe_uftp_rate_range, validate_gate_summary
 from tests.real_hardware.issue41_lifecycle import validate_lifecycle_summary
 
 
@@ -137,6 +137,15 @@ def _validate_envelope(archive_dir, summary, errors):
                 val = resolved.get(deadline_key)
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            rate = resolved.get('uftp_rate_kbps')
+            if type(rate) is not int or rate <= 0:
+                errors.append('envelope.json resolved_config 缺少有效 UFTP 速率')
+            else:
+                safe_range = safe_uftp_rate_range(
+                    resolved.get('radio_mcs_index'), resolved.get('radio_bandwidth'),
+                    resolved.get('channel_width'))
+                if safe_range is None or not safe_range[0] <= rate <= safe_range[1]:
+                    errors.append('envelope.json UFTP 速率超出射频安全区间')
             is_passed = summary.get('conclusion', {}).get('status') == 'passed'
             io_timeout_cfg = resolved.get('io_timeout_seconds')
             if isinstance(io_timeout_cfg, (int, float)) and is_passed and io_timeout_cfg != 120 and mode == 'formal':
@@ -162,6 +171,18 @@ def _validate_envelope(archive_dir, summary, errors):
                 if 'io_timeout_seconds' in smoke and smoke['io_timeout_seconds'] != resolved.get('io_timeout_seconds'):
                     errors.append('运行中修改配置：pre_runtime_smoke io_timeout_seconds 与 envelope 不一致')
             formal = summary.get('formal_runtime_loop', {})
+            if is_passed and isinstance(formal, dict):
+                equivalence = formal.get('config_equivalence')
+                if not isinstance(equivalence, dict):
+                    equivalence = {}
+                gate_configs = equivalence.get('gate_configs')
+                runtime_configs = equivalence.get('runtime_configs')
+                gate_server = gate_configs.get('server') if isinstance(gate_configs, dict) else None
+                runtime_server = runtime_configs.get('server') if isinstance(runtime_configs, dict) else None
+                gate_rate = gate_server.get('uftp_rate_kbps') if isinstance(gate_server, dict) else None
+                runtime_rate = runtime_server.get('uftp_rate_kbps') if isinstance(runtime_server, dict) else None
+                if gate_rate != rate or runtime_rate != rate:
+                    errors.append('运行中修改配置：Gate/Runtime UFTP 速率与 envelope 不一致')
             if isinstance(formal, dict) and 'scenario' in formal and isinstance(formal['scenario'], dict):
                 sc = formal['scenario']
                 if 'round_deadline_seconds' in sc and sc['round_deadline_seconds'] != resolved.get('runtime_timeout_seconds'):
@@ -243,7 +264,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
     gate_kwargs = {}
     config_keys = [
         'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
-        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi', 'uftp_rate_kbps',
         'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
     ]
     for i in range(1, 11):
