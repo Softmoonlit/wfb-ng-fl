@@ -14,6 +14,22 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
     def setUp(self):
         self.root = tempfile.mkdtemp(prefix='wfb-issue41-archive-')
         self.addCleanup(shutil.rmtree, self.root, True)
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
 
     def test_accepts_complete_passed_summary(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):

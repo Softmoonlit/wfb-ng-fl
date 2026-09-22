@@ -251,21 +251,20 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         if k in resolved_cfg:
             gate_kwargs[k] = resolved_cfg[k]
 
-    if resolved_cfg:
-        for req_key, gate_arg in (
-            ('smoke_cycle_count', 'cycle_count'),
-            ('smoke_io_timeout_seconds', 'io_timeout_seconds'),
-            ('smoke_cycle_deadline_seconds', 'cycle_deadline_seconds'),
-            ('artifact_size_bytes', 'artifact_size_bytes'),
-        ):
-            if req_key in resolved_cfg:
-                gate_kwargs[gate_arg] = int(resolved_cfg[req_key])
-            else:
-                errors.append('envelope.json resolved_config 缺少门禁参数：%s' % req_key)
-    else:
-        for gate_arg in ('cycle_count', 'io_timeout_seconds', 'cycle_deadline_seconds', 'artifact_size_bytes'):
-            if gate_arg in value:
-                gate_kwargs[gate_arg] = int(value[gate_arg])
+    if not resolved_cfg:
+        errors.append('缺少 envelope.json 或 resolved_config')
+        return
+
+    for req_key, gate_arg in (
+        ('smoke_cycle_count', 'cycle_count'),
+        ('smoke_io_timeout_seconds', 'io_timeout_seconds'),
+        ('smoke_cycle_deadline_seconds', 'cycle_deadline_seconds'),
+        ('artifact_size_bytes', 'artifact_size_bytes'),
+    ):
+        if req_key in resolved_cfg:
+            gate_kwargs[gate_arg] = int(resolved_cfg[req_key])
+        else:
+            errors.append('envelope.json resolved_config 缺少门禁参数：%s' % req_key)
 
     config = GateConfig(**gate_kwargs)
     gate_errors = validate_gate_summary(value, config)
@@ -355,7 +354,7 @@ def _validate_formal_scenario(value, errors):
             prev_output_model_sha = round_value['model'].get('sha256')
 
     total_runtime_seconds = sum(
-        float(r.get('duration_seconds', 0)) for r in rounds if isinstance(r, dict)
+        float(r.get('duration_seconds') or 0.0) for r in rounds if isinstance(r, dict)
     )
     max_allowed_runtime = float(scenario.get('round_deadline_seconds', 400))
     if total_runtime_seconds > max_allowed_runtime:
