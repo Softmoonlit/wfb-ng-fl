@@ -4,7 +4,7 @@
 
 **Blocked by:** 03: 基于分源遥测的射频与链路参数调优验证
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 运行包络与门禁支持配置化载荷大小（40 MiB）与轮次数（2 轮）。
 - [x] 正式运行时记录两个 client 的 HTTP PUT 活动时间区间，支持观测并验证自然发生的并发重叠。

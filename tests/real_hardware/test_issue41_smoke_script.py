@@ -73,6 +73,8 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
 
     def test_formal_runtime_fails_on_120_second_io_stall(self):
         self.assertIn('ISSUE41_IO_TIMEOUT_SECONDS:-120', self.script)
+        self.assertIn('formal 验收严格要求 IO_TIMEOUT_SECONDS <= 120 秒', self.script)
+        self.assertIn('formal 验收严格要求 SMOKE_IO_TIMEOUT_SECONDS <= 120 秒', self.script)
 
     def test_formal_runtime_defaults_to_two_40mib_rounds_with_concurrent_clients(self):
         for fragment in (

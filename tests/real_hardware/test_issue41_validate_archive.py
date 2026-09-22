@@ -232,19 +232,31 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         errors = validate_archive(self.root)
         self.assertTrue(any('artifact_size_bytes' in error for error in errors))
 
-    def test_rejects_strict_sync_client1_not_before_client2(self):
+    def test_rejects_missing_or_non_integer_round_count(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
             self.write_json(name, {'conclusion': 'succeeded'})
         self.write_runtime_evidence()
         self.write_smoke_marker()
         summary = self.complete_summary('passed')
-        summary['formal_runtime_loop']['scenario']['training_delay_ms_by_node'] = {'1': 0, '2': 3000}
-        summary['formal_runtime_loop']['rounds'][0]['strict_sync']['client1_committed_before_client2'] = False
+        summary['formal_runtime_loop']['scenario']['round_count'] = None
         self.write_json('issue41_summary.json', summary)
         self.write_text('result.md', '# result\n')
 
         errors = validate_archive(self.root)
-        self.assertTrue(any('client1 先于 client2' in error for error in errors))
+        self.assertTrue(any('round_count 必须为 2 轮' in error for error in errors))
+
+    def test_rejects_strict_sync_server_not_waiting_after_first_commit(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['strict_sync']['server_waited_after_first_commit'] = False
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('首个客户端提交后 server 保持等待' in error for error in errors))
 
     def test_rejects_downlink_matrix_failure(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -280,6 +292,91 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
 
         errors = validate_archive(self.root)
         self.assertTrue(any('队列自然暂停' in error for error in errors))
+
+    def test_rejects_concurrent_put_interval_mismatch_with_uploads(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['client_intervals']['1'] = {'start': 5.0, 'end': 6.0}
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('concurrent_put node 1 区间与 uploads 不一致' in error for error in errors))
+
+    def test_rejects_concurrent_put_overlap_duration_mismatch(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['overlap_duration_seconds'] = 3.5
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('overlap_duration_seconds 与时间区间计算不符' in error for error in errors))
+
+    def test_rejects_concurrent_put_natural_overlap_contradiction(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        summary = self.complete_summary('passed')
+        summary['formal_runtime_loop']['rounds'][0]['concurrent_put']['natural_overlap'] = False
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('natural_overlap 标记与实际时间区间矛盾' in error for error in errors))
+
+    def test_rejects_smoke_io_timeout_exceeding_120_in_formal(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'smoke_io_timeout_seconds': 130,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('smoke_io_timeout_seconds' in error for error in errors))
+
+    def test_rejects_io_timeout_exceeding_120_in_formal(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        summary['run_id'] = 'run-123'
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-123',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'io_timeout_seconds': 130,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('io_timeout_seconds' in error for error in errors))
 
     def test_validates_archive_passed_two_rounds_40mib(self):
         for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
@@ -1065,7 +1162,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'active_upload_sets': [[1], [1, 2], [2], []],
             'concurrent_put': {
                 'natural_overlap': True,
-                'overlap_duration_seconds': 1.5,
+                'overlap_duration_seconds': 1.0,
                 'concurrent_active_observed': True,
                 'client_intervals': {
                     '1': {'start': 1.0, 'end': 2.0},

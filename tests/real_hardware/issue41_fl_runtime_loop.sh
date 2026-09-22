@@ -109,6 +109,9 @@ init_envelope() {
     if [ "$IO_TIMEOUT_SECONDS" -gt 120 ]; then
         die "formal 验收严格要求 IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
     fi
+    if [ "$SMOKE_IO_TIMEOUT_SECONDS" -gt 120 ]; then
+        die "formal 验收严格要求 SMOKE_IO_TIMEOUT_SECONDS <= 120 秒，禁止通过增大超时掩盖停滞"
+    fi
     local cfg_tmp
     cfg_tmp="$(mktemp)"
     cat > "$cfg_tmp" <<EOF

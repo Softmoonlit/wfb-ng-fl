@@ -9,7 +9,11 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
-from tests.real_hardware.issue41_build_summary import EVENT_PREFIX, main
+from tests.real_hardware.issue41_build_summary import (
+    EVENT_PREFIX,
+    main,
+    _filter_log_by_time_ms,
+)
 
 
 class Issue41BuildSummaryTestCase(unittest.TestCase):
@@ -272,6 +276,37 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         summary = json.loads(buf.getvalue())
         self.assertEqual('failed', summary['status'])
         self.assertIn('upload_in_progress', summary['reason'])
+
+    def test_build_summary_rejects_missing_upload_committed_events(self):
+        self.write_fixtures()
+        obs_path = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'observation.jsonl')
+        with open(obs_path, 'r', encoding='utf-8') as fh:
+            lines = [line for line in fh if not ('upload_committed' in line and '"node_id": 2' in line)]
+        with open(obs_path, 'w', encoding='utf-8') as fh:
+            fh.writelines(lines)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            ret = main([self.archive_dir])
+        self.assertEqual(0, ret)
+        summary = json.loads(buf.getvalue())
+        self.assertEqual('failed', summary['status'])
+        self.assertIn('缺少 upload_committed 事件', summary['reason'])
+        self.assertFalse(summary['rounds'][0]['strict_sync']['server_waited_after_first_commit'])
+
+    def test_filter_log_by_time_ms_strict_window(self):
+        log = (
+            "999\tPKT_SRC\t1:10:100:0:0:10:100\n"
+            "1000\tPKT_SRC\t1:20:200:0:0:20:200\n"
+            "1500\tPKT_SRC\t2:30:300:0:0:30:300\n"
+            "2000\tPKT_SRC\t1:40:400:0:0:40:400\n"
+            "2001\tPKT_SRC\t2:50:500:0:0:50:500\n"
+        )
+        filtered = _filter_log_by_time_ms(log, 1000, 2000)
+        self.assertNotIn("999\tPKT_SRC", filtered)
+        self.assertIn("1000\tPKT_SRC", filtered)
+        self.assertIn("1500\tPKT_SRC", filtered)
+        self.assertIn("2000\tPKT_SRC", filtered)
+        self.assertNotIn("2001\tPKT_SRC", filtered)
 
     def write_fixtures(self, rounds_count=1, client2_delay=3000,
                        returned_node_ids=None, same_template_hash=False,

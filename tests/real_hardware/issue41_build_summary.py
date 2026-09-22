@@ -12,7 +12,6 @@ from tests.real_hardware.issue41_gate import parse_telemetry
 
 
 EVENT_PREFIX = 'WFB_FL_EVENT '
-EXPECTED_SIZE = 4 * 1024 * 1024
 
 
 def main(argv=None):
@@ -164,10 +163,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             'sha256': server_round.get('input_model_sha256'),
         }
         if model['size_bytes'] != expected_size:
-            if expected_size == 4 * 1024 * 1024:
-                errors.append('server 第 %d 轮模型不是 4 MiB' % index)
-            else:
-                errors.append('server 第 %d 轮模型不是 %d 字节' % (index, expected_size))
+            errors.append('server 第 %d 轮模型不是 %d 字节' % (index, expected_size))
 
         # 验证跨轮占位聚合的一致性 (model_copy)
         if index > 1 and prev_output_model_sha is not None:
@@ -211,10 +207,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
                     node_id, 'committed') else None,
             }
             if upload['size_bytes'] != expected_size:
-                if expected_size == 4 * 1024 * 1024:
-                    errors.append('client%d 第 %d 轮 update 不是 4 MiB' % (node_id, index))
-                else:
-                    errors.append('client%d 第 %d 轮 update 不是 %d 字节' % (node_id, index, expected_size))
+                errors.append('client%d 第 %d 轮 update 不是 %d 字节' % (node_id, index, expected_size))
             if upload['sha256'] != client.get('update_template_sha256'):
                 errors.append('client%d 第 %d 轮未复用对应 update 模板' % (node_id, index))
             uploads.append(upload)
@@ -237,16 +230,20 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         commit_seq_2 = _event_sequence(
             observations['server'], 'upload_committed', round_id, 2, 'committed')
 
+        returned_nodes = server_round.get('update_node_ids')
+        partial_result = (returned_nodes != [1, 2])
+
         if commit_seq_1 is None or commit_seq_2 is None:
             errors.append('第 %d 轮 server observation 缺少 upload_committed 事件' % index)
             first_committed_node = None
+            client1_committed_first = False
+            server_waited = False
         else:
             first_committed_node = 1 if commit_seq_1 < commit_seq_2 else 2
-
-        client1_committed_first = (first_committed_node == 1)
-        returned_nodes = server_round.get('update_node_ids')
-        server_waited = (returned_nodes == [1, 2])
-        partial_result = (returned_nodes != [1, 2])
+            first_seq = min(commit_seq_1, commit_seq_2)
+            second_seq = max(commit_seq_1, commit_seq_2)
+            client1_committed_first = (first_committed_node == 1)
+            server_waited = (first_seq < second_seq and returned_nodes == [1, 2])
 
         if expected_delays.get(2, 0) > expected_delays.get(1, 0):
             if not client1_committed_first:
@@ -489,7 +486,7 @@ def _filter_log_by_time_ms(log_text, start_ms, end_ms):
         m = pattern.search(line)
         if m:
             ts = int(m.group(1))
-            if start_ms <= ts <= end_ms + 1000:
+            if start_ms <= ts <= end_ms:
                 filtered.append(line)
     return '\n'.join(filtered)
 

@@ -138,10 +138,13 @@ def _validate_envelope(archive_dir, summary, errors):
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
             io_timeout_cfg = resolved.get('io_timeout_seconds')
-            if isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and envelope.get('mode') == 'formal':
+            if isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and mode == 'formal':
                 errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 不得大于 120 秒')
+            smoke_io_cfg = resolved.get('smoke_io_timeout_seconds')
+            if isinstance(smoke_io_cfg, (int, float)) and smoke_io_cfg > 120 and mode == 'formal':
+                errors.append('formal 模式下门禁单次 I/O 超时 (smoke_io_timeout_seconds) 不得大于 120 秒')
             rt_timeout_cfg = resolved.get('runtime_timeout_seconds')
-            if isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and envelope.get('mode') == 'formal':
+            if isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and mode == 'formal':
                 errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 不得大于 400 秒')
             smoke = summary.get('pre_runtime_smoke', {})
             if isinstance(smoke, dict):
@@ -228,25 +231,40 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         if isinstance(env_obj, dict):
             resolved_cfg = env_obj.get('resolved_config', {})
 
-    artifact_size = int(resolved_cfg.get('artifact_size_bytes', value.get('artifact_size_bytes', 40 * 1024 * 1024)))
-    cycle_count = int(resolved_cfg.get('smoke_cycle_count', 3))
-    io_timeout = int(resolved_cfg.get('smoke_io_timeout_seconds', resolved_cfg.get('io_timeout_seconds', 120)))
-    cycle_deadline = int(resolved_cfg.get('smoke_cycle_deadline_seconds', 240))
-
-    config = GateConfig(
-        cycle_count=cycle_count,
-        artifact_size_bytes=artifact_size,
-        io_timeout_seconds=io_timeout,
-        cycle_deadline_seconds=cycle_deadline,
-        channel=int(resolved_cfg.get('channel', 157)),
-        channel_width=str(resolved_cfg.get('channel_width', 'HT40+')),
-        link_id=int(resolved_cfg.get('link_id', 406)),
-        fec_k=int(resolved_cfg.get('fec_k', 8)),
-        fec_n=int(resolved_cfg.get('fec_n', 14)),
-        radio_bandwidth=int(resolved_cfg.get('radio_bandwidth', 40)),
-        radio_mcs_index=int(resolved_cfg.get('radio_mcs_index', 3)),
-        radio_short_gi=int(resolved_cfg.get('radio_short_gi', 1)),
+    gate_kwargs = {}
+    config_keys = (
+        'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
+        'client1_tun', 'client1_tun_addr', 'client2_tun', 'client2_tun_addr',
     )
+    for k in config_keys:
+        if k in resolved_cfg:
+            gate_kwargs[k] = resolved_cfg[k]
+
+    if 'smoke_cycle_count' in resolved_cfg:
+        gate_kwargs['cycle_count'] = int(resolved_cfg['smoke_cycle_count'])
+    elif 'cycle_count' in value:
+        gate_kwargs['cycle_count'] = int(value['cycle_count'])
+
+    if 'smoke_io_timeout_seconds' in resolved_cfg:
+        gate_kwargs['io_timeout_seconds'] = int(resolved_cfg['smoke_io_timeout_seconds'])
+    elif 'io_timeout_seconds' in resolved_cfg:
+        gate_kwargs['io_timeout_seconds'] = int(resolved_cfg['io_timeout_seconds'])
+    elif 'io_timeout_seconds' in value:
+        gate_kwargs['io_timeout_seconds'] = int(value['io_timeout_seconds'])
+
+    if 'smoke_cycle_deadline_seconds' in resolved_cfg:
+        gate_kwargs['cycle_deadline_seconds'] = int(resolved_cfg['smoke_cycle_deadline_seconds'])
+    elif 'cycle_deadline_seconds' in value:
+        gate_kwargs['cycle_deadline_seconds'] = int(value['cycle_deadline_seconds'])
+
+    if 'artifact_size_bytes' in resolved_cfg:
+        gate_kwargs['artifact_size_bytes'] = int(resolved_cfg['artifact_size_bytes'])
+    elif 'artifact_size_bytes' in value:
+        gate_kwargs['artifact_size_bytes'] = int(value['artifact_size_bytes'])
+
+    config = GateConfig(**gate_kwargs)
     gate_errors = validate_gate_summary(value, config)
     for ge in gate_errors:
         errors.append('pre_runtime_smoke 校验失败：%s' % ge)
@@ -319,11 +337,8 @@ def _validate_formal_scenario(value, errors):
         errors.append('formal_runtime_loop.scenario 必须包含不同的 client 模板 SHA-256')
 
     rounds = value.get('rounds')
-    if not isinstance(rounds, list) or len(rounds) != round_count:
-        if round_count == 1:
-            errors.append('formal_runtime_loop 必须包含一轮完整证据')
-        else:
-            errors.append('formal_runtime_loop 必须包含 %d 轮完整证据' % round_count)
+    if not isinstance(rounds, list) or len(rounds) != 2:
+        errors.append('formal_runtime_loop 必须包含 2 轮完整证据')
         return
 
     seen_round_ids = set()
@@ -331,13 +346,13 @@ def _validate_formal_scenario(value, errors):
     for index, round_value in enumerate(rounds, 1):
         _validate_round(
             round_value, index, artifact_size, template_hashes,
-            seen_round_ids, errors, delays=delays,
+            seen_round_ids, errors,
             prev_output_model_sha=prev_output_model_sha)
         if isinstance(round_value, dict) and isinstance(round_value.get('model'), dict):
             prev_output_model_sha = round_value['model'].get('sha256')
 
 
-def _validate_round(value, index, expected_size, template_hashes, seen_round_ids, errors, delays=None, prev_output_model_sha=None):
+def _validate_round(value, index, expected_size, template_hashes, seen_round_ids, errors, prev_output_model_sha=None):
     prefix = 'formal_runtime_loop.rounds[%d]' % (index - 1)
     if not isinstance(value, dict):
         errors.append('%s 必须是对象' % prefix)
@@ -351,10 +366,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         seen_round_ids.add(round_id)
     model = value.get('model')
     if not isinstance(model, dict) or model.get('size_bytes') != expected_size or not _is_sha256(model.get('sha256')):
-        if expected_size == 4 * 1024 * 1024:
-            errors.append('%s.model 必须是 4 MiB 且含 SHA-256' % prefix)
-        else:
-            errors.append('%s.model 必须是 %d 字节且含 SHA-256' % (prefix, expected_size))
+        errors.append('%s.model 必须是 %d 字节且含 SHA-256' % (prefix, expected_size))
     if index > 1 and prev_output_model_sha is not None:
         if isinstance(model, dict) and model.get('sha256') != prev_output_model_sha:
             errors.append('%s 占位聚合模型 SHA-256 与前一轮输出不匹配' % prefix)
@@ -374,14 +386,8 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             errors.append('%s.strict_sync.server_wait_returned_node_ids 必须为 [1, 2]' % prefix)
         if strict_sync.get('partial_result_returned') is not False:
             errors.append('%s.strict_sync 必须证明未返回 partial result' % prefix)
-        if delays and delays.get('2', 0) > delays.get('1', 0):
-            if strict_sync.get('client1_committed_before_client2') is not True:
-                errors.append('%s.strict_sync 必须证明 client1 先于 client2 完成提交' % prefix)
-            if strict_sync.get('server_waited_after_client1') is not True:
-                errors.append('%s.strict_sync 必须证明 client1 提交后 server 保持等待' % prefix)
-        else:
-            if strict_sync.get('server_waited_after_first_commit') is not True:
-                errors.append('%s.strict_sync 必须证明首个客户端提交后 server 保持等待' % prefix)
+        if strict_sync.get('server_waited_after_first_commit') is not True:
+            errors.append('%s.strict_sync 必须证明首个客户端提交后 server 保持等待' % prefix)
     active_upload_sets = value.get('active_upload_sets')
     if (not isinstance(active_upload_sets, list) or not active_upload_sets or
             any(not isinstance(node_ids, list) or
@@ -400,10 +406,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
     for node_id in (1, 2):
         upload = uploads_by_node[node_id]
         if upload.get('size_bytes') != expected_size or not _is_sha256(upload.get('sha256')):
-            if expected_size == 4 * 1024 * 1024:
-                errors.append('%s node %d update 必须是 4 MiB 且含 SHA-256' % (prefix, node_id))
-            else:
-                errors.append('%s node %d update 必须是 %d 字节且含 SHA-256' % (prefix, node_id, expected_size))
+            errors.append('%s node %d update 必须是 %d 字节且含 SHA-256' % (prefix, node_id, expected_size))
         if upload.get('sha256') != template_hashes[str(node_id)]:
             errors.append('%s node %d 未复用对应 update 模板' % (prefix, node_id))
         if not _is_interval(upload.get('client_put_interval')) or not _is_interval(upload.get('server_put_interval')):
@@ -445,10 +448,20 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
             c1_int = client_intervals.get('1')
             c2_int = client_intervals.get('2')
             if _is_interval(c1_int) and _is_interval(c2_int):
+                if uploads_by_node.get(1) and c1_int != uploads_by_node[1].get('client_put_interval'):
+                    errors.append('%s.concurrent_put node 1 区间与 uploads 不一致' % prefix)
+                if uploads_by_node.get(2) and c2_int != uploads_by_node[2].get('client_put_interval'):
+                    errors.append('%s.concurrent_put node 2 区间与 uploads 不一致' % prefix)
+
                 calc_overlap = min(c1_int['end'], c2_int['end']) - max(c1_int['start'], c2_int['start'])
                 expected_overlap = calc_overlap > 0
                 if concurrent_put.get('natural_overlap') != expected_overlap:
                     errors.append('%s.concurrent_put natural_overlap 标记与实际时间区间矛盾' % prefix)
+                expected_dur = round(calc_overlap, 3) if expected_overlap else 0.0
+                actual_dur = concurrent_put.get('overlap_duration_seconds')
+                if not isinstance(actual_dur, (int, float)) or abs(actual_dur - expected_dur) > 0.001:
+                    errors.append('%s.concurrent_put overlap_duration_seconds 与时间区间计算不符 (报告: %s, 期望: %s)' %
+                                  (prefix, actual_dur, expected_dur))
 
     telem = value.get('telemetry')
     if telem is None:
