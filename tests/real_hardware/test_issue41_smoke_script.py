@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import os
+import socket
 import subprocess
+import sys
+import tempfile
+import time
 import unittest
 
 
@@ -50,6 +55,39 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
                 "verify_uplink_cycle(events, c_res, cfg, float(duration_str))",
         ):
             self.assertIn(fragment, self.script)
+
+    def test_receiver_rejects_truncated_put(self):
+        start = self.script.index('python3 - "$server_dir" "${HTTP_HOST}" "$HTTP_PORT" <<\'PY\' &')
+        code = self.script[start:].split("<<'PY' &\n", 1)[1].split('\nPY\n', 1)[0]
+        with tempfile.TemporaryDirectory() as directory:
+            with socket.socket() as reservation:
+                reservation.bind(('127.0.0.1', 0))
+                port = reservation.getsockname()[1]
+            process = subprocess.Popen(
+                [sys.executable, '-c', code, directory, '127.0.0.1', str(port)],
+                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            try:
+                ready_path = os.path.join(directory, 'http-server-ready')
+                deadline = time.monotonic() + 3
+                while not os.path.isfile(ready_path) and time.monotonic() < deadline:
+                    self.assertIsNone(process.poll(), 'receiver 提前退出')
+                    time.sleep(0.02)
+                self.assertTrue(os.path.isfile(ready_path))
+                with socket.create_connection(('127.0.0.1', port), timeout=3) as client:
+                    client.sendall(b'PUT /client1 HTTP/1.1\r\nHost: localhost\r\n'
+                                   b'Content-Length: 40\r\nConnection: close\r\n\r\nshort')
+                    client.shutdown(socket.SHUT_WR)
+                    response = client.recv(4096)
+                self.assertIn(b' 400 ', response)
+                with open(os.path.join(directory, 'server-put-events.jsonl'), encoding='utf-8') as fh:
+                    uploads = [json.loads(line) for line in fh if '"type":"upload"' in line]
+                self.assertEqual(1, len(uploads))
+                self.assertEqual('incomplete_body', uploads[0]['outcome'])
+                self.assertEqual(5, uploads[0]['size_bytes'])
+            finally:
+                process.terminate()
+                process.wait(timeout=3)
+                process.stderr.close()
 
     def test_smoke_configures_channel_and_stops_http_receiver(self):
         for fragment in (

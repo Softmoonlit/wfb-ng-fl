@@ -1038,6 +1038,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             hasher.update(chunk)
             read_bytes += len(chunk)
 
+        complete = read_bytes == length
+        status = 201 if complete else 400
+        outcome = 'committed' if complete else 'incomplete_body'
         t1 = time.monotonic()
         digest = hasher.hexdigest()
         with lock:
@@ -1051,12 +1054,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
             'path': self.path,
             'size_bytes': read_bytes,
             'sha256': digest,
-            'status': 201,
-            'outcome': 'committed',
+            'status': status,
+            'outcome': outcome,
             'start_time': t0,
             'end_time': t1,
         })
-        self.send_response(201)
+        self.send_response(status)
         self.send_header('Content-Length', '0')
         self.send_header('Connection', 'close')
         self.end_headers()

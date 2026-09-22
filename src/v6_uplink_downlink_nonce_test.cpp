@@ -76,6 +76,7 @@ public:
     }
 
     int port() const { return port_; }
+    int get() const { return fd_.get(); }
 
     std::vector<uint8_t> recv_packet() const
     {
@@ -235,6 +236,51 @@ TEST_CASE("UDP server 下每个 client target 保持独立下行发送器")
     REQUIRE(targets[0].transmitter != NULL);
     REQUIRE(targets[1].transmitter != NULL);
     REQUIRE(targets[0].transmitter != targets[1].transmitter);
+}
+
+TEST_CASE("shared raw-air transmitter sends one multicast packet for seven targets")
+{
+    ScopedUdpReceiver receiver;
+    std::vector<ClientTarget> targets;
+    for (uint8_t node = 1; node <= 7; ++node)
+    {
+        targets.push_back(make_target(node, "10.6.0.11"));
+    }
+    std::shared_ptr<AirTransmitter> shared(
+        new AirTransmitter("127.0.0.1", receiver.port(), 0, 255));
+    for (ClientTarget &target : targets)
+    {
+        target.transmitter = shared;
+    }
+
+    const std::vector<uint8_t> payload = {0x45, 0x00, 0x01};
+    send_downlink_payload(targets, payload.data(), payload.size(),
+                          parse_ipv4("239.80.41.1", "multicast"));
+    REQUIRE(packet_payload(receiver.recv_packet()) == payload);
+    uint8_t buffer[sizeof(wrxfwd_t) + MAX_FORWARDER_PACKET_SIZE] = {};
+    REQUIRE(recv(receiver.get(), buffer, sizeof(buffer), MSG_DONTWAIT) == -1);
+    REQUIRE(errno == EAGAIN);
+}
+
+TEST_CASE("independent UDP transmitters each receive multicast, unicast selects one")
+{
+    ScopedUdpReceiver first;
+    ScopedUdpReceiver second;
+    std::vector<ClientTarget> targets = make_two_targets();
+    targets[0].transmitter.reset(new AirTransmitter("127.0.0.1", first.port(), 0, 255));
+    targets[1].transmitter.reset(new AirTransmitter("127.0.0.1", second.port(), 0, 255));
+    const std::vector<uint8_t> payload = {0x45, 0x00, 0x01};
+
+    send_downlink_payload(targets, payload.data(), payload.size(),
+                          parse_ipv4("239.80.41.1", "multicast"));
+    REQUIRE(packet_payload(first.recv_packet()) == payload);
+    REQUIRE(packet_payload(second.recv_packet()) == payload);
+
+    send_downlink_payload(targets, payload.data(), payload.size(), targets[0].tun_ipv4);
+    REQUIRE(packet_payload(first.recv_packet()) == payload);
+    uint8_t buffer[sizeof(wrxfwd_t) + MAX_FORWARDER_PACKET_SIZE] = {};
+    REQUIRE(recv(second.get(), buffer, sizeof(buffer), MSG_DONTWAIT) == -1);
+    REQUIRE(errno == EAGAIN);
 }
 
 TEST_CASE("v6 client uplink data_nonce 编码包含 source_node 与本地 block 索引")

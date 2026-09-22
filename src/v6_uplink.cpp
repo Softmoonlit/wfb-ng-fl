@@ -1311,9 +1311,14 @@ void send_downlink_payload(vector<ClientTarget> &targets,
 {
     if (is_ipv4_multicast(dest_ipv4) || is_ipv4_limited_broadcast(dest_ipv4))
     {
+        set<AirTransmitter *> sent;
         for (size_t i = 0; i < targets.size(); ++i)
         {
-            send_payload_to_target(targets[i], packet, packet_size);
+            AirTransmitter *transmitter = targets[i].transmitter.get();
+            if (transmitter != NULL && sent.insert(transmitter).second)
+            {
+                transmitter->send_data(packet, packet_size);
+            }
         }
         return;
     }
