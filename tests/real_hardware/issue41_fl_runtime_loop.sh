@@ -541,7 +541,7 @@ write_issue41_configs() {
     if [ "$role" = server ]; then
         local participant_ids=""
         local known_clients=""
-        local client_targets=()
+        local client_targets_json=""
         local first=1
         for r in "${CLIENT_ROLES[@]}"; do
             local nid="${r#client}"
@@ -553,11 +553,7 @@ write_issue41_configs() {
                 participant_ids="$participant_ids,$nid"
                 known_clients="$known_clients,$nid"
             fi
-            client_targets+=(--client-target "$nid:$(client_ip "$r"):127.0.0.1:1")
-        done
-        local client_targets_json=""
-        for ct in "${client_targets[@]}"; do
-            client_targets_json+=',"--client-target","'"$ct"'"'
+            client_targets_json+=',"--client-target","'"$nid:$(client_ip "$r"):127.0.0.1:1"'"'
         done
         cat > "$tmp/fl.json" <<EOF
 {"schema_version":1,"role":"server","work_dir":"$work_dir","channel":$CHANNEL,"channel_width":"$CHANNEL_WIDTH","node_id":255,"participant_node_ids":[$participant_ids],"participant_uftp_uids":[$participant_ids],"server_uftp_uid":255,"uftp_port":$UFTP_PORT,"http_host":"$HTTP_HOST","http_port":$HTTP_PORT,"uftp_bind_host":"${SERVER_TUN_ADDR%/*}","uftp_multicast_host":"$UFTP_GROUP","uftp_private_multicast_host":"$UFTP_PRIVATE_GROUP","max_update_size_bytes":1073741824,"live_observation":true,"observation_path":"$work_dir/observation.jsonl","io_timeout_seconds":$IO_TIMEOUT_SECONDS,"link_args":["--tun-name","$tun","--tun-addr","$addr","--link-id","$LINK_ID","--uplink-stream","$UPLINK_STREAM","--downlink-stream","$DOWNLINK_STREAM","--fec-k","$FEC_K","--fec-n","$FEC_N","--radio-bandwidth","$RADIO_BANDWIDTH","--radio-mcs-index","$RADIO_MCS_INDEX"$short_gi_json,"--log-interval","$LINK_LOG_INTERVAL_MS","--air-interface","$(find_wlx | head -n1)","--known-clients","$known_clients"$client_targets_json,"--grant-duration-ms","120","--guard-interval-ms","20","--downlink-pause-threshold-bytes","131072","--downlink-resume-threshold-bytes","65536","--downlink-queue-packets-limit","64","--feedback-window-period-ms","$FEEDBACK_WINDOW_PERIOD_MS","--feedback-window-duration-ms","$FEEDBACK_WINDOW_DURATION_MS","--queue-summary-file","$work_dir/server_queue_summary.json"]}
