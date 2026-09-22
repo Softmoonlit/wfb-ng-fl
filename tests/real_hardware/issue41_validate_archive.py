@@ -137,14 +137,23 @@ def _validate_envelope(archive_dir, summary, errors):
                 val = resolved.get(deadline_key)
                 if not isinstance(val, (int, float)) or val <= 0:
                     errors.append('envelope.json resolved_config 缺少有效 deadline/超时配置：%s' % deadline_key)
+            is_passed = summary.get('conclusion', {}).get('status') == 'passed'
             io_timeout_cfg = resolved.get('io_timeout_seconds')
-            if isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and mode == 'formal':
+            if isinstance(io_timeout_cfg, (int, float)) and is_passed and io_timeout_cfg != 120 and mode == 'formal':
+                errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 必须严格锁定为 120 秒')
+            elif isinstance(io_timeout_cfg, (int, float)) and io_timeout_cfg > 120 and mode == 'formal':
                 errors.append('formal 模式下单次 I/O 超时 (io_timeout_seconds) 不得大于 120 秒')
+
             smoke_io_cfg = resolved.get('smoke_io_timeout_seconds')
-            if isinstance(smoke_io_cfg, (int, float)) and smoke_io_cfg > 120 and mode == 'formal':
+            if isinstance(smoke_io_cfg, (int, float)) and is_passed and smoke_io_cfg != 120 and mode == 'formal':
+                errors.append('formal 模式下门禁单次 I/O 超时 (smoke_io_timeout_seconds) 必须严格锁定为 120 秒')
+            elif isinstance(smoke_io_cfg, (int, float)) and smoke_io_cfg > 120 and mode == 'formal':
                 errors.append('formal 模式下门禁单次 I/O 超时 (smoke_io_timeout_seconds) 不得大于 120 秒')
+
             rt_timeout_cfg = resolved.get('runtime_timeout_seconds')
-            if isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and mode == 'formal':
+            if isinstance(rt_timeout_cfg, (int, float)) and is_passed and rt_timeout_cfg != 400 and mode == 'formal':
+                errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 必须严格锁定为 400 秒')
+            elif isinstance(rt_timeout_cfg, (int, float)) and rt_timeout_cfg > 400 and mode == 'formal':
                 errors.append('formal 模式下整轮超时 (runtime_timeout_seconds) 不得大于 400 秒')
             smoke = summary.get('pre_runtime_smoke', {})
             if isinstance(smoke, dict):
@@ -242,27 +251,24 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         if k in resolved_cfg:
             gate_kwargs[k] = resolved_cfg[k]
 
-    if 'smoke_cycle_count' in resolved_cfg:
-        gate_kwargs['cycle_count'] = int(resolved_cfg['smoke_cycle_count'])
-    elif 'cycle_count' in value:
-        gate_kwargs['cycle_count'] = int(value['cycle_count'])
-
-    if 'smoke_io_timeout_seconds' in resolved_cfg:
-        gate_kwargs['io_timeout_seconds'] = int(resolved_cfg['smoke_io_timeout_seconds'])
-    elif 'io_timeout_seconds' in resolved_cfg:
-        gate_kwargs['io_timeout_seconds'] = int(resolved_cfg['io_timeout_seconds'])
-    elif 'io_timeout_seconds' in value:
-        gate_kwargs['io_timeout_seconds'] = int(value['io_timeout_seconds'])
-
-    if 'smoke_cycle_deadline_seconds' in resolved_cfg:
-        gate_kwargs['cycle_deadline_seconds'] = int(resolved_cfg['smoke_cycle_deadline_seconds'])
-    elif 'cycle_deadline_seconds' in value:
-        gate_kwargs['cycle_deadline_seconds'] = int(value['cycle_deadline_seconds'])
-
-    if 'artifact_size_bytes' in resolved_cfg:
-        gate_kwargs['artifact_size_bytes'] = int(resolved_cfg['artifact_size_bytes'])
-    elif 'artifact_size_bytes' in value:
-        gate_kwargs['artifact_size_bytes'] = int(value['artifact_size_bytes'])
+    if resolved_cfg:
+        is_passed = summary.get('conclusion', {}).get('status') == 'passed'
+        for req_key, gate_arg in (
+            ('smoke_cycle_count', 'cycle_count'),
+            ('smoke_io_timeout_seconds', 'io_timeout_seconds'),
+            ('smoke_cycle_deadline_seconds', 'cycle_deadline_seconds'),
+            ('artifact_size_bytes', 'artifact_size_bytes'),
+        ):
+            if req_key in resolved_cfg:
+                gate_kwargs[gate_arg] = int(resolved_cfg[req_key])
+            elif is_passed:
+                errors.append('envelope.json resolved_config 缺少门禁参数：%s' % req_key)
+            elif gate_arg in value:
+                gate_kwargs[gate_arg] = int(value[gate_arg])
+    else:
+        for gate_arg in ('cycle_count', 'io_timeout_seconds', 'cycle_deadline_seconds', 'artifact_size_bytes'):
+            if gate_arg in value:
+                gate_kwargs[gate_arg] = int(value[gate_arg])
 
     config = GateConfig(**gate_kwargs)
     gate_errors = validate_gate_summary(value, config)
@@ -429,9 +435,12 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         files = downlink_matrix.get('uftp_result_matrix', {})
         if conn.get('1') != 'success' or conn.get('2') != 'success':
             errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
-        if (files.get('1', {}).get('model.bin') != 'copy' or
-                files.get('2', {}).get('model.bin') != 'copy'):
-            errors.append('%s UFTP 文件接收矩阵未全部 copy' % prefix)
+        for nid in ('1', '2'):
+            node_files = files.get(nid, {})
+            if node_files.get('model.bin') != 'copy':
+                errors.append('%s client %s UFTP model.bin 接收未成功' % (prefix, nid))
+            if node_files.get('model.manifest.json') != 'copy':
+                errors.append('%s client %s UFTP model.manifest.json 接收未成功' % (prefix, nid))
 
     concurrent_put = value.get('concurrent_put')
     if concurrent_put is None or not isinstance(concurrent_put, dict):

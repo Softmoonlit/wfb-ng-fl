@@ -25,6 +25,8 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
             'rounds': 2,
             'artifact_size_bytes': 40 * 1024 * 1024,
             'training_delay_ms_by_node': {'1': 0, '2': 0},
+            'smoke_cycle_count': 3,
+            'smoke_io_timeout_seconds': 120,
             'smoke_cycle_deadline_seconds': 240,
             'runtime_timeout_seconds': 400,
             'io_timeout_seconds': 120,

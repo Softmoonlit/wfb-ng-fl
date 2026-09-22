@@ -69,13 +69,24 @@ def main(argv=None):
     round_deadline = resolved_cfg.get('runtime_timeout_seconds', 400)
     io_timeout = resolved_cfg.get('io_timeout_seconds', 120)
 
-    # 场景参数解析（从 envelope.json 的 resolved_config 获取；默认 2 轮 40 MiB 正式场景）
-    expected_rounds = int(resolved_cfg.get('rounds', 2))
-    expected_size = int(resolved_cfg.get('artifact_size_bytes', 40 * 1024 * 1024))
-    if 'training_delay_ms_by_node' in resolved_cfg:
-        expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
+    # 场景参数解析（从 envelope.json 的 resolved_config 获取）
+    if 'rounds' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 rounds')
+        expected_rounds = 2
     else:
+        expected_rounds = int(resolved_cfg['rounds'])
+
+    if 'artifact_size_bytes' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 artifact_size_bytes')
+        expected_size = 40 * 1024 * 1024
+    else:
+        expected_size = int(resolved_cfg['artifact_size_bytes'])
+
+    if 'training_delay_ms_by_node' not in resolved_cfg:
+        errors.append('envelope.json resolved_config 缺少 training_delay_ms_by_node')
         expected_delays = {1: 0, 2: 0}
+    else:
+        expected_delays = {int(k): int(v) for k, v in resolved_cfg['training_delay_ms_by_node'].items()}
 
     scenario_cfg = {
         'rounds': expected_rounds,
@@ -254,7 +265,6 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
         strict_sync = {
             'client1_committed_before_client2': client1_committed_first,
             'server_waited_after_first_commit': server_waited,
-            'server_waited_after_client1': server_waited and client1_committed_first,
             'first_committed_node_id': first_committed_node,
             'intermediate_committed_node_ids': [first_committed_node] if first_committed_node else [],
             'intermediate_pending_node_ids': [2 if first_committed_node == 1 else 1] if first_committed_node else [],

@@ -412,8 +412,10 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'rounds': 2,
                 'artifact_size_bytes': 40 * 1024 * 1024,
                 'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
                 'smoke_cycle_deadline_seconds': 240,
-                'runtime_timeout_seconds': 180,
+                'runtime_timeout_seconds': 400,
                 'io_timeout_seconds': 120,
             }
         })
@@ -1176,7 +1178,6 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             'strict_sync': {
                 'client1_committed_before_client2': True,
                 'server_waited_after_first_commit': True,
-                'server_waited_after_client1': True,
                 'intermediate_committed_node_ids': [1],
                 'intermediate_pending_node_ids': [2],
                 'server_wait_returned_node_ids': [1, 2],

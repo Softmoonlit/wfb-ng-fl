@@ -44,7 +44,7 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
         round1 = summary['rounds'][0]
         self.assertEqual([1, 2], round1['strict_sync']['server_wait_returned_node_ids'])
         self.assertTrue(round1['strict_sync']['client1_committed_before_client2'])
-        self.assertTrue(round1['strict_sync']['server_waited_after_client1'])
+        self.assertTrue(round1['strict_sync']['server_waited_after_first_commit'])
         self.assertFalse(round1['strict_sync']['partial_result_returned'])
 
     def test_build_summary_rejects_two_rounds(self):
