@@ -22,8 +22,8 @@ _COMMON_FIELDS = {
     'schema_version', 'role', 'work_dir', 'node_id', 'uftp_port',
     'max_update_size_bytes', 'link_args', 'live_observation',
     'observation_path', 'io_timeout_seconds', 'channel', 'channel_width',
-    'radio_txpower_dbm',
 }
+_OPTIONAL_FIELDS = {'radio_txpower_dbm'}
 _SERVER_FIELDS = {
     'participant_node_ids', 'participant_uftp_uids', 'server_uftp_uid',
     'uftp_rate_kbps', 'http_host', 'http_port', 'uftp_bind_host', 'uftp_multicast_host',
@@ -300,9 +300,11 @@ def _read_config(path):
     if not isinstance(config, dict):
         raise FLRuntimeError('invalid_configuration', '角色服务配置结构无效')
     role = config.get('role')
-    allowed = _COMMON_FIELDS | (
+    required = _COMMON_FIELDS | (
         _SERVER_FIELDS if role == 'server' else _CLIENT_FIELDS)
-    if role not in ('server', 'client') or set(config) != allowed:
+    allowed = required | _OPTIONAL_FIELDS
+    config_keys = set(config)
+    if role not in ('server', 'client') or not (config_keys >= required and config_keys <= allowed):
         raise FLRuntimeError('invalid_configuration', '角色服务配置字段无效')
     if type(config['channel']) is not int or config['channel'] <= 0:
         raise FLRuntimeError('invalid_configuration', '角色服务 channel 配置无效')
@@ -320,10 +322,15 @@ def _read_config(path):
             not os.path.isabs(config['work_dir'])):
         raise FLRuntimeError('invalid_configuration', '工作目录必须是绝对路径')
     for name in ('node_id', 'uftp_port', 'max_update_size_bytes',
-                 'io_timeout_seconds', 'radio_txpower_dbm'):
+                 'io_timeout_seconds'):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
+    if 'radio_txpower_dbm' in config and (
+            type(config['radio_txpower_dbm']) is not int or
+            config['radio_txpower_dbm'] <= 0):
+        raise FLRuntimeError(
+            'invalid_configuration', '角色服务整数参数无效')
     if role == 'server' and (type(config['uftp_rate_kbps']) is not int or
                              config['uftp_rate_kbps'] <= 0):
         raise FLRuntimeError('invalid_configuration', 'UFTP 发送速率配置无效')
