@@ -209,9 +209,10 @@ class GateConfig:
                 'feedback_window_duration_ms': self.feedback_window_duration_ms,
                 'feedback_window_start_immediately': False,
             }
+        role_key = role if (role.startswith('client') and role != 'client') else f'client{node_id}'
         tun = self.client_tuns.get(f'client{node_id}', f'v8i41c{node_id}')
         tun_addr = self.client_tun_addrs.get(f'client{node_id}', f'10.80.0.{10+node_id}/24')
-        mcs = self.client_radio_mcs_indices.get(role, self.client_radio_mcs_index)
+        mcs = self.client_radio_mcs_indices.get(role_key, self.client_radio_mcs_index)
         return {
             'role': 'client',
             'node_id': node_id,
@@ -395,7 +396,7 @@ def check_role_configs_equivalence(gate_config: GateConfig,
         if role != 'server':
             m = re.search(r'\d+', role)
             nid = int(m.group()) if m else 1
-            gate_configs[role] = gate_config.get_expected_link_config('client', nid)
+            gate_configs[role] = gate_config.get_expected_link_config(role, nid)
 
     errors = verify_config_equivalence(gate_configs, runtime_configs)
     return {
