@@ -76,7 +76,7 @@ def default_client_ssh_map():
         return {r: os.environ.get(f"ISSUE41_{r.upper()}_SSH", f"vm{r.replace('client', '')}") for r in roles}
     return {
         f'client{i}': os.environ.get(f'ISSUE41_CLIENT{i}_SSH', f'vm{i}')
-        for i in range(1, 8)
+        for i in (1, 2, 3, 4, 6, 7)
     }
 
 

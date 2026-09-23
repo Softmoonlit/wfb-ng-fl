@@ -13,8 +13,8 @@ from .errors import FLRuntimeError
 
 DEFAULT_ARTIFACT_SIZE_BYTES = 4 * 1024 * 1024
 DEFAULT_ROUNDS = 1
-DEFAULT_PARTICIPANT_NODE_IDS = tuple(range(1, 8))
-DEFAULT_TRAINING_DELAY_MS_BY_NODE = {str(i): 0 for i in range(1, 8)}
+DEFAULT_PARTICIPANT_NODE_IDS = (1, 2, 3, 4, 6, 7)
+DEFAULT_TRAINING_DELAY_MS_BY_NODE = {str(i): 0 for i in (1, 2, 3, 4, 6, 7)}
 
 MODEL_PATTERN = b'wfb-ng-issue41-model-4mib-v1\n'
 

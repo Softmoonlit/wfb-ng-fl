@@ -12,7 +12,7 @@ ARCHIVE_ROOT="${ISSUE41_ARCHIVE_ROOT:-$PROJECT_ROOT/tests/logs}"
 RUN_ID="${ISSUE41_RUN_ID:-v8_issue41_$(date +%Y%m%d_%H%M%S)}"
 ARCHIVE_DIR="${ISSUE41_ARCHIVE_DIR:-$ARCHIVE_ROOT/$RUN_ID}"
 REMOTE_REPO="${ISSUE41_REMOTE_REPO:-/home/virt/projects/wfb-ng-fl}"
-read -r -a CLIENT_ROLES <<< "${ISSUE41_CLIENT_ROLES:-client1 client2 client3 client4 client5 client6 client7}"
+read -r -a CLIENT_ROLES <<< "${ISSUE41_CLIENT_ROLES:-client1 client2 client3 client4 client6 client7}"
 export ISSUE41_CLIENT_ROLES="${CLIENT_ROLES[*]}"
 CLIENT1_SSH="${ISSUE41_CLIENT1_SSH:-vm1}"
 CLIENT2_SSH="${ISSUE41_CLIENT2_SSH:-vm2}"
@@ -859,17 +859,17 @@ configure_local_monitor() {
     sudo iw dev "$iface" set type monitor
     sudo ip link set "$iface" up
     sudo iw dev "$iface" set channel "$CHANNEL" "$CHANNEL_WIDTH"
-    if [ -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override ]; then
+    if sudo test -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override; then
         echo "$RADIO_TXPOWER_DBM" | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null
     fi
-    sudo iw dev "$iface" set txpower fixed "-$((RADIO_TXPOWER_DBM * 100))"
+    sudo iw dev "$iface" set txpower fixed "$((RADIO_TXPOWER_DBM * 100))"
     ip -br link show "$iface" > "$archive/ip-link.txt" 2>&1 || true
     iw dev "$iface" info > "$archive/iw-info.txt" 2>&1 || true
 }
 
 configure_remote_monitor() {
     local role="$1" iface="$2" dir="$3"
-    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; if [ -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override ]; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null; fi; sudo iw dev '$iface' set txpower fixed '-$((RADIO_TXPOWER_DBM * 100))'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
+    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; if sudo test -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null; fi; sudo iw dev '$iface' set txpower fixed '$((RADIO_TXPOWER_DBM * 100))'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
 }
 
 configure_runtime_monitors() {

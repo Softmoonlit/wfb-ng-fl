@@ -155,7 +155,7 @@ class GateConfig:
         if 'ISSUE41_CLIENT_RADIO_MCS_INDEX' in os.environ:
             kwargs['client_radio_mcs_index'] = int(os.environ['ISSUE41_CLIENT_RADIO_MCS_INDEX'])
         client_mcs_map = {}
-        for role in ('client1', 'client2', 'client3', 'client4', 'client5', 'client6', 'client7'):
+        for role in ('client1', 'client2', 'client3', 'client4', 'client6', 'client7'):
             env_key = f"ISSUE41_{role.upper()}_RADIO_MCS_INDEX"
             if env_key in os.environ:
                 client_mcs_map[role] = int(os.environ[env_key])
