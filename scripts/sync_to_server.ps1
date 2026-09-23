@@ -31,7 +31,8 @@ function Show-Usage {
     Write-Host "WFB-FL Windows 电脑端向 Server 开发板一键增量同步工具" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "用法:" -ForegroundColor Yellow
-    Write-Host "  powershell -File .\scripts\sync_to_server.ps1 [选项]"
+    Write-Host "  powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 [选项]"
+    Write-Host "  (注: 若在 Git Bash/WSL 中运行，路径请使用正斜杠: ./scripts/sync_to_server.ps1)"
     Write-Host ""
     Write-Host "选项:" -ForegroundColor Yellow
     Write-Host "  -Server, -s <IP/别名>     指定 Server 开发板局域网 IP 或 SSH 别名 (如 192.168.1.100 或 vm0)"
@@ -77,7 +78,7 @@ if (-not $User) {
 
 if (-not $Server) {
     Write-Host "[FAIL] 未指定 Server 主机 IP 或 SSH 别名！" -ForegroundColor Red
-    Write-Host "       请通过参数传入: .\scripts\sync_to_server.ps1 -Server <IP/别名>" -ForegroundColor Red
+    Write-Host "       请通过参数传入: powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server <IP/别名>" -ForegroundColor Red
     Write-Host "       或者在 $ConfigFile 中配置 SERVER_HOST=<IP>" -ForegroundColor Red
     exit 1
 }

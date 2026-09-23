@@ -73,17 +73,17 @@ projects/
 
 ### 1. 一键脚本使用方法 (推荐)
 
-打开 **Windows PowerShell**，进入 `wfb-ng-fl` 目录执行：
+打开 **Windows PowerShell** 或 **CMD**（若在 Git Bash/WSL 中运行请将反斜杠 `\` 替换为正斜杠 `/`），进入 `wfb-ng-fl` 目录执行：
 
 ```powershell
 # 场景 A: 使用开发板局域网 IP
-powershell -File .\scripts\sync_to_server.ps1 -Server 192.168.1.100 -User ubuntu
+powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server 192.168.1.100 -User ubuntu
 
 # 场景 B: 使用 SSH 配置别名 (如 vm0，自动应用别名内绑定的用户名与私钥)
-powershell -File .\scripts\sync_to_server.ps1 -Server vm0
+powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server vm0
 
 # 场景 C: 预先演练 (仅查看即将执行的操作，不产生实际网络传输)
-powershell -File .\scripts\sync_to_server.ps1 -Server vm0 -DryRun
+powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server vm0 -DryRun
 ```
 
 ### 2. 手动执行方式 (脚本底层原理说明)
