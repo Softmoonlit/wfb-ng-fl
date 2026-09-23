@@ -459,7 +459,7 @@ struct Config {
     int air_target_port = 0;
     vector<string> air_interfaces;
     RawAirRadioConfig raw_air_radio;
-    uint32_t grant_duration_ms = 100;
+    uint32_t grant_duration_ms = 120;
     uint32_t guard_interval_ms = 10;
     uint32_t feedback_window_period_ms = 0;
     uint32_t feedback_window_duration_ms = 0;
