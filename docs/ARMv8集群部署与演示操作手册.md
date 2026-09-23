@@ -66,10 +66,29 @@ projects/
 
 在 Windows 上使用系统自带的 **PowerShell** 终端，将代码和离线依赖一次性推送到 Server 开发板。
 
-> **推荐使用 Windows 原生 `tar` 管道流传输**：
-> Windows 10/11 原生自带 `tar.exe`。利用管道传输可以**自动排除庞大的 `.git` 历史与编译垃圾**，秒级完成并就地解压。
+项目已为你内置了 Windows 专用的**一键同步脚本 (`scripts/sync_to_server.ps1`)**。该脚本在后台全自动完成：
+1. 自动定位上级目录中的 `..\uftp_src-5.0.3.zip` 离线源码包并上传至 Server 端父级目录；
+2. 利用 Windows 10/11 内置的 `tar.exe` 管道流极速上传项目代码，**自动排除庞大的 `.git` 历史与编译垃圾**，在 Server 端就地秒级解压；
+3. 全面支持 IP 地址（如 `192.168.1.100`）与 `~/.ssh/config` 中定义的 SSH 别名（如 `vm0`）。
 
-打开 **Windows PowerShell**，进入 `wfb-ng-fl` 目录并执行：
+### 1. 一键脚本使用方法 (推荐)
+
+打开 **Windows PowerShell**，进入 `wfb-ng-fl` 目录执行：
+
+```powershell
+# 场景 A: 使用开发板局域网 IP
+powershell -File .\scripts\sync_to_server.ps1 -Server 192.168.1.100 -User ubuntu
+
+# 场景 B: 使用 SSH 配置别名 (如 vm0，自动应用别名内绑定的用户名与私钥)
+powershell -File .\scripts\sync_to_server.ps1 -Server vm0
+
+# 场景 C: 预先演练 (仅查看即将执行的操作，不产生实际网络传输)
+powershell -File .\scripts\sync_to_server.ps1 -Server vm0 -DryRun
+```
+
+### 2. 手动执行方式 (脚本底层原理说明)
+
+若希望了解底层命令或手动执行，可在 PowerShell 中运行等价命令：
 
 ```powershell
 # 假定 Server 开发板局域网 IP 为 192.168.1.100，用户名为 ubuntu

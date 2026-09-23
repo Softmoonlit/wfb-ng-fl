@@ -37,6 +37,8 @@ UPLINK_MCS=""
 UFTP_RATE_KBPS=""
 SERVER_NODE_ID=""
 SERVER_TUN_IP=""
+SERVER_HOST=""
+SERVER_USER=""
 
 # 客户端数组
 CLIENT_ROLES=()
@@ -56,6 +58,8 @@ reset_cluster_config() {
     UFTP_RATE_KBPS=""
     SERVER_NODE_ID=""
     SERVER_TUN_IP=""
+    SERVER_HOST=""
+    SERVER_USER=""
 
     CLIENT_ROLES=()
     CLIENT_HOSTS=()
@@ -173,6 +177,8 @@ load_cluster_config() {
                 UFTP_RATE_KBPS)         UFTP_RATE_KBPS="$val" ;;
                 SERVER_NODE_ID)         SERVER_NODE_ID="$val" ;;
                 SERVER_TUN_IP)          SERVER_TUN_IP="$val" ;;
+                SERVER_HOST)            SERVER_HOST="$val" ;;
+                SERVER_USER)            SERVER_USER="$val" ;;
                 *)
                     log_fail "配置文件第 $line_num 行包含未知键: $key"
                     return 1
