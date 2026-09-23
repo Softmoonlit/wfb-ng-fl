@@ -336,7 +336,7 @@ def _validate_runtime(value, errors):
             if not _archive_file_exists(path):
                 errors.append(f'formal_runtime_loop 缺少 {key} 文件证据')
     route_evidence = value.get('route_evidence')
-    expected_route_count = 6 * len(expected_node_ids)
+    expected_route_count = (len(expected_node_ids) + 1) * 4
     if (not isinstance(route_evidence, list) or len(route_evidence) != expected_route_count or
             any(not _archive_file_exists(path) for path in route_evidence)):
         errors.append('formal_runtime_loop 缺少六组双向 UFTP 路由证据')
@@ -482,9 +482,10 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
     else:
         conn = downlink_matrix.get('uftp_connect_matrix', {})
         files = downlink_matrix.get('uftp_result_matrix', {})
-        if conn.get('1') != 'success' or conn.get('2') != 'success':
+        expected_str_nids = [str(x) for x in expected_node_ids]
+        if any(conn.get(nid) != 'success' for nid in expected_str_nids):
             errors.append('%s UFTP CONNECT 矩阵未全部通过' % prefix)
-        for nid in ('1', '2'):
+        for nid in expected_str_nids:
             node_files = files.get(nid, {})
             if node_files.get('model.bin') != 'copy':
                 errors.append('%s client %s UFTP model.bin 接收未成功' % (prefix, nid))
@@ -551,7 +552,7 @@ def _validate_round(value, index, expected_size, template_hashes, seen_round_ids
         elif not isinstance(by_node, dict):
             errors.append('%s.loss_and_fec_by_node 必须是对象' % prefix)
         else:
-            for nid in ('1', '2'):
+            for nid in [str(x) for x in expected_node_ids]:
                 if nid not in by_node:
                     errors.append('%s telemetry loss_and_fec_by_node 缺少 client %s' % (prefix, nid))
                 elif not isinstance(by_node[nid], dict):

@@ -6,6 +6,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 
 from tests.real_hardware.issue41_envelope import (
     FAILURE_CATEGORIES,
@@ -221,6 +222,31 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
         with open(topo_file, 'r', encoding='utf-8') as fh:
             saved_topo = json.load(fh)
         self.assertEqual(topo, saved_topo)
+
+    def test_six_client_topology_derivation_without_client5(self):
+        env_override = {
+            'ISSUE41_CLIENT_ROLES': 'client1 client2 client3 client4 client6 client7'
+        }
+        with mock.patch.dict(os.environ, env_override):
+            envelope = RunEnvelope(
+                run_id='v8_issue41_6clients',
+                archive_root=self.archive_root,
+                branch='feat/41-real-hardware-fl-runtime-redo',
+                commit='0123456789abcdef0123456789abcdef01234567',
+                resolved_config=self.default_config,
+            )
+            self.assertEqual(
+                envelope.client_roles,
+                ('client1', 'client2', 'client3', 'client4', 'client6', 'client7')
+            )
+            self.assertEqual(
+                envelope.roles,
+                ('server', 'client1', 'client2', 'client3', 'client4', 'client6', 'client7')
+            )
+            self.assertNotIn('client5', envelope.client_roles)
+            self.assertNotIn('client5', envelope.client_ssh_map)
+            self.assertEqual(envelope.client_ssh_map['client6'], 'vm6')
+            self.assertEqual(envelope.client_ssh_map['client7'], 'vm7')
 
     def test_topology_discovery_fails_when_wireless_interface_missing(self):
         envelope = RunEnvelope(

@@ -31,7 +31,10 @@ def main(argv=None):
             if t_delays:
                 client_names = [f'client{nid}' for nid in sorted(t_delays.keys(), key=lambda x: int(x))]
     if not client_names:
-        client_names = [f'client{i}' for i in range(1, 8)]
+        if 'ISSUE41_CLIENT_ROLES' in os.environ:
+            client_names = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
+        else:
+            client_names = [f'client{i}' for i in range(1, 8)]
 
     result_paths = {
         'server': os.path.join(archive_dir, 'formal_runtime_loop', 'server',
@@ -543,7 +546,10 @@ def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None
         client_names = sorted([os.path.basename(d) for d in client_dirs],
                               key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
         if not client_names:
-            client_names = [f'client{i}' for i in range(1, 8)]
+            if 'ISSUE41_CLIENT_ROLES' in os.environ:
+                client_names = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
+            else:
+                client_names = [f'client{i}' for i in range(1, 8)]
 
     if round_start_ms is None or round_end_ms is None:
         errors.append('缺少轮次有效起止时间戳，无法切片提取遥测数据')

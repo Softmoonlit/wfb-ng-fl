@@ -1191,7 +1191,9 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
             },
         }
 
-    def lifecycle_evidence(self):
+    def lifecycle_evidence(self, roles=None):
+        if roles is None:
+            roles = ('server', 'client1', 'client2')
         return {
             'status': 'passed',
             'first_stop': {
@@ -1202,7 +1204,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         'cgroup_clean': True,
                         'tun_exists': False,
                         'orphan_processes': [],
-                    } for role in ('server', 'client1', 'client2')
+                    } for role in roles
                 }
             },
             'restart': {
@@ -1216,7 +1218,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         'pid_reused': False,
                         'cgroup_disjoint': True,
                         'tun_up': True,
-                    } for i, role in enumerate(('server', 'client1', 'client2'), 1)
+                    } for i, role in enumerate(roles, 1)
                 }
             },
             'second_stop': {
@@ -1227,7 +1229,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                         'cgroup_clean': True,
                         'tun_exists': False,
                         'orphan_processes': [],
-                    } for role in ('server', 'client1', 'client2')
+                    } for role in roles
                 }
             },
             'evidence_files': [
@@ -1403,6 +1405,200 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         })
         errors = validate_archive(self.root)
         self.assertTrue(any('radio_txpower_dbm' in e for e in errors))
+
+    def test_validate_archive_six_clients_success(self):
+        client_roles = ['client1', 'client2', 'client3', 'client4', 'client6', 'client7']
+        node_ids = [1, 2, 3, 4, 6, 7]
+        template_shas = {str(nid): ('%x' % nid).ljust(64, '0') for nid in node_ids}
+        size = 40 * 1024 * 1024
+
+        # 创建所有证据文件
+        self.write_text('result.md', '# result\n')
+        self.write_smoke_marker('run-6clients')
+        self.write_lifecycle_evidence()
+        self.write_text('server-result.json', '{}')
+        self.write_text('server-journal.txt', 'ok\n')
+        for r in client_roles:
+            self.write_text(f'{r}-result.json', '{}')
+            self.write_text(f'{r}-journal.txt', 'ok\n')
+
+        # 6 clients + 1 server = 7 roles * 4 = 28 route files
+        expected_route_count = (len(node_ids) + 1) * 4
+        route_files = [os.path.join(self.root, f'route-{i}.txt') for i in range(expected_route_count)]
+        for rf in route_files:
+            with open(rf, 'w', encoding='utf-8') as fh:
+                fh.write('default via 10.80.0.1\n')
+
+        def make_six_client_round(idx):
+            uploads = []
+            for nid in node_ids:
+                uploads.append({
+                    'node_id': nid,
+                    'size_bytes': size,
+                    'sha256': template_shas[str(nid)],
+                    'client_put_interval': {'start': 1.0, 'end': 2.0},
+                    'client_http_status': 201,
+                    'server_put_interval': {'start': 1.0, 'end': 2.0},
+                    'server_http_status': 201,
+                    'server_outcome': 'committed',
+                })
+            return {
+                'round_index': idx,
+                'round_id': f'round-{idx}',
+                'duration_seconds': 25.0,
+                'model': {'size_bytes': size, 'sha256': 'a'.ljust(64, '0')},
+                'model_receive_intervals': {str(nid): {'start': 1.0, 'end': 2.0} for nid in node_ids},
+                'server_committed_node_ids': node_ids,
+                'server_wait_returned_node_ids': node_ids,
+                'strict_sync': {
+                    'server_wait_returned_node_ids': node_ids,
+                    'partial_result_returned': False,
+                    'server_waited_after_first_commit': True,
+                },
+                'downlink_matrix': {
+                    'status': 'passed',
+                    'uftp_connect_matrix': {str(nid): 'success' for nid in node_ids},
+                    'uftp_result_matrix': {
+                        str(nid): {'model.bin': 'copy', 'model.manifest.json': 'copy'}
+                        for nid in node_ids
+                    },
+                },
+                'uploads': uploads,
+                'active_upload_sets': [node_ids, []],
+                'concurrent_put': {
+                    'natural_overlap': True,
+                    'overlap_duration_seconds': 1.0,
+                    'client_intervals': {str(nid): {'start': 1.0, 'end': 2.0} for nid in node_ids},
+                },
+                'telemetry': {
+                    'queue': {'tun_read_pause_total': 0, 'tun_read_resume_total': 0},
+                    'loss_and_fec_by_node': {
+                        str(nid): {
+                            'sample_count': 1,
+                            'rx_packets': 1000,
+                            'rx_bytes': 1000000,
+                            'packets_fec_recovered': 5,
+                            'packets_lost': 2,
+                            'out_packets': 998,
+                            'out_bytes': 998000,
+                            'loss_rate': 0.002,
+                            'fec_recovery_rate': 0.005,
+                        } for nid in node_ids
+                    },
+                },
+            }
+
+        smoke = self.smoke_gate_evidence(artifact_size=size)
+        smoke['run_id'] = 'run-6clients'
+        # 更新 smoke 中的 client_received_verification 和 loss_and_fec_by_node
+        for cyc in smoke['cycles']:
+            cyc['downlink']['client_received_verification'] = {
+                str(nid): {'verified': True, 'model_sha256': cyc['downlink']['file']['sha256'], 'model_size_bytes': size}
+                for nid in node_ids
+            }
+            cyc['downlink']['uftp_connect_matrix'] = {str(nid): 'success' for nid in node_ids}
+            cyc['downlink']['uftp_result_matrix'] = {
+                str(nid): {'model.bin': 'copy', 'model.manifest.json': 'copy'} for nid in node_ids
+            }
+            cyc['uplink']['uploads'] = [
+                {
+                    'node_id': nid,
+                    'size_bytes': size,
+                    'sha256': template_shas[str(nid)],
+                    'client_http_status': 201,
+                    'server_http_status': 201,
+                    'server_outcome': 'committed',
+                } for nid in node_ids
+            ]
+            cyc['telemetry']['loss_and_fec_by_node'] = {
+                str(nid): {
+                    'sample_count': 1,
+                    'out_packets': 500,
+                } for nid in node_ids
+            }
+
+        summary = {
+            'run_id': 'run-6clients',
+            'orchestration': {'status': 'passed'},
+            'pre_runtime_smoke': smoke,
+            'formal_runtime_loop': {
+                'status': 'passed',
+                'run_id': 'run-6clients',
+                'runtime_interfaces': [
+                    'publish_model', 'wait_for_model', 'submit_update',
+                    'wait_for_updates'
+                ],
+                'data_plane': '10.80.0.0/24',
+                'server_wait_for_updates_returned_node_ids': node_ids,
+                'partial_result_returned': False,
+                'scenario': {
+                    'round_count': 2,
+                    'artifact_size_bytes': size,
+                    'training_delay_ms_by_node': {str(nid): 0 for nid in node_ids},
+                    'placeholder_training': 'template_copy',
+                    'placeholder_aggregation': 'model_copy',
+                    'update_template_sha256_by_node': template_shas,
+                    'round_deadline_seconds': 400,
+                    'io_timeout_seconds': 120,
+                },
+                'rounds': [
+                    make_six_client_round(1),
+                    make_six_client_round(2),
+                ],
+                'server_result': os.path.join(self.root, 'server-result.json'),
+                'server_journal': os.path.join(self.root, 'server-journal.txt'),
+                **{f'{r}_result': os.path.join(self.root, f'{r}-result.json') for r in client_roles},
+                **{f'{r}_journal': os.path.join(self.root, f'{r}-journal.txt') for r in client_roles},
+                'route_evidence': route_files,
+                'config_equivalence': {
+                    'status': 'passed', 'errors': [],
+                    'gate_configs': {'server': {'uftp_rate_kbps': 15000}},
+                    'runtime_configs': {'server': {'uftp_rate_kbps': 15000}},
+                },
+                'controlled_stop': {'status': 'passed'},
+            },
+            'lifecycle': self.lifecycle_evidence(roles=['server'] + client_roles),
+            'conclusion': {'status': 'passed', 'reason': 'all passed'},
+        }
+        self.write_json('issue41_summary.json', summary)
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-6clients',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
+                'uftp_rate_kbps': 15000,
+                'grant_duration_ms': 200,
+                'guard_interval_ms': 15,
+                'rounds': 2,
+                'artifact_size_bytes': size,
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
+
+        errors = validate_archive(self.root)
+        self.assertEqual(errors, [])
+
+    def test_validate_archive_six_clients_route_evidence_mismatch(self):
+        # 先运行成功用例构建基础归档
+        self.test_validate_archive_six_clients_success()
+        summary_path = os.path.join(self.root, 'issue41_summary.json')
+        with open(summary_path, 'r', encoding='utf-8') as fh:
+            summary = json.load(fh)
+        # 破坏 route_evidence 数量（28 -> 27）
+        summary['formal_runtime_loop']['route_evidence'] = summary['formal_runtime_loop']['route_evidence'][:-1]
+        self.write_json('issue41_summary.json', summary)
+
+        errors = validate_archive(self.root)
+        self.assertTrue(any('缺少六组双向 UFTP 路由证据' in e for e in errors))
 
     def write_smoke_marker(self, run_id='test-run'):
         marker = {
