@@ -23,6 +23,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -404,6 +405,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -433,6 +435,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -477,6 +480,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -570,6 +574,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -781,6 +786,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -924,6 +930,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -962,6 +969,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -1316,6 +1324,7 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
                 'radio_mcs_index': 3,
                 'radio_bandwidth': 40,
                 'channel_width': 'HT40+',
+                'radio_txpower_dbm': 12,
                 'uftp_rate_kbps': 15000,
                 'grant_duration_ms': 120,
                 'guard_interval_ms': 20,
@@ -1331,6 +1340,69 @@ class Issue41ArchiveValidatorTestCase(unittest.TestCase):
         })
         errors = validate_archive(self.root)
         self.assertTrue(any('formal_runtime_loop 实际总耗时' in e for e in errors))
+
+    def test_rejects_missing_or_invalid_radio_txpower_dbm(self):
+        for name in ('server-result.json', 'client1-result.json', 'client2-result.json'):
+            self.write_json(name, {'conclusion': 'succeeded'})
+        self.write_runtime_evidence()
+        self.write_smoke_marker()
+        self.write_lifecycle_evidence()
+        summary = self.complete_summary('passed')
+        self.write_json('issue41_summary.json', summary)
+        self.write_text('result.md', '# result\n')
+
+        # 缺少 radio_txpower_dbm
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'uftp_rate_kbps': 15000,
+                'grant_duration_ms': 120,
+                'guard_interval_ms': 20,
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
+        errors = validate_archive(self.root)
+        self.assertTrue(any('radio_txpower_dbm' in e for e in errors))
+
+        # 非法 radio_txpower_dbm (> 30)
+        self.write_json('envelope.json', {
+            'schema_version': 1,
+            'run_id': 'run-test-run',
+            'mode': 'formal',
+            'network_isolation': {'prohibit_management_as_data_plane': True},
+            'resolved_config': {
+                'radio_mcs_index': 3,
+                'radio_bandwidth': 40,
+                'channel_width': 'HT40+',
+                'radio_txpower_dbm': 35,
+                'uftp_rate_kbps': 15000,
+                'grant_duration_ms': 120,
+                'guard_interval_ms': 20,
+                'rounds': 2,
+                'artifact_size_bytes': 40 * 1024 * 1024,
+                'training_delay_ms_by_node': {'1': 0, '2': 0},
+                'smoke_cycle_count': 3,
+                'smoke_io_timeout_seconds': 120,
+                'smoke_cycle_deadline_seconds': 240,
+                'runtime_timeout_seconds': 400,
+                'io_timeout_seconds': 120,
+            },
+        })
+        errors = validate_archive(self.root)
+        self.assertTrue(any('radio_txpower_dbm' in e for e in errors))
 
     def write_smoke_marker(self, run_id='test-run'):
         marker = {

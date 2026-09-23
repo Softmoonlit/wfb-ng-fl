@@ -59,6 +59,7 @@ class GateConfig:
                  client_radio_mcs_index: Optional[int] = None,
                  client_radio_mcs_indices: Optional[Dict[str, int]] = None,
                  radio_short_gi: int = 1,
+                 radio_txpower_dbm: int = 12,
                  uftp_rate_kbps: int = 15000,
                  grant_duration_ms: int = 120,
                  guard_interval_ms: int = 20,
@@ -97,6 +98,7 @@ class GateConfig:
             if val is not None:
                 self.client_radio_mcs_indices[f'client{i}'] = int(val)
         self.radio_short_gi = radio_short_gi
+        self.radio_txpower_dbm = int(radio_txpower_dbm)
         self.uftp_rate_kbps = uftp_rate_kbps
         self.grant_duration_ms = grant_duration_ms
         self.guard_interval_ms = guard_interval_ms
@@ -161,6 +163,8 @@ class GateConfig:
             kwargs['client_radio_mcs_indices'] = client_mcs_map
         if 'ISSUE41_RADIO_SHORT_GI' in os.environ:
             kwargs['radio_short_gi'] = int(os.environ['ISSUE41_RADIO_SHORT_GI'])
+        if 'ISSUE41_RADIO_TXPOWER_DBM' in os.environ:
+            kwargs['radio_txpower_dbm'] = int(os.environ['ISSUE41_RADIO_TXPOWER_DBM'])
         if 'ISSUE41_UFTP_RATE_KBPS' in os.environ:
             kwargs['uftp_rate_kbps'] = int(os.environ['ISSUE41_UFTP_RATE_KBPS'])
         if 'ISSUE41_GRANT_DURATION_MS' in os.environ:
@@ -188,6 +192,7 @@ class GateConfig:
                 'radio_bandwidth': self.radio_bandwidth,
                 'radio_mcs_index': self.server_radio_mcs_index,
                 'radio_short_gi': bool(self.radio_short_gi),
+                'radio_txpower_dbm': self.radio_txpower_dbm,
                 'fec_k': self.fec_k,
                 'fec_n': self.fec_n,
                 'link_id': self.link_id,
@@ -215,6 +220,7 @@ class GateConfig:
             'radio_bandwidth': self.radio_bandwidth,
             'radio_mcs_index': mcs,
             'radio_short_gi': bool(self.radio_short_gi),
+            'radio_txpower_dbm': self.radio_txpower_dbm,
             'fec_k': self.fec_k,
             'fec_n': self.fec_n,
             'link_id': self.link_id,
@@ -309,7 +315,7 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
     errors: List[str] = []
     server_fields = [
         'uftp_rate_kbps', 'grant_duration_ms', 'guard_interval_ms',
-        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi', 'radio_txpower_dbm',
         'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
         'tun_name', 'tun_addr',
         'downlink_pause_threshold_bytes', 'downlink_resume_threshold_bytes',
@@ -317,7 +323,7 @@ def verify_config_equivalence(gate_configs: Dict[str, Any],
         'feedback_window_period_ms', 'feedback_window_duration_ms',
     ]
     client_fields = [
-        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi',
+        'radio_bandwidth', 'radio_mcs_index', 'radio_short_gi', 'radio_txpower_dbm',
         'fec_k', 'fec_n', 'link_id', 'uplink_stream', 'downlink_stream',
         'tun_name', 'tun_addr',
         'uplink_pause_threshold_bytes', 'uplink_resume_threshold_bytes',

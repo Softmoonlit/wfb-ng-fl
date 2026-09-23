@@ -820,6 +820,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'role': 'server',
                 'node_id': 255,
                 'uftp_rate_kbps': 15000,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -836,6 +837,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client1': {
                 'role': 'client',
                 'node_id': 1,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -849,6 +851,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client2': {
                 'role': 'client',
                 'node_id': 2,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -879,6 +882,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'role': 'server',
                 'node_id': 255,
                 'uftp_rate_kbps': 15000,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -895,6 +899,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client1': {
                 'role': 'client',
                 'node_id': 1,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -908,6 +913,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client2': {
                 'role': 'client',
                 'node_id': 2,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -927,6 +933,11 @@ class Issue41GateTestCase(unittest.TestCase):
         errors = verify_config_equivalence(gate_configs, runtime_configs)
         self.assertTrue(any('uftp_rate_kbps' in e for e in errors))
 
+        runtime_configs['server']['uftp_rate_kbps'] = 15000
+        runtime_configs['server']['radio_txpower_dbm'] = 20
+        errors = verify_config_equivalence(gate_configs, runtime_configs)
+        self.assertTrue(any('radio_txpower_dbm' in e for e in errors))
+
     def test_verify_config_equivalence_rejects_immediate_feedback(self):
         from tests.real_hardware.issue41_gate import (
             GateConfig, verify_config_equivalence,
@@ -942,6 +953,7 @@ class Issue41GateTestCase(unittest.TestCase):
                 'role': 'server',
                 'node_id': 255,
                 'uftp_rate_kbps': 15000,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -959,6 +971,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client1': {
                 'role': 'client',
                 'node_id': 1,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -972,6 +985,7 @@ class Issue41GateTestCase(unittest.TestCase):
             'client2': {
                 'role': 'client',
                 'node_id': 2,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -998,6 +1012,7 @@ class Issue41GateTestCase(unittest.TestCase):
             json.dump({
                 'role': 'server',
                 'uftp_rate_kbps': 15000,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41s0', '--tun-addr', '10.80.0.1/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -1015,6 +1030,7 @@ class Issue41GateTestCase(unittest.TestCase):
             json.dump({
                 'role': 'client',
                 'node_id': 1,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -1029,6 +1045,7 @@ class Issue41GateTestCase(unittest.TestCase):
             json.dump({
                 'role': 'client',
                 'node_id': 2,
+                'radio_txpower_dbm': 12,
                 'link_args': [
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
@@ -1089,6 +1106,7 @@ class Issue41GateTestCase(unittest.TestCase):
             self.assertEqual(40, cfg.radio_bandwidth)
             self.assertEqual(3, cfg.radio_mcs_index)
             self.assertEqual(1, cfg.radio_short_gi)
+            self.assertEqual(12, cfg.radio_txpower_dbm)
 
             # 环境变量覆盖
             os.environ['ISSUE41_SMOKE_CYCLE_COUNT'] = '1'
@@ -1103,6 +1121,7 @@ class Issue41GateTestCase(unittest.TestCase):
             os.environ['ISSUE41_RADIO_BANDWIDTH'] = '40'
             os.environ['ISSUE41_RADIO_MCS_INDEX'] = '2'
             os.environ['ISSUE41_RADIO_SHORT_GI'] = '0'
+            os.environ['ISSUE41_RADIO_TXPOWER_DBM'] = '15'
             cfg2 = GateConfig.from_env()
             self.assertEqual(1, cfg2.cycle_count)
             self.assertEqual(40 * 1024 * 1024, cfg2.artifact_size_bytes)
@@ -1116,6 +1135,7 @@ class Issue41GateTestCase(unittest.TestCase):
             self.assertEqual(40, cfg2.radio_bandwidth)
             self.assertEqual(2, cfg2.radio_mcs_index)
             self.assertEqual(0, cfg2.radio_short_gi)
+            self.assertEqual(15, cfg2.radio_txpower_dbm)
         finally:
             os.environ.clear()
             os.environ.update(old_env)

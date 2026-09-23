@@ -29,6 +29,7 @@ class TestIssue41FormalEntry(Issue41ArchiveValidatorTestCase):
             'radio_mcs_index': 3,
             'radio_bandwidth': 40,
             'channel_width': 'HT40+',
+            'radio_txpower_dbm': 12,
             'artifact_size_bytes': 40 * 1024 * 1024,
             'training_delay_ms_by_node': {'1': 0, '2': 0},
             'smoke_cycle_count': 3,

@@ -152,6 +152,9 @@ def _validate_envelope(archive_dir, summary, errors):
                     resolved.get('channel_width'))
                 if safe_range is None or not safe_range[0] <= rate <= safe_range[1]:
                     errors.append('envelope.json UFTP 速率超出射频安全区间')
+            txpower = resolved.get('radio_txpower_dbm')
+            if type(txpower) is not int or txpower <= 0 or txpower > 30:
+                errors.append('envelope.json resolved_config 缺少有效发射功率配置 (radio_txpower_dbm)')
             is_passed = summary.get('conclusion', {}).get('status') == 'passed'
             io_timeout_cfg = resolved.get('io_timeout_seconds')
             if isinstance(io_timeout_cfg, (int, float)) and is_passed and io_timeout_cfg != 120 and mode == 'formal':
@@ -271,7 +274,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
     config_keys = [
         'channel', 'channel_width', 'link_id', 'fec_k', 'fec_n',
         'radio_bandwidth', 'radio_mcs_index', 'server_radio_mcs_index', 'client_radio_mcs_index',
-        'radio_short_gi', 'uftp_rate_kbps',
+        'radio_short_gi', 'radio_txpower_dbm', 'uftp_rate_kbps',
         'grant_duration_ms', 'guard_interval_ms',
         'uplink_stream', 'downlink_stream', 'server_tun', 'server_tun_addr',
     ]
