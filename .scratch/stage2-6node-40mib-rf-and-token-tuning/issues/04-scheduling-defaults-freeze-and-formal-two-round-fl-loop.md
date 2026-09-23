@@ -9,27 +9,27 @@
 
 - [x] 根据评测优胜结果，更新代码与脚本中的默认 Grant Duration 与 Guard Interval 参数（Grant 120 ms, Guard 10 ms, Client MCS 6）
 - [x] 将优胜参数写入 `docs/adr/0013-近距台面射频衰减保护与六客户端上行调度基准.md` 并标记为 accepted
-- [x] 执行完整的两轮 40 MiB 正式 FL Runtime 闭环（`run-all`，Run ID: `v8_issue41_formal_6node_20260923_163642`）
+- [x] 执行完整的两轮 40 MiB 正式 FL Runtime 闭环（`run-all`，Run ID: `v8_issue41_formal_6node_20260923_173512`）
 - [x] 验证 6 客户端各轮次 HTTP PUT 区间自然并发重叠且全部成功提交（两轮共 12 次 40 MiB 上传全部 100% 成功获得 HTTP 201 Committed）
 - [x] 运行 `issue41_validate_archive.py` 进行机械化校验，确认 5 个分区（orchestration, pre_runtime_smoke, formal_runtime_loop, lifecycle, conclusion）全部 passed
-- [x] 验证整轮耗时（220.96s）远低于 400 秒硬限，单次 I/O 最长（83.84s）远低于 120 秒限时（裕量超过 36 秒），完成可审计的 formal 归档交付
+- [x] 验证整轮耗时（244.5s）远低于 400 秒硬限，单次 I/O 最长（86.27s）远低于 120 秒限时（裕量超过 33 秒），完成可审计的 formal 归档交付
 
 ---
 
 ## Stage 2 正式验收详细报告
 
 ### 一、归档基本信息与机械校验结果
-- **正式归档 Run ID**: `v8_issue41_formal_6node_20260923_163642`
-- **归档路径**: `tests/logs/v8_issue41_formal_6node_20260923_163642`
-- **执行 Commit**: `0575b3f`（工作区完全干净）
-- **验证命令**: `python3 tests/real_hardware/issue41_validate_archive.py tests/logs/v8_issue41_formal_6node_20260923_163642`
+- **正式归档 Run ID**: `v8_issue41_formal_6node_20260923_173512`
+- **归档路径**: `tests/logs/v8_issue41_formal_6node_20260923_173512`
+- **执行 Commit**: `6c1e031`（工作区完全干净）
+- **验证命令**: `python3 tests/real_hardware/issue41_validate_archive.py tests/logs/v8_issue41_formal_6node_20260923_173512`
 - **机械校验结论**: **`OK: issue41 archive validation passed`**（全量 5 个分区通过，零错误）
 
 | 验收分区 | 分区状态 | 关键指标与合规证据 |
 | :--- | :--- | :--- |
 | **1. orchestration** | **passed** | 7 节点拓扑自动发现（1 Server + 6 Clients），USB 接口速度审计通过，射频健康检查全部通过 |
-| **2. pre_runtime_smoke** | **passed** | 单周期 40 MiB 双向数据面 Gate 成功（耗时 126.69s），分源遥测有效覆盖全部 6 节点，无碰撞，0 TCP 重传 |
-| **3. formal_runtime_loop**| **passed** | 两轮 40 MiB FL 闭环成功，严格同步等待 `[1, 2, 3, 4, 6, 7]`，两轮整轮总耗时 220.96s（远低于 400s 上限） |
+| **2. pre_runtime_smoke** | **passed** | 单周期 40 MiB 双向数据面 Gate 成功（耗时 116.32s），分源遥测有效覆盖全部 6 节点，无碰撞，0 TCP 重传 |
+| **3. formal_runtime_loop**| **passed** | 两轮 40 MiB FL 闭环成功，严格同步等待 `[1, 2, 3, 4, 6, 7]`，两轮整轮总耗时 244.52s（远低于 400s 上限） |
 | **4. lifecycle** | **passed** | 角色服务受控停止、重启及二次停止全部通过；MainPID 无重用，cgroup 隔离，TUN 接口彻底清理无泄露 |
 | **5. conclusion** | **passed** | 2 轮 40 MiB 严格同步场景证据完整，无失败分类 (`failure_category: none`) |
 
