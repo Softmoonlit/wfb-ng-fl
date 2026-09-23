@@ -862,14 +862,17 @@ configure_local_monitor() {
     if sudo test -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override; then
         echo "$RADIO_TXPOWER_DBM" | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null
     fi
-    sudo iw dev "$iface" set txpower fixed "$((RADIO_TXPOWER_DBM * 100))"
+    # 核心机制说明：rtl88xxau_wfb 驱动在 ioctl_cfg80211.c 中硬编码利用 iw 负值 mBm 协议
+    # 将 -value 赋给 rtw_tx_pwr_idx_override 以钳制底层功率索引（如 -1200 mBm -> 功率索引 12）。
+    # 若传入正值，驱动会将 override 恢复为 0 并以全功率发射导致台面近距 LNA 严重饱和。
+    sudo iw dev "$iface" set txpower fixed "-$((RADIO_TXPOWER_DBM * 100))"
     ip -br link show "$iface" > "$archive/ip-link.txt" 2>&1 || true
     iw dev "$iface" info > "$archive/iw-info.txt" 2>&1 || true
 }
 
 configure_remote_monitor() {
     local role="$1" iface="$2" dir="$3"
-    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; if sudo test -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null; fi; sudo iw dev '$iface' set txpower fixed '$((RADIO_TXPOWER_DBM * 100))'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
+    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; if sudo test -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null; fi; sudo iw dev '$iface' set txpower fixed '-$((RADIO_TXPOWER_DBM * 100))'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
 }
 
 configure_runtime_monitors() {
