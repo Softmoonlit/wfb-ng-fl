@@ -110,7 +110,7 @@ class Issue41SmokeScriptTestCase(unittest.TestCase):
         self.assertIn('ISSUE41_RADIO_MCS_INDEX:-3', self.script)
         self.assertIn('ISSUE41_UFTP_RATE_KBPS:-15000', self.script)
         self.assertIn('ISSUE41_GRANT_DURATION_MS:-120', self.script)
-        self.assertIn('ISSUE41_GUARD_INTERVAL_MS:-20', self.script)
+        self.assertIn('ISSUE41_GUARD_INTERVAL_MS:-10', self.script)
         self.assertIn('"uftp_rate_kbps":$UFTP_RATE_KBPS', self.script)
         self.assertIn('"--grant-duration-ms","$GRANT_DURATION_MS"', self.script)
 

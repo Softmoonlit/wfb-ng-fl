@@ -37,7 +37,8 @@ class Issue41GateTestCase(unittest.TestCase):
         self.assertEqual('HT40+', self.config.channel_width)
         self.assertEqual(3, self.config.radio_mcs_index)
         self.assertEqual(3, self.config.server_radio_mcs_index)
-        self.assertEqual(3, self.config.client_radio_mcs_index)
+        self.assertEqual(6, self.config.client_radio_mcs_index)
+        self.assertEqual(10, self.config.guard_interval_ms)
         self.assertEqual(8, self.config.fec_k)
         self.assertEqual(14, self.config.fec_n)
 
@@ -826,7 +827,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
-                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '10',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
                     '--downlink-queue-packets-limit', '64',
@@ -842,7 +843,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
-                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--radio-mcs-index', '6', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
                     '--uplink-queue-packets-limit', '64',
@@ -856,7 +857,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
-                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--radio-mcs-index', '6', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
                     '--uplink-queue-packets-limit', '64',
@@ -1018,7 +1019,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
                     '--radio-mcs-index', '3', '--radio-short-gi',
-                    '--grant-duration-ms', '120', '--guard-interval-ms', '20',
+                    '--grant-duration-ms', '120', '--guard-interval-ms', '10',
                     '--downlink-pause-threshold-bytes', '131072',
                     '--downlink-resume-threshold-bytes', '65536',
                     '--downlink-queue-packets-limit', '64',
@@ -1035,7 +1036,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--tun-name', 'v8i41c1', '--tun-addr', '10.80.0.11/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
-                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--radio-mcs-index', '6', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
                     '--uplink-queue-packets-limit', '64',
@@ -1050,7 +1051,7 @@ class Issue41GateTestCase(unittest.TestCase):
                     '--tun-name', 'v8i41c2', '--tun-addr', '10.80.0.12/24',
                     '--link-id', '406', '--uplink-stream', '32', '--downlink-stream', '33',
                     '--fec-k', '8', '--fec-n', '14', '--radio-bandwidth', '40',
-                    '--radio-mcs-index', '3', '--radio-short-gi',
+                    '--radio-mcs-index', '6', '--radio-short-gi',
                     '--uplink-pause-threshold-bytes', '131072',
                     '--uplink-resume-threshold-bytes', '65536',
                     '--uplink-queue-packets-limit', '64',

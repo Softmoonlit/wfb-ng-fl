@@ -37,12 +37,12 @@ FEC_N="${ISSUE41_FEC_N:-14}"
 RADIO_BANDWIDTH="${ISSUE41_RADIO_BANDWIDTH:-40}"
 RADIO_MCS_INDEX="${ISSUE41_RADIO_MCS_INDEX:-3}"
 SERVER_RADIO_MCS_INDEX="${ISSUE41_SERVER_RADIO_MCS_INDEX:-$RADIO_MCS_INDEX}"
-CLIENT_RADIO_MCS_INDEX="${ISSUE41_CLIENT_RADIO_MCS_INDEX:-$RADIO_MCS_INDEX}"
+CLIENT_RADIO_MCS_INDEX="${ISSUE41_CLIENT_RADIO_MCS_INDEX:-6}"
 RADIO_SHORT_GI="${ISSUE41_RADIO_SHORT_GI:-1}"
 RADIO_TXPOWER_DBM="${ISSUE41_RADIO_TXPOWER_DBM:-12}"
 UFTP_RATE_KBPS="${ISSUE41_UFTP_RATE_KBPS:-15000}"
 GRANT_DURATION_MS="${ISSUE41_GRANT_DURATION_MS:-120}"
-GUARD_INTERVAL_MS="${ISSUE41_GUARD_INTERVAL_MS:-20}"
+GUARD_INTERVAL_MS="${ISSUE41_GUARD_INTERVAL_MS:-10}"
 LINK_LOG_INTERVAL_MS="${ISSUE41_LINK_LOG_INTERVAL_MS:-1000}"
 IO_TIMEOUT_SECONDS="${ISSUE41_IO_TIMEOUT_SECONDS:-120}"
 FEEDBACK_WINDOW_PERIOD_MS="${ISSUE41_FEEDBACK_WINDOW_PERIOD_MS:-500}"
@@ -164,7 +164,7 @@ for key, value in zip(('uftp_rate_kbps', 'server_radio_mcs_index', 'client_radio
     if val is None and key == 'client_radio_mcs_index':
         val = cfg.get('radio_mcs_index')
     if val is None and key in ('grant_duration_ms', 'guard_interval_ms'):
-        val = 120 if key == 'grant_duration_ms' else 20
+        val = 120 if key == 'grant_duration_ms' else 10
     if val is None and key == 'radio_txpower_dbm':
         val = 12
     if val != value:
