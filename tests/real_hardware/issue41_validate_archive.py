@@ -65,7 +65,7 @@ def validate_archive(archive_dir):
         return errors
     _validate_smoke_gate(archive_dir, smoke, summary, errors)
 
-    _validate_runtime(summary['formal_runtime_loop'], errors)
+    _validate_runtime(summary['formal_runtime_loop'], errors, archive_dir=archive_dir, summary=summary)
     _validate_lifecycle(archive_dir, summary['lifecycle'], errors)
     _validate_conclusion(summary['conclusion'], summary, errors)
     _validate_envelope(archive_dir, summary, errors)
@@ -305,7 +305,7 @@ def _validate_smoke_gate(archive_dir, value, summary, errors):
         errors.append('pre_runtime_smoke 校验失败：%s' % ge)
 
 
-def _validate_runtime(value, errors):
+def _validate_runtime(value, errors, archive_dir=None, summary=None):
     _require_status(value, 'formal_runtime_loop', errors)
     if not isinstance(value, dict):
         return
@@ -314,6 +314,23 @@ def _validate_runtime(value, errors):
     scenario = value.get('scenario') if isinstance(value.get('scenario'), dict) else {}
     template_hashes = scenario.get('update_template_sha256_by_node', {})
     expected_node_ids = sorted([int(k) for k in template_hashes.keys()]) if template_hashes else [1, 2]
+
+    if archive_dir:
+        env_path = os.path.join(archive_dir, 'envelope.json')
+        if os.path.isfile(env_path):
+            try:
+                with open(env_path, 'r', encoding='utf-8') as fh:
+                    env_data = json.load(fh)
+                rc = env_data.get('resolved_config', {})
+                c_roles = rc.get('client_roles')
+                if not c_roles and 'training_delay_ms_by_node' in rc:
+                    c_roles = [f'client{nid}' for nid in rc['training_delay_ms_by_node'].keys()]
+                if c_roles:
+                    configured_nids = sorted([int(re.search(r'\d+', r).group()) for r in c_roles if re.search(r'\d+', r)])
+                    if expected_node_ids != configured_nids:
+                        errors.append('formal_runtime_loop 节点集合与 envelope 拓扑配置不一致: %r != %r' % (expected_node_ids, configured_nids))
+            except Exception:
+                pass
 
     required = {
         'runtime_interfaces': [

@@ -248,6 +248,21 @@ class Issue41EnvelopeTestCase(unittest.TestCase):
             self.assertEqual(envelope.client_ssh_map['client6'], 'vm6')
             self.assertEqual(envelope.client_ssh_map['client7'], 'vm7')
 
+            envelope.initialize()
+            executor = make_mock_topology_executor()
+            topo = envelope.discover_topology(executor)
+            self.assertIn('server', topo)
+            for r in ('client1', 'client2', 'client3', 'client4', 'client6', 'client7'):
+                self.assertIn(r, topo)
+            self.assertNotIn('client5', topo)
+
+            topo_file = os.path.join(envelope.archive_dir, 'orchestration', 'topology.json')
+            self.assertTrue(os.path.isfile(topo_file))
+            with open(topo_file, 'r', encoding='utf-8') as fh:
+                saved_topo = json.load(fh)
+            self.assertEqual(topo, saved_topo)
+            self.assertNotIn('client5', saved_topo)
+
     def test_topology_discovery_fails_when_wireless_interface_missing(self):
         envelope = RunEnvelope(
             run_id='v8_issue41_topo_fail',

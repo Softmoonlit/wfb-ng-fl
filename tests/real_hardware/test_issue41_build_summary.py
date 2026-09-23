@@ -484,6 +484,44 @@ class Issue41BuildSummaryTestCase(unittest.TestCase):
             os.path.join(self.archive_dir, 'formal_runtime_loop', 'client2', 'observation.jsonl'),
             c2_obs)
 
+    def test_resolve_client_names_from_envelope_or_env(self):
+        from tests.real_hardware.issue41_build_summary import resolve_client_names
+        # 1. From envelope.json client_roles
+        self.write_json(
+            os.path.join(self.archive_dir, 'envelope.json'),
+            {'resolved_config': {'client_roles': ['client1', 'client2', 'client3', 'client4', 'client6', 'client7']}}
+        )
+        roles = resolve_client_names(self.archive_dir)
+        self.assertEqual(roles, ['client1', 'client2', 'client3', 'client4', 'client6', 'client7'])
+
+        # 2. From envelope.json training_delay_ms_by_node
+        self.write_json(
+            os.path.join(self.archive_dir, 'envelope.json'),
+            {'resolved_config': {'training_delay_ms_by_node': {'1': 0, '2': 0, '6': 0}}}
+        )
+        roles = resolve_client_names(self.archive_dir)
+        self.assertEqual(roles, ['client1', 'client2', 'client6'])
+
+    def test_build_downlink_matrix_arbitrary_clients(self):
+        from tests.real_hardware.issue41_build_summary import _build_downlink_matrix
+        round_dir = os.path.join(self.archive_dir, 'formal_runtime_loop', 'server', 'rounds', 'round-1')
+        os.makedirs(round_dir, exist_ok=True)
+        status_path = os.path.join(round_dir, 'uftp-1.status')
+        client_names = ['client1', 'client2', 'client3', 'client4', 'client6', 'client7']
+        with open(status_path, 'w', encoding='utf-8') as fh:
+            for nid in [1, 2, 3, 4, 6, 7]:
+                fh.write(f'CONNECT;success;0x{nid:08x}\n')
+                fh.write(f'RESULT;0x{nid:08x};issue41/model.bin;40960KB;copy\n')
+                fh.write(f'RESULT;0x{nid:08x};issue41/model.manifest.json;142B;copy\n')
+
+        errors = []
+        matrix = _build_downlink_matrix(self.archive_dir, 'round-1', 'sha', errors, client_names=client_names)
+        self.assertEqual(errors, [])
+        self.assertEqual(matrix['status'], 'passed')
+        for nid in ['1', '2', '3', '4', '6', '7']:
+            self.assertEqual(matrix['uftp_connect_matrix'][nid], 'success')
+            self.assertEqual(matrix['uftp_result_matrix'][nid]['model.bin'], 'copy')
+
     def write_json(self, path, data):
         with open(path, 'w', encoding='utf-8') as fh:
             json.dump(data, fh)

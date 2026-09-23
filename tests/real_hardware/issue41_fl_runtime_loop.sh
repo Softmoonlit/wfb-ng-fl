@@ -859,19 +859,17 @@ configure_local_monitor() {
     sudo iw dev "$iface" set type monitor
     sudo ip link set "$iface" up
     sudo iw dev "$iface" set channel "$CHANNEL" "$CHANNEL_WIDTH"
-    # rtl88xxau_wfb driver uses negative mBm to set rtw_tx_pwr_idx_override
-    sudo iw dev "$iface" set txpower fixed "-$((RADIO_TXPOWER_DBM * 100))" 2>/dev/null || \
-        sudo iw dev "$iface" set txpower fixed "$((RADIO_TXPOWER_DBM * 100))" || true
     if [ -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override ]; then
-        echo "$RADIO_TXPOWER_DBM" | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null || true
+        echo "$RADIO_TXPOWER_DBM" | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null
     fi
+    sudo iw dev "$iface" set txpower fixed "-$((RADIO_TXPOWER_DBM * 100))"
     ip -br link show "$iface" > "$archive/ip-link.txt" 2>&1 || true
     iw dev "$iface" info > "$archive/iw-info.txt" 2>&1 || true
 }
 
 configure_remote_monitor() {
     local role="$1" iface="$2" dir="$3"
-    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; sudo iw dev '$iface' set txpower fixed '-$((RADIO_TXPOWER_DBM * 100))' 2>/dev/null || sudo iw dev '$iface' set txpower fixed '$((RADIO_TXPOWER_DBM * 100))' || true; if [ -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override ]; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null || true; fi; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
+    remote "$role" "sudo ip link set '$iface' down || true; sudo iw dev '$iface' set type monitor; sudo ip link set '$iface' up; sudo iw dev '$iface' set channel '$CHANNEL' '$CHANNEL_WIDTH'; if [ -w /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override ]; then echo '$RADIO_TXPOWER_DBM' | sudo tee /sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override >/dev/null; fi; sudo iw dev '$iface' set txpower fixed '-$((RADIO_TXPOWER_DBM * 100))'; ip -br link show '$iface' > '$dir/ip-link.txt' 2>&1 || true; iw dev '$iface' info > '$dir/iw-info.txt' 2>&1 || true"
 }
 
 configure_runtime_monitors() {

@@ -14,27 +14,36 @@ from tests.real_hardware.issue41_gate import parse_telemetry
 EVENT_PREFIX = 'WFB_FL_EVENT '
 
 
+def resolve_client_names(archive_dir):
+    """解析归档对应的客户端角色列表，拒绝固定兜底。"""
+    env_path = os.path.join(archive_dir, 'envelope.json')
+    if os.path.isfile(env_path):
+        env_data = _read_json(env_path, [])
+        rc = env_data.get('resolved_config', {})
+        if 'client_roles' in rc and isinstance(rc['client_roles'], list) and rc['client_roles']:
+            return list(rc['client_roles'])
+        t_delays = rc.get('training_delay_ms_by_node', {})
+        if t_delays:
+            return [f'client{nid}' for nid in sorted(t_delays.keys(), key=lambda x: int(x))]
+    if 'ISSUE41_CLIENT_ROLES' in os.environ:
+        roles = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
+        if roles:
+            return roles
+    client_dirs = glob.glob(os.path.join(archive_dir, 'formal_runtime_loop', 'client*'))
+    if client_dirs:
+        return sorted([os.path.basename(d) for d in client_dirs],
+                      key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
+    return []
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description='生成 issue41 正式 Runtime 归档摘要')
     parser.add_argument('archive_dir')
     args = parser.parse_args(argv)
     archive_dir = os.path.abspath(args.archive_dir)
-    client_dirs = glob.glob(os.path.join(archive_dir, 'formal_runtime_loop', 'client*'))
-    client_names = sorted([os.path.basename(d) for d in client_dirs],
-                          key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
+    client_names = resolve_client_names(archive_dir)
     if not client_names:
-        env_path = os.path.join(archive_dir, 'envelope.json')
-        if os.path.isfile(env_path):
-            env_data = _read_json(env_path, [])
-            rc = env_data.get('resolved_config', {})
-            t_delays = rc.get('training_delay_ms_by_node', {})
-            if t_delays:
-                client_names = [f'client{nid}' for nid in sorted(t_delays.keys(), key=lambda x: int(x))]
-    if not client_names:
-        if 'ISSUE41_CLIENT_ROLES' in os.environ:
-            client_names = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
-        else:
-            client_names = [f'client{i}' for i in range(1, 8)]
+        client_names = [f'client{i}' for i in range(1, 8)]
 
     result_paths = {
         'server': os.path.join(archive_dir, 'formal_runtime_loop', 'server',
@@ -367,7 +376,7 @@ def _build_rounds(results, observations, archive_dir, errors, scenario_cfg):
             'duration_seconds': duration_sec,
             'model': model,
             'model_receive_intervals': receive_intervals,
-            'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors),
+            'downlink_matrix': _build_downlink_matrix(archive_dir, round_id, model['sha256'], errors, client_names=client_names),
             'uploads': uploads,
             'active_upload_sets': active_sets,
             'concurrent_put': concurrent_put,
@@ -467,14 +476,23 @@ def _event_interval(events, first, round_id, node_id, last):
             'end': max(value['_sequence'] for value in matching)}
 
 
-def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
+def _build_downlink_matrix(archive_dir, round_id, model_sha, errors, client_names=None):
     candidates = []
     round_dir = os.path.join(archive_dir, 'formal_runtime_loop', 'server', 'rounds', round_id)
     if os.path.isdir(round_dir):
         candidates.extend(sorted(glob.glob(os.path.join(round_dir, 'uftp-*.status'))))
 
+    expected_nids = []
+    if client_names:
+        for c in client_names:
+            m = re.search(r'\d+', c)
+            if m:
+                expected_nids.append(m.group())
+    if not expected_nids:
+        expected_nids = ['1', '2']
+
     connect_matrix = {}
-    result_matrix = {'1': {}, '2': {}}
+    result_matrix = {nid: {} for nid in expected_nids}
     status_file = candidates[0] if candidates else None
     if status_file and os.path.isfile(status_file):
         try:
@@ -500,10 +518,9 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
 
     if not connect_matrix:
         errors.append('缺少 UFTP CONNECT 状态')
-    if not result_matrix.get('1') or not result_matrix.get('2'):
-        errors.append('缺少 UFTP 下行文件接收矩阵')
-
-    for nid in ('1', '2'):
+    for nid in expected_nids:
+        if not result_matrix.get(nid):
+            errors.append('缺少 client%s UFTP 下行文件接收矩阵' % nid)
         if connect_matrix.get(nid) != 'success':
             errors.append('client%s UFTP CONNECT 未成功' % nid)
         res = result_matrix.get(nid, {})
@@ -511,12 +528,10 @@ def _build_downlink_matrix(archive_dir, round_id, model_sha, errors):
             errors.append('client%s UFTP 下行文件接收矩阵未完整 copy' % nid)
 
     status = 'passed' if (
-        connect_matrix.get('1') == 'success' and
-        connect_matrix.get('2') == 'success' and
-        result_matrix.get('1', {}).get('model.bin') == 'copy' and
-        result_matrix.get('2', {}).get('model.bin') == 'copy' and
-        result_matrix.get('1', {}).get('model.manifest.json') == 'copy' and
-        result_matrix.get('2', {}).get('model.manifest.json') == 'copy'
+        bool(expected_nids) and
+        all(connect_matrix.get(nid) == 'success' for nid in expected_nids) and
+        all(result_matrix.get(nid, {}).get('model.bin') == 'copy' for nid in expected_nids) and
+        all(result_matrix.get(nid, {}).get('model.manifest.json') == 'copy' for nid in expected_nids)
     ) else 'failed'
 
     return {
@@ -542,14 +557,9 @@ def _filter_log_by_time_ms(log_text, start_ms, end_ms):
 
 def _build_telemetry(archive_dir, errors, round_start_ms=None, round_end_ms=None, client_names=None):
     if client_names is None:
-        client_dirs = glob.glob(os.path.join(archive_dir, 'formal_runtime_loop', 'client*'))
-        client_names = sorted([os.path.basename(d) for d in client_dirs],
-                              key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else x)
+        client_names = resolve_client_names(archive_dir)
         if not client_names:
-            if 'ISSUE41_CLIENT_ROLES' in os.environ:
-                client_names = [r.strip() for r in os.environ['ISSUE41_CLIENT_ROLES'].split() if r.strip()]
-            else:
-                client_names = [f'client{i}' for i in range(1, 8)]
+            client_names = [f'client{i}' for i in range(1, 8)]
 
     if round_start_ms is None or round_end_ms is None:
         errors.append('缺少轮次有效起止时间戳，无法切片提取遥测数据')
