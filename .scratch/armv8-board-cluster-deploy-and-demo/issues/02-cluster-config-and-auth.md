@@ -4,11 +4,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 在项目根目录提供 `cluster_nodes.conf` 模板，明确定义无线参数区（`WIRELESS_CHANNEL`、`WIRELESS_CHANNEL_WIDTH`、`WIRELESS_TXPOWER_DBM`、`DOWNLINK_MCS`、`UPLINK_MCS`、`UFTP_RATE_KBPS`）与节点列表区（`role_name host_ip ssh_user node_id tun_ip`）。
-- [ ] 配置文件解析器严格校验：禁止将信道设为已知存在驱动越界缺陷的 `161`；将发射功率限制在合法区间（10~20 dBm，默认推荐 12 dBm）；根据 `DOWNLINK_MCS` 校验 UFTP 速率合理性。
-- [ ] 编写 `scripts/setup_cluster_auth.sh` 脚本：
+- [x] 在项目根目录提供 `cluster_nodes.conf` 模板，明确定义无线参数区（`WIRELESS_CHANNEL`、`WIRELESS_CHANNEL_WIDTH`、`WIRELESS_TXPOWER_DBM`、`DOWNLINK_MCS`、`UPLINK_MCS`、`UFTP_RATE_KBPS`）与节点列表区（`role_name host_ip ssh_user node_id tun_ip`）。
+- [x] 配置文件解析器严格校验：禁止将信道设为已知存在驱动越界缺陷的 `161`；将发射功率限制在合法区间（10~20 dBm，默认推荐 12 dBm）；根据 `DOWNLINK_MCS` 校验 UFTP 速率合理性。
+- [x] 编写 `scripts/setup_cluster_auth.sh` 脚本：
   - 检查 Server 本机 `~/.ssh/id_rsa.pub`，若无则自动生成；
   - 逐一测试配置文件中登记的 Client，提示用户输入一次 SSH 登录密码，自动通过 `ssh-copy-id` 拷贝公钥；
   - 通过 SSH 在各 Client 远程执行免密配置，写入 `/etc/sudoers.d/99-wfb-nopasswd`；
