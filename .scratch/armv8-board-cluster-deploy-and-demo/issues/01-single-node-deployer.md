@@ -6,14 +6,14 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 检查并使用 apt 安装 `build-essential`, `pkg-config`, `python3`, `python3-pip`, `libssl-dev`, `libsodium-dev`, `libpcap-dev`, `iw`, `rfkill`, `unzip`, `git`, `bc`, `dkms`, `net-tools`, `iproute2`。
-- [ ] 自动检测并安装当前运行内核对应的头文件包（`linux-headers-$(uname -r)`）。
-- [ ] 自动下载或复用本地 `rtl8812au` 源码，调用 `dkms-install.sh` 编译并安装驱动内核模块，自动执行 `modprobe 8812au` 并在失败时给出明确指引。
-- [ ] 检查并解压 `../uftp_src-5.0.3.zip`（或本地源码），执行 `make` 编译（链接 OpenSSL `-lcrypto`），并调用 `make install` 将 `uftp` 和 `uftpd` 写入 `/usr/bin`。
-- [ ] 在 `/etc/NetworkManager/conf.d/wfb-unmanaged.conf` 中配置忽略 `wlx*` 前缀网卡并重启 NetworkManager 服务。
-- [ ] 执行 `rfkill unblock all` 解锁无线射频。
-- [ ] 将 `scripts/sysctl/98-wifibroadcast.conf` 安装到 `/etc/sysctl.d/` 并执行 `sysctl --system` 调优 socket 缓冲与队列。
-- [ ] 自动在 `/etc/sudoers.d/99-wfb-nopasswd` 写入规则，确保当前用户具备非交互 `sudo` 免密执行权限。
-- [ ] 在项目根目录执行 `make build_v6` 编译产出 `wfb_v6_uplink`，并执行 `sudo make install_v8` 完成系统级角色服务与 Python 运行时安装。
+- [x] 检查并使用 apt 安装 `build-essential`, `pkg-config`, `python3`, `python3-pip`, `libssl-dev`, `libsodium-dev`, `libpcap-dev`, `iw`, `rfkill`, `unzip`, `git`, `bc`, `dkms`, `net-tools`, `iproute2`。
+- [x] 自动检测并安装当前运行内核对应的头文件包（`linux-headers-$(uname -r)`）。
+- [x] 自动下载或复用本地 `rtl8812au` 源码，调用 `dkms-install.sh` 编译并安装驱动内核模块，自动执行 `modprobe 8812au` 并在失败时给出明确指引。
+- [x] 检查并解压 `../uftp_src-5.0.3.zip`（或本地源码），执行 `make` 编译（链接 OpenSSL `-lcrypto`），并调用 `make install` 将 `uftp` 和 `uftpd` 写入 `/usr/bin`。
+- [x] 在 `/etc/NetworkManager/conf.d/wfb-unmanaged.conf` 中配置忽略 `wlx*` 前缀网卡并重启 NetworkManager 服务。
+- [x] 执行 `rfkill unblock all` 解锁无线射频。
+- [x] 将 `scripts/sysctl/98-wifibroadcast.conf` 安装到 `/etc/sysctl.d/` 并执行 `sysctl --system` 调优 socket 缓冲与队列。
+- [x] 自动在 `/etc/sudoers.d/99-wfb-nopasswd` 写入规则，确保当前用户具备非交互 `sudo` 免密执行权限。
+- [x] 在项目根目录执行 `make build_v6` 编译产出 `wfb_v6_uplink`，并执行 `sudo make install_v8` 完成系统级角色服务与 Python 运行时安装。
