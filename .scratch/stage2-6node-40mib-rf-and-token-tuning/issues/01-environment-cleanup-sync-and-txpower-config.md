@@ -5,11 +5,11 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** need-for-review
 
-- [ ] 全集群（Server 及 Client 1~7）无线网卡接口彻底复位至 `managed/DOWN` 状态，清理无残留后台进程
-- [ ] 逐台机器核验 git 状态，确认处于相同 HEAD 提交且工作区完全干净
-- [ ] 全集群统一重新编译 C++ 链路底座 `wfb_v6_uplink`，比对各端二进制 SHA-256 哈希确保绝对一致
-- [ ] 支持通过用户配置或环境变量指定发射功率（如 `ISSUE41_RADIO_TXPOWER_DBM=12`），将其写入 `envelope.json`
-- [ ] 扩展 Gate 与归档等价审计校验器，对发射功率配置实施强一致性等价校验
-- [ ] 执行全集群 `preflight` 预检并通过全量检查
+- [x] 全集群（Server 及 Client 1~7）无线网卡接口彻底复位至 `managed/DOWN` 状态，清理无残留后台进程
+- [x] 逐台机器核验 git 状态，确认处于相同 HEAD 提交且工作区完全干净
+- [x] 全集群统一重新编译 C++ 链路底座 `wfb_v6_uplink`，比对各端二进制 SHA-256 哈希确保绝对一致
+- [x] 支持通过用户配置或环境变量指定发射功率（如 `ISSUE41_RADIO_TXPOWER_DBM=12`），将其写入 `envelope.json`
+- [x] 扩展 Gate 与归档等价审计校验器，对发射功率配置实施强一致性等价校验
+- [x] 执行全集群 `preflight` 预检并通过全量检查
