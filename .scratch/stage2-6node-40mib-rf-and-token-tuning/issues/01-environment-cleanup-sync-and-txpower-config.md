@@ -5,7 +5,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 全集群（Server 及 Client 1~7）无线网卡接口彻底复位至 `managed/DOWN` 状态，清理无残留后台进程
 - [x] 逐台机器核验 git 状态，确认处于相同 HEAD 提交且工作区完全干净
