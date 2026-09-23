@@ -1928,6 +1928,18 @@ void run_server(Config config)
             IPC_MSG_SEND();
         }
         next_grant_at_ms = now_ms + grant.duration_ms + grant.guard_interval_ms;
+
+        vector<TokenScheduler::SilentNodeRemoval> removed_nodes;
+        scheduler.collect_silent_node_removals(now_ms, &removed_nodes, grant.node_id);
+        for (size_t i = 0; i < removed_nodes.size(); ++i)
+        {
+            IPC_MSG("silent_remove node_id=%u silence_ms=%" PRIu64 " consecutive_silent_grants=%u%s\n",
+                    static_cast<unsigned>(removed_nodes[i].node_id),
+                    removed_nodes[i].silence_ms,
+                    removed_nodes[i].consecutive_silent_grants,
+                    scheduler.describe_active_state().c_str());
+            IPC_MSG_SEND();
+        }
     }
 }
 
