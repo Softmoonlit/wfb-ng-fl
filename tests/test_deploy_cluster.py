@@ -329,6 +329,77 @@ exit 0
             self.assertIn("存在", res.stdout + res.stderr)
             self.assertIn("部署失败", res.stdout + res.stderr)
 
+    def test_client_readiness_failure_causes_nonzero_exit(self):
+        """测试远程节点部署虽然返回 0，但核验发现关键命令缺失时，判定为硬性就绪故障并退出非 0。"""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            conf = make_test_conf(tmp, 5)
+            mock_bin = tmp / "bin"
+            mock_bin.mkdir(parents=True)
+            log_dir = tmp / "logs"
+
+            mock_ssh = """#!/bin/bash
+if echo "$@" | grep -q "deploy_node.sh"; then
+    exit 0
+fi
+if echo "$@" | grep -q "bash -s"; then
+    # 模拟关键命令缺失
+    echo "VERIFY_RESULT: cmds_missing=2 driver=LOADED nic=wlx0013ef123456"
+fi
+exit 0
+"""
+            write_executable(mock_bin / "ssh", mock_ssh)
+            write_executable(mock_bin / "rsync", "#!/bin/bash\nexit 0\n")
+
+            env = os.environ.copy()
+            env["PATH"] = f"{mock_bin}:" + env["PATH"]
+
+            res = subprocess.run([
+                str(SCRIPT_PATH),
+                "--config", str(conf),
+                "--log-dir", str(log_dir)
+            ], env=env, capture_output=True, text=True)
+
+            self.assertNotEqual(res.returncode, 0)
+            self.assertIn("CMD_MISSING", res.stdout)
+            self.assertIn("硬性就绪故障", res.stdout + res.stderr)
+
+    def test_ssh_verification_transport_failure_reports_check_fail(self):
+        """测试核验阶段 SSH 传输失败时，如实报告 CHECK_FAIL，绝不误报 5/5 OK。"""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            conf = make_test_conf(tmp, 5)
+            mock_bin = tmp / "bin"
+            mock_bin.mkdir(parents=True)
+            log_dir = tmp / "logs"
+
+            # 部署成功，但在就绪检测阶段 SSH 报错断开
+            mock_ssh = """#!/bin/bash
+if echo "$@" | grep -q "deploy_node.sh"; then
+    exit 0
+fi
+if echo "$@" | grep -q "bash -s"; then
+    echo "SSH connection broken" >&2
+    exit 255
+fi
+exit 0
+"""
+            write_executable(mock_bin / "ssh", mock_ssh)
+            write_executable(mock_bin / "rsync", "#!/bin/bash\nexit 0\n")
+
+            env = os.environ.copy()
+            env["PATH"] = f"{mock_bin}:" + env["PATH"]
+
+            res = subprocess.run([
+                str(SCRIPT_PATH),
+                "--config", str(conf),
+                "--log-dir", str(log_dir)
+            ], env=env, capture_output=True, text=True)
+
+            self.assertNotEqual(res.returncode, 0)
+            self.assertIn("CHECK_FAIL", res.stdout)
+            self.assertNotIn("5/5 OK", res.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
