@@ -8,18 +8,18 @@
 
 **Blocked by:** 02, 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 编写总控脚本 `tests/real_hardware/run_fl_demo.sh`，支持子命令 `all`、`downlink`、`uplink`，支持选项 `--file <path>`、`--config <path>`。
-- [ ] 动态探测与容错：读取 `cluster_nodes.conf`，通过 ping/ssh 快速确认在线 Client 集合，若存在离线节点输出警告并自动以在线节点集合开跑。
-- [ ] 空口网卡准备：在 Server 和所有在线 Client 上探测唯一的 `wlx*` 网卡，执行 down/up、设为 monitor 模式、锁定到指定信道与频宽。
-- [ ] 下行传输实现：
+- [x] 编写总控脚本 `tests/real_hardware/run_fl_demo.sh`，支持子命令 `all`、`downlink`、`uplink`，支持选项 `--file <path>`、`--config <path>`。
+- [x] 动态探测与容错：读取 `cluster_nodes.conf`，通过 ping/ssh 快速确认在线 Client 集合，若存在离线节点输出警告并自动以在线节点集合开跑。
+- [x] 空口网卡准备：在 Server 和所有在线 Client 上探测唯一的 `wlx*` 网卡，执行 down/up、设为 monitor 模式、锁定到指定信道与频宽。
+- [x] 下行传输实现：
   - 校验源文件（或现场自动生成 40MB 确定性文件），计算并记录初始 SHA-256 与开始时间；
   - 远程在各 Client 拉起 `uftpd` 监听组播组，指定落盘目录 `/var/lib/wfb-ng/fl_demo/received/`；
   - Server 启动底座组播通道并调用 `uftp` 广播下发文件；
   - 等待各 Client 完成接收，远程计算各 Client 接收文件的 SHA-256 并核对无损一致性；
   - 终端渲染【下行传输指标看板】（耗时、平均速率、各 Client 接收绝对路径、哈希校验）。
-- [ ] 上行传输实现：
+- [x] 上行传输实现：
   - 检查各 Client 端已接收的模型文件；
   - Server 端启动受控 HTTP PUT 接收端与 `wfb_v6_uplink` 调度服务（开启令牌与反压监测）；
   - 各 Client 端并发/轮流发起 HTTP PUT 将接收到的模型文件上传回 Server；
