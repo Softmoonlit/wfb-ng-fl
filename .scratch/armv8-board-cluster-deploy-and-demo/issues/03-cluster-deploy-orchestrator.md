@@ -6,11 +6,11 @@
 
 **Blocked by:** 01, 02
 
-**Status:** ready-for-agent
+**Status:** need-for-review
 
-- [ ] 编写 `scripts/deploy_cluster.sh`，读取 `cluster_nodes.conf` 中的 Client 列表。
-- [ ] 探测 Client 在线状态，遇到离线节点给出明显黄色告警并安全跳过。
-- [ ] 通过 SSH/rsync 将当前项目代码及 UFTP 源码包推送到各 Client 对应路径。
-- [ ] 远程触发各 Client 执行 `sudo ./scripts/deploy_node.sh` 并捕获执行日志。
-- [ ] 执行全集群安装后就绪核验：检查 `command -v wfb-fl-server wfb-fl-client wfb_v6_uplink uftp uftpd`、检查无线网卡驱动加载状态及唯一 `wlx*` 接口存在性。
-- [ ] 终端以表格形式输出所有节点的部署成功状态与软硬件环境汇总。
+- [x] 编写 `scripts/deploy_cluster.sh`，读取 `cluster_nodes.conf` 中的 Client 列表。
+- [x] 探测 Client 在线状态，遇到离线节点给出明显黄色告警并安全跳过。
+- [x] 通过 SSH/rsync 将当前项目代码及 UFTP 源码包推送到各 Client 对应路径。
+- [x] 远程触发各 Client 执行 `sudo ./scripts/deploy_node.sh` 并捕获执行日志。
+- [x] 执行全集群安装后就绪核验：检查 `command -v wfb-fl-server wfb-fl-client wfb_v6_uplink uftp uftpd`、检查无线网卡驱动加载状态及唯一 `wlx*` 接口存在性。
+- [x] 终端以表格形式输出所有节点的部署成功状态与软硬件环境汇总。
