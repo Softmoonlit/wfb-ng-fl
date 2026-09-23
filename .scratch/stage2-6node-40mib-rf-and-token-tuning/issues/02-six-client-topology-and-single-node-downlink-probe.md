@@ -5,11 +5,11 @@
 
 **Blocked by:** 01: 环境清理、全集群代码一致性核验与发射功率配置支持
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 验证编排脚本与校验器在 `client1 client2 client3 client4 client6 client7` 拓扑下正确推导 6 个客户端
-- [ ] 在超近距台面 12 dBm 功率下，单机启动 Server 与 Client 1 数据面链路
-- [ ] Server 下行射频参数配置为 MCS 3、HT40+、Short GI，UFTP 速率配置为 15000 Kbps
-- [ ] 执行 40 MiB 单节点 shared UFTP 下行传输探路
-- [ ] 验证 Client 1 完整接收 40 MiB 模型文件，SHA-256 校验完全一致
-- [ ] 验证下行总耗时稳定在 21 ~ 24 秒区间，无多轮 NAK 重发，底层遥测丢包完全被 FEC 8/14 吸收
+- [x] 验证编排脚本与校验器在 `client1 client2 client3 client4 client6 client7` 拓扑下正确推导 6 个客户端
+- [x] 在超近距台面 12 dBm 功率下，单机启动 Server 与 Client 1 数据面链路
+- [x] Server 下行射频参数配置为 MCS 3、HT40+、Short GI，UFTP 速率配置为 15000 Kbps
+- [x] 执行 40 MiB 单节点 shared UFTP 下行传输探路
+- [x] 验证 Client 1 完整接收 40 MiB 模型文件，SHA-256 校验完全一致
+- [x] 验证下行总耗时稳定在 21 ~ 24 秒区间，无多轮 NAK 重发，底层遥测丢包完全被 FEC 8/14 吸收
