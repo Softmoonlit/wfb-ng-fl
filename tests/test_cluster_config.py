@@ -143,15 +143,15 @@ class TestClusterConfig(unittest.TestCase):
         self.assert_conf_invalid({"SERVER_TUN_IP": "10.80.0.1"}, expected_in_output="SERVER_TUN_IP")
         self.assert_conf_invalid({"SERVER_TUN_IP": "192.168.1.1/24"}, expected_in_output="SERVER_TUN_IP")
 
-    def test_client_count_contract_5_to_7(self):
-        clients_4 = [f"client{i} 192.168.1.10{i} ubuntu {i} 10.80.0.1{i}" for i in range(1, 5)]
-        self.assert_conf_invalid(clients=clients_4, expected_in_output="5~7")
+    def test_client_count_contract_3_to_7(self):
+        clients_2 = [f"client{i} 192.168.1.10{i} ubuntu {i} 10.80.0.1{i}" for i in range(1, 3)]
+        self.assert_conf_invalid(clients=clients_2, expected_in_output="3~7")
 
         clients_8 = [f"client{i} 192.168.1.10{i} ubuntu {i} 10.80.0.1{i}" for i in range(1, 9)]
-        self.assert_conf_invalid(clients=clients_8, expected_in_output="5~7")
+        self.assert_conf_invalid(clients=clients_8, expected_in_output="3~7")
 
-        clients_5 = [f"client{i} 192.168.1.10{i} ubuntu {i} 10.80.0.1{i}" for i in range(1, 6)]
-        self.assert_conf_valid(clients=clients_5)
+        clients_3 = [f"client{i} 192.168.1.10{i} ubuntu {i} 10.80.0.1{i}" for i in range(1, 4)]
+        self.assert_conf_valid(clients=clients_3)
 
     def test_missing_required_parameter(self):
         self.assert_conf_invalid({"DOWNLINK_MCS": None}, expected_in_output="缺失必填参数")
@@ -194,7 +194,7 @@ echo "FIRST_ROLE=${{CLIENT_ROLES[0]}}"
         res = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
         self.assertEqual(res.returncode, 0)
         self.assertIn("CH=157", res.stdout)
-        self.assertIn("CLIENTS=7", res.stdout)
+        self.assertIn("CLIENTS=3", res.stdout)
         self.assertIn("FIRST_ROLE=client1", res.stdout)
 
 

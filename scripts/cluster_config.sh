@@ -312,9 +312,9 @@ validate_cluster_config() {
         return 1
     fi
 
-    # 9. 客户端列表校验 (5 ~ 7 台 Client)
-    if [ "$CLIENT_COUNT" -lt 5 ] || [ "$CLIENT_COUNT" -gt 7 ]; then
-        log_fail "集群 Client 节点数量必须在 5~7 台之间（当前配置了 $CLIENT_COUNT 台）"
+    # 9. 客户端列表校验 (3 ~ 7 台 Client)
+    if [ "$CLIENT_COUNT" -lt 3 ] || [ "$CLIENT_COUNT" -gt 7 ]; then
+        log_fail "集群 Client 节点数量必须在 3~7 台之间（当前配置了 $CLIENT_COUNT 台）"
         return 1
     fi
 
