@@ -449,7 +449,7 @@ for cmd in wfb-fl-server wfb-fl-client wfb_v6_uplink uftp uftpd; do
 done
 
 driver_status="NOT_LOADED"
-if lsmod 2>/dev/null | grep -qE "8812au|88XXau|rtl88xxau_wfb"; then
+if lsmod 2>/dev/null | grep -E "8812au|88XXau|rtl88xxau_wfb" >/dev/null 2>&1; then
     driver_status="LOADED"
 fi
 

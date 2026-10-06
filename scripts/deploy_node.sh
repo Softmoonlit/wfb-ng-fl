@@ -151,6 +151,7 @@ step1_apt_dependencies() {
         dkms
         net-tools
         iproute2
+        rsync
     )
 
     if [ "$SKIP_APT" -eq 1 ]; then
@@ -191,8 +192,8 @@ step2_install_driver() {
         return 0
     fi
 
-    # 检查是否已加载驱动模块
-    if lsmod 2>/dev/null | grep -qE '8812au|88XXau|rtl88xxau_wfb'; then
+    # 检查是否已加载驱动模块 (避免使用 grep -q 导致 set -o pipefail 下 lsmod 触发 SIGPIPE 141)
+    if lsmod 2>/dev/null | grep -E '8812au|88XXau|rtl88xxau_wfb' >/dev/null 2>&1; then
         log_pass "检测到 RTL8812AU 驱动内核模块已处于加载状态，跳过重复构建"
         return 0
     fi

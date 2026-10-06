@@ -8,7 +8,7 @@
 
 1. [系统架构与网络拓扑](#一系统架构与网络拓扑)
 2. [环境准备与依赖要求](#二环境准备与依赖要求)
-3. [阶段零：从 Windows 电脑向 Server 开发板传输代码](#三阶段零从-windows-电脑向-server-开发板传输代码)
+3. [阶段零：从 WSL / 本地 Linux 向 Server 开发板传输代码](#三阶段零从-wsl--本地-linux-向-server-开发板传输代码)
 4. [阶段一：配置集群全局参数 (`cluster_nodes.conf`)](#四阶段一配置集群全局参数-cluster_nodesconf)
 5. [阶段二：Server 本机一键环境装配 (`deploy_node.sh`)](#五阶段二server-本机一键环境装配-deploy_nodesh)
 6. [阶段三：一键建立全集群免密互信 (`setup_cluster_auth.sh`)](#六阶段三一键建立全集群免密互信-setup_cluster_authsh)
@@ -23,7 +23,7 @@
 整个测试床采用**带外管理平面**与**空口数据平面**完全物理隔离的双平面架构：
 
 ```
-[操作者电脑 (Windows)]
+[操作者电脑 (WSL / Linux)]
         │ (以太网 / 路由器 Wi-Fi)
         ▼
  ┌──────────────┐   带外以太网局域网 (DHCP, 192.168.1.x)   ┌──────────────┐
@@ -40,7 +40,7 @@
  ═══════════════════════════════════════════════════════════════════════════════
 ```
 
-- **带外管理平面**：电脑通过 SSH 连接 Server 开发板，Server 通过 SSH 调度各 Client 板子，仅用于命令下发、节点存活感知与遥测数据采集；
+- **带外管理平面**：电脑 (WSL) 通过 SSH 连接 Server 开发板，Server 通过 SSH 调度各 Client 板子，仅用于命令下发、节点存活感知与遥测数据采集；
 - **空口数据平面**：所有待测大文件（如模型参数包）100% 通过 WFB-FL 构建的 TUN 虚拟网卡与 802.11 原始注入/监听链路传输，严禁走以太网。
 
 ---
@@ -53,7 +53,7 @@
 - **局域网交换机/路由器**：将所有开发板以太网口与操作者电脑连入同一局域网（确保彼此网络可达）。
 
 ### 2. 本地文件准备
-在操作者电脑上，确保目录结构如下：
+在操作者电脑（WSL 终端，如 `~/projects/`）上，确保目录结构如下：
 ```text
 projects/
 ├── uftp_src-5.0.3.zip     # UFTP 离线源码包 (约 318 KB)
@@ -62,54 +62,78 @@ projects/
 
 ---
 
-## 三、阶段零：从 Windows 电脑向 Server 开发板传输代码
+## 三、阶段零：从 WSL / 本地 Linux 向 Server 开发板传输代码
 
-在 Windows 上使用系统自带的 **PowerShell** 终端，将代码和离线依赖一次性推送到 Server 开发板。
+在切换到 WSL（Windows Subsystem for Linux）或本地 Linux 环境后，代码传输方式升级为业界标准的 **`rsync` 增量同步**（与集群内部 `deploy_cluster.sh` 的分发机制完全统一）：
+- **秒级增量传输**：只传输产生变动的文件差异，修改代码后数毫秒至数百毫秒即可同步完毕，无需每次重复打包解压；
+- **镜像对齐与自动清理 (`--delete`)**：本地删除或重命名文件后，远端同步删除废弃旧文件，彻底杜绝编译产物残留引起的隐蔽 Bug；
+- **平滑向下兼容**：若新刷机的 Server 开发板尚未安装 `rsync`，一键脚本会自动无缝降级为 `tar` 管道流传输，确保 100% 可用。
 
-项目已为你内置了 Windows 专用的**一键同步脚本 (`scripts/sync_to_server.ps1`)**。该脚本在后台全自动完成：
-1. 自动定位上级目录中的 `..\uftp_src-5.0.3.zip` 离线源码包并上传至 Server 端父级目录；
-2. 利用 Windows 10/11 内置的 `tar.exe` 管道流极速上传项目代码，**自动排除庞大的 `.git` 历史与编译垃圾**，在 Server 端就地秒级解压；
-3. 全面支持 IP 地址（如 `192.168.1.100`）与 `~/.ssh/config` 中定义的 SSH 别名（如 `vm0`）。
+项目已内置了 WSL / Linux 专用的**一键同步脚本 (`scripts/sync_to_server.sh`)**（同时保留兼容 Windows PowerShell 的 `scripts/sync_to_server.ps1`）。该脚本在后台全自动完成：
+1. 自动定位上级目录中的 `../uftp_src-5.0.3.zip` 离线源码包并同步至 Server 端父级目录；
+2. 优先采用 `rsync -avz --delete` 极速增量同步项目代码，**自动排除庞大的 `.git` 历史、编译二进制与日志**；
+3. 全面支持 IP 地址（如 `192.168.1.100`）、`~/.ssh/config` 中定义的 SSH 别名（如 `vm0`），并能自动读取 `cluster_nodes.conf` 中配置的 `SERVER_HOST` 与 `SERVER_USER`。
 
 ### 1. 一键脚本使用方法 (推荐)
 
-打开 **Windows PowerShell** 或 **CMD**（若在 Git Bash/WSL 中运行请将反斜杠 `\` 替换为正斜杠 `/`），进入 `wfb-ng-fl` 目录执行：
+在 WSL 终端中进入 `wfb-ng-fl` 目录执行：
 
-```powershell
-# 场景 A: 使用开发板局域网 IP
-powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server 192.168.1.100 -User ubuntu
+```bash
+# 场景 A: 自动读取 cluster_nodes.conf 中的 SERVER_HOST 与 SERVER_USER (免输入参数)
+./scripts/sync_to_server.sh
 
-# 场景 B: 使用 SSH 配置别名 (如 vm0，自动应用别名内绑定的用户名与私钥)
-powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server vm0
+# 场景 B: 显式指定开发板局域网 IP 与登录用户
+./scripts/sync_to_server.sh -s 192.168.1.100 -u ubuntu
 
-# 场景 C: 预先演练 (仅查看即将执行的操作，不产生实际网络传输)
-powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server vm0 -DryRun
+# 场景 C: 使用 SSH 配置别名 (如 vm0，自动应用别名内绑定的用户名与私钥)
+./scripts/sync_to_server.sh -s vm0
+
+# 场景 D: 预先演练 (仅查看即将执行的操作与命令，不产生实际网络传输)
+./scripts/sync_to_server.sh -s vm0 --dry-run
 ```
+
+> **进阶选项**：
+> - 强制使用 tar 管道模式：`./scripts/sync_to_server.sh -s vm0 -m tar`
+> - rsync 不删除远端多余文件：`./scripts/sync_to_server.sh -s vm0 --no-delete`
 
 ### 2. 手动执行方式 (脚本底层原理说明)
 
-若希望了解底层命令或手动执行，可在 PowerShell 中运行等价命令：
+若希望了解底层原理或在纯命令行手动操作，推荐使用 **rsync** 标准命令：
 
-```powershell
+```bash
 # 假定 Server 开发板局域网 IP 为 192.168.1.100，用户名为 ubuntu
-$SERVER_IP = "192.168.1.100"
-$SERVER_USER = "ubuntu"
+SERVER_IP="192.168.1.100"
+SERVER_USER="ubuntu"
 
-# 1. 确保 Server 开发板上存在 ~/projects 目录
+# 1. 确保 Server 开发板上存在 ~/projects 目录并推送 UFTP 源码包
 ssh ${SERVER_USER}@${SERVER_IP} "mkdir -p ~/projects"
+rsync -az ../uftp_src-5.0.3.zip ${SERVER_USER}@${SERVER_IP}:~/projects/
 
-# 2. 将 uftp 离线源码包上传到 Server 的 ~/projects/ 目录
-scp ..\uftp_src-5.0.3.zip ${SERVER_USER}@${SERVER_IP}:~/projects/
-
-# 3. 管道极速打包上传代码 (排除 .git 与临时编译产物，远端就地解压)
-tar --exclude=".git" --exclude="*.o" -czf - . | ssh ${SERVER_USER}@${SERVER_IP} "mkdir -p ~/projects/wfb-ng-fl && tar -xzf - -C ~/projects/wfb-ng-fl"
+# 2. rsync 极速增量同步代码库 (排除 .git 与编译产物，远端镜像对齐)
+rsync -avz --delete \
+    --exclude=".git/" \
+    --exclude="*.o" \
+    --exclude="*.so" \
+    --exclude="*.a" \
+    --exclude="wfb_v6_uplink" \
+    --exclude="__pycache__/" \
+    --exclude="*.pyc" \
+    --exclude="logs/" \
+    ./ ${SERVER_USER}@${SERVER_IP}:~/projects/wfb-ng-fl/
 ```
 
-传输完成后，在 PowerShell 中直接登录 Server 开发板：
-```powershell
+*(备选方案：若远端板子为刚烧录的最小镜像且尚未安装 rsync，可使用 `tar` 管道打包传输)*：
+```bash
+tar --exclude=".git" --exclude="*.o" --exclude="*.so" --exclude="logs" -czf - . | ssh ${SERVER_USER}@${SERVER_IP} "mkdir -p ~/projects/wfb-ng-fl && tar -xzf - -C ~/projects/wfb-ng-fl"
+```
+
+传输完成后，在 WSL 终端中直接登录 Server 开发板：
+```bash
 ssh ubuntu@192.168.1.100
 cd ~/projects/wfb-ng-fl
 ```
+
+> **注（Windows PowerShell 原生用户备选）**：若在纯 Windows 环境下未使用 WSL，也可在 PowerShell 中执行 `powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server 192.168.1.100`。
 
 ---
 
@@ -332,8 +356,8 @@ bash tests/real_hardware/run_fl_demo.sh clean
 
 | 操作阶段 | 命令 |
 | :--- | :--- |
-| **Windows 传代码** | `tar --exclude=".git" -czf - . \| ssh ubuntu@<IP> "mkdir -p ~/projects/wfb-ng-fl && tar -xzf - -C ~/projects/wfb-ng-fl"` |
-| **Windows 传UFTP** | `scp ..\uftp_src-5.0.3.zip ubuntu@<IP>:~/projects/` |
+| **WSL 传代码与UFTP** | `./scripts/sync_to_server.sh -s <IP>`<br>或 `rsync -avz --delete --exclude=".git/" --exclude="*.o" ./ ubuntu@<IP>:~/projects/wfb-ng-fl/` |
+| **WSL 传UFTP (手动)** | `scp ../uftp_src-5.0.3.zip ubuntu@<IP>:~/projects/` |
 | **修改集群配置** | `nano cluster_nodes.conf` |
 | **校验集群配置** | `./scripts/cluster_config.sh cluster_nodes.conf` |
 | **Server 本机装配** | `sudo ./scripts/deploy_node.sh` |
