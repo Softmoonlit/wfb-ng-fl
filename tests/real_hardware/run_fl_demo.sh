@@ -31,7 +31,7 @@ LINK_ID=406
 UPLINK_STREAM=32
 DOWNLINK_STREAM=33
 FEC_K=8
-FEC_N=12
+FEC_N=14
 MULTICAST_GROUP="239.80.41.1"
 UFTP_PORT=1044
 HTTP_PORT=8080
@@ -193,6 +193,7 @@ cleanup_processes() {
     sudo pkill -x wfb_v6_uplink 2>/dev/null || true
     sudo pkill -x uftp 2>/dev/null || true
     sudo pkill -x uftpd 2>/dev/null || true
+    sudo pkill -f 'fl_demo_metrics.py http-receiver' 2>/dev/null || true
     if [ -n "$SERVER_HTTP_PID" ] && kill -0 "$SERVER_HTTP_PID" 2>/dev/null; then
         kill "$SERVER_HTTP_PID" 2>/dev/null || true
     fi
@@ -299,7 +300,8 @@ step4_start_wfb_mesh() {
         return 0
     fi
 
-    mkdir -p "$SERVER_RUN_DIR"
+    # 底座进程会在此写入 PID、日志和队列摘要；默认目录位于 /var/lib，先通过免密 sudo 创建。
+    sudo mkdir -p "$SERVER_RUN_DIR"
     local s_iface
     s_iface="$(find_wfb_radio_local | head -n1)"
 
@@ -368,7 +370,7 @@ step4_start_wfb_mesh() {
 
         log_info "启动节点 $r 端 wfb_v6_uplink 守护进程..."
         ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "
-            mkdir -p '$WORK_DIR/run'
+            sudo mkdir -p '$WORK_DIR/run'
             c_iface=\$(source '$REMOTE_REPO/scripts/radio_interface.sh' && find_wfb_radio_interfaces | head -n1)
             sudo bash -c \"nohup wfb_v6_uplink \
                 --role client \
@@ -536,6 +538,7 @@ EOF
         ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "
             sudo mkdir -p '$REMOTE_RECEIVED_DIR' '$WORK_DIR/tmp'
             sudo rm -f '$REMOTE_RECEIVED_DIR/$src_name'
+            sudo rm -rf '$WORK_DIR/tmp'/*
             sudo chown -R \$(id -u):\$(id -g) '$WORK_DIR'
             nohup uftpd -d -q -I '$tip' -M '$MULTICAST_GROUP' -p '$UFTP_PORT' -U '$hex_uid' \
                 -D '$REMOTE_RECEIVED_DIR/' -T '$WORK_DIR/tmp/' -F '$WORK_DIR/uftpd.status' \
@@ -774,6 +777,7 @@ EOF
                 --file '$REMOTE_RECEIVED_DIR/$src_name' \
                 --node-id '$nid' \
                 --source-ip '$tip' \
+                --timeout 260 \
                 > '$WORK_DIR/run/put_result.json' 2>&1
         " &
         put_pids+=($!)

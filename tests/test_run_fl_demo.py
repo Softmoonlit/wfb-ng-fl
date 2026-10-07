@@ -91,6 +91,12 @@ class TestRunFLDemoScript(unittest.TestCase):
             self.assertIn("上行受控调度回传指标看板", res.stdout)
             self.assertIn("步骤 7: WFB-FL 现场演示全流程执行完毕", res.stdout)
 
+    def test_mesh_start_prepares_privileged_run_directories(self):
+        """默认 /var/lib 工作目录必须在启动底座前由 sudo 创建。"""
+        script = DEMO_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('sudo mkdir -p "$SERVER_RUN_DIR"', script)
+        self.assertIn("sudo mkdir -p '$WORK_DIR/run'", script)
+
     def test_dry_run_downlink_only(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp = Path(tmp_dir)
@@ -372,6 +378,10 @@ while true; do sleep 10; done
 
             # Mock sudo
             mock_sudo = """#!/bin/bash
+if [ "$1" = "mkdir" ]; then
+    shift
+    exec /usr/bin/mkdir "$@"
+fi
 if [ "$1" = "bash" ]; then
     shift
     exec bash "$@"
@@ -504,6 +514,10 @@ while true; do sleep 10; done
 
             # Mock sudo
             mock_sudo = """#!/bin/bash
+if [ "$1" = "mkdir" ]; then
+    shift
+    exec /usr/bin/mkdir "$@"
+fi
 if [ "$1" = "bash" ]; then
     shift
     exec bash "$@"
