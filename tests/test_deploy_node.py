@@ -114,7 +114,7 @@ exit 0
             # 验证 NetworkManager 配置已写入
             nm_conf = mock_etc / "NetworkManager/conf.d/wfb-unmanaged.conf"
             self.assertTrue(nm_conf.exists(), "NetworkManager 忽略规则文件必须生成")
-            self.assertIn("unmanaged-devices=interface-name:wlx*", nm_conf.read_text(encoding="utf-8"))
+            self.assertIn("unmanaged-devices=driver:rtl88xxau_wfb", nm_conf.read_text(encoding="utf-8"))
 
             # 验证 sysctl 配置已拷贝
             sysctl_conf = mock_etc / "sysctl.d/98-wifibroadcast.conf"

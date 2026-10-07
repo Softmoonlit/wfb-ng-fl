@@ -10,6 +10,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # 加载集群全局配置解析器
 # shellcheck source=scripts/cluster_config.sh
 source "$PROJECT_ROOT/scripts/cluster_config.sh"
+# shellcheck source=scripts/radio_interface.sh
+source "$PROJECT_ROOT/scripts/radio_interface.sh"
 
 log_step() { echo ""; echo "${C_BOLD}${C_CYAN}=== 步骤 $1: $2 ===${C_RESET}"; }
 
@@ -213,25 +215,25 @@ cleanup_processes() {
     done
 }
 
-# 5. 空口网卡准备：探测唯一 wlx* 网卡，切换 monitor 模式并锁定信道与功率
-find_wlx_local() {
-    iw dev 2>/dev/null | awk '/Interface / {print $2}' | grep '^wlx' || true
+# 5. 空口网卡准备：按 RTL8812AU 驱动探测唯一空口网卡，切换 monitor 模式并锁定信道与功率
+find_wfb_radio_local() {
+    find_wfb_radio_interfaces
 }
 
 step3_configure_radio_interfaces() {
-    log_step "3" "准备无线空口网卡 (探测 wlx*，设为 monitor 模式并锁定参数)"
+    log_step "3" "准备无线空口网卡 (按 RTL8812AU 驱动识别 wl* 接口，设为 monitor 模式并锁定参数)"
 
     if [ "$DRY_RUN" -eq 1 ]; then
-        log_info "  [DRY-RUN] 模拟在 Server 与各在线 Client 探测并配置 wlx* 网卡"
+        log_info "  [DRY-RUN] 模拟在 Server 与各在线 Client 探测并配置 RTL8812AU 驱动绑定的 wl* 网卡"
         log_info "  [DRY-RUN] 设定信道: $WIRELESS_CHANNEL $WIRELESS_CHANNEL_WIDTH, 功率: ${WIRELESS_TXPOWER_DBM}dBm"
         return 0
     fi
 
     # Server 本机网卡探测与配置
     local server_ifaces
-    server_ifaces=($(find_wlx_local))
+    server_ifaces=($(find_wfb_radio_local))
     if [ "${#server_ifaces[@]}" -ne 1 ]; then
-        log_fail "Server 本机必须恰好存在一个 wlx* 无线网卡，当前发现 ${#server_ifaces[@]} 个 (${server_ifaces[*]:-无})"
+        log_fail "Server 本机必须恰好存在一个 RTL8812AU 空口网卡，当前发现 ${#server_ifaces[@]} 个 (${server_ifaces[*]:-无})"
         exit 1
     fi
     local s_iface="${server_ifaces[0]}"
@@ -260,9 +262,9 @@ step3_configure_radio_interfaces() {
 
         log_info "正在配置节点 $r ($h) 空口网卡..."
         local c_ifaces
-        c_ifaces=($(ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "iw dev 2>/dev/null | awk '/Interface / {print \$2}' | grep '^wlx' || true"))
+        c_ifaces=($(ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "source '$REMOTE_REPO/scripts/radio_interface.sh' && find_wfb_radio_interfaces"))
         if [ "${#c_ifaces[@]}" -ne 1 ]; then
-            log_fail "节点 $r 必须恰好存在一个 wlx* 无线网卡，当前发现 ${#c_ifaces[@]} 个 (${c_ifaces[*]:-无})"
+            log_fail "节点 $r 必须恰好存在一个 RTL8812AU 空口网卡，当前发现 ${#c_ifaces[@]} 个 (${c_ifaces[*]:-无})"
             exit 1
         fi
         local c_iface="${c_ifaces[0]}"
@@ -299,7 +301,7 @@ step4_start_wfb_mesh() {
 
     mkdir -p "$SERVER_RUN_DIR"
     local s_iface
-    s_iface="$(find_wlx_local | head -n1)"
+    s_iface="$(find_wfb_radio_local | head -n1)"
 
     # 计算带宽参数
     local bw=40
@@ -367,7 +369,7 @@ step4_start_wfb_mesh() {
         log_info "启动节点 $r 端 wfb_v6_uplink 守护进程..."
         ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "
             mkdir -p '$WORK_DIR/run'
-            c_iface=\$(iw dev 2>/dev/null | awk '/Interface / {print \$2}' | grep '^wlx' | head -n1)
+            c_iface=\$(source '$REMOTE_REPO/scripts/radio_interface.sh' && find_wfb_radio_interfaces | head -n1)
             sudo bash -c \"nohup wfb_v6_uplink \
                 --role client \
                 --tun-name '$c_tun' \

@@ -194,7 +194,7 @@ echo "FIRST_ROLE=${{CLIENT_ROLES[0]}}"
         res = subprocess.run(["bash", "-c", cmd], capture_output=True, text=True)
         self.assertEqual(res.returncode, 0)
         self.assertIn("CH=157", res.stdout)
-        self.assertIn("CLIENTS=3", res.stdout)
+        self.assertIn("CLIENTS=5", res.stdout)
         self.assertIn("FIRST_ROLE=client1", res.stdout)
 
 

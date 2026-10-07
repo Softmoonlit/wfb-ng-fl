@@ -21,6 +21,16 @@ def write_executable(path: Path, content: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
+def install_mock_radio_driver(mock_bin: Path) -> None:
+    write_executable(mock_bin / "readlink", """#!/bin/bash
+if [[ "$*" == *"/sys/class/net/"*"/device/driver"* ]]; then
+    echo "/sys/bus/usb/drivers/rtl88xxau_wfb"
+else
+    exec /usr/bin/readlink "$@"
+fi
+""")
+
+
 def make_test_conf(tmp_path: Path, channel: int = 157, client_count: int = 5) -> Path:
     clients = []
     for i in range(1, client_count + 1):
@@ -244,8 +254,8 @@ exit 255
             combined = res.stdout + res.stderr
             self.assertIn("所有 Client 节点均离线", combined)
 
-    def test_server_no_wlx_fails(self):
-        """测试在真实模式下 Server 未发现 wlx* 空口网卡时 fail-closed。"""
+    def test_server_no_rtl8812au_fails(self):
+        """测试在真实模式下 Server 未发现 RTL8812AU 空口网卡时 fail-closed。"""
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp = Path(tmp_dir)
             conf = make_test_conf(tmp, channel=157, client_count=5)
@@ -282,7 +292,7 @@ exit 0
 
             self.assertNotEqual(res.returncode, 0)
             combined = res.stdout + res.stderr
-            self.assertIn("必须恰好存在一个 wlx* 无线网卡", combined)
+            self.assertIn("必须恰好存在一个 RTL8812AU 空口网卡", combined)
 
 
     def test_uplink_missing_ref_file_fails(self):
@@ -325,7 +335,7 @@ if echo "$@" | grep -q "iw dev.*info"; then
     echo "type monitor"
     exit 0
 fi
-if echo "$@" | grep -q "iw dev"; then
+if echo "$@" | grep -Eq "iw dev|find_wfb_radio_interfaces"; then
     echo "wlxfc221c500a88"
     exit 0
 fi
@@ -346,6 +356,7 @@ echo "Interface wlxbcec23372588"
 exit 0
 """
             write_executable(mock_bin / "iw", mock_iw)
+            install_mock_radio_driver(mock_bin)
 
             # Mock ip
             mock_ip = """#!/bin/bash
@@ -450,7 +461,7 @@ if echo "$@" | grep -q "iw dev.*info"; then
     echo "type monitor"
     exit 0
 fi
-if echo "$@" | grep -q "iw dev"; then
+if echo "$@" | grep -Eq "iw dev|find_wfb_radio_interfaces"; then
     echo "wlxfc221c500a88"
     exit 0
 fi
@@ -471,6 +482,7 @@ echo "Interface wlxbcec23372588"
 exit 0
 """
             write_executable(mock_bin / "iw", mock_iw)
+            install_mock_radio_driver(mock_bin)
 
             # Mock ip
             mock_ip = """#!/bin/bash

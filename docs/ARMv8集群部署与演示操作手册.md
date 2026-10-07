@@ -49,7 +49,7 @@
 
 ### 1. 硬件准备
 - **开发板**：1 台作为 Server，3~7 台作为 Client（推荐 ARMv8 架构，如 RK3588/RK3568/树莓派 4B 等，系统为 Ubuntu 20.04/22.04 LTS aarch64）；
-- **无线网卡**：每台开发板外接 1 个 RTL8812AU 双频 USB 无线网卡（系统内识别为唯一的 `wlx*` 接口）；
+- **无线网卡**：每台开发板外接 1 个 RTL8812AU 双频 USB 无线网卡。接口名由 Linux udev 决定，统一视为 `wl*` 无线接口，**不得假设一定是 `wlx*`**；演示脚本按 RTL8812AU 内核驱动绑定关系识别空口网卡，以避免误选手机热点管理网卡；
 - **局域网交换机/路由器**：将所有开发板以太网口与操作者电脑连入同一局域网（确保彼此网络可达）。
 
 ### 2. 本地文件准备
@@ -206,10 +206,10 @@ sudo ./scripts/deploy_node.sh
 
 ### 脚本自动执行的 5 大阶段：
 1. **系统依赖自动安装**：自动执行 `apt-get update` 并安装 `build-essential`、`libsodium-dev`、`libpcap-dev`、`libssl-dev`、`dkms`、`iw`、`rfkill`、`net-tools` 等；
-2. **RTL8812AU 网卡驱动构建**：自动检测/安装当前内核头文件，自动调用 DKMS 编译并加载 `8812au` 驱动；
+2. **RTL8812AU 网卡驱动构建**：自动检测/安装当前内核头文件，调用已同步的 `rtl8812au/dkms-install.sh` 执行 DKMS 编译安装，并加载实际模块 `88XXau_wfb`；
 3. **UFTP 离线编译与安装**：自动读取 `../uftp_src-5.0.3.zip`，就地针对 ARMv8 编译并把原生二进制 `uftp` 和 `uftpd` 安装至 `/usr/bin/`（**无需外网下载**）；
 4. **系统网络与权限调优**：
-   - 自动向 NetworkManager 写入规则，永久忽略 `wlx*` 前缀的无线网卡，防止系统重置 Monitor 模式；
+   - 自动向 NetworkManager 写入规则，按 RTL8812AU 驱动标识永久忽略对应的 `wl*` 空口网卡，防止系统重置 Monitor 模式；手机热点管理网卡不纳入该规则；
    - 自动解锁 `rfkill unblock all`；
    - 自动应用 `scripts/sysctl/98-wifibroadcast.conf`，将内核 socket 与 datagram 队列大幅扩容；
    - 自动为当前用户配置免密 `sudo`（写入 `/etc/sudoers.d/99-wfb-nopasswd`），消除非交互卡死；
@@ -276,7 +276,7 @@ bash tests/real_hardware/run_fl_demo.sh all
 
 **演示全流程自动化逻辑**：
 1. **动态探测在线 Client**：自动通过 ping 和 SSH 探测在线节点集合，若有个别板子掉线，输出黄色告警并容错跳过，不会中断汇报；
-2. **空口网卡准备**：在 Server 和所有在线 Client 上探测唯一的 `wlx*` 网卡，切换为 monitor 模式，严格锁定到信道 157、频宽 HT40+ 和功率 12 dBm；
+2. **空口网卡准备**：在 Server 和所有在线 Client 上按 RTL8812AU 驱动绑定关系探测唯一空口网卡。接口名可能是任意 `wl*` 前缀（例如 `wlP...` 或 `wlx...`），脚本不会把手机热点管理网卡误当作空口网卡，然后切换为 monitor 模式并严格锁定到信道 157、频宽 HT40+ 和功率 12 dBm；
 3. **下行组播广播传输**：
    - 现场自动生成 40MB 确定性测试文件（或使用 `--file` 传入真实模型），计算并打印初始 SHA-256；
    - 远程在各 Client 拉起 `uftpd` 监听组播组，并在终端明确打印落盘绝对路径：
@@ -348,7 +348,7 @@ bash tests/real_hardware/run_fl_demo.sh clean
 - **排查**：检查 `/etc/NetworkManager/conf.d/wfb-unmanaged.conf` 是否存在且内容为：
   ```ini
   [keyfile]
-  unmanaged-devices=interface-name:wlx*
+  unmanaged-devices=driver:rtl88xxau_wfb
   ```
   `deploy_node.sh` 会自动写入此配置并重载服务。
 

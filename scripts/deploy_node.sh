@@ -8,6 +8,10 @@ trap 'echo "[FAIL] $(date +%H:%M:%S) 部署脚本在第 $LINENO 行发生未捕�
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# 复用统一的 RTL8812AU 空口网卡识别逻辑
+# shellcheck source=scripts/radio_interface.sh
+source "$SCRIPT_DIR/radio_interface.sh"
+
 # 基础路径与默认配置
 SYSCONFDIR="${SYSCONFDIR:-/etc}"
 PREFIX="${PREFIX:-/usr}"
@@ -193,7 +197,7 @@ step2_install_driver() {
     fi
 
     # 检查是否已加载驱动模块 (避免使用 grep -q 导致 set -o pipefail 下 lsmod 触发 SIGPIPE 141)
-    if lsmod 2>/dev/null | grep -E '8812au|88XXau|rtl88xxau_wfb' >/dev/null 2>&1; then
+    if lsmod 2>/dev/null | grep -E '^88XXau_wfb[[:space:]]' >/dev/null 2>&1; then
         log_pass "检测到 RTL8812AU 驱动内核模块已处于加载状态，跳过重复构建"
         return 0
     fi
@@ -219,17 +223,22 @@ step2_install_driver() {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "  [DRY-RUN] cd $build_dir && ./dkms-install.sh"
-        echo "  [DRY-RUN] modprobe 8812au"
+        echo "  [DRY-RUN] modprobe 88XXau_wfb"
         return 0
     fi
 
     if [ -f "$build_dir/dkms-install.sh" ]; then
         log_info "开始执行 DKMS 驱动安装 (dkms-install.sh)..."
         (cd "$build_dir" && ./dkms-install.sh)
-        log_info "尝试加载驱动内核模块..."
-        modprobe 8812au 2>/dev/null || modprobe 88XXau 2>/dev/null || modprobe rtl88xxau_wfb 2>/dev/null || {
-            log_warn "驱动已编译安装，但 modprobe 模块未成功加载（可能尚未插入 USB 网卡，插入网卡后将自动加载）"
+        log_info "尝试加载 RTL8812AU 驱动模块..."
+        modprobe 88XXau_wfb 2>/dev/null || {
+            log_warn "驱动已编译安装，但 88XXau_wfb 模块未成功加载（可能需要重新插拔 USB 网卡或检查内核模块依赖）"
         }
+        if lsmod 2>/dev/null | grep -E '^88XXau_wfb[[:space:]]' >/dev/null 2>&1; then
+            log_pass "RTL8812AU 驱动模块加载完成"
+        else
+            log_warn "RTL8812AU 驱动模块当前未出现在 lsmod 中"
+        fi
         log_pass "RTL8812AU 驱动安装流程完成"
     else
         log_fail "未在 $build_dir 找到 dkms-install.sh 脚本"
@@ -311,17 +320,17 @@ step4_network_and_rf() {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "  [DRY-RUN] mkdir -p $nm_conf_dir"
-        echo "  [DRY-RUN] write unmanaged-devices=interface-name:wlx* to $nm_conf_file"
+        echo "  [DRY-RUN] write unmanaged-devices=driver:rtl88xxau_wfb to $nm_conf_file"
         echo "  [DRY-RUN] systemctl restart/reload NetworkManager"
         echo "  [DRY-RUN] rfkill unblock all"
         return 0
     fi
 
-    log_info "在 $nm_conf_file 中配置 NetworkManager 忽略 wlx* 无线网卡..."
+    log_info "在 $nm_conf_file 中配置 NetworkManager 忽略 RTL8812AU 驱动对应的 wl* 空口网卡..."
     run_cmd mkdir -p "$nm_conf_dir"
     cat > "$nm_conf_file" <<'EOF'
 [keyfile]
-unmanaged-devices=interface-name:wlx*
+unmanaged-devices=driver:rtl88xxau_wfb
 EOF
     log_pass "已写入 $nm_conf_file"
 
@@ -438,7 +447,7 @@ step8_final_verification() {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "  [DRY-RUN] 模拟核验: wfb-fl-server wfb-fl-client wfb_v6_uplink uftp uftpd"
-        echo "  [DRY-RUN] 模拟探测: wlx* 无线网卡"
+        echo "  [DRY-RUN] 模拟探测 RTL8812AU 驱动绑定的 wl* 空口网卡"
         echo ""
         log_pass "=========================================================="
         log_pass " [DRY-RUN] 模拟运行完成，所有预演步骤均已正确生成！"
@@ -467,17 +476,18 @@ step8_final_verification() {
         fi
     done
 
-    log_info "检查可用 RTL8812AU (wlx*) 接口:"
-    local found_wlx=0
+    log_info "检查可用 RTL8812AU 空口接口 (接口名可能为任意 wl* 前缀):"
+    local found_radio=0
     if command -v iw >/dev/null 2>&1; then
-        for iface in $(iw dev 2>/dev/null | awk '/Interface / {print $2}' | grep '^wlx' || true); do
-            log_pass "  发现无线网卡: $iface"
-            found_wlx=1
-        done
+        while IFS= read -r iface; do
+            [ -n "$iface" ] || continue
+            log_pass "  发现 RTL8812AU 空口网卡: $iface"
+            found_radio=1
+        done < <(find_wfb_radio_interfaces)
     fi
 
-    if [ "$found_wlx" -eq 0 ]; then
-        log_warn "  当前未发现名称以 wlx 开头的无线网卡（请确保 USB 网卡已插入且供电充足）"
+    if [ "$found_radio" -eq 0 ]; then
+        log_warn "  当前未发现绑定 RTL8812AU 驱动的空口网卡（请确保 USB 网卡已插入且驱动模块已加载）"
     fi
 
     if [ "$missing" -eq 0 ]; then

@@ -7,6 +7,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# 复用统一的 RTL8812AU 空口网卡识别逻辑
+# shellcheck source=scripts/radio_interface.sh
+source "$SCRIPT_DIR/radio_interface.sh"
+
 # 加载集群配置文件解析器（复用颜色定义、日志函数与配置解析器）
 # shellcheck source=scripts/cluster_config.sh
 source "$SCRIPT_DIR/cluster_config.sh"
@@ -152,6 +156,25 @@ resolve_local_uftp_zip() {
     return 1
 }
 
+# 查找本地 RTL8812AU 驱动源码目录（支持离线环境分发）
+resolve_local_rtl8812au_dir() {
+    if [ -n "${RTL8812AU_DIR:-}" ] && [ -d "$RTL8812AU_DIR" ]; then
+        echo "$RTL8812AU_DIR"
+        return 0
+    fi
+    for cand in \
+        "$PROJECT_ROOT/../rtl8812au" \
+        "$PROJECT_ROOT/rtl8812au" \
+        "$HOME/projects/rtl8812au" \
+        "$HOME/rtl8812au"; do
+        if [ -d "$cand" ]; then
+            echo "$cand"
+            return 0
+        fi
+    done
+    return 1
+}
+
 # 2. 读取并校验集群配置
 step1_load_config() {
     log_step "1" "读取并解析集群配置文件: $CONFIG_FILE"
@@ -207,15 +230,18 @@ step2_probe_clients() {
     log_info "节点在线探测汇总: 共 $total 台，在线 $online 台，离线 $offline 台"
 }
 
-# 单节点代码与 UFTP 资源同步操作
+# 单节点代码与 UFTP/驱动 资源同步操作
 sync_single_node() {
     local r="$1"
     local h="$2"
     local u="$3"
     local local_uftp="$4"
+    local local_rtl="${5:-}"
+    local remote_parent
+    remote_parent="$(dirname "$REMOTE_DIR")"
 
     # 确保远端父目录与目标目录存在
-    ssh "${SSH_BATCH_OPTS[@]}" "${u}@${h}" "mkdir -p '$REMOTE_DIR' \"\$(dirname '$REMOTE_DIR')\""
+    ssh "${SSH_BATCH_OPTS[@]}" "${u}@${h}" "mkdir -p '$REMOTE_DIR' '$remote_parent'"
 
     # 使用 rsync 增量同步，排除非必要文件与编译缓存
     rsync -az --delete \
@@ -233,7 +259,19 @@ sync_single_node() {
     # deploy_node.sh 优先从上级目录查找 uftp_src-5.0.3.zip
     if [ -n "$local_uftp" ]; then
         rsync -az -e "ssh ${SSH_BATCH_OPTS[*]}" \
-            "$local_uftp" "${u}@${h}:\$(dirname '$REMOTE_DIR')/"
+            "$local_uftp" "${u}@${h}:${remote_parent}/"
+    fi
+
+    # 离线环境优先同步本地 RTL8812AU 驱动源码
+    if [ -n "$local_rtl" ]; then
+        rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='*.o' \
+            --exclude='*.ko' \
+            --exclude='*.mod*' \
+            --exclude='*.cmd' \
+            -e "ssh ${SSH_BATCH_OPTS[*]}" \
+            "$local_rtl/" "${u}@${h}:${remote_parent}/rtl8812au/"
     fi
 }
 
@@ -248,7 +286,7 @@ step3_sync_code_and_uftp() {
         return 0
     fi
 
-    log_step "3" "向所有在线 Client 分发代码库与 UFTP 源码包"
+    log_step "3" "向所有在线 Client 分发代码库与组件资源包"
 
     if [ "$DRY_RUN" -eq 0 ] && ! command -v rsync >/dev/null 2>&1; then
         log_fail "Server 本机未安装 rsync 命令，请先安装: sudo apt-get install -y rsync"
@@ -262,15 +300,25 @@ step3_sync_code_and_uftp() {
         log_warn "未在本地找到 uftp_src-5.0.3.zip（如远端尚未安装 UFTP，部署步骤可能受影响）"
     fi
 
+    local local_rtl=""
+    if local_rtl="$(resolve_local_rtl8812au_dir)"; then
+        log_info "找到本地 RTL8812AU 驱动源码: $local_rtl"
+    fi
+
     if [ "$DRY_RUN" -eq 1 ]; then
+        local remote_parent
+        remote_parent="$(dirname "$REMOTE_DIR")"
         for i in "${ONLINE_INDICES[@]}"; do
             local r="${CLIENT_ROLES[$i]}"
             local h="${CLIENT_HOSTS[$i]}"
             local u="${CLIENT_USERS[$i]}"
-            echo "  [DRY-RUN] 创建远端目录: ssh $u@$h \"mkdir -p '$REMOTE_DIR'\""
+            echo "  [DRY-RUN] 创建远端目录: ssh $u@$h \"mkdir -p '$REMOTE_DIR' '$remote_parent'\""
             echo "  [DRY-RUN] 同步项目代码至: $u@$h:$REMOTE_DIR/"
             if [ -n "$local_uftp" ]; then
-                echo "  [DRY-RUN] 推送 UFTP 源码包至: $u@$h:$(dirname "$REMOTE_DIR")/"
+                echo "  [DRY-RUN] 推送 UFTP 源码包至: $u@$h:${remote_parent}/"
+            fi
+            if [ -n "$local_rtl" ]; then
+                echo "  [DRY-RUN] 推送 RTL8812AU 源码至: $u@$h:${remote_parent}/rtl8812au/"
             fi
         done
         return 0
@@ -284,7 +332,7 @@ step3_sync_code_and_uftp() {
             local h="${CLIENT_HOSTS[$i]}"
             local u="${CLIENT_USERS[$i]}"
             log_info "  [$r] 启动代码同步至 $h..."
-            sync_single_node "$r" "$h" "$u" "$local_uftp" &
+            sync_single_node "$r" "$h" "$u" "$local_uftp" "$local_rtl" &
             pids[$i]=$!
         done
 
@@ -312,7 +360,7 @@ step3_sync_code_and_uftp() {
             local h="${CLIENT_HOSTS[$i]}"
             local u="${CLIENT_USERS[$i]}"
             log_info "  [$r] 正在同步代码库至 $h..."
-            if sync_single_node "$r" "$h" "$u" "$local_uftp"; then
+            if sync_single_node "$r" "$h" "$u" "$local_uftp" "$local_rtl"; then
                 log_pass "  [PASS] $r 代码与资源同步完成"
             else
                 log_fail "  [FAIL] $r 代码同步失败"
@@ -449,19 +497,26 @@ for cmd in wfb-fl-server wfb-fl-client wfb_v6_uplink uftp uftpd; do
 done
 
 driver_status="NOT_LOADED"
-if lsmod 2>/dev/null | grep -E "8812au|88XXau|rtl88xxau_wfb" >/dev/null 2>&1; then
+if lsmod 2>/dev/null | grep -E "^88XXau_wfb[[:space:]]" >/dev/null 2>&1; then
     driver_status="LOADED"
 fi
 
 nic_status="NONE"
 if command -v iw >/dev/null 2>&1; then
-    wlx_list=($(iw dev 2>/dev/null | awk "/Interface / {print \$2}" | grep "^wlx" || true))
-    if [ "${#wlx_list[@]}" -eq 1 ]; then
-        nic_status="${wlx_list[0]}"
-    elif [ "${#wlx_list[@]}" -gt 1 ]; then
+    radio_list=()
+    while IFS= read -r iface; do
+        [ -n "$iface" ] || continue
+        driver_path="$(readlink -f "/sys/class/net/$iface/device/driver" 2>/dev/null || true)"
+        case "$driver_path" in
+            */rtl88xxau_wfb)
+                radio_list+=("$iface")
+                ;;
+        esac
+    done < <(iw dev 2>/dev/null | awk "/^[[:space:]]*Interface / {print \$2}")
+    if [ "${#radio_list[@]}" -eq 1 ]; then
+        nic_status="${radio_list[0]}"
+    elif [ "${#radio_list[@]}" -gt 1 ]; then
         nic_status="CONFLICT"
-    else
-        nic_status="NONE"
     fi
 fi
 
