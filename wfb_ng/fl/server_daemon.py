@@ -46,7 +46,11 @@ from .client_daemon import (
     NetworkAdapter,
 )
 from .coordinator import FLCoordinator, JobConfig, VALID_FL_MODES
-from .transport import DEFAULT_UFTP_DATA_PORT
+from .transport import (
+    DEFAULT_UFTP_DATA_PORT,
+    DEFAULT_UFTP_MULTICAST_HOST,
+    DEFAULT_UFTP_PRIVATE_MULTICAST_HOST,
+)
 from .control import (
     CLIENT_UPLINK_DEFAULT_ADDR,
     CLIENT_UPLINK_DEFAULT_PORT,
@@ -726,8 +730,8 @@ class ServerDaemon:
                     max_update_size_bytes=int(payload.get("max_update_size_bytes", actual_file_size * 2)),
                     http_host=self.config.tun_ip,
                     uftp_bind_host=self.config.tun_ip,
-                    uftp_multicast_host=str(payload.get("uftp_multicast_host", "224.0.0.1")),
-                    uftp_private_multicast_host=str(payload.get("uftp_private_multicast_host", "224.0.0.2")),
+                    uftp_multicast_host=str(payload.get("uftp_multicast_host", DEFAULT_UFTP_MULTICAST_HOST)),
+                    uftp_private_multicast_host=str(payload.get("uftp_private_multicast_host", DEFAULT_UFTP_PRIVATE_MULTICAST_HOST)),
                 )
                 try:
                     server_role.start()

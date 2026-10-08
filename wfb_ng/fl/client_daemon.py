@@ -29,7 +29,11 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from .errors import FLRuntimeError
-from .transport import DEFAULT_UFTP_DATA_PORT
+from .transport import (
+    DEFAULT_UFTP_DATA_PORT,
+    DEFAULT_UFTP_MULTICAST_HOST,
+    DEFAULT_UFTP_PRIVATE_MULTICAST_HOST,
+)
 from .control import (
     CLIENT_UPLINK_DEFAULT_ADDR,
     CLIENT_UPLINK_DEFAULT_PORT,
@@ -380,8 +384,8 @@ class ClientJobConfig:
     uftp_port: int = DEFAULT_UFTP_DATA_PORT
     link_id: int = DEFAULT_LINK_ID
     uftp_bind_host: Optional[str] = None
-    uftp_multicast_host: str = "224.0.0.1"
-    uftp_private_multicast_host: str = "224.0.0.2"
+    uftp_multicast_host: str = DEFAULT_UFTP_MULTICAST_HOST
+    uftp_private_multicast_host: str = DEFAULT_UFTP_PRIVATE_MULTICAST_HOST
     channel: int = DEFAULT_CHANNEL
     channel_width: str = FIXED_BANDWIDTH
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM

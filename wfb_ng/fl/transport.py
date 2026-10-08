@@ -20,6 +20,8 @@ from .errors import FLRuntimeError
 from .observation import LiveObservation
 
 DEFAULT_UFTP_DATA_PORT = 1044
+DEFAULT_UFTP_MULTICAST_HOST = '239.80.41.1'
+DEFAULT_UFTP_PRIVATE_MULTICAST_HOST = '239.80.41.2'
 
 
 @dataclass(frozen=True)

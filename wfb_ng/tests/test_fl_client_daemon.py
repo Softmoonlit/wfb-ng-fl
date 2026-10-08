@@ -619,6 +619,9 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             link_id=7669206,
         )
         self.assertEqual(job.link_id, 7669206)
+        self.assertEqual(job.uftp_port, 1044)
+        self.assertEqual(job.uftp_multicast_host, "239.80.41.1")
+        self.assertEqual(job.uftp_private_multicast_host, "239.80.41.2")
 
     def test_daemon_full_lifecycle(self):
         config = ClientDaemonConfig(
