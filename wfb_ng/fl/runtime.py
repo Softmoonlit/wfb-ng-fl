@@ -98,7 +98,12 @@ def validate_round_state(state, round_id, role, active_states):
                 any(type(node_id) is not int or node_id <= 0
                     for node_id in participant_node_ids) or
                 participant_node_ids != sorted(set(participant_node_ids)) or
-                committed_node_ids != participant_node_ids):
+                not isinstance(committed_node_ids, list) or
+                any(type(node_id) is not int or node_id <= 0
+                    for node_id in committed_node_ids) or
+                committed_node_ids != sorted(set(committed_node_ids)) or
+                len(committed_node_ids) == 0 or
+                not set(committed_node_ids).issubset(set(participant_node_ids))):
             raise FLRuntimeError('round_state_corrupted', '成功轮次参与集合无效')
     diagnostics = state.get('downlink_diagnostics')
     if ('downlink_diagnostics' in state and state['state'] != 'failed'):
@@ -267,6 +272,11 @@ class ServerRuntime(object):
     def close(self):
         self._owner.close()
 
+    @property
+    def round_id(self):
+        with self._condition:
+            return self._round_id
+
     def _restore_terminal_state(self, state):
         round_id = state['round_id']
         if state['state'] == 'succeeded':
@@ -276,7 +286,10 @@ class ServerRuntime(object):
                     any(type(node_id) is not int or node_id <= 0
                         for node_id in participant_node_ids) or
                     participant_node_ids != sorted(set(participant_node_ids)) or
-                    committed_node_ids != participant_node_ids):
+                    not isinstance(committed_node_ids, list) or
+                    not committed_node_ids or
+                    not set(committed_node_ids).issubset(set(participant_node_ids)) or
+                    committed_node_ids != sorted(set(committed_node_ids))):
                 self._owner.close()
                 raise FLRuntimeError(
                     'round_state_corrupted', '成功轮次参与集合无效')
@@ -428,7 +441,19 @@ class ServerRuntime(object):
         finally:
             source.close()
 
-    def wait_for_updates(self):
+    def abort(self, reason='aborted'):
+        with self._condition:
+            if self._fatal_error is None:
+                self._fatal_error = FLRuntimeError('aborted', f'协同作业被主动中止: {reason}')
+            self._condition.notify_all()
+        operation = self._downlink_operation if self._publish_active else None
+        if operation is not None:
+            try:
+                self._cancel_downlink(operation)
+            except Exception:
+                pass
+
+    def wait_for_updates(self, min_updates=None, timeout=None):
         self._require_ready()
         with self._condition:
             if self._wait_for_updates_active:
@@ -443,7 +468,8 @@ class ServerRuntime(object):
             if self._state == 'succeeded':
                 result = self._rebuild_terminal_updates(round_id, round_dir)
             else:
-                result = self._wait_for_complete_updates(round_id, round_dir)
+                result = self._wait_for_complete_updates(
+                    round_id, round_dir, min_updates=min_updates, timeout=timeout)
             with self._condition:
                 self._round_result_consumed = True
             return result
@@ -455,23 +481,40 @@ class ServerRuntime(object):
             with self._condition:
                 self._wait_for_updates_active = False
 
-    def _wait_for_complete_updates(self, round_id, round_dir):
+    def _wait_for_complete_updates(self, round_id, round_dir, min_updates=None, timeout=None):
+        deadline = (time.monotonic() + timeout) if timeout is not None else None
+        min_required = min_updates if min_updates is not None else len(self.participant_node_ids)
         while True:
             with self._condition:
                 if self._fatal_error is not None:
                     raise self._fatal_error
                 if self._failure is not None:
                     raise self._failure
-            update_paths = self._complete_round_if_ready(round_id, round_dir)
+            update_paths = self._complete_round_if_ready(
+                round_id, round_dir, min_updates=min_required)
             if update_paths is not None:
                 return MappingProxyType(update_paths)
+
+            if deadline is not None and time.monotonic() >= deadline:
+                self._fail_round(
+                    'round_timeout',
+                    '轮次等待 update 超时，未达到最小配额: 期望 %d' % min_required)
+                with self._condition:
+                    raise self._failure
+
             self.transport.wait_for_update(0.1)
 
     def _rebuild_terminal_updates(self, round_id, round_dir):
         update_paths = {}
-        node_ids = (
-            self._recovered_participant_node_ids or self.participant_node_ids)
-        for node_id in node_ids:
+        state_path = os.path.join(round_dir, 'state.json')
+        if not os.path.isfile(state_path):
+            raise FLRuntimeError('round_artifacts_removed', '轮次状态文件缺失', round_id=round_id)
+        state = read_json(state_path)
+        committed_node_ids = state.get('committed_update_node_ids')
+        if not isinstance(committed_node_ids, list) or not committed_node_ids:
+            raise FLRuntimeError('round_state_corrupted', '轮次状态提交节点集无效', round_id=round_id)
+
+        for node_id in committed_node_ids:
             update_dir = os.path.join(round_dir, 'updates', str(node_id))
             manifest_path = os.path.join(update_dir, 'update.manifest.json')
             update_path = os.path.abspath(os.path.join(update_dir, 'update.bin'))
@@ -492,21 +535,24 @@ class ServerRuntime(object):
             update_paths[node_id] = update_path
         return MappingProxyType(update_paths)
 
-    def _complete_round_if_ready(self, round_id, round_dir):
+    def _complete_round_if_ready(self, round_id, round_dir, min_updates=None):
         with self._condition:
             if not self._downlink_completed:
                 return None
-        update_paths = {}
+        min_required = min_updates if min_updates is not None else len(self.participant_node_ids)
+        available_updates = {}
         for node_id in self.participant_node_ids:
             update_dir = os.path.join(round_dir, 'updates', str(node_id))
             manifest_path = os.path.join(update_dir, 'update.manifest.json')
-            if not os.path.isfile(manifest_path):
-                return None
-            update_paths[node_id] = os.path.abspath(
-                os.path.join(update_dir, 'update.bin'))
+            bin_path = os.path.join(update_dir, 'update.bin')
+            if os.path.isfile(manifest_path) and os.path.isfile(bin_path):
+                available_updates[node_id] = os.path.abspath(bin_path)
+
+        if len(available_updates) < min_required:
+            return None
 
         try:
-            for node_id, update_path in update_paths.items():
+            for node_id, update_path in available_updates.items():
                 manifest_path = os.path.join(
                     round_dir, 'updates', str(node_id), 'update.manifest.json')
                 manifest = read_json(manifest_path)
@@ -521,12 +567,13 @@ class ServerRuntime(object):
             if self._failure is not None:
                 raise self._failure
             node_ids = list(self.participant_node_ids)
+            committed_nodes = sorted(available_updates.keys())
             self._write_state(
                 'succeeded',
                 participant_node_ids=node_ids,
-                committed_update_node_ids=node_ids,
+                committed_update_node_ids=committed_nodes,
             )
-        return update_paths
+        return available_updates
 
     def report_update_failure(self, round_id, node_id, error_code, error_message):
         persistence_error = None
@@ -689,6 +736,17 @@ class ClientRuntime(object):
     def close(self):
         self._owner.close()
 
+    def abort(self, reason='aborted'):
+        with self._condition:
+            if self._fatal_error is None:
+                self._fatal_error = FLRuntimeError('aborted', f'协同作业被主动中止: {reason}')
+            self._condition.notify_all()
+
+    @property
+    def round_id(self):
+        with self._condition:
+            return self._round_id
+
     def _restore_terminal_state(self, state):
         round_id = state['round_id']
         if state['state'] == 'failed':
@@ -720,6 +778,9 @@ class ClientRuntime(object):
 
     def _wait_for_model(self):
         while True:
+            with self._condition:
+                if self._fatal_error is not None:
+                    raise self._fatal_error
             candidate_dir = self.transport.wait_for_model_candidate()
             manifest = None
             try:

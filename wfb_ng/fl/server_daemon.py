@@ -45,6 +45,7 @@ from .client_daemon import (
     LinuxNetworkAdapter,
     NetworkAdapter,
 )
+from .coordinator import FLCoordinator, JobConfig, VALID_FL_MODES
 from .control import (
     CLIENT_UPLINK_DEFAULT_ADDR,
     CLIENT_UPLINK_DEFAULT_PORT,
@@ -115,125 +116,6 @@ def calculate_file_sha256(path: str) -> str:
                 break
             hasher.update(chunk)
     return hasher.hexdigest()
-
-
-@dataclass(frozen=True)
-class JobConfig:
-    """Structured, validated configuration for an FL simulation job."""
-    job_id: str
-    mode: str
-    target_nodes: Tuple[int, ...]
-    model_path: str
-    model_size_bytes: int
-    rounds: int = 1
-    min_updates: int = 0
-    max_staleness: int = 0
-    round_timeout_seconds: float = 120.0
-    model_sha256: Optional[str] = None
-    radio_config: Optional[Dict[str, Any]] = None
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "JobConfig":
-        if not isinstance(data, dict):
-            raise FLRuntimeError("invalid_job_payload", "作业配置必须为 JSON object")
-
-        raw_nodes = data.get("target_nodes")
-        if not raw_nodes or not isinstance(raw_nodes, list):
-            raise FLRuntimeError("preflight_target_nodes_invalid", "必须提供非空 target_nodes 列表")
-        if len(set(raw_nodes)) != len(raw_nodes):
-            raise FLRuntimeError("preflight_target_nodes_invalid", "target_nodes 包含重复节点 ID")
-        for nid in raw_nodes:
-            if type(nid) is not int or not (1 <= nid <= 10):
-                raise FLRuntimeError("preflight_target_nodes_invalid", f"包含非法节点 ID: {nid!r}")
-        target_nodes = tuple(raw_nodes)
-
-        mode = data.get("mode", "sync")
-        if mode not in VALID_FL_MODES:
-            raise FLRuntimeError("invalid_fl_mode", f"不支持的协同范式 '{mode}'，必须为 {VALID_FL_MODES}")
-
-        min_updates_raw = data.get("min_updates")
-        if mode == "semi_async":
-            if min_updates_raw is None:
-                raise FLRuntimeError("invalid_semi_async_config", "semi_async 模式必须指定 min_updates")
-            if type(min_updates_raw) is not int or not (1 <= min_updates_raw <= len(target_nodes)):
-                raise FLRuntimeError("invalid_semi_async_config", f"min_updates 必须在 [1, {len(target_nodes)}] 范围内的整数")
-            min_updates = min_updates_raw
-        elif mode == "sync":
-            min_updates = len(target_nodes)
-        else:  # async
-            min_updates = 1
-
-        model_path = data.get("model_path")
-        if not model_path or not isinstance(model_path, str):
-            raise FLRuntimeError("preflight_model_missing_path", "缺少必填参数 'model_path'")
-
-        model_size_raw = data.get("model_size_bytes")
-        if model_size_raw is None or type(model_size_raw) is not int or model_size_raw <= 0:
-            raise FLRuntimeError(
-                "preflight_model_missing_size",
-                "必须显式提供合法正整数 'model_size_bytes' 以供确定性大小校验",
-            )
-        model_size_bytes = model_size_raw
-
-        rounds_raw = data.get("rounds", 1)
-        if type(rounds_raw) is not int or rounds_raw <= 0:
-            raise FLRuntimeError("invalid_rounds", "rounds 轮次数必须为大于 0 的整数")
-        rounds = rounds_raw
-
-        max_staleness_raw = data.get("max_staleness", 0)
-        if type(max_staleness_raw) is not int or max_staleness_raw < 0:
-            raise FLRuntimeError("invalid_max_staleness", "max_staleness 必须为大于等于 0 的整数")
-        max_staleness = max_staleness_raw
-
-        round_timeout_raw = data.get("round_timeout_seconds", 120.0)
-        if (type(round_timeout_raw) not in (int, float)) or round_timeout_raw <= 0:
-            raise FLRuntimeError("invalid_round_timeout", "round_timeout_seconds 必须为大于 0 的数值")
-        round_timeout_seconds = float(round_timeout_raw)
-
-        model_sha256 = data.get("model_sha256")
-        if model_sha256 is not None:
-            if not isinstance(model_sha256, str) or len(model_sha256) != 64 or not all(c in "0123456789abcdefABCDEF" for c in model_sha256):
-                raise FLRuntimeError("invalid_model_sha256", "model_sha256 必须为 64 位十六进制散列字符串")
-            model_sha256 = model_sha256.lower()
-
-        radio_cfg = data.get("radio_config")
-        if radio_cfg is not None:
-            if not isinstance(radio_cfg, dict):
-                raise FLRuntimeError("invalid_radio_configuration", "radio_config 必须为 object")
-            validate_radio_config(radio_cfg)
-
-        raw_job_id = data.get("job_id")
-        if raw_job_id is not None and not isinstance(raw_job_id, str):
-            raise FLRuntimeError("invalid_job_id", "job_id 必须为字符串")
-        job_id = raw_job_id or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
-        return cls(
-            job_id=job_id,
-            mode=mode,
-            target_nodes=target_nodes,
-            model_path=model_path,
-            model_size_bytes=model_size_bytes,
-            rounds=rounds,
-            min_updates=min_updates,
-            max_staleness=max_staleness,
-            round_timeout_seconds=round_timeout_seconds,
-            model_sha256=model_sha256,
-            radio_config=radio_cfg,
-        )
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "job_id": self.job_id,
-            "mode": self.mode,
-            "target_nodes": list(self.target_nodes),
-            "model_path": self.model_path,
-            "model_size_bytes": self.model_size_bytes,
-            "rounds": self.rounds,
-            "min_updates": self.min_updates,
-            "max_staleness": self.max_staleness,
-            "round_timeout_seconds": self.round_timeout_seconds,
-            "model_sha256": self.model_sha256,
-            "radio_config": self.radio_config,
-        }
 
 
 @dataclass(frozen=True)
@@ -581,14 +463,18 @@ class ServerDaemon:
         config: Optional[ServerDaemonConfig] = None,
         network_adapter: Optional[NetworkAdapter] = None,
         survey_backend: Optional[SurveyBackend] = None,
+        runtime_factory: Optional[Callable[[JobConfig, Dict[str, Any]], Any]] = None,
     ):
         self.config = config or ServerDaemonConfig()
         self.adapter = network_adapter or LinuxNetworkAdapter()
         self.survey_backend = survey_backend
+        self.runtime_factory = runtime_factory
         self.current_interface: Optional[str] = self.config.air_interface
 
         self.server_state = ServerState.INITIALIZING
         self.active_job: Optional[Dict[str, Any]] = None
+        self.coordinator: Optional[Any] = None
+        self.server_role: Optional[Any] = None
 
         self.event_bus = ServerEventBus()
         self._stop_event = threading.Event()
@@ -816,8 +702,36 @@ class ServerDaemon:
             job_dict["model_sha256"] = computed_sha256
             job_dict["started_at"] = time.time()
 
+            # Instantiate runtime and coordinator
+            runtime = None
+            server_role = None
+            if self.runtime_factory is not None:
+                runtime = self.runtime_factory(job, payload)
+            elif self.config.enable_link_process:
+                from .role import ServerRole
+                server_role = ServerRole(
+                    work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}_role"),
+                    participant_node_id=tuple(job.target_nodes),
+                    participant_uftp_uid=tuple(job.target_nodes),
+                    server_uftp_uid=100,
+                    uftp_port=int(payload.get("uftp_port", 9000)),
+                    http_port=int(payload.get("server_http_port", 8080)),
+                    max_update_size_bytes=int(payload.get("max_update_size_bytes", actual_file_size * 2)),
+                    http_host=self.config.tun_ip,
+                    uftp_bind_host=self.config.tun_ip,
+                    uftp_multicast_host=self.control_plane.broadcast_addr if self.control_plane else "10.80.0.255",
+                )
+                try:
+                    server_role.start()
+                    runtime = server_role.runtime
+                except Exception:
+                    server_role.close()
+                    raise
+
+            # Only transition state and commit active_job after runtime is ready
             self.active_job = job_dict
             self.server_state = ServerState.RUNNING
+            self.server_role = server_role
 
             # Broadcast TASK_ANNOUNCE downlink to all clients (per spec line 108)
             announce_msg = {
@@ -827,18 +741,36 @@ class ServerDaemon:
                 "rounds": job.rounds,
                 "target_nodes": list(job.target_nodes),
                 "min_updates": job.min_updates,
+                "max_staleness": job.max_staleness,
+                "round_timeout_seconds": job.round_timeout_seconds,
                 "model_size_bytes": actual_file_size,
                 "model_sha256": computed_sha256,
+                "server_http_host": self.config.tun_ip,
+                "server_http_port": int(payload.get("server_http_port", 8080)),
+                "uftp_port": int(payload.get("uftp_port", 9000)),
+                "algorithm": payload.get("algorithm", "wfb_ng.fl.issue41_algorithm:client_main"),
+                "algorithm_config": payload.get("algorithm_config", {}),
                 "timestamp_ms": int(time.time() * 1000),
             }
             self.control_plane.broadcast_downlink(announce_msg)
 
-            # Publish SSE event
+            # Broadcast SSE event
             self.publish_event({
                 "type": "JOB_STARTED",
                 "job": job_dict,
                 "timestamp": time.time(),
             })
+
+            if runtime is not None:
+                self.coordinator = FLCoordinator(
+                    job=job,
+                    runtime=runtime,
+                    work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}"),
+                    on_event=self.publish_event,
+                    on_completed=lambda summary: self._on_job_completed(job.job_id, summary),
+                    on_failed=lambda exc: self._on_job_failed(job.job_id, exc),
+                )
+                self.coordinator.start()
 
             logger.info(
                 "作业 %s 成功通过前置门禁并启动 (模式: %s, 轮次: %d, 节点: %s, 模型大小: %d B)",
@@ -860,36 +792,102 @@ class ServerDaemon:
                 "model_sha256": computed_sha256,
             }
 
+    def _cleanup_terminal_job(self, job_id: str) -> None:
+        role_to_close = None
+        with self._lock:
+            if self.active_job and self.active_job.get("job_id") == job_id:
+                self.server_state = ServerState.IDLE
+                self.active_job = None
+                role_to_close = self.server_role
+                self.server_role = None
+        if role_to_close is not None:
+            try:
+                role_to_close.close()
+            except Exception as exc:
+                logger.warning("关闭 server_role 失败: %s", exc)
+
+    def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
+        self._cleanup_terminal_job(job_id)
+        if self.control_plane is not None:
+            self.control_plane.broadcast_downlink({
+                "type": "JOB_COMPLETED",
+                "job_id": job_id,
+                "timestamp_ms": int(time.time() * 1000),
+            })
+        self.publish_event({
+            "type": "JOB_COMPLETED",
+            "job_id": job_id,
+            "summary": summary,
+        })
+
+    def _on_job_failed(self, job_id: str, exc: Exception) -> None:
+        self._cleanup_terminal_job(job_id)
+        if self.control_plane is not None:
+            self.control_plane.broadcast_downlink({
+                "type": "JOB_ABORT",
+                "job_id": job_id,
+                "reason": f"job_failed: {exc}",
+                "timestamp_ms": int(time.time() * 1000),
+            })
+        self.publish_event({
+            "type": "JOB_FAILED",
+            "job_id": job_id,
+            "error": str(exc),
+        })
+
+    def _stop_coordinator_and_role(self, reason: str = "stopped") -> None:
+        coord = None
+        s_role = None
+        with self._lock:
+            coord = self.coordinator
+            s_role = self.server_role
+            self.coordinator = None
+            self.server_role = None
+
+        if coord is not None:
+            try:
+                coord.abort(reason=reason)
+                coord.wait(timeout=3.0)
+            except Exception as exc:
+                logger.warning("中止 coordinator 失败: %s", exc)
+
+        if s_role is not None:
+            try:
+                s_role.close()
+            except Exception as exc:
+                logger.warning("关闭 server_role 失败: %s", exc)
+
     def abort_job(self, reason: str = "user_requested") -> Dict[str, Any]:
         """Forcefully abort active job and reset server state to IDLE."""
         with self._lock:
-            aborted_job_id = None
-            if self.active_job is not None:
-                aborted_job_id = self.active_job.get("job_id")
-
+            aborted_job_id = self.active_job.get("job_id") if self.active_job else None
             self.server_state = ServerState.ABORTING
 
-            # Broadcast JOB_ABORT to all clients
-            abort_msg = {
-                "type": "JOB_ABORT",
-                "job_id": aborted_job_id,
-                "reason": reason,
-                "timestamp_ms": int(time.time() * 1000),
-            }
+        self._stop_coordinator_and_role(reason=reason)
+
+        # Broadcast JOB_ABORT to all clients
+        abort_msg = {
+            "type": "JOB_ABORT",
+            "job_id": aborted_job_id,
+            "reason": reason,
+            "timestamp_ms": int(time.time() * 1000),
+        }
+        if self.control_plane is not None:
             self.control_plane.broadcast_downlink(abort_msg)
 
+        with self._lock:
             self.active_job = None
             self.server_state = ServerState.IDLE
 
-            self.publish_event({
-                "type": "JOB_ABORTED",
-                "job_id": aborted_job_id,
-                "reason": reason,
-                "timestamp": time.time(),
-            })
+        self.publish_event({
+            "type": "JOB_ABORTED",
+            "job_id": aborted_job_id,
+            "reason": reason,
+            "timestamp": time.time(),
+        })
 
-            logger.info("作业已中止，协同引擎重置为 IDLE (原因: %s)", reason)
-            return {"status": "aborted", "job_id": aborted_job_id, "reason": reason}
+        logger.info("作业已中止，协同引擎重置为 IDLE (原因: %s)", reason)
+        return {"status": "aborted", "job_id": aborted_job_id, "reason": reason}
 
     def _start_link_process(self) -> None:
         """Launch wfb_v6_uplink server background process with pre-allocated slots."""
@@ -1068,6 +1066,9 @@ class ServerDaemon:
             # Stop Control Plane
             if self.config.enable_control_plane:
                 self.control_plane.stop()
+
+            # Stop active coordinator and server role
+            self._stop_coordinator_and_role(reason="daemon_stopped")
 
             # Stop Link Process and teardown TUN
             if self.config.enable_link_process:

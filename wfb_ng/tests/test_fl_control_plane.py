@@ -874,6 +874,12 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             "type": "TASK_ANNOUNCE",
             "job_id": "job_fl_001",
             "target_nodes": [1, 2],
+            "rounds": 1,
+            "algorithm": "wfb_ng.fl.issue41_algorithm:client_main",
+            "algorithm_config": {},
+            "server_http_host": "10.80.0.1",
+            "server_http_port": 8080,
+            "uftp_port": 9000,
         })
 
         # Wait for job to start

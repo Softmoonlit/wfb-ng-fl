@@ -849,13 +849,20 @@ class ClientDaemon:
                 self._restore_tun_if_idle()
                 raise
 
-    def abort_job(self) -> None:
+    def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
         with self._lock:
             self.sandbox.abort()
             self._restore_tun_if_idle()
             if self.control_plane is not None:
-                self.control_plane.notify_state_change(ClientNodeState.ABORTING)
+                if intermediate_state is not None:
+                    self.control_plane.notify_state_change(intermediate_state)
                 self.control_plane.notify_state_change(ClientNodeState.IDLE)
+
+    def finish_job(self) -> None:
+        self._terminate_job()
+
+    def abort_job(self) -> None:
+        self._terminate_job(intermediate_state=ClientNodeState.ABORTING)
 
     def wait_job(self, timeout: Optional[float] = None) -> int:
         ret = self.sandbox.wait(timeout=timeout)
@@ -877,16 +884,58 @@ class ClientDaemon:
             if self.control_plane is not None:
                 self.control_plane.notify_state_change(ClientNodeState.PREPARING)
 
+            def _reject(reason: str) -> None:
+                logger.error(reason)
+                if self.control_plane is not None:
+                    self.control_plane.notify_state_change(ClientNodeState.IDLE)
+
             if "job_id" in msg:
+                job_id = str(msg["job_id"])
+                algorithm = msg.get("algorithm")
+                if not algorithm:
+                    return _reject("TASK_ANNOUNCE 缺失 algorithm 字段，拒绝启动")
+
+                raw_algo_config = msg.get("algorithm_config")
+                if not isinstance(raw_algo_config, dict):
+                    return _reject("TASK_ANNOUNCE 缺失有效的 algorithm_config，拒绝启动")
+
+                if "rounds" not in msg:
+                    return _reject("TASK_ANNOUNCE 缺失 rounds 字段，拒绝启动")
+
+                rounds = int(msg["rounds"])
+                algo_config = dict(raw_algo_config)
+                algo_config["rounds"] = rounds
+                algo_config["node_id"] = self.config.node_id
+                model_size = msg.get("model_size_bytes")
+                if model_size is not None:
+                    algo_config["required_artifact_size_bytes"] = model_size
+
+                tpl = algo_config.get("update_template_path")
+                if tpl and "{node_id}" in tpl:
+                    algo_config["update_template_path"] = tpl.format(node_id=self.config.node_id)
+                elif not tpl:
+                    algo_config["update_template_path"] = os.path.join(
+                        self.config.work_dir,
+                        f"update-client{self.config.node_id}-template.bin",
+                    )
+
+                if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg:
+                    return _reject("TASK_ANNOUNCE 缺失网络配置字段，拒绝启动")
+
+                server_http_host = str(msg["server_http_host"])
+                server_http_port = int(msg["server_http_port"])
+                uftp_port = int(msg["uftp_port"])
+
                 job_config = ClientJobConfig(
-                    job_id=str(msg["job_id"]),
+                    job_id=job_id,
                     node_id=self.config.node_id,
                     tun_name=self.config.tun_name,
                     tun_ip=self.config.tun_ip,
-                    server_http_host=msg.get("server_http_host", "10.80.0.1"),
-                    server_http_port=int(msg.get("server_http_port", 8080)),
-                    algorithm=msg.get("algorithm"),
-                    algorithm_config=msg.get("algorithm_config"),
+                    server_http_host=server_http_host,
+                    server_http_port=server_http_port,
+                    uftp_port=uftp_port,
+                    algorithm=algorithm,
+                    algorithm_config=algo_config,
                 )
                 self.trigger_job(job_config)
 
@@ -915,6 +964,9 @@ class ClientDaemon:
                 )
                 self.control_plane.register_broadcast_handler(
                     "JOB_ABORT", lambda msg: self.abort_job()
+                )
+                self.control_plane.register_broadcast_handler(
+                    "JOB_COMPLETED", lambda msg: self.finish_job()
                 )
                 self.control_plane.start()
 
