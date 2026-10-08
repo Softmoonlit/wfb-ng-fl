@@ -767,6 +767,33 @@ class ServerDaemon:
             }
             self.control_plane.broadcast_downlink(announce_msg)
 
+            if self.config.enable_link_process:
+                deadline = time.monotonic() + 10.0
+                while time.monotonic() < deadline:
+                    if all(
+                        (record := self.control_plane.registry.get_node(node_id)) is not None
+                        and record.reported_state == ClientNodeState.RUNNING.value
+                        for node_id in job.target_nodes
+                    ):
+                        break
+                    time.sleep(0.05)
+                else:
+                    self.active_job = None
+                    self.server_state = ServerState.IDLE
+                    self.server_role = None
+                    if server_role is not None:
+                        server_role.close()
+                    self.control_plane.broadcast_downlink({
+                        "type": "JOB_ABORT",
+                        "job_id": job.job_id,
+                        "reason": "client_startup_timeout",
+                        "timestamp_ms": int(time.time() * 1000),
+                    })
+                    raise FLRuntimeError(
+                        "client_startup_timeout",
+                        "目标客户端未在 10 秒内完成 RoleService 就绪",
+                    )
+
             # Broadcast SSE event
             self.publish_event({
                 "type": "JOB_STARTED",

@@ -712,6 +712,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
+            _require_ready_notification=False,
         )
         job_config = ClientJobConfig(
             job_id="mod_test",

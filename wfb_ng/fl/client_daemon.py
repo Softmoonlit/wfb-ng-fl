@@ -20,6 +20,7 @@ import logging
 import os
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import threading
@@ -426,10 +427,12 @@ class JobSandbox:
         work_dir: str,
         network_adapter: NetworkAdapter,
         _command_prefix: Optional[Sequence[str]] = None,
+        _require_ready_notification: bool = True,
     ):
         self.work_dir = os.path.abspath(work_dir)
         self.network_adapter = network_adapter
         self._command_prefix = list(_command_prefix) if _command_prefix else None
+        self._require_ready_notification = _require_ready_notification
         self._process: Optional[subprocess.Popen] = None
         self._pgid: Optional[int] = None
         self._log_file: Optional[Any] = None
@@ -551,6 +554,15 @@ class JobSandbox:
                 logger.info("派生 RoleService 子进程沙箱: %s", " ".join(cmd))
                 log_path = os.path.join(self._job_work_dir, "role_service.log")
                 self._log_file = open(log_path, "w", encoding="utf-8")
+                notify_socket = None
+                notify_path = os.path.join(self._job_work_dir, "notify.sock")
+                child_env = None
+                if self._command_prefix is None and self._require_ready_notification:
+                    notify_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+                    notify_socket.bind(notify_path)
+                    notify_socket.settimeout(0.1)
+                    child_env = os.environ.copy()
+                    child_env["NOTIFY_SOCKET"] = notify_path
                 # Use start_new_session=True to place child in a new process group
                 # Redirect stdout/stderr to log file to avoid pipe buffer deadlock
                 self._process = subprocess.Popen(
@@ -559,11 +571,39 @@ class JobSandbox:
                     stdout=self._log_file,
                     stderr=subprocess.STDOUT,
                     start_new_session=True,
+                    env=child_env,
                 )
                 try:
                     self._pgid = os.getpgid(self._process.pid)
                 except OSError:
                     self._pgid = None
+                if notify_socket is not None:
+                    try:
+                        deadline = time.monotonic() + 5.0
+                        while time.monotonic() < deadline:
+                            returncode = self._process.poll()
+                            if returncode is not None:
+                                raise FLRuntimeError(
+                                    "sandbox_start_failed",
+                                    f"角色服务就绪前退出，退出码: {returncode}",
+                                )
+                            try:
+                                notification = notify_socket.recv(1024)
+                            except socket.timeout:
+                                continue
+                            if b"READY=1" in notification.splitlines():
+                                break
+                        else:
+                            raise FLRuntimeError(
+                                "sandbox_start_timeout",
+                                "角色服务未在 5 秒内报告就绪",
+                            )
+                    finally:
+                        notify_socket.close()
+                        try:
+                            os.unlink(notify_path)
+                        except FileNotFoundError:
+                            pass
                 self.state = DaemonState.RUNNING
                 return self._process
             except Exception as exc:
