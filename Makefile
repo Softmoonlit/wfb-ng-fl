@@ -92,7 +92,7 @@ wfb_rtsp: src/rtsp_server.c
 	$(CC) $(_CFLAGS) $(shell pkg-config --cflags gstreamer-rtsp-server-1.0) -o $@ $^ $(LDFLAGS) $(shell pkg-config --libs gstreamer-rtsp-server-1.0)
 
 install_v8: build_v6
-	./scripts/install-v8.sh
+	./scripts/install/install-v8.sh
 
 acceptance_v6_realhw:
 	@echo "手动上行链路验收：tests/link_uplink/v6新底座无SSH手动上行演示手册.md"

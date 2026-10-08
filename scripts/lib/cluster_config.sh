@@ -1,5 +1,5 @@
 #!/bin/bash
-# scripts/cluster_config.sh
+# scripts/lib/cluster_config.sh
 # WFB-FL ARMv8 多板载集群配置文件解析与严格校验器
 
 set -euo pipefail
@@ -405,13 +405,13 @@ usage() {
 ${C_BOLD}WFB-FL 集群配置文件解析与严格校验工具${C_RESET}
 
 用法:
-  bash scripts/cluster_config.sh [配置文件路径]
+  bash scripts/lib/cluster_config.sh [配置文件路径]
 
 选项:
   -h, --help        显示本帮助信息并退出
 
 示例:
-  bash scripts/cluster_config.sh cluster_nodes.conf
+  bash scripts/lib/cluster_config.sh cluster_nodes.conf
 EOF
 }
 

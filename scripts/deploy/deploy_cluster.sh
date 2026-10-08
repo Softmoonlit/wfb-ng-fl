@@ -1,19 +1,19 @@
 #!/bin/bash
-# scripts/deploy_cluster.sh
+# scripts/deploy/deploy_cluster.sh
 # WFB-FL ARMv8 集群一键批量部署与环境就绪验证编排器
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 复用统一的 RTL8812AU 空口网卡识别逻辑
-# shellcheck source=scripts/radio_interface.sh
-source "$SCRIPT_DIR/radio_interface.sh"
+# shellcheck source=scripts/lib/radio_interface.sh
+source "$PROJECT_ROOT/scripts/lib/radio_interface.sh"
 
 # 加载集群配置文件解析器（复用颜色定义、日志函数与配置解析器）
-# shellcheck source=scripts/cluster_config.sh
-source "$SCRIPT_DIR/cluster_config.sh"
+# shellcheck source=scripts/lib/cluster_config.sh
+source "$PROJECT_ROOT/scripts/lib/cluster_config.sh"
 
 log_step() { echo ""; echo "${C_BOLD}${C_CYAN}=== 步骤 $1: $2 ===${C_RESET}"; }
 
@@ -46,7 +46,7 @@ usage() {
 ${C_BOLD}WFB-FL ARMv8 集群一键批量部署与环境就绪验证编排器${C_RESET}
 
 用法:
-  bash scripts/deploy_cluster.sh [选项]
+  bash scripts/deploy/deploy_cluster.sh [选项]
 
 选项:
   -c, --config <路径>       指定集群配置文件 (默认: cluster_nodes.conf)
@@ -382,10 +382,10 @@ deploy_single_node() {
         echo "=========================================================="
         echo " WFB-FL 远程部署日志 - 节点: $r ($h) 用户: $u"
         echo " 开始时间: $(date '+%Y-%m-%d %H:%M:%S')"
-        echo " 执行命令: cd '$REMOTE_DIR' && sudo bash ./scripts/deploy_node.sh $deploy_args_str"
+        echo " 执行命令: cd '$REMOTE_DIR' && sudo bash ./scripts/deploy/deploy_node.sh $deploy_args_str"
         echo "=========================================================="
         ssh "${SSH_BATCH_OPTS[@]}" "${u}@${h}" \
-            "cd '$REMOTE_DIR' && sudo bash ./scripts/deploy_node.sh $deploy_args_str"
+            "cd '$REMOTE_DIR' && sudo bash ./scripts/deploy/deploy_node.sh $deploy_args_str"
     ) > "$log_file" 2>&1
 }
 
@@ -427,7 +427,7 @@ step4_remote_deploy() {
             local r="${CLIENT_ROLES[$i]}"
             local h="${CLIENT_HOSTS[$i]}"
             local u="${CLIENT_USERS[$i]}"
-            echo "  [DRY-RUN] ssh $u@$h \"cd '$REMOTE_DIR' && sudo ./scripts/deploy_node.sh $deploy_args_str\""
+            echo "  [DRY-RUN] ssh $u@$h \"cd '$REMOTE_DIR' && sudo ./scripts/deploy/deploy_node.sh $deploy_args_str\""
             NODE_DEPLOY_STATUS[$i]="SUCCESS"
         done
         return 0

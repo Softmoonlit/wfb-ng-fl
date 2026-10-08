@@ -5,6 +5,10 @@ prefix=${PREFIX:-/usr}
 destdir=${DESTDIR:-}
 python=${PYTHON:-python3}
 
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+project_root=$(CDPATH= cd -- "$script_dir/../.." && pwd)
+cd "$project_root"
+
 require_command() {
     command -v "$1" >/dev/null 2>&1 || {
         printf '%s\n' "缺少运行依赖: $1" >&2
@@ -26,11 +30,11 @@ unit_dir=$destdir$prefix/lib/systemd/system
 config_dir=$destdir/etc/wfb-ng
 
 install -d "$site_dir/fl" "$bin_dir" "$unit_dir" "$config_dir"
-install -m 0644 scripts/v8-wfb-ng-init.py "$site_dir/__init__.py"
+install -m 0644 scripts/install/v8-wfb-ng-init.py "$site_dir/__init__.py"
 install -m 0644 wfb_ng/fl/*.py "$site_dir/fl/"
 install -m 0755 wfb_v6_uplink "$bin_dir/wfb_v6_uplink"
-install -m 0755 scripts/wfb-fl-server "$bin_dir/wfb-fl-server"
-install -m 0755 scripts/wfb-fl-client "$bin_dir/wfb-fl-client"
+install -m 0755 scripts/install/wfb-fl-server "$bin_dir/wfb-fl-server"
+install -m 0755 scripts/install/wfb-fl-client "$bin_dir/wfb-fl-client"
 install -m 0644 scripts/systemd/wfb-fl-server.service "$unit_dir/"
 install -m 0644 scripts/systemd/wfb-fl-client.service "$unit_dir/"
 install -m 0644 scripts/default/fl-server.json "$config_dir/"

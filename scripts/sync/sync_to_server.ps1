@@ -1,4 +1,4 @@
-﻿# scripts/sync_to_server.ps1
+﻿# scripts/sync/sync_to_server.ps1
 # Windows PowerShell: 一键向 Server 开发板传输项目代码与 UFTP 离线源码包
 
 [CmdletBinding()]
@@ -10,7 +10,7 @@ param(
     [string]$User,
 
     [Alias("c")]
-    [string]$ConfigFile = ".\cluster_nodes.conf",
+    [string]$ConfigFile = (Join-Path $PSScriptRoot "..\..\cluster_nodes.conf"),
 
     [Alias("r")]
     [string]$RemoteDir = "projects/wfb-ng-fl",
@@ -26,18 +26,19 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 
 function Show-Usage {
     Write-Host "WFB-FL Windows 电脑端向 Server 开发板一键增量同步工具" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "用法:" -ForegroundColor Yellow
-    Write-Host "  powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 [选项]"
-    Write-Host "  (注: 若在 Git Bash/WSL 中运行，路径请使用正斜杠: ./scripts/sync_to_server.ps1)"
+    Write-Host "  powershell -ExecutionPolicy Bypass -File .\scripts\sync\sync_to_server.ps1 [选项]"
+    Write-Host "  (注: 若在 Git Bash/WSL 中运行，路径请使用正斜杠: ./scripts/sync/sync_to_server.ps1)"
     Write-Host ""
     Write-Host "选项:" -ForegroundColor Yellow
     Write-Host "  -Server, -s <IP/别名>     指定 Server 开发板局域网 IP 或 SSH 别名 (如 192.168.1.100 或 vm0)"
     Write-Host "  -User, -u <用户名>        指定 SSH 登录用户名 (默认优先读取配置，缺省为 ubuntu)"
-    Write-Host "  -ConfigFile, -c <路径>    指定集群全局配置文件路径 (默认: .\cluster_nodes.conf)"
+    Write-Host "  -ConfigFile, -c <路径>    指定集群全局配置文件路径 (默认: 仓库根目录下 cluster_nodes.conf)"
     Write-Host "  -RemoteDir, -r <路径>     指定 Server 端存放项目的目标路径 (默认: projects/wfb-ng-fl)"
     Write-Host "  -UftpZip, -z <路径>       指定本地 uftp_src-5.0.3.zip 离线源码包路径 (默认自动寻源)"
     Write-Host "  -DryRun, -n               演练模式 (仅打印即将执行的步骤与命令，不产生实际网络传输)"
@@ -78,7 +79,7 @@ if (-not $User) {
 
 if (-not $Server) {
     Write-Host "[FAIL] 未指定 Server 主机 IP 或 SSH 别名！" -ForegroundColor Red
-    Write-Host "       请通过参数传入: powershell -ExecutionPolicy Bypass -File .\scripts\sync_to_server.ps1 -Server <IP/别名>" -ForegroundColor Red
+    Write-Host "       请通过参数传入: powershell -ExecutionPolicy Bypass -File .\scripts\sync\sync_to_server.ps1 -Server <IP/别名>" -ForegroundColor Red
     Write-Host "       或者在 $ConfigFile 中配置 SERVER_HOST=<IP>" -ForegroundColor Red
     exit 1
 }
@@ -101,8 +102,8 @@ Write-Host "[INFO] 连接目标 Server: $Target (远端目标目录: $RemoteDir)
 $ResolvedUftpZip = ""
 $searchPaths = @(
     $UftpZip,
-    (Join-Path $PSScriptRoot "..\..\uftp_src-5.0.3.zip"),
-    (Join-Path $PSScriptRoot "..\uftp_src-5.0.3.zip"),
+    (Join-Path (Split-Path -Parent $RepoRoot) "uftp_src-5.0.3.zip"),
+    (Join-Path $RepoRoot "uftp_src-5.0.3.zip"),
     "..\uftp_src-5.0.3.zip",
     ".\uftp_src-5.0.3.zip",
     (Join-Path $env:USERPROFILE "uftp_src-5.0.3.zip")
@@ -135,9 +136,9 @@ $hasTar = $null -ne (Get-Command "tar" -ErrorAction SilentlyContinue)
 if ($DryRun) {
     Write-Host "[INFO] [DRY-RUN] 创建远端目录: ssh $Target `"mkdir -p '$RemoteDir' '$remoteParent'`"" -ForegroundColor DarkGray
     if ($hasTar) {
-        Write-Host "[INFO] [DRY-RUN] 管道传输代码: tar --exclude=`".git`" --exclude=`"*.o`" -czf - . | ssh $Target `"tar -xzf - -C '$RemoteDir'`"" -ForegroundColor DarkGray
+        Write-Host "[INFO] [DRY-RUN] 管道传输代码: tar --exclude=`".git`" --exclude=`"*.o`" -C `"$RepoRoot`" -czf - . | ssh $Target `"tar -xzf - -C '$RemoteDir'`"" -ForegroundColor DarkGray
     } else {
-        Write-Host "[INFO] [DRY-RUN] SCP 拷贝代码: scp -r . `"${Target}:${RemoteDir}`"" -ForegroundColor DarkGray
+        Write-Host "[INFO] [DRY-RUN] SCP 拷贝代码: scp -r `"$RepoRoot/.`" `"${Target}:${RemoteDir}`"" -ForegroundColor DarkGray
     }
     if ($ResolvedUftpZip) {
         Write-Host "[INFO] [DRY-RUN] 上传 UFTP 离线包: scp `"$ResolvedUftpZip`" `"${Target}:${remoteParent}/`"" -ForegroundColor DarkGray
@@ -166,9 +167,9 @@ try {
 
     Write-Host "[INFO] 正在传输项目代码 (排除 .git 与编译临时文件)..." -ForegroundColor Cyan
     if ($hasTar) {
-        cmd.exe /c "tar --exclude=.git --exclude=*.o --exclude=*.so --exclude=logs -czf - . | ssh $Target `"tar -xzf - -C '$RemoteDir'`""
+        cmd.exe /c "tar --exclude=.git --exclude=*.o --exclude=*.so --exclude=logs -C `"$RepoRoot`" -czf - . | ssh $Target `"tar -xzf - -C '$RemoteDir'`""
     } else {
-        & scp -r . "${Target}:${RemoteDir}"
+        & scp -r (Join-Path $RepoRoot ".") "${Target}:${RemoteDir}"
     }
 
     if ($LASTEXITCODE -ne 0) {
@@ -181,9 +182,9 @@ try {
     Write-Host "后续操作指引 (在 PowerShell 中执行):" -ForegroundColor Yellow
     Write-Host "  1. 登录 Server 开发板:  ssh $Target" -ForegroundColor Cyan
     Write-Host "  2. 进入项目目录:        cd $RemoteDir" -ForegroundColor Cyan
-    Write-Host "  3. 首次部署 Server 本机: sudo ./scripts/deploy_node.sh" -ForegroundColor Cyan
-    Write-Host "  4. 建立集群免密互信:     ./scripts/setup_cluster_auth.sh" -ForegroundColor Cyan
-    Write-Host "  5. 批量部署所有 Client:  ./scripts/deploy_cluster.sh" -ForegroundColor Cyan
+    Write-Host "  3. 首次部署 Server 本机: sudo ./scripts/deploy/deploy_node.sh" -ForegroundColor Cyan
+    Write-Host "  4. 建立集群免密互信:     ./scripts/deploy/setup_cluster_auth.sh" -ForegroundColor Cyan
+    Write-Host "  5. 批量部署所有 Client:  ./scripts/deploy/deploy_cluster.sh" -ForegroundColor Cyan
     Write-Host "  6. 启动现场演示:        bash tests/demo/run_fl_demo.sh all" -ForegroundColor Cyan
 } catch {
     Write-Host "[FAIL] 传输过程中发生错误: $_" -ForegroundColor Red

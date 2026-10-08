@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/sync_to_server.sh
+# scripts/sync/sync_to_server.sh
 # WSL / Linux: 一键向 Server 开发板传输项目代码与 UFTP 离线源码包 (优先 rsync 增量同步)
 
 set -euo pipefail
@@ -41,7 +41,7 @@ ${C_YELLOW}用法:${C_RESET}
 ${C_YELLOW}选项:${C_RESET}
   -s, --server <IP/别名>     指定 Server 开发板局域网 IP 或 SSH 别名 (如 192.168.1.100 或 vm0)
   -u, --user <用户名>        指定 SSH 登录用户名 (默认优先读取配置，缺省为 ubuntu)
-  -c, --config <路径>        指定集群全局配置文件路径 (默认: ./cluster_nodes.conf)
+  -c, --config <路径>        指定集群全局配置文件路径 (默认: 仓库根目录下 cluster_nodes.conf)
   -r, --remote-dir <路径>    指定 Server 端存放项目的目标路径 (默认: projects/wfb-ng-fl)
   -z, --uftp-zip <路径>      指定本地 uftp_src-5.0.3.zip 离线源码包路径 (默认自动寻源)
   -m, --method <模式>        指定传输模式: auto (默认，优先 rsync 自动回退 tar) | rsync | tar
@@ -59,11 +59,11 @@ EOF
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 SERVER=""
 USER=""
-CONFIG_FILE="./cluster_nodes.conf"
+CONFIG_FILE="$REPO_ROOT/cluster_nodes.conf"
 REMOTE_DIR="projects/wfb-ng-fl"
 UFTP_ZIP=""
 METHOD="auto"
@@ -179,8 +179,8 @@ log_info "连接目标 Server: $TARGET (远端目标目录: $REMOTE_DIR)"
 RESOLVED_UFTP_ZIP=""
 search_candidates=(
     "$UFTP_ZIP"
-    "$SCRIPT_DIR/../../uftp_src-5.0.3.zip"
-    "$SCRIPT_DIR/../uftp_src-5.0.3.zip"
+    "$REPO_ROOT/../uftp_src-5.0.3.zip"
+    "$REPO_ROOT/uftp_src-5.0.3.zip"
     "../uftp_src-5.0.3.zip"
     "./uftp_src-5.0.3.zip"
     "${HOME}/uftp_src-5.0.3.zip"
@@ -295,7 +295,7 @@ echo ""
 echo "${C_YELLOW}后续操作指引 (在 WSL 终端中执行):${C_RESET}"
 echo "  1. 登录 Server 开发板:  ssh $TARGET"
 echo "  2. 进入项目目录:        cd $REMOTE_DIR"
-echo "  3. 首次部署 Server 本机: sudo ./scripts/deploy_node.sh"
-echo "  4. 建立集群免密互信:     ./scripts/setup_cluster_auth.sh"
-echo "  5. 批量部署所有 Client:  ./scripts/deploy_cluster.sh"
+echo "  3. 首次部署 Server 本机: sudo ./scripts/deploy/deploy_node.sh"
+echo "  4. 建立集群免密互信:     ./scripts/deploy/setup_cluster_auth.sh"
+echo "  5. 批量部署所有 Client:  ./scripts/deploy/deploy_cluster.sh"
 echo "  6. 启动现场演示:        bash tests/demo/run_fl_demo.sh all"

@@ -8,10 +8,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 加载集群全局配置解析器
-# shellcheck source=scripts/cluster_config.sh
-source "$PROJECT_ROOT/scripts/cluster_config.sh"
-# shellcheck source=scripts/radio_interface.sh
-source "$PROJECT_ROOT/scripts/radio_interface.sh"
+# shellcheck source=scripts/lib/cluster_config.sh
+source "$PROJECT_ROOT/scripts/lib/cluster_config.sh"
+# shellcheck source=scripts/lib/radio_interface.sh
+source "$PROJECT_ROOT/scripts/lib/radio_interface.sh"
 
 log_step() { echo ""; echo "${C_BOLD}${C_CYAN}=== 步骤 $1: $2 ===${C_RESET}"; }
 
@@ -264,7 +264,7 @@ step3_configure_radio_interfaces() {
 
         log_info "正在配置节点 $r ($h) 空口网卡..."
         local c_ifaces
-        c_ifaces=($(ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "source '$REMOTE_REPO/scripts/radio_interface.sh' && find_wfb_radio_interfaces"))
+        c_ifaces=($(ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "source '$REMOTE_REPO/scripts/lib/radio_interface.sh' && find_wfb_radio_interfaces"))
         if [ "${#c_ifaces[@]}" -ne 1 ]; then
             log_fail "节点 $r 必须恰好存在一个 RTL8812AU 空口网卡，当前发现 ${#c_ifaces[@]} 个 (${c_ifaces[*]:-无})"
             exit 1
@@ -372,7 +372,7 @@ step4_start_wfb_mesh() {
         log_info "启动节点 $r 端 wfb_v6_uplink 守护进程..."
         ssh "${SSH_COMMON_OPTS[@]}" "${u}@${h}" "
             sudo mkdir -p '$WORK_DIR/run'
-            c_iface=\$(source '$REMOTE_REPO/scripts/radio_interface.sh' && find_wfb_radio_interfaces | head -n1)
+            c_iface=\$(source '$REMOTE_REPO/scripts/lib/radio_interface.sh' && find_wfb_radio_interfaces | head -n1)
             sudo bash -c \"nohup wfb_v6_uplink \
                 --role client \
                 --tun-name '$c_tun' \

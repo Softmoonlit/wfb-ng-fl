@@ -5,6 +5,7 @@
 ## 开始探索前先读这些文件
 
 - 仓库根目录的 `CONTEXT.md`
+- [总设计入口](../design/README.md)，按问题域路由读取其六篇权威专题
 - 如果将来出现 `CONTEXT-MAP.md`，则优先读取它，并按它指向的上下文继续读取对应的 `CONTEXT.md`
 - 仓库根目录的 `docs/adr/`
 
@@ -17,7 +18,9 @@
 ```text
 /
 ├── CONTEXT.md
-├── docs/adr/
+├── docs/
+│   ├── design/README.md
+│   └── adr/
 └── src/
 ```
 

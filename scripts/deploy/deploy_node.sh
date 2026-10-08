@@ -1,16 +1,16 @@
 #!/bin/bash
-# scripts/deploy_node.sh
+# scripts/deploy/deploy_node.sh
 # ARMv8 多板载集群环境一键自动化部署脚本（单机节点）
 
 set -euo pipefail
 trap 'echo "[FAIL] $(date +%H:%M:%S) 部署脚本在第 $LINENO 行发生未捕获错误，退出码 $?" >&2' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 复用统一的 RTL8812AU 空口网卡识别逻辑
-# shellcheck source=scripts/radio_interface.sh
-source "$SCRIPT_DIR/radio_interface.sh"
+# shellcheck source=scripts/lib/radio_interface.sh
+source "$PROJECT_ROOT/scripts/lib/radio_interface.sh"
 
 # 基础路径与默认配置
 SYSCONFDIR="${SYSCONFDIR:-/etc}"
@@ -58,7 +58,7 @@ usage() {
 ${C_BOLD}ARMv8 板载节点一键自动化部署脚本${C_RESET}
 
 用法:
-  sudo bash scripts/deploy_node.sh [选项]
+  sudo bash scripts/deploy/deploy_node.sh [选项]
 
 选项:
   -h, --help        显示本帮助信息并退出
@@ -120,7 +120,7 @@ require_root() {
         return 0
     fi
     if [ "$(id -u)" -ne 0 ]; then
-        log_fail "本部署脚本必须以 root 权限运行，请使用 sudo: sudo bash scripts/deploy_node.sh"
+        log_fail "本部署脚本必须以 root 权限运行，请使用 sudo: sudo bash scripts/deploy/deploy_node.sh"
         exit 1
     fi
 }
@@ -429,7 +429,7 @@ step7_build_and_install_wfb() {
 
     if [ "$DRY_RUN" -eq 1 ]; then
         echo "  [DRY-RUN] cd $PROJECT_ROOT && make build_v6"
-        echo "  [DRY-RUN] cd $PROJECT_ROOT && ./scripts/install-v8.sh"
+        echo "  [DRY-RUN] cd $PROJECT_ROOT && ./scripts/install/install-v8.sh"
         return 0
     fi
 
@@ -438,7 +438,7 @@ step7_build_and_install_wfb() {
     log_pass "底座核心二进制构建成功"
 
     log_info "执行系统角色服务与 Python 运行时安装 (install-v8.sh)..."
-    (cd "$PROJECT_ROOT" && PREFIX="$PREFIX" DESTDIR="$DESTDIR" ./scripts/install-v8.sh)
+    (cd "$PROJECT_ROOT" && PREFIX="$PREFIX" DESTDIR="$DESTDIR" ./scripts/install/install-v8.sh)
     log_pass "WFB-FL 系统级角色服务与配置模板安装完成"
 }
 

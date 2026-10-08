@@ -2,7 +2,7 @@
 
 本文档为面向操作者和现场汇报者的全流程实操指南，涵盖：**从电脑端推送代码到 Server 开发板、Server 本机一键环境装配、集群免密互信分发、多 Client 节点批量并行部署，以及面向导师现场汇报的大文件组播广播与受控上行回传演示**。
 
-[文档导航](README.md) · [设计入口](联邦学习系统设计入口.md) · [部署与运行基准](部署与运行基准.md) · [演示脚本导航](../tests/demo/README.md) · [正式 Runtime 验收](../tests/fl_runtime/README.md)
+[文档导航](../README.md) · [设计入口](../design/README.md) · [部署与运行基准](部署与运行基准.md) · [演示脚本导航](../../tests/demo/README.md) · [正式 Runtime 验收](../../tests/fl_runtime/README.md)
 
 ---
 
@@ -71,7 +71,7 @@ projects/
 - **镜像对齐与自动清理 (`--delete`)**：本地删除或重命名文件后，远端同步删除废弃旧文件，彻底杜绝编译产物残留引起的隐蔽 Bug；
 - **平滑向下兼容**：若新刷机的 Server 开发板尚未安装 `rsync`，一键脚本会自动无缝降级为 `tar` 管道流传输，确保 100% 可用。
 
-项目已内置了 WSL / Linux 专用的**一键同步脚本 (`scripts/sync_to_server.sh`)**（同时保留兼容 Windows PowerShell 的 `scripts/sync_to_server.ps1`）。该脚本在后台全自动完成：
+项目已内置了 WSL / Linux 专用的**一键同步脚本 (`scripts/sync/sync_to_server.sh`)**（同时保留兼容 Windows PowerShell 的 `scripts/sync/sync_to_server.ps1`）。该脚本在后台全自动完成：
 1. 自动定位上级目录中的 `../uftp_src-5.0.3.zip` 离线源码包并同步至 Server 端父级目录；
 2. 优先采用 `rsync -avz --delete` 极速增量同步项目代码，**自动排除庞大的 `.git` 历史、编译二进制与日志**；
 3. 全面支持 IP 地址（如 `192.168.1.100`）、`~/.ssh/config` 中定义的 SSH 别名（如 `vm0`），并能自动读取 `cluster_nodes.conf` 中配置的 `SERVER_HOST` 与 `SERVER_USER`。
@@ -82,21 +82,21 @@ projects/
 
 ```bash
 # 场景 A: 自动读取 cluster_nodes.conf 中的 SERVER_HOST 与 SERVER_USER (免输入参数)
-./scripts/sync_to_server.sh
+./scripts/sync/sync_to_server.sh
 
 # 场景 B: 显式指定开发板局域网 IP 与登录用户
-./scripts/sync_to_server.sh -s 192.168.1.100 -u ubuntu
+./scripts/sync/sync_to_server.sh -s 192.168.1.100 -u ubuntu
 
 # 场景 C: 使用 SSH 配置别名 (如 vm0，自动应用别名内绑定的用户名与私钥)
-./scripts/sync_to_server.sh -s vm0
+./scripts/sync/sync_to_server.sh -s vm0
 
 # 场景 D: 预先演练 (仅查看即将执行的操作与命令，不产生实际网络传输)
-./scripts/sync_to_server.sh -s vm0 --dry-run
+./scripts/sync/sync_to_server.sh -s vm0 --dry-run
 ```
 
 > **进阶选项**：
-> - 强制使用 tar 管道模式：`./scripts/sync_to_server.sh -s vm0 -m tar`
-> - rsync 不删除远端多余文件：`./scripts/sync_to_server.sh -s vm0 --no-delete`
+> - 强制使用 tar 管道模式：`./scripts/sync/sync_to_server.sh -s vm0 -m tar`
+> - rsync 不删除远端多余文件：`./scripts/sync/sync_to_server.sh -s vm0 --no-delete`
 
 ### 2. 手动执行方式 (脚本底层原理说明)
 
@@ -192,7 +192,7 @@ CLIENTS=(
 ### 3. 快速语法与有效性校验
 执行自带的解析校验器，确保配置无误：
 ```bash
-./scripts/cluster_config.sh cluster_nodes.conf
+./scripts/lib/cluster_config.sh cluster_nodes.conf
 ```
 终端输出 `[PASS] 配置文件校验通过` 即表示参数合法。
 
@@ -203,7 +203,7 @@ CLIENTS=(
 在 Server 板端执行单机部署脚本，自动装配所有系统依赖、驱动与底座组件：
 
 ```bash
-sudo ./scripts/deploy_node.sh
+sudo ./scripts/deploy/deploy_node.sh
 ```
 
 ### 脚本自动执行的 5 大阶段：
@@ -217,7 +217,7 @@ sudo ./scripts/deploy_node.sh
    - 自动为当前用户配置免密 `sudo`（写入 `/etc/sudoers.d/99-wfb-nopasswd`），消除非交互卡死；
 5. **底座核心编译与系统安装**：编译产出 `wfb_v6_uplink` 并完成系统安装。
 
-> **演练选项**：若只想检查步骤而不实际改动系统，可运行 `./scripts/deploy_node.sh --dry-run`。
+> **演练选项**：若只想检查步骤而不实际改动系统，可运行 `./scripts/deploy/deploy_node.sh --dry-run`。
 
 ---
 
@@ -226,7 +226,7 @@ sudo ./scripts/deploy_node.sh
 为使 Server 能在后台自动化调度和管理各 Client 板端，执行集群免密纳管工具：
 
 ```bash
-./scripts/setup_cluster_auth.sh
+./scripts/deploy/setup_cluster_auth.sh
 ```
 
 ### 操作说明：
@@ -244,10 +244,10 @@ sudo ./scripts/deploy_node.sh
 
 ```bash
 # 1. 预检集群连通性与配置
-./scripts/deploy_cluster.sh --check-only
+./scripts/deploy/deploy_cluster.sh --check-only
 
 # 2. 正式并发推送到全部 Client 板端进行安装
-./scripts/deploy_cluster.sh
+./scripts/deploy/deploy_cluster.sh
 ```
 
 ### 编排器特性：
@@ -260,7 +260,7 @@ sudo ./scripts/deploy_node.sh
 
 ## 八、阶段五：现场演示与多维指标看板 (`run_fl_demo.sh`)
 
-面向导师现场汇报的核心总控脚本为 [tests/demo/run_fl_demo.sh](../tests/demo/run_fl_demo.sh)。
+面向导师现场汇报的核心总控脚本为 [tests/demo/run_fl_demo.sh](../../tests/demo/run_fl_demo.sh)。
 
 ### 1. 汇报前演练（Dry-Run 模式）
 在不影响网卡硬件状态的前提下，快速演练全流程并确认指标看板渲染效果：
@@ -430,14 +430,14 @@ cat /tmp/telemetry.json | jq '{loss_rate, fec_recovery_rate, tcp_retransmits, lo
 
 | 操作阶段 | 命令 |
 | :--- | :--- |
-| **WSL 传代码与UFTP** | `./scripts/sync_to_server.sh -s <IP>`<br>或 `rsync -avz --delete --exclude=".git/" --exclude="*.o" ./ ubuntu@<IP>:~/projects/wfb-ng-fl/` |
+| **WSL 传代码与UFTP** | `./scripts/sync/sync_to_server.sh -s <IP>`<br>或 `rsync -avz --delete --exclude=".git/" --exclude="*.o" ./ ubuntu@<IP>:~/projects/wfb-ng-fl/` |
 | **WSL 传UFTP (手动)** | `scp ../uftp_src-5.0.3.zip ubuntu@<IP>:~/projects/` |
 | **修改集群配置** | `nano cluster_nodes.conf` |
-| **校验集群配置** | `./scripts/cluster_config.sh cluster_nodes.conf` |
-| **Server 本机装配** | `sudo ./scripts/deploy_node.sh` |
-| **全集群免密互信** | `./scripts/setup_cluster_auth.sh` |
-| **批量部署预检** | `./scripts/deploy_cluster.sh --check-only` |
-| **全集群并行部署** | `./scripts/deploy_cluster.sh` |
+| **校验集群配置** | `./scripts/lib/cluster_config.sh cluster_nodes.conf` |
+| **Server 本机装配** | `sudo ./scripts/deploy/deploy_node.sh` |
+| **全集群免密互信** | `./scripts/deploy/setup_cluster_auth.sh` |
+| **批量部署预检** | `./scripts/deploy/deploy_cluster.sh --check-only` |
+| **全集群并行部署** | `./scripts/deploy/deploy_cluster.sh` |
 | **演示全流程演练** | `bash tests/demo/run_fl_demo.sh all --dry-run` |
 | **现场全流程演示** | `bash tests/demo/run_fl_demo.sh all` |
 | **单步下行组播演示** | `bash tests/demo/run_fl_demo.sh downlink` |

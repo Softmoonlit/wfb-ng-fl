@@ -1,15 +1,15 @@
 #!/bin/bash
-# scripts/setup_cluster_auth.sh
+# scripts/deploy/setup_cluster_auth.sh
 # WFB-FL ARMv8 集群全局 SSH 与 Sudo 免密互信一键分发工具
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # 加载集群配置文件解析器（复用颜色定义、日志函数与配置解析器）
-# shellcheck source=scripts/cluster_config.sh
-source "$SCRIPT_DIR/cluster_config.sh"
+# shellcheck source=scripts/lib/cluster_config.sh
+source "$PROJECT_ROOT/scripts/lib/cluster_config.sh"
 
 log_step() { echo ""; echo "${C_BOLD}${C_CYAN}=== 步骤 $1: $2 ===${C_RESET}"; }
 
@@ -50,7 +50,7 @@ usage() {
 ${C_BOLD}WFB-FL ARMv8 集群全局 SSH 与 Sudo 免密互信分发工具${C_RESET}
 
 用法:
-  bash scripts/setup_cluster_auth.sh [选项]
+  bash scripts/deploy/setup_cluster_auth.sh [选项]
 
 选项:
   -c, --config <路径>   指定集群配置文件 (默认: cluster_nodes.conf)
