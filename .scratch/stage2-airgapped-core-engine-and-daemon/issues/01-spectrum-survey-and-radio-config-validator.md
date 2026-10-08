@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 扫频探路扫描范围严格限制在合法 5 GHz UNII-3 信道池 `[149, 153, 157, 165]`。
 - [x] 常量级硬编码永久禁选与剔除已知驱动越界崩溃缺陷的 Channel 161，扫频与配置解析中绝对不出现该信道。
