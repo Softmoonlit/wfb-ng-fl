@@ -123,6 +123,7 @@ __all__ = (
     "get_downlink_rate_bounds",
     "RadioConfig",
     "validate_radio_config",
+    "normalize_radio_patch",
     "validate_radio_patch",
     "ChannelSurveyResult",
     "SpectrumSurveyReport",
@@ -264,6 +265,29 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     )
 
 
+def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Normalize radio reconfiguration patch field aliases:
+    - 'target_channel' -> 'channel'
+    - 'txpower_dbm' -> 'radio_txpower_dbm'
+    Preserves other fields as-is.
+    """
+    if not isinstance(patch, dict):
+        raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+    normalized = dict(patch)
+    if "target_channel" in normalized:
+        val = normalized.pop("target_channel")
+        if "channel" in normalized and normalized["channel"] != val:
+            raise ValueError("Patch cannot specify conflicting 'target_channel' and 'channel'")
+        normalized["channel"] = val
+    if "txpower_dbm" in normalized:
+        val = normalized.pop("txpower_dbm")
+        if "radio_txpower_dbm" in normalized and normalized["radio_txpower_dbm"] != val:
+            raise ValueError("Patch cannot specify conflicting 'txpower_dbm' and 'radio_txpower_dbm'")
+        normalized["radio_txpower_dbm"] = val
+    return normalized
+
+
 def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
     """
     Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
@@ -275,12 +299,13 @@ def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfi
     if not isinstance(base, RadioConfig):
         raise TypeError(f"Base must be a RadioConfig instance, got {type(base).__name__}")
 
-    for k in patch:
+    norm_patch = normalize_radio_patch(patch)
+    for k in norm_patch:
         if k not in ALLOWED_PATCH_KEYS:
             raise ValueError(f"Unknown patch key: {k!r}")
 
     merged = base.to_dict()
-    merged.update(patch)
+    merged.update(norm_patch)
     return validate_radio_config(merged)
 
 

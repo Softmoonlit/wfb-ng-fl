@@ -946,16 +946,19 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             enable_control_plane=True,
             poll_interval_seconds=0.05,
         )
+        # Simulate RF: server only receives packets when client sweeps to 153
+        self.server.packet_filter = lambda hb: hb.current_channel == 153
+
         daemon = ClientDaemon(config, network_adapter=adapter)
         daemon.poll_hardware_once()
         daemon.start_control_plane()
 
-        # Simulate RF: server only receives packets when client sweeps to 153
-        self.server.packet_filter = lambda hb: hb.current_channel == 153
-
-        # Hunt once to server (on 153)
-        found = daemon.control_plane.hunt_once()
-        self.assertTrue(found)
+        # Wait for control plane background loop to hunt and lock 153
+        start_t = time.monotonic()
+        while time.monotonic() - start_t < 2.0:
+            if daemon.control_plane.locked_channel == 153:
+                break
+            time.sleep(0.05)
         self.assertEqual(daemon.control_plane.locked_channel, 153)
 
         # Unplug interface

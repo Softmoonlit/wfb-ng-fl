@@ -903,6 +903,7 @@ class ClientDaemon:
                     server_port=self.config.server_control_port,
                     broadcast_port=self.config.broadcast_port,
                 )
+                self.control_plane.on_radio_finalized = self._on_radio_finalized
                 self.control_plane.register_broadcast_handler(
                     "TASK_ANNOUNCE", self._handle_task_announce
                 )
@@ -910,6 +911,14 @@ class ClientDaemon:
                     "JOB_ABORT", lambda msg: self.abort_job()
                 )
                 self.control_plane.start()
+
+    def _on_radio_finalized(self, new_config: Any) -> None:
+        """Handle finalized radio reconfiguration by persisting channel cache."""
+        with self._lock:
+            channel = getattr(new_config, "channel", None)
+            if isinstance(channel, int) and channel != self._last_locked_channel:
+                self._last_locked_channel = channel
+                self._save_cached_channel(channel)
 
     def run(self) -> None:
         """Run the main daemon supervisory loop until stopped."""
