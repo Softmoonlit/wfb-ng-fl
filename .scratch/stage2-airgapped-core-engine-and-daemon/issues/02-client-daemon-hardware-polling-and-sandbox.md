@@ -2,6 +2,8 @@
 
 **What to build:** 交付 `wfb-fl-client-daemon` 可执行程序与 systemd 服务单元。开机自动读取本地固化身份文件 `/etc/wfb-ng-fl/node.json`（支持 1~10 号节点身份与静态 TUN IP 映射）；提供内部安全网卡轮询机制，USB 网卡拔掉或后插入时不崩溃并自动热接管；支持依据配置设置网卡发射功率（如近距台面 12 dBm）与上行调制（MCS 3~6）；收到任务触发时，通过 `subprocess.Popen` 动态派生独立 `RoleService(role='client')` 执行闭环；任务结束或中止时安全回收子进程、清理临时接收区并回滚至 `IDLE`。
 
+**当前测试拓扑：** 涉及跨节点、硬件或端到端验证的测试仅使用本机 Server、`vm1`（client1）和 `vm2`（client2）；1~10 号节点支持属于平台容量约束，未提供节点只做配置或单元测试，不作为本阶段实体集群验收依据。
+
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved

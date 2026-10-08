@@ -2,6 +2,8 @@
 
 **What to build:** 交付纯 Python 独立射频工具库（`wfb_ng.fl.radio`）与独立 CLI。扫描合法 5 GHz UNII-3 信道池 `[149, 153, 157, 165]` 输出干净度排行；常量级硬编码永久禁选与屏蔽已知驱动越界崩溃缺陷的 Channel 161；解析与校验扁平射频参数模型（`channel` 149/153/157/165，独立发射功率 `radio_txpower_dbm` 10~20 dBm 近距推荐 12 dBm，解耦的 `downlink_mcs` 3~6 默认 3 与 `uplink_mcs` 3~6 推荐 6）；提供基于 `downlink_mcs` 的动态 UFTP 下行注入速率约束区间与默认推荐值生成器（MCS 3: 12~18 Mbps / 15 Mbps; MCS 4: 18~26 / 22; MCS 5: 24~35 / 28; MCS 6: 32~45 / 38），供 UI 与 CLI 交互输入直接施加约束。
 
+**当前测试拓扑：** 涉及跨节点、硬件或端到端验证的测试仅使用本机 Server、`vm1`（client1）和 `vm2`（client2）；1~10 号节点支持属于平台容量约束，未提供节点只做配置或单元测试，不作为本阶段实体集群验收依据。
+
 **Blocked by:** None (can start immediately)
 
 **Status:** resolved
