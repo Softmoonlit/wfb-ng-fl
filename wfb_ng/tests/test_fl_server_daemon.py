@@ -295,6 +295,33 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         time.sleep(0.05)
         sock.close()
 
+    def test_terminal_job_resets_persistent_link_after_role_close(self):
+        daemon = ServerDaemon(
+            config=ServerDaemonConfig(
+                work_dir=self.temp_dir,
+                enable_link_process=True,
+                enable_control_plane=False,
+            ),
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.active_job = {"job_id": "terminal-reset"}
+        daemon.server_state = ServerState.RUNNING
+        role = MagicMock()
+        daemon.server_role = role
+        calls = []
+        role.close.side_effect = lambda: calls.append("role_close")
+
+        with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), patch.object(
+            daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")
+        ):
+            daemon._cleanup_terminal_job("terminal-reset")
+
+        self.assertEqual(calls, ["role_close", "link_stop", "link_start"])
+        self.assertEqual(daemon.server_state, ServerState.IDLE)
+        self.assertIsNone(daemon.active_job)
+        self.assertIsNone(daemon.server_role)
+
     def test_status_endpoint_returns_topology_and_radio(self):
         # 1. Basic status without nodes
         status_code, body = self._http_get("/api/v1/status")

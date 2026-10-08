@@ -839,6 +839,12 @@ class ServerDaemon:
                 role_to_close.close()
             except Exception as exc:
                 logger.warning("关闭 server_role 失败: %s", exc)
+        if self.config.enable_link_process:
+            try:
+                self._stop_link_process()
+                self._start_link_process()
+            except Exception as exc:
+                logger.error("作业终态重置服务端链路失败: %s", exc)
 
     def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
         self._cleanup_terminal_job(job_id)
