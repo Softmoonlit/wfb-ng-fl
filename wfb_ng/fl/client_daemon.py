@@ -29,6 +29,13 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence
 
 from .errors import FLRuntimeError
+from .control import (
+    CLIENT_UPLINK_DEFAULT_ADDR,
+    CLIENT_UPLINK_DEFAULT_PORT,
+    SERVER_CONTROL_BROADCAST_PORT,
+    ClientNodeState,
+    ControlPlaneClient,
+)
 from .radio import (
     ALLOWED_5GHZ_CHANNELS,
     DEFAULT_CHANNEL,
@@ -55,6 +62,7 @@ DEFAULT_WORK_DIR = "/tmp/wfb-ng-fl/client"
 
 class DaemonState(str, Enum):
     POLLING_HARDWARE = "POLLING_HARDWARE"
+    HUNTING = "HUNTING"
     IDLE = "IDLE"
     PREPARING = "PREPARING"
     RUNNING = "RUNNING"
@@ -163,6 +171,17 @@ class NetworkAdapter:
     ) -> None:
         raise NotImplementedError
 
+    def set_channel(
+        self,
+        iface: str,
+        channel: int,
+        channel_width: str = FIXED_BANDWIDTH,
+    ) -> None:
+        raise NotImplementedError
+
+    def set_txpower(self, iface: str, txpower_dbm: int) -> None:
+        raise NotImplementedError
+
     def setup_tun(self, tun_name: str, tun_cidr: str) -> None:
         raise NotImplementedError
 
@@ -221,10 +240,24 @@ class LinuxNetworkAdapter(NetworkAdapter):
         # 3. ip link set <iface> up
         self._run_cmd(["ip", "link", "set", iface, "up"])
         # 4. iw dev <iface> set channel <channel> <channel_width>
-        self._run_cmd(["iw", "dev", iface, "set", "channel", str(channel), channel_width])
+        self.set_channel(iface, channel, channel_width)
 
         # 5. TX power setting
-        # Per memory #93: write to rtw_tx_pwr_idx_override and negative mBm in iw
+        self.set_txpower(iface, txpower_dbm)
+
+    def set_channel(
+        self,
+        iface: str,
+        channel: int,
+        channel_width: str = FIXED_BANDWIDTH,
+    ) -> None:
+        validate_radio_config({"channel": channel})
+        if channel == 165:
+            channel_width = "HT20"
+        self._run_cmd(["iw", "dev", iface, "set", "channel", str(channel), channel_width])
+
+    def set_txpower(self, iface: str, txpower_dbm: int) -> None:
+        validate_radio_config({"radio_txpower_dbm": txpower_dbm})
         override_path = "/sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override"
         if os.path.exists(override_path):
             try:
@@ -242,7 +275,6 @@ class LinuxNetworkAdapter(NetworkAdapter):
             except Exception as exc:
                 logger.warning("写入 rtw_tx_pwr_idx_override 失败: %s", exc)
 
-        # iw dev <iface> set txpower fixed -<txpower_dbm * 100> (preserve negative sign!)
         negative_mbm = -(txpower_dbm * 100)
         self._run_cmd(["iw", "dev", iface, "set", "txpower", "fixed", str(negative_mbm)])
 
@@ -267,8 +299,8 @@ class LinuxNetworkAdapter(NetworkAdapter):
 class ClientDaemonConfig:
     node_id: int
     tun_ip: str
-    tun_cidr: Optional[str] = None
-    tun_name: Optional[str] = None
+    tun_cidr: str = ""
+    tun_name: str = ""
     channel: int = DEFAULT_CHANNEL
     channel_width: str = FIXED_BANDWIDTH
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
@@ -276,11 +308,15 @@ class ClientDaemonConfig:
     work_dir: str = DEFAULT_WORK_DIR
     poll_interval_seconds: float = DEFAULT_POLL_INTERVAL_SECONDS
     interface: Optional[str] = None
+    server_control_host: str = CLIENT_UPLINK_DEFAULT_ADDR
+    server_control_port: int = CLIENT_UPLINK_DEFAULT_PORT
+    broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT
+    enable_control_plane: bool = True
 
     def __post_init__(self):
-        if self.tun_cidr is None:
+        if not self.tun_cidr:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
-        if self.tun_name is None:
+        if not self.tun_name:
             object.__setattr__(self, "tun_name", f"{DEFAULT_TUN_PREFIX}{self.node_id}")
         validate_radio_config({
             "channel": self.channel,
@@ -592,7 +628,8 @@ class JobSandbox:
                 except Exception:
                     pass
 
-            self._finalize(proc.poll() if proc else 0)
+            rc = proc.poll() if proc else 0
+            self._finalize(rc if rc is not None else 0)
 
     def _finalize(self, returncode: int) -> None:
         """Clean up process log file, process group, TUN, temporary workspace, and reset state."""
@@ -647,8 +684,38 @@ class ClientDaemon:
             network_adapter=self.network_adapter,
         )
         self.current_interface: Optional[str] = None
+        self._last_locked_channel: int = self._load_cached_channel()
+        self.control_plane: Optional[ControlPlaneClient] = None
         self._stop_event = threading.Event()
         self._lock = threading.RLock()
+
+    def _load_cached_channel(self) -> int:
+        """Load persisted cached channel from work_dir if valid."""
+        cache_path = os.path.join(self.config.work_dir, "channel_cache.json")
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    ch = data.get("channel")
+                    if (
+                        isinstance(ch, int)
+                        and ch in ALLOWED_5GHZ_CHANNELS
+                        and ch not in FORBIDDEN_CHANNELS
+                    ):
+                        return ch
+            except Exception:
+                pass
+        return self.config.channel
+
+    def _save_cached_channel(self, channel: int) -> None:
+        """Persist locked channel to work_dir across daemon restarts."""
+        try:
+            os.makedirs(self.config.work_dir, exist_ok=True)
+            cache_path = os.path.join(self.config.work_dir, "channel_cache.json")
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump({"channel": channel}, f)
+        except Exception as exc:
+            logger.warning("持久化信道缓存失败: %s", exc)
 
     @property
     def state(self) -> DaemonState:
@@ -662,6 +729,10 @@ class ClientDaemon:
                 DaemonState.ABORTING,
             ):
                 return self.sandbox.state
+            if self.control_plane is not None and self.control_plane.is_running:
+                if self.control_plane.state == ClientNodeState.HUNTING:
+                    return DaemonState.HUNTING
+                return DaemonState.IDLE
             if self.current_interface is not None:
                 return DaemonState.IDLE
             return DaemonState.POLLING_HARDWARE
@@ -719,6 +790,11 @@ class ClientDaemon:
         if self.sandbox.is_running:
             logger.warning("网卡丢失，紧急中止正在运行的作业沙箱...")
             self.sandbox.abort()
+        if self.control_plane is not None:
+            if self.control_plane.locked_channel is not None:
+                self._last_locked_channel = self.control_plane.locked_channel
+            self.control_plane.stop()
+            self.control_plane = None
         if self.current_interface is not None:
             self.network_adapter.teardown_tun(self.config.tun_name)
         self.current_interface = None
@@ -759,7 +835,10 @@ class ClientDaemon:
                     f"作业 TUN IP ({job_config.tun_ip}) 与守护进程 TUN IP ({self.config.tun_ip}) 不符",
                 )
             try:
-                return self.sandbox.start(job_config, air_interface=self.current_interface)
+                proc = self.sandbox.start(job_config, air_interface=self.current_interface)
+                if self.control_plane is not None:
+                    self.control_plane.notify_state_change(ClientNodeState.RUNNING)
+                return proc
             except Exception:
                 self._restore_tun_if_idle()
                 raise
@@ -768,12 +847,69 @@ class ClientDaemon:
         with self._lock:
             self.sandbox.abort()
             self._restore_tun_if_idle()
+            if self.control_plane is not None:
+                self.control_plane.notify_state_change(ClientNodeState.ABORTING)
+                self.control_plane.notify_state_change(ClientNodeState.IDLE)
 
     def wait_job(self, timeout: Optional[float] = None) -> int:
         ret = self.sandbox.wait(timeout=timeout)
         with self._lock:
             self._restore_tun_if_idle()
+            if self.control_plane is not None and not self.sandbox.is_running:
+                self.control_plane.notify_state_change(ClientNodeState.IDLE)
         return ret
+
+    def _handle_task_announce(self, msg: Dict[str, Any]) -> None:
+        """Handle incoming TASK_ANNOUNCE broadcast from server coordinator."""
+        with self._lock:
+            target_nodes = msg.get("target_nodes")
+            if target_nodes and self.config.node_id not in target_nodes:
+                return
+            if self.state != DaemonState.IDLE:
+                logger.warning("收到 TASK_ANNOUNCE 但节点非 IDLE (当前: %s)，忽略", self.state)
+                return
+            if self.control_plane is not None:
+                self.control_plane.notify_state_change(ClientNodeState.PREPARING)
+
+            if "job_id" in msg:
+                job_config = ClientJobConfig(
+                    job_id=str(msg["job_id"]),
+                    node_id=self.config.node_id,
+                    tun_name=self.config.tun_name,
+                    tun_ip=self.config.tun_ip,
+                    server_http_host=msg.get("server_http_host", "10.80.0.1"),
+                    server_http_port=int(msg.get("server_http_port", 8080)),
+                    algorithm=msg.get("algorithm"),
+                    algorithm_config=msg.get("algorithm_config"),
+                )
+                self.trigger_job(job_config)
+
+    def start_control_plane(self) -> None:
+        """Start client UDP control plane if network interface is available."""
+        with self._lock:
+            if self.current_interface is None:
+                return
+            if self.control_plane is None or not self.control_plane.is_running:
+                self.control_plane = ControlPlaneClient(
+                    node_id=self.config.node_id,
+                    tun_ip=self.config.tun_ip,
+                    network_adapter=self.network_adapter,
+                    air_interface=self.current_interface,
+                    initial_channel=self.config.channel,
+                    cached_channel=self._last_locked_channel or self.config.channel,
+                    txpower_dbm=self.config.radio_txpower_dbm,
+                    uplink_mcs=self.config.uplink_mcs,
+                    server_host=self.config.server_control_host,
+                    server_port=self.config.server_control_port,
+                    broadcast_port=self.config.broadcast_port,
+                )
+                self.control_plane.register_broadcast_handler(
+                    "TASK_ANNOUNCE", self._handle_task_announce
+                )
+                self.control_plane.register_broadcast_handler(
+                    "JOB_ABORT", lambda msg: self.abort_job()
+                )
+                self.control_plane.start()
 
     def run(self) -> None:
         """Run the main daemon supervisory loop until stopped."""
@@ -791,8 +927,27 @@ class ClientDaemon:
                     self._stop_event.wait(self.config.poll_interval_seconds)
                     continue
 
-            # Check if active job finished
+            if (
+                self.config.enable_control_plane
+                and self.current_interface is not None
+                and (self.control_plane is None or not self.control_plane.is_running)
+            ):
+                self.start_control_plane()
+
+            # Check if active job finished and reconcile control-plane state
             self.sandbox.poll()
+            if (
+                self.control_plane is not None
+                and not self.sandbox.is_running
+                and self.control_plane.state in (ClientNodeState.RUNNING, ClientNodeState.PREPARING)
+            ):
+                self.control_plane.notify_state_change(ClientNodeState.IDLE)
+
+            if self.control_plane is not None and self.control_plane.locked_channel is not None:
+                if self.control_plane.locked_channel != self._last_locked_channel:
+                    self._last_locked_channel = self.control_plane.locked_channel
+                    self._save_cached_channel(self.control_plane.locked_channel)
+
             if self.current_interface is not None and not self.sandbox.is_running:
                 self._restore_tun_if_idle()
 
@@ -813,6 +968,9 @@ class ClientDaemon:
 
     def _cleanup(self) -> None:
         with self._lock:
+            if self.control_plane is not None:
+                self.control_plane.stop()
+                self.control_plane = None
             if self.sandbox.is_running:
                 self.sandbox.abort()
             if self.current_interface is not None:
@@ -861,6 +1019,24 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         help=f"网卡挂起轮询周期 (秒) (默认: {DEFAULT_POLL_INTERVAL_SECONDS})",
     )
 
+    parser.add_argument(
+        "--server-host",
+        default=CLIENT_UPLINK_DEFAULT_ADDR,
+        help=f"服务端 UDP 控制面上行地址 (默认: {CLIENT_UPLINK_DEFAULT_ADDR})",
+    )
+    parser.add_argument(
+        "--server-port",
+        type=int,
+        default=CLIENT_UPLINK_DEFAULT_PORT,
+        help=f"服务端 UDP 控制面上行端口 (默认: {CLIENT_UPLINK_DEFAULT_PORT})",
+    )
+    parser.add_argument(
+        "--broadcast-port",
+        type=int,
+        default=SERVER_CONTROL_BROADCAST_PORT,
+        help=f"服务端 UDP 控制面广播监听端口 (默认: {SERVER_CONTROL_BROADCAST_PORT})",
+    )
+
     args = parser.parse_args(argv)
 
     try:
@@ -879,6 +1055,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         work_dir=args.work_dir,
         poll_interval_seconds=args.poll_interval,
         interface=args.interface,
+        server_control_host=args.server_host,
+        server_control_port=args.server_port,
+        broadcast_port=args.broadcast_port,
     )
 
     daemon = ClientDaemon(config=daemon_config)

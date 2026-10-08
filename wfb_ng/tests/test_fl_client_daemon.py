@@ -34,6 +34,7 @@ class MockNetworkAdapter(NetworkAdapter):
     def __init__(self, interfaces=None):
         self._interfaces = list(interfaces or [])
         self.wireless_states = {}
+        self.channel_history = []
         self.tun_interfaces = {}
 
     def set_interfaces(self, interfaces):
@@ -47,6 +48,7 @@ class MockNetworkAdapter(NetworkAdapter):
         if channel == 165:
             channel_width = "HT20"
 
+        self.channel_history.append(channel)
         self.wireless_states[iface] = {
             "mode": "monitor",
             "channel": channel,
@@ -54,6 +56,30 @@ class MockNetworkAdapter(NetworkAdapter):
             "txpower_dbm": txpower_dbm,
             "is_up": True,
         }
+
+    def set_channel(self, iface, channel, channel_width="HT40+"):
+        validate_radio_config({"channel": channel})
+        self.channel_history.append(channel)
+        if iface in self.wireless_states:
+            self.wireless_states[iface]["channel"] = channel
+            self.wireless_states[iface]["channel_width"] = channel_width
+        else:
+            self.wireless_states[iface] = {
+                "channel": channel,
+                "channel_width": channel_width,
+                "txpower_dbm": 12,
+            }
+
+    def set_txpower(self, iface, txpower_dbm):
+        validate_radio_config({"radio_txpower_dbm": txpower_dbm})
+        if iface in self.wireless_states:
+            self.wireless_states[iface]["txpower_dbm"] = txpower_dbm
+        else:
+            self.wireless_states[iface] = {
+                "channel": 157,
+                "channel_width": "HT40+",
+                "txpower_dbm": txpower_dbm,
+            }
 
     def setup_tun(self, tun_name, tun_cidr):
         self.tun_interfaces[tun_name] = tun_cidr
@@ -637,6 +663,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
             poll_interval_seconds=0.02,
+            enable_control_plane=False,
         )
         stub_script = "import sys; sys.exit(0)"
         daemon = ClientDaemon(
