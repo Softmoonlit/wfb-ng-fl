@@ -92,11 +92,11 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(config.channel_width, "HT40+")
         self.assertEqual(config.guard_interval, "short")
 
-    def test_channel_width_adaptation(self):
+    def test_channel_width_fixed_ht40_plus(self):
         config157 = validate_radio_config({"channel": 157})
         self.assertEqual(config157.channel_width, "HT40+")
         config165 = validate_radio_config({"channel": 165})
-        self.assertEqual(config165.channel_width, "HT20")
+        self.assertEqual(config165.channel_width, "HT40+")
 
     def test_unknown_keys_fail_closed(self):
         with self.assertRaises(ValueError) as ctx:
@@ -196,6 +196,10 @@ class TestRadioConfigValidator(unittest.TestCase):
         # Patch with unknown key fails closed
         with self.assertRaises(ValueError):
             validate_radio_patch({"unknown_field": 123}, base=base)
+
+        # Patch without base fails (base is mandatory)
+        with self.assertRaises(TypeError):
+            validate_radio_patch({"channel": 153}, base=None)  # type: ignore
 
         # Patch with forbidden channel 161 rejected
         with self.assertRaises(ValueError):
@@ -383,14 +387,14 @@ class TestRadioCLI(unittest.TestCase):
         combined = out + err
         self.assertIn("161", combined)
 
-    def test_cli_validate_warns_on_out_of_bounds_rate(self):
+    def test_cli_validate_rejects_out_of_bounds_rate(self):
         code, out, err = self.run_cli([
             "validate",
             "--downlink-mcs", "3",
             "--uftp-rate", "30000"
         ])
-        self.assertEqual(code, 0)
-        self.assertIn("警告", err)
+        self.assertEqual(code, 1)
+        self.assertIn("安全区间", err)
 
     def test_cli_validate_rejects_negative_rate(self):
         code, out, err = self.run_cli([
@@ -557,6 +561,14 @@ class TestForeignFrameInspection(unittest.TestCase):
             with self.assertRaises(RuntimeError) as ctx:
                 backend.prepare("wlx_test")
             self.assertIn("Cannot determine current channel", str(ctx.exception))
+
+    def test_live_backend_finish_restores_initial_channel(self):
+        backend = LiveRadioSurveyBackend()
+        backend.initial_channel = 36
+        backend.initial_width = "HT20"
+        with mock.patch.object(backend, "_set_channel") as mock_set:
+            backend.finish("wlx_test")
+            mock_set.assert_called_once_with("wlx_test", 36, "HT20")
 
 
 if __name__ == "__main__":

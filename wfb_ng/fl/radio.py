@@ -165,8 +165,7 @@ class RadioConfig:
 
     @property
     def channel_width(self) -> str:
-        # Channel 165 in UNII-3 has no upper secondary channel; operates in HT20 mode
-        return "HT20" if self.channel == 165 else FIXED_BANDWIDTH
+        return FIXED_BANDWIDTH
 
     @property
     def guard_interval(self) -> str:
@@ -265,23 +264,21 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     )
 
 
-def validate_radio_patch(
-    patch: Dict[str, Any], base: Optional[RadioConfig] = None
-) -> RadioConfig:
+def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
     """
     Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
-    Per ADR-0014, unmentioned attributes strictly remain untouched.
+    Per ADR-0014, base state is required and unmentioned attributes strictly remain untouched.
     Unknown keys fail closed.
     """
     if not isinstance(patch, dict):
         raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+    if not isinstance(base, RadioConfig):
+        raise TypeError(f"Base must be a RadioConfig instance, got {type(base).__name__}")
 
     for k in patch:
         if k not in ALLOWED_PATCH_KEYS:
             raise ValueError(f"Unknown patch key: {k!r}")
 
-    if base is None:
-        base = RadioConfig()
     merged = base.to_dict()
     merged.update(patch)
     return validate_radio_config(merged)
@@ -341,6 +338,15 @@ class SurveyBackend(Protocol):
 WFB_MAC_PREFIX: bytes = bytes([0x57, 0x42])
 
 
+def _is_our_address(addr: bytes, local_mac: Optional[bytes] = None) -> bool:
+    """Check if MAC address belongs to local interface or synthetic WFB cluster."""
+    if local_mac and addr == local_mac:
+        return True
+    if addr.startswith(WFB_MAC_PREFIX):
+        return True
+    return False
+
+
 def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes] = None) -> bool:
     """
     Determine whether a raw captured frame is genuine foreign 802.11 environmental interference.
@@ -378,30 +384,18 @@ def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes]
             if len(mac_payload) < 10:
                 return False
             ra = mac_payload[4:10]
-            if local_mac and ra == local_mac:
-                return False
-            if ra.startswith(WFB_MAC_PREFIX):
-                return False
-            return True
+            return not _is_our_address(ra, local_mac)
         else:
             # RTS (11) and other control frames have TA at offset 10
             if len(mac_payload) < 16:
                 return False
             ta = mac_payload[10:16]
-            if local_mac and ta == local_mac:
-                return False
-            if ta.startswith(WFB_MAC_PREFIX):
-                return False
-            return True
+            return not _is_our_address(ta, local_mac)
     elif ftype in (0, 2):  # Management (0) or Data (2) frames
         if len(mac_payload) < 24:
             return False
         ta = mac_payload[10:16]
-        if local_mac and ta == local_mac:
-            return False
-        if ta.startswith(WFB_MAC_PREFIX):
-            return False
-        return True
+        return not _is_our_address(ta, local_mac)
     else:
         return False
 
@@ -520,8 +514,8 @@ class LiveRadioSurveyBackend:
         return count
 
     def finish(self, interface: str) -> None:
-        # Restore original channel and width to prevent unintended background channel hopping
-        if self.initial_channel and self.initial_channel in ALLOWED_5GHZ_CHANNELS:
+        # Restore original channel and width to prevent unintended radio mutations
+        if self.initial_channel is not None:
             self._set_channel(interface, self.initial_channel, self.initial_width)
 
 
@@ -664,13 +658,16 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     if args.uplink_mcs is not None:
         raw_cfg["uplink_mcs"] = args.uplink_mcs
     if args.uftp_rate is not None:
-        bounds = get_downlink_rate_bounds(raw_cfg.get("downlink_mcs", DEFAULT_DOWNLINK_MCS))
+        downlink_mcs = raw_cfg.get("downlink_mcs", DEFAULT_DOWNLINK_MCS)
+        bounds = get_downlink_rate_bounds(downlink_mcs)
         if not (bounds.min_rate_kbps <= args.uftp_rate <= bounds.max_rate_kbps):
             print(
-                f"提示/警告: uftp_rate={args.uftp_rate} 超出当前 downlink_mcs "
-                f"推荐安全区间 [{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps",
+                f"错误: uftp_rate={args.uftp_rate} 超出当前 downlink_mcs={downlink_mcs} "
+                f"安全区间 [{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps "
+                f"({bounds.min_rate_mbps}~{bounds.max_rate_mbps} Mbps)。",
                 file=sys.stderr,
             )
+            return 1
         raw_cfg["uftp_rate_kbps"] = args.uftp_rate
 
     try:
