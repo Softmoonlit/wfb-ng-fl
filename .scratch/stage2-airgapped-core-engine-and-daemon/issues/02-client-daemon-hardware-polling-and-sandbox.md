@@ -14,7 +14,7 @@
 - [x] 任务正常完成或异常中止（如收到中止信号）时，守护进程负责彻底 kill/terminate 子进程并回收资源，清理临时工作区，安全恢复至 `IDLE` 待命。
 - [x] 进程与资源审计测试证明无任何孤儿进程残留、TUN 设备安全回收。
 
-## Comments
+## 交付说明
 
 - 交付 `wfb_ng.fl.client_daemon` 模块与可执行入口 `wfb-fl-client-daemon`（注册在 `setup.py` console_scripts，亦支持 `python3 -m wfb_ng.fl.client_daemon`）。
 - 交付 systemd 服务单元文件 `scripts/systemd/wfb-fl-client-daemon.service` 与默认身份模板 `scripts/default/node.json`，并纳入打包与安装清单。

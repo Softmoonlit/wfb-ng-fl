@@ -14,6 +14,7 @@ from unittest import mock
 
 from wfb_ng.fl.service import _read_config
 from wfb_ng.fl.errors import FLRuntimeError
+from wfb_ng.fl.radio import ALLOWED_5GHZ_CHANNELS, FORBIDDEN_CHANNELS
 from wfb_ng.fl.client_daemon import (
     ClientDaemon,
     ClientDaemonConfig,
@@ -21,10 +22,56 @@ from wfb_ng.fl.client_daemon import (
     DaemonState,
     JobSandbox,
     LinuxNetworkAdapter,
-    MockNetworkAdapter,
+    NetworkAdapter,
     NodeIdentity,
     load_node_identity,
 )
+
+
+class MockNetworkAdapter(NetworkAdapter):
+    """In-memory mock network adapter for unit testing without physical hardware."""
+
+    def __init__(self, interfaces=None):
+        self._interfaces = list(interfaces or [])
+        self.wireless_states = {}
+        self.tun_interfaces = {}
+
+    def set_interfaces(self, interfaces):
+        self._interfaces = list(interfaces)
+
+    def find_interfaces(self):
+        return list(self._interfaces)
+
+    def configure_wireless(self, iface, channel=157, channel_width="HT40+", txpower_dbm=12):
+        if channel in FORBIDDEN_CHANNELS:
+            raise FLRuntimeError(
+                "forbidden_channel",
+                f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
+            )
+        if channel not in ALLOWED_5GHZ_CHANNELS:
+            raise FLRuntimeError(
+                "invalid_channel",
+                f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
+            )
+        if channel == 165:
+            channel_width = "HT20"
+
+        self.wireless_states[iface] = {
+            "mode": "monitor",
+            "channel": channel,
+            "channel_width": channel_width,
+            "txpower_dbm": txpower_dbm,
+            "is_up": True,
+        }
+
+    def setup_tun(self, tun_name, tun_cidr):
+        self.tun_interfaces[tun_name] = tun_cidr
+
+    def teardown_tun(self, tun_name):
+        self.tun_interfaces.pop(tun_name, None)
+
+    def is_tun_active(self, tun_name):
+        return tun_name in self.tun_interfaces
 
 
 class TestNodeIdentity(unittest.TestCase):
@@ -54,19 +101,18 @@ class TestNodeIdentity(unittest.TestCase):
         self.assertEqual(identity.tun_ip, "10.80.0.17")
         self.assertEqual(identity.tun_cidr, "10.80.0.17/24")
 
-    def test_load_node_identity_auto_derives_tun_ip(self):
+    def test_load_node_identity_rejects_missing_tun_ip(self):
         path = self._write_node_json({"node_id": 4})
-        identity = load_node_identity(path)
-        self.assertEqual(identity.node_id, 4)
-        self.assertEqual(identity.tun_ip, "10.80.0.14")
-        self.assertEqual(identity.tun_cidr, "10.80.0.14/24")
+        with self.assertRaises(FLRuntimeError) as ctx:
+            load_node_identity(path)
+        self.assertEqual(ctx.exception.error_code, "invalid_node_identity")
 
     def test_load_node_identity_supports_boundary_1_and_10(self):
-        path1 = self._write_node_json({"node_id": 1})
+        path1 = self._write_node_json({"node_id": 1, "tun_ip": "10.80.0.11"})
         id1 = load_node_identity(path1)
         self.assertEqual(id1.node_id, 1)
 
-        path10 = self._write_node_json({"node_id": 10})
+        path10 = self._write_node_json({"node_id": 10, "tun_ip": "10.80.0.20"})
         id10 = load_node_identity(path10)
         self.assertEqual(id10.node_id, 10)
         self.assertEqual(id10.tun_ip, "10.80.0.20")
@@ -182,6 +228,7 @@ class TestHardwarePolling(unittest.TestCase):
         self.assertEqual(daemon.current_interface, "wlx_hotplug_01")
         self.assertEqual(daemon.state, DaemonState.IDLE)
         self.assertTrue(adapter.wireless_states["wlx_hotplug_01"]["is_up"])
+        self.assertTrue(adapter.is_tun_active(daemon.config.tun_name))
 
     def test_polling_detects_card_unplugged(self):
         adapter = MockNetworkAdapter(interfaces=["wlx_hotplug_01"])
@@ -191,6 +238,7 @@ class TestHardwarePolling(unittest.TestCase):
         daemon.poll_hardware_once()
         self.assertEqual(daemon.state, DaemonState.IDLE)
         self.assertEqual(daemon.current_interface, "wlx_hotplug_01")
+        self.assertTrue(adapter.is_tun_active(daemon.config.tun_name))
 
         # Unplug interface
         adapter.set_interfaces([])
@@ -198,6 +246,7 @@ class TestHardwarePolling(unittest.TestCase):
         self.assertIsNone(iface)
         self.assertIsNone(daemon.current_interface)
         self.assertEqual(daemon.state, DaemonState.POLLING_HARDWARE)
+        self.assertFalse(adapter.is_tun_active(daemon.config.tun_name))
 
 
 class TestRoleServiceSandbox(unittest.TestCase):
@@ -283,6 +332,65 @@ class TestRoleServiceSandbox(unittest.TestCase):
 
         # Audit: TUN removed
         self.assertFalse(self.adapter.is_tun_active("tun_test2"))
+
+    def test_sandbox_terminates_entire_process_tree_including_grandchild(self):
+        # Spawn child which spawns a background grandchild process
+        gc_pid_file = os.path.join(self.temp_dir, "grandchild.pid")
+        stub_script = (
+            "import time, subprocess, sys\n"
+            f"sub = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
+            f"with open(r'{gc_pid_file}', 'w') as f:\n"
+            "    f.write(str(sub.pid))\n"
+            "while True:\n"
+            "    time.sleep(0.1)\n"
+        )
+        sandbox = JobSandbox(
+            work_dir=self.temp_dir,
+            network_adapter=self.adapter,
+            command_prefix=[sys.executable, "-c", stub_script],
+        )
+        job_config = ClientJobConfig(
+            job_id="job_tree_01",
+            node_id=2,
+            tun_name="tun_test_tree",
+            tun_ip="10.80.0.12",
+            server_http_host="10.80.0.1",
+            server_http_port=8080,
+        )
+
+        # Pre-set TUN to verify it gets cleaned
+        self.adapter.setup_tun("tun_test_tree", "10.80.0.12/24")
+        self.assertTrue(self.adapter.is_tun_active("tun_test_tree"))
+
+        proc = sandbox.start(job_config, air_interface="wlx001")
+        child_pid = proc.pid
+
+        # Wait for grandchild PID file to appear
+        for _ in range(50):
+            if os.path.exists(gc_pid_file):
+                break
+            time.sleep(0.05)
+        self.assertTrue(os.path.exists(gc_pid_file))
+        with open(gc_pid_file, "r") as f:
+            gc_pid = int(f.read().strip())
+
+        # Verify grandchild is alive
+        os.kill(gc_pid, 0)
+
+        # Abort sandbox
+        sandbox.abort(timeout=1.0)
+        self.assertEqual(sandbox.state, DaemonState.IDLE)
+
+        # Verify child is dead
+        with self.assertRaises(OSError):
+            os.kill(child_pid, 0)
+
+        # Verify grandchild is dead (no orphaned grandchild processes)
+        with self.assertRaises(OSError):
+            os.kill(gc_pid, 0)
+
+        # Verify TUN is clean
+        self.assertFalse(self.adapter.is_tun_active("tun_test_tree"))
 
     def test_sandbox_rejects_duplicate_concurrent_jobs(self):
         stub_script = "import time; time.sleep(1.0)"

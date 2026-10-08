@@ -109,27 +109,28 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
 
     raw_tun_ip = data.get("tun_ip")
     if raw_tun_ip is None:
-        tun_ip_str = f"10.80.0.{10 + raw_node_id}"
-        tun_cidr_str = f"{tun_ip_str}/24"
-    else:
-        if not isinstance(raw_tun_ip, str):
-            raise FLRuntimeError(
-                "invalid_node_identity",
-                f"tun_ip 必须为字符串，实际为: {raw_tun_ip!r}",
-            )
-        try:
-            if "/" in raw_tun_ip:
-                interface = ipaddress.IPv4Interface(raw_tun_ip)
-                tun_ip_str = str(interface.ip)
-                tun_cidr_str = str(interface)
-            else:
-                addr = ipaddress.IPv4Address(raw_tun_ip)
-                tun_ip_str = str(addr)
-                tun_cidr_str = f"{tun_ip_str}/24"
-        except ValueError as exc:
-            raise FLRuntimeError(
-                "invalid_node_identity", f"tun_ip 地址格式非法: {raw_tun_ip}"
-            ) from exc
+        raise FLRuntimeError(
+            "invalid_node_identity",
+            f"节点身份配置缺少必填字段 'tun_ip': {path}",
+        )
+    if not isinstance(raw_tun_ip, str):
+        raise FLRuntimeError(
+            "invalid_node_identity",
+            f"tun_ip 必须为字符串，实际为: {raw_tun_ip!r}",
+        )
+    try:
+        if "/" in raw_tun_ip:
+            interface = ipaddress.IPv4Interface(raw_tun_ip)
+            tun_ip_str = str(interface.ip)
+            tun_cidr_str = str(interface)
+        else:
+            addr = ipaddress.IPv4Address(raw_tun_ip)
+            tun_ip_str = str(addr)
+            tun_cidr_str = f"{tun_ip_str}/24"
+    except ValueError as exc:
+        raise FLRuntimeError(
+            "invalid_node_identity", f"tun_ip 地址格式非法: {raw_tun_ip}"
+        ) from exc
 
     # Enforce subnet contract: 10.80.0.0/24 and reject conflict with server (10.80.0.1)
     try:
@@ -276,58 +277,6 @@ class LinuxNetworkAdapter(NetworkAdapter):
         return os.path.exists(f"/sys/class/net/{tun_name}")
 
 
-class MockNetworkAdapter(NetworkAdapter):
-    """In-memory mock network adapter for unit testing without physical hardware."""
-
-    def __init__(self, interfaces: Optional[List[str]] = None):
-        self._interfaces = list(interfaces or [])
-        self.wireless_states: Dict[str, Dict[str, Any]] = {}
-        self.tun_interfaces: Dict[str, str] = {}
-
-    def set_interfaces(self, interfaces: List[str]) -> None:
-        self._interfaces = list(interfaces)
-
-    def find_interfaces(self) -> List[str]:
-        return list(self._interfaces)
-
-    def configure_wireless(
-        self,
-        iface: str,
-        channel: int = DEFAULT_CHANNEL,
-        channel_width: str = FIXED_BANDWIDTH,
-        txpower_dbm: int = DEFAULT_TXPOWER_DBM,
-    ) -> None:
-        if channel in FORBIDDEN_CHANNELS:
-            raise FLRuntimeError(
-                "forbidden_channel",
-                f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
-            )
-        if channel not in ALLOWED_5GHZ_CHANNELS:
-            raise FLRuntimeError(
-                "invalid_channel",
-                f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-            )
-        if channel == 165:
-            channel_width = "HT20"
-
-        self.wireless_states[iface] = {
-            "mode": "monitor",
-            "channel": channel,
-            "channel_width": channel_width,
-            "txpower_dbm": txpower_dbm,
-            "is_up": True,
-        }
-
-    def setup_tun(self, tun_name: str, tun_cidr: str) -> None:
-        self.tun_interfaces[tun_name] = tun_cidr
-
-    def teardown_tun(self, tun_name: str) -> None:
-        self.tun_interfaces.pop(tun_name, None)
-
-    def is_tun_active(self, tun_name: str) -> bool:
-        return tun_name in self.tun_interfaces
-
-
 @dataclass(frozen=True)
 class ClientDaemonConfig:
     node_id: int
@@ -400,6 +349,7 @@ class JobSandbox:
         self.network_adapter = network_adapter
         self.command_prefix = list(command_prefix) if command_prefix else None
         self._process: Optional[subprocess.Popen] = None
+        self._log_file: Optional[Any] = None
         self._active_job: Optional[ClientJobConfig] = None
         self._job_work_dir: Optional[str] = None
         self._lock = threading.Lock()
@@ -501,17 +451,13 @@ class JobSandbox:
             if self.command_prefix:
                 cmd = list(self.command_prefix)
             else:
-                cli_bin = shutil.which("wfb-fl-client")
-                if cli_bin:
-                    cmd = [cli_bin, "--config", client_config_path]
-                else:
-                    cmd = [
-                        sys.executable,
-                        "-m",
-                        "wfb_ng.fl.service",
-                        "--config",
-                        client_config_path,
-                    ]
+                cmd = [
+                    sys.executable,
+                    "-c",
+                    "from wfb_ng.fl.service import client_main; client_main()",
+                    "--config",
+                    client_config_path,
+                ]
                 if job.algorithm:
                     cmd += ["--algorithm", job.algorithm]
                 if algorithm_config_path:
@@ -519,17 +465,26 @@ class JobSandbox:
 
             logger.info("派生 RoleService 子进程沙箱: %s", " ".join(cmd))
             try:
+                log_path = os.path.join(self._job_work_dir, "role_service.log")
+                self._log_file = open(log_path, "w", encoding="utf-8")
                 # Use start_new_session=True to place child in a new process group
+                # Redirect stdout/stderr to log file to avoid pipe buffer deadlock
                 self._process = subprocess.Popen(
                     cmd,
                     stdin=subprocess.DEVNULL,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    stdout=self._log_file,
+                    stderr=subprocess.STDOUT,
                     start_new_session=True,
                 )
                 self.state = DaemonState.RUNNING
                 return self._process
             except Exception as exc:
+                if self._log_file is not None:
+                    try:
+                        self._log_file.close()
+                    except Exception:
+                        pass
+                    self._log_file = None
                 self.state = DaemonState.IDLE
                 self._process = None
                 raise FLRuntimeError(
@@ -599,19 +554,13 @@ class JobSandbox:
             self._finalize(proc.poll() if proc else 0)
 
     def _finalize(self, returncode: int) -> None:
-        """Clean up process pipes, TUN, temporary workspace, and reset state."""
-        proc = self._process
-        if proc is not None:
-            if proc.stdout is not None:
-                try:
-                    proc.stdout.close()
-                except Exception:
-                    pass
-            if proc.stderr is not None:
-                try:
-                    proc.stderr.close()
-                except Exception:
-                    pass
+        """Clean up process log file, TUN, temporary workspace, and reset state."""
+        if self._log_file is not None:
+            try:
+                self._log_file.close()
+            except Exception:
+                pass
+            self._log_file = None
 
         job = self._active_job
         if job:
@@ -699,12 +648,16 @@ class ClientDaemon:
                         channel_width=self.config.channel_width,
                         txpower_dbm=self.config.radio_txpower_dbm,
                     )
+                    self.network_adapter.setup_tun(
+                        self.config.tun_name, self.config.tun_cidr
+                    )
                     self.current_interface = target_iface
                     logger.info(
-                        "网卡 %s 接管就绪 (Channel=%d, TXPower=%d dBm)",
+                        "网卡 %s 接管就绪 (Channel=%d, TXPower=%d dBm, TUN=%s)",
                         target_iface,
                         self.config.channel,
                         self.config.radio_txpower_dbm,
+                        self.config.tun_name,
                     )
                 except Exception as exc:
                     logger.error("网卡 %s 配置失败: %s", target_iface, exc)
@@ -718,6 +671,8 @@ class ClientDaemon:
         if self.sandbox.is_running:
             logger.warning("网卡丢失，紧急中止正在运行的作业沙箱...")
             self.sandbox.abort()
+        if self.current_interface is not None:
+            self.network_adapter.teardown_tun(self.config.tun_name)
         self.current_interface = None
 
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
@@ -772,6 +727,8 @@ class ClientDaemon:
         with self._lock:
             if self.sandbox.is_running:
                 self.sandbox.abort()
+            if self.current_interface is not None:
+                self.network_adapter.teardown_tun(self.config.tun_name)
             logger.info("wfb-fl-client-daemon 已安全停止")
 
 
