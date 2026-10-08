@@ -781,6 +781,7 @@ class ClientDaemon:
         self._link_process_factory = _link_process_factory or subprocess.Popen
         self._link_process: Optional[subprocess.Popen] = None
         self._link_log_file: Optional[Any] = None
+        self._current_job_id: Optional[str] = None
         self._stop_event = threading.Event()
         self._lock = threading.RLock()
 
@@ -1039,13 +1040,29 @@ class ClientDaemon:
             self._stop_idle_link()
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
+                self._current_job_id = job_config.job_id
                 if self.control_plane is not None:
                     self.control_plane.notify_task_ready(job_config.job_id)
                     self.control_plane.notify_state_change(ClientNodeState.RUNNING)
                 return proc
             except Exception:
+                self._current_job_id = None
                 self._ensure_idle_transport()
                 raise
+
+    def _handle_job_terminal(self, msg: Dict[str, Any], aborted: bool) -> None:
+        job_id = msg.get("job_id")
+        with self._lock:
+            if not isinstance(job_id, str) or job_id != self._current_job_id:
+                return
+            self.sandbox.abort()
+            self._stop_idle_link()
+            self.start_idle_link()
+            self._current_job_id = None
+            if self.control_plane is not None:
+                if aborted:
+                    self.control_plane.notify_state_change(ClientNodeState.ABORTING)
+                self.control_plane.notify_state_change(ClientNodeState.IDLE)
 
     def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
         with self._lock:
@@ -1165,10 +1182,10 @@ class ClientDaemon:
                     "TASK_ANNOUNCE", self._handle_task_announce
                 )
                 self.control_plane.register_broadcast_handler(
-                    "JOB_ABORT", lambda msg: self.abort_job()
+                    "JOB_ABORT", lambda msg: self._handle_job_terminal(msg, aborted=True)
                 )
                 self.control_plane.register_broadcast_handler(
-                    "JOB_COMPLETED", lambda msg: self.finish_job()
+                    "JOB_COMPLETED", lambda msg: self._handle_job_terminal(msg, aborted=False)
                 )
                 self.control_plane.start()
 

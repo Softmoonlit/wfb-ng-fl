@@ -916,7 +916,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertEqual(daemon.state, DaemonState.RUNNING)
 
         # Broadcast JOB_ABORT
-        self.server.broadcast_downlink({"type": "JOB_ABORT"})
+        self.server.broadcast_downlink({"type": "JOB_ABORT", "job_id": "job_fl_001"})
 
         # Wait for job to be aborted and return to IDLE
         start_t = time.monotonic()
