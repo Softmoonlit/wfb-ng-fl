@@ -19,6 +19,8 @@ from .artifacts import write_json_atomic
 from .errors import FLRuntimeError
 from .observation import LiveObservation
 
+DEFAULT_UFTP_DATA_PORT = 1044
+
 
 @dataclass(frozen=True)
 class RoundContext:

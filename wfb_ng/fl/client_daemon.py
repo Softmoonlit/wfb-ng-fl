@@ -29,6 +29,7 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from .errors import FLRuntimeError
+from .transport import DEFAULT_UFTP_DATA_PORT
 from .control import (
     CLIENT_UPLINK_DEFAULT_ADDR,
     CLIENT_UPLINK_DEFAULT_PORT,
@@ -376,7 +377,7 @@ class ClientJobConfig:
     tun_ip: str
     server_http_host: str = "10.80.0.1"
     server_http_port: int = 8080
-    uftp_port: int = 9000
+    uftp_port: int = DEFAULT_UFTP_DATA_PORT
     link_id: int = DEFAULT_LINK_ID
     uftp_bind_host: Optional[str] = None
     uftp_multicast_host: str = "224.0.0.1"
@@ -1073,6 +1074,8 @@ class ClientDaemon:
                 server_http_host = str(msg["server_http_host"])
                 server_http_port = int(msg["server_http_port"])
                 uftp_port = int(msg["uftp_port"])
+                if uftp_port in (self.config.broadcast_port, self.config.server_control_port):
+                    return _reject("TASK_ANNOUNCE 的 UFTP 数据端口与控制面端口冲突")
                 link_id = int(msg["link_id"])
 
                 job_config = ClientJobConfig(

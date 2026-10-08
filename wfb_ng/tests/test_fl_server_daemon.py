@@ -606,6 +606,20 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertEqual(body["error"], "preflight_target_nodes_not_ready")
         self.assertEqual(body["unready_nodes"]["3"]["readiness"], "CONNECTING")
 
+    def test_preflight_rejects_uftp_control_port_conflict(self):
+        self._simulate_client_handshake(1)
+        payload = {
+            "job_id": "job_port_conflict",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
+            "uftp_port": self.config.control_broadcast_port,
+        }
+        status_code, body = self._http_post("/api/v1/jobs/start", payload)
+        self.assertEqual(status_code, 400)
+        self.assertEqual(body["error"], "preflight_port_conflict")
+        self.assertEqual(self.daemon.server_state, ServerState.IDLE)
+
     def test_preflight_invalid_target_nodes_payload(self):
         # Empty list
         status_code, body = self._http_post(

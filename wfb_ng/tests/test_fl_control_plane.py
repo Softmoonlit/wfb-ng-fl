@@ -881,7 +881,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             "algorithm_config": {},
             "server_http_host": "10.80.0.1",
             "server_http_port": 8080,
-            "uftp_port": 9000,
+            "uftp_port": 1044,
             "link_id": 7669206,
         })
 
