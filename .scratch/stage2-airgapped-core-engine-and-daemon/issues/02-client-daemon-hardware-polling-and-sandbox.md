@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** need-for-review
+**Status:** resolved
 
 - [x] 交付 `wfb-fl-client-daemon` 可执行程序与 systemd 服务单元。
 - [x] 开机自动读取本地固化身份文件 `/etc/wfb-ng-fl/node.json`，正确获取 `node_id`（支持 1~10 号节点）与 `tun_ip`。
