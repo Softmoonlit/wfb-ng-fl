@@ -24,8 +24,6 @@ wfb_ng-*.tar.gz
 
 # Make 构建产物
 src/*.o
-src/*.rx_test.o
-src/*.tx_gate_test.o
 *~
 
 # 可执行文件与测试二进制
@@ -39,19 +37,7 @@ src/*.tx_gate_test.o
 /wfb_keygen
 /kcp_small_sender
 /kcp_small_receiver
-/fec_test
-/libsodium_test
-/token_scheduler_test
-/token_control_packet_test
-/token_control_filter_test
-/rx_token_ipc_test
-/rx_token_listener_test
-/rx_source_telemetry_test
-/token_authorization_test
-/token_authorization_ipc_test
-/tx_authorization_integration_test
-/tx_data_source_gate_test
-/tx_token_gate_test
+/*_test
 /uftp
 /uftpd
 
@@ -64,13 +50,5 @@ _trial*/
 /wfb_ng/conf/site.cfg
 skills-lock.json
 opencode.jsonc
-.venv-test/lib64
-.venv-test/pyvenv.cfg
-.venv-test/bin/python
-.venv-test/bin/python3
-.venv-test/bin/python3.10
-control_envelope_test
-token_namespace_bridge_test
-wfb_v6_uplink
-v6_uplink_queue_test
-v6_uplink_downlink_nonce_test
+.venv*/
+/wfb_v6_uplink

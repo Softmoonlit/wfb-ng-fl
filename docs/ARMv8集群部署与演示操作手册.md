@@ -2,6 +2,8 @@
 
 本文档为面向操作者和现场汇报者的全流程实操指南，涵盖：**从电脑端推送代码到 Server 开发板、Server 本机一键环境装配、集群免密互信分发、多 Client 节点批量并行部署，以及面向导师现场汇报的大文件组播广播与受控上行回传演示**。
 
+[文档导航](README.md) · [设计入口](联邦学习系统设计入口.md) · [部署与运行基准](部署与运行基准.md) · [演示脚本导航](../tests/demo/README.md) · [正式 Runtime 验收](../tests/fl_runtime/README.md)
+
 ---
 
 ## 目录
@@ -258,12 +260,12 @@ sudo ./scripts/deploy_node.sh
 
 ## 八、阶段五：现场演示与多维指标看板 (`run_fl_demo.sh`)
 
-面向导师现场汇报的核心总控脚本为 `tests/real_hardware/run_fl_demo.sh`。
+面向导师现场汇报的核心总控脚本为 [tests/demo/run_fl_demo.sh](../tests/demo/run_fl_demo.sh)。
 
 ### 1. 汇报前演练（Dry-Run 模式）
 在不影响网卡硬件状态的前提下，快速演练全流程并确认指标看板渲染效果：
 ```bash
-bash tests/real_hardware/run_fl_demo.sh all --dry-run
+bash tests/demo/run_fl_demo.sh all --dry-run
 ```
 
 ---
@@ -271,7 +273,7 @@ bash tests/real_hardware/run_fl_demo.sh all --dry-run
 ### 2. 正式全流程演示（一键跑完下行 + 上行）
 现场最常用的汇报演示命令：
 ```bash
-bash tests/real_hardware/run_fl_demo.sh all
+bash tests/demo/run_fl_demo.sh all
 ```
 
 **演示全流程自动化逻辑**：
@@ -295,11 +297,11 @@ bash tests/real_hardware/run_fl_demo.sh all
 
 - **单独演示下行组播广播机制**（例如想用自己的真实大文件）：
   ```bash
-  bash tests/real_hardware/run_fl_demo.sh downlink --file /path/to/my_model.bin
+  bash tests/demo/run_fl_demo.sh downlink --file /path/to/my_model.bin
   ```
 - **单独演示上行受控回传与反压机制**：
   ```bash
-  bash tests/real_hardware/run_fl_demo.sh uplink
+  bash tests/demo/run_fl_demo.sh uplink
   ```
 
 ---
@@ -325,7 +327,7 @@ bash tests/real_hardware/run_fl_demo.sh all
 ### 5. 演示结束清理
 演示完毕后，若需停止残留后台进程、释放端口并清理 TUN 虚拟网卡，执行：
 ```bash
-bash tests/real_hardware/run_fl_demo.sh clean
+bash tests/demo/run_fl_demo.sh clean
 ```
 
 ---
@@ -398,7 +400,7 @@ bash tests/real_hardware/run_fl_demo.sh clean
 
 ```bash
 # 解析 Server 端 wfb.log 并输出结构化遥测 JSON
-python3 tests/real_hardware/fl_demo_metrics.py parse-telemetry \
+python3 tests/demo/fl_demo_metrics.py parse-telemetry \
     --server-log /var/lib/wfb-ng/fl_demo/run/wfb.log \
     --output /tmp/telemetry.json
 
@@ -436,9 +438,9 @@ cat /tmp/telemetry.json | jq '{loss_rate, fec_recovery_rate, tcp_retransmits, lo
 | **全集群免密互信** | `./scripts/setup_cluster_auth.sh` |
 | **批量部署预检** | `./scripts/deploy_cluster.sh --check-only` |
 | **全集群并行部署** | `./scripts/deploy_cluster.sh` |
-| **演示全流程演练** | `bash tests/real_hardware/run_fl_demo.sh all --dry-run` |
-| **现场全流程演示** | `bash tests/real_hardware/run_fl_demo.sh all` |
-| **单步下行组播演示** | `bash tests/real_hardware/run_fl_demo.sh downlink` |
-| **单步上行受控演示** | `bash tests/real_hardware/run_fl_demo.sh uplink` |
-| **遥测丢包指标解析** | `python3 tests/real_hardware/fl_demo_metrics.py parse-telemetry --server-log /var/lib/wfb-ng/fl_demo/run/wfb.log --output /tmp/telemetry.json` |
-| **演示环境清理** | `bash tests/real_hardware/run_fl_demo.sh clean` |
+| **演示全流程演练** | `bash tests/demo/run_fl_demo.sh all --dry-run` |
+| **现场全流程演示** | `bash tests/demo/run_fl_demo.sh all` |
+| **单步下行组播演示** | `bash tests/demo/run_fl_demo.sh downlink` |
+| **单步上行受控演示** | `bash tests/demo/run_fl_demo.sh uplink` |
+| **遥测丢包指标解析** | `python3 tests/demo/fl_demo_metrics.py parse-telemetry --server-log /var/lib/wfb-ng/fl_demo/run/wfb.log --output /tmp/telemetry.json` |
+| **演示环境清理** | `bash tests/demo/run_fl_demo.sh clean` |

@@ -10,6 +10,11 @@
   "uftp_bind_host": "10.0.0.2",
   "uftp_multicast_host": "239.80.41.1",
   "uftp_private_multicast_host": "239.80.41.2",
+  "channel": 157,
+  "channel_width": "HT40+",
+  "live_observation": false,
+  "observation_path": null,
+  "io_timeout_seconds": 300,
   "max_update_size_bytes": 1073741824,
   "link_args": [
     "--tun-name", "wfb-fl0",
@@ -17,6 +22,8 @@
     "--link-id", "1",
     "--uplink-stream", "32",
     "--downlink-stream", "160",
-    "--air-interface", "wlan0"
+    "--air-interface", "wlan0",
+    "--radio-bandwidth", "40",
+    "--radio-mcs-index", "3"
   ]
 }

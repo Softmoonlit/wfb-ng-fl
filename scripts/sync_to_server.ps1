@@ -184,7 +184,7 @@ try {
     Write-Host "  3. 首次部署 Server 本机: sudo ./scripts/deploy_node.sh" -ForegroundColor Cyan
     Write-Host "  4. 建立集群免密互信:     ./scripts/setup_cluster_auth.sh" -ForegroundColor Cyan
     Write-Host "  5. 批量部署所有 Client:  ./scripts/deploy_cluster.sh" -ForegroundColor Cyan
-    Write-Host "  6. 启动现场演示:        bash tests/real_hardware/run_fl_demo.sh all" -ForegroundColor Cyan
+    Write-Host "  6. 启动现场演示:        bash tests/demo/run_fl_demo.sh all" -ForegroundColor Cyan
 } catch {
     Write-Host "[FAIL] 传输过程中发生错误: $_" -ForegroundColor Red
     exit 1
