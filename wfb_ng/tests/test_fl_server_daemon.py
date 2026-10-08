@@ -647,6 +647,19 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertEqual(code, 400)
         self.assertEqual(body["error"], "invalid_semi_async_config")
 
+        # semi_async min_updates boolean (True) fails
+        payload_bool_min = {
+            "job_id": "job_semi_bool_min",
+            "mode": "semi_async",
+            "target_nodes": [1, 2],
+            "min_updates": True,
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_bool_min)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "invalid_semi_async_config")
+
         # semi_async out of bounds min_updates fails
         payload_bad_min = {
             "job_id": "job_semi_bad_min",
@@ -671,6 +684,40 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         code, body = self._http_post("/api/v1/jobs/start", payload_bad_mode)
         self.assertEqual(code, 400)
         self.assertEqual(body["error"], "invalid_fl_mode")
+
+        # duplicate target nodes fail
+        payload_dup_nodes = {
+            "job_id": "job_dup",
+            "target_nodes": [1, 1],
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_dup_nodes)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "preflight_target_nodes_invalid")
+
+        # model_size_bytes boolean (True) fails
+        payload_bool_size = {
+            "job_id": "job_bool_size",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+            "model_size_bytes": True,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_bool_size)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "preflight_model_missing_size")
+
+        # malformed model_sha256 fails
+        payload_bad_hex = {
+            "job_id": "job_bad_hex",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+            "model_sha256": "not-valid-hex-or-length",
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_bad_hex)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "invalid_model_sha256")
 
     def test_invalid_json_request_body(self):
         url = f"{self.base_url}/api/v1/jobs/start"

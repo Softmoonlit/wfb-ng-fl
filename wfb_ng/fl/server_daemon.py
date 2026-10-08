@@ -140,6 +140,8 @@ class JobConfig:
         raw_nodes = data.get("target_nodes")
         if not raw_nodes or not isinstance(raw_nodes, list):
             raise FLRuntimeError("preflight_target_nodes_invalid", "必须提供非空 target_nodes 列表")
+        if len(set(raw_nodes)) != len(raw_nodes):
+            raise FLRuntimeError("preflight_target_nodes_invalid", "target_nodes 包含重复节点 ID")
         for nid in raw_nodes:
             if type(nid) is not int or not (1 <= nid <= 10):
                 raise FLRuntimeError("preflight_target_nodes_invalid", f"包含非法节点 ID: {nid!r}")
@@ -149,12 +151,13 @@ class JobConfig:
         if mode not in VALID_FL_MODES:
             raise FLRuntimeError("invalid_fl_mode", f"不支持的协同范式 '{mode}'，必须为 {VALID_FL_MODES}")
 
-        min_updates = data.get("min_updates")
+        min_updates_raw = data.get("min_updates")
         if mode == "semi_async":
-            if min_updates is None:
+            if min_updates_raw is None:
                 raise FLRuntimeError("invalid_semi_async_config", "semi_async 模式必须指定 min_updates")
-            if not isinstance(min_updates, int) or not (1 <= min_updates <= len(target_nodes)):
-                raise FLRuntimeError("invalid_semi_async_config", f"min_updates 必须在 [1, {len(target_nodes)}] 范围内")
+            if type(min_updates_raw) is not int or not (1 <= min_updates_raw <= len(target_nodes)):
+                raise FLRuntimeError("invalid_semi_async_config", f"min_updates 必须在 [1, {len(target_nodes)}] 范围内的整数")
+            min_updates = min_updates_raw
         elif mode == "sync":
             min_updates = len(target_nodes)
         else:  # async
@@ -164,16 +167,34 @@ class JobConfig:
         if not model_path or not isinstance(model_path, str):
             raise FLRuntimeError("preflight_model_missing_path", "缺少必填参数 'model_path'")
 
-        model_size_bytes = data.get("model_size_bytes")
-        if model_size_bytes is None or not isinstance(model_size_bytes, int) or model_size_bytes <= 0:
+        model_size_raw = data.get("model_size_bytes")
+        if model_size_raw is None or type(model_size_raw) is not int or model_size_raw <= 0:
             raise FLRuntimeError(
                 "preflight_model_missing_size",
                 "必须显式提供合法正整数 'model_size_bytes' 以供确定性大小校验",
             )
+        model_size_bytes = model_size_raw
 
-        rounds = int(data.get("rounds", 1))
-        if rounds <= 0:
-            raise FLRuntimeError("invalid_rounds", "rounds 轮次数必须大于 0")
+        rounds_raw = data.get("rounds", 1)
+        if type(rounds_raw) is not int or rounds_raw <= 0:
+            raise FLRuntimeError("invalid_rounds", "rounds 轮次数必须为大于 0 的整数")
+        rounds = rounds_raw
+
+        max_staleness_raw = data.get("max_staleness", 0)
+        if type(max_staleness_raw) is not int or max_staleness_raw < 0:
+            raise FLRuntimeError("invalid_max_staleness", "max_staleness 必须为大于等于 0 的整数")
+        max_staleness = max_staleness_raw
+
+        round_timeout_raw = data.get("round_timeout_seconds", 120.0)
+        if (type(round_timeout_raw) not in (int, float)) or round_timeout_raw <= 0:
+            raise FLRuntimeError("invalid_round_timeout", "round_timeout_seconds 必须为大于 0 的数值")
+        round_timeout_seconds = float(round_timeout_raw)
+
+        model_sha256 = data.get("model_sha256")
+        if model_sha256 is not None:
+            if not isinstance(model_sha256, str) or len(model_sha256) != 64 or not all(c in "0123456789abcdefABCDEF" for c in model_sha256):
+                raise FLRuntimeError("invalid_model_sha256", "model_sha256 必须为 64 位十六进制散列字符串")
+            model_sha256 = model_sha256.lower()
 
         radio_cfg = data.get("radio_config")
         if radio_cfg is not None:
@@ -181,7 +202,10 @@ class JobConfig:
                 raise FLRuntimeError("invalid_radio_configuration", "radio_config 必须为 object")
             validate_radio_config(radio_cfg)
 
-        job_id = data.get("job_id") or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+        raw_job_id = data.get("job_id")
+        if raw_job_id is not None and not isinstance(raw_job_id, str):
+            raise FLRuntimeError("invalid_job_id", "job_id 必须为字符串")
+        job_id = raw_job_id or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
         return cls(
             job_id=job_id,
             mode=mode,
@@ -190,9 +214,9 @@ class JobConfig:
             model_size_bytes=model_size_bytes,
             rounds=rounds,
             min_updates=min_updates,
-            max_staleness=int(data.get("max_staleness", 0)),
-            round_timeout_seconds=float(data.get("round_timeout_seconds", 120.0)),
-            model_sha256=data.get("model_sha256"),
+            max_staleness=max_staleness,
+            round_timeout_seconds=round_timeout_seconds,
+            model_sha256=model_sha256,
             radio_config=radio_cfg,
         )
 

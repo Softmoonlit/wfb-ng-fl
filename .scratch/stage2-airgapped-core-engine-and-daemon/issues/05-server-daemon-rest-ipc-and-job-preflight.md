@@ -20,7 +20,7 @@
 1. 交付了 `wfb_ng/fl/server_daemon.py` 与 `wfb-fl-server-daemon` 命令行入口，并在 `setup.py` 中注册 `console_scripts` 和 `data_files`。
 2. 交付了 systemd 服务单元 `scripts/systemd/wfb-fl-server-daemon.service` 与默认配置文件 `scripts/default/server.json`。
 3. `build_v6_uplink_server_command` 实现了预置 1~10 号节点槽位与静态 `tun_ip` 映射，严格遵循 ADR-0014，依赖底座默认固化的 120ms/10ms 调度时隙，不传递 `--grant-duration-ms` 和 `--guard-interval-ms`。
-4. 交付了本地回环专用 REST IPC（`http://127.0.0.1:9090`），实现了 `/status`、`/survey`、`/jobs/start`、`/jobs/abort`、`/logs/stream`（SSE）。
+4. 交付了本地回环专用 REST IPC（`http://127.0.0.1:9090`），实现了严格版本化的 `/api/v1/status`、`/api/v1/survey`、`/api/v1/jobs/start`、`/api/v1/jobs/abort`、`/api/v1/logs/stream`（SSE）。拒绝一切未版本化别名与回退适配。
 5. 在 `/jobs/start` 构筑了三项确定性前置门禁：
    - 门禁 1：目标节点 10 秒内确认处于 `IDLE` 状态，对未上线、寻频中、两军防虚假就绪连接中、超时离线节点严格 fail-closed；
    - 门禁 2：初始模型文件存在、非空，且与预期大小一致；
