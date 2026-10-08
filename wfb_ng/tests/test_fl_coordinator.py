@@ -20,6 +20,7 @@ from wfb_ng.fl.coordinator import (
 )
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.server_daemon import JobConfig
+from wfb_ng.fl.runtime import ServerRuntime
 from wfb_ng.tests.mock_runtime import MockServerRuntime
 
 
@@ -68,6 +69,25 @@ class TestFLCoordinator(unittest.TestCase):
             round_timeout_seconds=round_timeout_seconds,
             model_sha256=self.model_sha256,
         )
+
+    def test_production_runtime_wait_timeout_path(self):
+        runtime = object.__new__(ServerRuntime)
+        runtime._condition = threading.Condition()
+        runtime._fatal_error = None
+        runtime._failure = None
+        runtime.participant_node_ids = (1, 2)
+        runtime.transport = mock.Mock()
+        runtime._complete_round_if_ready = mock.Mock(return_value=None)
+
+        def fail_round(code, message):
+            runtime._failure = FLRuntimeError(code, message)
+
+        runtime._fail_round = fail_round
+        with self.assertRaises(FLRuntimeError) as raised:
+            runtime._wait_for_complete_updates(
+                "round_1", self.test_dir, min_updates=2, timeout=0
+            )
+        self.assertEqual(raised.exception.error_code, "round_timeout")
 
     def test_sync_mode_two_rounds_success_with_sha256_continuity(self):
         """测试 sync 同步全员模式：两轮作业，收齐全员，FedAvg聚合，校验跨轮SHA256连续性与审计摘要。"""
