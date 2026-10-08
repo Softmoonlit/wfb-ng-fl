@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 from unittest import mock
 from wfb_ng.fl.radio import (
@@ -21,7 +23,7 @@ from wfb_ng.fl.radio import (
     SpectrumSurveyReport,
     LiveRadioSurveyBackend,
     is_foreign_80211_frame,
-    find_wlx_interfaces,
+    find_wl_interfaces,
     survey_spectrum,
     main,
 )
@@ -328,10 +330,39 @@ class TestSpectrumSurvey(unittest.TestCase):
         self.assertIn("rank", d["results"][0])
         self.assertIn("fps", d["results"][0])
 
-    def test_survey_raises_if_no_wlx_and_no_interface(self):
-        with mock.patch("wfb_ng.fl.radio.find_wlx_interfaces", return_value=[]):
+    def test_survey_raises_if_no_wl_and_no_interface(self):
+        with mock.patch("wfb_ng.fl.radio.find_wl_interfaces", return_value=[]):
             with self.assertRaises(RuntimeError):
                 survey_spectrum(interface=None, backend=None)
+
+    def test_find_wl_interfaces_detects_wl_prefix(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Create mock sysfs net directories
+            for name in ["eth0", "ens33", "lo", "wlan0", "wlP1p2s0", "wlx001a"]:
+                os.makedirs(os.path.join(tmp_dir, name))
+
+            results = find_wl_interfaces(sysfs_net=tmp_dir)
+            self.assertEqual(results, ["wlP1p2s0", "wlan0", "wlx001a"])
+
+    def test_find_wl_interfaces_prioritizes_rtl8812au_driver(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Create onboard hotspot wlan0 with brcmfmac and external card wlP1 with rtl88xxau_wfb
+            wlan_driver = os.path.join(tmp_dir, "drivers", "brcmfmac")
+            rtl_driver = os.path.join(tmp_dir, "drivers", "rtl88xxau_wfb")
+            os.makedirs(wlan_driver)
+            os.makedirs(rtl_driver)
+
+            net_dir = os.path.join(tmp_dir, "net")
+            os.makedirs(os.path.join(net_dir, "wlan0", "device"))
+            os.makedirs(os.path.join(net_dir, "wlP1p2s0", "device"))
+            os.makedirs(os.path.join(net_dir, "eth0", "device"))
+
+            os.symlink(wlan_driver, os.path.join(net_dir, "wlan0", "device", "driver"))
+            os.symlink(rtl_driver, os.path.join(net_dir, "wlP1p2s0", "device", "driver"))
+
+            results = find_wl_interfaces(sysfs_net=net_dir)
+            # Should prioritize the rtl88xxau_wfb card and ignore the wlan0 onboard hotspot
+            self.assertEqual(results, ["wlP1p2s0"])
 
 
 class TestRadioCLI(unittest.TestCase):

@@ -21,7 +21,7 @@ Status: ready-for-agent
    Server 部署开机常驻守护服务 `wfb-fl-server-daemon`，开机后独占纳管无线网卡并持续在后台监听客户端心跳，维护全局客户端实时在线拓扑视界（`NodeHorizonRegistry`）。拉起底座时一次性全量预置平台支持的 1~10 号节点槽位（`--known-clients 1..10` 及其静态 `tun_ip` 映射），采用固化的 120ms/10ms 底座调度默认值（无需外部传参）。对外暴露本地回环专用 HTTP REST API（`http://127.0.0.1:9090`），为 CLI 工具与 Web 后端提供无冲突的常态化状态推流、扫频触发与任务下发通道。
 
 2. **客户端常驻守护服务与子进程沙箱隔离 (Client Daemon & RoleService Sandbox)**：
-   Client 部署开机自启 systemd 常驻守护服务 `wfb-fl-client-daemon`。基于本机固化配置文件（`/etc/wfb-ng-fl/node.json`）确定身份与 TUN IP，开机后自动扫描并接管唯一的 `wlx*` 真实网卡；若网卡未插好，进入内部安全挂起轮询，插上即接管；收到 Server 任务配置后，Daemon 派生独立的 `RoleService` 子进程执行本轮模型接收、本地训练与参数上传闭环；任务结束后干净回收子进程并恢复待命，严格符合 ADR-0010 单作业生命周期隔离契约。
+   Client 部署开机自启 systemd 常驻守护服务 `wfb-fl-client-daemon`。基于本机固化配置文件（`/etc/wfb-ng-fl/node.json`）确定身份与 TUN IP，开机后自动扫描并接管唯一的 `wl*` 真实网卡（按 `rtl88xxau_wfb` 驱动优先绑定识别）；若网卡未插好，进入内部安全挂起轮询，插上即接管；收到 Server 任务配置后，Daemon 派生独立的 `RoleService` 子进程执行本轮模型接收、本地训练与参数上传闭环；任务结束后干净回收子进程并恢复待命，严格符合 ADR-0010 单作业生命周期隔离契约。
 
 3. **控制信令面与数据面正交分离的双平面架构 (Dual-Plane Protocol)**：
    - **控制信令面（小 JSON，对称轻量 UDP）**：下行由 Server 向 `255.255.255.255:9000` 受限广播任务级指令（命中 C++ 底座 `is_ipv4_limited_broadcast` 逻辑自动分发至所有发射天线），各 Client 向 `10.80.0.1:9001` 单播发送心跳保活与状态跃迁（自然交错零碰撞），Server 仅做单一单播回执（`{"ack": true}`），空口保持绝对静默，享底层 FEC 8/14 保护；
@@ -73,7 +73,7 @@ Status: ready-for-agent
 
 - **服务端常驻守护引擎与本地专用 REST IPC (Server Daemon & Local IPC)**：
   - 常驻服务名为 `wfb-fl-server-daemon`，以 systemd 单元运行；
-  - 启动后独占纳管服务端的 `wlx*` 真实网卡，绑定 TUN `10.80.0.1`，常驻监听 UDP 端口 `9001` 接收客户端心跳；
+  - 启动后独占纳管服务端的 `wl*` 真实网卡（按 `rtl88xxau_wfb` 驱动优先绑定），绑定 TUN `10.80.0.1`，常驻监听 UDP 端口 `9001` 接收客户端心跳；
   - 拉起底层 `wfb_v6_uplink` 时，C++ 底座内置默认采用 `grant_duration_ms = 120`, `guard_interval_ms = 10`，无需外部显式传参；
   - 一次性全量预置平台支持的 1~10 号节点槽位（`--known-clients 1,2,3,4,5,6,7,8,9,10` 及其静态 `tun_ip` 映射），确保后续任何新节点接入时均可立即被 C++ Token 调度器授予 Grant 并建立单播下行路由，无需重启底座；
   - 维护内存级实时拓扑注册表（`NodeHorizonRegistry`），记录参与节点 ID、IP、当前状态机阶段（`IDLE`、`TRAINING`、`COMMITTING` 等）、状态已耗时（`elapsed_ms`）、最后心跳时间戳（毫秒）与当前信道；
@@ -87,7 +87,7 @@ Status: ready-for-agent
 - **客户端常驻守护与子进程沙箱生命周期 (Client Daemon & Subprocess Sandbox)**：
   - 常驻服务名为 `wfb-fl-client-daemon`，以 systemd 单元运行；
   - 读取本地固化配置 `/etc/wfb-ng-fl/node.json`（包含 `node_id` 与 `tun_ip`，支持 1~10）；
-  - 开机后自动将 `wlx*` 网卡置为 Monitor 模式，信道设为默认 157，配置 TUN IP 并启动 UDP 客户端；若未检测到网卡，进程在内部以 3 秒周期挂起轮询，插上网卡即自动接管；
+  - 开机后自动将 `wl*` 网卡置为 Monitor 模式，信道设为默认 157，配置 TUN IP 并启动 UDP 客户端；若未检测到网卡，进程在内部以 3 秒周期挂起轮询，插上网卡即自动接管；
   - 收到 Server 的 `TASK_ANNOUNCE` 时，状态机从 `IDLE` 跃迁至 `PREPARING`，并在本地隔离的工作目录下通过 `subprocess.Popen` 动态派生独立的 `RoleService(role='client')` 执行本轮任务；
   - 任务正常完成或异常中止后，Daemon 负责 `terminate/kill` 子进程、清理临时接收区并回收资源，重新切回 `IDLE` 状态，坚决不驻留脏数据。
 
@@ -180,7 +180,7 @@ Status: ready-for-agent
      - 断言 Server 超时未集齐后停止在新信道发心跳并退回 Channel 157；
      - 断言 Client 1 在 15 秒租约耗尽后，看门狗成功触发物理网卡回退，最终两端均回到 Channel 157，无任何节点孤立。
   4. **Client 常驻守护子进程生命周期与网卡轮询接缝 (Client Daemon Sandbox & Polling Seam)**：
-     - 测试开机未检测到 `wlx*` 网卡时安全轮询不崩溃，模拟网卡插入后自动接管；
+     - 测试开机未检测到 `wl*` 网卡时安全轮询不崩溃，模拟网卡插入后自动接管；
      - 测试收到任务后派生 `RoleService` 子进程并监控其 PID；
      - 模拟任务正常完成、被 Server `JOB_ABORT` 中止，以及子进程异常退出等场景；
      - 严格断言子进程完全销毁、TUN 设备释放、无残留僵尸进程，守护进程安全恢复至 `IDLE`。

@@ -7,7 +7,7 @@ wfb_ng.fl.client_daemon: Client Persistent Daemon, Hardware Polling, and RoleSer
 Per ADR-0010, ADR-0012, ADR-0014:
 - Persistent systemd daemon: wfb-fl-client-daemon.
 - Identity: /etc/wfb-ng-fl/node.json (node_id 1..10, static tun_ip 10.80.0.{10+node_id}).
-- Hardware Polling: 3s suspended retry if wlx* wireless interface not detected; auto hot takeover.
+- Hardware Polling: 3s suspended retry if wl* wireless interface not detected; auto hot takeover.
 - Hardware Configuration: Monitor mode, Channel 157 (HT40+), TX power (12 dBm), TUN setup/cleanup.
 - Sandbox: Short-lifecycle RoleService(role='client') spawned via subprocess.Popen in isolated process group.
 - Resource Audit: Strict cleanup of child processes (SIGTERM/SIGKILL pgid) and TUN network devices upon completion/abort.
@@ -36,7 +36,7 @@ from .radio import (
     FIXED_BANDWIDTH,
     FORBIDDEN_CHANNELS,
     RECOMMENDED_UPLINK_MCS,
-    find_wlx_interfaces,
+    find_wl_interfaces,
     validate_radio_config,
 )
 
@@ -198,7 +198,7 @@ class LinuxNetworkAdapter(NetworkAdapter):
         return res
 
     def find_interfaces(self) -> List[str]:
-        return find_wlx_interfaces()
+        return find_wl_interfaces()
 
     def configure_wireless(
         self,
@@ -669,8 +669,8 @@ class ClientDaemon:
     def poll_hardware_once(self) -> Optional[str]:
         """
         Execute a single pass of hardware polling:
-        - If no wlx* interface is found: returns None (state: POLLING_HARDWARE).
-        - If wlx* interface is found: configures wireless and returns interface (state: IDLE).
+        - If no wl* interface is found: returns None (state: POLLING_HARDWARE).
+        - If wl* interface is found: configures wireless and returns interface (state: IDLE).
         - If known interface disappeared: triggers hardware unplug recovery.
         """
         with self._lock:
@@ -829,7 +829,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     parser.add_argument(
         "--interface",
-        help="指定无线网卡接口 (默认: 动态探测 wlx*)",
+        help="指定无线网卡接口 (默认: 动态探测 wl*)",
     )
     parser.add_argument(
         "--channel",

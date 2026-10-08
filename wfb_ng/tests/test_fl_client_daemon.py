@@ -180,6 +180,13 @@ class TestNetworkAdapter(unittest.TestCase):
         self.assertTrue(any("channel" in cmd and "157" in cmd for cmd in calls))
         self.assertTrue(any("txpower" in cmd and "-1200" in cmd for cmd in calls))
 
+    @mock.patch("wfb_ng.fl.client_daemon.find_wl_interfaces", return_value=["wlP1p2s0"])
+    def test_linux_network_adapter_find_interfaces_delegates_to_find_wl_interfaces(self, mock_find):
+        adapter = LinuxNetworkAdapter()
+        res = adapter.find_interfaces()
+        self.assertEqual(res, ["wlP1p2s0"])
+        mock_find.assert_called_once()
+
 
 class TestHardwarePolling(unittest.TestCase):
     def test_polling_suspends_and_takes_over_when_card_plugged(self):

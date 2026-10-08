@@ -129,7 +129,7 @@ __all__ = (
     "SurveyBackend",
     "LiveRadioSurveyBackend",
     "is_foreign_80211_frame",
-    "find_wlx_interfaces",
+    "find_wl_interfaces",
     "survey_spectrum",
     "main",
 )
@@ -400,15 +400,35 @@ def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes]
         return False
 
 
-def find_wlx_interfaces() -> List[str]:
-    """Find all wireless interfaces whose names begin with 'wlx' via sysfs."""
-    sysfs_net = "/sys/class/net"
+def find_wl_interfaces(sysfs_net: str = "/sys/class/net") -> List[str]:
+    """
+    Find wireless interfaces (prefix 'wl*') via sysfs, prioritizing RTL8812AU (rtl88xxau_wfb) driver binding.
+    Per ARMv8 deployment manual:
+    - Interface names are assigned dynamically by udev with 'wl*' prefix (e.g. wlan*, wlx*, wlP*).
+    - Interfaces bound to rtl88xxau_wfb driver are prioritized/isolated to avoid confusing with onboard hotspot.
+    """
     if not os.path.isdir(sysfs_net):
         return []
     try:
-        return sorted([name for name in os.listdir(sysfs_net) if name.startswith("wlx")])
+        candidates = sorted([name for name in os.listdir(sysfs_net) if name.startswith("wl")])
     except OSError:
         return []
+
+    driver_matched = []
+    for iface in candidates:
+        driver_path = os.path.join(sysfs_net, iface, "device", "driver")
+        if os.path.exists(driver_path):
+            try:
+                target = os.path.realpath(driver_path)
+                driver_name = os.path.basename(target)
+                if driver_name in ("rtl88xxau_wfb", "88XXau_wfb", "8812au"):
+                    driver_matched.append(iface)
+            except OSError:
+                pass
+
+    if driver_matched:
+        return driver_matched
+    return candidates
 
 
 class LiveRadioSurveyBackend:
@@ -546,10 +566,10 @@ def survey_spectrum(
     """
     if backend is None:
         if not interface:
-            detected = find_wlx_interfaces()
+            detected = find_wl_interfaces()
             if not detected:
                 raise RuntimeError(
-                    "No wlx* wireless interface detected. Specify --interface or connect wireless card."
+                    "No wl* wireless interface detected. Specify --interface or connect wireless card."
                 )
             interface = detected[0]
         backend = LiveRadioSurveyBackend()
@@ -739,7 +759,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Subcommand: survey
     p_surv = subparsers.add_parser("survey", help="执行 5 GHz 频段快速扫频探路并输出干净度排行")
-    p_surv.add_argument("-i", "--interface", type=str, help="无线网卡接口名称 (默认自动探测 wlx*)")
+    p_surv.add_argument("-i", "--interface", type=str, help="无线网卡接口名称 (默认自动探测 wl*)")
     p_surv.add_argument("-d", "--duration-ms", type=float, default=300.0, help="单信道嗅探时长毫秒 (默认 300ms)")
     p_surv.add_argument("-t", "--congestion-threshold", type=float, default=50.0, help="拥堵判定阈值 fps (默认 50)")
     p_surv.add_argument("--json", action="store_true", help="输出 JSON 格式")
