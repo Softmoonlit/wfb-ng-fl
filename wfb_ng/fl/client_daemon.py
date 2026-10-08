@@ -848,7 +848,11 @@ class ClientDaemon:
     def start_idle_link(self) -> None:
         """Start the client link that carries control-plane traffic while idle."""
         with self._lock:
-            if not self.config.enable_link_process or self.current_interface is None:
+            if (
+                not self.config.enable_link_process
+                or self.current_interface is None
+                or self.sandbox.is_running
+            ):
                 return
             if self.is_idle_link_running:
                 return

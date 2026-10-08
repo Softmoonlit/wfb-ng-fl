@@ -574,6 +574,15 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             _link_process_factory=start_link,
         )
         daemon.poll_hardware_once()
+        daemon.sandbox._process = mock.Mock()
+        daemon.sandbox._process.poll.return_value = None
+        daemon.sandbox.state = DaemonState.RUNNING
+        daemon.start_idle_link()
+        self.assertFalse(daemon.is_idle_link_running)
+        self.assertEqual(link_processes, [])
+        daemon.sandbox._process = None
+        daemon.sandbox.state = DaemonState.IDLE
+
         daemon.start_idle_link()
         self.assertTrue(daemon.is_idle_link_running)
         self.assertEqual(len(link_processes), 1)
