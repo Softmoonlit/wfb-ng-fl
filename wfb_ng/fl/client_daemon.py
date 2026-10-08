@@ -191,6 +191,9 @@ class NetworkAdapter:
     def is_tun_active(self, tun_name: str) -> bool:
         raise NotImplementedError
 
+    def set_tun_txqueuelen(self, tun_name: str, txqueuelen: int = 5000) -> None:
+        pass
+
 
 class LinuxNetworkAdapter(NetworkAdapter):
     """Production Linux network adapter using system netlink, iw, and sysfs."""
@@ -293,6 +296,9 @@ class LinuxNetworkAdapter(NetworkAdapter):
 
     def is_tun_active(self, tun_name: str) -> bool:
         return os.path.exists(f"/sys/class/net/{tun_name}")
+
+    def set_tun_txqueuelen(self, tun_name: str, txqueuelen: int = 5000) -> None:
+        self._run_cmd(["ip", "link", "set", "dev", tun_name, "txqueuelen", str(txqueuelen)])
 
 
 @dataclass(frozen=True)

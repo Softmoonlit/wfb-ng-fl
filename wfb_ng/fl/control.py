@@ -628,6 +628,7 @@ class ControlPlaneServer:
         broadcast_addr: str = SERVER_CONTROL_BROADCAST_ADDR,
         broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT,
         offline_threshold_seconds: float = NODE_OFFLINE_THRESHOLD_SECONDS,
+        on_heartbeat_received: Optional[Callable[[NodeHeartbeat, NodeRecord], None]] = None,
     ):
         self.active_radio_config = active_radio_config
         self.network_adapter = network_adapter
@@ -636,6 +637,8 @@ class ControlPlaneServer:
         self.bind_port = bind_port
         self.broadcast_addr = broadcast_addr
         self.broadcast_port = broadcast_port
+        self.offline_threshold_seconds = offline_threshold_seconds
+        self.on_heartbeat_received = on_heartbeat_received
         self.registry = NodeHorizonRegistry(offline_threshold_seconds=offline_threshold_seconds)
 
         self._stop_event = threading.Event()
@@ -774,6 +777,13 @@ class ControlPlaneServer:
             client_addr=client_addr,
             server_radio=self.active_radio_config,
         )
+
+        record = self.registry.get_node(hb.node_id)
+        if self.on_heartbeat_received is not None and record is not None:
+            try:
+                self.on_heartbeat_received(hb, record)
+            except Exception as exc:
+                logger.warning("心跳处理回调执行异常: %s", exc)
 
         replies = [ack_res.to_bytes()]
         if align_patch:

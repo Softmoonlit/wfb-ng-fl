@@ -84,6 +84,9 @@ class MockNetworkAdapter(NetworkAdapter):
     def setup_tun(self, tun_name, tun_cidr):
         self.tun_interfaces[tun_name] = tun_cidr
 
+    def set_tun_txqueuelen(self, tun_name, txqueuelen=5000):
+        self.tun_txqueuelen = txqueuelen
+
     def teardown_tun(self, tun_name):
         self.tun_interfaces.pop(tun_name, None)
 
