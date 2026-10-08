@@ -719,7 +719,8 @@ class ServerDaemon:
                     max_update_size_bytes=int(payload.get("max_update_size_bytes", actual_file_size * 2)),
                     http_host=self.config.tun_ip,
                     uftp_bind_host=self.config.tun_ip,
-                    uftp_multicast_host=self.control_plane.broadcast_addr if self.control_plane else "10.80.0.255",
+                    uftp_multicast_host=str(payload.get("uftp_multicast_host", "224.0.0.1")),
+                    uftp_private_multicast_host=str(payload.get("uftp_private_multicast_host", "224.0.0.2")),
                 )
                 try:
                     server_role.start()
