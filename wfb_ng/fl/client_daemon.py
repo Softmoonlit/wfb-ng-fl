@@ -26,7 +26,7 @@ import threading
 import time
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from .errors import FLRuntimeError
 from .control import (
@@ -58,6 +58,39 @@ DEFAULT_NODE_CONFIG_PATH = "/etc/wfb-ng-fl/node.json"
 DEFAULT_POLL_INTERVAL_SECONDS = 3.0
 DEFAULT_TUN_PREFIX = "fl-c"
 DEFAULT_WORK_DIR = "/tmp/wfb-ng-fl/client"
+DEFAULT_LINK_ID = 7669206
+
+
+def build_v6_uplink_client_command(
+    executable_path: str,
+    node_id: int,
+    tun_name: str,
+    tun_addr: str,
+    air_interface: str,
+    uplink_mcs: int,
+    link_id: int,
+    channel_width: str = FIXED_BANDWIDTH,
+) -> List[str]:
+    """Build the persistent client link command used by the control plane."""
+    return [
+        executable_path,
+        "--role", "client",
+        "--tun-name", tun_name,
+        "--tun-addr", tun_addr,
+        "--node-id", str(node_id),
+        "--link-id", str(link_id),
+        "--uplink-stream", "1",
+        "--downlink-stream", "2",
+        "--fec-k", "8",
+        "--fec-n", "14",
+        "--radio-bandwidth", "40" if "40" in channel_width else "20",
+        "--radio-mcs-index", str(uplink_mcs),
+        "--radio-short-gi",
+        "--air-interface", air_interface,
+        "--uplink-pause-threshold-bytes", "131072",
+        "--uplink-resume-threshold-bytes", "65536",
+        "--uplink-queue-packets-limit", "64",
+    ]
 
 
 class DaemonState(str, Enum):
@@ -317,7 +350,9 @@ class ClientDaemonConfig:
     server_control_host: str = CLIENT_UPLINK_DEFAULT_ADDR
     server_control_port: int = CLIENT_UPLINK_DEFAULT_PORT
     broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT
+    link_id: int = DEFAULT_LINK_ID
     enable_control_plane: bool = True
+    enable_link_process: bool = True
 
     def __post_init__(self):
         if not self.tun_cidr:
@@ -329,6 +364,8 @@ class ClientDaemonConfig:
             "radio_txpower_dbm": self.radio_txpower_dbm,
             "uplink_mcs": self.uplink_mcs,
         })
+        if type(self.link_id) is not int or self.link_id <= 0:
+            raise ValueError("link_id 必须为正整数")
 
 
 @dataclass(frozen=True)
@@ -340,6 +377,7 @@ class ClientJobConfig:
     server_http_host: str = "10.80.0.1"
     server_http_port: int = 8080
     uftp_port: int = 9000
+    link_id: int = DEFAULT_LINK_ID
     uftp_bind_host: Optional[str] = None
     uftp_multicast_host: str = "224.0.0.1"
     uftp_private_multicast_host: str = "224.0.0.2"
@@ -364,6 +402,8 @@ class ClientJobConfig:
             "radio_txpower_dbm": self.radio_txpower_dbm,
             "uplink_mcs": self.uplink_mcs,
         })
+        if type(self.link_id) is not int or self.link_id <= 0:
+            raise ValueError("link_id 必须为正整数")
 
 
 class JobSandbox:
@@ -432,7 +472,7 @@ class JobSandbox:
                     "--tun-addr",
                     tun_addr,
                     "--link-id",
-                    "0",
+                    str(job.link_id),
                     "--uplink-stream",
                     "1",
                     "--downlink-stream",
@@ -682,6 +722,7 @@ class ClientDaemon:
         self,
         config: ClientDaemonConfig,
         network_adapter: Optional[NetworkAdapter] = None,
+        _link_process_factory: Optional[Callable[..., subprocess.Popen]] = None,
     ):
         self.config = config
         self.network_adapter = network_adapter or LinuxNetworkAdapter()
@@ -692,6 +733,9 @@ class ClientDaemon:
         self.current_interface: Optional[str] = None
         self._last_locked_channel: int = self._load_cached_channel()
         self.control_plane: Optional[ControlPlaneClient] = None
+        self._link_process_factory = _link_process_factory or subprocess.Popen
+        self._link_process: Optional[subprocess.Popen] = None
+        self._link_log_file: Optional[Any] = None
         self._stop_event = threading.Event()
         self._lock = threading.RLock()
 
@@ -791,6 +835,103 @@ class ClientDaemon:
 
             return self.current_interface
 
+    @property
+    def is_idle_link_running(self) -> bool:
+        with self._lock:
+            return self._link_process is not None and self._link_process.poll() is None
+
+    def start_idle_link(self) -> None:
+        """Start the client link that carries control-plane traffic while idle."""
+        with self._lock:
+            if not self.config.enable_link_process or self.current_interface is None:
+                return
+            if self.is_idle_link_running:
+                return
+            if self._link_process is not None:
+                self._stop_idle_link()
+
+            executable = shutil.which("wfb_v6_uplink")
+            if not executable:
+                local_bin = os.path.abspath("wfb_v6_uplink")
+                if os.path.isfile(local_bin) and os.access(local_bin, os.X_OK):
+                    executable = local_bin
+            if not executable:
+                raise FLRuntimeError(
+                    "link_executable_missing",
+                    "未找到 wfb_v6_uplink 可执行程序，客户端控制链路无法启动",
+                )
+
+            self.network_adapter.teardown_tun(self.config.tun_name)
+            cmd = build_v6_uplink_client_command(
+                executable_path=executable,
+                node_id=self.config.node_id,
+                tun_name=self.config.tun_name,
+                tun_addr=self.config.tun_cidr,
+                air_interface=self.current_interface,
+                uplink_mcs=self.config.uplink_mcs,
+                link_id=self.config.link_id,
+                channel_width=self.config.channel_width,
+            )
+            os.makedirs(self.config.work_dir, exist_ok=True)
+            log_path = os.path.join(self.config.work_dir, "wfb_uplink.log")
+            self._link_log_file = open(log_path, "a", encoding="utf-8")
+            logger.info("启动客户端空闲链路底座: %s", " ".join(cmd))
+            try:
+                self._link_process = self._link_process_factory(
+                    cmd,
+                    stdin=subprocess.DEVNULL,
+                    stdout=self._link_log_file,
+                    stderr=self._link_log_file,
+                )
+                deadline = time.monotonic() + 3.0
+                while time.monotonic() < deadline:
+                    returncode = self._link_process.poll()
+                    if returncode is not None:
+                        raise FLRuntimeError(
+                            "link_process_start_failed",
+                            f"客户端 wfb_v6_uplink 启动期异常退出，退出码: {returncode}",
+                        )
+                    if self.network_adapter.is_tun_active(self.config.tun_name):
+                        return
+                    time.sleep(0.05)
+                raise FLRuntimeError(
+                    "link_tun_failed",
+                    f"客户端链路未创建 TUN: {self.config.tun_name}",
+                )
+            except Exception:
+                self._stop_idle_link()
+                raise
+
+    def _stop_idle_link(self) -> None:
+        """Stop the idle client link and release its TUN."""
+        with self._lock:
+            if self._link_process is not None:
+                try:
+                    self._link_process.terminate()
+                    self._link_process.wait(timeout=2.0)
+                except Exception:
+                    try:
+                        self._link_process.kill()
+                        self._link_process.wait(timeout=1.0)
+                    except Exception:
+                        pass
+                self._link_process = None
+            if self._link_log_file is not None:
+                try:
+                    self._link_log_file.close()
+                except Exception:
+                    pass
+                self._link_log_file = None
+            self.network_adapter.teardown_tun(self.config.tun_name)
+
+    def _ensure_idle_transport(self) -> None:
+        if self.current_interface is None or self.sandbox.is_running:
+            return
+        if self.config.enable_link_process and self.config.enable_control_plane:
+            self.start_idle_link()
+        else:
+            self._restore_tun_if_idle()
+
     def _on_interface_lost(self) -> None:
         """Safely handle interface unplugging while running."""
         if self.sandbox.is_running:
@@ -801,6 +942,7 @@ class ClientDaemon:
                 self._last_locked_channel = self.control_plane.locked_channel
             self.control_plane.stop()
             self.control_plane = None
+        self._stop_idle_link()
         if self.current_interface is not None:
             self.network_adapter.teardown_tun(self.config.tun_name)
         self.current_interface = None
@@ -840,19 +982,25 @@ class ClientDaemon:
                     "invalid_job_config",
                     f"作业 TUN IP ({job_config.tun_ip}) 与守护进程 TUN IP ({self.config.tun_ip}) 不符",
                 )
+            if job_config.link_id != self.config.link_id:
+                raise FLRuntimeError(
+                    "invalid_job_config",
+                    f"作业 link_id ({job_config.link_id}) 与守护进程 link_id ({self.config.link_id}) 不符",
+                )
+            self._stop_idle_link()
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
                 if self.control_plane is not None:
                     self.control_plane.notify_state_change(ClientNodeState.RUNNING)
                 return proc
             except Exception:
-                self._restore_tun_if_idle()
+                self._ensure_idle_transport()
                 raise
 
     def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
         with self._lock:
             self.sandbox.abort()
-            self._restore_tun_if_idle()
+            self._ensure_idle_transport()
             if self.control_plane is not None:
                 if intermediate_state is not None:
                     self.control_plane.notify_state_change(intermediate_state)
@@ -867,7 +1015,7 @@ class ClientDaemon:
     def wait_job(self, timeout: Optional[float] = None) -> int:
         ret = self.sandbox.wait(timeout=timeout)
         with self._lock:
-            self._restore_tun_if_idle()
+            self._ensure_idle_transport()
             if self.control_plane is not None and not self.sandbox.is_running:
                 self.control_plane.notify_state_change(ClientNodeState.IDLE)
         return ret
@@ -919,12 +1067,13 @@ class ClientDaemon:
                         f"update-client{self.config.node_id}-template.bin",
                     )
 
-                if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg:
+                if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg or "link_id" not in msg:
                     return _reject("TASK_ANNOUNCE 缺失网络配置字段，拒绝启动")
 
                 server_http_host = str(msg["server_http_host"])
                 server_http_port = int(msg["server_http_port"])
                 uftp_port = int(msg["uftp_port"])
+                link_id = int(msg["link_id"])
 
                 job_config = ClientJobConfig(
                     job_id=job_id,
@@ -934,6 +1083,7 @@ class ClientDaemon:
                     server_http_host=server_http_host,
                     server_http_port=server_http_port,
                     uftp_port=uftp_port,
+                    link_id=link_id,
                     algorithm=algorithm,
                     algorithm_config=algo_config,
                 )
@@ -997,6 +1147,18 @@ class ClientDaemon:
             if (
                 self.config.enable_control_plane
                 and self.current_interface is not None
+                and not self.sandbox.is_running
+            ):
+                try:
+                    self._ensure_idle_transport()
+                except Exception as exc:
+                    logger.error("客户端空闲链路启动失败: %s", exc)
+                    self._stop_event.wait(self.config.poll_interval_seconds)
+                    continue
+
+            if (
+                self.config.enable_control_plane
+                and self.current_interface is not None
                 and (self.control_plane is None or not self.control_plane.is_running)
             ):
                 self.start_control_plane()
@@ -1016,7 +1178,7 @@ class ClientDaemon:
                     self._save_cached_channel(self.control_plane.locked_channel)
 
             if self.current_interface is not None and not self.sandbox.is_running:
-                self._restore_tun_if_idle()
+                self._ensure_idle_transport()
 
             # Periodic hardware check (ensure interface hasn't vanished)
             if self.current_interface is not None:
@@ -1040,6 +1202,7 @@ class ClientDaemon:
                 self.control_plane = None
             if self.sandbox.is_running:
                 self.sandbox.abort()
+            self._stop_idle_link()
             if self.current_interface is not None:
                 self.network_adapter.teardown_tun(self.config.tun_name)
             logger.info("wfb-fl-client-daemon 已安全停止")
@@ -1073,6 +1236,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         type=int,
         default=RECOMMENDED_UPLINK_MCS,
         help=f"上行 MCS 调制索引 (默认: {RECOMMENDED_UPLINK_MCS})",
+    )
+    parser.add_argument(
+        "--link-id",
+        type=int,
+        default=DEFAULT_LINK_ID,
+        help=f"WFB 链路 ID (默认: {DEFAULT_LINK_ID})",
     )
     parser.add_argument(
         "--work-dir",
@@ -1119,6 +1288,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         channel=args.channel,
         radio_txpower_dbm=args.radio_txpower_dbm,
         uplink_mcs=args.uplink_mcs,
+        link_id=args.link_id,
         work_dir=args.work_dir,
         poll_interval_seconds=args.poll_interval,
         interface=args.interface,

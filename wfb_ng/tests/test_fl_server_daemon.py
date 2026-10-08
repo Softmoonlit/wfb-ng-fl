@@ -806,6 +806,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             self.assertTrue(any(b.get("type") == "TASK_ANNOUNCE" for b in received_broadcasts))
             task_msg = next(b for b in received_broadcasts if b.get("type") == "TASK_ANNOUNCE")
             self.assertEqual(task_msg["job_id"], "job_e2e_test")
+            self.assertEqual(task_msg["link_id"], self.daemon.config.link_id)
 
             # 3. Abort job via REST IPC
             abort_code, abort_body = self._http_post("/api/v1/jobs/abort")

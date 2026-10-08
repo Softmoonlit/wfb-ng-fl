@@ -809,6 +809,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             server_control_port=self.server_port,
             broadcast_port=self.client_broadcast_port,
             enable_control_plane=True,
+            enable_link_process=False,
             poll_interval_seconds=0.05,
         )
         daemon = ClientDaemon(config, network_adapter=adapter)
@@ -851,6 +852,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             server_control_port=self.server_port,
             broadcast_port=self.client_broadcast_port,
             enable_control_plane=True,
+            enable_link_process=False,
             poll_interval_seconds=0.05,
         )
         daemon = ClientDaemon(config, network_adapter=adapter)
@@ -880,6 +882,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             "server_http_host": "10.80.0.1",
             "server_http_port": 8080,
             "uftp_port": 9000,
+            "link_id": 7669206,
         })
 
         # Wait for job to start

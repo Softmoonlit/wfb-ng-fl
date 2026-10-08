@@ -24,6 +24,7 @@ from wfb_ng.fl.client_daemon import (
     LinuxNetworkAdapter,
     NetworkAdapter,
     NodeIdentity,
+    build_v6_uplink_client_command,
     load_node_identity,
 )
 
@@ -536,12 +537,96 @@ class TestClientDaemonLifecycle(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
+    def test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion(self):
+        config = ClientDaemonConfig(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            work_dir=self.temp_dir,
+            link_id=7669206,
+        )
+        link_processes = []
+
+        class FakeLinkProcess:
+            def __init__(self):
+                self.returncode = None
+                link_processes.append(self)
+                self.adapter = None
+
+            def poll(self):
+                return self.returncode
+
+            def terminate(self):
+                self.returncode = 0
+
+            def wait(self, timeout=None):
+                return self.returncode
+
+            def kill(self):
+                self.returncode = -9
+
+        def start_link(cmd, **kwargs):
+            self.adapter.setup_tun("fl-c1", "10.80.0.11/24")
+            return FakeLinkProcess()
+
+        daemon = ClientDaemon(
+            config=config,
+            network_adapter=self.adapter,
+            _link_process_factory=start_link,
+        )
+        daemon.poll_hardware_once()
+        daemon.start_idle_link()
+        self.assertTrue(daemon.is_idle_link_running)
+        self.assertEqual(len(link_processes), 1)
+
+        sandbox_proc = mock.Mock()
+        sandbox_proc.poll.return_value = None
+        with mock.patch.object(daemon.sandbox, "start", return_value=sandbox_proc) as sandbox_start:
+            job = ClientJobConfig(
+                job_id="handoff",
+                node_id=1,
+                tun_name="fl-c1",
+                tun_ip="10.80.0.11",
+                link_id=7669206,
+            )
+            daemon.trigger_job(job)
+            self.assertFalse(daemon.is_idle_link_running)
+            self.assertEqual(link_processes[0].returncode, 0)
+            sandbox_start.assert_called_once()
+
+        daemon.sandbox._process = None
+        daemon.sandbox.state = DaemonState.IDLE
+        daemon.start_idle_link()
+        self.assertTrue(daemon.is_idle_link_running)
+        self.assertEqual(len(link_processes), 2)
+        daemon.stop()
+
+    def test_client_link_command_and_job_share_server_link_id(self):
+        cmd = build_v6_uplink_client_command(
+            executable_path="/usr/bin/wfb_v6_uplink",
+            node_id=2,
+            tun_name="fl-c2",
+            tun_addr="10.80.0.12/24",
+            air_interface="wlx-test",
+            uplink_mcs=6,
+            link_id=7669206,
+        )
+        self.assertEqual(cmd[cmd.index("--link-id") + 1], "7669206")
+        job = ClientJobConfig(
+            job_id="link-id",
+            node_id=2,
+            tun_name="fl-c2",
+            tun_ip="10.80.0.12",
+            link_id=7669206,
+        )
+        self.assertEqual(job.link_id, 7669206)
+
     def test_daemon_full_lifecycle(self):
         config = ClientDaemonConfig(
             node_id=1,
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
             poll_interval_seconds=0.05,
+            enable_link_process=False,
         )
         stub_script = "import sys; sys.exit(0)"
         daemon = ClientDaemon(
@@ -743,7 +828,12 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertIn("Restart=always", content)
 
     def test_trigger_job_validates_matching_identity_and_restores_on_failure(self):
-        config = ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", work_dir=self.temp_dir)
+        config = ClientDaemonConfig(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            work_dir=self.temp_dir,
+            enable_link_process=False,
+        )
         daemon = ClientDaemon(config=config, network_adapter=self.adapter)
         daemon.poll_hardware_once()
         self.assertTrue(self.adapter.is_tun_active("fl-c1"))

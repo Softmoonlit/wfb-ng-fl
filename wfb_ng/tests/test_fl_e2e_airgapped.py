@@ -190,6 +190,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
                 server_control_host="127.0.0.1",
                 server_control_port=self.control_bind_port,
                 broadcast_port=self.control_broadcast_port,
+                enable_link_process=False,
             ),
             network_adapter=self.client1_adapter,
         )
@@ -204,6 +205,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
                 server_control_host="127.0.0.1",
                 server_control_port=self.control_bind_port,
                 broadcast_port=self.control_broadcast_port,
+                enable_link_process=False,
             ),
             network_adapter=self.client2_adapter,
         )

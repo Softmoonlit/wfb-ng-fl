@@ -748,6 +748,7 @@ class ServerDaemon:
                 "server_http_host": self.config.tun_ip,
                 "server_http_port": int(payload.get("server_http_port", 8080)),
                 "uftp_port": int(payload.get("uftp_port", 9000)),
+                "link_id": self.config.link_id,
                 "algorithm": payload.get("algorithm", "wfb_ng.fl.issue41_algorithm:client_main"),
                 "algorithm_config": payload.get("algorithm_config", {}),
                 "timestamp_ms": int(time.time() * 1000),
