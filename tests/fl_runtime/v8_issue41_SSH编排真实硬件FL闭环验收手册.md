@@ -108,6 +108,19 @@ Transport 参数：
 | radio short GI | `1` |
 | FEC K/N | `8/12` |
 
+### 1.4 物理网卡与宿主机 USB 控制器约束
+
+真实测试现场中，无线网卡物理硬件特性与虚拟化控制器形态对 40 MiB 大文件空口传输有决定性影响：
+
+1. **虚拟 USB 控制器要求（xHCI 强约束）**：
+   - 虚拟机（如 VMware）中挂载无线网卡时，在虚拟机内部必须通过 `lsusb -t` 确认网卡绑定在 **`xhci_hcd`** 控制器下。
+   - **禁止使用虚拟 `ehci-pci` 控制器**：若物理网卡插在宿主机 USB 2.0 黑色/白色接口或 USB 2.0 扩展坞上，VMware 会将其分配给虚拟 `ehci-pci`。在 15 Mbps 组播广播高吞吐下，虚拟 EHCI 中断合并延时严重，导致内核与驱动丢失超过 80% 数据包，最终触发 120 秒超时。
+   - 物理宿主机必须将网卡接入 **物理 USB 3.0 蓝色接口（或标有 SS 标志）**。
+2. **标定网卡与弱网卡隔离**：
+   - **Server 广播发射机**：必须分配 MAC 为 **`5c:ff:ff:af:6d:8c`** 的网卡。该网卡 5GHz HT40+ 发射平稳、覆盖均匀。
+   - **弱发射网卡隔离**：MAC 为 **`fc:22:1c:10:01:19`** 的网卡存在硬件发射功率衰减，高调制（MCS 6）空口丢包率极高，严禁分配给核心节点。
+   - **Client 推荐网卡**：`fc:22:1c:30:0f:04`、`fc:22:1c:10:01:57`、`fc:22:1c:30:0c:bb`、`fc:22:1c:30:0c:bc`。
+
 ## 2. 代码基线同步
 
 ### 2.1 分支来源
@@ -533,3 +546,31 @@ tests/logs/v8_issue41_<timestamp>_<token>/
 12. 归档目录未被覆盖，非 diagnostic 模式，顶层及各阶段 run_id 一致。
 13. `result.md` 和 `issue41_summary.json` 完整包含全部五个分区，并通过 `issue41_validate_archive.py` 严格校验。
 14. 任何失败均生成 failed 结论并准确分类，严禁缺证据或降级报告成功。
+
+## 7. 现场常见故障定位与避坑指南
+
+### 7.1 故障一：周期 1 shared UFTP 下行超时（丢包率 > 80%）
+- **现象**：Server 发送 40 MiB 模型时，部分 Client 接收极其缓慢或丢包率达 80% 以上，持续发送 NAK 直到 120 秒超时退出。
+- **排查路径**：
+  1. 在 Client 上执行 `lsusb -t`，检查无线网卡是否挂载在 `Driver=ehci-pci` 控制器下。若是，将其换插到物理 USB 3.0 蓝色接口，确保挂载在 `Driver=xhci_hcd` 下。
+  2. 检查 Server 网卡 MAC 是否为弱网卡 `fc:22:1c:10:01:19`。若是，将 Server 网卡更换为标定的 `5c:ff:ff:af:6d:8c`。
+
+### 7.2 故障二：UFTP 握手阶段立即报错（Aborting all clients）
+- **现象**：Server 发送 ANNOUNCE 1.1~20.1 仅耗时数秒后即退出，提示 `CONNECT;failed;<client_uid>`。
+- **排查路径**：
+  1. 查看未注册 Client 的 `uftpd.log`：若 Client 记录了 `REGISTER sent` 多次，说明 Client 确实发出了握手包。
+  2. 查看 Server 的 `wfb.log`：搜索 `PKT_SRC <node_id>`。若 Server 仅收到少量分片（如 4 个分片），说明空口丢包导致无法凑齐 FEC $K=8$ 还原数据包。检查该 Client 是否误用了弱发射网卡 `fc:22:1c:10:01:19` 或天线松动。
+
+### 7.3 故障三：VMware 网卡自动断开（闪断）
+- **现象**：宿主机刚插入网卡，虚拟机 `dmesg` 提示 `USB disconnect, device number N`，预检报找不到网卡。
+- **排查路径**：
+  - 在 VMware 虚拟机窗口点击菜单：`虚拟机 -> 可移动设备 -> Realtek 802.11n NIC -> 连接` 手动重新连接。
+
+### 7.4 故障四：非 6 节点拓扑预检报错找不到 client6/client7
+- **现象**：运行现场只有 2 台或 4 台客户端时，脚本预检直接 fail-closed。
+- **排查路径**：
+  - 必须显式导出 `ISSUE41_CLIENT_ROLES` 覆盖默认 6 客户端拓扑，例如：
+    ```bash
+    export ISSUE41_CLIENT_ROLES="client1 client2"
+    export ISSUE41_SMOKE_CYCLE_COUNT=1
+    ```
