@@ -118,8 +118,13 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
     try:
         if "/" in raw_tun_ip:
             interface = ipaddress.IPv4Interface(raw_tun_ip)
+            if interface.network.prefixlen != 24:
+                raise FLRuntimeError(
+                    "invalid_node_identity",
+                    f"tun_ip 子网掩码必须为 /24，实际为: /{interface.network.prefixlen}",
+                )
             tun_ip_str = str(interface.ip)
-            tun_cidr_str = str(interface)
+            tun_cidr_str = f"{tun_ip_str}/24"
         else:
             addr = ipaddress.IPv4Address(raw_tun_ip)
             tun_ip_str = str(addr)
@@ -282,6 +287,26 @@ class ClientDaemonConfig:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
         if self.tun_name is None:
             object.__setattr__(self, "tun_name", f"{DEFAULT_TUN_PREFIX}{self.node_id}")
+        if self.channel in FORBIDDEN_CHANNELS:
+            raise FLRuntimeError(
+                "forbidden_channel",
+                f"Channel {self.channel} is strictly forbidden due to driver kernel crash defect.",
+            )
+        if self.channel not in ALLOWED_5GHZ_CHANNELS:
+            raise FLRuntimeError(
+                "invalid_channel",
+                f"Channel {self.channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
+            )
+        if not (10 <= self.radio_txpower_dbm <= 20):
+            raise FLRuntimeError(
+                "invalid_txpower",
+                f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {self.radio_txpower_dbm}",
+            )
+        if not (3 <= self.uplink_mcs <= 6):
+            raise FLRuntimeError(
+                "invalid_mcs",
+                f"uplink_mcs 必须在 [3, 6] 范围内: {self.uplink_mcs}",
+            )
 
 
 @dataclass(frozen=True)
@@ -313,6 +338,26 @@ class ClientJobConfig:
             # Strip CIDR prefix if present
             clean_ip = self.tun_ip.split("/")[0]
             object.__setattr__(self, "uftp_bind_host", clean_ip)
+        if self.channel in FORBIDDEN_CHANNELS:
+            raise FLRuntimeError(
+                "forbidden_channel",
+                f"Channel {self.channel} is strictly forbidden due to driver kernel crash defect.",
+            )
+        if self.channel not in ALLOWED_5GHZ_CHANNELS:
+            raise FLRuntimeError(
+                "invalid_channel",
+                f"Channel {self.channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
+            )
+        if not (10 <= self.radio_txpower_dbm <= 20):
+            raise FLRuntimeError(
+                "invalid_txpower",
+                f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {self.radio_txpower_dbm}",
+            )
+        if not (3 <= self.uplink_mcs <= 6):
+            raise FLRuntimeError(
+                "invalid_mcs",
+                f"uplink_mcs 必须在 [3, 6] 范围内: {self.uplink_mcs}",
+            )
 
 
 class JobSandbox:
@@ -363,94 +408,95 @@ class JobSandbox:
             self.state = DaemonState.PREPARING
             self._active_job = job
             self._job_work_dir = os.path.join(self.work_dir, f"job_{job.job_id}")
-            os.makedirs(self._job_work_dir, exist_ok=True)
 
-            # Ensure any leftover TUN from a previous crashed run is cleaned up
-            self.network_adapter.teardown_tun(job.tun_name)
-
-            # Generate role configuration JSON per wfb_ng.fl.service schema
-            tun_addr = f"{job.tun_ip}/24" if "/" not in job.tun_ip else job.tun_ip
-            client_config_path = os.path.join(self._job_work_dir, "client_role.json")
-
-            link_args = [
-                "--tun-name",
-                job.tun_name,
-                "--tun-addr",
-                tun_addr,
-                "--link-id",
-                "0",
-                "--uplink-stream",
-                "1",
-                "--downlink-stream",
-                "2",
-                "--fec-k",
-                "8",
-                "--fec-n",
-                "14",
-                "--radio-bandwidth",
-                "40" if "40" in job.channel_width else "20",
-                "--radio-mcs-index",
-                str(job.uplink_mcs),
-                "--radio-short-gi",
-                "--air-interface",
-                air_interface,
-            ]
-
-            obs_path = job.observation_path
-            if job.live_observation and not obs_path:
-                obs_path = os.path.join(self._job_work_dir, "observation.jsonl")
-
-            role_dict: Dict[str, Any] = {
-                "schema_version": 1,
-                "role": "client",
-                "work_dir": self._job_work_dir,
-                "node_id": job.node_id,
-                "uftp_uid": job.node_id,
-                "uftp_port": job.uftp_port,
-                "server_http_host": job.server_http_host,
-                "server_http_port": job.server_http_port,
-                "uftp_bind_host": job.uftp_bind_host,
-                "uftp_multicast_host": job.uftp_multicast_host,
-                "uftp_private_multicast_host": job.uftp_private_multicast_host,
-                "channel": job.channel,
-                "channel_width": job.channel_width,
-                "radio_txpower_dbm": job.radio_txpower_dbm,
-                "max_update_size_bytes": job.max_update_size_bytes,
-                "live_observation": job.live_observation,
-                "observation_path": obs_path,
-                "io_timeout_seconds": job.io_timeout_seconds,
-                "link_args": link_args,
-            }
-
-            with open(client_config_path, "w", encoding="utf-8") as f:
-                json.dump(role_dict, f, indent=2)
-
-            algorithm_config_path = None
-            if job.algorithm_config is not None:
-                algorithm_config_path = os.path.join(
-                    self._job_work_dir, "algorithm_config.json"
-                )
-                with open(algorithm_config_path, "w", encoding="utf-8") as f:
-                    json.dump(job.algorithm_config, f, indent=2)
-
-            # Build command line
-            if self.command_prefix:
-                cmd = list(self.command_prefix)
-            else:
-                cmd = [
-                    sys.executable,
-                    "-c",
-                    "from wfb_ng.fl.service import client_main; client_main()",
-                    "--config",
-                    client_config_path,
-                ]
-                if job.algorithm:
-                    cmd += ["--algorithm", job.algorithm]
-                if algorithm_config_path:
-                    cmd += ["--algorithm-config", algorithm_config_path]
-
-            logger.info("派生 RoleService 子进程沙箱: %s", " ".join(cmd))
             try:
+                os.makedirs(self._job_work_dir, exist_ok=True)
+
+                # Ensure any leftover TUN from a previous crashed run is cleaned up
+                self.network_adapter.teardown_tun(job.tun_name)
+
+                # Generate role configuration JSON per wfb_ng.fl.service schema
+                tun_addr = f"{job.tun_ip}/24" if "/" not in job.tun_ip else job.tun_ip
+                client_config_path = os.path.join(self._job_work_dir, "client_role.json")
+
+                link_args = [
+                    "--tun-name",
+                    job.tun_name,
+                    "--tun-addr",
+                    tun_addr,
+                    "--link-id",
+                    "0",
+                    "--uplink-stream",
+                    "1",
+                    "--downlink-stream",
+                    "2",
+                    "--fec-k",
+                    "8",
+                    "--fec-n",
+                    "14",
+                    "--radio-bandwidth",
+                    "40" if "40" in job.channel_width else "20",
+                    "--radio-mcs-index",
+                    str(job.uplink_mcs),
+                    "--radio-short-gi",
+                    "--air-interface",
+                    air_interface,
+                ]
+
+                obs_path = job.observation_path
+                if job.live_observation and not obs_path:
+                    obs_path = os.path.join(self._job_work_dir, "observation.jsonl")
+
+                role_dict: Dict[str, Any] = {
+                    "schema_version": 1,
+                    "role": "client",
+                    "work_dir": self._job_work_dir,
+                    "node_id": job.node_id,
+                    "uftp_uid": job.node_id,
+                    "uftp_port": job.uftp_port,
+                    "server_http_host": job.server_http_host,
+                    "server_http_port": job.server_http_port,
+                    "uftp_bind_host": job.uftp_bind_host,
+                    "uftp_multicast_host": job.uftp_multicast_host,
+                    "uftp_private_multicast_host": job.uftp_private_multicast_host,
+                    "channel": job.channel,
+                    "channel_width": job.channel_width,
+                    "radio_txpower_dbm": job.radio_txpower_dbm,
+                    "max_update_size_bytes": job.max_update_size_bytes,
+                    "live_observation": job.live_observation,
+                    "observation_path": obs_path,
+                    "io_timeout_seconds": job.io_timeout_seconds,
+                    "link_args": link_args,
+                }
+
+                with open(client_config_path, "w", encoding="utf-8") as f:
+                    json.dump(role_dict, f, indent=2)
+
+                algorithm_config_path = None
+                if job.algorithm_config is not None:
+                    algorithm_config_path = os.path.join(
+                        self._job_work_dir, "algorithm_config.json"
+                    )
+                    with open(algorithm_config_path, "w", encoding="utf-8") as f:
+                        json.dump(job.algorithm_config, f, indent=2)
+
+                # Build command line
+                if self.command_prefix:
+                    cmd = list(self.command_prefix)
+                else:
+                    cmd = [
+                        sys.executable,
+                        "-m",
+                        "wfb_ng.fl.service",
+                        "--config",
+                        client_config_path,
+                    ]
+                    if job.algorithm:
+                        cmd += ["--algorithm", job.algorithm]
+                    if algorithm_config_path:
+                        cmd += ["--algorithm-config", algorithm_config_path]
+
+                logger.info("派生 RoleService 子进程沙箱: %s", " ".join(cmd))
                 log_path = os.path.join(self._job_work_dir, "role_service.log")
                 self._log_file = open(log_path, "w", encoding="utf-8")
                 # Use start_new_session=True to place child in a new process group
@@ -465,21 +511,27 @@ class JobSandbox:
                 self.state = DaemonState.RUNNING
                 return self._process
             except Exception as exc:
-                if self._log_file is not None:
-                    try:
-                        self._log_file.close()
-                    except Exception:
-                        pass
-                    self._log_file = None
-                if self._job_work_dir and os.path.exists(self._job_work_dir):
-                    shutil.rmtree(self._job_work_dir, ignore_errors=True)
-                self._job_work_dir = None
-                self._active_job = None
-                self._process = None
-                self.state = DaemonState.IDLE
+                self._cleanup_failed_start()
                 raise FLRuntimeError(
                     "sandbox_start_failed", f"启动角色服务子进程失败: {exc}"
                 ) from exc
+
+    def _cleanup_failed_start(self) -> None:
+        if self._log_file is not None:
+            try:
+                self._log_file.close()
+            except Exception:
+                pass
+            self._log_file = None
+        if self._job_work_dir and os.path.exists(self._job_work_dir):
+            try:
+                shutil.rmtree(self._job_work_dir, ignore_errors=True)
+            except Exception:
+                pass
+        self._job_work_dir = None
+        self._active_job = None
+        self._process = None
+        self.state = DaemonState.IDLE
 
     def poll(self) -> Optional[int]:
         with self._lock:
@@ -514,6 +566,7 @@ class JobSandbox:
             proc = self._process
             if proc is not None and proc.poll() is None:
                 pid = proc.pid
+                pgid = None
                 try:
                     pgid = os.getpgid(pid)
                     logger.info("终止子进程组 PGID=%d (PID=%d)", pgid, pid)
@@ -531,15 +584,20 @@ class JobSandbox:
                     time.sleep(0.05)
 
                 if proc.poll() is None:
-                    logger.warning("子进程未响应 SIGTERM，发送 SIGKILL (PGID=%d)", pgid)
-                    try:
-                        os.killpg(pgid, signal.SIGKILL)
-                    except OSError:
+                    if pgid is not None:
+                        logger.warning("子进程未响应 SIGTERM，发送 SIGKILL (PGID=%d)", pgid)
                         try:
-                            proc.kill()
+                            os.killpg(pgid, signal.SIGKILL)
                         except OSError:
                             pass
-                    proc.wait()
+                    try:
+                        proc.kill()
+                    except OSError:
+                        pass
+                    try:
+                        proc.wait(timeout=1.0)
+                    except Exception:
+                        pass
 
             self._finalize(proc.poll() if proc else 0)
 
@@ -685,7 +743,26 @@ class ClientDaemon:
                 raise FLRuntimeError(
                     "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
                 )
-            return self.sandbox.start(job_config, air_interface=self.current_interface)
+            if job_config.node_id != self.config.node_id:
+                raise FLRuntimeError(
+                    "invalid_job_config",
+                    f"作业节点 ID ({job_config.node_id}) 与守护进程节点 ID ({self.config.node_id}) 不符",
+                )
+            if job_config.tun_name != self.config.tun_name:
+                raise FLRuntimeError(
+                    "invalid_job_config",
+                    f"作业 TUN 名称 ({job_config.tun_name}) 与守护进程 TUN 名称 ({self.config.tun_name}) 不符",
+                )
+            if job_config.tun_ip != self.config.tun_ip:
+                raise FLRuntimeError(
+                    "invalid_job_config",
+                    f"作业 TUN IP ({job_config.tun_ip}) 与守护进程 TUN IP ({self.config.tun_ip}) 不符",
+                )
+            try:
+                return self.sandbox.start(job_config, air_interface=self.current_interface)
+            except Exception:
+                self._restore_tun_if_idle()
+                raise
 
     def abort_job(self) -> None:
         with self._lock:

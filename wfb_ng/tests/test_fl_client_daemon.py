@@ -138,8 +138,8 @@ class TestNodeIdentity(unittest.TestCase):
         self.assertEqual(ctx.exception.error_code, "invalid_node_identity")
 
     def test_load_node_identity_rejects_invalid_tun_ip(self):
-        # Conflicts with server 10.80.0.1, wrong node IP (10.80.0.11 is node 1), invalid IP, wrong subnet
-        for bad_ip in ["10.80.0.1", "10.80.0.11", "invalid_ip", "10.80.0.256", "192.168.1.1"]:
+        # Conflicts with server 10.80.0.1, wrong node IP (10.80.0.11 is node 1), invalid prefix length /16, invalid IP, wrong subnet
+        for bad_ip in ["10.80.0.1", "10.80.0.11", "10.80.0.12/16", "invalid_ip", "10.80.0.256", "192.168.1.1"]:
             path = self._write_node_json({"node_id": 2, "tun_ip": bad_ip})
             with self.assertRaises(FLRuntimeError) as ctx:
                 load_node_identity(path)
@@ -472,7 +472,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         job_config = ClientJobConfig(
             job_id="run_01",
             node_id=1,
-            tun_name="tun_c1",
+            tun_name="fl-c1",
             tun_ip="10.80.0.11",
             server_http_host="10.80.0.1",
             server_http_port=8080,
@@ -523,6 +523,33 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertIn("--tun-name", parsed_config["link_args"])
 
         sandbox.wait(timeout=2.0)
+
+    def test_sandbox_default_command_uses_module_entry(self):
+        sandbox = JobSandbox(
+            work_dir=self.temp_dir,
+            network_adapter=self.adapter,
+        )
+        job_config = ClientJobConfig(
+            job_id="mod_test",
+            node_id=1,
+            tun_name="fl-c1",
+            tun_ip="10.80.0.11",
+        )
+        with mock.patch("subprocess.Popen") as mock_popen:
+            mock_proc = mock.Mock(
+                pid=12345,
+                poll=mock.Mock(return_value=0),
+                wait=mock.Mock(return_value=0),
+            )
+            mock_popen.return_value = mock_proc
+            sandbox.start(job_config, air_interface="wlx001")
+
+            cmd = mock_popen.call_args[0][0]
+            self.assertEqual(cmd[0], sys.executable)
+            self.assertEqual(cmd[1], "-m")
+            self.assertEqual(cmd[2], "wfb_ng.fl.service")
+            self.assertIn("--config", cmd)
+            sandbox.abort()
 
     def test_sandbox_handles_abnormal_child_exit_code(self):
         stub_script = "import sys; sys.exit(42)"
@@ -577,7 +604,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         job_config = ClientJobConfig(
             job_id="bg_job",
             node_id=1,
-            tun_name="tun_bg",
+            tun_name="fl-c1",
             tun_ip="10.80.0.11",
         )
         daemon.trigger_job(job_config)
@@ -626,6 +653,58 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertIn("ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json", content)
         self.assertIn("KillMode=control-group", content)
         self.assertIn("Restart=always", content)
+
+    def test_trigger_job_validates_matching_identity_and_restores_on_failure(self):
+        config = ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", work_dir=self.temp_dir)
+        daemon = ClientDaemon(config=config, network_adapter=self.adapter)
+        daemon.poll_hardware_once()
+        self.assertTrue(self.adapter.is_tun_active("fl-c1"))
+
+        # 1. Reject mismatched node_id
+        bad_node = ClientJobConfig(job_id="b1", node_id=2, tun_name="fl-c1", tun_ip="10.80.0.12")
+        with self.assertRaises(FLRuntimeError) as ctx:
+            daemon.trigger_job(bad_node)
+        self.assertEqual(ctx.exception.error_code, "invalid_job_config")
+
+        # 2. Reject mismatched tun_name
+        bad_name = ClientJobConfig(job_id="b2", node_id=1, tun_name="other_tun", tun_ip="10.80.0.11")
+        with self.assertRaises(FLRuntimeError) as ctx:
+            daemon.trigger_job(bad_name)
+        self.assertEqual(ctx.exception.error_code, "invalid_job_config")
+
+        # 3. Reject mismatched tun_ip
+        bad_ip = ClientJobConfig(job_id="b3", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.12")
+        with self.assertRaises(FLRuntimeError) as ctx:
+            daemon.trigger_job(bad_ip)
+        self.assertEqual(ctx.exception.error_code, "invalid_job_config")
+
+        # 4. Failed start restores TUN
+        daemon.sandbox.command_prefix = ["/nonexistent/failing_binary"]
+        good_job = ClientJobConfig(job_id="fail_restore", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.11")
+        with self.assertRaises(FLRuntimeError):
+            daemon.trigger_job(good_job)
+        self.assertTrue(self.adapter.is_tun_active("fl-c1"))
+
+    def test_rf_parameter_ranges_validation(self):
+        # Forbidden channel 161
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=161)
+        self.assertEqual(ctx.exception.error_code, "forbidden_channel")
+
+        # Out of pool channel 36
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=36)
+        self.assertEqual(ctx.exception.error_code, "invalid_channel")
+
+        # Out of range txpower
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=25)
+        self.assertEqual(ctx.exception.error_code, "invalid_txpower")
+
+        # Out of range uplink_mcs
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=7)
+        self.assertEqual(ctx.exception.error_code, "invalid_mcs")
 
     def test_default_template_node_json_validity(self):
         template_path = "scripts/default/node.json"
