@@ -15,11 +15,12 @@ import json
 import os
 import select
 import socket
+import struct
 import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Sequence, Set, Tuple
 
 # Allowed 5GHz UNII-3 channel pool
 ALLOWED_5GHZ_CHANNELS: Tuple[int, ...] = (149, 153, 157, 165)
@@ -43,6 +44,26 @@ FIXED_FEC_K: int = 8
 FIXED_FEC_N: int = 14
 FIXED_BANDWIDTH: str = "HT40+"
 FIXED_GUARD_INTERVAL: str = "short"
+
+ALLOWED_CONFIG_KEYS: Set[str] = {
+    "channel",
+    "radio_txpower_dbm",
+    "downlink_mcs",
+    "uplink_mcs",
+    "uftp_rate_kbps",
+    "fec_k",
+    "fec_n",
+    "channel_width",
+    "guard_interval",
+}
+
+ALLOWED_PATCH_KEYS: Set[str] = {
+    "channel",
+    "radio_txpower_dbm",
+    "downlink_mcs",
+    "uplink_mcs",
+    "uftp_rate_kbps",
+}
 
 
 @dataclass(frozen=True)
@@ -146,7 +167,8 @@ class RadioConfig:
 
     @property
     def channel_width(self) -> str:
-        return FIXED_BANDWIDTH
+        # Channel 165 has no upper secondary channel in UNII-3; kernel strictly requires HT20
+        return "HT20" if self.channel == 165 else FIXED_BANDWIDTH
 
     @property
     def guard_interval(self) -> str:
@@ -179,6 +201,11 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     """
     if not isinstance(config, dict):
         raise TypeError(f"Config must be a dict, got {type(config).__name__}")
+
+    # Fail closed on unknown keys
+    for k in config:
+        if k not in ALLOWED_CONFIG_KEYS:
+            raise ValueError(f"Unknown configuration key: {k!r}")
 
     raw_channel = config.get("channel", DEFAULT_CHANNEL)
     if not isinstance(raw_channel, int) or isinstance(raw_channel, bool):
@@ -248,19 +275,19 @@ def validate_radio_patch(
 ) -> RadioConfig:
     """
     Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
-    If base is not provided, defaults to default RadioConfig().
+    Per ADR-0014, unmentioned attributes strictly remain untouched.
+    Unknown keys fail closed.
     """
+    if not isinstance(patch, dict):
+        raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+
+    for k in patch:
+        if k not in ALLOWED_PATCH_KEYS:
+            raise ValueError(f"Unknown patch key: {k!r}")
+
     if base is None:
         base = RadioConfig()
     merged = base.to_dict()
-
-    # If downlink_mcs is being changed but uftp_rate_kbps is not explicitly specified in patch,
-    # auto-adapt the default rate for the new MCS.
-    if "downlink_mcs" in patch and "uftp_rate_kbps" not in patch:
-        new_mcs = patch["downlink_mcs"]
-        if isinstance(new_mcs, int) and new_mcs in ALLOWED_MCS_VALUES:
-            merged["uftp_rate_kbps"] = get_downlink_rate_bounds(new_mcs).default_rate_kbps
-
     merged.update(patch)
     return validate_radio_config(merged)
 
@@ -371,31 +398,48 @@ class LiveRadioSurveyBackend:
     def __init__(self, use_sudo: bool = True):
         self.use_sudo = use_sudo
         self.initial_channel: Optional[int] = None
+        self.initial_width: Optional[str] = None
 
     def prepare(self, interface: str) -> None:
-        self.initial_channel = self._get_current_channel(interface)
+        self.initial_channel, self.initial_width = self._get_current_channel_info(interface)
 
-    def _get_current_channel(self, interface: str) -> Optional[int]:
+    def _get_current_channel_info(self, interface: str) -> Tuple[Optional[int], Optional[str]]:
         try:
             out = subprocess.check_output(["iw", "dev", interface, "info"], text=True, stderr=subprocess.DEVNULL)
+            ch = None
+            width = None
             for line in out.splitlines():
                 line = line.strip()
                 if line.startswith("channel "):
                     parts = line.split()
                     if len(parts) >= 2:
-                        return int(parts[1])
+                        ch = int(parts[1])
+                    if "width: 40 MHz" in line:
+                        width = "HT40+"
+                    elif "width: 20 MHz" in line:
+                        width = "HT20"
+            return ch, width
         except (OSError, subprocess.SubprocessError):
-            pass
-        return None
+            return None, None
 
-    def _set_channel(self, interface: str, channel: int) -> None:
-        cmd = ["iw", "dev", interface, "set", "channel", str(channel)]
+    def _get_local_mac(self, interface: str) -> Optional[bytes]:
+        try:
+            with open(f"/sys/class/net/{interface}/address", "r", encoding="utf-8") as f:
+                mac_str = f.read().strip()
+                return bytes.fromhex(mac_str.replace(":", ""))
+        except (OSError, ValueError):
+            return None
+
+    def _set_channel(self, interface: str, channel: int, width: Optional[str] = None) -> None:
+        if width is None:
+            width = "HT20" if channel == 165 else FIXED_BANDWIDTH
+        cmd = ["iw", "dev", interface, "set", "channel", str(channel), width]
         if self.use_sudo and os.geteuid() != 0:
             cmd = ["sudo"] + cmd
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode != 0:
             raise RuntimeError(
-                f"Failed to set interface {interface} to channel {channel}: {res.stderr.strip()}"
+                f"Failed to set interface {interface} to channel {channel} {width}: {res.stderr.strip()}"
             )
 
     def count_frames(self, interface: str, channel: int, duration_ms: float) -> int:
@@ -406,6 +450,8 @@ class LiveRadioSurveyBackend:
 
         # Allow hardware to settle on frequency
         time.sleep(0.05)
+
+        local_mac = self._get_local_mac(interface)
 
         ETH_P_ALL = 0x0003
         try:
@@ -429,7 +475,25 @@ class LiveRadioSurveyBackend:
                 if r:
                     try:
                         while True:
-                            sock.recv(4096)
+                            data, sll = sock.recvfrom(4096)
+                            # Exclude locally generated outgoing packets
+                            if len(sll) >= 3 and sll[2] == socket.PACKET_OUTGOING:
+                                continue
+                            # Parse Radiotap header to inspect 802.11 frame
+                            if len(data) < 4:
+                                continue
+                            it_len = struct.unpack_from("<H", data, 2)[0]
+                            if len(data) < it_len + 16:
+                                continue
+                            # 802.11 Frame Control
+                            fc = struct.unpack_from("<H", data, it_len)[0]
+                            ftype = (fc >> 2) & 0x3
+                            if ftype > 2:  # 0=Mgmt, 1=Control, 2=Data
+                                continue
+                            # Transmitter Address (TA) at offset 10 in 802.11 header
+                            ta = data[it_len + 10 : it_len + 16]
+                            if local_mac and ta == local_mac:
+                                continue
                             count += 1
                     except (BlockingIOError, InterruptedError):
                         pass
@@ -439,10 +503,10 @@ class LiveRadioSurveyBackend:
         return count
 
     def finish(self, interface: str) -> None:
-        # Restore original channel to prevent unintended background channel hopping
+        # Restore original channel and width to prevent unintended background channel hopping
         if self.initial_channel and self.initial_channel in ALLOWED_5GHZ_CHANNELS:
             try:
-                self._set_channel(interface, self.initial_channel)
+                self._set_channel(interface, self.initial_channel, self.initial_width)
             except Exception:
                 pass
 
@@ -486,8 +550,7 @@ def survey_spectrum(
             interface = "mock"
 
     results_raw: List[Dict[str, Any]] = []
-    if hasattr(backend, "prepare"):
-        backend.prepare(interface)
+    backend.prepare(interface)
 
     try:
         for ch in ALLOWED_5GHZ_CHANNELS:
@@ -505,8 +568,7 @@ def survey_spectrum(
                 "density_level": density_level,
             })
     finally:
-        if hasattr(backend, "finish"):
-            backend.finish(interface)
+        backend.finish(interface)
 
     # Sort results: cleanest first (lowest fps), tie-break with channel number
     results_raw.sort(key=lambda x: (x["fps"], x["channel"]))
@@ -608,20 +670,10 @@ def _cmd_validate(args: argparse.Namespace) -> int:
 
 
 def _cmd_survey(args: argparse.Namespace) -> int:
-    backend: Optional[SurveyBackend] = None
-    if args.mock_frames:
-        mapping: Dict[int, int] = {}
-        for item in args.mock_frames.split(","):
-            if ":" in item:
-                ch_str, count_str = item.split(":", 1)
-                mapping[int(ch_str.strip())] = int(count_str.strip())
-        backend = MockSurveyBackend(mapping)
-
     try:
         report = survey_spectrum(
             interface=args.interface,
             duration_ms=args.duration_ms,
-            backend=backend,
             congestion_threshold_fps=args.congestion_threshold,
         )
         if args.json:
@@ -672,7 +724,6 @@ def build_parser() -> argparse.ArgumentParser:
     p_surv.add_argument("-i", "--interface", type=str, help="无线网卡接口名称 (默认自动探测 wlx*)")
     p_surv.add_argument("-d", "--duration-ms", type=float, default=300.0, help="单信道嗅探时长毫秒 (默认 300ms)")
     p_surv.add_argument("-t", "--congestion-threshold", type=float, default=50.0, help="拥堵判定阈值 fps (默认 50)")
-    p_surv.add_argument("--mock-frames", type=str, help="模拟数据 'ch:frames,ch:frames' (用于无网卡测试)")
     p_surv.add_argument("--json", action="store_true", help="输出 JSON 格式")
 
     return parser

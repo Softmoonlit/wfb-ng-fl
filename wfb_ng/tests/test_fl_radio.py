@@ -92,6 +92,21 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(config.channel_width, "HT40+")
         self.assertEqual(config.guard_interval, "short")
 
+    def test_channel_165_adapts_to_ht20(self):
+        config157 = validate_radio_config({"channel": 157})
+        self.assertEqual(config157.channel_width, "HT40+")
+        config165 = validate_radio_config({"channel": 165})
+        self.assertEqual(config165.channel_width, "HT20")
+
+    def test_unknown_keys_fail_closed(self):
+        with self.assertRaises(ValueError) as ctx:
+            validate_radio_config({"channel": 157, "preset": "robust"})
+        self.assertIn("preset", str(ctx.exception))
+
+        with self.assertRaises(ValueError) as ctx:
+            validate_radio_config({"channel": 157, "chanel": 157})
+        self.assertIn("chanel", str(ctx.exception))
+
     def test_custom_valid_config(self):
         cfg_dict = {
             "channel": 149,
@@ -162,15 +177,27 @@ class TestRadioConfigValidator(unittest.TestCase):
 
     def test_validate_radio_patch(self):
         base = RadioConfig(channel=157, radio_txpower_dbm=12, downlink_mcs=3, uplink_mcs=6, uftp_rate_kbps=15000)
-        # Patch channel only
+        # Patch channel only: unmentioned attributes strictly preserved per ADR-0014
         patched = validate_radio_patch({"channel": 153}, base=base)
         self.assertEqual(patched.channel, 153)
         self.assertEqual(patched.radio_txpower_dbm, 12)
+        self.assertEqual(patched.downlink_mcs, 3)
+        self.assertEqual(patched.uplink_mcs, 6)
+        self.assertEqual(patched.uftp_rate_kbps, 15000)
 
-        # Patch downlink_mcs updates uftp_rate default if uftp_rate not provided in patch
-        patched_mcs = validate_radio_patch({"downlink_mcs": 5}, base=base)
+        # Patch txpower only
+        patched_pwr = validate_radio_patch({"radio_txpower_dbm": 15}, base=base)
+        self.assertEqual(patched_pwr.radio_txpower_dbm, 15)
+        self.assertEqual(patched_pwr.channel, 157)
+
+        # Patch downlink_mcs and uftp_rate explicitly
+        patched_mcs = validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": 28000}, base=base)
         self.assertEqual(patched_mcs.downlink_mcs, 5)
         self.assertEqual(patched_mcs.uftp_rate_kbps, 28000)
+
+        # Patch with unknown key fails closed
+        with self.assertRaises(ValueError):
+            validate_radio_patch({"unknown_field": 123}, base=base)
 
         # Patch with forbidden channel 161 rejected
         with self.assertRaises(ValueError):
@@ -344,12 +371,21 @@ class TestRadioCLI(unittest.TestCase):
         ])
         self.assertEqual(code, 1)
 
-    def test_cli_survey_mock_json(self):
-        code, out, _ = self.run_cli([
-            "survey",
-            "--mock-frames", "149:50,153:0,157:10,165:20",
-            "--json"
-        ])
+    def test_cli_survey_json(self):
+        mock_report = SpectrumSurveyReport(
+            interface="wlx_mock",
+            results=[
+                ChannelSurveyResult(153, 0, 300.0, 0.0, 1, False, "clean"),
+                ChannelSurveyResult(157, 10, 300.0, 33.3, 2, False, "moderate"),
+                ChannelSurveyResult(165, 20, 300.0, 66.7, 3, True, "congested"),
+                ChannelSurveyResult(149, 30, 300.0, 100.0, 4, True, "congested"),
+            ],
+            recommended_channel=153,
+            all_congested=False,
+            risk_warning=None,
+        )
+        with mock.patch("wfb_ng.fl.radio.survey_spectrum", return_value=mock_report):
+            code, out, _ = self.run_cli(["survey", "-i", "wlx_mock", "--json"])
         self.assertEqual(code, 0)
         import json
         data = json.loads(out)
@@ -358,14 +394,54 @@ class TestRadioCLI(unittest.TestCase):
         self.assertEqual(len(data["results"]), 4)
 
     def test_cli_survey_congested_warning(self):
-        code, out, _ = self.run_cli([
-            "survey",
-            "--mock-frames", "149:80,153:90,157:85,165:100",
-            "--congestion-threshold", "50"
-        ])
+        mock_report = SpectrumSurveyReport(
+            interface="wlx_mock",
+            results=[
+                ChannelSurveyResult(149, 80, 300.0, 266.7, 1, True, "busy"),
+                ChannelSurveyResult(157, 85, 300.0, 283.3, 2, True, "busy"),
+                ChannelSurveyResult(153, 90, 300.0, 300.0, 3, True, "busy"),
+                ChannelSurveyResult(165, 100, 300.0, 333.3, 4, True, "busy"),
+            ],
+            recommended_channel=149,
+            all_congested=True,
+            risk_warning="警告：全频段（149, 153, 157, 165）检测到较强外部 802.11 帧密度干扰",
+        )
+        with mock.patch("wfb_ng.fl.radio.survey_spectrum", return_value=mock_report):
+            code, out, _ = self.run_cli(["survey", "-i", "wlx_mock"])
         self.assertEqual(code, 0)
         self.assertIn("警告", out)
-        self.assertIn("153", out)
+        self.assertIn("149", out)
+
+    def test_external_process_invocation(self):
+        import subprocess
+        import sys
+        # Verify python -m wfb_ng.fl.radio rates
+        p1 = subprocess.run(
+            [sys.executable, "-m", "wfb_ng.fl.radio", "rates", "--json"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(p1.returncode, 0)
+        self.assertIn('"downlink_mcs": 3', p1.stdout)
+
+        # Verify scripts/wfb-fl-radio validate
+        p2 = subprocess.run(
+            ["./scripts/wfb-fl-radio", "validate", "-c", "157", "-p", "12", "-d", "3", "-u", "6", "--json"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(p2.returncode, 0)
+        self.assertIn('"channel": 157', p2.stdout)
+
+        # Verify exit code 1 on forbidden channel 161
+        p3 = subprocess.run(
+            ["./scripts/wfb-fl-radio", "validate", "-c", "161"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(p3.returncode, 0)
 
 
 if __name__ == "__main__":
