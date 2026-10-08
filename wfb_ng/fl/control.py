@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 
+from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.radio import (
     ALLOWED_5GHZ_CHANNELS,
     DEFAULT_CHANNEL,
@@ -1420,16 +1421,31 @@ class ControlPlaneClient:
             self._send_heartbeat(new_state.value, elapsed_ms=0)
             self._wake_event.set()
 
-    def notify_task_ready(self, job_id: str) -> None:
+    def notify_task_ready(self, job_id: str, timeout: float = 8.0) -> None:
         message = json.dumps({
             "type": "TASK_READY",
             "job_id": job_id,
             "node_id": self.node_id,
             "timestamp_ms": self._next_timestamp_ms(),
         }).encode("utf-8")
-        # Duplicate datagrams make the one-shot readiness edge robust over RF.
-        for _ in range(5):
-            self._send_unicast_datagram(message)
+        deadline = time.monotonic() + timeout
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(min(0.25, timeout))
+        try:
+            while time.monotonic() < deadline:
+                try:
+                    sock.sendto(message, (self.server_host, self.server_port))
+                    data, _ = sock.recvfrom(4096)
+                    if HeartbeatAck.from_bytes(data).ack:
+                        return
+                except (socket.timeout, BlockingIOError, ValueError, OSError):
+                    continue
+        finally:
+            sock.close()
+        raise FLRuntimeError(
+            "task_ready_timeout",
+            f"作业 {job_id} 的 TASK_READY 未在 {timeout:g} 秒内获得服务端确认",
+        )
 
     def _send_unicast_datagram(self, data: bytes) -> None:
         """Helper to send unicast control datagram to server."""
