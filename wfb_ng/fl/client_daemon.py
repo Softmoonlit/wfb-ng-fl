@@ -37,6 +37,7 @@ from .radio import (
     FORBIDDEN_CHANNELS,
     RECOMMENDED_UPLINK_MCS,
     find_wlx_interfaces,
+    validate_radio_config,
 )
 
 logger = logging.getLogger("wfb_fl_client_daemon")
@@ -152,43 +153,39 @@ def validate_rf_parameters(
     txpower_dbm: int = DEFAULT_TXPOWER_DBM,
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS,
 ) -> None:
-    """Validate discrete RF parameters against system contracts."""
+    """Validate discrete RF parameters by delegating to canonical radio.validate_radio_config."""
     if type(channel) is not int:
         raise FLRuntimeError(
             "invalid_channel", f"channel 必须为整数，实际为: {type(channel).__name__}"
         )
-    if channel in FORBIDDEN_CHANNELS:
-        raise FLRuntimeError(
-            "forbidden_channel",
-            f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
-        )
-    if channel not in ALLOWED_5GHZ_CHANNELS:
-        raise FLRuntimeError(
-            "invalid_channel",
-            f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-        )
-
     if type(txpower_dbm) is not int:
         raise FLRuntimeError(
             "invalid_txpower",
             f"radio_txpower_dbm 必须为整数，实际为: {type(txpower_dbm).__name__}",
         )
-    if not (10 <= txpower_dbm <= 20):
-        raise FLRuntimeError(
-            "invalid_txpower",
-            f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {txpower_dbm}",
-        )
-
     if type(uplink_mcs) is not int:
         raise FLRuntimeError(
             "invalid_mcs",
             f"uplink_mcs 必须为整数，实际为: {type(uplink_mcs).__name__}",
         )
-    if not (3 <= uplink_mcs <= 6):
-        raise FLRuntimeError(
-            "invalid_mcs",
-            f"uplink_mcs 必须在 [3, 6] 范围内: {uplink_mcs}",
-        )
+
+    try:
+        validate_radio_config({
+            "channel": channel,
+            "radio_txpower_dbm": txpower_dbm,
+            "uplink_mcs": uplink_mcs,
+        })
+    except ValueError as exc:
+        msg = str(exc)
+        if "forbidden" in msg:
+            raise FLRuntimeError("forbidden_channel", msg) from exc
+        if "channel" in msg:
+            raise FLRuntimeError("invalid_channel", msg) from exc
+        if "radio_txpower_dbm" in msg:
+            raise FLRuntimeError("invalid_txpower", msg) from exc
+        if "uplink_mcs" in msg:
+            raise FLRuntimeError("invalid_mcs", msg) from exc
+        raise FLRuntimeError("invalid_rf_config", msg) from exc
 
 
 class NetworkAdapter:
@@ -385,6 +382,7 @@ class JobSandbox:
         self.network_adapter = network_adapter
         self.command_prefix = list(command_prefix) if command_prefix else None
         self._process: Optional[subprocess.Popen] = None
+        self._pgid: Optional[int] = None
         self._log_file: Optional[Any] = None
         self._active_job: Optional[ClientJobConfig] = None
         self._job_work_dir: Optional[str] = None
@@ -513,6 +511,10 @@ class JobSandbox:
                     stderr=subprocess.STDOUT,
                     start_new_session=True,
                 )
+                try:
+                    self._pgid = os.getpgid(self._process.pid)
+                except OSError:
+                    self._pgid = None
                 self.state = DaemonState.RUNNING
                 return self._process
             except Exception as exc:
@@ -522,6 +524,12 @@ class JobSandbox:
                 ) from exc
 
     def _cleanup_failed_start(self) -> None:
+        if self._pgid is not None:
+            try:
+                os.killpg(self._pgid, signal.SIGKILL)
+            except OSError:
+                pass
+            self._pgid = None
         if self._log_file is not None:
             try:
                 self._log_file.close()
@@ -625,7 +633,16 @@ class JobSandbox:
             self._finalize(proc.poll() if proc else 0)
 
     def _finalize(self, returncode: int) -> None:
-        """Clean up process log file, TUN, temporary workspace, and reset state."""
+        """Clean up process log file, process group, TUN, temporary workspace, and reset state."""
+        # Always terminate any lingering descendant processes in the process group
+        pgid = self._pgid
+        if pgid is not None:
+            try:
+                os.killpg(pgid, signal.SIGKILL)
+            except OSError:
+                pass
+            self._pgid = None
+
         if self._log_file is not None:
             try:
                 self._log_file.close()

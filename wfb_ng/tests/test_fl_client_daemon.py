@@ -404,6 +404,52 @@ class TestRoleServiceSandbox(unittest.TestCase):
         with self.assertRaises(OSError):
             os.kill(gc_pid, 0)
 
+    def test_sandbox_normal_completion_kills_lingering_grandchild_descendants(self):
+        # Child completes normally with exit code 0, but leaves a lingering background grandchild
+        gc_pid_file = os.path.join(self.temp_dir, "grandchild_norm.pid")
+        stub_script = (
+            "import time, subprocess, sys\n"
+            f"sub = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
+            f"with open(r'{gc_pid_file}', 'w') as f:\n"
+            "    f.write(str(sub.pid))\n"
+            "time.sleep(0.05)\n"
+            "sys.exit(0)\n"
+        )
+        sandbox = JobSandbox(
+            work_dir=self.temp_dir,
+            network_adapter=self.adapter,
+            command_prefix=[sys.executable, "-c", stub_script],
+        )
+        job_config = ClientJobConfig(
+            job_id="norm_tree_01",
+            node_id=2,
+            tun_name="fl-c2",
+            tun_ip="10.80.0.12",
+        )
+
+        sandbox.start(job_config, air_interface="wlx001")
+
+        # Wait for child to exit normally
+        exit_code = sandbox.wait(timeout=2.0)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(sandbox.state, DaemonState.IDLE)
+
+        # Read grandchild PID
+        self.assertTrue(os.path.exists(gc_pid_file))
+        with open(gc_pid_file, "r") as f:
+            gc_pid = int(f.read().strip())
+
+        # Verify lingering grandchild was terminated by _finalize
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            try:
+                os.kill(gc_pid, 0)
+                time.sleep(0.05)
+            except OSError:
+                break
+        with self.assertRaises(OSError):
+            os.kill(gc_pid, 0)
+
         # Verify TUN is clean
         self.assertFalse(self.adapter.is_tun_active("tun_test_tree"))
 
