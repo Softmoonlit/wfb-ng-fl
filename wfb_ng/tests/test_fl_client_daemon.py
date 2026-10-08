@@ -14,7 +14,7 @@ from unittest import mock
 
 from wfb_ng.fl.service import _read_config
 from wfb_ng.fl.errors import FLRuntimeError
-from wfb_ng.fl.radio import ALLOWED_5GHZ_CHANNELS, FORBIDDEN_CHANNELS
+from wfb_ng.fl.radio import ALLOWED_5GHZ_CHANNELS, FORBIDDEN_CHANNELS, validate_radio_config
 from wfb_ng.fl.client_daemon import (
     ClientDaemon,
     ClientDaemonConfig,
@@ -43,16 +43,7 @@ class MockNetworkAdapter(NetworkAdapter):
         return list(self._interfaces)
 
     def configure_wireless(self, iface, channel=157, channel_width="HT40+", txpower_dbm=12):
-        if channel in FORBIDDEN_CHANNELS:
-            raise FLRuntimeError(
-                "forbidden_channel",
-                f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
-            )
-        if channel not in ALLOWED_5GHZ_CHANNELS:
-            raise FLRuntimeError(
-                "invalid_channel",
-                f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-            )
+        validate_radio_config({"channel": channel, "radio_txpower_dbm": txpower_dbm})
         if channel == 165:
             channel_width = "HT20"
 
@@ -167,9 +158,8 @@ class TestNetworkAdapter(unittest.TestCase):
 
     def test_configure_wireless_rejects_forbidden_channel_161(self):
         adapter = MockNetworkAdapter(interfaces=["wlx001"])
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             adapter.configure_wireless("wlx001", channel=161)
-        self.assertEqual(ctx.exception.error_code, "forbidden_channel")
 
     def test_configure_wireless_sets_ht20_for_channel_165(self):
         adapter = MockNetworkAdapter(interfaces=["wlx001"])
@@ -263,7 +253,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
 
         job_config = ClientJobConfig(
@@ -300,7 +290,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
 
         job_config = ClientJobConfig(
@@ -348,7 +338,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
         job_config = ClientJobConfig(
             job_id="job_tree_01",
@@ -418,7 +408,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
         job_config = ClientJobConfig(
             job_id="norm_tree_01",
@@ -457,7 +447,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=["/nonexistent/invalid_binary_name_fail"],
+            _command_prefix=["/nonexistent/invalid_binary_name_fail"],
         )
         job_config = ClientJobConfig(
             job_id="fail_job_01",
@@ -476,7 +466,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
 
         job_config = ClientJobConfig(
@@ -521,8 +511,8 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         daemon = ClientDaemon(
             config=config,
             network_adapter=self.adapter,
-            sandbox_command_prefix=[sys.executable, "-c", stub_script],
         )
+        daemon.sandbox._command_prefix = [sys.executable, "-c", stub_script]
 
         # Poll and initialize hardware
         daemon.poll_hardware_once()
@@ -556,7 +546,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
         job_config = ClientJobConfig(
             job_id="conformance_01",
@@ -617,7 +607,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         sandbox = JobSandbox(
             work_dir=self.temp_dir,
             network_adapter=self.adapter,
-            command_prefix=[sys.executable, "-c", stub_script],
+            _command_prefix=[sys.executable, "-c", stub_script],
         )
         job_config = ClientJobConfig(
             job_id="job_err_01",
@@ -645,8 +635,8 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         daemon = ClientDaemon(
             config=config,
             network_adapter=adapter,
-            sandbox_command_prefix=[sys.executable, "-c", stub_script],
         )
+        daemon.sandbox._command_prefix = [sys.executable, "-c", stub_script]
 
         bg_thread = threading.Thread(target=daemon.run, daemon=True)
         bg_thread.start()
@@ -740,7 +730,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertEqual(ctx.exception.error_code, "invalid_job_config")
 
         # 4. Failed start restores TUN
-        daemon.sandbox.command_prefix = ["/nonexistent/failing_binary"]
+        daemon.sandbox._command_prefix = ["/nonexistent/failing_binary"]
         good_job = ClientJobConfig(job_id="fail_restore", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.11")
         with self.assertRaises(FLRuntimeError):
             daemon.trigger_job(good_job)
@@ -748,39 +738,32 @@ class TestClientDaemonLifecycle(unittest.TestCase):
 
     def test_rf_parameter_ranges_validation(self):
         # Forbidden channel 161
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=161)
-        self.assertEqual(ctx.exception.error_code, "forbidden_channel")
 
         # Out of pool channel 36
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=36)
-        self.assertEqual(ctx.exception.error_code, "invalid_channel")
 
         # Out of range txpower
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=25)
-        self.assertEqual(ctx.exception.error_code, "invalid_txpower")
 
         # Out of range uplink_mcs
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=7)
-        self.assertEqual(ctx.exception.error_code, "invalid_mcs")
 
         # Non-integer channel
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=157.0)
-        self.assertEqual(ctx.exception.error_code, "invalid_channel")
 
         # Non-integer txpower
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=12.5)
-        self.assertEqual(ctx.exception.error_code, "invalid_txpower")
 
         # Non-integer uplink_mcs
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(ValueError):
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=3.5)
-        self.assertEqual(ctx.exception.error_code, "invalid_mcs")
 
     def test_default_template_node_json_validity(self):
         template_path = "scripts/default/node.json"

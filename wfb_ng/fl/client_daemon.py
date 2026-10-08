@@ -148,46 +148,6 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
     )
 
 
-def validate_rf_parameters(
-    channel: int = DEFAULT_CHANNEL,
-    txpower_dbm: int = DEFAULT_TXPOWER_DBM,
-    uplink_mcs: int = RECOMMENDED_UPLINK_MCS,
-) -> None:
-    """Validate discrete RF parameters by delegating to canonical radio.validate_radio_config."""
-    if type(channel) is not int:
-        raise FLRuntimeError(
-            "invalid_channel", f"channel 必须为整数，实际为: {type(channel).__name__}"
-        )
-    if type(txpower_dbm) is not int:
-        raise FLRuntimeError(
-            "invalid_txpower",
-            f"radio_txpower_dbm 必须为整数，实际为: {type(txpower_dbm).__name__}",
-        )
-    if type(uplink_mcs) is not int:
-        raise FLRuntimeError(
-            "invalid_mcs",
-            f"uplink_mcs 必须为整数，实际为: {type(uplink_mcs).__name__}",
-        )
-
-    try:
-        validate_radio_config({
-            "channel": channel,
-            "radio_txpower_dbm": txpower_dbm,
-            "uplink_mcs": uplink_mcs,
-        })
-    except ValueError as exc:
-        msg = str(exc)
-        if "forbidden" in msg:
-            raise FLRuntimeError("forbidden_channel", msg) from exc
-        if "channel" in msg:
-            raise FLRuntimeError("invalid_channel", msg) from exc
-        if "radio_txpower_dbm" in msg:
-            raise FLRuntimeError("invalid_txpower", msg) from exc
-        if "uplink_mcs" in msg:
-            raise FLRuntimeError("invalid_mcs", msg) from exc
-        raise FLRuntimeError("invalid_rf_config", msg) from exc
-
-
 class NetworkAdapter:
     """Interface for system wireless and TUN network operations."""
 
@@ -247,7 +207,10 @@ class LinuxNetworkAdapter(NetworkAdapter):
         channel_width: str = FIXED_BANDWIDTH,
         txpower_dbm: int = DEFAULT_TXPOWER_DBM,
     ) -> None:
-        validate_rf_parameters(channel=channel, txpower_dbm=txpower_dbm)
+        validate_radio_config({
+            "channel": channel,
+            "radio_txpower_dbm": txpower_dbm,
+        })
         if channel == 165:
             channel_width = "HT20"
 
@@ -319,11 +282,11 @@ class ClientDaemonConfig:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
         if self.tun_name is None:
             object.__setattr__(self, "tun_name", f"{DEFAULT_TUN_PREFIX}{self.node_id}")
-        validate_rf_parameters(
-            channel=self.channel,
-            txpower_dbm=self.radio_txpower_dbm,
-            uplink_mcs=self.uplink_mcs,
-        )
+        validate_radio_config({
+            "channel": self.channel,
+            "radio_txpower_dbm": self.radio_txpower_dbm,
+            "uplink_mcs": self.uplink_mcs,
+        })
 
 
 @dataclass(frozen=True)
@@ -342,7 +305,6 @@ class ClientJobConfig:
     channel_width: str = FIXED_BANDWIDTH
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
-    downlink_mcs: int = 3
     max_update_size_bytes: int = 1073741824
     io_timeout_seconds: int = 120
     algorithm: Optional[str] = None
@@ -355,11 +317,11 @@ class ClientJobConfig:
             # Strip CIDR prefix if present
             clean_ip = self.tun_ip.split("/")[0]
             object.__setattr__(self, "uftp_bind_host", clean_ip)
-        validate_rf_parameters(
-            channel=self.channel,
-            txpower_dbm=self.radio_txpower_dbm,
-            uplink_mcs=self.uplink_mcs,
-        )
+        validate_radio_config({
+            "channel": self.channel,
+            "radio_txpower_dbm": self.radio_txpower_dbm,
+            "uplink_mcs": self.uplink_mcs,
+        })
 
 
 class JobSandbox:
@@ -376,11 +338,11 @@ class JobSandbox:
         self,
         work_dir: str,
         network_adapter: NetworkAdapter,
-        command_prefix: Optional[Sequence[str]] = None,
+        _command_prefix: Optional[Sequence[str]] = None,
     ):
         self.work_dir = os.path.abspath(work_dir)
         self.network_adapter = network_adapter
-        self.command_prefix = list(command_prefix) if command_prefix else None
+        self._command_prefix = list(_command_prefix) if _command_prefix else None
         self._process: Optional[subprocess.Popen] = None
         self._pgid: Optional[int] = None
         self._log_file: Optional[Any] = None
@@ -484,8 +446,8 @@ class JobSandbox:
                         json.dump(job.algorithm_config, f, indent=2)
 
                 # Build command line
-                if self.command_prefix:
-                    cmd = list(self.command_prefix)
+                if self._command_prefix:
+                    cmd = list(self._command_prefix)
                 else:
                     cmd = [
                         sys.executable,
@@ -677,14 +639,12 @@ class ClientDaemon:
         self,
         config: ClientDaemonConfig,
         network_adapter: Optional[NetworkAdapter] = None,
-        sandbox_command_prefix: Optional[Sequence[str]] = None,
     ):
         self.config = config
         self.network_adapter = network_adapter or LinuxNetworkAdapter()
         self.sandbox = JobSandbox(
             work_dir=config.work_dir,
             network_adapter=self.network_adapter,
-            command_prefix=sandbox_command_prefix,
         )
         self.current_interface: Optional[str] = None
         self._stop_event = threading.Event()
