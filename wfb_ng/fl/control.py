@@ -657,6 +657,12 @@ class ControlPlaneServer:
         self._commit_event = threading.Event()
         self._expected_target_nodes: Set[int] = set()
 
+        # Job-scoped client RoleService readiness synchronization
+        self._task_ready_job_id: Optional[str] = None
+        self._task_ready_expected_nodes: Set[int] = set()
+        self._task_ready_nodes: Set[int] = set()
+        self._task_ready_event = threading.Event()
+
     def start(self) -> None:
         """Bind sockets and start receiving client heartbeats."""
         with self._lock:
@@ -722,6 +728,23 @@ class ControlPlaneServer:
         with self._lock:
             self.active_radio_config = config
 
+    def prepare_task_readiness(self, job_id: str, target_nodes: Sequence[int]) -> None:
+        with self._lock:
+            self._task_ready_job_id = job_id
+            self._task_ready_expected_nodes = set(target_nodes)
+            self._task_ready_nodes.clear()
+            self._task_ready_event.clear()
+
+    def wait_for_task_readiness(self, timeout: float) -> bool:
+        return self._task_ready_event.wait(timeout)
+
+    def clear_task_readiness(self) -> None:
+        with self._lock:
+            self._task_ready_job_id = None
+            self._task_ready_expected_nodes.clear()
+            self._task_ready_nodes.clear()
+            self._task_ready_event.clear()
+
     def broadcast_downlink(self, message: Dict[str, Any]) -> None:
         """Broadcast control message to 255.255.255.255:9000."""
         with self._lock:
@@ -744,6 +767,21 @@ class ControlPlaneServer:
             return None
 
         msg_type = payload.get("type")
+        if msg_type == "TASK_READY":
+            job_id = payload.get("job_id")
+            node_id = payload.get("node_id")
+            if not isinstance(job_id, str) or type(node_id) is not int:
+                return None
+            with self._lock:
+                if (
+                    job_id == self._task_ready_job_id
+                    and node_id in self._task_ready_expected_nodes
+                ):
+                    self._task_ready_nodes.add(node_id)
+                    if self._task_ready_expected_nodes.issubset(self._task_ready_nodes):
+                        self._task_ready_event.set()
+            return [HeartbeatAck(ack=True).to_bytes()]
+
         if msg_type == "PREPARE_ACK":
             ack = PrepareAck.from_dict(payload)
             with self._lock:
@@ -1381,6 +1419,17 @@ class ControlPlaneClient:
             # 0-delay instant send
             self._send_heartbeat(new_state.value, elapsed_ms=0)
             self._wake_event.set()
+
+    def notify_task_ready(self, job_id: str) -> None:
+        message = json.dumps({
+            "type": "TASK_READY",
+            "job_id": job_id,
+            "node_id": self.node_id,
+            "timestamp_ms": self._next_timestamp_ms(),
+        }).encode("utf-8")
+        # Duplicate datagrams make the one-shot readiness edge robust over RF.
+        for _ in range(5):
+            self._send_unicast_datagram(message)
 
     def _send_unicast_datagram(self, data: bytes) -> None:
         """Helper to send unicast control datagram to server."""

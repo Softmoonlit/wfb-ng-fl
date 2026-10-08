@@ -765,19 +765,12 @@ class ServerDaemon:
                 "algorithm_config": payload.get("algorithm_config", {}),
                 "timestamp_ms": int(time.time() * 1000),
             }
+            self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes)
             self.control_plane.broadcast_downlink(announce_msg)
 
             if self.config.enable_link_process:
-                deadline = time.monotonic() + 10.0
-                while time.monotonic() < deadline:
-                    if all(
-                        (record := self.control_plane.registry.get_node(node_id)) is not None
-                        and record.reported_state == ClientNodeState.RUNNING.value
-                        for node_id in job.target_nodes
-                    ):
-                        break
-                    time.sleep(0.05)
-                else:
+                if not self.control_plane.wait_for_task_readiness(10.0):
+                    self.control_plane.clear_task_readiness()
                     self.active_job = None
                     self.server_state = ServerState.IDLE
                     self.server_role = None
@@ -793,6 +786,7 @@ class ServerDaemon:
                         "client_startup_timeout",
                         "目标客户端未在 10 秒内完成 RoleService 就绪",
                     )
+            self.control_plane.clear_task_readiness()
 
             # Broadcast SSE event
             self.publish_event({

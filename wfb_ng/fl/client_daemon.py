@@ -1040,6 +1040,7 @@ class ClientDaemon:
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
                 if self.control_plane is not None:
+                    self.control_plane.notify_task_ready(job_config.job_id)
                     self.control_plane.notify_state_change(ClientNodeState.RUNNING)
                 return proc
             except Exception:

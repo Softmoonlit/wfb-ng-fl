@@ -439,6 +439,27 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
     def tearDown(self):
         self.server.stop()
 
+    def test_task_ready_barrier_is_job_scoped_and_requires_all_targets(self):
+        self.server.prepare_task_readiness("job-ready", [1, 2])
+
+        wrong_job = json.dumps({
+            "type": "TASK_READY", "job_id": "other", "node_id": 1
+        }).encode()
+        self.assertIsNotNone(self.server.handle_datagram(wrong_job, ("127.0.0.1", 1)))
+        self.assertFalse(self.server.wait_for_task_readiness(0))
+
+        node1 = json.dumps({
+            "type": "TASK_READY", "job_id": "job-ready", "node_id": 1
+        }).encode()
+        self.assertIsNotNone(self.server.handle_datagram(node1, ("127.0.0.1", 1)))
+        self.assertFalse(self.server.wait_for_task_readiness(0))
+
+        node2 = json.dumps({
+            "type": "TASK_READY", "job_id": "job-ready", "node_id": 2
+        }).encode()
+        self.assertIsNotNone(self.server.handle_datagram(node2, ("127.0.0.1", 2)))
+        self.assertTrue(self.server.wait_for_task_readiness(0))
+
     def test_unidirectional_drop_two_army_simulation(self):
         """
         Simulate 'uplink works, downlink drops' two-army scenario:
