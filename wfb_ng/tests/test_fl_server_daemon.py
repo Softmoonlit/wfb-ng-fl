@@ -67,7 +67,6 @@ class TestServerDaemonConfig(unittest.TestCase):
                 "downlink_mcs": 4,
                 "uplink_mcs": 5,
                 "tun_name": "fl-custom",
-                "known_clients": [1, 2, 3],
             }, f)
             temp_path = f.name
 
@@ -79,10 +78,15 @@ class TestServerDaemonConfig(unittest.TestCase):
             self.assertEqual(cfg.downlink_mcs, 4)
             self.assertEqual(cfg.uplink_mcs, 5)
             self.assertEqual(cfg.tun_name, "fl-custom")
-            self.assertEqual(cfg.known_clients, (1, 2, 3))
+            self.assertEqual(cfg.known_clients, tuple(range(1, 11)))
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+    def test_load_nonexistent_custom_config_fails_closed(self):
+        with self.assertRaises(FLRuntimeError) as ctx:
+            load_server_config("/nonexistent/path/server.json")
+        self.assertEqual(ctx.exception.error_code, "config_not_found")
 
     def test_fail_closed_on_invalid_radio_parameters(self):
         # Forbidden channel 161
@@ -101,11 +105,10 @@ class TestServerDaemonConfig(unittest.TestCase):
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(downlink_mcs=7)
 
-        # Invalid known_clients (outside 1..10)
-        with self.assertRaises(FLRuntimeError):
-            ServerDaemonConfig(known_clients=(0, 1))
-        with self.assertRaises(FLRuntimeError):
-            ServerDaemonConfig(known_clients=(1, 11))
+        # Shrinking known_clients pool is strictly forbidden
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ServerDaemonConfig(known_clients=(1, 2, 3))
+        self.assertEqual(ctx.exception.error_code, "invalid_known_clients")
 
 
 class TestV6UplinkServerCommand(unittest.TestCase):
@@ -305,10 +308,9 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertEqual(body["tun"]["name"], "fl-s")
         self.assertEqual(body["tun"]["ip"], "10.80.0.1")
 
-        # Also verify /status alias
+        # Also verify unversioned alias returns 404 (strict versioned API)
         code_alias, body_alias = self._http_get("/status")
-        self.assertEqual(code_alias, 200)
-        self.assertEqual(body_alias["server_state"], "IDLE")
+        self.assertEqual(code_alias, 404)
 
         # 2. Simulate Node 1 and Node 2 check-ins
         self._simulate_client_handshake(1)
@@ -317,13 +319,22 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         status_code, body = self._http_get("/api/v1/status")
         self.assertEqual(status_code, 200)
         nodes = body["nodes"]
-        self.assertIn("1", nodes)
-        self.assertIn("2", nodes)
+        # Per spec, all 1..10 pre-allocated slots must be present
+        self.assertEqual(len(nodes), 10)
+        for nid in range(1, 11):
+            self.assertIn(str(nid), nodes)
+
         self.assertEqual(nodes["1"]["readiness"], "READY")
         self.assertEqual(nodes["1"]["reported_state"], "IDLE")
+        self.assertIsNotNone(nodes["1"]["last_heartbeat_timestamp_ms"])
         self.assertEqual(nodes["2"]["readiness"], "READY")
         self.assertEqual(nodes["2"]["reported_state"], "IDLE")
         self.assertLess(nodes["1"]["last_heartbeat_ago_seconds"], 2.0)
+
+        # Unconnected nodes are pre-allocated but OFFLINE
+        self.assertEqual(nodes["3"]["readiness"], "OFFLINE")
+        self.assertIsNone(nodes["3"]["reported_state"])
+        self.assertEqual(nodes["3"]["tun_ip"], "10.80.0.13")
 
     def test_survey_endpoint(self):
         # Trigger 5GHz survey
@@ -334,10 +345,9 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Channel 153 had 0 frames, so it should rank 1st
         self.assertEqual(body["ranking"][0], 153)
 
-        # Also verify /survey alias
+        # Also verify unversioned alias returns 404
         status_code_alias, body_alias = self._http_post("/survey", {"duration_ms": 300})
-        self.assertEqual(status_code_alias, 200)
-        self.assertEqual(body_alias["ranking"][0], 153)
+        self.assertEqual(status_code_alias, 404)
 
     def test_preflight_gate_1_target_nodes_not_ready(self):
         """
@@ -350,6 +360,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_fl_001",
             "target_nodes": [1, 2],
             "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -377,6 +388,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_fl_002",
             "target_nodes": [1],
             "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -396,6 +408,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_fl_003",
             "target_nodes": [1],
             "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -413,6 +426,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_fl_004",
             "target_nodes": [1],
             "model_path": os.path.join(self.temp_dir, "non_existent.bin"),
+            "model_size_bytes": 1024,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_missing)
         self.assertEqual(status_code, 400)
@@ -425,12 +439,23 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_fl_005",
             "target_nodes": [1],
             "model_path": empty_path,
+            "model_size_bytes": 1024,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_empty)
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_model_empty")
 
-        # 3. Size mismatch
+        # 3. Missing model_size_bytes (strictly required)
+        payload_missing_size = {
+            "job_id": "job_fl_no_size",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+        }
+        status_code, body = self._http_post("/api/v1/jobs/start", payload_missing_size)
+        self.assertEqual(status_code, 400)
+        self.assertEqual(body["error"], "preflight_model_missing_size")
+
+        # 4. Size mismatch
         payload_size_mismatch = {
             "job_id": "job_fl_006",
             "target_nodes": [1],
@@ -440,6 +465,18 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         status_code, body = self._http_post("/api/v1/jobs/start", payload_size_mismatch)
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_model_validation_failed")
+
+        # 5. Checksum mismatch if model_sha256 provided
+        payload_sha_mismatch = {
+            "job_id": "job_fl_bad_sha",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
+            "model_sha256": "0" * 64,
+        }
+        status_code, body = self._http_post("/api/v1/jobs/start", payload_sha_mismatch)
+        self.assertEqual(status_code, 400)
+        self.assertEqual(body["error"], "preflight_model_checksum_failed")
 
     def test_preflight_gate_3_engine_concurrency_conflict(self):
         """
@@ -482,6 +519,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_to_abort",
             "target_nodes": [1],
             "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
         }
         status_code, _ = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 200)
@@ -561,6 +599,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             "job_id": "job_unsolicited",
             "target_nodes": [3],
             "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -571,7 +610,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Empty list
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": [], "model_path": self.model_path},
+            {"target_nodes": [], "model_path": self.model_path, "model_size_bytes": 1024},
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
@@ -579,7 +618,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Out-of-bounds node id
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": [1, 99], "model_path": self.model_path},
+            {"target_nodes": [1, 99], "model_path": self.model_path, "model_size_bytes": 1024},
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
@@ -587,10 +626,51 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Non-integer node id
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": ["client1"], "model_path": self.model_path},
+            {"target_nodes": ["client1"], "model_path": self.model_path, "model_size_bytes": 1024},
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
+
+    def test_semi_async_and_async_modes_validation(self):
+        self._simulate_client_handshake(1)
+        self._simulate_client_handshake(2)
+
+        # semi_async missing min_updates fails
+        payload_no_min = {
+            "job_id": "job_semi_no_min",
+            "mode": "semi_async",
+            "target_nodes": [1, 2],
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_no_min)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "invalid_semi_async_config")
+
+        # semi_async out of bounds min_updates fails
+        payload_bad_min = {
+            "job_id": "job_semi_bad_min",
+            "mode": "semi_async",
+            "target_nodes": [1, 2],
+            "min_updates": 5,
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_bad_min)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "invalid_semi_async_config")
+
+        # invalid mode fails
+        payload_bad_mode = {
+            "job_id": "job_bad_mode",
+            "mode": "unknown_paradigm",
+            "target_nodes": [1, 2],
+            "model_path": self.model_path,
+            "model_size_bytes": 1024,
+        }
+        code, body = self._http_post("/api/v1/jobs/start", payload_bad_mode)
+        self.assertEqual(code, 400)
+        self.assertEqual(body["error"], "invalid_fl_mode")
 
     def test_invalid_json_request_body(self):
         url = f"{self.base_url}/api/v1/jobs/start"

@@ -21,6 +21,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
 """
 
 import argparse
+import hashlib
 import ipaddress
 import json
 import logging
@@ -91,6 +92,7 @@ DEFAULT_LINK_ID = 7669206
 DEFAULT_DOWNLINK_MCS = 3
 DEFAULT_UPLINK_MCS = 6
 ALL_KNOWN_CLIENT_IDS = tuple(range(1, 11))
+VALID_FL_MODES = ("sync", "semi_async", "async")
 
 
 class ServerState(str, Enum):
@@ -101,6 +103,113 @@ class ServerState(str, Enum):
     ABORTING = "ABORTING"
     SWITCHING_RADIO = "SWITCHING_RADIO"
     STOPPED = "STOPPED"
+
+
+def calculate_file_sha256(path: str) -> str:
+    """Compute deterministic SHA-256 checksum for a local file."""
+    hasher = hashlib.sha256()
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(65536)
+            if not chunk:
+                break
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
+@dataclass(frozen=True)
+class JobConfig:
+    """Structured, validated configuration for an FL simulation job."""
+    job_id: str
+    mode: str
+    target_nodes: Tuple[int, ...]
+    model_path: str
+    model_size_bytes: int
+    rounds: int = 1
+    min_updates: int = 0
+    max_staleness: int = 0
+    round_timeout_seconds: float = 120.0
+    model_sha256: Optional[str] = None
+    radio_config: Optional[Dict[str, Any]] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "JobConfig":
+        if not isinstance(data, dict):
+            raise FLRuntimeError("invalid_job_payload", "作业配置必须为 JSON object")
+
+        raw_nodes = data.get("target_nodes")
+        if not raw_nodes or not isinstance(raw_nodes, list):
+            raise FLRuntimeError("preflight_target_nodes_invalid", "必须提供非空 target_nodes 列表")
+        for nid in raw_nodes:
+            if type(nid) is not int or not (1 <= nid <= 10):
+                raise FLRuntimeError("preflight_target_nodes_invalid", f"包含非法节点 ID: {nid!r}")
+        target_nodes = tuple(raw_nodes)
+
+        mode = data.get("mode", "sync")
+        if mode not in VALID_FL_MODES:
+            raise FLRuntimeError("invalid_fl_mode", f"不支持的协同范式 '{mode}'，必须为 {VALID_FL_MODES}")
+
+        min_updates = data.get("min_updates")
+        if mode == "semi_async":
+            if min_updates is None:
+                raise FLRuntimeError("invalid_semi_async_config", "semi_async 模式必须指定 min_updates")
+            if not isinstance(min_updates, int) or not (1 <= min_updates <= len(target_nodes)):
+                raise FLRuntimeError("invalid_semi_async_config", f"min_updates 必须在 [1, {len(target_nodes)}] 范围内")
+        elif mode == "sync":
+            min_updates = len(target_nodes)
+        else:  # async
+            min_updates = 1
+
+        model_path = data.get("model_path")
+        if not model_path or not isinstance(model_path, str):
+            raise FLRuntimeError("preflight_model_missing_path", "缺少必填参数 'model_path'")
+
+        model_size_bytes = data.get("model_size_bytes")
+        if model_size_bytes is None or not isinstance(model_size_bytes, int) or model_size_bytes <= 0:
+            raise FLRuntimeError(
+                "preflight_model_missing_size",
+                "必须显式提供合法正整数 'model_size_bytes' 以供确定性大小校验",
+            )
+
+        rounds = int(data.get("rounds", 1))
+        if rounds <= 0:
+            raise FLRuntimeError("invalid_rounds", "rounds 轮次数必须大于 0")
+
+        radio_cfg = data.get("radio_config")
+        if radio_cfg is not None:
+            if not isinstance(radio_cfg, dict):
+                raise FLRuntimeError("invalid_radio_configuration", "radio_config 必须为 object")
+            validate_radio_config(radio_cfg)
+
+        job_id = data.get("job_id") or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+        return cls(
+            job_id=job_id,
+            mode=mode,
+            target_nodes=target_nodes,
+            model_path=model_path,
+            model_size_bytes=model_size_bytes,
+            rounds=rounds,
+            min_updates=min_updates,
+            max_staleness=int(data.get("max_staleness", 0)),
+            round_timeout_seconds=float(data.get("round_timeout_seconds", 120.0)),
+            model_sha256=data.get("model_sha256"),
+            radio_config=radio_cfg,
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "job_id": self.job_id,
+            "mode": self.mode,
+            "target_nodes": list(self.target_nodes),
+            "model_path": self.model_path,
+            "model_size_bytes": self.model_size_bytes,
+            "rounds": self.rounds,
+            "min_updates": self.min_updates,
+            "max_staleness": self.max_staleness,
+            "round_timeout_seconds": self.round_timeout_seconds,
+            "model_sha256": self.model_sha256,
+            "radio_config": self.radio_config,
+        }
 
 
 @dataclass(frozen=True)
@@ -139,16 +248,11 @@ class ServerDaemonConfig:
             raise FLRuntimeError("invalid_radio_configuration", str(exc)) from exc
 
         # Validate known_clients
-        if not self.known_clients:
+        if self.known_clients != ALL_KNOWN_CLIENT_IDS:
             raise FLRuntimeError(
-                "invalid_known_clients", "known_clients 不能为为空，平台设计容量为 1~10 号节点"
+                "invalid_known_clients",
+                "必须全量预置平台支持的 1~10 号节点白名单槽位，严禁缩减槽位池",
             )
-        for nid in self.known_clients:
-            if type(nid) is not int or not (1 <= nid <= 10):
-                raise FLRuntimeError(
-                    "invalid_known_clients",
-                    f"node_id {nid!r} 超出平台支持节点范围 [1, 10]",
-                )
 
         # Validate IP addresses
         try:
@@ -161,11 +265,12 @@ class ServerDaemonConfig:
 def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonConfig:
     """
     Load server daemon configuration from JSON file.
-    If file doesn't exist, returns default ServerDaemonConfig.
-    Fails closed on malformed JSON.
+    Fails closed if custom path does not exist or JSON is invalid.
     """
     if not os.path.exists(path):
-        logger.info("服务端配置文件 %s 不存在，使用默认基准配置", path)
+        if path != DEFAULT_SERVER_CONFIG_PATH:
+            raise FLRuntimeError("config_not_found", f"指定的配置文件不存在: {path}")
+        logger.info("服务端默认配置文件 %s 不存在，使用标准基准配置", path)
         return ServerDaemonConfig()
 
     try:
@@ -180,12 +285,6 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         raise FLRuntimeError(
             "invalid_server_config", f"服务端配置必须为 JSON object: {path}"
         )
-
-    known_clients = data.get("known_clients")
-    if known_clients is not None:
-        known_clients = tuple(known_clients)
-    else:
-        known_clients = ALL_KNOWN_CLIENT_IDS
 
     return ServerDaemonConfig(
         ipc_host=data.get("ipc_host", DEFAULT_IPC_HOST),
@@ -204,7 +303,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         control_broadcast_port=int(data.get("control_broadcast_port", SERVER_CONTROL_BROADCAST_PORT)),
         air_interface=data.get("air_interface"),
         link_id=int(data.get("link_id", DEFAULT_LINK_ID)),
-        known_clients=known_clients,
+        known_clients=ALL_KNOWN_CLIENT_IDS,
         work_dir=data.get("work_dir", "/tmp/wfb-ng-fl/server"),
         enable_link_process=bool(data.get("enable_link_process", True)),
         enable_control_plane=bool(data.get("enable_control_plane", True)),
@@ -309,7 +408,6 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(payload)))
-        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(payload)
 
@@ -318,9 +416,9 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path
         daemon: ServerDaemon = self.server.daemon  # type: ignore
 
-        if path in ("/api/v1/status", "/status"):
+        if path == "/api/v1/status":
             self._handle_status(daemon)
-        elif path in ("/api/v1/logs/stream", "/logs/stream"):
+        elif path == "/api/v1/logs/stream":
             self._handle_logs_stream(daemon)
         else:
             self._send_json_response(404, {"error": "not_found", "message": f"未知路径: {path}"})
@@ -342,11 +440,11 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
                 )
                 return
 
-        if path in ("/api/v1/survey", "/survey"):
+        if path == "/api/v1/survey":
             self._handle_survey(daemon, body)
-        elif path in ("/api/v1/jobs/start", "/jobs/start"):
+        elif path == "/api/v1/jobs/start":
             self._handle_jobs_start(daemon, body)
-        elif path in ("/api/v1/jobs/abort", "/jobs/abort"):
+        elif path == "/api/v1/jobs/abort":
             self._handle_jobs_abort(daemon, body)
         else:
             self._send_json_response(404, {"error": "not_found", "message": f"未知路径: {path}"})
@@ -420,7 +518,6 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache")
         self.send_header("Connection", "keep-alive")
-        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
 
         event_queue = daemon.event_bus.subscribe()
@@ -475,6 +572,7 @@ class ServerDaemon:
 
         # Link Process management
         self._link_process: Optional[subprocess.Popen] = None
+        self._link_log_file: Optional[Any] = None
         self._link_thread: Optional[threading.Thread] = None
 
         # Control Plane Engine
@@ -524,21 +622,44 @@ class ServerDaemon:
             all_nodes = self.control_plane.registry.get_all_nodes()
             now = time.monotonic()
             nodes_dict: Dict[str, Any] = {}
-            for nid, r in all_nodes.items():
-                ago = max(0.0, now - r.last_heartbeat_time)
-                nodes_dict[str(nid)] = {
-                    "node_id": r.node_id,
-                    "tun_ip": r.tun_ip,
-                    "reported_state": r.reported_state,
-                    "readiness": r.readiness.value,
-                    "elapsed_ms": r.elapsed_ms,
-                    "current_channel": r.current_channel,
-                    "txpower_dbm": r.txpower_dbm,
-                    "uplink_mcs": r.uplink_mcs,
-                    "last_heartbeat_time": r.last_heartbeat_time,
-                    "last_heartbeat_ago_seconds": round(ago, 2),
-                    "error_code": r.error_code,
-                }
+            for nid in self.config.known_clients:
+                r = all_nodes.get(nid)
+                if r is not None:
+                    ago = max(0.0, now - r.last_heartbeat_time)
+                    ts_ms = (
+                        int(r.last_heartbeat_wall_time * 1000)
+                        if r.last_heartbeat_wall_time is not None
+                        else r.timestamp_ms
+                    )
+                    nodes_dict[str(nid)] = {
+                        "node_id": r.node_id,
+                        "tun_ip": r.tun_ip,
+                        "reported_state": r.reported_state,
+                        "readiness": r.readiness.value,
+                        "elapsed_ms": r.elapsed_ms,
+                        "current_channel": r.current_channel,
+                        "txpower_dbm": r.txpower_dbm,
+                        "uplink_mcs": r.uplink_mcs,
+                        "last_heartbeat_time": r.last_heartbeat_time,
+                        "last_heartbeat_timestamp_ms": ts_ms,
+                        "last_heartbeat_ago_seconds": round(ago, 2),
+                        "error_code": r.error_code,
+                    }
+                else:
+                    nodes_dict[str(nid)] = {
+                        "node_id": nid,
+                        "tun_ip": f"10.80.0.{10 + nid}",
+                        "reported_state": None,
+                        "readiness": NodeReadiness.OFFLINE.value,
+                        "elapsed_ms": 0,
+                        "current_channel": None,
+                        "txpower_dbm": None,
+                        "uplink_mcs": None,
+                        "last_heartbeat_time": None,
+                        "last_heartbeat_timestamp_ms": None,
+                        "last_heartbeat_ago_seconds": None,
+                        "error_code": None,
+                    }
 
             is_link_running = False
             link_pid = None
@@ -591,6 +712,8 @@ class ServerDaemon:
         """
         Execute 3 deterministic preflight checks and transition to active job execution.
         """
+        job = JobConfig.from_dict(payload)
+
         with self._lock:
             # Check 3: Current engine is idle, no concurrent job conflict
             if self.server_state != ServerState.IDLE or self.active_job is not None:
@@ -601,25 +724,9 @@ class ServerDaemon:
                 )
 
             # Check 1: Target nodes check (within 10s confirmed IDLE)
-            raw_target_nodes = payload.get("target_nodes")
-            if not raw_target_nodes or not isinstance(raw_target_nodes, list):
-                raise FLRuntimeError(
-                    "preflight_target_nodes_invalid",
-                    "必须提供有效的非空 target_nodes 节点列表",
-                )
-
-            target_nodes: List[int] = []
-            for item in raw_target_nodes:
-                if type(item) is not int or not (1 <= item <= 10):
-                    raise FLRuntimeError(
-                        "preflight_target_nodes_invalid",
-                        f"target_nodes 包含非法节点 ID: {item!r}",
-                    )
-                target_nodes.append(item)
-
             unready_nodes: Dict[str, Any] = {}
             now = time.monotonic()
-            for nid in target_nodes:
+            for nid in job.target_nodes:
                 record = self.control_plane.registry.get_node(nid)
                 if record is None:
                     unready_nodes[str(nid)] = {
@@ -652,59 +759,52 @@ class ServerDaemon:
                     details={"unready_nodes": unready_nodes},
                 )
 
-            # Check 2: Initial model file exists and valid size
-            model_path = payload.get("model_path")
-            if not model_path or not isinstance(model_path, str):
-                raise FLRuntimeError(
-                    "preflight_model_missing_path", "缺少必填参数 'model_path'"
-                )
-
-            if not os.path.isfile(model_path):
+            # Check 2: Initial model file exists, is non-empty, and strictly matches size
+            if not os.path.isfile(job.model_path):
                 raise FLRuntimeError(
                     "preflight_model_file_not_found",
-                    f"初始模型文件不存在: {model_path}",
+                    f"初始模型文件不存在: {job.model_path}",
                 )
 
-            actual_file_size = os.path.getsize(model_path)
+            actual_file_size = os.path.getsize(job.model_path)
             if actual_file_size <= 0:
                 raise FLRuntimeError(
                     "preflight_model_empty",
-                    f"初始模型文件为空 (0 字节): {model_path}",
+                    f"初始模型文件为空 (0 字节): {job.model_path}",
                 )
 
-            expected_size = payload.get("model_size_bytes")
-            if expected_size is not None:
-                if actual_file_size != expected_size:
-                    raise FLRuntimeError(
-                        "preflight_model_validation_failed",
-                        f"模型大小不匹配: 期望 {expected_size} 字节，实际 {actual_file_size} 字节",
-                    )
+            if actual_file_size != job.model_size_bytes:
+                raise FLRuntimeError(
+                    "preflight_model_validation_failed",
+                    f"模型大小不匹配: 期望 {job.model_size_bytes} 字节，实际 {actual_file_size} 字节",
+                )
+
+            # Check integrity sha256 if provided, or compute it
+            computed_sha256 = calculate_file_sha256(job.model_path)
+            if job.model_sha256 is not None and computed_sha256 != job.model_sha256:
+                raise FLRuntimeError(
+                    "preflight_model_checksum_failed",
+                    f"模型 SHA-256 校验不一致: 期望 {job.model_sha256}，实际 {computed_sha256}",
+                )
 
             # All 3 preflight checks passed!
-            job_id = payload.get("job_id") or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
-            mode = payload.get("mode", "sync")
-            min_updates = payload.get("min_updates", len(target_nodes) if mode == "sync" else 1)
+            job_dict = job.to_dict()
+            job_dict["model_sha256"] = computed_sha256
+            job_dict["started_at"] = time.time()
 
-            job_info = {
-                "job_id": job_id,
-                "mode": mode,
-                "target_nodes": target_nodes,
-                "min_updates": min_updates,
-                "model_path": model_path,
-                "model_size_bytes": actual_file_size,
-                "started_at": time.time(),
-            }
-
-            self.active_job = job_info
+            self.active_job = job_dict
             self.server_state = ServerState.RUNNING
 
-            # Broadcast TASK_ANNOUNCE downlink to all clients
+            # Broadcast TASK_ANNOUNCE downlink to all clients (per spec line 108)
             announce_msg = {
                 "type": "TASK_ANNOUNCE",
-                "job_id": job_id,
-                "mode": mode,
-                "target_nodes": target_nodes,
+                "job_id": job.job_id,
+                "mode": job.mode,
+                "rounds": job.rounds,
+                "target_nodes": list(job.target_nodes),
+                "min_updates": job.min_updates,
                 "model_size_bytes": actual_file_size,
+                "model_sha256": computed_sha256,
                 "timestamp_ms": int(time.time() * 1000),
             }
             self.control_plane.broadcast_downlink(announce_msg)
@@ -712,24 +812,28 @@ class ServerDaemon:
             # Publish SSE event
             self.publish_event({
                 "type": "JOB_STARTED",
-                "job": job_info,
+                "job": job_dict,
                 "timestamp": time.time(),
             })
 
             logger.info(
-                "作业 %s 成功通过前置门禁并启动 (模式: %s, 节点: %s, 模型大小: %d B)",
-                job_id,
-                mode,
-                target_nodes,
+                "作业 %s 成功通过前置门禁并启动 (模式: %s, 轮次: %d, 节点: %s, 模型大小: %d B)",
+                job.job_id,
+                job.mode,
+                job.rounds,
+                list(job.target_nodes),
                 actual_file_size,
             )
 
             return {
                 "status": "accepted",
-                "job_id": job_id,
-                "mode": mode,
-                "target_nodes": target_nodes,
+                "job_id": job.job_id,
+                "mode": job.mode,
+                "rounds": job.rounds,
+                "target_nodes": list(job.target_nodes),
+                "min_updates": job.min_updates,
                 "model_size_bytes": actual_file_size,
+                "model_sha256": computed_sha256,
             }
 
     def abort_job(self, reason: str = "user_requested") -> Dict[str, Any]:
@@ -773,8 +877,7 @@ class ServerDaemon:
                 executable = local_bin
 
         if not executable:
-            logger.warning("未找到 wfb_v6_uplink 可执行程序，跳过链路底座启动")
-            return
+            raise FLRuntimeError("link_executable_missing", "未找到 wfb_v6_uplink 可执行程序，链路底座无法启动")
 
         iface = self.current_interface or "wlan0"
         cmd = build_v6_uplink_server_command(
@@ -789,38 +892,48 @@ class ServerDaemon:
         )
 
         logger.info("启动 wfb_v6_uplink 链路底座: %s", " ".join(cmd))
+        os.makedirs(self.config.work_dir, exist_ok=True)
+        log_path = os.path.join(self.config.work_dir, "wfb_uplink.log")
+        self._link_log_file = open(log_path, "a", encoding="utf-8")
+
         try:
             self._link_process = subprocess.Popen(
                 cmd,
                 stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE,
+                stdout=self._link_log_file,
+                stderr=self._link_log_file,
+            )
+        except Exception as exc:
+            if hasattr(self, "_link_log_file") and self._link_log_file is not None:
+                self._link_log_file.close()
+                self._link_log_file = None
+            raise FLRuntimeError("link_process_start_failed", f"拉起 wfb_v6_uplink 进程失败: {exc}") from exc
+
+        # Wait briefly for TUN interface creation and configure txqueuelen
+        deadline = time.monotonic() + 3.0
+        while time.monotonic() < deadline:
+            rc = self._link_process.poll()
+            if rc is not None:
+                raise FLRuntimeError("link_process_start_failed", f"wfb_v6_uplink 启动期异常退出，退出码: {rc}")
+            if self.adapter.is_tun_active(self.config.tun_name):
+                break
+            time.sleep(0.05)
+
+        if not self.adapter.is_tun_active(self.config.tun_name):
+            self._stop_link_process()
+            raise FLRuntimeError(
+                "link_tun_failed",
+                f"wfb_v6_uplink 未能在超时时间内创建 TUN 接口: {self.config.tun_name}",
             )
 
-            # Wait briefly for TUN interface creation and configure txqueuelen
-            deadline = time.monotonic() + 3.0
-            while time.monotonic() < deadline:
-                if self.adapter.is_tun_active(self.config.tun_name):
-                    break
-                time.sleep(0.05)
-
-            if self.adapter.is_tun_active(self.config.tun_name):
-                try:
-                    self.adapter.set_tun_txqueuelen(
-                        self.config.tun_name, self.config.tun_txqueuelen
-                    )
-                    logger.info(
-                        "已设置 TUN %s txqueuelen=%d",
-                        self.config.tun_name,
-                        self.config.tun_txqueuelen,
-                    )
-                except Exception as exc:
-                    logger.warning("设置 TUN txqueuelen 失败: %s", exc)
+        try:
+            self.adapter.set_tun_txqueuelen(self.config.tun_name, self.config.tun_txqueuelen)
+            logger.info("已设置 TUN %s txqueuelen=%d", self.config.tun_name, self.config.tun_txqueuelen)
         except Exception as exc:
-            logger.error("启动 wfb_v6_uplink 失败: %s", exc)
+            logger.warning("设置 TUN txqueuelen 失败: %s", exc)
 
     def _stop_link_process(self) -> None:
-        """Safely terminate wfb_v6_uplink process and clean up TUN."""
+        """Safely terminate wfb_v6_uplink process, close log file, and clean up TUN."""
         if self._link_process is not None:
             try:
                 self._link_process.terminate()
@@ -832,6 +945,13 @@ class ServerDaemon:
                 except Exception:
                     pass
             self._link_process = None
+
+        if hasattr(self, "_link_log_file") and self._link_log_file is not None:
+            try:
+                self._link_log_file.close()
+            except Exception:
+                pass
+            self._link_log_file = None
 
         try:
             self.adapter.teardown_tun(self.config.tun_name)
@@ -857,22 +977,19 @@ class ServerDaemon:
                     logger.warning("未检测到物理无线网卡，将以无网卡模式运行")
 
             if self.current_interface:
-                try:
-                    width = "HT20" if self.config.channel == 165 else FIXED_BANDWIDTH
-                    self.adapter.configure_wireless(
-                        iface=self.current_interface,
-                        channel=self.config.channel,
-                        channel_width=width,
-                        txpower_dbm=self.config.radio_txpower_dbm,
-                    )
-                    logger.info(
-                        "网卡 %s 配置就绪 (信道=%d, 发射功率=%d dBm)",
-                        self.current_interface,
-                        self.config.channel,
-                        self.config.radio_txpower_dbm,
-                    )
-                except Exception as exc:
-                    logger.warning("物理网卡配置失败: %s", exc)
+                width = "HT20" if self.config.channel == 165 else FIXED_BANDWIDTH
+                self.adapter.configure_wireless(
+                    iface=self.current_interface,
+                    channel=self.config.channel,
+                    channel_width=width,
+                    txpower_dbm=self.config.radio_txpower_dbm,
+                )
+                logger.info(
+                    "网卡 %s 配置就绪 (信道=%d, 发射功率=%d dBm)",
+                    self.current_interface,
+                    self.config.channel,
+                    self.config.radio_txpower_dbm,
+                )
 
             # 2. Start Link Process if enabled
             if self.config.enable_link_process:
