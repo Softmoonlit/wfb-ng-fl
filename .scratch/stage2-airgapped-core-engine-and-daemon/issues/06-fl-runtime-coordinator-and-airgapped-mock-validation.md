@@ -17,4 +17,14 @@
 ## Comments
 
 - 当前测试资源固定为本机 Server、`vm1`（client1）和 `vm2`（client2）；已移除不适用的实体集群验收表述，`1~10` 仍表示平台能力容量，不表示本阶段具备对应数量的测试节点。
-- 实现交付并在 `wfb_ng/tests/test_fl_coordinator.py` 与 `wfb_ng/tests/test_fl_e2e_airgapped.py` 中完整验证三大范式（sync / semi_async / async）调度、多轮 SHA-256 跨轮连续性、掉队节点容错、主动中止安全复位、以及沙箱回收无残留。全量 162 个测试用例通过，Mypy 静态类型校验无告警。
+- 实现交付并在 `wfb_ng/tests/test_fl_coordinator.py` 与 `wfb_ng/tests/test_fl_e2e_airgapped.py` 中完整验证三大范式（sync / semi_async / async）调度、多轮 SHA-256 跨轮连续性、掉队节点容错、主动中止安全复位、以及沙箱回收无残留。最终全量 168 个测试用例通过，Mypy 静态类型校验无告警。
+
+## 三机真实硬件功能验收（2026-10-09）
+
+- 验收提交：`a0c9284`；三端提交一致，vm1/vm2 工作树干净。
+- 拓扑：本机 vm0 Server、vm1 client1、vm2 client2；信道 157，发射功率 12 dBm。
+- 作业：`hw_sync_2round_4mib_a0c9284`，`sync` 全员模式，2 轮，每轮向两个客户端下发 4 MiB 确定性模型并收取两份 update。
+- 结果：作业 `succeeded`，两轮均由 node 1/2 提交且无掉队；第 1 轮 6.351 秒，第 2 轮 7.641 秒。
+- 连续性：第 2 轮输入 SHA-256 严格等于第 1 轮聚合输出 SHA-256，均为 `6d31405ed992d003e19bc26a027b64bbcf4d13b69582f6a0744f989540aa6c17`。
+- 终态：Server 自动回到 `IDLE`，node 1/2 自动恢复 `IDLE/READY`；停止临时 systemd 单元后，三端无 daemon、RoleService、`wfb_v6_uplink`、UFTP 进程或 TUN 残留。
+- 本次属于 4 MiB 真实射频功能闭环，不替代 40 MiB 实体容量验收。完整协调摘要保留于 `/tmp/wfb-ng-fl/server/job_hw_sync_2round_4mib_a0c9284/coordinator_summary.json`。
