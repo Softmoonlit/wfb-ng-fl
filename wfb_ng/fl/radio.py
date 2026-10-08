@@ -165,7 +165,8 @@ class RadioConfig:
 
     @property
     def channel_width(self) -> str:
-        return FIXED_BANDWIDTH
+        # Channel 165 in UNII-3 has no upper secondary channel; operates in HT20 mode
+        return "HT20" if self.channel == 165 else FIXED_BANDWIDTH
 
     @property
     def guard_interval(self) -> str:
@@ -185,10 +186,7 @@ class RadioConfig:
         }
 
 
-def validate_radio_config(
-    config: Dict[str, Any],
-    validate_rate_bounds: bool = True,
-) -> RadioConfig:
+def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     """
     Validate and construct a RadioConfig instance from dictionary config.
     Enforces ADR-0014 flat radio parameter rules:
@@ -197,7 +195,8 @@ def validate_radio_config(
     - radio_txpower_dbm in [10, 20].
     - downlink_mcs in [3, 4, 5, 6].
     - uplink_mcs in [3, 4, 5, 6].
-    - uftp_rate_kbps validated against downlink_mcs when validate_rate_bounds=True.
+    - uftp_rate_kbps: defaults to recommended default for downlink_mcs if omitted.
+      Per ADR-0014, backend executes received configuration directly without gate barriers.
     """
     if not isinstance(config, dict):
         raise TypeError(f"Config must be a dict, got {type(config).__name__}")
@@ -253,12 +252,8 @@ def validate_radio_config(
     else:
         if not isinstance(raw_rate, int) or isinstance(raw_rate, bool):
             raise ValueError(f"uftp_rate_kbps must be an integer, got {raw_rate!r}")
-        if validate_rate_bounds and not (bounds.min_rate_kbps <= raw_rate <= bounds.max_rate_kbps):
-            raise ValueError(
-                f"uftp_rate_kbps={raw_rate} outside safe bounds for downlink_mcs={raw_downlink_mcs} "
-                f"[{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps "
-                f"({bounds.min_rate_mbps}~{bounds.max_rate_mbps} Mbps)."
-            )
+        if raw_rate <= 0:
+            raise ValueError(f"uftp_rate_kbps must be positive, got {raw_rate}")
         rate = raw_rate
 
     return RadioConfig(
@@ -276,7 +271,6 @@ def validate_radio_patch(
     """
     Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
     Per ADR-0014, unmentioned attributes strictly remain untouched.
-    If uftp_rate_kbps is omitted in the patch, it preserves the base rate without gating.
     Unknown keys fail closed.
     """
     if not isinstance(patch, dict):
@@ -290,10 +284,7 @@ def validate_radio_patch(
         base = RadioConfig()
     merged = base.to_dict()
     merged.update(patch)
-
-    # If uftp_rate_kbps was omitted in the patch, keep base rate without gating
-    validate_rate = "uftp_rate_kbps" in patch
-    return validate_radio_config(merged, validate_rate_bounds=validate_rate)
+    return validate_radio_config(merged)
 
 
 @dataclass(frozen=True)
@@ -356,40 +347,63 @@ def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes]
     Excludes:
     - Locally generated outgoing packets (pkttype == PACKET_OUTGOING)
     - Frames from own interface MAC
-    - Internal WFB cluster frames (Transmitter Address starting with 57:42)
+    - Internal WFB cluster frames (Address starting with 57:42)
     - Malformed or non-802.11 packets
     """
     if pkttype == socket.PACKET_OUTGOING:
         return False
-    if len(data) < 4:
+    if len(data) < 8:
         return False
 
     version, pad, it_len = struct.unpack_from("<BBH", data, 0)
-    # Radiotap version must be 0
-    if version != 0 or it_len > len(data):
-        return False
-    if len(data) < it_len + 16:
+    # Radiotap version must be 0, header length must be >= 8 and <= total packet length
+    if version != 0 or it_len < 8 or it_len > len(data):
         return False
 
-    # IEEE 802.11 Frame Control at data[it_len]
-    fc = struct.unpack_from("<H", data, it_len)[0]
+    mac_payload = data[it_len:]
+    if len(mac_payload) < 10:
+        return False
+
+    fc = struct.unpack_from("<H", mac_payload, 0)[0]
     proto_ver = fc & 0x03
     if proto_ver != 0:
         return False
 
     ftype = (fc >> 2) & 0x03
-    if ftype > 2:  # Valid types: 0=Management, 1=Control, 2=Data
-        return False
+    fsubtype = (fc >> 4) & 0x0F
 
-    # Transmitter Address (TA) / Address 2 is at offset 10 of 802.11 header
-    ta = data[it_len + 10 : it_len + 16]
-    if local_mac and ta == local_mac:
+    if ftype == 1:  # Control frames
+        # CTS (12) and ACK (13) only have RA at offset 4
+        if fsubtype in (12, 13):
+            if len(mac_payload) < 10:
+                return False
+            ra = mac_payload[4:10]
+            if local_mac and ra == local_mac:
+                return False
+            if ra.startswith(WFB_MAC_PREFIX):
+                return False
+            return True
+        else:
+            # RTS (11) and other control frames have TA at offset 10
+            if len(mac_payload) < 16:
+                return False
+            ta = mac_payload[10:16]
+            if local_mac and ta == local_mac:
+                return False
+            if ta.startswith(WFB_MAC_PREFIX):
+                return False
+            return True
+    elif ftype in (0, 2):  # Management (0) or Data (2) frames
+        if len(mac_payload) < 24:
+            return False
+        ta = mac_payload[10:16]
+        if local_mac and ta == local_mac:
+            return False
+        if ta.startswith(WFB_MAC_PREFIX):
+            return False
+        return True
+    else:
         return False
-    # Exclude synthetic WFB cluster frames
-    if ta.startswith(WFB_MAC_PREFIX):
-        return False
-
-    return True
 
 
 def find_wlx_interfaces() -> List[str]:
@@ -412,7 +426,14 @@ class LiveRadioSurveyBackend:
         self.initial_width: Optional[str] = None
 
     def prepare(self, interface: str) -> None:
-        self.initial_channel, self.initial_width = self._get_current_channel_info(interface)
+        ch, width = self._get_current_channel_info(interface)
+        if ch is None:
+            raise RuntimeError(
+                f"Cannot determine current channel of interface {interface} before survey. "
+                "Aborting to avoid uncontrolled radio state mutation."
+            )
+        self.initial_channel = ch
+        self.initial_width = width
 
     def _get_current_channel_info(self, interface: str) -> Tuple[Optional[int], Optional[str]]:
         try:
@@ -501,10 +522,7 @@ class LiveRadioSurveyBackend:
     def finish(self, interface: str) -> None:
         # Restore original channel and width to prevent unintended background channel hopping
         if self.initial_channel and self.initial_channel in ALLOWED_5GHZ_CHANNELS:
-            try:
-                self._set_channel(interface, self.initial_channel, self.initial_width)
-            except Exception:
-                pass
+            self._set_channel(interface, self.initial_channel, self.initial_width)
 
 
 def _classify_density(fps: float) -> str:
@@ -646,6 +664,13 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     if args.uplink_mcs is not None:
         raw_cfg["uplink_mcs"] = args.uplink_mcs
     if args.uftp_rate is not None:
+        bounds = get_downlink_rate_bounds(raw_cfg.get("downlink_mcs", DEFAULT_DOWNLINK_MCS))
+        if not (bounds.min_rate_kbps <= args.uftp_rate <= bounds.max_rate_kbps):
+            print(
+                f"提示/警告: uftp_rate={args.uftp_rate} 超出当前 downlink_mcs "
+                f"推荐安全区间 [{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps",
+                file=sys.stderr,
+            )
         raw_cfg["uftp_rate_kbps"] = args.uftp_rate
 
     try:

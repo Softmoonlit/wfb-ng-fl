@@ -92,11 +92,11 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(config.channel_width, "HT40+")
         self.assertEqual(config.guard_interval, "short")
 
-    def test_channel_width_is_fixed_ht40_plus(self):
+    def test_channel_width_adaptation(self):
         config157 = validate_radio_config({"channel": 157})
         self.assertEqual(config157.channel_width, "HT40+")
         config165 = validate_radio_config({"channel": 165})
-        self.assertEqual(config165.channel_width, "HT40+")
+        self.assertEqual(config165.channel_width, "HT20")
 
     def test_unknown_keys_fail_closed(self):
         with self.assertRaises(ValueError) as ctx:
@@ -162,18 +162,11 @@ class TestRadioConfigValidator(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_radio_config({"uplink_mcs": 7})
 
-    def test_uftp_rate_outside_bounds_rejected(self):
-        # MCS 3 range is 12000..18000
+    def test_uftp_rate_must_be_positive(self):
         with self.assertRaises(ValueError):
-            validate_radio_config({"downlink_mcs": 3, "uftp_rate_kbps": 11999})
+            validate_radio_config({"uftp_rate_kbps": -100})
         with self.assertRaises(ValueError):
-            validate_radio_config({"downlink_mcs": 3, "uftp_rate_kbps": 18001})
-
-        # MCS 6 range is 32000..45000
-        with self.assertRaises(ValueError):
-            validate_radio_config({"downlink_mcs": 6, "uftp_rate_kbps": 31999})
-        with self.assertRaises(ValueError):
-            validate_radio_config({"downlink_mcs": 6, "uftp_rate_kbps": 45001})
+            validate_radio_config({"uftp_rate_kbps": 0})
 
     def test_validate_radio_patch(self):
         base = RadioConfig(channel=157, radio_txpower_dbm=12, downlink_mcs=3, uplink_mcs=6, uftp_rate_kbps=15000)
@@ -390,11 +383,20 @@ class TestRadioCLI(unittest.TestCase):
         combined = out + err
         self.assertIn("161", combined)
 
-    def test_cli_validate_invalid_rate(self):
+    def test_cli_validate_warns_on_out_of_bounds_rate(self):
         code, out, err = self.run_cli([
             "validate",
             "--downlink-mcs", "3",
             "--uftp-rate", "30000"
+        ])
+        self.assertEqual(code, 0)
+        self.assertIn("警告", err)
+
+    def test_cli_validate_rejects_negative_rate(self):
+        code, out, err = self.run_cli([
+            "validate",
+            "--downlink-mcs", "3",
+            "--uftp-rate", "-100"
         ])
         self.assertEqual(code, 1)
 
@@ -452,9 +454,9 @@ class TestRadioCLI(unittest.TestCase):
         self.assertEqual(p1.returncode, 0)
         self.assertIn('"downlink_mcs": 3', p1.stdout)
 
-        # Verify scripts/wfb-fl-radio validate
+        # Verify python -m wfb_ng.fl.radio validate
         p2 = subprocess.run(
-            ["./scripts/wfb-fl-radio", "validate", "-c", "157", "-p", "12", "-d", "3", "-u", "6", "--json"],
+            [sys.executable, "-m", "wfb_ng.fl.radio", "validate", "-c", "157", "-p", "12", "-d", "3", "-u", "6", "--json"],
             capture_output=True,
             text=True,
             check=True,
@@ -464,7 +466,7 @@ class TestRadioCLI(unittest.TestCase):
 
         # Verify exit code 1 on forbidden channel 161
         p3 = subprocess.run(
-            ["./scripts/wfb-fl-radio", "validate", "-c", "161"],
+            [sys.executable, "-m", "wfb_ng.fl.radio", "validate", "-c", "161"],
             capture_output=True,
             text=True,
         )
@@ -530,6 +532,31 @@ class TestForeignFrameInspection(unittest.TestCase):
         foreign_mac = b"\x00\x0c\x29\x86\x55\x89"
         foreign_ieee = self._make_80211_frame(ta=foreign_mac)
         self.assertTrue(is_foreign_80211_frame(rtap + foreign_ieee, 0, local_mac=b"\xaa\xbb\xcc\xdd\xee\xff"))
+
+    def test_foreign_control_ack_cts_accepted(self):
+        import struct
+        rtap = self._make_radiotap_header()
+        # ACK frame: ftype=1, subtype=13 (ACK) -> fc = (13 << 4) | (1 << 2) = 0x00d4
+        ack_fc = (13 << 4) | (1 << 2)
+        duration = 0
+        foreign_ra = b"\x00\x0c\x29\x86\x55\x89"
+        ack_frame = struct.pack("<HH6s", ack_fc, duration, foreign_ra)
+        self.assertTrue(is_foreign_80211_frame(rtap + ack_frame, 0, local_mac=b"\xaa\xbb\xcc\xdd\xee\xff"))
+
+    def test_wfb_control_ack_rejected(self):
+        import struct
+        rtap = self._make_radiotap_header()
+        ack_fc = (13 << 4) | (1 << 2)
+        wfb_ra = b"\x57\x42\x00\x11\x22\x33"
+        ack_frame = struct.pack("<HH6s", ack_fc, 0, wfb_ra)
+        self.assertFalse(is_foreign_80211_frame(rtap + ack_frame, 0))
+
+    def test_live_backend_prepare_raises_if_channel_undetermined(self):
+        backend = LiveRadioSurveyBackend()
+        with mock.patch.object(backend, "_get_current_channel_info", return_value=(None, None)):
+            with self.assertRaises(RuntimeError) as ctx:
+                backend.prepare("wlx_test")
+            self.assertIn("Cannot determine current channel", str(ctx.exception))
 
 
 if __name__ == "__main__":
