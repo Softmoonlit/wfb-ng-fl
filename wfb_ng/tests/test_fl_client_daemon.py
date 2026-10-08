@@ -138,8 +138,8 @@ class TestNodeIdentity(unittest.TestCase):
         self.assertEqual(ctx.exception.error_code, "invalid_node_identity")
 
     def test_load_node_identity_rejects_invalid_tun_ip(self):
-        # Conflicts with server 10.80.0.1 or invalid IP
-        for bad_ip in ["10.80.0.1", "invalid_ip", "10.80.0.256", "192.168.1.1"]:
+        # Conflicts with server 10.80.0.1, wrong node IP (10.80.0.11 is node 1), invalid IP, wrong subnet
+        for bad_ip in ["10.80.0.1", "10.80.0.11", "invalid_ip", "10.80.0.256", "192.168.1.1"]:
             path = self._write_node_json({"node_id": 2, "tun_ip": bad_ip})
             with self.assertRaises(FLRuntimeError) as ctx:
                 load_node_identity(path)
@@ -392,6 +392,24 @@ class TestRoleServiceSandbox(unittest.TestCase):
         # Verify TUN is clean
         self.assertFalse(self.adapter.is_tun_active("tun_test_tree"))
 
+    def test_sandbox_start_failure_cleans_up_workspace(self):
+        sandbox = JobSandbox(
+            work_dir=self.temp_dir,
+            network_adapter=self.adapter,
+            command_prefix=["/nonexistent/invalid_binary_name_fail"],
+        )
+        job_config = ClientJobConfig(
+            job_id="fail_job_01",
+            node_id=1,
+            tun_name="tun_fail",
+            tun_ip="10.80.0.11",
+        )
+        with self.assertRaises(FLRuntimeError) as ctx:
+            sandbox.start(job_config, air_interface="wlx001")
+        self.assertEqual(ctx.exception.error_code, "sandbox_start_failed")
+        self.assertEqual(sandbox.state, DaemonState.IDLE)
+        self.assertFalse(os.path.exists(os.path.join(self.temp_dir, "job_fail_01")))
+
     def test_sandbox_rejects_duplicate_concurrent_jobs(self):
         stub_script = "import time; time.sleep(1.0)"
         sandbox = JobSandbox(
@@ -469,6 +487,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         exit_code = daemon.wait_job(timeout=2.0)
         self.assertEqual(exit_code, 0)
         self.assertEqual(daemon.state, DaemonState.IDLE)
+        self.assertTrue(self.adapter.is_tun_active(daemon.config.tun_name))
 
     def test_generated_client_role_config_strictly_conforms_to_service_contract(self):
         # Verify that client_role.json written by JobSandbox can be successfully validated by service._read_config

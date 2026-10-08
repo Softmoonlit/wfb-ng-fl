@@ -18,9 +18,9 @@
 
 - 交付 `wfb_ng.fl.client_daemon` 模块与可执行入口 `wfb-fl-client-daemon`（注册在 `setup.py` console_scripts，亦支持 `python3 -m wfb_ng.fl.client_daemon`）。
 - 交付 systemd 服务单元文件 `scripts/systemd/wfb-fl-client-daemon.service` 与默认身份模板 `scripts/default/node.json`，并纳入打包与安装清单。
-- 实现 `load_node_identity`，严格校验 1~10 号节点与 TUN IP（支持自动派生 `10.80.0.{10+node_id}/24`，fail-closed 拦截非法 IP 与越界 ID）。
+- 实现 `load_node_identity`，严格校验 1~10 号节点与 TUN IP 静态映射契约（严禁 fallback，静态映射 `10.80.0.{10+node_id}/24`，fail-closed 拦截非法 IP、越界 ID 与错位映射）。
 - 实现 `NetworkAdapter` / `LinuxNetworkAdapter` 与安全轮询机制：开机 0 网卡时以 3 秒周期挂起轮询不崩溃，检测到网卡插入即自动接管；运行中拔卡安全自愈并回退挂起轮询。
 - 自动将纳管的 `wlx*` 网卡配置为 Monitor 模式、锁定 Channel 157（HT40+）、根据 ADR-0014 与驱动协议注入负值 mBm 功率（12 dBm -> -1200），支持 TUN 接口创建与清理。
 - 实现 `JobSandbox` 进程沙箱：以独立进程组（`start_new_session=True`）派生 `RoleService(role='client')`，严格符合 `service._read_config` 配置契约；作业完成或异常中止时，强杀进程组（SIGTERM -> SIGKILL）、清理 TUN 与临时工作区，安全回滚至 `IDLE`。
-- 编写 24 项全覆盖单元与集成测试，零资源警告，全套 71 项测试 100% 通过。
+- 编写 26 项全覆盖单元与集成测试，零资源警告，全套 73 项测试 100% 通过。
 

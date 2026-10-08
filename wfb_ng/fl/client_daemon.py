@@ -24,7 +24,7 @@ import subprocess
 import sys
 import threading
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -36,8 +36,6 @@ from .radio import (
     FIXED_BANDWIDTH,
     FORBIDDEN_CHANNELS,
     RECOMMENDED_UPLINK_MCS,
-    TXPOWER_MAX_DBM,
-    TXPOWER_MIN_DBM,
     find_wlx_interfaces,
 )
 
@@ -55,7 +53,6 @@ DEFAULT_WORK_DIR = "/tmp/wfb-ng-fl/client"
 
 
 class DaemonState(str, Enum):
-    UNINITIALIZED = "UNINITIALIZED"
     POLLING_HARDWARE = "POLLING_HARDWARE"
     IDLE = "IDLE"
     PREPARING = "PREPARING"
@@ -132,24 +129,13 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
             "invalid_node_identity", f"tun_ip 地址格式非法: {raw_tun_ip}"
         ) from exc
 
-    # Enforce subnet contract: 10.80.0.0/24 and reject conflict with server (10.80.0.1)
-    try:
-        network = ipaddress.IPv4Network("10.80.0.0/24")
-        addr = ipaddress.IPv4Address(tun_ip_str)
-        if addr not in network:
-            raise FLRuntimeError(
-                "invalid_node_identity",
-                f"tun_ip ({tun_ip_str}) 不在空口数据面子网 10.80.0.0/24 内",
-            )
-        if tun_ip_str == "10.80.0.1":
-            raise FLRuntimeError(
-                "invalid_node_identity",
-                f"tun_ip ({tun_ip_str}) 与服务端 TUN 地址冲突",
-            )
-    except ValueError as exc:
+    # Enforce static mapping contract: 10.80.0.{10+node_id} (Memory #66)
+    expected_ip = f"10.80.0.{10 + raw_node_id}"
+    if tun_ip_str != expected_ip:
         raise FLRuntimeError(
-            "invalid_node_identity", f"tun_ip 地址解析失败: {exc}"
-        ) from exc
+            "invalid_node_identity",
+            f"节点 {raw_node_id} 的 tun_ip ({tun_ip_str}) 不符合静态分配契约 (必须为 {expected_ip})",
+        )
 
     return NodeIdentity(
         node_id=raw_node_id, tun_ip=tun_ip_str, tun_cidr=tun_cidr_str
@@ -352,7 +338,7 @@ class JobSandbox:
         self._log_file: Optional[Any] = None
         self._active_job: Optional[ClientJobConfig] = None
         self._job_work_dir: Optional[str] = None
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self.state = DaemonState.IDLE
 
     @property
@@ -485,8 +471,12 @@ class JobSandbox:
                     except Exception:
                         pass
                     self._log_file = None
-                self.state = DaemonState.IDLE
+                if self._job_work_dir and os.path.exists(self._job_work_dir):
+                    shutil.rmtree(self._job_work_dir, ignore_errors=True)
+                self._job_work_dir = None
+                self._active_job = None
                 self._process = None
+                self.state = DaemonState.IDLE
                 raise FLRuntimeError(
                     "sandbox_start_failed", f"启动角色服务子进程失败: {exc}"
                 ) from exc
@@ -600,7 +590,7 @@ class ClientDaemon:
         )
         self.current_interface: Optional[str] = None
         self._stop_event = threading.Event()
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
     @property
     def state(self) -> DaemonState:
@@ -675,19 +665,38 @@ class ClientDaemon:
             self.network_adapter.teardown_tun(self.config.tun_name)
         self.current_interface = None
 
+    def _restore_tun_if_idle(self) -> None:
+        """Ensure persistent TUN interface is active when daemon is idle with interface."""
+        if self.current_interface is not None and not self.sandbox.is_running:
+            if not self.network_adapter.is_tun_active(self.config.tun_name):
+                logger.info(
+                    "恢复常驻 TUN 接口 %s (%s)",
+                    self.config.tun_name,
+                    self.config.tun_cidr,
+                )
+                self.network_adapter.setup_tun(
+                    self.config.tun_name, self.config.tun_cidr
+                )
+
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
         """Start a job in the sandbox using the active wireless interface."""
-        if self.current_interface is None:
-            raise FLRuntimeError(
-                "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
-            )
-        return self.sandbox.start(job_config, air_interface=self.current_interface)
+        with self._lock:
+            if self.current_interface is None:
+                raise FLRuntimeError(
+                    "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
+                )
+            return self.sandbox.start(job_config, air_interface=self.current_interface)
 
     def abort_job(self) -> None:
-        self.sandbox.abort()
+        with self._lock:
+            self.sandbox.abort()
+            self._restore_tun_if_idle()
 
     def wait_job(self, timeout: Optional[float] = None) -> int:
-        return self.sandbox.wait(timeout=timeout)
+        ret = self.sandbox.wait(timeout=timeout)
+        with self._lock:
+            self._restore_tun_if_idle()
+        return ret
 
     def run(self) -> None:
         """Run the main daemon supervisory loop until stopped."""
@@ -707,6 +716,8 @@ class ClientDaemon:
 
             # Check if active job finished
             self.sandbox.poll()
+            if self.current_interface is not None and not self.sandbox.is_running:
+                self._restore_tun_if_idle()
 
             # Periodic hardware check (ensure interface hasn't vanished)
             if self.current_interface is not None:
