@@ -112,8 +112,6 @@ __all__ = (
     "TXPOWER_MIN_DBM",
     "TXPOWER_MAX_DBM",
     "DEFAULT_TXPOWER_DBM",
-    "MCS_MIN",
-    "MCS_MAX",
     "ALLOWED_MCS_VALUES",
     "DEFAULT_DOWNLINK_MCS",
     "RECOMMENDED_UPLINK_MCS",
@@ -129,8 +127,8 @@ __all__ = (
     "ChannelSurveyResult",
     "SpectrumSurveyReport",
     "SurveyBackend",
-    "MockSurveyBackend",
     "LiveRadioSurveyBackend",
+    "is_foreign_80211_frame",
     "find_wlx_interfaces",
     "survey_spectrum",
     "main",
@@ -167,8 +165,7 @@ class RadioConfig:
 
     @property
     def channel_width(self) -> str:
-        # Channel 165 has no upper secondary channel in UNII-3; kernel strictly requires HT20
-        return "HT20" if self.channel == 165 else FIXED_BANDWIDTH
+        return FIXED_BANDWIDTH
 
     @property
     def guard_interval(self) -> str:
@@ -188,7 +185,10 @@ class RadioConfig:
         }
 
 
-def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
+def validate_radio_config(
+    config: Dict[str, Any],
+    validate_rate_bounds: bool = True,
+) -> RadioConfig:
     """
     Validate and construct a RadioConfig instance from dictionary config.
     Enforces ADR-0014 flat radio parameter rules:
@@ -197,7 +197,7 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     - radio_txpower_dbm in [10, 20].
     - downlink_mcs in [3, 4, 5, 6].
     - uplink_mcs in [3, 4, 5, 6].
-    - uftp_rate_kbps in [min_rate_kbps, max_rate_kbps] for downlink_mcs.
+    - uftp_rate_kbps validated against downlink_mcs when validate_rate_bounds=True.
     """
     if not isinstance(config, dict):
         raise TypeError(f"Config must be a dict, got {type(config).__name__}")
@@ -253,7 +253,7 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
     else:
         if not isinstance(raw_rate, int) or isinstance(raw_rate, bool):
             raise ValueError(f"uftp_rate_kbps must be an integer, got {raw_rate!r}")
-        if not (bounds.min_rate_kbps <= raw_rate <= bounds.max_rate_kbps):
+        if validate_rate_bounds and not (bounds.min_rate_kbps <= raw_rate <= bounds.max_rate_kbps):
             raise ValueError(
                 f"uftp_rate_kbps={raw_rate} outside safe bounds for downlink_mcs={raw_downlink_mcs} "
                 f"[{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps "
@@ -276,6 +276,7 @@ def validate_radio_patch(
     """
     Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
     Per ADR-0014, unmentioned attributes strictly remain untouched.
+    If uftp_rate_kbps is omitted in the patch, it preserves the base rate without gating.
     Unknown keys fail closed.
     """
     if not isinstance(patch, dict):
@@ -289,7 +290,10 @@ def validate_radio_patch(
         base = RadioConfig()
     merged = base.to_dict()
     merged.update(patch)
-    return validate_radio_config(merged)
+
+    # If uftp_rate_kbps was omitted in the patch, keep base rate without gating
+    validate_rate = "uftp_rate_kbps" in patch
+    return validate_radio_config(merged, validate_rate_bounds=validate_rate)
 
 
 @dataclass(frozen=True)
@@ -343,53 +347,60 @@ class SurveyBackend(Protocol):
         ...
 
 
-class MockSurveyBackend:
-    """Mock backend for deterministic testing and dry-run environments."""
+WFB_MAC_PREFIX: bytes = bytes([0x57, 0x42])
 
-    def __init__(self, channel_frames: Optional[Dict[int, int]] = None):
-        self.channel_frames: Dict[int, int] = dict(channel_frames or {})
-        self.queried_channels: List[int] = []
-        self.prepared: bool = False
-        self.finished: bool = False
 
-    def prepare(self, interface: str) -> None:
-        self.prepared = True
+def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes] = None) -> bool:
+    """
+    Determine whether a raw captured frame is genuine foreign 802.11 environmental interference.
+    Excludes:
+    - Locally generated outgoing packets (pkttype == PACKET_OUTGOING)
+    - Frames from own interface MAC
+    - Internal WFB cluster frames (Transmitter Address starting with 57:42)
+    - Malformed or non-802.11 packets
+    """
+    if pkttype == socket.PACKET_OUTGOING:
+        return False
+    if len(data) < 4:
+        return False
 
-    def count_frames(self, interface: str, channel: int, duration_ms: float) -> int:
-        if channel in FORBIDDEN_CHANNELS:
-            raise ValueError(f"Channel {channel} is forbidden from survey query")
-        self.queried_channels.append(channel)
-        return self.channel_frames.get(channel, 0)
+    version, pad, it_len = struct.unpack_from("<BBH", data, 0)
+    # Radiotap version must be 0
+    if version != 0 or it_len > len(data):
+        return False
+    if len(data) < it_len + 16:
+        return False
 
-    def finish(self, interface: str) -> None:
-        self.finished = True
+    # IEEE 802.11 Frame Control at data[it_len]
+    fc = struct.unpack_from("<H", data, it_len)[0]
+    proto_ver = fc & 0x03
+    if proto_ver != 0:
+        return False
+
+    ftype = (fc >> 2) & 0x03
+    if ftype > 2:  # Valid types: 0=Management, 1=Control, 2=Data
+        return False
+
+    # Transmitter Address (TA) / Address 2 is at offset 10 of 802.11 header
+    ta = data[it_len + 10 : it_len + 16]
+    if local_mac and ta == local_mac:
+        return False
+    # Exclude synthetic WFB cluster frames
+    if ta.startswith(WFB_MAC_PREFIX):
+        return False
+
+    return True
 
 
 def find_wlx_interfaces() -> List[str]:
-    """Find all wireless interfaces whose names begin with 'wlx'."""
-    interfaces: List[str] = []
-    # Try sysfs first
+    """Find all wireless interfaces whose names begin with 'wlx' via sysfs."""
     sysfs_net = "/sys/class/net"
-    if os.path.isdir(sysfs_net):
-        try:
-            for name in os.listdir(sysfs_net):
-                if name.startswith("wlx"):
-                    interfaces.append(name)
-        except OSError:
-            pass
-    if not interfaces:
-        # Fallback to iw dev
-        try:
-            out = subprocess.check_output(["iw", "dev"], text=True, stderr=subprocess.DEVNULL)
-            for line in out.splitlines():
-                line = line.strip()
-                if line.startswith("Interface "):
-                    parts = line.split()
-                    if len(parts) >= 2 and parts[1].startswith("wlx"):
-                        interfaces.append(parts[1])
-        except (OSError, subprocess.SubprocessError):
-            pass
-    return sorted(list(set(interfaces)))
+    if not os.path.isdir(sysfs_net):
+        return []
+    try:
+        return sorted([name for name in os.listdir(sysfs_net) if name.startswith("wlx")])
+    except OSError:
+        return []
 
 
 class LiveRadioSurveyBackend:
@@ -431,6 +442,7 @@ class LiveRadioSurveyBackend:
             return None
 
     def _set_channel(self, interface: str, channel: int, width: Optional[str] = None) -> None:
+        # In 802.11n UNII-3, channel 165 has no upper extension channel; kernel requires HT20
         if width is None:
             width = "HT20" if channel == 165 else FIXED_BANDWIDTH
         cmd = ["iw", "dev", interface, "set", "channel", str(channel), width]
@@ -476,25 +488,9 @@ class LiveRadioSurveyBackend:
                     try:
                         while True:
                             data, sll = sock.recvfrom(4096)
-                            # Exclude locally generated outgoing packets
-                            if len(sll) >= 3 and sll[2] == socket.PACKET_OUTGOING:
-                                continue
-                            # Parse Radiotap header to inspect 802.11 frame
-                            if len(data) < 4:
-                                continue
-                            it_len = struct.unpack_from("<H", data, 2)[0]
-                            if len(data) < it_len + 16:
-                                continue
-                            # 802.11 Frame Control
-                            fc = struct.unpack_from("<H", data, it_len)[0]
-                            ftype = (fc >> 2) & 0x3
-                            if ftype > 2:  # 0=Mgmt, 1=Control, 2=Data
-                                continue
-                            # Transmitter Address (TA) at offset 10 in 802.11 header
-                            ta = data[it_len + 10 : it_len + 16]
-                            if local_mac and ta == local_mac:
-                                continue
-                            count += 1
+                            pkttype = sll[2] if len(sll) >= 3 else 0
+                            if is_foreign_80211_frame(data, pkttype, local_mac):
+                                count += 1
                     except (BlockingIOError, InterruptedError):
                         pass
         finally:

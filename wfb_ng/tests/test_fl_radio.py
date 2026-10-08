@@ -19,8 +19,8 @@ from wfb_ng.fl.radio import (
     validate_radio_patch,
     ChannelSurveyResult,
     SpectrumSurveyReport,
-    MockSurveyBackend,
     LiveRadioSurveyBackend,
+    is_foreign_80211_frame,
     find_wlx_interfaces,
     survey_spectrum,
     main,
@@ -92,11 +92,11 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(config.channel_width, "HT40+")
         self.assertEqual(config.guard_interval, "short")
 
-    def test_channel_165_adapts_to_ht20(self):
+    def test_channel_width_is_fixed_ht40_plus(self):
         config157 = validate_radio_config({"channel": 157})
         self.assertEqual(config157.channel_width, "HT40+")
         config165 = validate_radio_config({"channel": 165})
-        self.assertEqual(config165.channel_width, "HT20")
+        self.assertEqual(config165.channel_width, "HT40+")
 
     def test_unknown_keys_fail_closed(self):
         with self.assertRaises(ValueError) as ctx:
@@ -190,10 +190,15 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(patched_pwr.radio_txpower_dbm, 15)
         self.assertEqual(patched_pwr.channel, 157)
 
-        # Patch downlink_mcs and uftp_rate explicitly
-        patched_mcs = validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": 28000}, base=base)
+        # Patch downlink_mcs alone: ADR-0014 incremental patch contract preserves omitted uftp_rate without gate rejection
+        patched_mcs = validate_radio_patch({"downlink_mcs": 5}, base=base)
         self.assertEqual(patched_mcs.downlink_mcs, 5)
-        self.assertEqual(patched_mcs.uftp_rate_kbps, 28000)
+        self.assertEqual(patched_mcs.uftp_rate_kbps, 15000)
+
+        # Patch downlink_mcs and uftp_rate explicitly
+        patched_mcs_rate = validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": 28000}, base=base)
+        self.assertEqual(patched_mcs_rate.downlink_mcs, 5)
+        self.assertEqual(patched_mcs_rate.uftp_rate_kbps, 28000)
 
         # Patch with unknown key fails closed
         with self.assertRaises(ValueError):
@@ -202,6 +207,28 @@ class TestRadioConfigValidator(unittest.TestCase):
         # Patch with forbidden channel 161 rejected
         with self.assertRaises(ValueError):
             validate_radio_patch({"channel": 161}, base=base)
+
+
+class MockSurveyBackend:
+    """Mock backend for deterministic unit tests."""
+
+    def __init__(self, channel_frames=None):
+        self.channel_frames = dict(channel_frames or {})
+        self.queried_channels = []
+        self.prepared = False
+        self.finished = False
+
+    def prepare(self, interface: str) -> None:
+        self.prepared = True
+
+    def count_frames(self, interface: str, channel: int, duration_ms: float) -> int:
+        if channel in FORBIDDEN_CHANNELS:
+            raise ValueError(f"Channel {channel} is forbidden from survey query")
+        self.queried_channels.append(channel)
+        return self.channel_frames.get(channel, 0)
+
+    def finish(self, interface: str) -> None:
+        self.finished = True
 
 
 class TestSpectrumSurvey(unittest.TestCase):
@@ -442,6 +469,67 @@ class TestRadioCLI(unittest.TestCase):
             text=True,
         )
         self.assertNotEqual(p3.returncode, 0)
+
+
+class TestForeignFrameInspection(unittest.TestCase):
+    def _make_radiotap_header(self, length=8):
+        # Radiotap version=0, pad=0, length=length (LE), present flags=0
+        import struct
+        return struct.pack("<BBHL", 0, 0, length, 0)
+
+    def _make_80211_frame(self, ftype=2, proto_ver=0, ta=b"\x00\x11\x22\x33\x44\x55"):
+        # Frame control: (ftype << 2) | proto_ver
+        import struct
+        fc = (ftype << 2) | (proto_ver & 0x3)
+        duration = 0
+        ra = b"\xff\xff\xff\xff\xff\xff"
+        bssid = b"\x00\x11\x22\x33\x44\x55"
+        seq = 0
+        # Total MAC header: 24 bytes
+        return struct.pack("<HH6s6s6sH", fc, duration, ra, ta, bssid, seq)
+
+    def test_outgoing_packet_rejected(self):
+        import socket
+        rtap = self._make_radiotap_header()
+        ieee = self._make_80211_frame()
+        self.assertFalse(is_foreign_80211_frame(rtap + ieee, socket.PACKET_OUTGOING))
+
+    def test_short_packet_rejected(self):
+        self.assertFalse(is_foreign_80211_frame(b"\x00\x00", 0))
+
+    def test_invalid_radiotap_version_rejected(self):
+        import struct
+        bad_rtap = struct.pack("<BBHL", 1, 0, 8, 0)  # version 1
+        ieee = self._make_80211_frame()
+        self.assertFalse(is_foreign_80211_frame(bad_rtap + ieee, 0))
+
+    def test_radiotap_len_overflow_rejected(self):
+        import struct
+        bad_rtap = struct.pack("<BBHL", 0, 0, 100, 0)  # len 100 on 8-byte pkt
+        self.assertFalse(is_foreign_80211_frame(bad_rtap, 0))
+
+    def test_invalid_80211_proto_rejected(self):
+        rtap = self._make_radiotap_header()
+        bad_ieee = self._make_80211_frame(proto_ver=1)
+        self.assertFalse(is_foreign_80211_frame(rtap + bad_ieee, 0))
+
+    def test_wfb_synthetic_cluster_mac_rejected(self):
+        rtap = self._make_radiotap_header()
+        # TA starts with \x57\x42 (WFB MAC prefix)
+        wfb_ieee = self._make_80211_frame(ta=b"\x57\x42\xaa\xbb\xcc\xdd")
+        self.assertFalse(is_foreign_80211_frame(rtap + wfb_ieee, 0))
+
+    def test_local_mac_match_rejected(self):
+        rtap = self._make_radiotap_header()
+        local_mac = b"\x12\x34\x56\x78\x9a\xbc"
+        local_ieee = self._make_80211_frame(ta=local_mac)
+        self.assertFalse(is_foreign_80211_frame(rtap + local_ieee, 0, local_mac=local_mac))
+
+    def test_genuine_foreign_80211_frame_accepted(self):
+        rtap = self._make_radiotap_header()
+        foreign_mac = b"\x00\x0c\x29\x86\x55\x89"
+        foreign_ieee = self._make_80211_frame(ta=foreign_mac)
+        self.assertTrue(is_foreign_80211_frame(rtap + foreign_ieee, 0, local_mac=b"\xaa\xbb\xcc\xdd\xee\xff"))
 
 
 if __name__ == "__main__":
