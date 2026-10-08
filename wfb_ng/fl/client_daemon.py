@@ -72,7 +72,7 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
     """
     Load and strictly validate client node identity from /etc/wfb-ng-fl/node.json.
     - node_id must be an integer in range [1, 10].
-    - tun_ip must be a valid 10.80.0.x IPv4 address, defaulting to 10.80.0.{10+node_id}/24.
+    - tun_ip is required and must strictly match the static schema 10.80.0.{10+node_id}/24.
     Fails closed with FLRuntimeError('invalid_node_identity', ...) on any defect.
     """
     if not os.path.exists(path):
@@ -147,6 +147,50 @@ def load_node_identity(path: str = DEFAULT_NODE_CONFIG_PATH) -> NodeIdentity:
     )
 
 
+def validate_rf_parameters(
+    channel: int = DEFAULT_CHANNEL,
+    txpower_dbm: int = DEFAULT_TXPOWER_DBM,
+    uplink_mcs: int = RECOMMENDED_UPLINK_MCS,
+) -> None:
+    """Validate discrete RF parameters against system contracts."""
+    if type(channel) is not int:
+        raise FLRuntimeError(
+            "invalid_channel", f"channel 必须为整数，实际为: {type(channel).__name__}"
+        )
+    if channel in FORBIDDEN_CHANNELS:
+        raise FLRuntimeError(
+            "forbidden_channel",
+            f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
+        )
+    if channel not in ALLOWED_5GHZ_CHANNELS:
+        raise FLRuntimeError(
+            "invalid_channel",
+            f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
+        )
+
+    if type(txpower_dbm) is not int:
+        raise FLRuntimeError(
+            "invalid_txpower",
+            f"radio_txpower_dbm 必须为整数，实际为: {type(txpower_dbm).__name__}",
+        )
+    if not (10 <= txpower_dbm <= 20):
+        raise FLRuntimeError(
+            "invalid_txpower",
+            f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {txpower_dbm}",
+        )
+
+    if type(uplink_mcs) is not int:
+        raise FLRuntimeError(
+            "invalid_mcs",
+            f"uplink_mcs 必须为整数，实际为: {type(uplink_mcs).__name__}",
+        )
+    if not (3 <= uplink_mcs <= 6):
+        raise FLRuntimeError(
+            "invalid_mcs",
+            f"uplink_mcs 必须在 [3, 6] 范围内: {uplink_mcs}",
+        )
+
+
 class NetworkAdapter:
     """Interface for system wireless and TUN network operations."""
 
@@ -206,16 +250,7 @@ class LinuxNetworkAdapter(NetworkAdapter):
         channel_width: str = FIXED_BANDWIDTH,
         txpower_dbm: int = DEFAULT_TXPOWER_DBM,
     ) -> None:
-        if channel in FORBIDDEN_CHANNELS:
-            raise FLRuntimeError(
-                "forbidden_channel",
-                f"Channel {channel} is strictly forbidden due to driver kernel crash defect.",
-            )
-        if channel not in ALLOWED_5GHZ_CHANNELS:
-            raise FLRuntimeError(
-                "invalid_channel",
-                f"Channel {channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-            )
+        validate_rf_parameters(channel=channel, txpower_dbm=txpower_dbm)
         if channel == 165:
             channel_width = "HT20"
 
@@ -287,26 +322,11 @@ class ClientDaemonConfig:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
         if self.tun_name is None:
             object.__setattr__(self, "tun_name", f"{DEFAULT_TUN_PREFIX}{self.node_id}")
-        if self.channel in FORBIDDEN_CHANNELS:
-            raise FLRuntimeError(
-                "forbidden_channel",
-                f"Channel {self.channel} is strictly forbidden due to driver kernel crash defect.",
-            )
-        if self.channel not in ALLOWED_5GHZ_CHANNELS:
-            raise FLRuntimeError(
-                "invalid_channel",
-                f"Channel {self.channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-            )
-        if not (10 <= self.radio_txpower_dbm <= 20):
-            raise FLRuntimeError(
-                "invalid_txpower",
-                f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {self.radio_txpower_dbm}",
-            )
-        if not (3 <= self.uplink_mcs <= 6):
-            raise FLRuntimeError(
-                "invalid_mcs",
-                f"uplink_mcs 必须在 [3, 6] 范围内: {self.uplink_mcs}",
-            )
+        validate_rf_parameters(
+            channel=self.channel,
+            txpower_dbm=self.radio_txpower_dbm,
+            uplink_mcs=self.uplink_mcs,
+        )
 
 
 @dataclass(frozen=True)
@@ -338,26 +358,11 @@ class ClientJobConfig:
             # Strip CIDR prefix if present
             clean_ip = self.tun_ip.split("/")[0]
             object.__setattr__(self, "uftp_bind_host", clean_ip)
-        if self.channel in FORBIDDEN_CHANNELS:
-            raise FLRuntimeError(
-                "forbidden_channel",
-                f"Channel {self.channel} is strictly forbidden due to driver kernel crash defect.",
-            )
-        if self.channel not in ALLOWED_5GHZ_CHANNELS:
-            raise FLRuntimeError(
-                "invalid_channel",
-                f"Channel {self.channel} is not in legal pool {ALLOWED_5GHZ_CHANNELS}.",
-            )
-        if not (10 <= self.radio_txpower_dbm <= 20):
-            raise FLRuntimeError(
-                "invalid_txpower",
-                f"radio_txpower_dbm 必须在 [10, 20] dBm 范围内: {self.radio_txpower_dbm}",
-            )
-        if not (3 <= self.uplink_mcs <= 6):
-            raise FLRuntimeError(
-                "invalid_mcs",
-                f"uplink_mcs 必须在 [3, 6] 范围内: {self.uplink_mcs}",
-            )
+        validate_rf_parameters(
+            channel=self.channel,
+            txpower_dbm=self.radio_txpower_dbm,
+            uplink_mcs=self.uplink_mcs,
+        )
 
 
 class JobSandbox:
@@ -564,40 +569,58 @@ class JobSandbox:
         with self._lock:
             self.state = DaemonState.ABORTING
             proc = self._process
-            if proc is not None and proc.poll() is None:
+            if proc is not None:
                 pid = proc.pid
                 pgid = None
                 try:
                     pgid = os.getpgid(pid)
-                    logger.info("终止子进程组 PGID=%d (PID=%d)", pgid, pid)
-                    os.killpg(pgid, signal.SIGTERM)
                 except OSError:
+                    pass
+
+                # 1. Send SIGTERM to process group or direct child
+                if pgid is not None:
+                    logger.info("终止子进程组 PGID=%d (PID=%d)", pgid, pid)
+                    try:
+                        os.killpg(pgid, signal.SIGTERM)
+                    except OSError:
+                        pass
+                else:
                     try:
                         proc.terminate()
                     except OSError:
                         pass
 
+                # 2. Wait for process group / child to exit within timeout
                 deadline = time.monotonic() + timeout
                 while time.monotonic() < deadline:
-                    if proc.poll() is not None:
+                    pg_alive = False
+                    if pgid is not None:
+                        try:
+                            os.killpg(pgid, 0)
+                            pg_alive = True
+                        except OSError:
+                            pg_alive = False
+                    elif proc.poll() is None:
+                        pg_alive = True
+
+                    if not pg_alive:
                         break
                     time.sleep(0.05)
 
-                if proc.poll() is None:
-                    if pgid is not None:
-                        logger.warning("子进程未响应 SIGTERM，发送 SIGKILL (PGID=%d)", pgid)
-                        try:
-                            os.killpg(pgid, signal.SIGKILL)
-                        except OSError:
-                            pass
+                # 3. Always send SIGKILL to process group if any descendants survive
+                if pgid is not None:
                     try:
-                        proc.kill()
+                        os.killpg(pgid, signal.SIGKILL)
                     except OSError:
                         pass
-                    try:
-                        proc.wait(timeout=1.0)
-                    except Exception:
-                        pass
+                try:
+                    proc.kill()
+                except OSError:
+                    pass
+                try:
+                    proc.wait(timeout=2.0)
+                except Exception:
+                    pass
 
             self._finalize(proc.poll() if proc else 0)
 

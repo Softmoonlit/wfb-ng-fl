@@ -334,11 +334,12 @@ class TestRoleServiceSandbox(unittest.TestCase):
         self.assertFalse(self.adapter.is_tun_active("tun_test2"))
 
     def test_sandbox_terminates_entire_process_tree_including_grandchild(self):
-        # Spawn child which spawns a background grandchild process
+        # Spawn child which exits immediately on SIGTERM, while grandchild ignores SIGTERM
         gc_pid_file = os.path.join(self.temp_dir, "grandchild.pid")
         stub_script = (
-            "import time, subprocess, sys\n"
-            f"sub = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])\n"
+            "import time, subprocess, sys, signal\n"
+            "signal.signal(signal.SIGTERM, lambda s, f: sys.exit(0))\n"
+            f"sub = subprocess.Popen([sys.executable, '-c', 'import time, signal; signal.signal(signal.SIGTERM, signal.SIG_IGN); time.sleep(30)'])\n"
             f"with open(r'{gc_pid_file}', 'w') as f:\n"
             "    f.write(str(sub.pid))\n"
             "while True:\n"
@@ -382,10 +383,24 @@ class TestRoleServiceSandbox(unittest.TestCase):
         self.assertEqual(sandbox.state, DaemonState.IDLE)
 
         # Verify child is dead
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            try:
+                os.kill(child_pid, 0)
+                time.sleep(0.05)
+            except OSError:
+                break
         with self.assertRaises(OSError):
             os.kill(child_pid, 0)
 
         # Verify grandchild is dead (no orphaned grandchild processes)
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            try:
+                os.kill(gc_pid, 0)
+                time.sleep(0.05)
+            except OSError:
+                break
         with self.assertRaises(OSError):
             os.kill(gc_pid, 0)
 
@@ -704,6 +719,21 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         # Out of range uplink_mcs
         with self.assertRaises(FLRuntimeError) as ctx:
             ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=7)
+        self.assertEqual(ctx.exception.error_code, "invalid_mcs")
+
+        # Non-integer channel
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=157.0)
+        self.assertEqual(ctx.exception.error_code, "invalid_channel")
+
+        # Non-integer txpower
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=12.5)
+        self.assertEqual(ctx.exception.error_code, "invalid_txpower")
+
+        # Non-integer uplink_mcs
+        with self.assertRaises(FLRuntimeError) as ctx:
+            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=3.5)
         self.assertEqual(ctx.exception.error_code, "invalid_mcs")
 
     def test_default_template_node_json_validity(self):

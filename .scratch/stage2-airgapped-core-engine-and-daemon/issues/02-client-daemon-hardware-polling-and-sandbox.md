@@ -23,4 +23,3 @@
 - 自动将纳管的 `wlx*` 网卡配置为 Monitor 模式、锁定 Channel 157（HT40+）、根据 ADR-0014 与驱动协议注入负值 mBm 功率（12 dBm -> -1200），支持 TUN 接口创建与清理。
 - 实现 `JobSandbox` 进程沙箱：以独立进程组（`start_new_session=True`）派生 `RoleService(role='client')`，严格符合 `service._read_config` 配置契约；作业完成或异常中止时，强杀进程组（SIGTERM -> SIGKILL）、清理 TUN 与临时工作区，安全回滚至 `IDLE`。
 - 编写 29 项全覆盖单元与集成测试，零资源警告，全套 76 项测试 100% 通过。
-
