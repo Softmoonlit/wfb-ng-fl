@@ -3,7 +3,10 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import threading
 import uuid
-from typing import Any, Callable, Dict, Optional
+from pathlib import Path
+from typing import Any, BinaryIO, Callable, Dict, Optional
+
+from .model_library import ModelLibrary, ModelLibraryError
 
 
 SERVER_STATES = {
@@ -34,7 +37,8 @@ def _job_view(job: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
 class ConsoleApplicationService:
     """Project daemon facts into one recoverable, detached Web snapshot."""
 
-    def __init__(self, read_status: Callable[[], Dict[str, Any]], source_lock: Any) -> None:
+    def __init__(self, read_status: Callable[[], Dict[str, Any]], source_lock: Any,
+                 model_root: Optional[Path] = None) -> None:
         self.instance_id = str(uuid.uuid4())
         self._read_status = read_status
         self._source_lock = source_lock
@@ -45,6 +49,40 @@ class ConsoleApplicationService:
         self._event_sequence = 0
         self._node_online: Dict[int, bool] = {}
         self._web_status: Optional[tuple] = None
+        self.models = ModelLibrary(model_root or Path('/var/lib/wfb-ng-fl/models'))
+
+    def _referenced_models(self) -> set:
+        raw = self._read_status()
+        jobs = [raw.get('active_job')]
+        recent = raw.get('recent_job')
+        if recent and recent.get('recovery_state') != 'ready':
+            jobs.append(recent)
+        return {job['model_sha256'] for job in jobs if job and job.get('model_sha256')}
+
+    def list_models(self) -> Dict[str, Any]:
+        # Startup integrity checking can read a large library. Do it before
+        # taking the daemon lock so heartbeats and lifecycle work continue.
+        models = self.models.list_models()
+        with self._source_lock:
+            references = self._referenced_models()
+            for model in models:
+                model['referenced'] = model['referenced'] or model['sha256'] in references
+            return {'models': models}
+
+    def upload_model(self, stream: BinaryIO, size: int, filename: str) -> Dict[str, Any]:
+        result = self.models.upload(stream, size, filename)
+        with self._source_lock:
+            result['model']['referenced'] |= result['model']['sha256'] in self._referenced_models()
+        return result
+
+    def delete_model(self, sha256: str) -> Dict[str, bool]:
+        self.models.validate_digest(sha256)
+        self.models.list_models()
+        with self._source_lock:
+            if sha256 in self._referenced_models():
+                raise ModelLibraryError('MODEL_REFERENCED', '模型正在被作业引用，不能删除', 409)
+            self.models.delete(sha256)
+            return {'deleted': True}
 
     def record_web_status(self, status: str, error: Optional[str]) -> None:
         # Web stop cannot wait on the daemon lock. Keep its facts and event

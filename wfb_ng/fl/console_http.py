@@ -2,27 +2,106 @@
 import ipaddress
 import json
 import logging
+from email.parser import Parser
 from pathlib import Path
+import re
 import socket
 import threading
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, BinaryIO, Callable, Dict, Optional, Tuple, cast
 from urllib.parse import urlparse
 
 from pyroute2 import IPRoute
 
 from .console import ConsoleApplicationService
+from .model_library import ModelLibrary, ModelLibraryError
 
 logger = logging.getLogger(__name__)
 ASSETS = Path(__file__).with_name('static')
 STATIC_ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
+                 '/models': ('models.html', 'text/html; charset=utf-8'),
+                 '/assets/models.js': ('models.js', 'text/javascript; charset=utf-8'),
+                 '/assets/models.css': ('models.css', 'text/css; charset=utf-8'),
                  '/assets/console.css': ('console.css', 'text/css; charset=utf-8'),
                  '/assets/console.js': ('console.js', 'text/javascript; charset=utf-8')}
 REPLACED_ROUTES = {'/api/v1/jobs/start': '/api/v1/jobs',
                    '/api/v1/jobs/abort': '/api/v1/jobs/{job_id}/abort',
                    '/api/v1/radio/reconfigure': '/api/v1/radio/config/apply',
                    '/api/v1/survey': '/api/v1/radio/config'}
+
+
+class MultipartFileStream:
+    """One bounded file part; validate the closing frame before publication."""
+
+    def __init__(self, handler: BaseHTTPRequestHandler) -> None:
+        lengths: list = handler.headers.get_all('Content-Length', [])
+        types: list = handler.headers.get_all('Content-Type', [])
+        if (len(lengths) != 1 or re.fullmatch('[0-9]{1,12}', lengths[0]) is None
+                or handler.headers.get_all('Transfer-Encoding') or len(types) != 1):
+            raise ModelLibraryError('INVALID_REQUEST', '必须提供唯一合法的 Content-Length 与 Content-Type')
+        length = int(lengths[0])
+        if length > ModelLibrary.MAX_FILE_BYTES + 16384:
+            raise ModelLibraryError('MODEL_TOO_LARGE', '单文件不能超过 1 GiB', 413)
+        content_type = Parser().parsestr('Content-Type: ' + types[0] + '\r\n\r\n')
+        boundary = content_type.get_boundary()
+        if (content_type.get_content_type() != 'multipart/form-data' or not boundary
+                or re.fullmatch(r"[0-9A-Za-z'()+_,./:=? -]{1,70}", boundary) is None
+                or boundary.endswith(' ')):
+            raise ModelLibraryError('INVALID_MULTIPART', '必须上传 multipart/form-data 单个文件')
+        self._stream = handler.rfile
+        self._remaining = length
+        self._marker = b'\r\n--' + boundary.encode('ascii')
+        self._footer = self._marker + b'--\r\n'
+        self._tail = b''
+        expected = b'--' + boundary.encode('ascii') + b'\r\n'
+        if self._line() != expected:
+            raise ModelLibraryError('INVALID_MULTIPART', 'multipart 起始边界非法')
+        header_lines = []
+        header_size = 0
+        while True:
+            line = self._line()
+            header_size += len(line)
+            if header_size > 8192:
+                raise ModelLibraryError('INVALID_MULTIPART', '文件部分头过长')
+            if line == b'\r\n':
+                break
+            header_lines.append(line)
+        try:
+            headers = Parser().parsestr(b''.join(header_lines).decode('utf-8') + '\r\n')
+        except UnicodeError as exc:
+            raise ModelLibraryError('INVALID_MULTIPART', '文件部分头编码非法') from exc
+        filename = headers.get_filename()
+        if (headers.defects or len(headers.get_all('Content-Disposition', [])) != 1
+                or headers.get_content_disposition() != 'form-data'
+                or headers.get_param('name', header='content-disposition') != 'file'
+                or not filename or headers.get('Content-Transfer-Encoding')):
+            raise ModelLibraryError('INVALID_MULTIPART', '必须提供一个名为 file 的文件部分')
+        self.filename = filename
+        self.size = self._remaining - len(self._footer)
+        if self.size < 0:
+            raise ModelLibraryError('INVALID_MULTIPART', 'multipart 长度非法')
+        self._file_remaining = self.size
+
+    def _line(self) -> bytes:
+        line = self._stream.readline(min(8193, self._remaining + 1))
+        self._remaining -= len(line)
+        if self._remaining < 0 or not line.endswith(b'\r\n'):
+            raise ModelLibraryError('INVALID_MULTIPART', 'multipart 头不完整或格式非法')
+        return line
+
+    def read(self, size: int) -> bytes:
+        chunk = self._stream.read(min(size, self._file_remaining))
+        self._file_remaining -= len(chunk)
+        combined = self._tail + chunk
+        if self._marker + b'\r\n' in combined or self._marker + b'--' in combined:
+            raise ModelLibraryError('INVALID_MULTIPART', '只能上传一个文件部分')
+        self._tail = combined[-(len(self._marker) + 1):]
+        return chunk
+
+    def finish(self) -> None:
+        if self._file_remaining or self._stream.read(len(self._footer)) != self._footer:
+            raise ModelLibraryError('INVALID_MULTIPART', 'multipart 结束边界不完整或格式非法')
 
 
 class ConsoleHTTPServer(ThreadingHTTPServer):
@@ -77,7 +156,7 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
         if server.expected_host and self.headers.get('Host') != server.expected_host:
             self._error(400, 'INVALID_HOST', 'Host 必须匹配管理网地址与端口')
             return
-        # No writes in this slice; do not parse retired request bodies.
+        # Each request owns its body and closes after the response.
         self.close_connection = True
         if path in REPLACED_ROUTES:
             self._error(410, 'ROUTE_REPLACED', '该路由已退出 Web 契约',
@@ -93,6 +172,33 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
                 self._error(503, 'STATE_UNAVAILABLE', '暂时无法读取状态')
                 return
             self._send(200, payload, 'application/json; charset=utf-8')
+        elif path == '/api/v1/models' or path.startswith('/api/v1/models/'):
+            try:
+                if path == '/api/v1/models':
+                    if self.command == 'GET':
+                        result = server.application.list_models()
+                        status = 200
+                    elif self.command == 'POST':
+                        stream = MultipartFileStream(self)
+                        result = server.application.upload_model(cast(BinaryIO, stream), stream.size, stream.filename)
+                        status = 200 if result['deduplicated'] else 201
+                    else:
+                        self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 GET、POST', allow='GET, POST')
+                        return
+                else:
+                    if self.command != 'DELETE':
+                        self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 DELETE', allow='DELETE')
+                        return
+                    result = server.application.delete_model(path[len('/api/v1/models/'):])
+                    status = 200
+                self._send(status, json.dumps(result).encode(), 'application/json; charset=utf-8')
+            except ModelLibraryError as exc:
+                self._error(exc.status, exc.code, str(exc))
+            except (TimeoutError, ConnectionError):
+                self._error(400, 'UPLOAD_INTERRUPTED', '上传连接中断，请重新上传')
+            except Exception:
+                logger.exception('Console model library unavailable')
+                self._error(503, 'MODEL_STORAGE_FAILED', '模型库暂时不可用，请重试')
         elif path in STATIC_ROUTES:
             if self.command not in ('GET', 'HEAD'):
                 self._error(405, 'METHOD_NOT_ALLOWED', '静态资源仅支持 GET、HEAD', allow='GET, HEAD')

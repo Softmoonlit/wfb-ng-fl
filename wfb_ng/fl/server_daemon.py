@@ -38,6 +38,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from urllib.parse import parse_qs, urlparse
@@ -152,6 +153,7 @@ class ServerDaemonConfig:
     link_id: int = DEFAULT_LINK_ID
     known_clients: Tuple[int, ...] = ALL_KNOWN_CLIENT_IDS
     work_dir: str = "/tmp/wfb-ng-fl/server"
+    model_library_dir: str = "/var/lib/wfb-ng-fl/models"
     enable_link_process: bool = True
     enable_control_plane: bool = True
 
@@ -238,6 +240,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         link_id=int(data.get("link_id", DEFAULT_LINK_ID)),
         known_clients=ALL_KNOWN_CLIENT_IDS,
         work_dir=data.get("work_dir", "/tmp/wfb-ng-fl/server"),
+        model_library_dir=data.get("model_library_dir", "/var/lib/wfb-ng-fl/models"),
         enable_link_process=bool(data.get("enable_link_process", True)),
         enable_control_plane=bool(data.get("enable_control_plane", True)),
     )
@@ -579,7 +582,8 @@ class ServerDaemon:
         self._http_thread: Optional[threading.Thread] = None
         self.actual_ipc_port: int = self.config.ipc_port
         self._web_state = ("management_web_unavailable", "WEB_HOST_NOT_CONFIGURED" if self.config.web_host is None else None)
-        self.console = ConsoleApplicationService(self.get_status_report, self._lock)
+        self.console = ConsoleApplicationService(self.get_status_report, self._lock,
+                                                 Path(self.config.model_library_dir))
         self._web = ManagementWebListener(
             self.config.web_host, self.config.web_port, self.console,
             lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),

@@ -26,7 +26,7 @@ def validate_path_safe_identifier(value, name="identifier"):
     return value
 
 
-def _fsync_directory(path):
+def fsync_directory(path):
     directory_fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(directory_fd)
@@ -118,7 +118,7 @@ def archive_open_file(source, source_stat, target_path, max_size_bytes=None):
 
         os.replace(temp_path, target_path)
         temp_path = None
-        _fsync_directory(os.path.dirname(target_path))
+        fsync_directory(os.path.dirname(target_path))
         return size_bytes, digest.hexdigest()
     finally:
         if temp_path is not None:
@@ -146,7 +146,7 @@ def write_json_atomic(path, value):
             os.fsync(fh.fileno())
         os.replace(temp_path, path)
         temp_path = None
-        _fsync_directory(os.path.dirname(path))
+        fsync_directory(os.path.dirname(path))
     finally:
         if temp_path is not None:
             try:
