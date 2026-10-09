@@ -75,16 +75,12 @@ class TestRadioPatchNormalizationAndDataclasses(unittest.TestCase):
         self.assertIsNone(parsed.error)
         self.assertEqual(parsed.timestamp_ms, 1000)
 
-        # PrepareAck with seq_id
-        ack_seq = PrepareAck(
-            node_id=1,
-            session_id="switch_123",
-            seq_id="switch_123",
-            ok=True,
-        )
-        parsed_seq = PrepareAck.from_bytes(ack_seq.to_bytes())
-        self.assertEqual(parsed_seq.seq_id, "switch_123")
-        self.assertEqual(parsed_seq.session_id, "switch_123")
+        # ACKs require the canonical nonempty session and a strict boolean.
+        for invalid in ({"node_id": 1, "seq_id": "old", "ok": True},
+                        {"node_id": 1, "session_id": "", "ok": True},
+                        {"node_id": 1, "session_id": "s", "ok": "false"}):
+            with self.assertRaises(ValueError):
+                PrepareAck.from_dict(invalid)
 
         # Failure ACK
         fail_ack = PrepareAck(
@@ -113,6 +109,7 @@ class TestRadioPatchNormalizationAndDataclasses(unittest.TestCase):
     def test_radio_switch_result_truthiness(self):
         res_ok = RadioSwitchResult(
             success=True,
+            status="finalized",
             session_id="s1",
             target_channel=149,
             applied_patch={"channel": 149},
@@ -121,6 +118,7 @@ class TestRadioPatchNormalizationAndDataclasses(unittest.TestCase):
 
         res_fail = RadioSwitchResult(
             success=False,
+            status="rolled_back",
             session_id="s2",
             target_channel=153,
             applied_patch={"channel": 153},
@@ -600,3 +598,143 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.assertTrue(recovered, "Client 1 未能完整回滚全部射频参数 (信道、发射功率与MCS)")
         self.assertEqual(self.client1_adapter.wireless_states["wlan1"]["channel"], DEFAULT_BENCHMARK_CHANNEL)
         self.assertEqual(self.client1_adapter.wireless_states["wlan1"]["txpower_dbm"], 12)
+
+    def _short_switch(self):
+        return self.server.reconfigure_radio(
+            {"channel": 149}, [1, 2], prepare_timeout_seconds=.5,
+            commit_delay_seconds=.02, commit_timeout_seconds=.15,
+            lease_timeout_seconds=.3, ping_interval_seconds=.025,
+        )
+
+    def _wait_client_fallback(self, client):
+        deadline = time.monotonic() + 1.5
+        while time.monotonic() < deadline:
+            if client.current_channel == 157 and not client.lease_watchdog.is_armed:
+                return
+            time.sleep(.01)
+        self.fail("Client 未完成租约回退")
+
+    def _drop_client2_broadcast(self, kind):
+        receive = self.client2.handle_broadcast
+        self.client2.handle_broadcast = lambda msg: receive(msg) if msg.get("type") != kind else None
+
+    def test_finalized_loss_keeps_clients_leased_until_rollback(self):
+        self._bring_clients_online()
+        self._drop_client2_broadcast("RADIO_SWITCH_FINALIZED")
+        result = self._short_switch()
+        self.assertEqual(result.status, "rolled_back")
+        self.assertEqual(result.failed_phase, "FINALIZED")
+        self.assertEqual(result.unresponsive_nodes, [2])
+        self.assertEqual(self.server.active_radio_config.channel, 157)
+        self._wait_client_fallback(self.client1)
+        self._wait_client_fallback(self.client2)
+
+    def test_partial_finalized_delivery_then_broadcast_exception_rolls_back(self):
+        self._bring_clients_online()
+        broadcast = self.server.broadcast_downlink
+        send = self.client1._send_unicast_datagram
+        proposal_received = threading.Event()
+
+        def observe_proposal_ack(data):
+            send(data)
+            if json.loads(data).get("type") == "RADIO_SWITCH_FINALIZED_ACK":
+                proposal_received.set()
+
+        self.client1._send_unicast_datagram = observe_proposal_ack
+
+        def fail_after_proposal(msg):
+            if msg["type"] == "RADIO_SWITCH_FINALIZED":
+                # Deliver through the real UDP listener to only Client 1.
+                broadcast(dict(msg, target_nodes=[1]))
+                self.assertTrue(proposal_received.wait(.5))
+                self.assertTrue(self.client1.lease_watchdog.is_armed)
+                self.assertTrue(self.client2.lease_watchdog.is_armed)
+                raise OSError("failure after partial FINALIZED delivery")
+            broadcast(msg)
+
+        self.server.broadcast_downlink = fail_after_proposal
+        result = self._short_switch()
+        self.assertEqual(result.status, "rolled_back")
+        self.assertTrue(self.client1.lease_watchdog.is_armed)
+        self._wait_client_fallback(self.client1)
+        self._wait_client_fallback(self.client2)
+
+    def test_confirmed_loss_keeps_server_committed(self):
+        self._bring_clients_online()
+        self._drop_client2_broadcast("RADIO_SWITCH_CONFIRMED")
+        broadcast = self.server.broadcast_downlink
+
+        def observe_confirmation(msg):
+            if msg["type"] == "RADIO_SWITCH_CONFIRMED" and self.client1.locked_channel != 149:
+                self.assertTrue(self.client1.lease_watchdog.is_armed)
+                self.assertTrue(self.client2.lease_watchdog.is_armed)
+            broadcast(msg)
+
+        self.server.broadcast_downlink = observe_confirmation
+        result = self._short_switch()
+        self.assertEqual(result.status, "radio_error")
+        self.assertEqual(result.failed_phase, "CONFIRMED")
+        self.assertEqual(result.unresponsive_nodes, [2])
+        self.assertEqual(self.server.active_radio_config.channel, 149)
+        self.assertEqual(self.client1.locked_channel, 149)
+        self.assertFalse(self.client1.lease_watchdog.is_armed)
+        self._wait_client_fallback(self.client2)
+
+    def test_first_confirmed_ack_loss_is_recovered_by_duplicate_confirmation(self):
+        self._bring_clients_online()
+        send = self.client2._send_unicast_datagram
+        dropped = threading.Event()
+
+        def drop_first_ack(data):
+            if json.loads(data).get("type") == "RADIO_SWITCH_CONFIRMED_ACK" and not dropped.is_set():
+                dropped.set()
+                return
+            send(data)
+
+        self.client2._send_unicast_datagram = drop_first_ack
+        result = self._short_switch()
+        self.assertTrue(dropped.is_set())
+        self.assertEqual(result.status, "finalized")
+        self.assertEqual(self.client2.locked_channel, 149)
+        self.assertFalse(self.client2.lease_watchdog.is_armed)
+
+    def test_all_confirmed_acks_lost_never_report_false_finalized(self):
+        self._bring_clients_online()
+        send = self.client2._send_unicast_datagram
+
+        def drop_all_acks(data):
+            if json.loads(data).get("type") != "RADIO_SWITCH_CONFIRMED_ACK":
+                send(data)
+
+        self.client2._send_unicast_datagram = drop_all_acks
+        result = self._short_switch()
+        self.assertEqual(result.status, "radio_error")
+        self.assertEqual(result.failed_phase, "CONFIRMED")
+        self.assertEqual(self.server.active_radio_config.channel, 149)
+        self.assertEqual(self.client2.locked_channel, 149)
+        self.assertFalse(self.client2.lease_watchdog.is_armed)
+
+    def test_expired_lease_retries_failed_hardware_fallback_in_supervisor(self):
+        self._bring_clients_online()
+        self._drop_client2_broadcast("RADIO_SWITCH_FINALIZED")
+        set_channel = self.client1_adapter.set_channel
+        failed_restore = threading.Event()
+        restored = threading.Event()
+
+        def fail_first_restore(iface, channel, channel_width):
+            if channel == 157:
+                if not failed_restore.is_set():
+                    self.assertTrue(self.client1.lease_watchdog.is_expired)
+                    failed_restore.set()
+                    raise OSError("transient adapter failure on lease fallback")
+                restored.set()
+            set_channel(iface, channel, channel_width)
+
+        self.client1_adapter.set_channel = fail_first_restore
+        result = self._short_switch()
+        self.assertEqual(result.status, "rolled_back")
+        self.assertTrue(failed_restore.wait(1.0))
+        self.assertTrue(restored.wait(1.0), "supervisor 未重试失败的租约回退")
+        self._wait_client_fallback(self.client1)
+        self.assertEqual(self.client1.current_channel, 157)
+        self.assertFalse(self.client1.lease_watchdog.is_armed)

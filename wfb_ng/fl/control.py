@@ -12,7 +12,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional, Sequence, Set, Tuple
 
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.radio import (
@@ -219,14 +219,12 @@ class PrepareAck:
     ok: bool = True
     error: Optional[str] = None
     timestamp_ms: Optional[int] = None
-    seq_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         res: Dict[str, Any] = {
             "type": "PREPARE_ACK",
             "node_id": self.node_id,
             "session_id": self.session_id,
-            "seq_id": self.seq_id or self.session_id,
             "ok": self.ok,
         }
         if self.error is not None:
@@ -244,17 +242,17 @@ class PrepareAck:
             raise TypeError(f"Payload must be a dict, got {type(data).__name__}")
         if "node_id" not in data or type(data["node_id"]) is not int or not (1 <= data["node_id"] <= 10):
             raise ValueError(f"Invalid or missing node_id: {data.get('node_id')}")
-        session_id = data.get("session_id") or data.get("seq_id")
-        if not isinstance(session_id, str):
-            raise ValueError(f"Invalid or missing session_id/seq_id in PREPARE_ACK")
-        seq_id = data.get("seq_id") if isinstance(data.get("seq_id"), str) else session_id
+        session_id = data.get("session_id")
+        if not isinstance(session_id, str) or not session_id:
+            raise ValueError("Invalid or missing session_id in PREPARE_ACK")
+        if type(data.get("ok")) is not bool:
+            raise ValueError("Invalid or missing boolean ok in PREPARE_ACK")
         return cls(
             node_id=data["node_id"],
             session_id=session_id,
-            ok=bool(data.get("ok", True)),
+            ok=data["ok"],
             error=data.get("error"),
             timestamp_ms=data.get("timestamp_ms"),
-            seq_id=seq_id,
         )
 
     @classmethod
@@ -313,8 +311,10 @@ class RadioSwitchResult:
     session_id: str
     target_channel: int
     applied_patch: Dict[str, Any]
+    status: Literal["finalized", "rolled_back", "radio_error"]
+    effective_config: Optional[RadioConfig] = None
     error_message: Optional[str] = None
-    failed_phase: Optional[str] = None  # "PREPARE" or "COMMIT"
+    failed_phase: Optional[str] = None
     unresponsive_nodes: List[int] = field(default_factory=list)
 
     def __bool__(self) -> bool:
@@ -338,18 +338,18 @@ class LeaseWatchdog:
         self.timeout_seconds = timeout_seconds
         self.on_expired = on_expired
         self.name = name
+        self._generation = 0
         self._deadline: float = 0.0
         self._armed: bool = False
         self._expired: bool = False
-        self._stop_event = threading.Event()
-        self._wake_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
         self._lock = threading.RLock()
+        self._condition = threading.Condition(self._lock)
 
     @property
     def is_armed(self) -> bool:
         with self._lock:
-            return self._armed and not self._expired
+            return self._armed and not self._expired and time.monotonic() < self._deadline
 
     @property
     def is_expired(self) -> bool:
@@ -364,13 +364,12 @@ class LeaseWatchdog:
             self._deadline = time.monotonic() + self.timeout_seconds
             self._armed = True
             self._expired = False
-            self._stop_event.clear()
-            if self._thread is None or not self._thread.is_alive():
-                self._thread = threading.Thread(
-                    target=self._run, name=self.name, daemon=True
-                )
-                self._thread.start()
-            self._wake_event.set()
+            self._generation += 1
+            self._condition.notify_all()
+            self._thread = threading.Thread(
+                target=self._run, args=(self._generation,), name=self.name, daemon=True
+            )
+            self._thread.start()
 
     def refresh(self, timeout_seconds: Optional[float] = None) -> bool:
         """
@@ -378,47 +377,51 @@ class LeaseWatchdog:
         Returns True if successfully refreshed, False if not armed or already expired.
         """
         with self._lock:
-            if not self._armed or self._expired:
+            if not self._armed or self._expired or time.monotonic() >= self._deadline:
                 return False
             if timeout_seconds is not None:
                 self.timeout_seconds = timeout_seconds
             self._deadline = time.monotonic() + self.timeout_seconds
-            self._wake_event.set()
+            self._condition.notify_all()
             return True
 
     def disarm(self) -> None:
         """Disarm and cancel the watchdog cleanly upon switch finalization."""
         with self._lock:
             self._armed = False
-            self._stop_event.set()
-            self._wake_event.set()
+            self._condition.notify_all()
 
-    def _run(self) -> None:
-        while not self._stop_event.is_set():
-            with self._lock:
-                if not self._armed or self._stop_event.is_set():
-                    break
+    def disarm_if_alive(self) -> bool:
+        """Atomically accept confirmation only before lease expiration."""
+        with self._lock:
+            if not self.is_armed:
+                return False
+            self.disarm()
+            return True
+
+    def _run(self, generation: int) -> None:
+        with self._condition:
+            while generation == self._generation and self._armed:
                 remaining = self._deadline - time.monotonic()
-
-            if remaining <= 0:
-                with self._lock:
-                    if not self._armed or self._stop_event.is_set():
-                        break
-                    self._armed = False
-                    self._expired = True
-                logger.warning(
-                    "射频重配租约看门狗耗尽 (超时 %.2fs)！触发防脑裂自愈回退！",
-                    self.timeout_seconds,
-                )
-                if self.on_expired is not None:
-                    try:
-                        self.on_expired()
-                    except Exception as exc:
-                        logger.error("租约看门狗超时自愈回调执行异常: %s", exc)
+                if remaining > 0:
+                    # Condition.wait atomically releases the deadline lock. A
+                    # concurrent refresh/rearm cannot lose its wake notification.
+                    self._condition.wait(timeout=remaining)
+                    continue
+                self._armed = False
+                self._expired = True
                 break
-
-            self._wake_event.clear()
-            self._wake_event.wait(timeout=max(0.01, remaining))
+            else:
+                return
+        logger.warning(
+            "射频重配租约看门狗耗尽 (超时 %.2fs)！触发防脑裂自愈回退！",
+            self.timeout_seconds,
+        )
+        if self.on_expired is not None:
+            try:
+                self.on_expired()
+            except Exception as exc:
+                logger.error("租约看门狗超时自愈回调执行异常: %s", exc)
 
 
 @dataclass
@@ -632,6 +635,8 @@ class ControlPlaneServer:
         on_heartbeat_received: Optional[Callable[[NodeHeartbeat, NodeRecord], None]] = None,
     ):
         self.active_radio_config = active_radio_config
+        # Latched fail-closed state, also set by the daemon on unexpected escape.
+        self.radio_error = False
         self.network_adapter = network_adapter
         self.air_interface = air_interface
         self.bind_host = bind_host
@@ -657,6 +662,10 @@ class ControlPlaneServer:
         self._prepare_event = threading.Event()
         self._commit_event = threading.Event()
         self._expected_target_nodes: Set[int] = set()
+        self._switch_phase: Optional[str] = None
+        self._finalized_acks: Set[int] = set()
+        self._confirmed_acks: Set[int] = set()
+        self._barrier_event = threading.Event()
 
         # Job-scoped client RoleService readiness synchronization
         self._task_ready_job_id: Optional[str] = None
@@ -767,7 +776,28 @@ class ControlPlaneServer:
             logger.debug("无法解析 JSON 数据报: %s", exc)
             return None
 
+        if not isinstance(payload, dict):
+            return None
         msg_type = payload.get("type")
+        if msg_type in ("RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK"):
+            phase = "FINALIZED" if msg_type == "RADIO_SWITCH_FINALIZED_ACK" else "CONFIRMED"
+            node_id = payload.get("node_id")
+            with self._lock:
+                if (
+                    self._active_switch_session is not None
+                    and payload.get("session_id") == self._active_switch_session
+                    and self._switch_phase == phase
+                    and type(node_id) is int
+                    and node_id in self._expected_target_nodes
+                    and type(payload.get("channel")) is int
+                    and payload["channel"] == self._target_switch_channel
+                ):
+                    acks = self._finalized_acks if phase == "FINALIZED" else self._confirmed_acks
+                    acks.add(node_id)
+                    if self._expected_target_nodes.issubset(acks):
+                        self._barrier_event.set()
+            return None
+
         if msg_type == "TASK_READY":
             job_id = payload.get("job_id")
             node_id = payload.get("node_id")
@@ -786,7 +816,9 @@ class ControlPlaneServer:
         if msg_type == "PREPARE_ACK":
             ack = PrepareAck.from_dict(payload)
             with self._lock:
-                if self._active_switch_session == ack.session_id:
+                if (self._active_switch_session == ack.session_id
+                    and self._switch_phase == "PREPARE"
+                    and ack.node_id in self._expected_target_nodes):
                     self._prepare_acks[ack.node_id] = ack
                     if self._expected_target_nodes and self._expected_target_nodes.issubset(
                         self._prepare_acks.keys()
@@ -799,6 +831,8 @@ class ControlPlaneServer:
             with self._lock:
                 if (
                     self._active_switch_session == cs.session_id
+                    and self._switch_phase == "COMMIT"
+                    and cs.node_id in self._expected_target_nodes
                     and self._target_switch_channel is not None
                     and cs.current_channel == self._target_switch_channel
                 ):
@@ -811,11 +845,15 @@ class ControlPlaneServer:
 
         # Standard NodeHeartbeat
         hb = NodeHeartbeat.from_dict(payload)
-        ack_res, align_patch = self.registry.update_heartbeat(
-            heartbeat=hb,
-            client_addr=client_addr,
-            server_radio=self.active_radio_config,
-        )
+        with self._lock:
+            ack_res, align_patch = self.registry.update_heartbeat(
+                heartbeat=hb, client_addr=client_addr,
+                server_radio=self.active_radio_config,
+            )
+            if self.radio_error or (
+                self._active_switch_session is not None and hb.node_id in self._expected_target_nodes
+            ):
+                align_patch = None
 
         record = self.registry.get_node(hb.node_id)
         if self.on_heartbeat_received is not None and record is not None:
@@ -843,238 +881,196 @@ class ControlPlaneServer:
         lease_timeout_seconds: float = LEASE_TIMEOUT_DEFAULT_SECONDS,
         ping_interval_seconds: float = NEW_CHANNEL_PING_INTERVAL_SECONDS,
     ) -> RadioSwitchResult:
-        """
-        Execute two-phase atomic radio reconfiguration with lease watchdog (ADR-0012, ADR-0014, Ticket 04).
-        - Phase 1: Broadcast CONFIG_RADIO_PREPARE, wait up to prepare_timeout_seconds for PREPARE_ACK from all target nodes.
-                   Fail closed and broadcast CONFIG_RADIO_ABORT if any target node missing or rejected.
-        - Phase 2: Broadcast CONFIG_RADIO_COMMIT with delay_ms and 15s lease watchdog.
-                   Server & Clients synchronously delay delay_ms before switching hardware.
-                   Server broadcasts NEW_CHANNEL_PING on new channel, refreshing client watchdogs.
-                   If all targets reply COMMIT_SUCCESS within commit_timeout_seconds:
-                       Broadcast RADIO_SWITCH_FINALIZED and lock new channel!
-                   If timeout:
-                       Stop pings, revert hardware to Channel 157, broadcast abort on 157.
-                       Clients' watchdogs expire and force rollback to Channel 157, hunting server.
+        """Run the lease-protected transaction and reliable final confirmation barriers.
+
+        FINALIZED acknowledgements precede the irreversible commit. After that
+        point a failed CONFIRMED barrier keeps the new config and fails closed.
+        Each barrier uses commit_timeout_seconds; clients renew leases only while
+        the transaction remains reversible.
         """
         with self._switch_lock:
+            if self.radio_error:
+                raise FLRuntimeError("radio_error", "射频状态不可确认，禁止后续射频重配")
             norm_patch = normalize_radio_patch(patch)
-            updated_config = validate_radio_patch(norm_patch, base=self.active_radio_config)
-            target_channel = updated_config.channel
-
-            # Determine target nodes
-            if target_nodes is None or len(target_nodes) == 0:
-                with self._lock:
-                    all_tracked = self.registry.get_all_nodes()
-                    nodes = [
-                        nid
-                        for nid, r in all_tracked.items()
-                        if r.readiness in (NodeReadiness.READY, NodeReadiness.ACTIVE)
-                    ]
-                if not nodes:
-                    return RadioSwitchResult(
-                        success=False,
-                        session_id="",
-                        target_channel=target_channel,
-                        applied_patch=norm_patch,
-                        error_message="无可用在线目标节点参与射频重配",
-                        failed_phase="PREPARE",
-                    )
-                targets = sorted(nodes)
-            else:
-                targets = sorted(list(set(target_nodes)))
-
-            session_id = f"switch_{int(time.monotonic() * 1000)}_{uuid.uuid4().hex[:6]}"
+            previous = self.active_radio_config
+            updated = validate_radio_patch(norm_patch, base=previous)
+            targets = set(target_nodes or [
+                nid for nid, record in self.registry.get_all_nodes().items()
+                if record.readiness in (NodeReadiness.READY, NodeReadiness.ACTIVE)
+            ])
+            if not targets:
+                return RadioSwitchResult(
+                    success=False, status="rolled_back", session_id="",
+                    target_channel=updated.channel, applied_patch=norm_patch,
+                    effective_config=previous, failed_phase="PREPARE",
+                    error_message="无可用在线目标节点参与射频重配",
+                )
+            session_id = f"switch_{uuid.uuid4().hex}"
+            committed = False
+            commit_sent = False
+            phase = "PREPARE"
+            missing = sorted(targets)
             with self._lock:
                 self._active_switch_session = session_id
-                self._target_switch_channel = target_channel
+                self._target_switch_channel = updated.channel
+                self._expected_target_nodes = targets
                 self._prepare_acks.clear()
                 self._commit_successes.clear()
+                self._finalized_acks.clear()
+                self._confirmed_acks.clear()
                 self._prepare_event.clear()
                 self._commit_event.clear()
-                self._expected_target_nodes = set(targets)
+                self._barrier_event.clear()
+                self._switch_phase = phase
 
-            # --- Phase 1: Prepare ---
-            prep_msg = {
-                "type": "CONFIG_RADIO_PREPARE",
-                "session_id": session_id,
-                "patch": norm_patch,
-                "target_nodes": targets,
-                "timeout_seconds": prepare_timeout_seconds,
-            }
-            logger.info(
-                "开始射频重配 Phase 1 (Prepare): 目标节点 %s, patch=%s, session=%s",
-                targets,
-                norm_patch,
-                session_id,
-            )
-            self.broadcast_downlink(prep_msg)
+            def message(kind: str, **fields: Any) -> Dict[str, Any]:
+                return dict(type=kind, session_id=session_id,
+                            target_nodes=sorted(targets), **fields)
 
-            # Wait for all targets to ACK or timeout
-            self._prepare_event.wait(timeout=prepare_timeout_seconds)
+            def wait_barrier(kind: str, acks: Set[int]) -> bool:
+                nonlocal missing
+                deadline = time.monotonic() + commit_timeout_seconds
+                while time.monotonic() < deadline:
+                    # FINALIZED is still reversible: keep all clients' leases alive.
+                    if not committed:
+                        self.broadcast_downlink(message("NEW_CHANNEL_PING", channel=updated.channel))
+                    self.broadcast_downlink(message(kind, channel=updated.channel, patch=norm_patch))
+                    with self._lock:
+                        missing = sorted(targets - acks)
+                        if not missing:
+                            return True
+                        self._barrier_event.clear()
+                    self._barrier_event.wait(max(0, min(ping_interval_seconds, deadline - time.monotonic())))
+                return False
 
-            with self._lock:
-                successful_nodes = {
-                    nid
-                    for nid, ack in self._prepare_acks.items()
-                    if ack.session_id == session_id and ack.ok
-                }
-            missing_nodes = sorted(set(targets) - successful_nodes)
-            if missing_nodes:
-                logger.warning(
-                    "Phase 1 预备门禁失败: 目标节点 %s 未在 %.2fs 内返回成功确认，中止切换！",
-                    missing_nodes,
-                    prepare_timeout_seconds,
+            try:
+                logger.info("射频重配 PREPARE session=%s targets=%s patch=%s", session_id, sorted(targets), norm_patch)
+                self.broadcast_downlink(message("CONFIG_RADIO_PREPARE", patch=norm_patch,
+                                                timeout_seconds=prepare_timeout_seconds))
+                self._prepare_event.wait(prepare_timeout_seconds)
+                with self._lock:
+                    missing = sorted(targets - {nid for nid, ack in self._prepare_acks.items() if ack.ok})
+                if missing:
+                    raise TimeoutError(f"节点缺失或准备失败: {missing}")
+
+                phase = "COMMIT"
+                with self._lock:
+                    self._switch_phase = phase
+                # Set before sending: a send may partly succeed before raising.
+                commit_sent = True
+                self.broadcast_downlink(message("CONFIG_RADIO_COMMIT", patch=norm_patch,
+                    delay_ms=int(commit_delay_seconds * 1000), lease_timeout_seconds=lease_timeout_seconds))
+                if commit_delay_seconds > 0:
+                    time.sleep(commit_delay_seconds)
+                if updated.channel != previous.channel:
+                    self._apply_channel_switch(updated.channel)
+                if updated.radio_txpower_dbm != previous.radio_txpower_dbm:
+                    self._apply_txpower_switch(updated.radio_txpower_dbm)
+                self.update_radio_config(updated)
+                deadline = time.monotonic() + commit_timeout_seconds
+                while True:
+                    self.broadcast_downlink(message("NEW_CHANNEL_PING", channel=updated.channel))
+                    with self._lock:
+                        missing = sorted(targets - self._commit_successes.keys())
+                    if not missing:
+                        break
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise TimeoutError(f"新信道上线超时: {missing}")
+                    self._commit_event.wait(min(ping_interval_seconds, remaining))
+
+                phase = "FINALIZED"
+                with self._lock:
+                    self._switch_phase = phase
+                    self._barrier_event.clear()
+                if not wait_barrier("RADIO_SWITCH_FINALIZED", self._finalized_acks):
+                    raise TimeoutError(f"FINALIZED ACK 超时: {missing}")
+                with self._lock:
+                    committed = True
+                    phase = "CONFIRMED"
+                    self._switch_phase = phase
+                    self._barrier_event.clear()
+                logger.info("射频重配不可逆 commit session=%s channel=%d", session_id, updated.channel)
+                if not wait_barrier("RADIO_SWITCH_CONFIRMED", self._confirmed_acks):
+                    raise TimeoutError(f"CONFIRMED ACK 超时: {missing}")
+                return RadioSwitchResult(
+                    success=True, status="finalized", session_id=session_id,
+                    target_channel=updated.channel, applied_patch=norm_patch,
+                    effective_config=updated,
                 )
-                abort_msg: Dict[str, Any] = {
-                    "type": "CONFIG_RADIO_ABORT",
-                    "session_id": session_id,
-                    "target_nodes": targets,
-                    "reason": f"节点缺失或准备失败: {missing_nodes}",
-                }
-                for _ in range(2):
-                    self.broadcast_downlink(abort_msg)
-                    time.sleep(0.01)
+            except Exception as exc:
+                logger.warning("射频重配 %s 失败 session=%s: %s", phase, session_id, exc)
+                error = str(exc)
+                effective: Optional[RadioConfig] = updated if committed else previous
+                status: Literal["rolled_back", "radio_error"] = "radio_error" if committed else "rolled_back"
+                if not committed:
+                    fallback = validate_radio_patch({"channel": DEFAULT_BENCHMARK_CHANNEL}, base=previous)
+                    if not commit_sent:
+                        # Prepared clients on a nonbenchmark channel have no
+                        # lease yet. Notify them before leaving that channel.
+                        try:
+                            self.broadcast_downlink(message("CONFIG_RADIO_ABORT",
+                                channel=previous.channel, reason=error))
+                        except Exception as abort_exc:
+                            logger.warning("射频 prepare abort 发送失败 session=%s: %s", session_id, abort_exc)
+                    # Attempt both physical restores even when one fails; do not
+                    # infer hardware state from the last successfully cached config.
+                    rollback_errors = []
+                    for restore in (
+                        lambda: self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL),
+                        lambda: self._apply_txpower_switch(previous.radio_txpower_dbm),
+                    ):
+                        try:
+                            restore()
+                        except Exception as rollback_exc:
+                            rollback_errors.append(str(rollback_exc))
+                    if rollback_errors:
+                        status = "radio_error"
+                        effective = None
+                        error += "; 硬件回退无法确认: " + "; ".join(rollback_errors)
+                    else:
+                        effective = fallback
+                        self.update_radio_config(fallback)
+                        logger.warning("射频重配回退至 Channel %d session=%s", DEFAULT_BENCHMARK_CHANNEL, session_id)
+                    # All reversible failures converge on the benchmark.
+                    for _ in range(2):
+                        try:
+                            self.broadcast_downlink(message("CONFIG_RADIO_ABORT",
+                                channel=DEFAULT_BENCHMARK_CHANNEL, reason=error))
+                        except Exception as abort_exc:
+                            logger.warning("射频 abort 发送失败 session=%s: %s", session_id, abort_exc)
+                with self._lock:
+                    if status == "radio_error":
+                        self.radio_error = True
+                    if phase == "PREPARE":
+                        missing = sorted(targets - {
+                            nid for nid, ack in self._prepare_acks.items() if ack.ok
+                        })
+                    elif phase == "COMMIT":
+                        missing = sorted(targets - self._commit_successes.keys())
+                    elif phase == "FINALIZED":
+                        missing = sorted(targets - self._finalized_acks)
+                    elif phase == "CONFIRMED":
+                        missing = sorted(targets - self._confirmed_acks)
+                return RadioSwitchResult(
+                    success=False, status=status, session_id=session_id,
+                    target_channel=updated.channel, applied_patch=norm_patch,
+                    effective_config=effective, error_message=error,
+                    failed_phase=phase, unresponsive_nodes=missing,
+                )
+            finally:
                 with self._lock:
                     self._active_switch_session = None
                     self._target_switch_channel = None
-                return RadioSwitchResult(
-                    success=False,
-                    session_id=session_id,
-                    target_channel=target_channel,
-                    applied_patch=norm_patch,
-                    error_message=f"节点缺失或准备失败: {missing_nodes}",
-                    failed_phase="PREPARE",
-                    unresponsive_nodes=missing_nodes,
-                )
-
-            # --- Phase 2: Commit & Arm Lease ---
-            logger.info(
-                "Phase 1 全员准备就绪！广播 Phase 2 (Commit): 延时 %.2fs, 租约 %.2fs",
-                commit_delay_seconds,
-                lease_timeout_seconds,
-            )
-            commit_msg = {
-                "type": "CONFIG_RADIO_COMMIT",
-                "session_id": session_id,
-                "patch": norm_patch,
-                "delay_ms": int(commit_delay_seconds * 1000),
-                "lease_timeout_seconds": lease_timeout_seconds,
-                "target_nodes": targets,
-            }
-            self.broadcast_downlink(commit_msg)
-
-            # Synchronized hardware switch delay
-            if commit_delay_seconds > 0:
-                time.sleep(commit_delay_seconds)
-
-            prev_config = self.active_radio_config
-            if target_channel != prev_config.channel:
-                self._apply_channel_switch(target_channel)
-            if updated_config.radio_txpower_dbm != prev_config.radio_txpower_dbm:
-                self._apply_txpower_switch(updated_config.radio_txpower_dbm)
-            self.active_radio_config = updated_config
-
-            # Broadcast NEW_CHANNEL_PING on new channel and wait for COMMIT_SUCCESS
-            deadline = time.monotonic() + commit_timeout_seconds
-            all_online = False
-
-            while time.monotonic() < deadline:
-                ping_msg = {
-                    "type": "NEW_CHANNEL_PING",
-                    "session_id": session_id,
-                    "channel": target_channel,
-                    "target_nodes": targets,
-                    "timestamp_ms": int(time.monotonic_ns() // 1_000_000),
-                }
-                self.broadcast_downlink(ping_msg)
-
-                with self._lock:
-                    online_nodes = {
-                        nid
-                        for nid, cs in self._commit_successes.items()
-                        if cs.session_id == session_id
-                        and cs.current_channel == target_channel
-                    }
-                if online_nodes.issuperset(set(targets)):
-                    all_online = True
-                    break
-
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
-                    break
-                self._commit_event.wait(timeout=min(ping_interval_seconds, remaining))
-
-            if all_online:
-                logger.info(
-                    "所有目标节点 %s 已在新信道 %d 上线！终审定案锁定新信道！",
-                    targets,
-                    target_channel,
-                )
-                final_msg = {
-                    "type": "RADIO_SWITCH_FINALIZED",
-                    "session_id": session_id,
-                    "channel": target_channel,
-                    "patch": norm_patch,
-                    "target_nodes": targets,
-                }
-                for _ in range(3):
-                    self.broadcast_downlink(final_msg)
-                    time.sleep(0.02)
-
-                self.active_radio_config = updated_config
-                with self._lock:
-                    self._active_switch_session = None
-                    self._target_switch_channel = None
-                return RadioSwitchResult(
-                    success=True,
-                    session_id=session_id,
-                    target_channel=target_channel,
-                    applied_patch=norm_patch,
-                )
-
-            # Anomaly / Timeout: Server stops heartbeats on new channel and reverts to Channel 157
-            with self._lock:
-                unresponsive = sorted(set(targets) - online_nodes)
-            logger.warning(
-                "新信道全员上线超时 (%.2fs)！未上线节点: %s。立即停止心跳并退回 Channel %d！",
-                commit_timeout_seconds,
-                unresponsive,
-                DEFAULT_BENCHMARK_CHANNEL,
-            )
-            # Revert server hardware
-            if updated_config.channel != DEFAULT_BENCHMARK_CHANNEL:
-                self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL)
-            if updated_config.radio_txpower_dbm != prev_config.radio_txpower_dbm:
-                self._apply_txpower_switch(prev_config.radio_txpower_dbm)
-
-            fallback_dict = prev_config.to_dict()
-            fallback_dict["channel"] = DEFAULT_BENCHMARK_CHANNEL
-            self.active_radio_config = validate_radio_config(fallback_dict)
-
-            abort_msg = {
-                "type": "CONFIG_RADIO_ABORT",
-                "session_id": session_id,
-                "channel": DEFAULT_BENCHMARK_CHANNEL,
-                "target_nodes": targets,
-                "reason": f"新信道上线超时，集群回退至基准信道 {DEFAULT_BENCHMARK_CHANNEL}",
-            }
-            for _ in range(2):
-                self.broadcast_downlink(abort_msg)
-                time.sleep(0.02)
-
-            with self._lock:
-                self._active_switch_session = None
-                self._target_switch_channel = None
-
-            return RadioSwitchResult(
-                success=False,
-                session_id=session_id,
-                target_channel=target_channel,
-                applied_patch=norm_patch,
-                error_message=f"新信道全员上线超时，未响应节点: {unresponsive}",
-                failed_phase="COMMIT",
-                unresponsive_nodes=unresponsive,
-            )
+                    self._switch_phase = None
+                    self._expected_target_nodes = set()
+                    self._prepare_acks.clear()
+                    self._commit_successes.clear()
+                    self._finalized_acks.clear()
+                    self._confirmed_acks.clear()
+                    self._prepare_event.clear()
+                    self._commit_event.clear()
+                    self._barrier_event.clear()
 
     def _recv_loop(self) -> None:
         """Receive incoming UDP heartbeats and reply with ACK or alignment."""
@@ -1171,6 +1167,10 @@ class ControlPlaneClient:
         self._pending_switch_session_id: Optional[str] = None
         self._pending_switch_patch: Optional[Dict[str, Any]] = None
         self._pre_switch_config: Optional[RadioConfig] = None
+        self._switch_applied = False
+        self._finalized_proposal_session: Optional[str] = None
+        self._confirmed_switch_session: Optional[str] = None
+        self._confirmed_switch_channel: Optional[int] = None
 
         # Register radio switch broadcast handlers
         self.register_broadcast_handler(
@@ -1187,6 +1187,9 @@ class ControlPlaneClient:
         )
         self.register_broadcast_handler(
             "RADIO_SWITCH_FINALIZED", self._handle_radio_switch_finalized
+        )
+        self.register_broadcast_handler(
+            "RADIO_SWITCH_CONFIRMED", self._handle_radio_switch_confirmed
         )
 
     @property
@@ -1244,7 +1247,7 @@ class ControlPlaneClient:
         Channel hopping is prohibited here per project rule #89.
         """
         with self._lock:
-            if not isinstance(patch, dict) or not patch:
+            if self._pre_switch_config is not None or not isinstance(patch, dict) or not patch:
                 return
 
             base = RadioConfig(
@@ -1269,6 +1272,9 @@ class ControlPlaneClient:
         Execute one full pass through the three-tier hunting ladder:
         Returns True if server was discovered and locked, False otherwise.
         """
+        with self._lock:
+            if self._pre_switch_config is not None:
+                return False
         channels = ladder if ladder is not None else build_hunting_ladder(self.cached_channel)
         sock = self._get_uplink_sock()
 
@@ -1276,7 +1282,10 @@ class ControlPlaneClient:
             if self._stop_event.is_set():
                 return False
 
-            self._apply_channel_switch(ch)
+            with self._lock:
+                if self._pre_switch_config is not None:
+                    return False
+                self._apply_channel_switch(ch)
 
             for attempt in range(1, self.max_attempts_per_channel + 1):
                 if self._stop_event.is_set():
@@ -1304,21 +1313,24 @@ class ControlPlaneClient:
                     resp_data, _ = sock.recvfrom(4096)
                     ack = HeartbeatAck.from_bytes(resp_data)
                     if ack.ack:
-                        # Success! Lock channel and cache it
-                        self.locked_channel = ch
-                        self.cached_channel = ch
-                        self.missed_acks = 0
+                        with self._lock:
+                            if self._pre_switch_config is not None:
+                                return False
+                            # Success! Lock channel and cache it
+                            self.locked_channel = ch
+                            self.cached_channel = ch
+                            self.missed_acks = 0
 
-                        # Also drain/check for subsequent CONFIG_RADIO_ALIGN packet
-                        self._check_and_apply_alignment_packet(sock)
+                            # Also drain/check for subsequent CONFIG_RADIO_ALIGN packet
+                            self._check_and_apply_alignment_packet(sock)
 
-                        # Transition to IDLE
-                        self.state = ClientNodeState.IDLE
-                        self._state_enter_time = time.monotonic()
+                            # Transition to IDLE
+                            self.state = ClientNodeState.IDLE
+                            self._state_enter_time = time.monotonic()
 
-                        # 即刻抢跑 (0 delay) send IDLE heartbeat to close two-army loop
-                        self._send_heartbeat(ClientNodeState.IDLE.value, elapsed_ms=0)
-                        return True
+                            # 即刻抢跑 (0 delay) send IDLE heartbeat to close two-army loop
+                            self._send_heartbeat(ClientNodeState.IDLE.value, elapsed_ms=0)
+                            return True
                 except (socket.timeout, BlockingIOError):
                     continue
                 except Exception as exc:
@@ -1353,7 +1365,7 @@ class ControlPlaneClient:
             node_id=self.node_id,
             state=state,
             elapsed_ms=elapsed_ms,
-            current_channel=self.locked_channel or self.current_channel,
+            current_channel=self.current_channel,
             txpower_dbm=self.txpower_dbm,
             uplink_mcs=self.uplink_mcs,
             timestamp_ms=self._next_timestamp_ms(),
@@ -1393,7 +1405,7 @@ class ControlPlaneClient:
                     elapsed_ms=self.get_elapsed_ms(),
                 )
                 if ack is None:
-                    if self.state == ClientNodeState.IDLE:
+                    if self.state == ClientNodeState.IDLE and self._pre_switch_config is None:
                         self.missed_acks += 1
                         if self.missed_acks >= IDLE_MISSED_ACK_THRESHOLD:
                             logger.warning(
@@ -1455,204 +1467,192 @@ class ControlPlaneClient:
         except Exception as exc:
             logger.debug("发送单播控制报文失败: %s", exc)
 
-    def _handle_radio_prepare(self, msg: Dict[str, Any]) -> None:
-        session_id = msg.get("session_id", "")
-        target_nodes = msg.get("target_nodes")
-        if target_nodes and self.node_id not in target_nodes:
-            return
+    def _matches_pending_switch(self, msg: Dict[str, Any]) -> bool:
+        """Call with the client lock held; absent sessions never match."""
+        return (
+            self._pending_switch_session_id is not None
+            and msg.get("session_id") == self._pending_switch_session_id
+            and self.node_id in msg.get("target_nodes", [self.node_id])
+        )
 
-        patch = msg.get("patch", {})
-        try:
-            norm_patch = normalize_radio_patch(patch)
-            base_cfg = RadioConfig(
-                channel=self.current_channel,
-                radio_txpower_dbm=self.txpower_dbm,
-                uplink_mcs=self.uplink_mcs,
-            )
-            validate_radio_patch(norm_patch, base=base_cfg)
-            with self._lock:
+    def _clear_pending_switch(self) -> None:
+        self._pending_switch_session_id = None
+        self._pending_switch_patch = None
+        self._pre_switch_config = None
+        self._switch_applied = False
+        self._finalized_proposal_session = None
+
+    def _handle_radio_prepare(self, msg: Dict[str, Any]) -> None:
+        session_id = msg.get("session_id")
+        if not isinstance(session_id, str) or not session_id:
+            return
+        if self.node_id not in msg.get("target_nodes", [self.node_id]):
+            return
+        with self._lock:
+            # An active lease cannot be superseded by a delayed/new PREPARE.
+            if self._pre_switch_config is not None:
+                return
+            try:
+                norm_patch = normalize_radio_patch(msg.get("patch", {}))
+                validate_radio_patch(norm_patch, base=RadioConfig(
+                    channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
+                    uplink_mcs=self.uplink_mcs,
+                ))
                 self._pending_switch_session_id = session_id
                 self._pending_switch_patch = norm_patch
-            ack = PrepareAck(
-                node_id=self.node_id,
-                session_id=session_id,
-                ok=True,
-                timestamp_ms=self._next_timestamp_ms(),
-            )
-        except Exception as exc:
-            logger.warning("节点 %d 射频重配预备校验失败: %s", self.node_id, exc)
-            ack = PrepareAck(
-                node_id=self.node_id,
-                session_id=session_id,
-                ok=False,
-                error=str(exc),
-                timestamp_ms=self._next_timestamp_ms(),
-            )
-        self._send_unicast_datagram(ack.to_bytes())
+                self._finalized_proposal_session = None
+                # A new transaction invalidates the previous re-ACK receipt.
+                self._confirmed_switch_session = None
+                self._confirmed_switch_channel = None
+                ack = PrepareAck(self.node_id, session_id, ok=True,
+                                 timestamp_ms=self._next_timestamp_ms())
+            except Exception as exc:
+                ack = PrepareAck(self.node_id, session_id, ok=False, error=str(exc),
+                                 timestamp_ms=self._next_timestamp_ms())
+            self._send_unicast_datagram(ack.to_bytes())
 
     def _handle_radio_commit(self, msg: Dict[str, Any]) -> None:
-        session_id = msg.get("session_id", "")
-        if self._pending_switch_session_id and session_id != self._pending_switch_session_id:
-            logger.warning("节点 %d 忽略不匹配会话的 COMMIT: %s != %s", self.node_id, session_id, self._pending_switch_session_id)
-            return
-        target_nodes = msg.get("target_nodes")
-        if target_nodes and self.node_id not in target_nodes:
-            return
-
         with self._lock:
+            if not self._matches_pending_switch(msg) or self._pre_switch_config is not None:
+                return
+            session_id = self._pending_switch_session_id
+            norm_patch = normalize_radio_patch(msg.get("patch") or self._pending_switch_patch or {})
+            if norm_patch != self._pending_switch_patch:
+                return
             self._pre_switch_config = RadioConfig(
-                channel=self.current_channel,
-                radio_txpower_dbm=self.txpower_dbm,
+                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
                 uplink_mcs=self.uplink_mcs,
             )
+            delay_sec = max(0.0, int(msg.get("delay_ms", 2000)) / 1000.0)
+            self._switch_applied = False
+            self.lease_watchdog.arm(float(msg.get("lease_timeout_seconds", LEASE_TIMEOUT_DEFAULT_SECONDS)))
+            self._wake_event.set()
 
-        delay_ms = int(msg.get("delay_ms", 2000))
-        lease_timeout = float(msg.get("lease_timeout_seconds", LEASE_TIMEOUT_DEFAULT_SECONDS))
-        patch = msg.get("patch") or self._pending_switch_patch or {}
-        norm_patch = normalize_radio_patch(patch)
-
-        # Arm lease watchdog
-        self.lease_watchdog.arm(timeout_seconds=lease_timeout)
-
-        def _delayed_switch():
-            delay_sec = max(0.0, delay_ms / 1000.0)
+        def delayed_switch() -> None:
             if delay_sec > 0:
                 time.sleep(delay_sec)
             with self._lock:
-                if not self.lease_watchdog.is_armed:
+                if session_id != self._pending_switch_session_id or not self.lease_watchdog.is_armed:
                     return
-                if "channel" in norm_patch:
-                    self._apply_channel_switch(norm_patch["channel"])
-                if "radio_txpower_dbm" in norm_patch:
-                    self._apply_txpower_switch(norm_patch["radio_txpower_dbm"])
-                if "uplink_mcs" in norm_patch:
-                    self.uplink_mcs = norm_patch["uplink_mcs"]
-                logger.info(
-                    "节点 %d 已执行射频重配切换 (Channel=%d, TXPower=%d, MCS=%d)",
-                    self.node_id,
-                    self.current_channel,
-                    self.txpower_dbm,
-                    self.uplink_mcs,
-                )
+                try:
+                    if "channel" in norm_patch:
+                        self._apply_channel_switch(norm_patch["channel"])
+                    if "radio_txpower_dbm" in norm_patch:
+                        self._apply_txpower_switch(norm_patch["radio_txpower_dbm"])
+                    if "uplink_mcs" in norm_patch:
+                        self.uplink_mcs = norm_patch["uplink_mcs"]
+                    self._switch_applied = True
+                    logger.info("节点 %d COMMIT session=%s channel=%d", self.node_id, session_id, self.current_channel)
+                except Exception as exc:
+                    # Keep the lease armed so an incomplete physical apply heals.
+                    logger.error("节点 %d COMMIT 硬件应用失败: %s", self.node_id, exc)
+                    self._pending_switch_patch = None
 
-        t = threading.Thread(
-            target=_delayed_switch,
-            name=f"wfb-client-{self.node_id}-switch",
-            daemon=True,
-        )
-        t.start()
+        threading.Thread(target=delayed_switch, name=f"wfb-client-{self.node_id}-switch", daemon=True).start()
 
     def _handle_new_channel_ping(self, msg: Dict[str, Any]) -> None:
-        session_id = msg.get("session_id", "")
-        if self._pending_switch_session_id and session_id != self._pending_switch_session_id:
-            return
-        target_nodes = msg.get("target_nodes")
-        if target_nodes and self.node_id not in target_nodes:
-            return
-        ping_channel = msg.get("channel")
-        if ping_channel is not None and ping_channel != self.current_channel:
-            return
-
-        # If watchdog is armed, refresh lease and respond COMMIT_SUCCESS
-        if self.lease_watchdog.is_armed:
-            self.lease_watchdog.refresh()
+        with self._lock:
+            if (not self._matches_pending_switch(msg)
+                or msg.get("channel") != self.current_channel
+                or self._pending_switch_patch is None
+                or not self._switch_applied
+                or not self.lease_watchdog.refresh()):
+                return
             success = CommitSuccess(
-                node_id=self.node_id,
-                session_id=session_id or self._pending_switch_session_id or "",
-                current_channel=self.current_channel,
-                timestamp_ms=self._next_timestamp_ms(),
+                node_id=self.node_id, session_id=self._pending_switch_session_id or "",
+                current_channel=self.current_channel, timestamp_ms=self._next_timestamp_ms(),
             )
             self._send_unicast_datagram(success.to_bytes())
 
+    def _send_final_barrier_ack(self, kind: str, session_id: str) -> None:
+        self._send_unicast_datagram(json.dumps({
+            "type": kind, "session_id": session_id, "node_id": self.node_id,
+            "channel": self.current_channel,
+        }).encode("utf-8"))
+
     def _handle_radio_switch_finalized(self, msg: Dict[str, Any]) -> None:
-        session_id = msg.get("session_id", "")
-        if self._pending_switch_session_id and session_id != self._pending_switch_session_id:
-            return
-        target_nodes = msg.get("target_nodes")
-        if target_nodes and self.node_id not in target_nodes:
-            return
-        channel = msg.get("channel", self.current_channel)
-
-        # Disarm watchdog
-        self.lease_watchdog.disarm()
-
         with self._lock:
-            self.locked_channel = channel
-            self.cached_channel = channel
-            self._pending_switch_session_id = None
-            self._pending_switch_patch = None
-            self._pre_switch_config = None
+            if (not self._matches_pending_switch(msg)
+                or msg.get("channel") != self.current_channel
+                or self._pending_switch_patch is None
+                or not self._switch_applied
+                or not self.lease_watchdog.refresh()):
+                return
+            session_id = self._pending_switch_session_id or ""
+            self._finalized_proposal_session = session_id
+            self._send_final_barrier_ack("RADIO_SWITCH_FINALIZED_ACK", session_id)
+
+    def _handle_radio_switch_confirmed(self, msg: Dict[str, Any]) -> None:
+        with self._lock:
+            session_id = msg.get("session_id")
+            if not isinstance(session_id, str) or not session_id:
+                return
+            if (self.node_id not in msg.get("target_nodes", [self.node_id])
+                or msg.get("channel") != self.current_channel):
+                return
+            if (session_id == self._confirmed_switch_session
+                and self.current_channel == self._confirmed_switch_channel):
+                self._send_final_barrier_ack("RADIO_SWITCH_CONFIRMED_ACK", session_id)
+                return
+            if (not self._matches_pending_switch(msg)
+                or self._finalized_proposal_session != session_id
+                or not self.lease_watchdog.disarm_if_alive()):
+                return
+            self.locked_channel = self.current_channel
+            self.cached_channel = self.current_channel
+            self._confirmed_switch_session = session_id
+            self._confirmed_switch_channel = self.current_channel
+            self._clear_pending_switch()
             self.state = ClientNodeState.IDLE
             self._state_enter_time = time.monotonic()
+            new_config = RadioConfig(
+                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
+                uplink_mcs=self.uplink_mcs,
+            )
+            self._send_final_barrier_ack("RADIO_SWITCH_CONFIRMED_ACK", session_id)
+            self._wake_event.set()
+            logger.info("节点 %d CONFIRMED session=%s channel=%d", self.node_id, session_id, self.current_channel)
+        if self.on_radio_finalized is not None:
+            try:
+                self.on_radio_finalized(new_config)
+            except Exception as exc:
+                logger.warning("on_radio_finalized 执行失败: %s", exc)
 
-            if self.on_radio_finalized is not None:
-                try:
-                    new_cfg = RadioConfig(
-                        channel=self.current_channel,
-                        radio_txpower_dbm=self.txpower_dbm,
-                        uplink_mcs=self.uplink_mcs,
-                    )
-                    self.on_radio_finalized(new_cfg)
-                except Exception as exc:
-                    logger.warning("on_radio_finalized 执行失败: %s", exc)
-
-        logger.info(
-            "节点 %d 射频重配终审定案 (Channel=%d)！看门狗已解除。",
-            self.node_id,
-            channel,
-        )
-        # Dispatch instant IDLE heartbeat to close loop on new channel
-        self._send_heartbeat(ClientNodeState.IDLE.value, elapsed_ms=0)
+    def _rollback_switch(self) -> None:
+        """Restore the benchmark and all pre-switch client parameters."""
+        self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL)
+        if self._pre_switch_config is not None:
+            self._apply_txpower_switch(self._pre_switch_config.radio_txpower_dbm)
+            self.uplink_mcs = self._pre_switch_config.uplink_mcs
+        self._clear_pending_switch()
+        self.locked_channel = None
+        self.state = ClientNodeState.HUNTING
+        self._state_enter_time = time.monotonic()
+        self._wake_event.set()
 
     def _handle_radio_abort(self, msg: Dict[str, Any]) -> None:
-        session_id = msg.get("session_id", "")
-        if self._pending_switch_session_id and session_id != self._pending_switch_session_id:
-            return
-        target_nodes = msg.get("target_nodes")
-        if target_nodes and self.node_id not in target_nodes:
-            return
-
-        reason = msg.get("reason", "")
-        logger.warning("节点 %d 收到射频重配取消/中止指令: %s", self.node_id, reason)
-        self.lease_watchdog.disarm()
         with self._lock:
-            if self._pre_switch_config is not None:
-                if self._pre_switch_config.channel != self.current_channel:
-                    self._apply_channel_switch(self._pre_switch_config.channel)
-                if self._pre_switch_config.radio_txpower_dbm != self.txpower_dbm:
-                    self._apply_txpower_switch(self._pre_switch_config.radio_txpower_dbm)
-                self.uplink_mcs = self._pre_switch_config.uplink_mcs
-                self._pre_switch_config = None
-            elif self.locked_channel and self.current_channel != self.locked_channel:
-                self._apply_channel_switch(self.locked_channel)
-            self._pending_switch_session_id = None
-            self._pending_switch_patch = None
+            if not self._matches_pending_switch(msg):
+                return
+            logger.warning("节点 %d 射频 ABORT session=%s", self.node_id, self._pending_switch_session_id)
+            # Physical-channel isolation also applies to direct protocol dispatch.
+            if msg.get("channel", self.current_channel) != self.current_channel:
+                return
+            # Restore before disarming: a failed restore retains the watchdog.
+            self._rollback_switch()
+            self.lease_watchdog.disarm()
 
     def _on_lease_watchdog_expired(self) -> None:
-        logger.warning(
-            "节点 %d: 15 秒射频重配租约耗尽！服务端在新信道失联，强制回退至 Channel %d 并启动寻频自愈！",
-            self.node_id,
-            DEFAULT_BENCHMARK_CHANNEL,
-        )
         with self._lock:
-            # 1. Force physical interface back to DEFAULT_BENCHMARK_CHANNEL (157)
-            self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL)
-
-            # 2. Revert physical txpower and uplink MCS if pre_switch_config exists
-            if self._pre_switch_config is not None:
-                if self._pre_switch_config.radio_txpower_dbm != self.txpower_dbm:
-                    self._apply_txpower_switch(self._pre_switch_config.radio_txpower_dbm)
-                self.uplink_mcs = self._pre_switch_config.uplink_mcs
-                self._pre_switch_config = None
-
-            self._pending_switch_session_id = None
-            self._pending_switch_patch = None
-            self.locked_channel = None
-
-            # 3. Transition state to HUNTING and signal supervisory loop
-            self.state = ClientNodeState.HUNTING
-            self._state_enter_time = time.monotonic()
+            # A queued expiration callback cannot undo a newer lease or a
+            # confirmation that won the atomic watchdog deadline check.
+            if not self.lease_watchdog.is_expired or self._pending_switch_session_id is None:
+                return
+            logger.warning("节点 %d: 射频租约耗尽 session=%s，回退至 Channel %d", self.node_id,
+                           self._pending_switch_session_id, DEFAULT_BENCHMARK_CHANNEL)
+            # Wake the existing supervisor even if this first restore raises.
             self._wake_event.set()
+            self._rollback_switch()
 
     def register_broadcast_handler(
         self, msg_type: str, handler: Callable[[Dict[str, Any]], None]
@@ -1687,6 +1687,23 @@ class ControlPlaneClient:
             )
             self._broadcast_thread.start()
 
+    def handle_broadcast(self, message: Dict[str, Any]) -> None:
+        """Dispatch a downlink datagram using the physical channel filter."""
+        if not isinstance(message, dict):
+            return
+        with self._lock:
+            channel = message.get("channel")
+            if channel is not None and channel != self.current_channel:
+                return
+            handlers = list(self._broadcast_handlers.get(message.get("type", ""), []))
+        # Daemon callbacks acquire their own lock and may call back into control.
+        # Only snapshot dispatch under this lock to avoid reversing lock order.
+        for handler in handlers:
+            try:
+                handler(message)
+            except Exception as exc:
+                logger.error("处理广播指令 %s 失败: %s", message.get("type"), exc)
+
     def _broadcast_loop(self) -> None:
         while not self._stop_event.is_set():
             if self._broadcast_listener_sock is None:
@@ -1701,21 +1718,7 @@ class ControlPlaneClient:
             except Exception as exc:
                 logger.debug("解析广播信令异常: %s", exc)
                 continue
-
-            msg_type = msg.get("type")
-            # RF physical channel isolation filtering:
-            # If the broadcast packet explicitly specifies a channel and it does not match
-            # client's current tuned channel, client physical radio cannot receive it.
-            msg_channel = msg.get("channel")
-            if msg_channel is not None and msg_channel != self.current_channel:
-                continue
-
-            if msg_type and msg_type in self._broadcast_handlers:
-                for handler in self._broadcast_handlers[msg_type]:
-                    try:
-                        handler(msg)
-                    except Exception as exc:
-                        logger.error("处理广播指令 %s 失败: %s", msg_type, exc)
+            self.handle_broadcast(msg)
 
     def start(self) -> None:
         """Start the supervisory hunting and adaptive heartbeat loop."""
@@ -1765,6 +1768,22 @@ class ControlPlaneClient:
     def _supervisory_loop(self) -> None:
         """Adaptive loop handling HUNTING, IDLE, and ACTIVE heartbeat schedules."""
         while not self._stop_event.is_set():
+            with self._lock:
+                switching = self._pre_switch_config is not None
+                if switching and self.lease_watchdog.is_expired:
+                    # Expiration callbacks may fail on transient adapter errors.
+                    # Preserve the saved config until every restore succeeds and
+                    # retry through the existing supervisory loop while hunting
+                    # remains suspended.
+                    try:
+                        self._rollback_switch()
+                        switching = False
+                    except Exception as exc:
+                        logger.error("节点 %d 租约回退重试失败: %s", self.node_id, exc)
+            if switching:
+                self._wake_event.wait(timeout=0.1)
+                self._wake_event.clear()
+                continue
             if self.state == ClientNodeState.HUNTING:
                 found = self.hunt_once()
                 if not found:

@@ -78,6 +78,7 @@ from .radio import (
     find_wl_interfaces,
     survey_spectrum,
     validate_radio_config,
+    validate_radio_patch,
 )
 
 logger = logging.getLogger("wfb_fl_server_daemon")
@@ -108,6 +109,8 @@ class ServerState(str, Enum):
     RUNNING = "RUNNING"
     ABORTING = "ABORTING"
     SWITCHING_RADIO = "SWITCHING_RADIO"
+    SURVEYING = "SURVEYING"
+    RADIO_ERROR = "RADIO_ERROR"
     STOPPED = "STOPPED"
 
 
@@ -351,7 +354,9 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
                 )
                 return
 
-        if path == "/api/v1/survey":
+        if path == "/api/v1/radio/reconfigure":
+            self._handle_radio_reconfigure(daemon, body)
+        elif path == "/api/v1/survey":
             self._handle_survey(daemon, body)
         elif path == "/api/v1/jobs/start":
             self._handle_jobs_start(daemon, body)
@@ -364,8 +369,23 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         status_data = daemon.get_status_report()
         self._send_json_response(200, status_data)
 
+    def _handle_radio_reconfigure(self, daemon: "ServerDaemon", body: Any) -> None:
+        try:
+            result = daemon.reconfigure_radio(body)
+        except FLRuntimeError as exc:
+            code = 409 if exc.error_code in ("engine_busy", "radio_target_nodes_not_ready") else 400
+            self._send_json_response(code, {
+                "error": exc.error_code, "message": exc.error_message,
+                **(exc.details or {}),
+            })
+        except Exception as exc:
+            logger.exception("射频重配执行异常")
+            self._send_json_response(500, {"error": "radio_reconfigure_failed", "message": str(exc)})
+        else:
+            self._send_json_response(200, result)
+
     def _handle_survey(self, daemon: "ServerDaemon", body: Dict[str, Any]) -> None:
-        if daemon.server_state in (ServerState.RUNNING, ServerState.PREPARING):
+        if daemon.server_state != ServerState.IDLE:
             self._send_json_response(
                 409,
                 {
@@ -385,6 +405,11 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
             rep_dict = report.to_dict()
             rep_dict["ranking"] = [r["channel"] for r in rep_dict.get("results", [])]
             self._send_json_response(200, rep_dict)
+        except FLRuntimeError as exc:
+            self._send_json_response(
+                409 if exc.error_code == "engine_busy" else 500,
+                {"error": exc.error_code, "message": exc.error_message},
+            )
         except Exception as exc:
             logger.error("扫频执行异常: %s", exc)
             self._send_json_response(
@@ -497,6 +522,7 @@ class ServerDaemon:
             downlink_mcs=self.config.downlink_mcs,
             uplink_mcs=self.config.uplink_mcs,
         )
+        self._radio_config_confirmed = True
         self.control_plane = ControlPlaneServer(
             active_radio_config=self.radio_config,
             network_adapter=self.adapter,
@@ -585,7 +611,7 @@ class ServerDaemon:
             return {
                 "server_state": self.server_state.value,
                 "active_job": self.active_job,
-                "radio": self.radio_config.to_dict(),
+                "radio": self.radio_config.to_dict() if self._radio_config_confirmed else None,
                 "tun": {
                     "name": self.config.tun_name,
                     "ip": self.config.tun_ip,
@@ -601,27 +627,99 @@ class ServerDaemon:
                 "nodes": nodes_dict,
             }
 
+    def reconfigure_radio(self, payload: Any) -> Dict[str, Any]:
+        """接受人工确认请求；协议执行期间释放锁以便状态查询和冲突响应。"""
+        if not isinstance(payload, dict):
+            raise FLRuntimeError("invalid_radio_request", "请求体必须为 JSON object")
+        if set(payload) != {"confirmed", "patch", "target_nodes"}:
+            raise FLRuntimeError("invalid_radio_request", "仅允许 confirmed、patch、target_nodes 字段")
+        if payload["confirmed"] is not True:
+            raise FLRuntimeError("invalid_radio_request", "必须由操作者明确确认 confirmed=true")
+        patch = payload["patch"]
+        targets = payload["target_nodes"]
+        if not isinstance(patch, dict) or not patch:
+            raise FLRuntimeError("invalid_radio_request", "patch 必须为非空 object")
+        if (
+            not isinstance(targets, list) or not targets
+            or any(type(nid) is not int or nid not in self.config.known_clients for nid in targets)
+            or len(set(targets)) != len(targets)
+        ):
+            raise FLRuntimeError("invalid_radio_request", "target_nodes 必须为不重复的 1~10 节点列表")
+
+        with self._lock:
+            try:
+                validate_radio_patch(patch, base=self.radio_config)
+            except (TypeError, ValueError) as exc:
+                raise FLRuntimeError("invalid_radio_request", str(exc)) from exc
+            if self.server_state != ServerState.IDLE or self.active_job is not None:
+                raise FLRuntimeError("engine_busy", f"当前状态 {self.server_state.value} 无法执行射频重配")
+            unready = []
+            for nid in targets:
+                record = self.control_plane.registry.get_node(nid)
+                if (
+                    record is None or record.readiness != NodeReadiness.READY
+                    or record.reported_state != ClientNodeState.IDLE.value
+                ):
+                    unready.append(nid)
+            if unready:
+                raise FLRuntimeError(
+                    "radio_target_nodes_not_ready", "目标节点必须全部 IDLE/READY",
+                    details={"unready_nodes": sorted(unready)},
+                )
+            self.server_state = ServerState.SWITCHING_RADIO
+
+        try:
+            result = self.control_plane.reconfigure_radio(patch, target_nodes=targets)
+        except Exception:
+            with self._lock:
+                self.radio_config = self.control_plane.active_radio_config
+                self._radio_config_confirmed = False
+                self.control_plane.radio_error = True
+                if self.server_state != ServerState.STOPPED:
+                    self.server_state = ServerState.RADIO_ERROR
+            raise
+        with self._lock:
+            self.radio_config = self.control_plane.active_radio_config
+            self._radio_config_confirmed = result.effective_config is not None
+            if self.server_state != ServerState.STOPPED:
+                self.server_state = ServerState.RADIO_ERROR if result.status == "radio_error" else ServerState.IDLE
+            return {
+                "session_id": result.session_id,
+                "status": result.status,
+                "target_channel": result.target_channel,
+                "applied_patch": result.applied_patch,
+                "failed_phase": result.failed_phase,
+                "unresponsive_nodes": result.unresponsive_nodes,
+                "error_message": result.error_message,
+                "effective_config": self.radio_config.to_dict() if self._radio_config_confirmed else None,
+            }
+
     def run_spectrum_survey(
         self, duration_ms: float = 300.0, congestion_threshold_fps: float = 50.0
     ) -> SpectrumSurveyReport:
-        """Trigger 5 GHz channel survey using underlying wireless adapter."""
+        """与作业和射频重配共享准入锁，预留扫频状态直到硬件操作结束。"""
         with self._lock:
-            if self.server_state in (ServerState.RUNNING, ServerState.PREPARING):
-                raise FLRuntimeError("engine_busy", "作业执行期间无法执行扫频")
-
-        iface = self.current_interface or "wlan0"
-        report = survey_spectrum(
-            interface=iface,
-            duration_ms=duration_ms,
-            backend=self.survey_backend,
-            congestion_threshold_fps=congestion_threshold_fps,
-        )
-        self.publish_event({
-            "type": "SPECTRUM_SURVEY_COMPLETED",
-            "report": report.to_dict(),
-            "timestamp": time.time(),
-        })
-        return report
+            if self.server_state != ServerState.IDLE:
+                raise FLRuntimeError("engine_busy", "当前状态无法执行扫频")
+            self.server_state = ServerState.SURVEYING
+        try:
+            iface = self.current_interface or "wlan0"
+            report = survey_spectrum(
+                interface=iface,
+                duration_ms=duration_ms,
+                backend=self.survey_backend,
+                congestion_threshold_fps=congestion_threshold_fps,
+            )
+            self.publish_event({
+                "type": "SPECTRUM_SURVEY_COMPLETED",
+                "report": report.to_dict(),
+                "timestamp": time.time(),
+            })
+            return report
+        finally:
+            with self._lock:
+                if self.server_state == ServerState.SURVEYING:
+                    self.server_state = ServerState.IDLE
 
     def start_job(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -995,8 +1093,8 @@ class ServerDaemon:
             tun_name=self.config.tun_name,
             tun_addr=self.config.tun_cidr,
             air_interface=iface,
-            channel=self.config.channel,
-            downlink_mcs=self.config.downlink_mcs,
+            channel=self.radio_config.channel,
+            downlink_mcs=self.radio_config.downlink_mcs,
             link_id=self.config.link_id,
             known_clients=self.config.known_clients,
         )

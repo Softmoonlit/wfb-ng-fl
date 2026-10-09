@@ -25,6 +25,7 @@ Type: map
 - Client 在终态清理前持久化白名单小型证据，不复制模型/update 本体。
 - 工单 01 已完成：四种 lifecycle outcome 共用原子 evidence 归档，包内 build identity 绑定 commit 与资源摘要；ADR-0015 固化必选文件矩阵，归档失败保留沙箱且正常资源回收后恢复待命。全量回归 201 项与 Mypy 通过。
 - 增加正式本地 `POST /api/v1/radio/reconfigure`，不增加 CLI。
+- 工单 02 已完成：人工确认 REST 复用既有控制面事务，采用 FINALIZED/CONFIRMED 双向最终屏障；提交前异常回退、提交后确认失败进入 `RADIO_ERROR`，禁用自动对齐。扫频与重配共享状态互斥，生效配置与未知硬件状态显式报告；全量 234 项测试、四模块 Mypy 通过，完成双轴审查。
 - Stage 3 直接复用 Stage 2 已实现的双 daemon、控制面、RoleService、Coordinator、Runtime、UFTP/HTTP 数据面、`TASK_READY` 和终态复位，不另建平行运行时。
 - Issue #41 的硬件预检、独立构建安装、canonical fixture、SHA-256、资源核查和失败归档能力应直接调用或小范围提取；禁止无理由复制。
 - 不复用 Issue #41 的 SSH RoleService/Runtime 作业编排、五分区 envelope 或旧 validator 结论语义；Stage 3 的独立性仅限于证据结构和裁决规则。
