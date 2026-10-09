@@ -73,7 +73,7 @@ Stage 3 不得复用 Issue #41 通过 SSH 启动 Client RoleService/Runtime、�
 | 射频租约 | `15 s` |
 | 租约触发回退后恢复 `IDLE/READY` | `<= 20 s` |
 
-模型和节点 update 必须通过 `wfb_ng.fl.issue41_fixtures` 生成；禁止在 shell 中另写随机或临时 fixture 生成器。确定性算法使用正式算法入口和 Runtime 四接口，但只复制节点特定 update 并保持聚合模型内容不变，因此只能称为**确定性占位训练/聚合**。
+模型和节点 update 必须通过 `wfb_ng.fl.issue41_fixtures` 生成；禁止在 shell 中另写随机或临时 fixture 生成器。UFTP 使用原生 GRTT 参数 `0.5:0.1:2.0`（初始 0.5 秒、最小 0.1 秒、最大 2 秒），保持 robustness 20；最小 GRTT 不能因快速节点的回应压至 10 ms，导致注册窗口短于平台 10 槽位的 1.3 秒轮询周期。两端 I/O timeout 仍为 120 秒，不添加固定 sleep 或作业重试来规避注册失败。确定性算法使用正式算法入口和 Runtime 四接口，但只复制节点特定 update 并保持聚合模型内容不变，因此只能称为**确定性占位训练/聚合**。
 
 ## Solution
 

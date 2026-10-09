@@ -244,7 +244,9 @@ class ServerTransport(object):
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
             '-R', str(self.uftp_rate_kbps),
-            '-r', '0.1:0.01:2.0',
+            # Ten 120/10 ms token slots can delay a REGISTER by 1.3 s.
+            # A fast peer must not shrink the group retry budget below that.
+            '-r', '0.5:0.1:2.0',
             '-s', '20',
             '-L', log_path,
             '-S', status_path,
