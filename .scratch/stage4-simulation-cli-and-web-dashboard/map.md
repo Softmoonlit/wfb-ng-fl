@@ -48,6 +48,8 @@ Type: map
 
 - [定义无外网直连管理网部署契约](issues/05-direct-link-management-network.md#answer)：保留 `127.0.0.1:9090` 本机 IPC，新增显式 `web_host` 与固定 `web_port: 8080` 的同源 Web listener；地址不可用时仅降级 Web listener，核心 daemon 持续运行并在地址就绪后恢复；浏览器只通过 `http://<web_host>:8080/` 访问 Server Daemon。
 
+- [定义 Web 控制面的 HTTP 与 SSE 契约](issues/07-web-control-api-and-events.md#answer)：冻结同源 HTTP 资源、SHA-256 模型上传、同步作业与扁平射频两阶段 API、统一错误对象、完整快照恢复和带有限队列的 SSE 事件；handler 仅做 Web 适配，管理网上传与无线数据面严格分离。
+
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
 
