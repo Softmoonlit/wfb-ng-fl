@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stage 4 Web 控制台信息架构原型 (PROTOTYPE)</title>
+  <style>
+    /* ==========================================================================
+       Stage 4 Web Console Information Architecture Prototype
+       Pure CSS, Zero Build, Zero External Dependency, Airgapped-safe
+       ========================================================================== */
+    :root {
+      --bg-canvas: #0f141c;
+      --bg-surface: #171f2c;
+      --bg-surface-elevated: #1f293d;
+      --bg-subtle: #25334a;
+      --border-subtle: #2d3b52;
+      --border-focus: #3b82f6;
+
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --accent-blue: #38bdf8;
+      --accent-blue-bg: rgba(56, 189, 248, 0.12);
+      --accent-green: #34d399;
+      --accent-green-bg: rgba(52, 211, 153, 0.12);
+      --accent-yellow: #fbbf24;
+      --accent-yellow-bg: rgba(251, 191, 36, 0.15);
+      --accent-red: #f87171;
+      --accent-red-bg: rgba(248, 113, 113, 0.15);
+
+      --danger-btn: #ef4444;
+      --danger-btn-hover: #dc2626;
+
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Common Utility Components */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .badge-green { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.25); }
+    .badge-blue { background: var(--accent-blue-bg); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.25); }
+    .badge-yellow { background: var(--accent-yellow-bg); color: var(--accent-yellow); border: 1px solid rgba(251, 191, 36, 0.25); }
+    .badge-red { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(248, 113, 113, 0.25); }
+    .badge-gray { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      background: var(--bg-subtle);
+      color: var(--text-main);
+    }
+    .btn:hover { background: #2f405c; border-color: var(--border-subtle); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: #0284c7; color: #fff; }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-danger {
+      background: var(--danger-btn);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .btn-danger:hover { background: var(--danger-btn-hover); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+    .btn-sm { padding: 3px 8px; font-size: 11px; }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mono { font-family: var(--font-mono); }
+
+    /* Modal Warning */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .modal-box {
+      width: 480px;
+      background: var(--bg-surface-elevated);
+      border: 2px solid var(--accent-yellow);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
+
+    /* Container simulator modes */
+    #prototype-viewport-container {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 70px; /* space for bottom bar */
+      max-width: 100%;
+      min-width: 1200px;
+    }
+
+    /* ==========================================================================
+       VARIANT A: Three-Column Integrated Mission Control
+       ========================================================================== */
+    .var-a-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: calc(100vh - 70px);
+    }
+    .var-a-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .var-a-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 290px minmax(500px, 1fr) 350px;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-canvas);
+    }
+    .var-a-col-left { display: flex; flex-direction: column; gap: 12px; }
+    .var-a-col-center { display: flex; flex-direction: column; gap: 12px; }
+    .var-a-col-right { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ==========================================================================
+       VARIANT B: Dual-Mode State-Driven Dashboard
+       ========================================================================== */
+    .var-b-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 70px);
+    }
+    .var-b-header {
+      background: #111827;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .var-b-body {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .var-b-grid-setup {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+    }
+    .var-b-flight-hero {
+      background: linear-gradient(180deg, #162438 0%, #111a29 100%);
+      border: 1px solid #28446b;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* ==========================================================================
+       VARIANT C: Persistent Command Header + Modular Tabs
+       ========================================================================== */
+    .var-c-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 70px);
+    }
+    .var-c-command-bar {
+      background: #0d1522;
+      border-bottom: 2px solid #1e2e47;
+      height: 64px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .var-c-tabs-nav {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      padding: 0 16px;
+      gap: 4px;
+    }
+    .var-c-tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .var-c-tab-btn:hover { color: var(--text-main); }
+    .var-c-tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .var-c-content {
+      padding: 16px;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       Floating Prototype Switcher Bar (Skill standard)
+       ========================================================================== */
+    .proto-switcher-bar {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #38bdf8;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.25);
+      backdrop-filter: blur(8px);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10000;
+      font-family: var(--font-sans);
+    }
+    .proto-switcher-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.1s ease;
+    }
+    .proto-switcher-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+    .proto-switcher-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .proto-sep { width: 1px; height: 18px; background: #334155; }
+    .proto-state-select {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Main Viewport Container (Desktop Operator Station 1280x720+)
+       ========================================================================== -->
+  <div id="prototype-viewport-container">
+    <!-- Populated by JS according to ?variant= and simulated state -->
+  </div>
+
+  <!-- ==========================================================================
+       Floating Switcher & Simulator Bar
+       ========================================================================== -->
+  <div class="proto-switcher-bar">
+    <button class="proto-switcher-btn" id="btn-prev-var" title="上一个原型 (快捷键 ←)">&larr;</button>
+    <div class="proto-switcher-label" id="proto-var-name">Variant A</div>
+    <button class="proto-switcher-btn" id="btn-next-var" title="下一个原型 (快捷键 →)">&rarr;</button>
+
+    <div class="proto-sep"></div>
+
+    <label style="font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:5px;">
+      运行状态模拟:
+      <select id="state-selector" class="proto-state-select">
+        <option value="IDLE">1. 空闲待命 (IDLE)</option>
+        <option value="RUNNING" selected>2. 运行中: 轮次2/3 - 下发文件</option>
+        <option value="AWAITING">3. 运行中: 轮次2/3 - 等待Update</option>
+        <option value="RECOVERING">4. 终态恢复: 成功·正在恢复待命</option>
+        <option value="ABORTED">5. 已急停中止 (ABORTED)</option>
+      </select>
+    </label>
+
+    <div class="proto-sep"></div>
+
+    <div style="font-size:11px; color:#94a3b8; display:flex; align-items:center; gap:6px;">
+      🖥️ 目标环境: <span style="color:#38bdf8; font-weight:bold;">纯桌面直连台 (≥1280x720)</span>
+    </div>
+  </div>
+
+  <!-- Modal Container for Warnings / Confirmations -->
+  <div id="modal-container"></div>
+
+  <script>
+    // ==========================================================================
+    // Prototype Mock State & Data (Strictly matches Stage 4 ADRs & Specs)
+    // ==========================================================================
+    const mockState = {
+      variant: 'A', // 'A', 'B', 'C'
+      simMode: 'RUNNING', // 'IDLE', 'RUNNING', 'AWAITING', 'RECOVERING', 'ABORTED'
+      isMobile: false,
+      activeTabC: 'monitor', // 'monitor', 'models', 'radio', 'events'
+      showRfWarningModal: false,
+
+      // Daemon & Radio State
+      server: {
+        status: "RUNNING",
+        web_host: "192.168.10.1",
+        web_port: 8080,
+        tun_ip: "10.80.0.1",
+        tun_ready: true,
+        channel: 157,
+        txpower: 12,
+        downlink_mcs: 3,
+        uplink_mcs: 3,
+        radio_sync_status: "IN_SYNC", // IN_SYNC | RECONFIGURING | RADIO_ERROR
+      },
+
+      // Cluster Nodes (Physical Acceptance Topology: Server + vm1 + vm2)
+      nodes: [
+        { id: 1, name: "vm1 (Client 1)", ip: "10.80.0.11", status: "ONLINE", coarse: "RUNNING", rtt: "4ms", ch: 157, pwr: 12, lastHeartbeat: "1s 前" },
+        { id: 2, name: "vm2 (Client 2)", ip: "10.80.0.12", status: "ONLINE", coarse: "RUNNING", rtt: "5ms", ch: 157, pwr: 12, lastHeartbeat: "1s 前" }
+      ],
+
+      // Model Library (Content Addressed, 10 GiB budget)
+      modelUsageBytes: 41943040 + 209715200, // ~240 MiB / 10 GiB
+      models: [
+        {
+          sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          filename: "canonical_fixture_40mib.bin",
+          sizeBytes: 41943040,
+          sizeHuman: "40.0 MiB",
+          createdAt: "2026-10-10 14:20:00",
+          inUseByActiveJob: true
+        },
+        {
+          sha256: "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+          filename: "resnet18_baseline_mock.bin",
+          sizeBytes: 209715200,
+          sizeHuman: "200.0 MiB",
+          createdAt: "2026-10-09 18:05:12",
+          inUseByActiveJob: false
+        }
+      ],
+
+      // Active / Recent Job
+      job: {
+        id: "job-20261010-001",
+        modelSha: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        targetNodes: [1, 2],
+        totalRounds: 3,
+        currentRound: 2,
+        completedRounds: 1,
+        // Server Phases: 准备任务 | 下发文件 | 等待 update | 恢复待命
+        serverPhase: "下发文件",
+        jobElapsed: "01:24",
+        roundElapsed: "00:32",
+        phaseElapsed: "00:15",
+        result: null, // null | "SUCCESS" | "FAILED" | "ABORTED"
+        recoveryStatus: "IDLE", // "IDLE" | "RECOVERING" | "RECOVERY_BLOCKED"
+        canStartNext: false
+      },
+
+      // Operator Events (Last 100 in memory)
+      events: [
+        { time: "14:21:05", level: "INFO", text: "已达成作业级准备屏障 TASK_READY (vm1, vm2)" },
+        { time: "14:21:06", level: "INFO", text: "第 1/3 轮完成：已收齐目标节点 vm1, vm2 的有效 update" },
+        { time: "14:21:08", level: "INFO", text: "第 2/3 轮开始：进入 Server 阶段 [下发文件]" },
+        { time: "14:21:12", level: "INFO", text: "UFTP 组播下行分发中 (MCS 3, 15 Mbps)..." }
+      ]
+    };
+
+    // Update state based on Sim Mode selector
+    function applySimMode(mode) {
+      mockState.simMode = mode;
+      if (mode === 'IDLE') {
+        mockState.job.result = null;
+        mockState.job.currentRound = 0;
+        mockState.job.completedRounds = 0;
+        mockState.job.serverPhase = "恢复待命";
+        mockState.job.recoveryStatus = "IDLE";
+        mockState.job.canStartNext = true;
+        mockState.models[0].inUseByActiveJob = false;
+        mockState.nodes.forEach(n => n.coarse = "IDLE");
+      } else if (mode === 'RUNNING') {
+        mockState.job.result = null;
+        mockState.job.currentRound = 2;
+        mockState.job.completedRounds = 1;
+        mockState.job.serverPhase = "下发文件";
+        mockState.job.recoveryStatus = "IDLE";
+        mockState.job.canStartNext = false;
+        mockState.models[0].inUseByActiveJob = true;
+        mockState.nodes.forEach(n => n.coarse = "RUNNING");
+      } else if (mode === 'AWAITING') {
+        mockState.job.result = null;
+        mockState.job.currentRound = 2;
+        mockState.job.completedRounds = 1;
+        mockState.job.serverPhase = "等待全部目标节点的有效 update";
+        mockState.job.recoveryStatus = "IDLE";
+        mockState.job.canStartNext = false;
+        mockState.models[0].inUseByActiveJob = true;
+        mockState.nodes.forEach(n => n.coarse = "RUNNING");
+      } else if (mode === 'RECOVERING') {
+        mockState.job.result = "SUCCESS";
+        mockState.job.currentRound = 3;
+        mockState.job.completedRounds = 3;
+        mockState.job.serverPhase = "恢复待命";
+        mockState.job.recoveryStatus = "RECOVERING";
+        mockState.job.canStartNext = false; // blocked until recovery finishes
+        mockState.models[0].inUseByActiveJob = true;
+        mockState.nodes.forEach(n => n.coarse = "RECOVERING");
+      } else if (mode === 'ABORTED') {
+        mockState.job.result = "ABORTED";
+        mockState.job.serverPhase = "恢复待命";
+        mockState.job.recoveryStatus = "RECOVERING";
+        mockState.job.canStartNext = false;
+        mockState.models[0].inUseByActiveJob = true;
+        mockState.nodes.forEach(n => n.coarse = "ABORTING");
+      }
+      render();
+    }
+
+    // ==========================================================================
+    // Renderers for Common Components
+    // ==========================================================================
+
+    function renderAbortButton(extraClass = '') {
+      const isJobActive = mockState.simMode === 'RUNNING' || mockState.simMode === 'AWAITING' || mockState.simMode === 'RECOVERING';
+      return `
+        <button class="btn btn-danger ${extraClass}" onclick="handleAbortClick()" ${!isJobActive ? 'disabled title="当前无活动作业"' : ''}>
+          <span class="pulse-dot" style="background:#fff;"></span>
+          急停 (ABORT)
+        </button>
+      `;
+    }
+
+    function renderNodeCard(node) {
+      let badgeClass = "badge-gray";
+      if (node.coarse === "RUNNING") badgeClass = "badge-blue";
+      else if (node.coarse === "IDLE") badgeClass = "badge-green";
+      else if (node.coarse === "ABORTING" || node.coarse === "ERROR") badgeClass = "badge-red";
+      else if (node.coarse === "RECOVERING") badgeClass = "badge-yellow";
+
+      return `
+        <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:6px; padding:8px 10px; margin-bottom:6px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <div style="font-weight:600; font-size:12px; color:var(--text-main);">${node.name}</div>
+            <span class="badge ${badgeClass}"><span class="pulse-dot"></span>${node.coarse}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">
+            <span>IP: ${node.ip}</span>
+            <span>CH${node.ch} · ${node.pwr}dBm</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim); margin-top:2px;">
+            <span>时延: ${node.rtt}</span>
+            <span>心跳: ${node.lastHeartbeat}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderModelTable(showSelectActions = true) {
+      const isRunning = mockState.simMode !== 'IDLE';
+      const quotaPct = Math.round((mockState.modelUsageBytes / 10737418240) * 100);
+      return `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:11px; color:var(--text-muted);">
+            <span>存储配额: 240.0 MiB / 10.0 GiB (${quotaPct}%)</span>
+            <div style="width:120px; height:6px; background:var(--bg-subtle); border-radius:3px; overflow:hidden;">
+              <div style="width:${quotaPct}%; height:100%; background:var(--accent-blue);"></div>
+            </div>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
+            <thead>
+              <tr style="color:var(--text-dim); border-bottom:1px solid var(--border-subtle);">
+                <th style="padding:4px 6px;">文件名</th>
+                <th style="padding:4px 6px;">大小</th>
+                <th style="padding:4px 6px;">SHA-256 摘要</th>
+                <th style="padding:4px 6px; text-align:right;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${mockState.models.map(m => `
+                <tr style="border-bottom:1px solid rgba(45,59,82,0.5);">
+                  <td style="padding:6px; font-weight:600; color:var(--text-main);">${m.filename}</td>
+                  <td style="padding:6px; font-family:var(--font-mono); color:var(--text-muted);">${m.sizeHuman}</td>
+                  <td style="padding:6px; font-family:var(--font-mono); color:var(--text-dim);" title="${m.sha256}">
+                    ${m.sha256.substring(0, 10)}...${m.sha256.substring(58)}
+                    ${m.inUseByActiveJob ? '<span class="badge badge-yellow" style="margin-left:4px;">作业引用中</span>' : ''}
+                  </td>
+                  <td style="padding:6px; text-align:right;">
+                    ${showSelectActions ? `
+                      <button class="btn btn-sm btn-primary" onclick="alert('已选定为作业输入模型: ${m.filename}')" ${isRunning ? 'disabled title="运行中不可更改输入"' : ''}>选择</button>
+                    ` : ''}
+                    <button class="btn btn-sm" onclick="alert('删除模型: ${m.filename}')" ${m.inUseByActiveJob ? 'disabled title="作业引用中严禁删除"' : ''}>删除</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top:10px; border:1px dashed var(--border-subtle); border-radius:6px; padding:10px; text-align:center; background:rgba(37,51,74,0.3);">
+            <span style="color:var(--text-muted); font-size:11px;">📥 拖拽模型文件到此处 或 </span>
+            <button class="btn btn-sm" onclick="alert('模拟触发管理网 HTTP 流式上传')">点击上传模型 (≤1 GiB)</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEventsBox(heightPx = 220) {
+      return `
+        <div style="height:${heightPx}px; overflow-y:auto; font-family:var(--font-mono); font-size:11px; background:#0b1017; border:1px solid var(--border-subtle); border-radius:6px; padding:8px;">
+          ${mockState.events.map(e => `
+            <div style="margin-bottom:5px; line-height:1.4;">
+              <span style="color:var(--text-dim);">${e.time}</span>
+              <span class="badge badge-blue" style="padding:0 4px; margin:0 4px; font-size:9px;">${e.level}</span>
+              <span style="color:var(--text-main);">${e.text}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderRadioForm() {
+      const isIdle = mockState.simMode === 'IDLE';
+      return `
+        <div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
+            <div>
+              <label style="font-size:10px; color:var(--text-dim); display:block;">信道 (Channel)</label>
+              <select id="rf-ch" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" ${!isIdle ? 'disabled' : ''}>
+                <option value="157" selected>157 (5.785 GHz, 推荐)</option>
+                <option value="149">149 (5.745 GHz)</option>
+                <option value="153">153 (5.765 GHz)</option>
+                <option value="165">165 (5.825 GHz)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:10px; color:var(--text-dim); display:block;">发射功率 (dBm)</label>
+              <input type="number" id="rf-txpower" value="12" min="10" max="20" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" ${!isIdle ? 'disabled' : ''} />
+            </div>
+            <div>
+              <label style="font-size:10px; color:var(--text-dim); display:block;">下行 MCS (下行速率)</label>
+              <select id="rf-dl-mcs" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" ${!isIdle ? 'disabled' : ''} onchange="handleMcsChange(this.value)">
+                <option value="3" selected>MCS 3 (推荐安全区间 15 Mbps)</option>
+                <option value="4">MCS 4 (20 Mbps)</option>
+                <option value="5">MCS 5 (25 Mbps)</option>
+                <option value="6">MCS 6 (30 Mbps - 触发强告警)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:10px; color:var(--text-dim); display:block;">上行 MCS</label>
+              <select id="rf-ul-mcs" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" ${!isIdle ? 'disabled' : ''}>
+                <option value="3" selected>MCS 3</option>
+                <option value="4">MCS 4</option>
+                <option value="5">MCS 5</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; color:var(--text-dim);">
+              ${!isIdle ? '⚠️ 仅在空闲且资源已恢复时允许应用' : '15秒租约 + 双最终屏障校验'}
+            </span>
+            <button class="btn btn-sm btn-primary" onclick="handleApplyRadio()" ${!isIdle ? 'disabled' : ''}>
+              应用到集群
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==========================================================================
+    // VARIANT A: Three-Column Integrated Mission Control
+    // ==========================================================================
+    function renderVariantA() {
+      const isIdle = mockState.simMode === 'IDLE';
+      const isRunning = !isIdle;
+
+      return `
+        <div class="var-a-layout">
+          <!-- Top Global Bar -->
+          <header class="var-a-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-weight:800; font-size:14px; color:#fff; letter-spacing:0.05em;">WFB-FL CONTROL STATION</span>
+              <span class="badge badge-green"><span class="pulse-dot"></span>SERVER DAEMON ONLINE</span>
+              <span class="badge badge-gray mono">CH${mockState.server.channel} · ${mockState.server.txpower}dBm · MCS${mockState.server.downlink_mcs}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div style="font-size:11px; color:var(--text-muted);">
+                管理网: <span class="mono" style="color:var(--text-main);">${mockState.server.web_host}:${mockState.server.web_port}</span>
+              </div>
+              ${renderAbortButton()}
+            </div>
+          </header>
+
+          <!-- Three Column Body -->
+          <div class="var-a-body">
+            <!-- Left Column: Cluster Nodes & RF Hardware -->
+            <div class="var-a-col-left">
+              <div class="card" style="flex:1;">
+                <div class="card-header">
+                  <span class="card-title">📡 集群拓扑与物理节点 (${mockState.nodes.length})</span>
+                  <span class="badge badge-blue">空口 TUN 10.80.0.1</span>
+                </div>
+                ${mockState.nodes.map(n => renderNodeCard(n)).join('')}
+
+                <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border-subtle);">
+                  <div style="font-weight:700; font-size:11px; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase;">
+                    ⚙️ ADR-0014 扁平射频参数配置
+                  </div>
+                  ${renderRadioForm()}
+                </div>
+              </div>
+            </div>
+
+            <!-- Center Column: Job Execution Monitor & Model Library -->
+            <div class="var-a-col-center">
+              <!-- Active Job Big Card -->
+              <div class="card" style="border-color:${isRunning ? 'var(--border-focus)' : 'var(--border-subtle)'};">
+                <div class="card-header">
+                  <span class="card-title">🎯 同步文件仿真作业监控</span>
+                  <div>
+                    ${mockState.job.result === 'SUCCESS' ? '<span class="badge badge-green">执行成功</span>' : ''}
+                    ${mockState.job.result === 'ABORTED' ? '<span class="badge badge-red">已急停中止</span>' : ''}
+                    ${isRunning && !mockState.job.result ? '<span class="badge badge-blue"><span class="pulse-dot"></span>进行中</span>' : ''}
+                    ${isIdle ? '<span class="badge badge-gray">空闲待命</span>' : ''}
+                  </div>
+                </div>
+
+                ${isRunning ? `
+                  <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; text-align:center; margin-bottom:12px; background:var(--bg-surface-elevated); padding:10px; border-radius:6px;">
+                    <div>
+                      <div style="font-size:10px; color:var(--text-dim);">当前推进轮次</div>
+                      <div style="font-size:22px; font-weight:800; color:var(--accent-blue); font-family:var(--font-mono);">
+                        ${mockState.job.currentRound} <span style="font-size:13px; color:var(--text-dim); font-weight:400;">/ ${mockState.job.totalRounds}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px; color:var(--text-dim);">SERVER 当前阶段</div>
+                      <div style="font-size:13px; font-weight:700; color:#fff; margin-top:4px;">
+                        ${mockState.job.serverPhase}
+                      </div>
+                    </div>
+                    <div>
+                      <div style="font-size:10px; color:var(--text-dim);">耗时 (作业 / 轮次 / 阶段)</div>
+                      <div style="font-size:11px; font-weight:600; color:var(--text-main); font-family:var(--font-mono); margin-top:6px;">
+                        ${mockState.job.jobElapsed} | ${mockState.job.roundElapsed} | <span style="color:var(--accent-yellow);">${mockState.job.phaseElapsed}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+                    <span>作业 ID: <span class="mono" style="color:var(--text-main);">${mockState.job.id}</span></span>
+                    <span>资源恢复状态: <span class="badge ${mockState.job.recoveryStatus === 'IDLE' ? 'badge-green' : 'badge-yellow'}">${mockState.job.recoveryStatus}</span></span>
+                  </div>
+                ` : `
+                  <!-- Start Job Form -->
+                  <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:6px; margin-bottom:8px;">
+                    <div style="font-size:12px; font-weight:600; margin-bottom:8px; color:var(--text-main);">新建同步文件仿真作业</div>
+                    <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:8px; align-items:end;">
+                      <div>
+                        <label style="font-size:10px; color:var(--text-dim);">所选模型制品 (SHA-256)</label>
+                        <select style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:5px; font-family:var(--font-mono); font-size:11px;">
+                          <option>e3b0c442... (canonical_fixture_40mib.bin - 40.0 MiB)</option>
+                          <option>9f86d081... (resnet18_baseline_mock.bin - 200.0 MiB)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style="font-size:10px; color:var(--text-dim);">固定同步轮数</label>
+                        <input type="number" value="3" min="1" max="50" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" />
+                      </div>
+                      <div>
+                        <button class="btn btn-primary" style="width:100%;" onclick="applySimMode('RUNNING')">启动作业</button>
+                      </div>
+                    </div>
+                  </div>
+                `}
+              </div>
+
+              <!-- Model Repository Card -->
+              <div class="card" style="flex:1;">
+                <div class="card-header">
+                  <span class="card-title">📦 内容寻址模型库 (不可变制品)</span>
+                  <span style="font-size:10px; color:var(--text-dim);">SHA-256 内容寻址 · 40 MiB 验收</span>
+                </div>
+                ${renderModelTable()}
+              </div>
+            </div>
+
+            <!-- Right Column: Operator Critical Events -->
+            <div class="var-a-col-right">
+              <div class="card" style="height:100%; display:flex; flex-direction:column;">
+                <div class="card-header">
+                  <span class="card-title">📋 操作者关键事件 (最新 100 条)</span>
+                  <span class="badge badge-gray">实时流</span>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  ${renderEventsBox(450)}
+                </div>
+                <div style="margin-top:10px; padding:8px; background:rgba(37,51,74,0.4); border-radius:6px; font-size:11px; color:var(--text-dim);">
+                  💡 事实依据：仅记录关键阶段跃迁与错误，周期性心跳不刷屏，无虚假百分比。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==========================================================================
+    // VARIANT B: Dual-Mode State-Driven Dashboard
+    // ==========================================================================
+    function renderVariantB() {
+      const isIdle = mockState.simMode === 'IDLE';
+
+      return `
+        <div class="var-b-layout">
+          <!-- Top Bar -->
+          <header class="var-b-header">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-weight:800; font-size:15px; color:#fff;">WFB-FL DUAL-MODE CONSOLE</span>
+              <span class="badge ${isIdle ? 'badge-green' : 'badge-blue'}">
+                <span class="pulse-dot"></span>模式: ${isIdle ? '准备与配置 (SETUP)' : '飞行监控中 (FLIGHT)'}
+              </span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span class="badge badge-gray mono">CH${mockState.server.channel} · ${mockState.server.txpower}dBm · MCS${mockState.server.downlink_mcs}</span>
+              ${renderAbortButton('style="padding:8px 18px; font-size:13px;"')}
+            </div>
+          </header>
+
+          <div class="var-b-body">
+            ${isIdle ? `
+              <!-- State 1: Setup Mode (Idle) -->
+              <div class="var-b-grid-setup">
+                <!-- Left: Hardware & Radio Readiness -->
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">📡 硬件节点健康度 (${mockState.nodes.length})</span>
+                      <span class="badge badge-green">全部就绪</span>
+                    </div>
+                    ${mockState.nodes.map(n => renderNodeCard(n)).join('')}
+                  </div>
+
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">⚙️ 集群射频准备</span>
+                    </div>
+                    ${renderRadioForm()}
+                  </div>
+                </div>
+
+                <!-- Right: Model Library & Launch Launcher -->
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">🚀 启动新作业</span>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px; background:var(--bg-surface-elevated); padding:10px; border-radius:6px;">
+                      <div style="flex:1;">
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">当前选定输入模型:</span>
+                        <span class="mono" style="font-weight:700; color:var(--accent-blue);">canonical_fixture_40mib.bin</span>
+                        <span style="font-size:11px; color:var(--text-dim);">(40.0 MiB, SHA: e3b0c442...)</span>
+                      </div>
+                      <div style="width:120px;">
+                        <span style="font-size:11px; color:var(--text-muted); display:block;">固定同步轮数:</span>
+                        <input type="number" value="3" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:4px;" />
+                      </div>
+                      <div>
+                        <button class="btn btn-primary" style="padding:8px 20px;" onclick="applySimMode('RUNNING')">确认启动作业</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">📦 模型库不可变制品</span>
+                    </div>
+                    ${renderModelTable()}
+                  </div>
+                </div>
+              </div>
+            ` : `
+              <!-- State 2: Flight Mode (Running) -->
+              <div class="var-b-flight-hero">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <span class="badge badge-blue mono" style="font-size:12px;">作业 ID: ${mockState.job.id}</span>
+                  <span class="badge ${mockState.job.recoveryStatus === 'IDLE' ? 'badge-green' : 'badge-yellow'}">
+                    资源状态: ${mockState.job.recoveryStatus}
+                  </span>
+                </div>
+
+                <div style="margin:16px 0;">
+                  <div style="font-size:13px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em;">SERVER 权威当前阶段</div>
+                  <div style="font-size:32px; font-weight:900; color:#fff; margin:6px 0; letter-spacing:0.02em;">
+                    ${mockState.job.serverPhase}
+                  </div>
+                  <div style="font-size:14px; color:var(--accent-yellow); font-family:var(--font-mono);">
+                    阶段耗时: ${mockState.job.phaseElapsed} · 轮次耗时: ${mockState.job.roundElapsed} · 总作业耗时: ${mockState.job.jobElapsed}
+                  </div>
+                </div>
+
+                <div style="display:inline-flex; align-items:center; gap:20px; background:rgba(15,23,42,0.6); padding:10px 24px; border-radius:999px; border:1px solid #28446b;">
+                  <span style="font-size:16px; font-weight:700; color:var(--text-muted);">
+                    同步轮次进度: <span style="font-size:24px; font-weight:900; color:var(--accent-blue);">${mockState.job.currentRound}</span> / ${mockState.job.totalRounds}
+                  </span>
+                  <span class="badge badge-gray" style="font-size:12px;">已完成: ${mockState.job.completedRounds} 轮</span>
+                </div>
+              </div>
+
+              <!-- In-Flight Details Grid -->
+              <div style="display:grid; grid-template-columns:360px 1fr; gap:16px;">
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">👥 参与节点实时状态</span>
+                  </div>
+                  ${mockState.nodes.map(n => renderNodeCard(n)).join('')}
+                </div>
+
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">📋 作业关键事件审计</span>
+                  </div>
+                  ${renderEventsBox(240)}
+                </div>
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    // ==========================================================================
+    // VARIANT C: Persistent Command Header + Modular Tabs
+    // ==========================================================================
+    function renderVariantC() {
+      const isRunning = mockState.simMode !== 'IDLE';
+
+      return `
+        <div class="var-c-layout">
+          <!-- Fixed Global Command Bar (64px) -->
+          <header class="var-c-command-bar">
+            <!-- Brand & Status -->
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-weight:900; font-size:15px; color:#fff;">WFB-FL</span>
+              <span class="badge badge-green"><span class="pulse-dot"></span>DAEMON OK</span>
+              <span class="badge badge-gray mono">CH${mockState.server.channel} · ${mockState.server.txpower}dBm</span>
+            </div>
+
+            <!-- Mini HUD for Active Job -->
+            <div style="display:flex; align-items:center; gap:16px; background:#162438; padding:6px 14px; border-radius:8px; border:1px solid #28446b;">
+              <div>
+                <span style="font-size:10px; color:var(--text-dim); display:block;">作业进度</span>
+                <span class="mono" style="font-weight:700; color:var(--accent-blue);">
+                  ${isRunning ? `第 ${mockState.job.currentRound}/${mockState.job.totalRounds} 轮` : '空闲待命'}
+                </span>
+              </div>
+              <div style="width:1px; height:24px; background:#28446b;"></div>
+              <div>
+                <span style="font-size:10px; color:var(--text-dim); display:block;">当前阶段</span>
+                <span style="font-weight:600; color:#fff;">
+                  ${isRunning ? mockState.job.serverPhase : '等待创建作业'}
+                </span>
+              </div>
+              <div style="width:1px; height:24px; background:#28446b;"></div>
+              <div>
+                <span style="font-size:10px; color:var(--text-dim); display:block;">耗时</span>
+                <span class="mono" style="color:var(--accent-yellow);">
+                  ${isRunning ? mockState.job.phaseElapsed : '--:--'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Persistent Abort Button -->
+            <div>
+              ${renderAbortButton('style="padding:8px 18px; font-size:13px;"')}
+            </div>
+          </header>
+
+          <!-- Tab Navigation Bar -->
+          <nav class="var-c-tabs-nav">
+            <button class="var-c-tab-btn ${mockState.activeTabC === 'monitor' ? 'active' : ''}" onclick="switchTabC('monitor')">
+              🎯 运行监控 (Monitor)
+            </button>
+            <button class="var-c-tab-btn ${mockState.activeTabC === 'models' ? 'active' : ''}" onclick="switchTabC('models')">
+              📦 模型库 (Model Library)
+            </button>
+            <button class="var-c-tab-btn ${mockState.activeTabC === 'radio' ? 'active' : ''}" onclick="switchTabC('radio')">
+              📡 集群与射频 (Nodes & RF)
+            </button>
+            <button class="var-c-tab-btn ${mockState.activeTabC === 'events' ? 'active' : ''}" onclick="switchTabC('events')">
+              📋 事件日志 (Event Stream)
+            </button>
+          </nav>
+
+          <!-- Tab Content Area -->
+          <main class="var-c-content">
+            ${mockState.activeTabC === 'monitor' ? `
+              <div style="display:grid; grid-template-columns:1fr 340px; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">🎯 同步文件仿真作业执行板</span>
+                      <span class="badge ${isRunning ? 'badge-blue' : 'badge-gray'}">${mockState.job.serverPhase}</span>
+                    </div>
+
+                    ${isRunning ? `
+                      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; text-align:center; padding:16px; background:var(--bg-surface-elevated); border-radius:8px; margin-bottom:12px;">
+                        <div>
+                          <div style="font-size:11px; color:var(--text-dim);">轮次推进</div>
+                          <div style="font-size:26px; font-weight:900; color:var(--accent-blue); font-family:var(--font-mono);">
+                            ${mockState.job.currentRound} <span style="font-size:14px; color:var(--text-dim); font-weight:400;">/ ${mockState.job.totalRounds}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div style="font-size:11px; color:var(--text-dim);">当前阶段计时</div>
+                          <div style="font-size:22px; font-weight:700; color:var(--accent-yellow); font-family:var(--font-mono); margin-top:4px;">
+                            ${mockState.job.phaseElapsed}
+                          </div>
+                        </div>
+                        <div>
+                          <div style="font-size:11px; color:var(--text-dim);">总作业耗时</div>
+                          <div style="font-size:22px; font-weight:700; color:var(--text-main); font-family:var(--font-mono); margin-top:4px;">
+                            ${mockState.job.jobElapsed}
+                          </div>
+                        </div>
+                      </div>
+                    ` : `
+                      <div style="padding:14px; background:var(--bg-surface-elevated); border-radius:8px;">
+                        <div style="font-weight:700; font-size:13px; margin-bottom:10px;">启动新作业</div>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                          <div style="flex:1;">
+                            <label style="font-size:11px; color:var(--text-muted); display:block;">选择模型制品</label>
+                            <select style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:6px; font-size:11px;">
+                              <option>e3b0c442... (canonical_fixture_40mib.bin - 40.0 MiB)</option>
+                            </select>
+                          </div>
+                          <div style="width:100px;">
+                            <label style="font-size:11px; color:var(--text-muted); display:block;">同步轮数</label>
+                            <input type="number" value="3" style="width:100%; background:var(--bg-subtle); color:#fff; border:1px solid var(--border-subtle); border-radius:4px; padding:5px;" />
+                          </div>
+                          <div style="margin-top:16px;">
+                            <button class="btn btn-primary" onclick="applySimMode('RUNNING')">启动作业</button>
+                          </div>
+                        </div>
+                      </div>
+                    `}
+                  </div>
+
+                  <div class="card">
+                    <div class="card-header">
+                      <span class="card-title">📋 关键事件流切片</span>
+                    </div>
+                    ${renderEventsBox(220)}
+                  </div>
+                </div>
+
+                <!-- Right Rail: Cluster Nodes Snapshot -->
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">📡 参与节点健康度</span>
+                  </div>
+                  ${mockState.nodes.map(n => renderNodeCard(n)).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${mockState.activeTabC === 'models' ? `
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">📦 内容寻址模型制品库 (10 GiB 预算)</span>
+                </div>
+                ${renderModelTable()}
+              </div>
+            ` : ''}
+
+            ${mockState.activeTabC === 'radio' ? `
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">📡 拓扑节点物理网卡清单</span>
+                  </div>
+                  ${mockState.nodes.map(n => renderNodeCard(n)).join('')}
+                </div>
+                <div class="card">
+                  <div class="card-header">
+                    <span class="card-title">⚙️ ADR-0014 扁平射频参数配置</span>
+                  </div>
+                  ${renderRadioForm()}
+                </div>
+              </div>
+            ` : ''}
+
+            ${mockState.activeTabC === 'events' ? `
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">📋 权威操作者关键事件历史 (最近 100 条)</span>
+                </div>
+                ${renderEventsBox(450)}
+              </div>
+            ` : ''}
+          </main>
+        </div>
+      `;
+    }
+
+    // ==========================================================================
+    // Interactive Handlers & Modals
+    // ==========================================================================
+    function handleAbortClick() {
+      if (confirm('确认执行常驻急停 (ABORT)？这将立即中止当前作业下行/上行并启动资源恢复。')) {
+        applySimMode('ABORTED');
+      }
+    }
+
+    function handleMcsChange(val) {
+      if (val === '6') {
+        showModalWarning();
+      }
+    }
+
+    function handleApplyRadio() {
+      const dlMcs = document.getElementById('rf-dl-mcs').value;
+      if (dlMcs === '6') {
+        showModalWarning();
+        return;
+      }
+      alert('已通过 Server 校验并下发双最终屏障：已成功应用射频配置到全部节点！');
+    }
+
+    function showModalWarning() {
+      const container = document.getElementById('modal-container');
+      container.innerHTML = `
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <div style="font-size:16px; font-weight:800; color:var(--accent-yellow); margin-bottom:8px;">
+              ⚠️ 强告警：UFTP 下行速率超出安全区间
+            </div>
+            <div style="font-size:12px; color:#cbd5e1; line-height:1.6; margin-bottom:14px;">
+              选择 <strong style="color:#fff;">MCS 6</strong> 将导致下行速率达到 <strong>30 Mbps</strong>，严重超出桌面近场建议区间（<strong>12 ~ 18 Mbps</strong>）。
+              高并发组播下行将引起严重的 NAK 放大和 USB xHCI 丢包风险！
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <button class="btn btn-sm" onclick="closeModal()">取消修改</button>
+              <button class="btn btn-sm btn-danger" onclick="confirmHighMcs()">我已了解风险，二次确认应用</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function closeModal() {
+      document.getElementById('modal-container').innerHTML = '';
+      const select = document.getElementById('rf-dl-mcs');
+      if (select) select.value = '3';
+    }
+
+    function confirmHighMcs() {
+      document.getElementById('modal-container').innerHTML = '';
+      alert('已完成二次强告警确认。正在通过双最终屏障应用配置到集群...');
+      mockState.server.downlink_mcs = 6;
+      render();
+    }
+
+    function switchTabC(tab) {
+      mockState.activeTabC = tab;
+      render();
+    }
+
+    // ==========================================================================
+    // Master Render & Switcher Logic
+    // ==========================================================================
+    function render() {
+      const container = document.getElementById('prototype-viewport-container');
+      const varNameLabel = document.getElementById('proto-var-name');
+
+      if (mockState.variant === 'A') {
+        container.innerHTML = renderVariantA();
+        varNameLabel.textContent = 'Variant A (三栏全景工业中控台)';
+      } else if (mockState.variant === 'B') {
+        container.innerHTML = renderVariantB();
+        varNameLabel.textContent = 'Variant B (状态驱动双态聚焦台)';
+      } else if (mockState.variant === 'C') {
+        container.innerHTML = renderVariantC();
+        varNameLabel.textContent = 'Variant C (常驻指挥条+模块化工作站)';
+      }
+    }
+
+    function setVariant(v) {
+      mockState.variant = v;
+      const url = new URL(window.location);
+      url.searchParams.set('variant', v);
+      window.history.replaceState({}, '', url);
+      render();
+    }
+
+    function cycleVariant(direction) {
+      const vars = ['A', 'B', 'C'];
+      let idx = vars.indexOf(mockState.variant);
+      if (direction === 'next') {
+        idx = (idx + 1) % vars.length;
+      } else {
+        idx = (idx - 1 + vars.length) % vars.length;
+      }
+      setVariant(vars[idx]);
+    }
+
+    // Keyboard & UI Listeners
+    document.getElementById('btn-prev-var').addEventListener('click', () => cycleVariant('prev'));
+    document.getElementById('btn-next-var').addEventListener('click', () => cycleVariant('next'));
+
+    document.getElementById('state-selector').addEventListener('change', (e) => {
+      applySimMode(e.target.value);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+      if (e.key === 'ArrowLeft') cycleVariant('prev');
+      if (e.key === 'ArrowRight') cycleVariant('next');
+    });
+
+    // Initialize from URL search param if present
+    const initParams = new URLSearchParams(window.location.search);
+    const initialVar = initParams.get('variant');
+    if (['A', 'B', 'C'].includes(initialVar)) {
+      mockState.variant = initialVar;
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

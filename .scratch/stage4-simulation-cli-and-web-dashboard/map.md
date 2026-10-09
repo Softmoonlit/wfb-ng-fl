@@ -50,6 +50,8 @@ Type: map
 
 - [定义 Web 控制面的 HTTP 与 SSE 契约](issues/07-web-control-api-and-events.md#answer)：冻结同源 HTTP 资源、SHA-256 模型上传、同步作业与扁平射频两阶段 API、统一错误对象、完整快照恢复和带有限队列的 SSE 事件；handler 仅做 Web 适配，管理网上传与无线数据面严格分离。
 
+- [验证桌面 Web 操作台的信息架构与交互](issues/08-dashboard-information-architecture-prototype.md#answer)：裁撤移动端并锁定 ≥1280x720 纯桌面基线；采纳常驻 64px 指挥条（急停置顶与微缩HUD）、运行监控主页同屏全景闭环、独立模型库与射频分页，以及 UFTP 越界阻断式告警 Modal。
+
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
 
