@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WFB 文件仿真控制台</title>
+  <link rel="stylesheet" href="/assets/console.css">
+  <script defer src="/assets/console.js"></script>
+</head>
+<body>
+<header><div><h1>WFB 文件仿真控制台</h1><p>Server、节点与当前 / 最近作业</p></div><button id="refresh" type="button">刷新状态</button></header>
+<main>
+  <p id="connection-error" role="alert" hidden></p>
+  <p id="instance-notice" role="status" hidden>服务已重启，前次作业状态不可用</p>
+  <section aria-labelledby="server-heading"><h2 id="server-heading">运行状态</h2>
+    <dl class="metrics"><div><dt>Server</dt><dd id="server-state">加载中…</dd></div><div><dt>管理 Web</dt><dd id="web-state">加载中…</dd></div><div><dt>资源</dt><dd id="resources">加载中…</dd></div></dl>
+    <p id="snapshot-time" class="muted"></p>
+    <h3>启动条件</h3><ul id="start-blockers"></ul>
+  </section>
+  <div class="columns">
+    <section aria-labelledby="job-heading"><h2 id="job-heading">当前 / 最近作业</h2>
+      <dl><dt>作业</dt><dd id="job-id">暂无作业</dd><dt>执行结果</dt><dd id="job-result">未执行</dd><dt>资源恢复</dt><dd id="job-recovery">无需恢复</dd><dt>配置</dt><dd id="job-config">—</dd></dl>
+      <p id="job-error" role="status"></p>
+    </section>
+    <section aria-labelledby="radio-heading"><h2 id="radio-heading">已确认射频配置</h2><p id="radio">加载中…</p>
+      <p class="muted">信道与射频配置由操作者明确确认。</p></section>
+  </div>
+  <section aria-labelledby="nodes-heading"><h2 id="nodes-heading">节点</h2><table><thead><tr><th>节点</th><th>在线</th><th>粗状态</th><th>就绪</th><th>错误</th></tr></thead><tbody id="nodes"></tbody></table></section>
+  <section aria-labelledby="events-heading"><h2 id="events-heading">最近关键事件</h2><ol id="events"></ol></section>
+</main>
+<noscript>请启用 JavaScript 以读取 Server 状态。</noscript>
+</body>
+</html>

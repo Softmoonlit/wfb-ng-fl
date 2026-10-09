@@ -75,7 +75,7 @@ setup(
                                       'wfb-fl-server-daemon=wfb_ng.fl.server_daemon:main',
                                       'wfb-fl-radio=wfb_ng.fl.radio:main']},
     package_data={'wfb_ng.conf': ['master.cfg', 'site.cfg'],
-                  'wfb_ng.fl': ['build_identity.json']},
+                  'wfb_ng.fl': ['build_identity.json', 'static/*.html', 'static/*.css', 'static/*.js']},
     data_files = [('/usr/bin', ['wfb_v6_uplink']),
                   ('/lib/systemd/system', ['scripts/systemd/wfb-fl-server.service',
                                            'scripts/systemd/wfb-fl-client.service',

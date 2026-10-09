@@ -21,6 +21,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
 """
 
 import argparse
+from copy import deepcopy
 import hashlib
 import ipaddress
 import json
@@ -63,6 +64,8 @@ from .control import (
     NodeReadiness,
     NodeRecord,
 )
+from .console import ConsoleApplicationService
+from .console_http import ManagementWebListener, validate_management_address
 from .errors import FLRuntimeError
 from .radio import (
     ALLOWED_5GHZ_CHANNELS,
@@ -91,6 +94,7 @@ if not logger.handlers:
 DEFAULT_SERVER_CONFIG_PATH = "/etc/wfb-ng-fl/server.json"
 DEFAULT_IPC_HOST = "127.0.0.1"
 DEFAULT_IPC_PORT = 9090
+DEFAULT_WEB_PORT = 8080
 DEFAULT_TUN_NAME = "fl-s"
 DEFAULT_TUN_IP = "10.80.0.1"
 DEFAULT_TUN_CIDR = "10.80.0.1/24"
@@ -130,6 +134,8 @@ def calculate_file_sha256(path: str) -> str:
 class ServerDaemonConfig:
     ipc_host: str = DEFAULT_IPC_HOST
     ipc_port: int = DEFAULT_IPC_PORT
+    web_host: Optional[str] = None
+    web_port: int = DEFAULT_WEB_PORT
     channel: int = DEFAULT_CHANNEL
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     downlink_mcs: int = DEFAULT_DOWNLINK_MCS
@@ -161,19 +167,30 @@ class ServerDaemonConfig:
         except Exception as exc:
             raise FLRuntimeError("invalid_radio_configuration", str(exc)) from exc
 
-        # Validate known_clients
-        if self.known_clients != ALL_KNOWN_CLIENT_IDS:
-            raise FLRuntimeError(
-                "invalid_known_clients",
-                "必须全量预置平台支持的 1~10 号节点白名单槽位，严禁缩减槽位池",
-            )
-
         # Validate IP addresses
         try:
             ipaddress.IPv4Address(self.tun_ip)
             ipaddress.IPv4Interface(self.tun_cidr)
         except Exception as exc:
             raise FLRuntimeError("invalid_tun_ip", f"TUN 地址配置非法: {exc}") from exc
+
+        # Web is deliberately opt-in: it must use an explicit management address.
+        if self.web_host is not None:
+            try:
+                web_address = ipaddress.IPv4Address(self.web_host)
+            except Exception as exc:
+                raise FLRuntimeError("invalid_web_host", f"管理 Web 地址非法: {exc}") from exc
+            if web_address.is_loopback or web_address.is_unspecified or web_address == ipaddress.IPv4Address(self.tun_ip):
+                raise FLRuntimeError("invalid_web_host", "管理 Web 地址不得为回环、通配或 TUN 地址")
+        if self.web_port != DEFAULT_WEB_PORT:
+            raise FLRuntimeError("invalid_web_port", "管理 Web 端口固定为 8080")
+
+        # Validate known_clients
+        if self.known_clients != ALL_KNOWN_CLIENT_IDS:
+            raise FLRuntimeError(
+                "invalid_known_clients",
+                "必须全量预置平台支持的 1~10 号节点白名单槽位，严禁缩减槽位池",
+            )
 
 
 def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonConfig:
@@ -203,6 +220,8 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
     return ServerDaemonConfig(
         ipc_host=data.get("ipc_host", DEFAULT_IPC_HOST),
         ipc_port=int(data.get("ipc_port", DEFAULT_IPC_PORT)),
+        web_host=data.get("web_host"),
+        web_port=int(data.get("web_port", DEFAULT_WEB_PORT)),
         channel=int(data.get("channel", DEFAULT_CHANNEL)),
         radio_txpower_dbm=int(data.get("radio_txpower_dbm", DEFAULT_TXPOWER_DBM)),
         downlink_mcs=int(data.get("downlink_mcs", DEFAULT_DOWNLINK_MCS)),
@@ -330,7 +349,9 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path
         daemon: ServerDaemon = self.server.daemon  # type: ignore
 
-        if path == "/api/v1/status":
+        if path == "/api/v1/state":
+            self._send_json_response(200, daemon.console.snapshot())
+        elif path == "/api/v1/status":
             self._handle_status(daemon)
         elif path == "/api/v1/logs/stream":
             self._handle_logs_stream(daemon)
@@ -484,9 +505,27 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
 
 
 class ServerDaemon:
-    """
-    Production WFB-ng Stage 2 Server Persistent Daemon.
-    """
+    """Persistent cluster owner with separate local IPC and console adapters."""
+
+    @property
+    def server_state(self) -> ServerState:
+        return self._server_state
+
+    @server_state.setter
+    def server_state(self, state: ServerState) -> None:
+        if not hasattr(self, "console"):
+            self._server_state = state
+            return
+        with self._lock:
+            self._server_state = state
+            self._best_effort_console_refresh()
+
+    def _best_effort_console_refresh(self) -> None:
+        """Optional Web observation must never interrupt a core mutation."""
+        try:
+            self.console.snapshot()
+        except Exception:
+            logger.exception("控制台观察刷新失败，核心操作继续")
 
     def __init__(
         self,
@@ -503,6 +542,7 @@ class ServerDaemon:
 
         self.server_state = ServerState.INITIALIZING
         self.active_job: Optional[Dict[str, Any]] = None
+        self._recent_job: Optional[Dict[str, Any]] = None
         self.coordinator: Optional[Any] = None
         self.server_role: Optional[Any] = None
 
@@ -538,6 +578,18 @@ class ServerDaemon:
         self._httpd: Optional[ThreadingHTTPServer] = None
         self._http_thread: Optional[threading.Thread] = None
         self.actual_ipc_port: int = self.config.ipc_port
+        self._web_state = ("management_web_unavailable", "WEB_HOST_NOT_CONFIGURED" if self.config.web_host is None else None)
+        self.console = ConsoleApplicationService(self.get_status_report, self._lock)
+        self._web = ManagementWebListener(
+            self.config.web_host, self.config.web_port, self.console,
+            lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),
+            self._on_web_status,
+        )
+
+    def _on_web_status(self, status: str, error: Optional[str]) -> None:
+        # Listener status cannot wait behind a potentially slow snapshot reader.
+        self._web_state = (status, error)
+        self.console.record_web_status(status, error)
 
     def _on_node_heartbeat(self, hb: NodeHeartbeat, record: NodeRecord) -> None:
         """Forward heartbeat notifications to SSE event stream."""
@@ -554,13 +606,16 @@ class ServerDaemon:
         })
 
     def publish_event(self, event: Dict[str, Any]) -> None:
-        """Publish an event to all connected SSE clients."""
+        """Keep diagnostic stream and console operator history separate."""
+        with self._lock:
+            self.console.record_event(event)
+            self._best_effort_console_refresh()
         self.event_bus.publish(event)
 
     def get_status_report(self) -> Dict[str, Any]:
         """Generate structured status snapshot for GET /api/v1/status."""
         with self._lock:
-            all_nodes = self.control_plane.registry.get_all_nodes()
+            all_nodes = self.control_plane.registry.get_all_nodes() if self.control_plane is not None else {}
             now = time.monotonic()
             nodes_dict: Dict[str, Any] = {}
             for nid in self.config.known_clients:
@@ -602,6 +657,7 @@ class ServerDaemon:
                         "error_code": None,
                     }
 
+            web_status, web_error = self._web_state
             is_link_running = False
             link_pid = None
             if self._link_process is not None and self._link_process.poll() is None:
@@ -610,7 +666,15 @@ class ServerDaemon:
 
             return {
                 "server_state": self.server_state.value,
-                "active_job": self.active_job,
+                "management_web": {
+                    "status": web_status,
+                    "host": self.config.web_host,
+                    "port": self.config.web_port,
+                    "error": web_error,
+                },
+                "link_required": self.config.enable_link_process,
+                "recent_job": deepcopy(self._recent_job),
+                "active_job": deepcopy(self.active_job),
                 "radio": self.radio_config.to_dict() if self._radio_config_confirmed else None,
                 "tun": {
                     "name": self.config.tun_name,
@@ -677,12 +741,14 @@ class ServerDaemon:
                 self.control_plane.radio_error = True
                 if self.server_state != ServerState.STOPPED:
                     self.server_state = ServerState.RADIO_ERROR
+                self.console.record_event({"type": "RADIO_APPLY_FAILED", "message": "射频应用失败"})
             raise
         with self._lock:
             self.radio_config = self.control_plane.active_radio_config
             self._radio_config_confirmed = result.effective_config is not None
             if self.server_state != ServerState.STOPPED:
                 self.server_state = ServerState.RADIO_ERROR if result.status == "radio_error" else ServerState.IDLE
+            self.console.record_event({"type": "RADIO_APPLY_RESULT", "message": result.status})
             return {
                 "session_id": result.session_id,
                 "status": result.status,
@@ -844,6 +910,7 @@ class ServerDaemon:
                     raise
 
             # Only transition state and commit active_job after runtime is ready
+            self._recent_job = None
             self.active_job = job_dict
             self.server_state = ServerState.RUNNING
             self.server_role = server_role
@@ -960,6 +1027,13 @@ class ServerDaemon:
             if target_job_id is None:
                 target_job_id = self.active_job.get("job_id")
 
+            self._recent_job = deepcopy(self.active_job)
+            self._recent_job.update(
+                execution_result={"completed": "succeeded", "failed": "failed", "aborted": "aborted"}[outcome],
+                recovery_state="recovering", reason=reason, error=error,
+            )
+            self.console.record_event({"type": "RECOVERY_STARTED", "job_id": target_job_id})
+
             if outcome == "aborted":
                 self.server_state = ServerState.ABORTING
 
@@ -969,6 +1043,7 @@ class ServerDaemon:
             self.active_job = None
             self.server_role = None
 
+        recovery_error = None
         # 1. Stop coordinator if aborting from outside
         if coord is not None and outcome == "aborted":
             try:
@@ -976,6 +1051,7 @@ class ServerDaemon:
                 coord.wait(timeout=3.0)
             except Exception as exc:
                 logger.warning("中止 coordinator 失败: %s", exc)
+                recovery_error = "COORDINATOR_STOP_FAILED"
 
         # 2. Close server role
         if role_to_close is not None:
@@ -983,6 +1059,7 @@ class ServerDaemon:
                 role_to_close.close()
             except Exception as exc:
                 logger.warning("关闭 server_role 失败: %s", exc)
+                recovery_error = "ROLE_CLOSE_FAILED"
 
         # 3. Reset persistent link process (fail-closed before broadcasting terminal signal)
         link_reset_error = None
@@ -1001,6 +1078,8 @@ class ServerDaemon:
             with self._lock:
                 if not self._stop_event.is_set():
                     self.server_state = ServerState.STOPPED
+                self._recent_job.update(recovery_state="blocked", recovery_error="LINK_RESET_FAILED")
+                self.console.record_event({"type": "RECOVERY_BLOCKED", "job_id": target_job_id})
             raise FLRuntimeError("link_reset_failed", f"作业终态重置服务端链路失败: {link_reset_error}")
 
         # 4. Broadcast terminal message only after persistent link reset succeeds
@@ -1019,6 +1098,8 @@ class ServerDaemon:
         except Exception as broadcast_exc:
             with self._lock:
                 self.server_state = ServerState.STOPPED
+                self._recent_job.update(recovery_state="blocked", recovery_error="TERMINAL_BROADCAST_FAILED")
+                self.console.record_event({"type": "RECOVERY_BLOCKED", "job_id": target_job_id})
             logger.error(
                 "作业终态广播失败 type=%s job_id=%s: %s",
                 terminal_type, target_job_id, broadcast_exc,
@@ -1033,6 +1114,13 @@ class ServerDaemon:
         with self._lock:
             if not self._stop_event.is_set():
                 self.server_state = ServerState.IDLE
+            if self.server_state == ServerState.STOPPED or self._stop_event.is_set():
+                recovery_error = recovery_error or "DAEMON_STOPPED"
+            self._recent_job["recovery_state"] = "blocked" if recovery_error else "ready"
+            if recovery_error:
+                self._recent_job["recovery_error"] = recovery_error
+            self.console.record_event({"type": "RECOVERY_BLOCKED" if recovery_error else "RECOVERY_COMPLETED",
+                                       "job_id": target_job_id})
 
         # 5. Publish SSE event
         if outcome == "completed":
@@ -1237,6 +1325,7 @@ class ServerDaemon:
             )
 
             self.server_state = ServerState.IDLE
+            self._web.start()
 
     def stop(self) -> None:
         """Stop all background workers, sockets, and processes."""
@@ -1245,6 +1334,12 @@ class ServerDaemon:
                 return
 
             self._stop_event.set()
+            if self.active_job is not None:
+                self._recent_job = deepcopy(self.active_job)
+                self._recent_job.update(execution_result="aborted", recovery_state="blocked",
+                                        reason="daemon_stopped", recovery_error="DAEMON_STOPPED")
+            elif self._recent_job and self._recent_job["recovery_state"] == "recovering":
+                self._recent_job.update(recovery_state="blocked", recovery_error="DAEMON_STOPPED")
             self.server_state = ServerState.STOPPED
 
             httpd = self._httpd
@@ -1257,6 +1352,7 @@ class ServerDaemon:
             self.coordinator = None
             self.active_job = None
             self.server_role = None
+            self._best_effort_console_refresh()
 
         # Stop HTTP REST Server outside lock
         if httpd is not None:
@@ -1265,6 +1361,11 @@ class ServerDaemon:
 
         if http_thread is not None:
             http_thread.join(timeout=1.0)
+
+        try:
+            self._web.stop()
+        except Exception:
+            logger.exception("管理 Web 停止失败，继续清理核心资源")
 
         # Stop Control Plane outside lock
         if self.config.enable_control_plane:

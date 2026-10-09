@@ -29,9 +29,10 @@ bin_dir=$destdir$prefix/bin
 unit_dir=$destdir$prefix/lib/systemd/system
 config_dir=$destdir/etc/wfb-ng
 
-install -d "$site_dir/fl" "$bin_dir" "$unit_dir" "$config_dir"
+install -d "$site_dir/fl/static" "$bin_dir" "$unit_dir" "$config_dir"
 install -m 0644 scripts/install/v8-wfb-ng-init.py "$site_dir/__init__.py"
 install -m 0644 wfb_ng/fl/*.py "$site_dir/fl/"
+install -m 0644 wfb_ng/fl/static/* "$site_dir/fl/static/"
 install -m 0755 wfb_v6_uplink "$bin_dir/wfb_v6_uplink"
 install -m 0755 scripts/install/wfb-fl-server "$bin_dir/wfb-fl-server"
 install -m 0755 scripts/install/wfb-fl-client "$bin_dir/wfb-fl-client"

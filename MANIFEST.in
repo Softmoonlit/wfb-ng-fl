@@ -1,2 +1,4 @@
 # 源码包中的项目说明，供 setup.py 读取。
 include docs/README.md
+
+recursive-include wfb_ng/fl/static *.html *.css *.js
