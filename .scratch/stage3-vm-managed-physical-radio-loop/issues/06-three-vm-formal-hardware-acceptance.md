@@ -49,6 +49,8 @@ Blocked by: 05, 07
 - 最新 `stage3_20261009_175625_b5de8bffbe5f`，提交 `23c08af6b59300b0b1a59e7566cc17642234b1ca`：三端 preflight、同包安装、正式服务就绪通过，Coordinator 两轮 succeeded，但仍因终态恢复超时失败，未进入射频场景。三端 failure-resources 均 clean，进程/TUN 与故障规则已清理。
 - 软件验证：网卡/执行器定向 112 项通过；控制路由/daemon 定向 82 项通过；独立复审另跑 100 项通过，未发现已提交修复的阻塞问题。
 - 后续阻塞详见工单 07；本工单保持未解决，尚无 validator `passed`，不得宣布 Stage 3 完整硬件通过。
+- 空间整理：旧 2.9 GiB 归档 `tests/logs/v8_issue41_formal_6node_20260923_163642/` 已无损压缩为同名 `.tar.gz`（13,296,805 字节），经 `tar --compare` 逐文件验证后删除展开副本，压缩证据完整保留。
+
 ## Answer
 
 2026-10-09：工单 07 已修复终态启动会话、GRANT 授权、registry 身份与空闲链路所有权问题，并闭合收集权限与多值目标校验缺陷。本工单验收完成，设为 `resolved`。
@@ -64,4 +66,3 @@ Blocked by: 05, 07
 - 最终 Python 全量 395 项通过，C++ 会话/FEC/加密回归与全部生产构建通过，13 个相关模块及最终 validator/runner Mypy 通过；独立复审无阻塞。
 
 旧失败归档保持失败结论，压缩副本经逐文件比较校验保留。通过边界仅为三机双 Client、确定性占位训练/聚合、作业运行时无 SSH 依赖；不声明真实训练/FedAvg、air-gapped、冷启动或更大硬件集群。
-
