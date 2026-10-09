@@ -2,11 +2,11 @@
 
 Type: task
 Status: ready-for-agent
-Blocked by: 05
+Blocked by: 05, 07
 
 ## What to build
 
-在 vm0、vm1、vm2 三台 Linux VM 和 USB 直通真实 `rtl88xxau_wfb` 网卡上执行 Stage 3 唯一正式入口，生成一组完整通过的正常作业与射频受控故障归档。三端已发现 `wlx*` 接口且均由 xHCI 纳管；操作者已确认网卡性能满足要求，无需交换 USB 直通。vm0 已清理可再生成缓存并达到磁盘预检门槛，继续执行正式验收。
+在 vm0、vm1、vm2 三台 Linux VM 和 USB 直通真实 `rtl88xxau_wfb` 网卡上执行 Stage 3 唯一正式入口，生成一组完整通过的正常作业与射频受控故障归档。三端已发现 `wlx*` 接口且均由 xHCI 纳管；操作者已确认网卡性能满足要求，无需交换 USB 直通。vm0 已清理可再生成缓存并达到磁盘预检门槛；正式运行发现终态恢复阻塞，待工单 07 修复后继续。
 
 ## Acceptance criteria
 
@@ -37,3 +37,16 @@ Blocked by: 05
 
 - 操作者明确确认当前连接的所有网卡性能满足要求，无需换卡。已更新 canonical spec：移除按 MAC 指定 Server 或排除个体的规则，MAC 仅用于硬件身份记录；执行器与离线 validator 同步执行此口径，保留动态接口、驱动、xHCI 和 USB 速度门禁。
 - 清理无运行中 pytest 占用的 `/tmp/pytest-of-virt`、npm 下载缓存、Mypy/pytest 缓存和 APT 缓存，vm0 根分区可用空间由 778 MiB 增至约 1.7 GiB。既有硬件归档、代码、已安装依赖均保留。
+
+### 2026-10-09 实机执行结果：终态恢复仍阻塞
+
+- 已提交并同步三端：`3af888b` 移除 MAC 个体门禁；`dcf1b97` 修复 Makefile 独立工作树 ENV 与含空格 PATH；`5a39668` 修复 UFTP 注册重试窗口；`23c08af` 将控制面监听/广播源地址绑定 TUN，避免受限广播经管理网绕过射频。
+- 补齐 vm0 Debian 构建依赖 `python3-all-dev`、`debhelper`、`dh-python` 以及三端运行依赖 `python3-serial`、`socat`。三端 `/usr/local/lib/python3.10/dist-packages/wfb_ng` 旧安装已备份至 `/var/tmp/wfb-stage3-legacy-20261009/`，避免遮蔽本次 Debian 包。
+- `stage3_20261009_165809_63073c18509e`：旧 MAC 门禁失败；`stage3_20261009_170641_5c723fcbb8ef`：旧软件测试沙箱残留，已保留至该失败档案的 preparation-evidence；`stage3_20261009_170731_c16d6ebb25ad`：构建目录/PATH；`stage3_20261009_170958_deaf20bab28c` 与 `stage3_20261009_171145_47eabd412c3c`：缺少构建依赖；`stage3_20261009_171245_5a2e829e4290`：运行包依赖；`stage3_20261009_171408_7bef0ce56bf7`：旧 Python 安装遮蔽；以上失败均保留。
+- `stage3_20261009_171554_8149f6eb3bc5`：第一轮 48.852 秒完成，第二轮 UFTP exit 7。真实双 namespace 实验复现快速节点压低 GRTT 后延迟 1.3 秒的节点无法注册；原参数失败、`0.5:0.1:2.0` 成功。诊断脚本保留在此档案 diagnostics，临时 namespace/veth/bridge 已删除。
+- `stage3_20261009_172803_29b31eab95a7`：两轮成功（52.280 / 55.002 秒，无掉队），终态 20 秒内未恢复 READY。
+- `stage3_20261009_173418_4d7f1cee9af0`：两轮及 IDLE/READY 恢复通过；射频请求却 finalized，精确规则未作用。诊断确定旧受限广播走管理网；该尝试不构成射频回退或完整通过证据。失败遗留的 149 缓存已备份至各 Client `/var/tmp/stage3-failed-149-channel-cache.json` 后恢复基线，非正式回退证据。
+- 最新 `stage3_20261009_175625_b5de8bffbe5f`，提交 `23c08af6b59300b0b1a59e7566cc17642234b1ca`：三端 preflight、同包安装、正式服务就绪通过，Coordinator 两轮 succeeded，但仍因终态恢复超时失败，未进入射频场景。三端 failure-resources 均 clean，进程/TUN 与故障规则已清理。
+- 软件验证：网卡/执行器定向 112 项通过；控制路由/daemon 定向 82 项通过；独立复审另跑 100 项通过，未发现已提交修复的阻塞问题。
+- 后续阻塞详见工单 07；本工单保持未解决，尚无 validator `passed`，不得宣布 Stage 3 完整硬件通过。
+- 空间整理：旧 2.9 GiB 归档 `tests/logs/v8_issue41_formal_6node_20260923_163642/` 已无损压缩为同名 `.tar.gz`（13,296,805 字节），经 `tar --compare` 逐文件验证后删除展开副本。压缩证据完整保留，当前根分区约余 2.8 GiB。

@@ -33,6 +33,8 @@ Type: map
 - 工单 04 已完成：Stage 3 独立 runner、envelope、严格 validator 和无硬件回归测试已交付；正式入口严格串联七个执行阶段后只读 validate，复用边界已记录在 `tests/fl_runtime/stage3三机真实射频执行器.md`。全量 pytest 326 项、Stage 3 定向 91 项通过，Mypy 和 shell/Python 静态检查通过。实体三机验收待工单 06。
 - 工单 05 已完成：Standards/Spec 独立审查并闭合 identifier 复用、运行后提交/unit 绑定、原始 preflight 拓扑、job-scoped 终态证据、广播失败 fail-closed 与成功 lifecycle 负退出码语义；修复 E2E 测试重复寻频竞态。最终全量 355 项、定向 204 项通过，13 文件 Mypy、shell/Python 静态检查通过，两轴复审无阻塞。解除工单 06 的软件前置阻塞；未执行实体三机射频运行。
 
+- 2026-10-09 工单 06 已实机执行：按用户确认移除 MAC 个体分配限制；修复独立 Debian 构建、UFTP GRTT 注册预算和控制广播绑定 TUN。三端两轮 40 MiB Coordinator 已成功，但最新归档 `stage3_20261009_175625_b5de8bffbe5f` 仍在终态 READY 恢复失败；工单 07 单独跟踪，尚无完整通过结论。三端服务/进程/TUN 已停止清理。旧硬件归档无损压缩保留，vm0 可用空间约 2.8 GiB。
+
 ## Work graph
 
 1. [01 Client 节点本地 evidence](issues/01-client-local-evidence-archive.md)
@@ -40,7 +42,8 @@ Type: map
 3. [03 作业 I/O/观测参数贯通与终态一致性](issues/03-job-parameters-and-terminal-consistency.md)
 4. [04 Stage 3 执行器、envelope 与 validator](issues/04-stage3-runner-envelope-validator.md)，依赖 01、02、03
 5. [05 软件回归与双轴审查](issues/05-software-regression-and-review.md)，依赖 01、02、03、04
-6. [06 三机正式硬件验收](issues/06-three-vm-formal-hardware-acceptance.md)，依赖 05，并等待 USB 无线网卡直通
+6. [06 三机正式硬件验收](issues/06-three-vm-formal-hardware-acceptance.md)，依赖 05、07；USB 网卡已就绪，当前阻塞为作业终态恢复
+7. [07 作业终态链路重启恢复](issues/07-terminal-link-session-recovery.md)，依赖 05，实机暴露后补充
 
 ## Out of scope
 
