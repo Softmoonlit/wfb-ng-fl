@@ -17,7 +17,7 @@ else
     VERSION := $(or $(VERSION), $(shell basename $(PWD) | grep -E -o '[0-9]+.[0-9]+(.[0-9]+)?$$'), 0.0.0)
 endif
 
-ENV ?= $(PWD)/env
+ENV ?= $(CURDIR)/env
 STDEB ?= "git+https://github.com/svpcom/stdeb"
 
 export VERSION COMMIT SOURCE_DATE_EPOCH
@@ -36,7 +36,7 @@ version:
 
 $(ENV):
 	$(PYTHON) -m venv --clear $(ENV)
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) -m pip install --upgrade pip setuptools $(STDEB)
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) -m pip install --upgrade pip setuptools $(STDEB)
 
 all_bin: wfb_rx wfb_tx wfb_keygen wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_v6_uplink
 
@@ -100,17 +100,17 @@ acceptance_v6_realhw:
 
 rpm: build_v6 $(ENV)
 	rm -rf dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py bdist_rpm --force-arch $(ARCH) --requires python3-twisted,python3-pyroute2,python3-pyserial,python3-msgpack,python3-jinja2,python3-yaml,socat,iw,uftp,iproute,libsodium,libpcap
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py bdist_rpm --force-arch $(ARCH) --requires python3-twisted,python3-pyroute2,python3-pyserial,python3-msgpack,python3-jinja2,python3-yaml,socat,iw,uftp,iproute,libsodium,libpcap
 	rm -rf wfb_ng.egg-info/
 
 deb: build_v6 $(ENV)
 	rm -rf deb_dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py --command-packages=stdeb.command sdist_dsc --debian-version 0~$(OS_CODENAME) bdist_deb
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py --command-packages=stdeb.command sdist_dsc --debian-version 0~$(OS_CODENAME) bdist_deb
 	rm -rf wfb_ng.egg-info/ wfb-ng-$(VERSION).tar.gz
 
 bdist: build_v6 $(ENV)
 	rm -rf dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py bdist --plat-name linux-$(ARCH)
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py bdist --plat-name linux-$(ARCH)
 	rm -rf wfb_ng.egg-info/
 
 check:
