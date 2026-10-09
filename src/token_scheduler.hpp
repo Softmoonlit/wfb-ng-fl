@@ -85,6 +85,7 @@ public:
     bool send_grant(const TokenGrant &grant, uint64_t now_ms) const;
 
 private:
+    const uint64_t session_id;
     std::unique_ptr<TokenAuthorizationDatagramSender> single_sender;
     std::map<uint8_t, std::unique_ptr<TokenAuthorizationDatagramSender> > node_senders;
 };

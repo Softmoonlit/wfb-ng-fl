@@ -2,6 +2,16 @@ Status: ready-for-agent
 
 # Stage 2: 无网络环境下的无 SSH 核心协同引擎、Client 常驻服务与射频感知
 
+## 当前测试拓扑与验收边界
+
+本阶段可供部署、联调和端到端验收的拓扑固定为 1 个 Server 与 2 个 Client：
+
+- Server：本机；
+- Client 1：SSH 别名 `vm1`，逻辑节点 `node_id=1`；
+- Client 2：SSH 别名 `vm2`，逻辑节点 `node_id=2`。
+
+SSH 仅用于测试节点的部署、启动和日志收集；运行时控制面仍必须通过带内 UDP 与数据面协议工作，不得依赖 SSH。文中的“当前测试拓扑”“真实测试”“端到端验收”均只覆盖以上三台机器。平台仍可保留 1~10 号节点的协议与身份容量，但未提供的节点不计入本阶段验收，也不应写成已验证的更大实体集群。
+
 ## Problem Statement
 
 在现有的联邦学习实现中，Server 依赖集中的 SSH 远程网络编排（通过带外以太网管理网）来探测客户端硬件、下发运行配置、拉起角色服务以及收集日志。然而在真实的无外网现场演示和物理仿真环境中，节点之间根本没有管理以太网，Server 无法通过 SSH 连接客户端。
@@ -13,7 +23,7 @@ Status: ready-for-agent
 2. 在 Client 侧提供开机自启的常驻守护服务（`wfb-fl-client-daemon`），具备内部网卡插拔轮询自愈能力，并采用子进程沙箱隔离每一次算法作业生命周期；
 3. 建立纯粹、极轻量的对称 UDP 控制信令平面（下行受限广播、上行单播），与大文件数据平面（UFTP 下行、HTTP PUT 上行）正交解耦；
 4. 建立防信道脑裂的租约式看门狗自愈协议，以及防两军问题虚假就绪的三级寻频探测与状态闭环确认机制；
-5. 建立面向用户的扁平射频参数直配模型（信道、发射功率、上下行 MCS 3~6 自由选配）与交互层动态 UFTP 速率约束，支持多机拓扑（设计容量 10 节点，台面现场以 6 节点真实集群为基准）与三种联邦学习协同范式（同步、半异步、异步）。
+5. 建立面向用户的扁平射频参数直配模型（信道、发射功率、上下行 MCS 3~6 自由选配）与交互层动态 UFTP 速率约束，支持多机拓扑（平台设计容量 10 个节点；本阶段实际测试基准为本机 Server + `vm1`、`vm2` 两个 Client）与三种联邦学习协同范式（同步、半异步、异步）。
 
 ## Solution
 
@@ -21,7 +31,7 @@ Status: ready-for-agent
    Server 部署开机常驻守护服务 `wfb-fl-server-daemon`，开机后独占纳管无线网卡并持续在后台监听客户端心跳，维护全局客户端实时在线拓扑视界（`NodeHorizonRegistry`）。拉起底座时一次性全量预置平台支持的 1~10 号节点槽位（`--known-clients 1..10` 及其静态 `tun_ip` 映射），采用固化的 120ms/10ms 底座调度默认值（无需外部传参）。对外暴露本地回环专用 HTTP REST API（`http://127.0.0.1:9090`），为 CLI 工具与 Web 后端提供无冲突的常态化状态推流、扫频触发与任务下发通道。
 
 2. **客户端常驻守护服务与子进程沙箱隔离 (Client Daemon & RoleService Sandbox)**：
-   Client 部署开机自启 systemd 常驻守护服务 `wfb-fl-client-daemon`。基于本机固化配置文件（`/etc/wfb-ng-fl/node.json`）确定身份与 TUN IP，开机后自动扫描并接管唯一的 `wlx*` 真实网卡；若网卡未插好，进入内部安全挂起轮询，插上即接管；收到 Server 任务配置后，Daemon 派生独立的 `RoleService` 子进程执行本轮模型接收、本地训练与参数上传闭环；任务结束后干净回收子进程并恢复待命，严格符合 ADR-0010 单作业生命周期隔离契约。
+   Client 部署开机自启 systemd 常驻守护服务 `wfb-fl-client-daemon`。基于本机固化配置文件（`/etc/wfb-ng-fl/node.json`）确定身份与 TUN IP，开机后自动扫描并接管唯一的 `wl*` 真实网卡（按 `rtl88xxau_wfb` 驱动优先绑定识别）；若网卡未插好，进入内部安全挂起轮询，插上即接管；收到 Server 任务配置后，Daemon 派生独立的 `RoleService` 子进程执行本轮模型接收、本地训练与参数上传闭环；任务结束后干净回收子进程并恢复待命，严格符合 ADR-0010 单作业生命周期隔离契约。
 
 3. **控制信令面与数据面正交分离的双平面架构 (Dual-Plane Protocol)**：
    - **控制信令面（小 JSON，对称轻量 UDP）**：下行由 Server 向 `255.255.255.255:9000` 受限广播任务级指令（命中 C++ 底座 `is_ipv4_limited_broadcast` 逻辑自动分发至所有发射天线），各 Client 向 `10.80.0.1:9001` 单播发送心跳保活与状态跃迁（自然交错零碰撞），Server 仅做单一单播回执（`{"ack": true}`），空口保持绝对静默，享底层 FEC 8/14 保护；
@@ -61,7 +71,7 @@ Status: ready-for-agent
 15. 作为 链路控制面，我希望所有心跳、状态汇报与任务信令采用轻量 UDP 报文承载，各客户端自然交错单播上行，以便杜绝空口广播唤醒引发的同频对撞撕裂（Collision）。
 16. 作为 仿真操作者，我希望在发布任务时能够在“同步（sync）”、“半异步（semi_async）”与“异步（async）”三种协同范式间自由选择，以便进行不同算法特性的科研对比。
 17. 作为 算法研究者，我希望在选择“半异步”模式时指定最小收齐节点数（`min_updates`），以便在部分慢节点掉队或超时时不中断轮次推进。
-18. 作为 算法研究者，我希望在选择“同步”模式时引擎严格等待全部目标客户端（现场 6 节点），以便确保基线实验数据的严谨性。
+18. 作为 算法研究者，我希望在选择“同步”模式时引擎严格等待全部目标客户端（当前测试拓扑为 `vm1`、`vm2` 两个 Client），以便确保基线实验数据的严谨性。
 19. 作为 仿真操作者，我希望 Server 核心引擎能够向常驻客户端下发增量射频重配信令（如切信道、切调制），以便按需动态调整物理参数。
 20. 作为 Client 守护进程，我希望在收到增量射频重配信令后执行两阶段确认，以便向 Server 证明本机已准备好同步切换。
 21. 作为 Client 守护进程，我希望在切换信道后启用 15 秒心跳租约看门狗，以便在未收到 Server 持续心跳时自动回滚至基准 Channel 157。
@@ -73,7 +83,7 @@ Status: ready-for-agent
 
 - **服务端常驻守护引擎与本地专用 REST IPC (Server Daemon & Local IPC)**：
   - 常驻服务名为 `wfb-fl-server-daemon`，以 systemd 单元运行；
-  - 启动后独占纳管服务端的 `wlx*` 真实网卡，绑定 TUN `10.80.0.1`，常驻监听 UDP 端口 `9001` 接收客户端心跳；
+  - 启动后独占纳管服务端的 `wl*` 真实网卡（按 `rtl88xxau_wfb` 驱动优先绑定），绑定 TUN `10.80.0.1`，常驻监听 UDP 端口 `9001` 接收客户端心跳；
   - 拉起底层 `wfb_v6_uplink` 时，C++ 底座内置默认采用 `grant_duration_ms = 120`, `guard_interval_ms = 10`，无需外部显式传参；
   - 一次性全量预置平台支持的 1~10 号节点槽位（`--known-clients 1,2,3,4,5,6,7,8,9,10` 及其静态 `tun_ip` 映射），确保后续任何新节点接入时均可立即被 C++ Token 调度器授予 Grant 并建立单播下行路由，无需重启底座；
   - 维护内存级实时拓扑注册表（`NodeHorizonRegistry`），记录参与节点 ID、IP、当前状态机阶段（`IDLE`、`TRAINING`、`COMMITTING` 等）、状态已耗时（`elapsed_ms`）、最后心跳时间戳（毫秒）与当前信道；
@@ -87,7 +97,7 @@ Status: ready-for-agent
 - **客户端常驻守护与子进程沙箱生命周期 (Client Daemon & Subprocess Sandbox)**：
   - 常驻服务名为 `wfb-fl-client-daemon`，以 systemd 单元运行；
   - 读取本地固化配置 `/etc/wfb-ng-fl/node.json`（包含 `node_id` 与 `tun_ip`，支持 1~10）；
-  - 开机后自动将 `wlx*` 网卡置为 Monitor 模式，信道设为默认 157，配置 TUN IP 并启动 UDP 客户端；若未检测到网卡，进程在内部以 3 秒周期挂起轮询，插上网卡即自动接管；
+  - 开机后自动将 `wl*` 网卡置为 Monitor 模式，信道设为默认 157，配置 TUN IP 并启动 UDP 客户端；若未检测到网卡，进程在内部以 3 秒周期挂起轮询，插上网卡即自动接管；
   - 收到 Server 的 `TASK_ANNOUNCE` 时，状态机从 `IDLE` 跃迁至 `PREPARING`，并在本地隔离的工作目录下通过 `subprocess.Popen` 动态派生独立的 `RoleService(role='client')` 执行本轮任务；
   - 任务正常完成或异常中止后，Daemon 负责 `terminate/kill` 子进程、清理临时接收区并回收资源，重新切回 `IDLE` 状态，坚决不驻留脏数据。
 
@@ -137,8 +147,8 @@ Status: ready-for-agent
     ```json
     {
       "mode": "sync", // 可选: "sync", "semi_async", "async"
-      "target_nodes": [1, 2, 3, 4, 6, 7], // 现场 6 节点真实集群
-      "min_updates": 6, // 当 mode 为 semi_async 时必须指定，sync 模式自动等同于 len(target_nodes)
+      "target_nodes": [1, 2], // 当前测试拓扑：vm1/client1 与 vm2/client2
+      "min_updates": 2, // 当 mode 为 semi_async 时必须指定，sync 模式自动等同于 len(target_nodes)
       "max_staleness": 0, // 当 mode 为 async 时支持落后版本聚合
       "round_timeout_seconds": 120,
       "radio_config": {
@@ -163,6 +173,7 @@ Status: ready-for-agent
 
 - **测试设计原则 (Seams at the highest level)**：
   - 遵循深模块与高接缝原则，在本地 REST IPC 套接字（`127.0.0.1:9090`）、UDP 信令套接字与虚拟 TAP/TUN 网络设备层构建端到端自动化测试；
+  - **当前测试拓扑**：本阶段端到端测试固定使用本机 Server 与 `vm1`（`node_id=1`）、`vm2`（`node_id=2`）两个 Client；1~10 号节点槽位仅通过配置、协议和单元测试验证，不能据此宣称已完成更大实体集群验收；
   - 保证在无物理无线网卡的开发与 CI 环境中，通过虚拟网络接口对与 Mock 套接字能够 100% 完整测试协议、状态机、两军问题防虚假就绪、增量 PATCH 重配与看门狗逻辑。
 
 - **五大核心测试接缝 (Primary Testing Seams)**：
@@ -171,7 +182,7 @@ Status: ready-for-agent
      - 断言 `GET /api/v1/status` 能正确反映从模拟 UDP 心跳中解析出的客户端细粒度状态、射频配置与耗时；
      - 断言 `POST /api/v1/jobs/start` 的三项前置门禁（状态未确认为 `IDLE` 拦截、模型不合法拦截、并发冲突拦截）。
   2. **对称 UDP 控制信令与两军问题防护接缝 (Symmetric UDP & Anti-Desync Seam)**：
-     - 在虚拟网络套接字对之间收发下行受限广播（`255.255.255.255:9000`）与上行单播（9001 端口），验证 C++ 链路层受限广播分发与预置 1..10 槽位 Token 授权；
+     - 在虚拟网络套接字对之间收发下行受限广播（`255.255.255.255:9000`）与上行单播（9001 端口），以当前测试拓扑中的两个 Client（`node_id` 1、2）验证 C++ 链路层受限广播分发与预置槽位 Token 授权；1~10 槽位扩展仅做无硬件配置/单元测试；
      - 模拟“上行通、下行丢”场景：客户端发送 `state="HUNTING"`，服务端回复 ACK 但人为丢弃；断言服务端仅显示 `🟡 连接中`，绝不跃迁为 `🟢 就绪`；
      - 注入高频乱序与重发，验证极简 `{"ack": true}` 幂等性与毫秒级时序单调性。
   3. **防脑裂租约式看门狗与增量重配自愈接缝 (Lease Watchdog & Incremental Reconfiguration Seam)**：
@@ -180,12 +191,12 @@ Status: ready-for-agent
      - 断言 Server 超时未集齐后停止在新信道发心跳并退回 Channel 157；
      - 断言 Client 1 在 15 秒租约耗尽后，看门狗成功触发物理网卡回退，最终两端均回到 Channel 157，无任何节点孤立。
   4. **Client 常驻守护子进程生命周期与网卡轮询接缝 (Client Daemon Sandbox & Polling Seam)**：
-     - 测试开机未检测到 `wlx*` 网卡时安全轮询不崩溃，模拟网卡插入后自动接管；
+     - 测试开机未检测到 `wl*` 网卡时安全轮询不崩溃，模拟网卡插入后自动接管；
      - 测试收到任务后派生 `RoleService` 子进程并监控其 PID；
      - 模拟任务正常完成、被 Server `JOB_ABORT` 中止，以及子进程异常退出等场景；
      - 严格断言子进程完全销毁、TUN 设备释放、无残留僵尸进程，守护进程安全恢复至 `IDLE`。
   5. **协同范式参数解析与收齐接缝 (Collaboration Paradigm Seam)**：
-     - 测试 `sync` 与 `semi_async` 模式（支持 6 节点真实拓扑与 1..10 任意子集）；
+     - 测试 `sync` 与 `semi_async` 模式，以 `[1, 2]` 两个 Client 作为当前端到端基准；1..10 任意子集仅通过无硬件的配置/单元测试验证；
      - 断言 `sync` 模式在任一节点缺失时 fail-closed 触发全集群复位；
      - 断言 `semi_async` 模式在满足 `min_updates` 时即使有节点缺失亦能成功触发聚合并标记落选节点。
 
@@ -198,11 +209,11 @@ Status: ready-for-agent
 
 - 浏览器 Web 前端单页应用与 SSE 推流可视化界面（明确归属 Stage 4）。
 - 面向用户的终端丰富交互 TUI（明确归属 Stage 4）。
-- 真实的拔掉以太网网线纯物理闭环验证（明确归属 Stage 3）。
+- Stage 3 的 vm0/vm1/vm2 管理网可达、作业运行时无 SSH 依赖、40 MiB 真实射频闭环与受控射频故障验收（不覆盖拔线或 air-gapped）。
 - 运行时空口动态自适应跳频（已由 ADR-0011 彻底否决）。
 - 2.4 GHz 频段支持（仅聚焦 5 GHz 合法频段）。
 
 ## Further Notes
 
 - Stage 2 是本项目从“测试脚本编排”迈向“自治分布式系统”的最关键 Seam。
-- 完成 Stage 2 后，系统无需 SSH 即可在多台机器上自主完成网卡发现、拓扑组网、信道重配与两轮 FL 闭环，Stage 3 的物理断网闭环与 Stage 4 的 Web 界面只需作为上层消费端直接接入。
+- 完成 Stage 2 后，系统能够在当前本机 Server + `vm1`/`vm2` 拓扑上通过带内控制面自主完成任务发布、RoleService 派生、数据交换与终态复位；Stage 3 在管理网可达条件下继续验证 40 MiB 真实射频容量、节点本地证据和受控射频租约回退，Stage 4 的 Web 界面作为本地 REST 的上层消费端接入。

@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+
+from .artifacts import write_json_atomic
+
 from .runtime import ClientRuntime, ServerRuntime
 from .transport import ClientTransport, ServerTransport
 
@@ -47,6 +51,21 @@ class ServerRole(object):
             max_update_size_bytes=max_update_size_bytes,
             transport=self.transport,
         )
+
+        try:
+            write_json_atomic(os.path.join(work_dir, 'server_role.json'), {
+                'schema_version': 1, 'role': 'server',
+                'participant_node_ids': list(participant_node_ids),
+                'participant_uftp_uids': list(participant_uftp_uids),
+                'io_timeout_seconds': self.transport.io_timeout,
+                'live_observation': self.transport.live_observation,
+                'observation_path': self.transport.observation_path,
+                'uftp_rate_kbps': self.transport.uftp_rate_kbps,
+                'uftp_port': self.transport.uftp_port,
+            })
+        except Exception:
+            self.close()
+            raise
 
     @property
     def http_address(self):

@@ -19,6 +19,10 @@ from .artifacts import write_json_atomic
 from .errors import FLRuntimeError
 from .observation import LiveObservation
 
+DEFAULT_UFTP_DATA_PORT = 1044
+DEFAULT_UFTP_MULTICAST_HOST = '239.80.41.1'
+DEFAULT_UFTP_PRIVATE_MULTICAST_HOST = '239.80.41.2'
+
 
 @dataclass(frozen=True)
 class RoundContext:
@@ -86,6 +90,7 @@ class ServerTransport(object):
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
         self.live_observation = live_observation
+        self.observation_path = observation_path
         self.role_node_id = role_node_id
         self._observation = LiveObservation(
             live_observation, observation_writer, observation_path)
@@ -239,7 +244,9 @@ class ServerTransport(object):
             '-H', ','.join(_format_uid(uid) for uid in self.participant_uftp_uids),
             '-Y', 'none',
             '-R', str(self.uftp_rate_kbps),
-            '-r', '0.1:0.01:2.0',
+            # Ten 120/10 ms token slots can delay a REGISTER by 1.3 s.
+            # A fast peer must not shrink the group retry budget below that.
+            '-r', '0.5:0.1:2.0',
             '-s', '20',
             '-L', log_path,
             '-S', status_path,
@@ -616,6 +623,7 @@ class ClientTransport(object):
         self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
         self.live_observation = live_observation
+        self.observation_path = observation_path
         self._observation = LiveObservation(
             live_observation, observation_writer, observation_path)
         self.ready = False

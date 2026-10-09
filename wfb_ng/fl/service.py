@@ -502,3 +502,7 @@ def server_main():
 
 def client_main():
     sys.exit(main('client'))
+
+
+if __name__ == '__main__':
+    sys.exit(main())

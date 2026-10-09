@@ -1,0 +1,13 @@
+{
+  "ipc_host": "127.0.0.1",
+  "ipc_port": 9090,
+  "channel": 157,
+  "radio_txpower_dbm": 12,
+  "downlink_mcs": 3,
+  "uplink_mcs": 6,
+  "tun_name": "fl-s",
+  "tun_ip": "10.80.0.1",
+  "tun_cidr": "10.80.0.1/24",
+  "tun_txqueuelen": 5000,
+  "known_clients": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+}

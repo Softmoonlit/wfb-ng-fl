@@ -1,5 +1,7 @@
 # 完整 FL Runtime 真实硬件验收
 
+Stage 3 常驻双 daemon 的唯一正式入口为 `stage3_vm_physical_loop.sh`，参见 [Stage 3 三机执行器](stage3三机真实射频执行器.md)。它使用独立 envelope 和 validator，通过 Server 本地 REST 发起作业并验证作业运行时无 SSH 依赖。以下内容介绍 Issue #41 的 SSH 编排验收，属于另一套验收边界。
+
 `issue41_fl_runtime_loop.sh run-all` 是完整验收总入口：依次执行预检、安装、连续三周期双向数据面 Gate、配置等价性核验、正式 Runtime 闭环、systemd 生命周期审计、证据采集和归档校验。正式闭环通过 `publish_model()`、`wait_for_model()`、`submit_update()`、`wait_for_updates()` 完成；任何关键阶段或证据失败，总结论都不能通过。
 
 [完整现场手册](v8_issue41_SSH编排真实硬件FL闭环验收手册.md) 保留原验收步骤、参数及证据要求。手册包含历史现场基线；本次运行的客户端集合、文件大小、轮数与无线参数以现役脚本和操作者显式配置为准，本次目录迁移不改变这些值。当前脚本默认客户端集合为 `client1 client2 client3 client4 client6 client7`，管理别名为对应 `vmN`；可通过 `ISSUE41_CLIENT_ROLES` 配置现场参与集合。

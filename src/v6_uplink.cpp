@@ -120,6 +120,7 @@ struct AirTransmitter {
     uint32_t channel_id = 0;
     uint16_t ieee80211_seq = 0;
     uint8_t source_node = 0;
+    const uint64_t session_id;
     int plaintext_fec_k = 1;
     uint64_t fec_flush_deadline_ms = 0;
     unique_ptr<V6PlaintextFecTransmitter> data_transmitter_;
@@ -128,9 +129,11 @@ struct AirTransmitter {
                    int port,
                    int snd_buf,
                    uint8_t source_node,
-                   int plaintext_fec_k = 1,
-                   int plaintext_fec_n = 1)
+                   int plaintext_fec_k,
+                   int plaintext_fec_n,
+                   uint64_t session_id)
         : source_node(source_node),
+          session_id(session_id),
           plaintext_fec_k(plaintext_fec_k)
     {
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -157,18 +160,21 @@ struct AirTransmitter {
                                                               snd_buf,
                                                               source_node,
                                                               plaintext_fec_k,
-                                                              plaintext_fec_n));
+                                                              plaintext_fec_n,
+                                                              session_id));
     }
 
     AirTransmitter(const vector<string> &interfaces,
                    uint32_t channel_id,
                    uint8_t source_node,
                    const RawAirRadioConfig &radio_config,
-                   int plaintext_fec_k = 1,
-                   int plaintext_fec_n = 1)
+                   int plaintext_fec_k,
+                   int plaintext_fec_n,
+                   uint64_t session_id)
         : raw_radiotap_header(build_ht_radiotap_header(radio_config)),
           channel_id(channel_id),
           source_node(source_node),
+          session_id(session_id),
           plaintext_fec_k(plaintext_fec_k)
     {
         if (interfaces.empty())
@@ -189,7 +195,8 @@ struct AirTransmitter {
                                                               source_node,
                                                               fec_radio,
                                                               plaintext_fec_k,
-                                                              plaintext_fec_n));
+                                                              plaintext_fec_n,
+                                                              session_id));
     }
 
     ~AirTransmitter()
@@ -267,6 +274,7 @@ struct AirTransmitter {
         envelope->target_node = 0;
         envelope->reserved = 0;
         envelope->sequence = htobe64(0);
+        envelope->session_id = htobe64(session_id);
         send_air_datagram(packet, sizeof(packet));
     }
 
@@ -285,6 +293,7 @@ struct AirTransmitter {
         envelope->target_node = target_node;
         envelope->reserved = 0;
         envelope->sequence = htobe64(sequence);
+        envelope->session_id = htobe64(session_id);
 
         wcontrol_grant_payload_t *payload = reinterpret_cast<wcontrol_grant_payload_t *>(packet + sizeof(wcontrol_envelope_hdr_t));
         payload->duration_ms = htobe32(duration_ms);
@@ -1087,10 +1096,14 @@ public:
 
         TokenAuthorizationEvent event = {};
         event.node_id = packet.target_node;
+        event.session_id = packet.session_id;
         event.sequence = packet.sequence;
         event.duration_ms = packet.grant_duration_ms;
         event.expires_at_ms = packet.grant_expires_at_ms;
-        authorization_state_.apply_event(event);
+        if (!authorization_state_.apply_event(event, get_time_ms()))
+        {
+            return;
+        }
 
         IPC_MSG("grant_accept node_id=%u sequence=%" PRIu64 " duration_ms=%u expires_at_ms=%" PRIu64 "\n",
                 static_cast<unsigned>(event.node_id),
@@ -1497,7 +1510,7 @@ bool maybe_send_feedback_grant(FeedbackWindowState *state,
     return true;
 }
 
-void run_client(const Config &config)
+void run_client(const Config &config, uint64_t session_id)
 {
     const uint32_t uplink_channel_id = (config.link_id << 8) + config.uplink_stream;
     const uint32_t downlink_channel_id = (config.link_id << 8) + config.downlink_stream;
@@ -1514,7 +1527,8 @@ void run_client(const Config &config)
                                         config.node_id,
                                         config.raw_air_radio,
                                         config.plaintext_fec_k,
-                                        config.plaintext_fec_n));
+                                        config.plaintext_fec_n,
+                                        session_id));
     }
     else
     {
@@ -1523,7 +1537,8 @@ void run_client(const Config &config)
                                         config.snd_buf,
                                         config.node_id,
                                         config.plaintext_fec_k,
-                                        config.plaintext_fec_n));
+                                        config.plaintext_fec_n,
+                                        session_id));
     }
 
     TokenAuthorizationState authorization_state;
@@ -1685,7 +1700,7 @@ void run_client(const Config &config)
     }
 }
 
-void run_server(Config config)
+void run_server(Config config, uint64_t session_id)
 {
     const uint32_t uplink_channel_id = (config.link_id << 8) + config.uplink_stream;
     const uint32_t downlink_channel_id = (config.link_id << 8) + config.downlink_stream;
@@ -1743,7 +1758,8 @@ void run_server(Config config)
                                                                  config.node_id,
                                                                  config.raw_air_radio,
                                                                  config.plaintext_fec_k,
-                                                                 config.plaintext_fec_n));
+                                                                 config.plaintext_fec_n,
+                                                                 session_id));
         },
         [&](const ClientTarget &target) {
             return shared_ptr<AirTransmitter>(new AirTransmitter(target.host,
@@ -1751,7 +1767,8 @@ void run_server(Config config)
                                                                  config.snd_buf,
                                                                  config.node_id,
                                                                  config.plaintext_fec_k,
-                                                                 config.plaintext_fec_n));
+                                                                 config.plaintext_fec_n,
+                                                                 session_id));
         });
 
     FeedbackWindowState feedback_state = {};
@@ -1957,6 +1974,8 @@ int main(int argc, char **argv)
     try
     {
         Config config = parse_args(argc, argv);
+        const uint64_t session_id = generate_session_id();
+        WFB_INFO("v6_session session_id=%" PRIu64 "\n", session_id);
         WFB_INFO("v6_uplink role=%s node_id=%u link_id=0x%06x uplink_stream=%u downlink_stream=%u trusted_plaintext fec=%d/%d risk=受信任环境/无链路机密性\n",
                  config.role.c_str(),
                  static_cast<unsigned>(config.node_id),
@@ -1965,14 +1984,20 @@ int main(int argc, char **argv)
                  static_cast<unsigned>(config.downlink_stream),
                  config.plaintext_fec_k,
                  config.plaintext_fec_n);
+        WFB_INFO("v6_config radio_bandwidth=%u radio_mcs_index=%u radio_short_gi=%u fec_k=%d fec_n=%d grant_duration_ms=%u guard_interval_ms=%u\n",
+                 static_cast<unsigned>(config.raw_air_radio.bandwidth),
+                 static_cast<unsigned>(config.raw_air_radio.mcs_index),
+                 static_cast<unsigned>(config.raw_air_radio.short_gi),
+                 config.plaintext_fec_k, config.plaintext_fec_n,
+                 config.grant_duration_ms, config.guard_interval_ms);
 
         if (config.role == "client")
         {
-            run_client(config);
+            run_client(config, session_id);
         }
         else
         {
-            run_server(std::move(config));
+            run_server(std::move(config), session_id);
         }
     }
     catch (const exception &e)

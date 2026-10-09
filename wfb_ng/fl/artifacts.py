@@ -4,6 +4,7 @@
 import hashlib
 import json
 import os
+import re
 import stat
 import tempfile
 
@@ -11,6 +12,18 @@ from .errors import FLRuntimeError
 
 
 CHUNK_SIZE = 64 * 1024
+
+
+def validate_path_safe_identifier(value, name="identifier"):
+    """Validate that value is a strictly path-safe non-empty identifier ([a-zA-Z0-9_-]+)."""
+    if not isinstance(value, str) or not value:
+        raise FLRuntimeError(f"invalid_{name}", f"{name} 必须为非空字符串")
+    if not re.fullmatch(r"[a-zA-Z0-9_\-]+", value):
+        raise FLRuntimeError(
+            f"invalid_{name}",
+            f"{name} 包含非法字符，必须为路径安全的字母数字下划线或连字符: {value!r}",
+        )
+    return value
 
 
 def _fsync_directory(path):

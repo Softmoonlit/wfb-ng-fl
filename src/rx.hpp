@@ -64,6 +64,7 @@ public:
     virtual void on_token_control(const ControlEnvelopeView &packet)
     {
         TokenAuthorizationEvent event = {};
+        event.session_id = packet.session_id;
         event.sequence = packet.sequence;
         event.duration_ms = packet.grant_duration_ms;
         event.expires_at_ms = packet.grant_expires_at_ms;
@@ -139,6 +140,9 @@ struct RxSourceStats {
 };
 
 typedef struct {
+    bool has_session;
+    uint64_t session_id;
+    std::set<uint64_t> retired_sessions;
     uint8_t source_node;
     uint32_t seq;
     rx_ring_item_t rx_ring[RX_RING_SIZE];
@@ -256,7 +260,7 @@ public:
     uint32_t count_p_dec_err;
     uint32_t count_p_session;
     uint32_t count_p_data;
-    std::set<uint64_t> count_p_uniq;
+    std::set<std::pair<uint64_t, uint64_t>> count_p_uniq;
     uint32_t count_p_fec_recovered;
     uint32_t count_p_lost;
     uint32_t count_p_bad;
@@ -284,6 +288,8 @@ private:
     void log_rssi(const sockaddr_in *sockaddr, uint8_t wlan_idx, const uint8_t *ant, const int8_t *rssi,
                   const int8_t *noise, uint16_t freq, uint8_t mcs_index, uint8_t bandwidth);
     int get_block_ring_idx(rx_source_state_t *state, uint64_t block_idx);
+    void reset_source_reassembly(rx_source_state_t *state);
+    bool accept_data_session(rx_source_state_t *state, uint64_t session_id, uint64_t block_idx);
     int rx_ring_push(rx_source_state_t *state);
     // cppcheck-suppress unusedPrivateFunction
     static int get_tag(const void *buf, size_t size, uint8_t tag_id, void *value, size_t value_size);

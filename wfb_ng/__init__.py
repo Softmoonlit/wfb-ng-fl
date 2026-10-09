@@ -76,11 +76,11 @@ colors = [
 # Create foreground and background colors...
 for lcode, lname in [('3', ''), ('4', 'bg_')]:
     # ...with the list of colors...
-    for code, name in enumerate(colors):
-        code = str(code)
+    for code_idx, name in enumerate(colors):
+        color_code = str(code_idx)
         # ...and both normal and bold versions of each color
-        escape_codes[lname + name] = esc(lcode + code)
-        escape_codes[lname + "bold_" + name] = esc(lcode + code, "01")
+        escape_codes[lname + name] = esc(lcode + color_code)
+        escape_codes[lname + "bold_" + name] = esc(lcode + color_code, "01")
 
 
 def color_str(arg, c, bold=False):
