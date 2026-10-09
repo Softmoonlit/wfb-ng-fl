@@ -1,7 +1,7 @@
 # 01: Client 作业终态前持久化节点本地 evidence
 
 Type: task
-Status: ready-for-agent
+Status: resolved
 Blocked by: None
 
 ## What to build
@@ -26,3 +26,18 @@ Blocked by: None
 - 相关 Client Daemon、生命周期、Runtime 测试及 Mypy 通过。
 
 ## Comments
+
+### 实现与验证
+
+- 前置工单 03 已完成；从 `71ae7d50936786df1e8d504613e4f9bb25eb6963` 开始实施。
+- 新增 `wfb_ng.fl.evidence`，复用 artifacts 原子复制与摘要能力。根文件与 canonical UUID 轮次路径使用明确白名单，拒绝非普通文件、符号链接、超出 16 MiB 文件和同名归档；Linux `renameat2(RENAME_NOREPLACE)` 在 manifest 与目录刷写完成后原子发布。
+- 完成、启动失败、中止与异常退出共用归档路径；归档失败保留沙箱和错误记录，任务资源正常回收后恢复待命。TUN 自身清理失败则 fail closed 进入 STOPPED；沙箱删除失败记录 journal 和保留路径。
+- 安装包独立携带 build identity，要求完整 commit；归档原资源及其摘要，不读取合并配置。修复 setuptools 增量构建相同大小/秒级时间戳导致 identity 未更新的情况。
+- ADR-0015 明确四种 outcome、Stage 3 正常成功/失败的必选文件矩阵；更新 Stage 2 事后取证与显式清理指南。工单 04 的 validator 仍按该矩阵后续实现。
+- 单元测试覆盖真实 ClientRuntime 两轮归档、排除大文件及未知文件、非法文件类型、目录冲突（包括并发空目录）、摘要/落盘失败、真实启动退出码、TUN/删除失败及包构建身份。
+- 最终全量 `python3 -m pytest -q`：201 passed；control/client daemon/server daemon/runtime/evidence 的 Mypy 通过，`git diff --check` 通过。
+- 双轴审查发现的资源清理、退出码、沙箱删除及构建缓存问题已修复并复验。本工单未执行实体射频验收或完整 Debian 打包；包资源验证使用真实 wheel/sdist 构建。
+
+## Answer
+
+Client 终态小型 evidence 持久归档已完成；运行身份来自包内 build identity，成功归档后删除沙箱，证据失败保留现场而不阻塞正常资源回收，硬件资源清理失败停止接单。后续 Stage 3 执行器可在终态后直接收集 evidence，并按 ADR-0015 的矩阵严格裁决证据充分性。

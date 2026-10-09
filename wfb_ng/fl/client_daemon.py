@@ -29,7 +29,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
-from .artifacts import validate_path_safe_identifier
+from .artifacts import validate_path_safe_identifier, write_json_atomic
+from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
@@ -435,7 +436,11 @@ class JobSandbox:
         network_adapter: NetworkAdapter,
         _command_prefix: Optional[Sequence[str]] = None,
         _require_ready_notification: bool = True,
+        evidence_dir: Optional[str] = None,
     ):
+        self.evidence_dir = evidence_dir if evidence_dir is not None else DEFAULT_EVIDENCE_DIR
+        self.last_evidence_error: Optional[str] = None
+        self.retained_sandbox_dir: Optional[str] = None
         self.work_dir = os.path.abspath(work_dir)
         self.network_adapter = network_adapter
         self._command_prefix = list(_command_prefix) if _command_prefix else None
@@ -461,18 +466,26 @@ class JobSandbox:
 
     def start(self, job: ClientJobConfig, air_interface: str) -> subprocess.Popen:
         with self._lock:
-            if self._process is not None and self._process.poll() is None:
-                raise FLRuntimeError(
-                    "sandbox_already_running",
-                    f"已有作业正在运行 (PID={self._process.pid})，拒绝并发执行",
-                )
+            if self.state == DaemonState.STOPPED:
+                raise FLRuntimeError('sandbox_stopped', '任务资源清理失败，拒绝启动新作业')
+            if self._process is not None:
+                returncode = self._process.poll()
+                if returncode is None:
+                    raise FLRuntimeError(
+                        "sandbox_already_running",
+                        f"已有作业正在运行 (PID={self._process.pid})，拒绝并发执行",
+                    )
+                self._finalize(returncode)
 
             self.state = DaemonState.PREPARING
+            self.last_evidence_error = None
             self._active_job = job
-            self._job_work_dir = os.path.join(self.work_dir, f"job_{job.job_id}")
+            job_work_dir = os.path.join(self.work_dir, f"job_{job.job_id}")
+            self._job_work_dir = None
 
             try:
-                os.makedirs(self._job_work_dir, exist_ok=True)
+                os.makedirs(job_work_dir, exist_ok=False)
+                self._job_work_dir = job_work_dir
 
                 # Ensure any leftover TUN from a previous crashed run is cleaned up
                 self.network_adapter.teardown_tun(job.tun_name)
@@ -618,27 +631,21 @@ class JobSandbox:
                 ) from exc
 
     def _cleanup_failed_start(self) -> None:
-        if self._pgid is not None:
+        proc = self._process
+        returncode = -1
+        if proc is not None:
             try:
-                os.killpg(self._pgid, signal.SIGKILL)
+                if self._pgid is not None:
+                    os.killpg(self._pgid, signal.SIGKILL)
             except OSError:
                 pass
-            self._pgid = None
-        if self._log_file is not None:
             try:
-                self._log_file.close()
-            except Exception:
-                pass
-            self._log_file = None
-        if self._job_work_dir and os.path.exists(self._job_work_dir):
-            try:
-                shutil.rmtree(self._job_work_dir, ignore_errors=True)
-            except Exception:
-                pass
-        self._job_work_dir = None
-        self._active_job = None
-        self._process = None
-        self.state = DaemonState.IDLE
+                if proc.poll() is None:
+                    proc.kill()
+                returncode = proc.wait(timeout=2.0)
+            except (OSError, subprocess.TimeoutExpired):
+                logger.exception('启动失败后回收角色服务失败')
+        self._finalize(returncode, outcome='start_failed')
 
     def poll(self) -> Optional[int]:
         with self._lock:
@@ -664,7 +671,7 @@ class JobSandbox:
             self._finalize(ret)
         return ret
 
-    def abort(self, timeout: float = 3.0) -> None:
+    def abort(self, timeout: float = 3.0, *, outcome: str = 'aborted') -> None:
         """
         Forcefully abort and terminate the sandbox process group, ensuring no orphans remain.
         """
@@ -672,6 +679,10 @@ class JobSandbox:
             self.state = DaemonState.ABORTING
             proc = self._process
             if proc is not None:
+                completed_returncode = proc.poll()
+                if completed_returncode is not None:
+                    self._finalize(completed_returncode)
+                    return
                 pid = proc.pid
                 pgid = None
                 try:
@@ -725,9 +736,9 @@ class JobSandbox:
                     pass
 
             rc = proc.poll() if proc else 0
-            self._finalize(rc if rc is not None else 0)
+            self._finalize(rc if rc is not None else -1, outcome=outcome)
 
-    def _finalize(self, returncode: int) -> None:
+    def _finalize(self, returncode: int, outcome: Optional[str] = None) -> None:
         """Clean up process log file, process group, TUN, temporary workspace, and reset state."""
         # Always terminate any lingering descendant processes in the process group
         pgid = self._pgid
@@ -746,20 +757,51 @@ class JobSandbox:
             self._log_file = None
 
         job = self._active_job
+        archive_succeeded = False
+        if job and self._job_work_dir:
+            try:
+                archive_client_evidence(
+                    self._job_work_dir, self.evidence_dir,
+                    run_id=job.run_id, job_id=job.job_id, node_id=job.node_id,
+                    lifecycle_outcome=outcome or ('succeeded' if returncode == 0 else 'failed'),
+                    returncode=returncode,
+                )
+                archive_succeeded = True
+            except Exception as exc:
+                self.last_evidence_error = str(exc)
+                logger.exception('作业 %s evidence 归档失败，保留沙箱 %s', job.job_id, self._job_work_dir)
+                try:
+                    write_json_atomic(os.path.join(self._job_work_dir, 'evidence_error.json'), {
+                        'schema_version': 1, 'run_id': job.run_id, 'job_id': job.job_id,
+                        'error': str(exc),
+                    })
+                except Exception:
+                    logger.exception('无法写入 evidence 错误记录，错误已保留在 daemon journal')
+        cleanup_error = None
         if job:
             logger.info("回收作业 %s 资源 (exit_code=%d)", job.job_id, returncode)
-            self.network_adapter.teardown_tun(job.tun_name)
-
-        if self._job_work_dir and os.path.exists(self._job_work_dir):
             try:
-                shutil.rmtree(self._job_work_dir, ignore_errors=True)
+                self.network_adapter.teardown_tun(job.tun_name)
+                if self.network_adapter.is_tun_active(job.tun_name):
+                    raise FLRuntimeError('task_tun_cleanup_failed', '任务 TUN 仍存在')
             except Exception as exc:
-                logger.warning("清理临时工作区失败: %s", exc)
+                cleanup_error = exc
+                logger.exception('释放任务 TUN 失败: %s', job.tun_name)
+
+        if archive_succeeded and self._job_work_dir and os.path.exists(self._job_work_dir):
+            try:
+                shutil.rmtree(self._job_work_dir)
+            except Exception:
+                logger.exception("清理临时工作区失败，保留路径: %s", self._job_work_dir)
+        if self._job_work_dir and os.path.lexists(self._job_work_dir):
+            self.retained_sandbox_dir = self._job_work_dir
 
         self._process = None
         self._active_job = None
         self._job_work_dir = None
-        self.state = DaemonState.IDLE
+        self.state = DaemonState.STOPPED if cleanup_error is not None else DaemonState.IDLE
+        if cleanup_error is not None:
+            raise FLRuntimeError('task_tun_cleanup_failed', '任务 TUN 清理失败，停止接单') from cleanup_error
 
 
 class ClientDaemon:
@@ -822,7 +864,7 @@ class ClientDaemon:
     def state(self) -> DaemonState:
         """Derive authoritative daemon state from active sub-components."""
         with self._lock:
-            if self._stop_event.is_set():
+            if self._stop_event.is_set() or self.sandbox.state == DaemonState.STOPPED:
                 return DaemonState.STOPPED
             if self.sandbox.state in (
                 DaemonState.PREPARING,
@@ -897,6 +939,7 @@ class ClientDaemon:
             if (
                 not self.config.enable_link_process
                 or self.current_interface is None
+                or self.sandbox.state == DaemonState.STOPPED
                 or self.sandbox.is_running
             ):
                 return
@@ -980,7 +1023,7 @@ class ClientDaemon:
             self.network_adapter.teardown_tun(self.config.tun_name)
 
     def _ensure_idle_transport(self) -> None:
-        if self.current_interface is None or self.sandbox.is_running:
+        if self.current_interface is None or self.sandbox.state == DaemonState.STOPPED or self.sandbox.is_running:
             return
         if self.config.enable_link_process and self.config.enable_control_plane:
             self.start_idle_link()
@@ -1018,6 +1061,8 @@ class ClientDaemon:
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
         """Start a job in the sandbox using the active wireless interface."""
         with self._lock:
+            if self.state == DaemonState.STOPPED:
+                raise FLRuntimeError('sandbox_stopped', '任务资源清理失败，拒绝启动新作业')
             if self.current_interface is None:
                 raise FLRuntimeError(
                     "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
@@ -1060,7 +1105,7 @@ class ClientDaemon:
         with self._lock:
             if not isinstance(job_id, str) or job_id != self._current_job_id:
                 return
-            self.sandbox.abort()
+            self.sandbox.abort(outcome='aborted' if aborted else 'succeeded')
             self._stop_idle_link()
             self.start_idle_link()
             self._current_job_id = None
@@ -1071,7 +1116,7 @@ class ClientDaemon:
 
     def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
         with self._lock:
-            self.sandbox.abort()
+            self.sandbox.abort(outcome='aborted' if intermediate_state is not None else 'succeeded')
             self._ensure_idle_transport()
             if self.control_plane is not None:
                 if intermediate_state is not None:

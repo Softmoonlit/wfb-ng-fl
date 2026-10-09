@@ -43,7 +43,22 @@ Daemon 先在同一文件系统的唯一临时目录中复制文件，独立计�
 
 SHA-256 只证明归档内部完整性。该机制不提供签名、加密、防恶意本机管理员篡改、不可抵赖或合规 WORM 存储，不得使用“不可篡改归档”描述它。
 
-### 4. 失败语义
+### 4. 终态与必选文件矩阵
+
+实现固定使用 `succeeded`（子进程正常退出或收到当前作业完成信令）、`start_failed`（启动/就绪阶段失败）、`aborted`（主动中止）、`failed`（已就绪子进程非零退出）四种 lifecycle outcome。manifest 同时保留实际 `returncode`（子进程从未创建时固定为 `-1`），服务端完成信令终止仍在监管循环中的角色时，不能把 SIGTERM 退出码误判为算法失败。自然退出已经归档后，后续终态信令不重新归档或改变 outcome。
+
+通用归档器只复制实际存在的白名单文件，不因部分文件未生成而伪造内容。Stage 3 validator 使用以下固定矩阵；所有行都要求有效 `evidence_manifest.json` 与其中绑定的 `build_identity.json`，并验证每个已列文件的大小、摘要、路径和身份：
+
+| lifecycle outcome | 必选文件 | 判定边界 |
+| --- | --- | --- |
+| `succeeded` | `client_role.json`、`algorithm_config.json`、`role_service.log`、`uftpd.log`、`issue41-client-result.json`、`observation.jsonl`、`current-round.json`，以及算法结果指定的两轮各自的 `round-state.json`、`model.manifest.json`、`update.manifest.json` | 两轮正常 Stage 3 场景，缺失任一项即证据失败 |
+| `start_failed` | build identity 与 evidence manifest；其余只校验实际存在项 | 启动可能在创建配置之前失败，不能要求日志/轮次产物；必须判为启动失败，不能裁决为正常成功 |
+| `aborted` | `client_role.json`、`role_service.log`；其余只校验实际存在项 | 已启动作业主动中止，结果和轮次产物可能尚未生成，不能裁决为正常成功 |
+| `failed` | `client_role.json`、`role_service.log`；其余只校验实际存在项 | 已就绪子进程异常退出，不能裁决为正常成功 |
+
+白名单根路径固定为上表中的文件，轮次只接受 `rounds/<canonical UUID>/{round-state.json,model.manifest.json,update.manifest.json}`。每个文件上限 16 MiB；普通文件以外的类型（含符号链接）、超限、已有最终目录及文件在复制中发生改变都拒绝归档。build identity 从包内独立资源读取并原样归档，其 SHA-256 与 runtime commit 同时写入 evidence manifest。最终目录用 Linux `renameat2(RENAME_NOREPLACE)` 提交，即使目标是并发创建的空目录也拒绝覆盖。
+
+### 5. 失败语义
 
 证据归档位于部署审计边界，不参与算法、Runtime 或 Transport 的成功判定：
 
@@ -52,7 +67,7 @@ SHA-256 只证明归档内部完整性。该机制不提供签名、加密、防
 - 归档失败不能阻止 RoleService 进程组回收、任务链路释放和空闲链路恢复；
 - 正式验收必须独立检查 evidence，缺失、不完整或摘要错误时以“证据不足”判定整次验收失败，即使 Coordinator 已报告成功。
 
-### 5. 收集与保留
+### 6. 收集与保留
 
 本地 evidence 由管理平面在作业终态后收集。作业成功路径不得依赖 SSH 抢救即将删除的沙箱文件。Daemon 不自动执行过期删除；容量管理与显式清理由部署或验收工具负责，且只能删除已确认不再使用的终态归档。
 

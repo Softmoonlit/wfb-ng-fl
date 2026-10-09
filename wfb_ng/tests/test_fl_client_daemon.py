@@ -9,6 +9,7 @@ import sys
 import tempfile
 import threading
 import time
+from pathlib import Path
 import unittest
 from unittest import mock
 
@@ -301,6 +302,15 @@ def _make_client_job(
 class TestRoleServiceSandbox(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp(prefix="test_sandbox_")
+        identity_path = os.path.join(self.temp_dir, 'build_identity.json')
+        with open(identity_path, 'w', encoding='utf-8') as identity:
+            json.dump({'schema_version': 1, 'commit': 'a' * 40}, identity)
+        for patch in (
+            mock.patch('wfb_ng.fl.evidence.BUILD_IDENTITY_PATH', Path(identity_path)),
+            mock.patch('wfb_ng.fl.client_daemon.DEFAULT_EVIDENCE_DIR', os.path.join(self.temp_dir, 'evidence')),
+        ):
+            patch.start()
+            self.addCleanup(patch.stop)
         self.adapter = MockNetworkAdapter(interfaces=["wlx001"])
 
     def tearDown(self):
@@ -551,6 +561,15 @@ class TestRoleServiceSandbox(unittest.TestCase):
 class TestClientDaemonLifecycle(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp(prefix="test_daemon_")
+        identity_path = os.path.join(self.temp_dir, 'build_identity.json')
+        with open(identity_path, 'w', encoding='utf-8') as identity:
+            json.dump({'schema_version': 1, 'commit': 'a' * 40}, identity)
+        for patch in (
+            mock.patch('wfb_ng.fl.evidence.BUILD_IDENTITY_PATH', Path(identity_path)),
+            mock.patch('wfb_ng.fl.client_daemon.DEFAULT_EVIDENCE_DIR', os.path.join(self.temp_dir, 'evidence')),
+        ):
+            patch.start()
+            self.addCleanup(patch.stop)
         self.node_json_path = os.path.join(self.temp_dir, "node.json")
         with open(self.node_json_path, "w", encoding="utf-8") as f:
             json.dump({"node_id": 1, "tun_ip": "10.80.0.11"}, f)

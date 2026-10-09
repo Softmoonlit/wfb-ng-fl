@@ -48,7 +48,7 @@
 - 停止测试单元；
 - 核查进程、TUN 和工作树状态。
 
-Client Daemon 在收到作业终态后会立即删除 `job_<job_id>` 沙箱目录，其中的 `role_service.log`、RoleService 配置和客户端 Runtime 制品不能依赖作业结束后再取证。需要额外诊断材料时，只能在作业仍运行时只读复制 `role_service.log`、`uftpd.log` 和生成配置，且不得复制模型、manifest 或 update，不得控制 Client 作业、修改状态或促成成功；正式长期留存仍应以实现自动持久归档后为准。
+Client Daemon 在作业完成、中止、启动失败或异常退出时，先把白名单小型文件及 `evidence_manifest.json` 原子归档到 `/var/lib/wfb-ng-fl/evidence/<job_id>/`，再删除任务沙箱。事后取证以该持久目录和 daemon journal 为来源；模型/update 本体不在 evidence 中。归档失败会保留原沙箱并记录 `evidence_error.json` 与 journal 错误，同时仍回收任务资源、恢复待命。Coordinator 成功不能代替 evidence 完整性检查。
 
 从 REST 作业请求被接受到作业进入终态期间，禁止通过 SSH：
 
@@ -292,7 +292,9 @@ PY
 - 作业前、运行中、终态后的 REST 状态；
 - 清理后的进程和 TUN 核查结果。
 
-ServerRole 日志、每轮 Server 模型与 update manifest 可一并归档。Client 的 `role_service.log`、生成配置和 Runtime 制品位于终态即删除的沙箱目录，不得列为事后必然可取的证据；若为故障诊断在运行中只读复制 Client 日志或生成配置，应单独记录取证时间和 SHA-256，仍不得复制模型、manifest 或 update。
+ServerRole 日志、每轮 Server 模型与 update manifest 可一并归档。Client 终态后从 `/var/lib/wfb-ng-fl/evidence/<job_id>/` 收集 RoleService/UFTP 日志、生成配置、算法结果、observation 和 Runtime 状态/manifest；按 `evidence_manifest.json` 核对身份、build identity 摘要、大小和 SHA-256。只收集完整最终目录，点号开头的临时目录不能作为成功证据。源码开发验收也必须先通过带完整 `COMMIT` 的包构建生成 build identity，否则归档会失败并保留沙箱。
+
+持久 evidence 不自动过期。操作者完成外部备份和摘要核验、确认作业终态及材料不再需要后，按单个路径显式清理，例如在对应 Client 执行 `sudo rm -r -- /var/lib/wfb-ng-fl/evidence/<job_id>`（替换为已核验的路径安全 job_id，禁止通配符批量删除）。归档失败保留的 `/tmp/wfb-ng-fl/client/job_<job_id>` 应先取证，确认无活跃任务后再按同样方式显式清理。重跑使用新的 run_id/job_id，不覆盖旧目录。
 
 `/tmp` 内容会丢失。需要作为正式证据时，应在停止服务前复制到带 run ID 的持久归档目录，并记录文件 SHA-256。只保存终端截图不构成完整归档。
 
@@ -315,7 +317,7 @@ ServerRole 日志、每轮 Server 模型与 update manifest 可一并归档。Cl
 
 ### 13.2 RoleService 启动后立即退出
 
-当前失败清理路径会立即删除 Client 的 `job_<job_id>` 沙箱目录，事后通常无法再读取其中的 `role_service.log`、`uftpd.log` 或生成配置。先检查 Client daemon journal 中记录的启动阶段、退出码和异常；如果需要沙箱内细节，应在复现时实时只读跟踪日志，或先实现失败证据自动持久化，不能假定失败后目录仍存在。
+先检查 Client daemon journal 的启动阶段、退出码和异常，再读取 `/var/lib/wfb-ng-fl/evidence/<job_id>/`。启动失败可能只形成部分白名单文件，manifest 的 `lifecycle_outcome=start_failed` 不代表正常成功。若最终 evidence 不存在，检查原沙箱中的 `evidence_error.json` 和 journal；归档失败会保留沙箱，磁盘本身故障时错误记录可能只能保存在 journal。禁止把缺失证据降级为通过。
 
 曾确认的确定性错误包括：
 

@@ -23,6 +23,7 @@ Type: map
 - 正常场景固定为双 Client、两轮、40 MiB、`sync` 和确定性占位算法。
 - 射频场景固定为 157→149，在 Client 2 预置精确控制消息丢弃规则，验证 Server 与 Client 自动回退 157。
 - Client 在终态清理前持久化白名单小型证据，不复制模型/update 本体。
+- 工单 01 已完成：四种 lifecycle outcome 共用原子 evidence 归档，包内 build identity 绑定 commit 与资源摘要；ADR-0015 固化必选文件矩阵，归档失败保留沙箱且正常资源回收后恢复待命。全量回归 201 项与 Mypy 通过。
 - 增加正式本地 `POST /api/v1/radio/reconfigure`，不增加 CLI。
 - Stage 3 直接复用 Stage 2 已实现的双 daemon、控制面、RoleService、Coordinator、Runtime、UFTP/HTTP 数据面、`TASK_READY` 和终态复位，不另建平行运行时。
 - Issue #41 的硬件预检、独立构建安装、canonical fixture、SHA-256、资源核查和失败归档能力应直接调用或小范围提取；禁止无理由复制。

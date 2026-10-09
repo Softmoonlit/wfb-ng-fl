@@ -7,6 +7,7 @@ import json
 import socket
 import threading
 import time
+import tempfile
 import unittest
 from typing import Dict, List, Optional, Tuple
 from unittest.mock import MagicMock
@@ -864,8 +865,11 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         - JOB_ABORT broadcasts abort and restores IDLE.
         """
         import sys
+        work = tempfile.TemporaryDirectory()
+        self.addCleanup(work.cleanup)
         adapter = MockNetworkAdapter(["wlan0"])
         config = ClientDaemonConfig(
+            work_dir=work.name,
             node_id=1,
             tun_ip="10.80.0.11",
             channel=153,
@@ -877,6 +881,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             poll_interval_seconds=0.05,
         )
         daemon = ClientDaemon(config, network_adapter=adapter)
+        daemon.sandbox.evidence_dir = work.name + '/evidence'
         stub_script = "import time; time.sleep(10)"
         daemon.sandbox._command_prefix = [sys.executable, "-c", stub_script]
 
