@@ -1525,7 +1525,9 @@ class ControlPlaneClient:
             )
             delay_sec = max(0.0, int(msg.get("delay_ms", 2000)) / 1000.0)
             self._switch_applied = False
-            self.lease_watchdog.arm(float(msg.get("lease_timeout_seconds", LEASE_TIMEOUT_DEFAULT_SECONDS)))
+            lease_seconds = float(msg.get("lease_timeout_seconds", LEASE_TIMEOUT_DEFAULT_SECONDS))
+            self.lease_watchdog.arm(lease_seconds)
+            logger.info("节点 %d LEASE_ARM session=%s lease_seconds=%.3f", self.node_id, session_id, lease_seconds)
             self._wake_event.set()
 
         def delayed_switch() -> None:

@@ -221,6 +221,7 @@ class FLCoordinator:
         self.work_dir = os.path.abspath(work_dir or f"/tmp/wfb-ng-fl/server/jobs/{job.job_id}")
         self.artifact_dir = os.path.join(self.work_dir, "artifacts")
         os.makedirs(self.artifact_dir, exist_ok=True)
+        write_json_atomic(os.path.join(self.work_dir, 'job_config.json'), self.job.to_dict())
 
         self.result_path = result_path or os.path.join(self.work_dir, "coordinator_summary.json")
         self.aggregation_fn = aggregation_fn or aggregate_models

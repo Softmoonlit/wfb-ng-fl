@@ -25,6 +25,8 @@ import subprocess
 import sys
 import time
 
+from tests.fl_runtime.hardware import discover_wireless_interface
+
 
 class FailureCategory:
     ENVIRONMENT = 'environment'
@@ -203,11 +205,7 @@ class RunEnvelope:
                 node_info['management_target'] = self.client_ssh_map.get(role, role)
 
             # 4. 真实无线网卡接口 (匹配 wlx*)
-            rc, out, _ = executor.run(role, "iw dev")
-            interfaces = sorted(list(set(re.findall(r'\b(wlx[0-9a-zA-Z]+)\b', out))))
-            if len(interfaces) != 1:
-                raise RuntimeError(f"{role} 必须恰好发现一个 wlx* 网卡，实际发现：{interfaces}")
-            wlx_iface = interfaces[0]
+            wlx_iface = discover_wireless_interface(executor, role)
             node_info['wireless_interface'] = wlx_iface
 
             # 5. MAC 地址

@@ -1,7 +1,7 @@
 # 04: Stage 3 单一执行器、run envelope 与严格 validator
 
 Type: task
-Status: ready-for-agent
+Status: resolved
 Blocked by: 01, 02, 03
 
 ## What to build
@@ -27,4 +27,14 @@ Blocked by: 01, 02, 03
 - 失败尝试形成机器可读分类并永久保留；重跑必须使用新 `run_id`/`job_id`。
 - 为 envelope、SSH 阶段审计、evidence 校验和失败分类提供无硬件自动测试。
 
-## Comments
+## Answer
+
+已完成 Stage 3 唯一执行入口、独立 envelope 与严格 validator：
+
+- `tests/fl_runtime/stage3_vm_physical_loop.sh` 严格串联七个执行阶段和最终只读 validate；正常作业仅由 Server 本地 REST 发起，执行器在作业窗口拒绝 Client SSH。
+- `tests/fl_runtime/stage3_runner.py` 复用 Issue #41 的动态 `wlx*` 发现、生命周期资源审计、canonical fixture 与 SHA-256 能力，新增独立 Debian clean worktree 构建安装、正式 daemon unit、阶段 SSH 审计、故障规则 trap 清理和失败分类。
+- `tests/fl_runtime/stage3_archive.py` 独立验证固定射频/作业配置、实际回读配置、包与 build identity 绑定、Client evidence 矩阵、跨轮 SHA 连续性、射频 15 秒租约回退、资源清理和 sealed archive 完整性。
+- 新增无硬件测试覆盖 envelope、SSH 越界、stdin 制品传输、故障规则、seal→validate、失败保真和 evidence 篡改拒绝。
+- 补充 ServerRole/Coordinator 实际配置回读、Client 租约绑定日志与 `wfb_v6_uplink` 实际调度配置日志。
+
+验证：`pytest -q` 通过 326 项；Stage 3 定向测试 91 项；相关 Mypy 无错误；shell `bash -n`、Python 编译和 `git diff --check` 通过。实体三机运行仍由工单 06 执行。

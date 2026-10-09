@@ -1965,6 +1965,12 @@ int main(int argc, char **argv)
                  static_cast<unsigned>(config.downlink_stream),
                  config.plaintext_fec_k,
                  config.plaintext_fec_n);
+        WFB_INFO("v6_config radio_bandwidth=%u radio_mcs_index=%u radio_short_gi=%u fec_k=%d fec_n=%d grant_duration_ms=%u guard_interval_ms=%u\n",
+                 static_cast<unsigned>(config.raw_air_radio.bandwidth),
+                 static_cast<unsigned>(config.raw_air_radio.mcs_index),
+                 static_cast<unsigned>(config.raw_air_radio.short_gi),
+                 config.plaintext_fec_k, config.plaintext_fec_n,
+                 config.grant_duration_ms, config.guard_interval_ms);
 
         if (config.role == "client")
         {

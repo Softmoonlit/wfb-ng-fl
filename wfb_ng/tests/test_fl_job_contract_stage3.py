@@ -137,6 +137,25 @@ class TestStage3JobContractAndTerminalConsistency(unittest.TestCase):
     # -------------------------------------------------------------------------
     # Slice 2: ServerRole construction uses request I/O timeout & live_observation
     # -------------------------------------------------------------------------
+    def test_server_role_persists_actual_transport_configuration(self):
+        role_dir = os.path.join(self.temp_dir, "readback")
+        role = ServerRole(
+            work_dir=role_dir, participant_node_id=(1, 2),
+            participant_uftp_uid=(1, 2), server_uftp_uid=100,
+            uftp_port=1044, http_port=0, max_update_size_bytes=1024,
+            live_observation=True, observation_path=os.path.join(role_dir, "observation.jsonl"),
+            io_timeout=120, uftp_rate_kbps=15000,
+        )
+        try:
+            with open(os.path.join(role_dir, "server_role.json"), encoding="utf-8") as stream:
+                actual = json.load(stream)
+            self.assertEqual(actual["io_timeout_seconds"], 120)
+            self.assertEqual(actual["uftp_rate_kbps"], 15000)
+            self.assertIs(actual["live_observation"], True)
+            self.assertEqual(actual["participant_node_ids"], [1, 2])
+        finally:
+            role.close()
+
     def test_server_role_constructs_with_explicit_io_timeout_and_live_observation(self):
         role_dir = os.path.join(self.temp_dir, "server_role_test")
         obs_file = os.path.join(role_dir, "obs.jsonl")

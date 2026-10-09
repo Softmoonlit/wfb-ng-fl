@@ -116,6 +116,11 @@ class TestFLCoordinator(unittest.TestCase):
         self.assertEqual(coordinator.state, CoordinatorState.SUCCEEDED)
         self.assertEqual(summary["status"], "succeeded")
         self.assertEqual(summary["rounds_completed"], 2)
+        with open(os.path.join(coordinator.work_dir, "job_config.json"), encoding="utf-8") as stream:
+            effective = json.load(stream)
+        self.assertEqual(effective["run_id"], job.run_id)
+        self.assertEqual(effective["round_timeout_seconds"], 5.0)
+        self.assertEqual(effective["io_timeout_seconds"], 120)
         self.assertEqual(len(summary["rounds"]), 2)
 
         # 校验跨轮模型连续性 (Project Memory #51)

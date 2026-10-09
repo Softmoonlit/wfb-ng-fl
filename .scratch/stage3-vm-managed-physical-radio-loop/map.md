@@ -30,8 +30,7 @@ Type: map
 - Issue #41 的硬件预检、独立构建安装、canonical fixture、SHA-256、资源核查和失败归档能力应直接调用或小范围提取；禁止无理由复制。
 - 不复用 Issue #41 的 SSH RoleService/Runtime 作业编排、五分区 envelope 或旧 validator 结论语义；Stage 3 的独立性仅限于证据结构和裁决规则。
 - 正式入口为 `tests/fl_runtime/stage3_vm_physical_loop.sh`。
-- 当前 vm0、vm1、vm2 尚未出现 `wlx*` 接口，正式硬件运行需操作者先完成 USB 直通。
-
+- 工单 04 已完成：Stage 3 独立 runner、envelope、严格 validator 和无硬件回归测试已交付；正式入口严格串联七个执行阶段后只读 validate，复用边界已记录在 `tests/fl_runtime/stage3三机真实射频执行器.md`。全量 pytest 326 项、Stage 3 定向 91 项通过，Mypy 和 shell/Python 静态检查通过。实体三机验收待工单 06。
 ## Work graph
 
 1. [01 Client 节点本地 evidence](issues/01-client-local-evidence-archive.md)
