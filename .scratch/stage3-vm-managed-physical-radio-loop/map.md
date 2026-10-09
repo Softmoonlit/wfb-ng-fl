@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: resolved
 Type: map
 
 # Stage 3 虚拟机管理下真实射频闭环实施路线
@@ -35,6 +35,8 @@ Type: map
 
 - 2026-10-09 工单 06 已实机执行：按用户确认移除 MAC 个体分配限制；修复独立 Debian 构建、UFTP GRTT 注册预算和控制广播绑定 TUN。三端两轮 40 MiB Coordinator 已成功，但最新归档 `stage3_20261009_175625_b5de8bffbe5f` 仍在终态 READY 恢复失败；工单 07 单独跟踪，尚无完整通过结论。三端服务/进程/TUN 已停止清理。旧硬件归档无损压缩保留，vm0 可用空间约 2.8 GiB。
 
+- 2026-10-09 工单 07 和 06 已完成：启动会话隔离修复 DATA/GRANT 重启水位，已验证身份与 OFFLINE 活性分离，终态复用健康空闲链路；收集所有权与十节点目标校验缺陷闭合。三端干净提交 `ab66d45` 的新正式归档 `stage3_20261009_203210_c0c3bd93b53c` validator 为 passed：两轮 69.317 / 60.320 秒，正常终态恢复 0.255 秒，Client 租约超时后 12.451 秒全集群 READY，三端停服资源清空。全量 Python 395 项、C++ 会话/加密回归、Mypy 与独立复审通过。结论限于三机双 Client 确定性占位算法；旧失败证据保留。
+
 ## Work graph
 
 1. [01 Client 节点本地 evidence](issues/01-client-local-evidence-archive.md)
@@ -42,7 +44,7 @@ Type: map
 3. [03 作业 I/O/观测参数贯通与终态一致性](issues/03-job-parameters-and-terminal-consistency.md)
 4. [04 Stage 3 执行器、envelope 与 validator](issues/04-stage3-runner-envelope-validator.md)，依赖 01、02、03
 5. [05 软件回归与双轴审查](issues/05-software-regression-and-review.md)，依赖 01、02、03、04
-6. [06 三机正式硬件验收](issues/06-three-vm-formal-hardware-acceptance.md)，依赖 05、07；USB 网卡已就绪，当前阻塞为作业终态恢复
+6. [06 三机正式硬件验收](issues/06-three-vm-formal-hardware-acceptance.md)，依赖 05、07；正式硬件验收已通过
 7. [07 作业终态链路重启恢复](issues/07-terminal-link-session-recovery.md)，依赖 05，实机暴露后补充
 
 ## Out of scope

@@ -1,7 +1,7 @@
 # 07: 修复作业终态链路重启后无法恢复 IDLE/READY
 
 Type: task
-Status: ready-for-agent
+Status: resolved
 Blocked by: 05
 
 ## Problem Statement
@@ -13,11 +13,11 @@ Stage 3 正式三机两轮 40 MiB 作业已多次完成，但终态资源复位�
 - `tests/logs/stage3_20261009_175625_b5de8bffbe5f/`：目标提交 `23c08af`，preflight/install/start-services 通过，Coordinator 两轮 succeeded，run-sync 在 wait_ready(20) 失败；三端失败清理核查均 clean，无进程或 TUN 残留。
 - `tests/logs/stage3_20261009_172803_29b31eab95a7/`：两轮分别 52.280 秒、55.002 秒，两个 Client 都在自然退出后恢复 idle link；Server 重启持久链路、广播 JOB_COMPLETED 后 Client 又重启一次 idle link，最终恢复门禁失败。
 - `tests/logs/stage3_20261009_173418_4d7f1cee9af0/`：一次作业复位通过；后续射频场景因旧控制广播未绑定 TUN、故障规则被绕过而失败。该归档不构成通过证据。
-- 前两次的 Server 沙箱已原样移入相应失败归档的 `server-failure/`，后一次失败的现场仍在 `/tmp/wfb-ng-fl/server/job_stage3_20261009_175625_b5de8bffbe5f_sync{,_role}`，下一轮前须保留后移出预检沙箱路径。
+- 前两次的 Server 沙箱已原样移入相应失败归档的 `server-failure/`；后一次原现场也已移出预检路径并无损保存在 `tests/logs/stage3_issue07_diagnosis_20261009/server-failure{,_role}.tar.gz`。
 
 ## Investigation
 
-只读审查发现以下可证伪的机制，尚不可作为已确认根因：
+初始只读审查提出以下可证伪假设；后续确认过程与最终结论见 Comments 和 Answer：
 
 - trusted_plaintext TX 每次启动 block_idx 从 0 开始，不发送 session packet；RX 以 source 的 last_known_block 静默拒绝旧 DATA。Client 自然退出和 JOB_COMPLETED 双重重启可能使新 Server RX 先看到第一次 idle link 的高水位，再丢弃第二次 idle link 从 0 开始的数据。
 - Server TokenScheduler sequence 重启归零，未同步重置的 Client 会拒绝旧 GRANT。
@@ -53,3 +53,21 @@ Stage 3 正式三机两轮 40 MiB 作业已多次完成，但终态资源复位�
 - 第三次 `stage3_20261009_201312_7848145e1c79`（`2be0e72`）正常作业、射频回退、收集与停服全部通过；封口后 validator 将生产 Server 命令中合法重复的 `--client-target` 当作单值重复项，归档原 `validation.json` 为 failed 且保持未改。修复仅允许该参数多值，重复节点 ID 与其他单值重复仍拒绝；测试归档改用实际十节点 Server 命令构造器，先红后绿，archive/runner 合计 128 项通过。新校验器对旧档只读检查为 passed，诊断结果另存 `tests/logs/stage3_issue07_archive_diagnosis_20261009/validation.json`，正式结论仍等待新提交完整运行。
 - 独立审查要求 validator 同时验证固定 `known-clients=1,…,10` 与完整 canonical target 映射，额外/缺失节点、错误 TUN IP/host/port、Client 私带 target 均拒绝；已补完整归档负测，先红后绿，最终 archive/runner 138 项通过，独立复审无阻塞。
 - 前两次收集失败归档整体已无损压缩为同名 `.tar.gz` 并经 `tar --compare` 校验；第三次原封口归档保持原样，源沙箱在诊断目录中无损压缩保留。
+
+## Answer
+
+2026-10-09 完成修复与正式硬件验收，本工单设为 `resolved`，解除工单 06 的终态恢复阻塞。
+
+已确认旧 Server GRANT 序号水位会拒绝重启授权；真实原版 TX→RX 回归证明 DATA block 从零重启被旧 RX 水位拒绝；真实控制面 datagram 回归证明 OFFLINE 后直接 IDLE 被困在 CONNECTING；Client 自然退出与终态回调重复接管会再次重启健康空闲链路。修复采用独立启动会话和退役会话拒绝、握手身份与活性分离、健康链路幂等复用，不依赖两端同步重启，不扩大 20 秒门限。
+
+正式提交为 `ab66d45d8183bc72dca8a185a7b98bc972a18bd0`，vm0/vm1/vm2 同提交且工作树干净。唯一正式入口新运行 `stage3_20261009_203210_c0c3bd93b53c` 完成全部执行阶段，`validation.json` 为 `passed` 且 `errors=[]`：
+
+- 双 Client 两轮 40 MiB sync，单轮 69.317 / 60.320 秒，两轮 committed 均为 `[1, 2]`，无掉队；接受到终态约 129.835 秒。
+- 正常终态 0.255 秒恢复两节点 `IDLE/READY`，保留逐样本 REST 时间线。
+- 射频受控故障形成 157→149 COMMIT、Server `rolled_back`、Client 2 租约超时回退；从 LEASE_TIMEOUT 到两节点 READY 为 12.451 秒，低于 20 秒。
+- 两 Client evidence 均为 succeeded，各有 14 个白名单小型文件；模型/update 摘要及第二轮连续性通过严格归档校验，正常作业窗口无执行器 Client SSH。
+- 空闲时每端只保留 daemon 与一条持久底座；停服后各端进程数、cgroup 和 TUN 均清空，故障规则已清除。
+
+C++ DATA/GRANT/FEC/加密认证回归、全部生产构建和独立复审通过；归档/执行器 138 项与 Mypy 通过。最终全量 Python 为 **395 passed（144.03 秒）**，日志 `/tmp/stage3-07-release.log`。三个修复后的失败尝试完整保留；不拼接为通过档案。
+
+通过证据位于 `tests/logs/stage3_20261009_203210_c0c3bd93b53c/`。结论仅覆盖三机双 Client 确定性占位算法和执行器作业窗口无 SSH 依赖，不声明真实训练、FedAvg、管理网物理隔离、冷启动或多于两个 Client。

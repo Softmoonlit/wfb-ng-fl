@@ -1,7 +1,7 @@
 # 06: 三机 40 MiB sync 与射频租约回退正式硬件验收
 
 Type: task
-Status: ready-for-agent
+Status: resolved
 Blocked by: 05, 07
 
 ## What to build
@@ -49,4 +49,19 @@ Blocked by: 05, 07
 - 最新 `stage3_20261009_175625_b5de8bffbe5f`，提交 `23c08af6b59300b0b1a59e7566cc17642234b1ca`：三端 preflight、同包安装、正式服务就绪通过，Coordinator 两轮 succeeded，但仍因终态恢复超时失败，未进入射频场景。三端 failure-resources 均 clean，进程/TUN 与故障规则已清理。
 - 软件验证：网卡/执行器定向 112 项通过；控制路由/daemon 定向 82 项通过；独立复审另跑 100 项通过，未发现已提交修复的阻塞问题。
 - 后续阻塞详见工单 07；本工单保持未解决，尚无 validator `passed`，不得宣布 Stage 3 完整硬件通过。
-- 空间整理：旧 2.9 GiB 归档 `tests/logs/v8_issue41_formal_6node_20260923_163642/` 已无损压缩为同名 `.tar.gz`（13,296,805 字节），经 `tar --compare` 逐文件验证后删除展开副本。压缩证据完整保留，当前根分区约余 2.8 GiB。
+## Answer
+
+2026-10-09：工单 07 已修复终态启动会话、GRANT 授权、registry 身份与空闲链路所有权问题，并闭合收集权限与多值目标校验缺陷。本工单验收完成，设为 `resolved`。
+
+正式归档：`tests/logs/stage3_20261009_203210_c0c3bd93b53c/`，提交 `ab66d45d8183bc72dca8a185a7b98bc972a18bd0`。三端提交一致、工作树干净、安装同一 Debian 包，动态无线发现、驱动、xHCI 与 USB 检查通过。唯一正式入口完成全部执行阶段，validator 为 `passed`、`errors=[]`。
+
+- 双 Client 两轮 40 MiB sync：69.317 / 60.320 秒，每轮 committed 为 `[1, 2]`、无掉队；作业接受到终态约 129.835 秒，小于 400 秒。
+- 模型与两份 update 的大小、manifest、SHA-256 和轮次连续性通过；单轮及 I/O timeout 保持 120 秒，live observation 开启。
+- 正常终态 0.255 秒恢复两 Client `IDLE/READY`；正常作业窗口无执行器 Client SSH 操作。
+- 157→149 COMMIT 受控丢包后 Server rolled_back；Client 2 的 LEASE_TIMEOUT 到全集群 READY 为 12.451 秒，小于 20 秒，最终均为 157。
+- 两 Client succeeded evidence 各有 14 个白名单小型文件，没有模型/update 本体；配置固定为 12 dBm、下行 MCS 3、上行 MCS 6、15000 Kbps、HT40+、Short GI 和 FEC 8/14。
+- 故障规则已删除，空闲只保留每端 daemon/持久底座；停服后三端相关进程、cgroup 和 TUN 均清空。
+- 最终 Python 全量 395 项通过，C++ 会话/FEC/加密回归与全部生产构建通过，13 个相关模块及最终 validator/runner Mypy 通过；独立复审无阻塞。
+
+旧失败归档保持失败结论，压缩副本经逐文件比较校验保留。通过边界仅为三机双 Client、确定性占位训练/聚合、作业运行时无 SSH 依赖；不声明真实训练/FedAvg、air-gapped、冷启动或更大硬件集群。
+
