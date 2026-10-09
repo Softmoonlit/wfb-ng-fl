@@ -303,6 +303,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         self.server_daemon.runtime_factory = lambda job, payload: virtual_runtime
 
         job_payload = {
+            "run_id": "run_40mib_sync_2rounds",
             "job_id": "job_40mib_sync_2rounds",
             "mode": "sync",
             "rounds": 2,
@@ -311,6 +312,8 @@ class TestAirgappedE2ECluster(unittest.TestCase):
             "model_size_bytes": self.payload_size,
             "model_sha256": self.model_sha256,
             "round_timeout_seconds": 30.0,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
 
         # 3. 提交任务启动
@@ -320,17 +323,19 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         self.assertEqual(self.server_daemon.server_state, ServerState.RUNNING)
 
         # 等待协同器完成多轮作业
-        self.assertIsNotNone(self.server_daemon.coordinator)
-        ret = self.server_daemon.coordinator.wait(timeout=5.0)
+        coord = self.server_daemon.coordinator
+        self.assertIsNotNone(coord)
+        ret = coord.wait(timeout=5.0)
         self.assertEqual(ret, 0)
-        self.assertEqual(self.server_daemon.coordinator.state, CoordinatorState.SUCCEEDED)
+        self.assertEqual(coord.state, CoordinatorState.SUCCEEDED)
 
         # 等待服务端主循环平滑过渡回 IDLE
         self._wait_until(lambda: self.server_daemon.server_state == ServerState.IDLE, msg="server returning to IDLE")
         self.assertIsNone(self.server_daemon.active_job)
+        self.assertIsNone(self.server_daemon.coordinator)
 
         # 4. 校验审计摘要与跨轮连续性 (Project Memory #51)
-        summary = self.server_daemon.coordinator.get_summary()
+        summary = coord.get_summary()
         self.assertIsNotNone(summary)
         self.assertEqual(summary["status"], "succeeded")
         self.assertEqual(summary["rounds_completed"], 2)
@@ -383,6 +388,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         self.server_daemon.runtime_factory = lambda job, payload: virtual_runtime
 
         job_payload = {
+            "run_id": "run_40mib_semi_straggler",
             "job_id": "job_40mib_semi_straggler",
             "mode": "semi_async",
             "rounds": 2,
@@ -391,16 +397,22 @@ class TestAirgappedE2ECluster(unittest.TestCase):
             "model_path": self.model_path,
             "model_size_bytes": self.payload_size,
             "round_timeout_seconds": 10.0,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
 
         code, body = self._http_post("/api/v1/jobs/start", job_payload)
         self.assertEqual(code, 200)
 
-        ret = self.server_daemon.coordinator.wait(timeout=5.0)
+        coord = self.server_daemon.coordinator
+        self.assertIsNotNone(coord)
+        ret = coord.wait(timeout=5.0)
         self.assertEqual(ret, 0)
-        self.assertEqual(self.server_daemon.coordinator.state, CoordinatorState.SUCCEEDED)
+        self.assertEqual(coord.state, CoordinatorState.SUCCEEDED)
+        self.assertIsNone(self.server_daemon.active_job)
+        self.assertIsNone(self.server_daemon.coordinator)
 
-        summary = self.server_daemon.coordinator.get_summary()
+        summary = coord.get_summary()
         self.assertEqual(summary["status"], "succeeded")
         self.assertEqual(summary["rounds_completed"], 2)
 
@@ -450,6 +462,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         self.server_daemon.runtime_factory = lambda job, payload: slow_runtime
 
         job_payload = {
+            "run_id": "run_abort_test",
             "job_id": "job_abort_test",
             "mode": "sync",
             "rounds": 5,
@@ -457,6 +470,8 @@ class TestAirgappedE2ECluster(unittest.TestCase):
             "model_path": self.model_path,
             "model_size_bytes": self.payload_size,
             "round_timeout_seconds": 30.0,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
 
         code, body = self._http_post("/api/v1/jobs/start", job_payload)

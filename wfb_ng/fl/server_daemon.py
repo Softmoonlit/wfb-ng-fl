@@ -720,8 +720,10 @@ class ServerDaemon:
                 runtime = self.runtime_factory(job, payload)
             elif self.config.enable_link_process:
                 from .role import ServerRole
+                role_work_dir = os.path.join(self.config.work_dir, f"job_{job.job_id}_role")
+                obs_path = os.path.join(role_work_dir, "observation.jsonl") if job.live_observation else None
                 server_role = ServerRole(
-                    work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}_role"),
+                    work_dir=role_work_dir,
                     participant_node_id=tuple(job.target_nodes),
                     participant_uftp_uid=tuple(job.target_nodes),
                     server_uftp_uid=100,
@@ -732,6 +734,9 @@ class ServerDaemon:
                     uftp_bind_host=self.config.tun_ip,
                     uftp_multicast_host=str(payload.get("uftp_multicast_host", DEFAULT_UFTP_MULTICAST_HOST)),
                     uftp_private_multicast_host=str(payload.get("uftp_private_multicast_host", DEFAULT_UFTP_PRIVATE_MULTICAST_HOST)),
+                    live_observation=job.live_observation,
+                    observation_path=obs_path,
+                    io_timeout=job.io_timeout_seconds,
                 )
                 try:
                     server_role.start()
@@ -748,6 +753,7 @@ class ServerDaemon:
             # Broadcast TASK_ANNOUNCE downlink to all clients (per spec line 108)
             announce_msg = {
                 "type": "TASK_ANNOUNCE",
+                "run_id": job.run_id,
                 "job_id": job.job_id,
                 "mode": job.mode,
                 "rounds": job.rounds,
@@ -755,6 +761,8 @@ class ServerDaemon:
                 "min_updates": job.min_updates,
                 "max_staleness": job.max_staleness,
                 "round_timeout_seconds": job.round_timeout_seconds,
+                "io_timeout_seconds": job.io_timeout_seconds,
+                "live_observation": job.live_observation,
                 "model_size_bytes": actual_file_size,
                 "model_sha256": computed_sha256,
                 "server_http_host": self.config.tun_ip,
@@ -771,17 +779,11 @@ class ServerDaemon:
             if self.config.enable_link_process:
                 if not self.control_plane.wait_for_task_readiness(10.0):
                     self.control_plane.clear_task_readiness()
-                    self.active_job = None
-                    self.server_state = ServerState.IDLE
-                    self.server_role = None
-                    if server_role is not None:
-                        server_role.close()
-                    self.control_plane.broadcast_downlink({
-                        "type": "JOB_ABORT",
-                        "job_id": job.job_id,
-                        "reason": "client_startup_timeout",
-                        "timestamp_ms": int(time.time() * 1000),
-                    })
+                    self._finalize_job(
+                        outcome="aborted",
+                        job_id=job.job_id,
+                        reason="client_startup_timeout",
+                    )
                     raise FLRuntimeError(
                         "client_startup_timeout",
                         "目标客户端未在 10 秒内完成 RoleService 就绪",
@@ -817,6 +819,7 @@ class ServerDaemon:
 
             return {
                 "status": "accepted",
+                "run_id": job.run_id,
                 "job_id": job.job_id,
                 "mode": job.mode,
                 "rounds": job.rounds,
@@ -826,108 +829,153 @@ class ServerDaemon:
                 "model_sha256": computed_sha256,
             }
 
-    def _cleanup_terminal_job(self, job_id: str) -> None:
-        role_to_close = None
-        with self._lock:
-            if self.active_job and self.active_job.get("job_id") == job_id:
-                self.server_state = ServerState.IDLE
-                self.active_job = None
-                role_to_close = self.server_role
-                self.server_role = None
-        if role_to_close is not None:
-            try:
-                role_to_close.close()
-            except Exception as exc:
-                logger.warning("关闭 server_role 失败: %s", exc)
-        if self.config.enable_link_process:
-            try:
-                self._stop_link_process()
-                self._start_link_process()
-            except Exception as exc:
-                logger.error("作业终态重置服务端链路失败: %s", exc)
-
-    def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
-        self._cleanup_terminal_job(job_id)
-        if self.control_plane is not None:
-            self.control_plane.broadcast_downlink({
-                "type": "JOB_COMPLETED",
-                "job_id": job_id,
-                "timestamp_ms": int(time.time() * 1000),
-            })
-        self.publish_event({
-            "type": "JOB_COMPLETED",
-            "job_id": job_id,
-            "summary": summary,
-        })
-
-    def _on_job_failed(self, job_id: str, exc: Exception) -> None:
-        self._cleanup_terminal_job(job_id)
-        if self.control_plane is not None:
-            self.control_plane.broadcast_downlink({
-                "type": "JOB_ABORT",
-                "job_id": job_id,
-                "reason": f"job_failed: {exc}",
-                "timestamp_ms": int(time.time() * 1000),
-            })
-        self.publish_event({
-            "type": "JOB_FAILED",
-            "job_id": job_id,
-            "error": str(exc),
-        })
-
-    def _stop_coordinator_and_role(self, reason: str = "stopped") -> None:
+    def _finalize_job(
+        self,
+        outcome: str,
+        job_id: Optional[str] = None,
+        reason: str = "completed",
+        summary: Optional[Dict[str, Any]] = None,
+        error: str = "",
+    ) -> Dict[str, Any]:
+        """
+        Unified terminal helper for all job termination paths (completed, failed, aborted).
+        Closes coordinator/role, broadcasts terminal downlink with job_id, resets persistent link,
+        and restores IDLE state. Fails closed if link reset fails.
+        """
+        target_job_id = job_id
         coord = None
-        s_role = None
+        role_to_close = None
+
         with self._lock:
+            if self.server_state == ServerState.STOPPED:
+                logger.warning("服务已处于 STOPPED 状态，忽略终态收口 (job=%s)", target_job_id)
+                return {"status": "ignored", "job_id": target_job_id}
+
+            if self.active_job is None or (target_job_id is not None and self.active_job.get("job_id") != target_job_id):
+                logger.warning(
+                    "忽略针对已失活作业 %s 的终态收口 (当前活跃: %s)",
+                    target_job_id,
+                    self.active_job.get("job_id") if self.active_job else None,
+                )
+                return {"status": "ignored", "job_id": target_job_id}
+
+            if target_job_id is None:
+                target_job_id = self.active_job.get("job_id")
+
+            if outcome == "aborted":
+                self.server_state = ServerState.ABORTING
+
             coord = self.coordinator
-            s_role = self.server_role
+            role_to_close = self.server_role
             self.coordinator = None
+            self.active_job = None
             self.server_role = None
 
-        if coord is not None:
+        # 1. Stop coordinator if aborting from outside
+        if coord is not None and outcome == "aborted":
             try:
                 coord.abort(reason=reason)
                 coord.wait(timeout=3.0)
             except Exception as exc:
                 logger.warning("中止 coordinator 失败: %s", exc)
 
-        if s_role is not None:
+        # 2. Close server role
+        if role_to_close is not None:
             try:
-                s_role.close()
+                role_to_close.close()
             except Exception as exc:
                 logger.warning("关闭 server_role 失败: %s", exc)
 
+        # 3. Reset persistent link process (fail-closed before broadcasting terminal signal)
+        link_reset_error = None
+        if self.config.enable_link_process:
+            with self._lock:
+                should_reset = not self._stop_event.is_set() and self.server_state != ServerState.STOPPED
+            if should_reset:
+                try:
+                    self._stop_link_process()
+                    self._start_link_process()
+                except Exception as exc:
+                    link_reset_error = exc
+                    logger.error("作业终态重置服务端链路失败: %s", exc)
+
+        if link_reset_error is not None:
+            with self._lock:
+                if not self._stop_event.is_set():
+                    self.server_state = ServerState.STOPPED
+            raise FLRuntimeError("link_reset_failed", f"作业终态重置服务端链路失败: {link_reset_error}")
+
+        # 4. Broadcast terminal message only after persistent link reset succeeds
+        if self.control_plane is not None and target_job_id is not None:
+            try:
+                if outcome == "completed":
+                    self.control_plane.broadcast_downlink({
+                        "type": "JOB_COMPLETED",
+                        "job_id": target_job_id,
+                        "timestamp_ms": int(time.time() * 1000),
+                    })
+                else:
+                    self.control_plane.broadcast_downlink({
+                        "type": "JOB_ABORT",
+                        "job_id": target_job_id,
+                        "reason": reason or error,
+                        "timestamp_ms": int(time.time() * 1000),
+                    })
+            except Exception as broadcast_exc:
+                logger.warning("广播终态消息失败: %s", broadcast_exc)
+
+        with self._lock:
+            if not self._stop_event.is_set():
+                self.server_state = ServerState.IDLE
+
+        # 5. Publish SSE event
+        if outcome == "completed":
+            self.publish_event({
+                "type": "JOB_COMPLETED",
+                "job_id": target_job_id,
+                "summary": summary or {},
+            })
+        elif outcome == "failed":
+            self.publish_event({
+                "type": "JOB_FAILED",
+                "job_id": target_job_id,
+                "error": error,
+            })
+        else:  # aborted
+            self.publish_event({
+                "type": "JOB_ABORTED",
+                "job_id": target_job_id,
+                "reason": reason,
+                "timestamp": time.time(),
+            })
+
+        logger.info(
+            "作业 %s 终态收口完成 (outcome=%s, reason=%s)",
+            target_job_id,
+            outcome,
+            reason or error,
+        )
+
+        return {
+            "status": "aborted" if outcome == "aborted" else outcome,
+            "job_id": target_job_id,
+            "reason": reason,
+        }
+
+    def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
+        self._finalize_job(outcome="completed", job_id=job_id, summary=summary)
+
+    def _on_job_failed(self, job_id: str, exc: Exception) -> None:
+        self._finalize_job(
+            outcome="failed",
+            job_id=job_id,
+            error=str(exc),
+            reason=f"job_failed: {exc}",
+        )
+
     def abort_job(self, reason: str = "user_requested") -> Dict[str, Any]:
         """Forcefully abort active job and reset server state to IDLE."""
-        with self._lock:
-            aborted_job_id = self.active_job.get("job_id") if self.active_job else None
-            self.server_state = ServerState.ABORTING
-
-        self._stop_coordinator_and_role(reason=reason)
-
-        # Broadcast JOB_ABORT to all clients
-        abort_msg = {
-            "type": "JOB_ABORT",
-            "job_id": aborted_job_id,
-            "reason": reason,
-            "timestamp_ms": int(time.time() * 1000),
-        }
-        if self.control_plane is not None:
-            self.control_plane.broadcast_downlink(abort_msg)
-
-        with self._lock:
-            self.active_job = None
-            self.server_state = ServerState.IDLE
-
-        self.publish_event({
-            "type": "JOB_ABORTED",
-            "job_id": aborted_job_id,
-            "reason": reason,
-            "timestamp": time.time(),
-        })
-
-        logger.info("作业已中止，协同引擎重置为 IDLE (原因: %s)", reason)
-        return {"status": "aborted", "job_id": aborted_job_id, "reason": reason}
+        return self._finalize_job(outcome="aborted", reason=reason)
 
     def _start_link_process(self) -> None:
         """Launch wfb_v6_uplink server background process with pre-allocated slots."""
@@ -1087,34 +1135,54 @@ class ServerDaemon:
     def stop(self) -> None:
         """Stop all background workers, sockets, and processes."""
         with self._lock:
-            if self.server_state == ServerState.STOPPED:
+            if self._stop_event.is_set():
                 return
 
             self._stop_event.set()
             self.server_state = ServerState.STOPPED
 
-            # Stop HTTP REST Server
-            if self._httpd is not None:
-                self._httpd.shutdown()
-                self._httpd.server_close()
-                self._httpd = None
+            httpd = self._httpd
+            http_thread = self._http_thread
+            coord = self.coordinator
+            role_to_close = self.server_role
 
-            if self._http_thread is not None:
-                self._http_thread.join(timeout=1.0)
-                self._http_thread = None
+            self._httpd = None
+            self._http_thread = None
+            self.coordinator = None
+            self.active_job = None
+            self.server_role = None
 
-            # Stop Control Plane
-            if self.config.enable_control_plane:
-                self.control_plane.stop()
+        # Stop HTTP REST Server outside lock
+        if httpd is not None:
+            httpd.shutdown()
+            httpd.server_close()
 
-            # Stop active coordinator and server role
-            self._stop_coordinator_and_role(reason="daemon_stopped")
+        if http_thread is not None:
+            http_thread.join(timeout=1.0)
 
-            # Stop Link Process and teardown TUN
-            if self.config.enable_link_process:
-                self._stop_link_process()
+        # Stop Control Plane outside lock
+        if self.config.enable_control_plane:
+            self.control_plane.stop()
 
-            logger.info("wfb-fl-server-daemon 已安全停止")
+        # Stop active coordinator and server role outside lock
+        if coord is not None:
+            try:
+                coord.abort(reason="daemon_stopped")
+                coord.wait(timeout=2.0)
+            except Exception as exc:
+                logger.warning("停止 coordinator 失败: %s", exc)
+
+        if role_to_close is not None:
+            try:
+                role_to_close.close()
+            except Exception as exc:
+                logger.warning("关闭 server_role 失败: %s", exc)
+
+        # Stop Link Process and teardown TUN
+        if self.config.enable_link_process:
+            self._stop_link_process()
+
+        logger.info("wfb-fl-server-daemon 已安全停止")
 
     def run(self) -> None:
         """Blocking supervisory runner responding to OS signals."""

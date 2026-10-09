@@ -56,17 +56,23 @@ class TestFLCoordinator(unittest.TestCase):
         min_updates: Optional[int] = None,
         max_staleness: int = 0,
         round_timeout_seconds: float = 5.0,
+        run_id: Optional[str] = None,
+        io_timeout_seconds: int = 120,
+        live_observation: bool = False,
     ) -> JobConfig:
         return JobConfig(
             job_id=f"job_{mode}_{int(time.time() * 1000)}",
+            run_id=run_id or f"run_{mode}_{int(time.time() * 1000)}",
             mode=mode,
             target_nodes=target_nodes,
             model_path=self.model_path,
             model_size_bytes=self.model_size,
             rounds=rounds,
-            min_updates=min_updates,
+            min_updates=min_updates or 0,
             max_staleness=max_staleness,
             round_timeout_seconds=round_timeout_seconds,
+            io_timeout_seconds=io_timeout_seconds,
+            live_observation=live_observation,
             model_sha256=self.model_sha256,
         )
 

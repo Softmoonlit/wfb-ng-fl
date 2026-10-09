@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
+from .artifacts import validate_path_safe_identifier
 from .errors import FLRuntimeError
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
@@ -377,9 +378,12 @@ class ClientDaemonConfig:
 @dataclass(frozen=True)
 class ClientJobConfig:
     job_id: str
+    run_id: str
     node_id: int
     tun_name: str
     tun_ip: str
+    io_timeout_seconds: int
+    live_observation: bool
     server_http_host: str = "10.80.0.1"
     server_http_port: int = 8080
     uftp_port: int = DEFAULT_UFTP_DATA_PORT
@@ -392,13 +396,16 @@ class ClientJobConfig:
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     max_update_size_bytes: int = 1073741824
-    io_timeout_seconds: int = 120
     algorithm: Optional[str] = None
     algorithm_config: Optional[Dict[str, Any]] = None
-    live_observation: bool = False
-    observation_path: Optional[str] = None
 
     def __post_init__(self):
+        validate_path_safe_identifier(self.run_id, "run_id")
+        validate_path_safe_identifier(self.job_id, "job_id")
+        if type(self.io_timeout_seconds) is not int or self.io_timeout_seconds <= 0:
+            raise FLRuntimeError("invalid_io_timeout", "io_timeout_seconds 必须为正整数")
+        if type(self.live_observation) is not bool:
+            raise FLRuntimeError("invalid_live_observation", "live_observation 必须为布尔值")
         if self.uftp_bind_host is None:
             # Strip CIDR prefix if present
             clean_ip = self.tun_ip.split("/")[0]
@@ -498,9 +505,7 @@ class JobSandbox:
                     air_interface,
                 ]
 
-                obs_path = job.observation_path
-                if job.live_observation and not obs_path:
-                    obs_path = os.path.join(self._job_work_dir, "observation.jsonl")
+                obs_path = os.path.join(self._job_work_dir, "observation.jsonl") if job.live_observation else None
 
                 role_dict: Dict[str, Any] = {
                     "schema_version": 1,
@@ -1104,59 +1109,76 @@ class ClientDaemon:
                 if self.control_plane is not None:
                     self.control_plane.notify_state_change(ClientNodeState.IDLE)
 
-            if "job_id" in msg:
-                job_id = str(msg["job_id"])
-                algorithm = msg.get("algorithm")
-                if not algorithm:
-                    return _reject("TASK_ANNOUNCE 缺失 algorithm 字段，拒绝启动")
+            try:
+                run_id = validate_path_safe_identifier(msg.get("run_id"), "run_id")
+                job_id = validate_path_safe_identifier(msg.get("job_id"), "job_id")
+            except FLRuntimeError as exc:
+                return _reject(f"TASK_ANNOUNCE 标识非法: {exc}")
 
-                raw_algo_config = msg.get("algorithm_config")
-                if not isinstance(raw_algo_config, dict):
-                    return _reject("TASK_ANNOUNCE 缺失有效的 algorithm_config，拒绝启动")
+            raw_io_timeout = msg.get("io_timeout_seconds")
+            if raw_io_timeout is None or type(raw_io_timeout) is not int or raw_io_timeout <= 0:
+                return _reject(f"TASK_ANNOUNCE 缺失或无效的 io_timeout_seconds 字段: {raw_io_timeout!r}")
+            io_timeout_seconds = raw_io_timeout
 
-                if "rounds" not in msg:
-                    return _reject("TASK_ANNOUNCE 缺失 rounds 字段，拒绝启动")
+            raw_live_obs = msg.get("live_observation")
+            if raw_live_obs is None or type(raw_live_obs) is not bool:
+                return _reject(f"TASK_ANNOUNCE 缺失或无效的 live_observation 字段: {raw_live_obs!r}")
+            live_observation = raw_live_obs
 
-                rounds = int(msg["rounds"])
-                algo_config = dict(raw_algo_config)
-                algo_config["rounds"] = rounds
-                algo_config["node_id"] = self.config.node_id
-                model_size = msg.get("model_size_bytes")
-                if model_size is not None:
-                    algo_config["required_artifact_size_bytes"] = model_size
+            algorithm = msg.get("algorithm")
+            if not algorithm:
+                return _reject("TASK_ANNOUNCE 缺失 algorithm 字段，拒绝启动")
 
-                tpl = algo_config.get("update_template_path")
-                if tpl and "{node_id}" in tpl:
-                    algo_config["update_template_path"] = tpl.format(node_id=self.config.node_id)
-                elif not tpl:
-                    algo_config["update_template_path"] = os.path.join(
-                        self.config.work_dir,
-                        f"update-client{self.config.node_id}-template.bin",
-                    )
+            raw_algo_config = msg.get("algorithm_config")
+            if not isinstance(raw_algo_config, dict):
+                return _reject("TASK_ANNOUNCE 缺失有效的 algorithm_config，拒绝启动")
 
-                if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg or "link_id" not in msg:
-                    return _reject("TASK_ANNOUNCE 缺失网络配置字段，拒绝启动")
+            if "rounds" not in msg:
+                return _reject("TASK_ANNOUNCE 缺失 rounds 字段，拒绝启动")
 
-                server_http_host = str(msg["server_http_host"])
-                server_http_port = int(msg["server_http_port"])
-                uftp_port = int(msg["uftp_port"])
-                if uftp_port in (self.config.broadcast_port, self.config.server_control_port):
-                    return _reject("TASK_ANNOUNCE 的 UFTP 数据端口与控制面端口冲突")
-                link_id = int(msg["link_id"])
+            rounds = int(msg["rounds"])
+            algo_config = dict(raw_algo_config)
+            algo_config["rounds"] = rounds
+            algo_config["node_id"] = self.config.node_id
+            model_size = msg.get("model_size_bytes")
+            if model_size is not None:
+                algo_config["required_artifact_size_bytes"] = model_size
 
-                job_config = ClientJobConfig(
-                    job_id=job_id,
-                    node_id=self.config.node_id,
-                    tun_name=self.config.tun_name,
-                    tun_ip=self.config.tun_ip,
-                    server_http_host=server_http_host,
-                    server_http_port=server_http_port,
-                    uftp_port=uftp_port,
-                    link_id=link_id,
-                    algorithm=algorithm,
-                    algorithm_config=algo_config,
+            tpl = algo_config.get("update_template_path")
+            if tpl and "{node_id}" in tpl:
+                algo_config["update_template_path"] = tpl.format(node_id=self.config.node_id)
+            elif not tpl:
+                algo_config["update_template_path"] = os.path.join(
+                    self.config.work_dir,
+                    f"update-client{self.config.node_id}-template.bin",
                 )
-                self.trigger_job(job_config)
+
+            if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg or "link_id" not in msg:
+                return _reject("TASK_ANNOUNCE 缺失网络配置字段，拒绝启动")
+
+            server_http_host = str(msg["server_http_host"])
+            server_http_port = int(msg["server_http_port"])
+            uftp_port = int(msg["uftp_port"])
+            if uftp_port in (self.config.broadcast_port, self.config.server_control_port):
+                return _reject("TASK_ANNOUNCE 的 UFTP 数据端口与控制面端口冲突")
+            link_id = int(msg["link_id"])
+
+            job_config = ClientJobConfig(
+                run_id=run_id,
+                job_id=job_id,
+                node_id=self.config.node_id,
+                tun_name=self.config.tun_name,
+                tun_ip=self.config.tun_ip,
+                server_http_host=server_http_host,
+                server_http_port=server_http_port,
+                uftp_port=uftp_port,
+                link_id=link_id,
+                algorithm=algorithm,
+                algorithm_config=algo_config,
+                io_timeout_seconds=io_timeout_seconds,
+                live_observation=live_observation,
+            )
+            self.trigger_job(job_config)
 
     def start_control_plane(self) -> None:
         """Start client UDP control plane if network interface is available."""

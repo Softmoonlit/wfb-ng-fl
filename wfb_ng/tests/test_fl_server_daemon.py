@@ -315,7 +315,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), patch.object(
             daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")
         ):
-            daemon._cleanup_terminal_job("terminal-reset")
+            daemon._finalize_job(outcome="completed", job_id="terminal-reset")
 
         self.assertEqual(calls, ["role_close", "link_stop", "link_start"])
         self.assertEqual(daemon.server_state, ServerState.IDLE)
@@ -384,10 +384,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self._simulate_client_handshake(1)
 
         payload = {
+            "run_id": "run_fl_001",
             "job_id": "job_fl_001",
             "target_nodes": [1, 2],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -412,10 +415,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         time.sleep(0.05)
 
         payload = {
+            "run_id": "run_fl_002",
             "job_id": "job_fl_002",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -432,10 +438,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         node_record.last_heartbeat_time -= 12.0
 
         payload = {
+            "run_id": "run_fl_003",
             "job_id": "job_fl_003",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -450,10 +459,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # 1. Non-existent file
         payload_missing = {
+            "run_id": "run_fl_004",
             "job_id": "job_fl_004",
             "target_nodes": [1],
             "model_path": os.path.join(self.temp_dir, "non_existent.bin"),
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_missing)
         self.assertEqual(status_code, 400)
@@ -463,10 +475,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         empty_path = os.path.join(self.temp_dir, "empty.bin")
         open(empty_path, "wb").close()
         payload_empty = {
+            "run_id": "run_fl_005",
             "job_id": "job_fl_005",
             "target_nodes": [1],
             "model_path": empty_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_empty)
         self.assertEqual(status_code, 400)
@@ -474,9 +489,12 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # 3. Missing model_size_bytes (strictly required)
         payload_missing_size = {
+            "run_id": "run_fl_no_size",
             "job_id": "job_fl_no_size",
             "target_nodes": [1],
             "model_path": self.model_path,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_missing_size)
         self.assertEqual(status_code, 400)
@@ -484,10 +502,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # 4. Size mismatch
         payload_size_mismatch = {
+            "run_id": "run_fl_006",
             "job_id": "job_fl_006",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": 999999,  # actual is 1024
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_size_mismatch)
         self.assertEqual(status_code, 400)
@@ -495,11 +516,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # 5. Checksum mismatch if model_sha256 provided
         payload_sha_mismatch = {
+            "run_id": "run_fl_bad_sha",
             "job_id": "job_fl_bad_sha",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
             "model_sha256": "0" * 64,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload_sha_mismatch)
         self.assertEqual(status_code, 400)
@@ -514,11 +538,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # Start first job successfully
         payload = {
+            "run_id": "run_fl_primary",
             "job_id": "job_fl_primary",
             "mode": "sync",
             "target_nodes": [1, 2],
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 200)
@@ -543,10 +570,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self._simulate_client_handshake(1)
 
         payload = {
+            "run_id": "run_to_abort",
             "job_id": "job_to_abort",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, _ = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 200)
@@ -623,10 +653,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertEqual(node3.readiness, NodeReadiness.CONNECTING)
 
         payload = {
+            "run_id": "run_unsolicited",
             "job_id": "job_unsolicited",
             "target_nodes": [3],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -636,11 +669,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
     def test_preflight_rejects_uftp_control_port_conflict(self):
         self._simulate_client_handshake(1)
         payload = {
+            "run_id": "run_port_conflict",
             "job_id": "job_port_conflict",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": len(self.model_data),
             "uftp_port": self.config.control_broadcast_port,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         status_code, body = self._http_post("/api/v1/jobs/start", payload)
         self.assertEqual(status_code, 400)
@@ -651,7 +687,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Empty list
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": [], "model_path": self.model_path, "model_size_bytes": 1024},
+            {
+                "run_id": "run_inv_nodes_1",
+                "target_nodes": [],
+                "model_path": self.model_path,
+                "model_size_bytes": 1024,
+                "io_timeout_seconds": 120,
+                "live_observation": True,
+            },
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
@@ -659,7 +702,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Out-of-bounds node id
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": [1, 99], "model_path": self.model_path, "model_size_bytes": 1024},
+            {
+                "run_id": "run_inv_nodes_2",
+                "target_nodes": [1, 99],
+                "model_path": self.model_path,
+                "model_size_bytes": 1024,
+                "io_timeout_seconds": 120,
+                "live_observation": True,
+            },
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
@@ -667,7 +717,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         # Non-integer node id
         status_code, body = self._http_post(
             "/api/v1/jobs/start",
-            {"target_nodes": ["client1"], "model_path": self.model_path, "model_size_bytes": 1024},
+            {
+                "run_id": "run_inv_nodes_3",
+                "target_nodes": ["client1"],
+                "model_path": self.model_path,
+                "model_size_bytes": 1024,
+                "io_timeout_seconds": 120,
+                "live_observation": True,
+            },
         )
         self.assertEqual(status_code, 400)
         self.assertEqual(body["error"], "preflight_target_nodes_invalid")
@@ -678,11 +735,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # semi_async missing min_updates fails
         payload_no_min = {
+            "run_id": "run_semi_no_min",
             "job_id": "job_semi_no_min",
             "mode": "semi_async",
             "target_nodes": [1, 2],
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_no_min)
         self.assertEqual(code, 400)
@@ -690,12 +750,15 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # semi_async min_updates boolean (True) fails
         payload_bool_min = {
+            "run_id": "run_semi_bool_min",
             "job_id": "job_semi_bool_min",
             "mode": "semi_async",
             "target_nodes": [1, 2],
             "min_updates": True,
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_bool_min)
         self.assertEqual(code, 400)
@@ -703,12 +766,15 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # semi_async out of bounds min_updates fails
         payload_bad_min = {
+            "run_id": "run_semi_bad_min",
             "job_id": "job_semi_bad_min",
             "mode": "semi_async",
             "target_nodes": [1, 2],
             "min_updates": 5,
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_bad_min)
         self.assertEqual(code, 400)
@@ -716,11 +782,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # invalid mode fails
         payload_bad_mode = {
+            "run_id": "run_bad_mode",
             "job_id": "job_bad_mode",
             "mode": "unknown_paradigm",
             "target_nodes": [1, 2],
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_bad_mode)
         self.assertEqual(code, 400)
@@ -728,10 +797,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # duplicate target nodes fail
         payload_dup_nodes = {
+            "run_id": "run_dup",
             "job_id": "job_dup",
             "target_nodes": [1, 1],
             "model_path": self.model_path,
             "model_size_bytes": 1024,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_dup_nodes)
         self.assertEqual(code, 400)
@@ -739,10 +811,13 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # model_size_bytes boolean (True) fails
         payload_bool_size = {
+            "run_id": "run_bool_size",
             "job_id": "job_bool_size",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": True,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_bool_size)
         self.assertEqual(code, 400)
@@ -750,11 +825,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         # malformed model_sha256 fails
         payload_bad_hex = {
+            "run_id": "run_bad_hex",
             "job_id": "job_bad_hex",
             "target_nodes": [1],
             "model_path": self.model_path,
             "model_size_bytes": 1024,
             "model_sha256": "not-valid-hex-or-length",
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         }
         code, body = self._http_post("/api/v1/jobs/start", payload_bad_hex)
         self.assertEqual(code, 400)
@@ -832,11 +910,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
             # 2. Start job via REST IPC
             payload = {
+                "run_id": "run_e2e_test",
                 "job_id": "job_e2e_test",
                 "mode": "sync",
                 "target_nodes": [1],
                 "model_path": self.model_path,
                 "model_size_bytes": len(self.model_data),
+                "io_timeout_seconds": 120,
+                "live_observation": True,
             }
             start_code, start_body = self._http_post("/api/v1/jobs/start", payload)
             self.assertEqual(start_code, 200)

@@ -895,6 +895,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         # Broadcast TASK_ANNOUNCE targeted to node 1
         self.server.broadcast_downlink({
             "type": "TASK_ANNOUNCE",
+            "run_id": "run_fl_001",
             "job_id": "job_fl_001",
             "target_nodes": [1, 2],
             "rounds": 1,
@@ -904,6 +905,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             "server_http_port": 8080,
             "uftp_port": 1044,
             "link_id": 7669206,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
         })
 
         # Wait for job to start

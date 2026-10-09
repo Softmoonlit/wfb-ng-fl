@@ -26,6 +26,7 @@ from .artifacts import (
     file_sha256,
     inspect_artifact,
     read_json,
+    validate_path_safe_identifier,
     write_json_atomic,
 )
 from .errors import FLRuntimeError
@@ -41,6 +42,7 @@ VALID_FL_MODES = ("sync", "semi_async", "async")
 class JobConfig:
     """Structured, validated configuration for an FL simulation job."""
     job_id: str
+    run_id: str
     mode: str
     target_nodes: Tuple[int, ...]
     model_path: str
@@ -49,6 +51,8 @@ class JobConfig:
     min_updates: int = 0
     max_staleness: int = 0
     round_timeout_seconds: float = 120.0
+    io_timeout_seconds: int = 120
+    live_observation: bool = False
     model_sha256: Optional[str] = None
     radio_config: Optional[Dict[str, Any]] = None
 
@@ -56,6 +60,31 @@ class JobConfig:
     def from_dict(cls, data: Dict[str, Any]) -> "JobConfig":
         if not isinstance(data, dict):
             raise FLRuntimeError("invalid_job_payload", "作业配置必须为 JSON object")
+
+        raw_run_id = data.get("run_id")
+        run_id = validate_path_safe_identifier(raw_run_id, "run_id")
+
+        raw_job_id = data.get("job_id")
+        if raw_job_id is not None:
+            job_id = validate_path_safe_identifier(raw_job_id, "job_id")
+        else:
+            job_id = f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+
+        raw_io_timeout = data.get("io_timeout_seconds")
+        if raw_io_timeout is None or type(raw_io_timeout) is not int or raw_io_timeout <= 0:
+            raise FLRuntimeError(
+                "invalid_io_timeout",
+                "缺少必填参数 'io_timeout_seconds' 或值非法，必须为大于 0 的正整数",
+            )
+        io_timeout_seconds = raw_io_timeout
+
+        raw_live_obs = data.get("live_observation")
+        if raw_live_obs is None or type(raw_live_obs) is not bool:
+            raise FLRuntimeError(
+                "invalid_live_observation",
+                "缺少必填参数 'live_observation' 或值非法，必须为布尔值 (true/false)",
+            )
+        live_observation = raw_live_obs
 
         raw_nodes = data.get("target_nodes")
         if not raw_nodes or not isinstance(raw_nodes, list):
@@ -122,12 +151,9 @@ class JobConfig:
                 raise FLRuntimeError("invalid_radio_configuration", "radio_config 必须为 object")
             validate_radio_config(radio_cfg)
 
-        raw_job_id = data.get("job_id")
-        if raw_job_id is not None and not isinstance(raw_job_id, str):
-            raise FLRuntimeError("invalid_job_id", "job_id 必须为字符串")
-        job_id = raw_job_id or f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
         return cls(
             job_id=job_id,
+            run_id=run_id,
             mode=mode,
             target_nodes=target_nodes,
             model_path=model_path,
@@ -136,6 +162,8 @@ class JobConfig:
             min_updates=min_updates,
             max_staleness=max_staleness,
             round_timeout_seconds=round_timeout_seconds,
+            io_timeout_seconds=io_timeout_seconds,
+            live_observation=live_observation,
             model_sha256=model_sha256,
             radio_config=radio_cfg,
         )
@@ -143,6 +171,7 @@ class JobConfig:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "job_id": self.job_id,
+            "run_id": self.run_id,
             "mode": self.mode,
             "target_nodes": list(self.target_nodes),
             "model_path": self.model_path,
@@ -151,6 +180,8 @@ class JobConfig:
             "min_updates": self.min_updates,
             "max_staleness": self.max_staleness,
             "round_timeout_seconds": self.round_timeout_seconds,
+            "io_timeout_seconds": self.io_timeout_seconds,
+            "live_observation": self.live_observation,
             "model_sha256": self.model_sha256,
             "radio_config": self.radio_config,
         }
@@ -306,6 +337,7 @@ class FLCoordinator:
             summary = {
                 "schema_version": 1,
                 "job_id": self.job.job_id,
+                "run_id": self.job.run_id,
                 "mode": self.job.mode,
                 "status": status,
                 "rounds_total": self.job.rounds,

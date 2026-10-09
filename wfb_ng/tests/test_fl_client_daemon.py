@@ -276,6 +276,28 @@ class TestHardwarePolling(unittest.TestCase):
         self.assertFalse(adapter.is_tun_active(daemon.config.tun_name))
 
 
+def _make_client_job(
+    job_id: str = "job_001",
+    run_id: str = "run_001",
+    node_id: int = 1,
+    tun_name: str = "fl-c1",
+    tun_ip: str = "10.80.0.11",
+    io_timeout_seconds: int = 120,
+    live_observation: bool = True,
+    **kwargs,
+) -> ClientJobConfig:
+    return ClientJobConfig(
+        job_id=job_id,
+        run_id=run_id,
+        node_id=node_id,
+        tun_name=tun_name,
+        tun_ip=tun_ip,
+        io_timeout_seconds=io_timeout_seconds,
+        live_observation=live_observation,
+        **kwargs,
+    )
+
+
 class TestRoleServiceSandbox(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp(prefix="test_sandbox_")
@@ -293,7 +315,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             _command_prefix=[sys.executable, "-c", stub_script],
         )
 
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="job_001",
             node_id=1,
             tun_name="tun_test1",
@@ -330,7 +352,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             _command_prefix=[sys.executable, "-c", stub_script],
         )
 
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="job_002",
             node_id=2,
             tun_name="tun_test2",
@@ -377,7 +399,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             network_adapter=self.adapter,
             _command_prefix=[sys.executable, "-c", stub_script],
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="job_tree_01",
             node_id=2,
             tun_name="tun_test_tree",
@@ -447,7 +469,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             network_adapter=self.adapter,
             _command_prefix=[sys.executable, "-c", stub_script],
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="norm_tree_01",
             node_id=2,
             tun_name="fl-c2",
@@ -486,7 +508,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             network_adapter=self.adapter,
             _command_prefix=["/nonexistent/invalid_binary_name_fail"],
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="fail_job_01",
             node_id=1,
             tun_name="tun_fail",
@@ -506,7 +528,7 @@ class TestRoleServiceSandbox(unittest.TestCase):
             _command_prefix=[sys.executable, "-c", stub_script],
         )
 
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="job_003",
             node_id=1,
             tun_name="tun_test3",
@@ -590,7 +612,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         sandbox_proc = mock.Mock()
         sandbox_proc.poll.return_value = None
         with mock.patch.object(daemon.sandbox, "start", return_value=sandbox_proc) as sandbox_start:
-            job = ClientJobConfig(
+            job = _make_client_job(
                 job_id="handoff",
                 node_id=1,
                 tun_name="fl-c1",
@@ -628,7 +650,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             link_id=7669206,
         )
         self.assertEqual(cmd[cmd.index("--link-id") + 1], "7669206")
-        job = ClientJobConfig(
+        job = _make_client_job(
             job_id="link-id",
             node_id=2,
             tun_name="fl-c2",
@@ -661,7 +683,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertEqual(daemon.current_interface, "wlx001")
 
         # Trigger job
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="run_01",
             node_id=1,
             tun_name="fl-c1",
@@ -689,7 +711,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             network_adapter=self.adapter,
             _command_prefix=[sys.executable, "-c", stub_script],
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="conformance_01",
             node_id=3,
             tun_name="tun_test_conf",
@@ -722,7 +744,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             network_adapter=self.adapter,
             _require_ready_notification=False,
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="mod_test",
             node_id=1,
             tun_name="fl-c1",
@@ -751,7 +773,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             network_adapter=self.adapter,
             _command_prefix=[sys.executable, "-c", stub_script],
         )
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="job_err_01",
             node_id=1,
             tun_name="tun_err",
@@ -795,7 +817,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertEqual(daemon.current_interface, "wlx_bg_01")
 
         # Trigger job
-        job_config = ClientJobConfig(
+        job_config = _make_client_job(
             job_id="bg_job",
             node_id=1,
             tun_name="fl-c1",
@@ -860,26 +882,26 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertTrue(self.adapter.is_tun_active("fl-c1"))
 
         # 1. Reject mismatched node_id
-        bad_node = ClientJobConfig(job_id="b1", node_id=2, tun_name="fl-c1", tun_ip="10.80.0.12")
+        bad_node = _make_client_job(job_id="b1", node_id=2, tun_name="fl-c1", tun_ip="10.80.0.12")
         with self.assertRaises(FLRuntimeError) as ctx:
             daemon.trigger_job(bad_node)
         self.assertEqual(ctx.exception.error_code, "invalid_job_config")
 
         # 2. Reject mismatched tun_name
-        bad_name = ClientJobConfig(job_id="b2", node_id=1, tun_name="other_tun", tun_ip="10.80.0.11")
+        bad_name = _make_client_job(job_id="b2", node_id=1, tun_name="other_tun", tun_ip="10.80.0.11")
         with self.assertRaises(FLRuntimeError) as ctx:
             daemon.trigger_job(bad_name)
         self.assertEqual(ctx.exception.error_code, "invalid_job_config")
 
         # 3. Reject mismatched tun_ip
-        bad_ip = ClientJobConfig(job_id="b3", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.12")
+        bad_ip = _make_client_job(job_id="b3", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.12")
         with self.assertRaises(FLRuntimeError) as ctx:
             daemon.trigger_job(bad_ip)
         self.assertEqual(ctx.exception.error_code, "invalid_job_config")
 
         # 4. Failed start restores TUN
         daemon.sandbox._command_prefix = ["/nonexistent/failing_binary"]
-        good_job = ClientJobConfig(job_id="fail_restore", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.11")
+        good_job = _make_client_job(job_id="fail_restore", node_id=1, tun_name="fl-c1", tun_ip="10.80.0.11")
         with self.assertRaises(FLRuntimeError):
             daemon.trigger_job(good_job)
         self.assertTrue(self.adapter.is_tun_active("fl-c1"))

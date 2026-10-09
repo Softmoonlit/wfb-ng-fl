@@ -1,7 +1,7 @@
 # 03: 作业 I/O/观测参数贯通与 Server 终态一致性
 
 Type: task
-Status: ready-for-agent
+Status: resolved
 Blocked by: None
 
 ## What to build
@@ -23,3 +23,10 @@ Blocked by: None
 - 相关 Coordinator、Server/Client Daemon、生命周期测试和 Mypy 通过。
 
 ## Comments
+
+### Implementation & Verification
+- 实现了 `JobConfig` 与 `ClientJobConfig` 对路径安全 `run_id`、正整数 `io_timeout_seconds`、布尔值 `live_observation` 的严格校验，缺失或非法格式立即 fail-closed。
+- `POST /api/v1/jobs/start` 接收并透传三个必填字段至 Server 作业状态、`TASK_ANNOUNCE` 广播及真实 `ServerRole`（不再回退到 10 秒默认值）。
+- Client 端沙箱强制在作业私有沙箱下生成固定的 `observation.jsonl`，彻底杜绝广播注入任意本地路径漏洞。
+- Server 端统一使用唯一终态 helper `_finalize_job`，严格按“关闭资源 -> 重置持久链路 -> 广播终态消息”执行；链路重置失败时进入 `STOPPED`、抛出 `link_reset_failed` 且不广播终态信令，中止与完成均具备一致收口保证与关停幂等性。
+- 新增单元测试集 `wfb_ng/tests/test_fl_job_contract_stage3.py`，全量回归 181 项测试与 Mypy 静态检查全部通过（181 passed）。

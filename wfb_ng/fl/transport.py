@@ -90,6 +90,7 @@ class ServerTransport(object):
         self.io_timeout = io_timeout
         self.cancel_grace_period = cancel_grace_period
         self.live_observation = live_observation
+        self.observation_path = observation_path
         self.role_node_id = role_node_id
         self._observation = LiveObservation(
             live_observation, observation_writer, observation_path)
@@ -620,6 +621,7 @@ class ClientTransport(object):
         self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
         self.live_observation = live_observation
+        self.observation_path = observation_path
         self._observation = LiveObservation(
             live_observation, observation_writer, observation_path)
         self.ready = False

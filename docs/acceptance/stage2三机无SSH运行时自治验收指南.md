@@ -238,7 +238,7 @@ payload = {
     'model_path': '/var/tmp/wfb-fl-hw/model-4mib.bin',
     'model_size_bytes': 4 * 1024 * 1024,
     'round_timeout_seconds': 60.0,
-    'io_timeout_seconds': 120.0,
+    'io_timeout_seconds': 120,
     'live_observation': True,
     'algorithm': 'wfb_ng.fl.issue41_algorithm:client_main',
     'algorithm_config': {
