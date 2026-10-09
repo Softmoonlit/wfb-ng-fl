@@ -55,7 +55,9 @@ Type: map
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
 
-## Not yet specified
+- [定义 Stage 4 分层验收矩阵](issues/09-stage4-acceptance-matrix.md#answer)：采用领域/模型库、HTTP/SSE、浏览器和三机实体四层验收；三机闭环同时验证无线控制面（发现、心跳、`TASK_READY`、轮次屏障、急停、终态恢复）与无线数据面（40 MiB UFTP/HTTP PUT、摘要完整性），分别归档证据并复用 Stage 2/3 射频边界。
+
+
 
 当前未发现尚不能明确成票的范围内问题；模型库、状态语义、射频准备、管理网、Web API、界面原型及验收矩阵已由现有未关闭决策票分别拥有。后续决策若暴露新的模糊区域，再补充本节。
 
