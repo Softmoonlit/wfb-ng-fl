@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from typing import Any, BinaryIO, Callable, Dict, Optional
 
+from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
 from .radio import ALLOWED_PATCH_KEYS, ALLOWED_MCS_VALUES, get_downlink_rate_bounds, validate_radio_config
 
@@ -39,7 +40,8 @@ def _job_view(job: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     if job is None:
         return None
     fields = {"job_id", "run_id", "model_sha256", "model_size_bytes", "target_nodes", "rounds",
-              "started_at", "execution_result", "recovery_state", "error", "reason", "recovery_error"}
+              "started_at", "execution_result", "recovery_state", "error", "reason", "recovery_error",
+              "current_round", "rounds_completed", "server_phase", "round_started_at"}
     return {k: deepcopy(v) for k, v in job.items() if k in fields}
 
 
@@ -48,7 +50,8 @@ class ConsoleApplicationService:
 
     def __init__(self, read_status: Callable[[], Dict[str, Any]], source_lock: Any,
                  model_root: Optional[Path] = None,
-                 apply_radio: Optional[Callable[[str, bool], Dict[str, Any]]] = None) -> None:
+                 apply_radio: Optional[Callable[[str, bool], Dict[str, Any]]] = None,
+                 start_job: Optional[Callable[[Dict[str, Any], str], Dict[str, Any]]] = None) -> None:
         self.instance_id = str(uuid.uuid4())
         self._read_status = read_status
         self._source_lock = source_lock
@@ -61,13 +64,55 @@ class ConsoleApplicationService:
         self._web_status: Optional[tuple] = None
         self.models = ModelLibrary(model_root or Path('/var/lib/wfb-ng-fl/models'))
         self._apply_radio = apply_radio
+        self._start_job = start_job
+        self._job_requests: Dict[str, tuple] = {}
         self._radio_confirmation: Optional[Dict[str, Any]] = None
+
+    def start_job(self, body: Any, idempotency_key: Optional[str]) -> Dict[str, Any]:
+        if self._start_job is None:
+            raise FLRuntimeError('JOB_UNAVAILABLE', '作业服务不可用')
+        if not isinstance(idempotency_key, str) or not (1 <= len(idempotency_key) <= 200):
+            raise FLRuntimeError('INVALID_JOB_REQUEST', '必须提供有效的 Idempotency-Key')
+        if not isinstance(body, dict) or set(body) != {'model_sha256', 'target_nodes', 'rounds'}:
+            raise FLRuntimeError('INVALID_JOB_REQUEST', '只允许 model_sha256、target_nodes、rounds')
+        digest = body['model_sha256']
+        try:
+            ModelLibrary.validate_digest(digest)
+        except (ModelLibraryError, TypeError) as exc:
+            raise FLRuntimeError('INVALID_JOB_REQUEST', str(exc)) from exc
+        nodes = body['target_nodes']
+        rounds = body['rounds']
+        if (not isinstance(nodes, list) or not nodes
+                or any(type(node) is not int or not 1 <= node <= 10 for node in nodes)
+                or len(set(nodes)) != len(nodes)
+                or type(rounds) is not int or rounds <= 0):
+            raise FLRuntimeError('INVALID_JOB_REQUEST', 'target_nodes 必须为固定不重复节点集合，rounds 必须为正整数')
+        canonical = (digest, tuple(nodes), rounds)
+        with self._source_lock:
+            previous = self._job_requests.get(idempotency_key)
+            if previous is not None:
+                if previous[0] != canonical:
+                    raise FLRuntimeError('IDEMPOTENCY_KEY_REUSED', 'Idempotency-Key 已用于不同请求', details={})
+                return deepcopy(previous[1])
+            try:
+                artifact = self.models.artifact_path(digest)
+                size_bytes = artifact.stat().st_size
+            except ModelLibraryError:
+                raise
+            except OSError as exc:
+                raise ModelLibraryError('MODEL_NOT_FOUND', '模型不存在', 404) from exc
+            payload = {'model_sha256': digest, 'target_nodes': list(nodes), 'rounds': rounds,
+                       'model_path': str(artifact), 'model_size_bytes': size_bytes}
+            result = self._start_job(payload, idempotency_key)
+            self._job_requests[idempotency_key] = (canonical, deepcopy(result))
+            return result
 
     def radio_configuration(self) -> Dict[str, Any]:
         state = self.snapshot()
         return {'config': state['server']['radio'], 'snapshot': state,
                 'rate_bounds': {str(mcs): get_downlink_rate_bounds(mcs).as_dict()
                                 for mcs in ALLOWED_MCS_VALUES}}
+
 
     def _radio_targets(self, state: Dict[str, Any]) -> list:
         blockers = state['server']['start_blockers']

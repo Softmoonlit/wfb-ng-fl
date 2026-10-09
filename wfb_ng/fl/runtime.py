@@ -267,6 +267,7 @@ class ServerRuntime(object):
         self._downlink_cancel_active = False
         self._downlink_cancel_finished = False
         self._wait_for_updates_active = False
+        self.require_update_model_match = False
         if recovered_state is not None:
             self._restore_terminal_state(recovered_state)
 
@@ -561,6 +562,13 @@ class ServerRuntime(object):
                 validate_artifact(
                     update_path, manifest['size_bytes'], manifest['sha256'],
                     self.max_update_size_bytes)
+                if self.require_update_model_match:
+                    model_manifest = read_json(os.path.join(round_dir, 'model.manifest.json'))
+                    if (manifest['size_bytes'] != model_manifest['size_bytes']
+                            or manifest['sha256'] != model_manifest['sha256']):
+                        raise FLRuntimeError(
+                            'update_model_mismatch', '文件仿真 update 必须与本轮模型完全一致',
+                            round_id=round_id, node_id=node_id)
         except FLRuntimeError as exc:
             self._fail_round(exc.error_code, exc.error_message)
             raise

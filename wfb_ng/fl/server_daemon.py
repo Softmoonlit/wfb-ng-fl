@@ -48,6 +48,7 @@ from .client_daemon import (
     NetworkAdapter,
 )
 from .coordinator import FLCoordinator, JobConfig, VALID_FL_MODES
+from .issue41_algorithm import copy_model
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
     DEFAULT_UFTP_MULTICAST_HOST,
@@ -585,12 +586,30 @@ class ServerDaemon:
         self.actual_ipc_port: int = self.config.ipc_port
         self._web_state = ("management_web_unavailable", "WEB_HOST_NOT_CONFIGURED" if self.config.web_host is None else None)
         self.console = ConsoleApplicationService(self.get_status_report, self._lock,
-                                                 Path(self.config.model_library_dir), self._apply_console_radio)
+                                                 Path(self.config.model_library_dir), self._apply_console_radio,
+                                                 self._start_console_job)
         self._web = ManagementWebListener(
             self.config.web_host, self.config.web_port, self.console,
             lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),
             self._on_web_status,
         )
+
+    def _start_console_job(self, request: Dict[str, Any], idempotency_key: str) -> Dict[str, Any]:
+        """Translate the narrow Web file-job contract into the daemon job contract."""
+        with self._lock:
+            payload = dict(request)
+            payload.update({
+                'run_id': f'web-{uuid.uuid4().hex}',
+                'job_id': f'web-{uuid.uuid4().hex}',
+                'mode': 'sync',
+                'io_timeout_seconds': 120,
+                'live_observation': False,
+                'algorithm': 'wfb_ng.fl.issue41_algorithm:client_main',
+                'algorithm_config': {'file_simulation': True},
+            })
+        result = self.start_job(payload)
+        result['idempotency_key'] = idempotency_key
+        return result
 
     def _on_web_status(self, status: str, error: Optional[str]) -> None:
         # Listener status cannot wait behind a potentially slow snapshot reader.
@@ -614,6 +633,19 @@ class ServerDaemon:
     def publish_event(self, event: Dict[str, Any]) -> None:
         """Keep diagnostic stream and console operator history separate."""
         with self._lock:
+            if self.active_job is not None:
+                event_type = event.get('type')
+                if event_type == 'ROUND_STARTED':
+                    self.active_job['current_round'] = event.get('round_index')
+                    self.active_job['server_phase'] = 'preparing'
+                    self.active_job['round_started_at'] = time.time()
+                elif event_type in ('MODEL_PUBLISH_START', 'MODEL_PUBLISH_STARTED'):
+                    self.active_job['server_phase'] = 'publishing_model'
+                elif event_type == 'WAIT_FOR_UPDATES_START':
+                    self.active_job['server_phase'] = 'waiting_updates'
+                elif event_type == 'ROUND_COMPLETED':
+                    self.active_job['rounds_completed'] = event.get('round_index', 0)
+                    self.active_job['server_phase'] = 'preparing'
             self.console.record_event(event)
             self._best_effort_console_refresh()
         self.event_bus.publish(event)
@@ -927,8 +959,14 @@ class ServerDaemon:
                     server_role.close()
                     raise
 
+            if payload.get('algorithm_config', {}).get('file_simulation') is True and runtime is not None:
+                runtime.require_update_model_match = True
+
             # Only transition state and commit active_job after runtime is ready
             self._recent_job = None
+            job_dict['current_round'] = 0
+            job_dict['rounds_completed'] = 0
+            job_dict['server_phase'] = 'preparing'
             self.active_job = job_dict
             self.server_state = ServerState.RUNNING
             self.server_role = server_role
@@ -988,6 +1026,7 @@ class ServerDaemon:
                     on_event=self.publish_event,
                     on_completed=lambda summary: self._on_job_completed(job.job_id, summary),
                     on_failed=lambda exc: self._on_job_failed(job.job_id, exc),
+                    aggregation_fn=(copy_model if payload.get('algorithm_config', {}).get('file_simulation') is True else None),
                 )
                 self.coordinator.start()
 
@@ -1048,7 +1087,7 @@ class ServerDaemon:
             self._recent_job = deepcopy(self.active_job)
             self._recent_job.update(
                 execution_result={"completed": "succeeded", "failed": "failed", "aborted": "aborted"}[outcome],
-                recovery_state="recovering", reason=reason, error=error,
+                recovery_state="recovering", server_phase="recovering", reason=reason, error=error,
             )
             self.console.record_event({"type": "RECOVERY_STARTED", "job_id": target_job_id})
 
@@ -1135,6 +1174,7 @@ class ServerDaemon:
             if self.server_state == ServerState.STOPPED or self._stop_event.is_set():
                 recovery_error = recovery_error or "DAEMON_STOPPED"
             self._recent_job["recovery_state"] = "blocked" if recovery_error else "ready"
+            self._recent_job["server_phase"] = "recovery_blocked" if recovery_error else "ready"
             if recovery_error:
                 self._recent_job["recovery_error"] = recovery_error
             self.console.record_event({"type": "RECOVERY_BLOCKED" if recovery_error else "RECOVERY_COMPLETED",

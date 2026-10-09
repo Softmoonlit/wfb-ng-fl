@@ -125,10 +125,13 @@ def client_main(runtime, config):
     rounds = _positive_int(config.get('rounds', 1), 'rounds')
     node_id = _positive_int(
         config.get('node_id', getattr(runtime, 'node_id', None)), 'node_id')
-    update_template_path = _required_artifact(
-        config.get('update_template_path'), 'update_template_path')
+    update_template_path = None
+    if config.get('file_simulation') is not True:
+        update_template_path = _required_artifact(
+            config.get('update_template_path'), 'update_template_path')
     required_size = _required_artifact_size(config)
-    _require_size(update_template_path, required_size, 'update_template_path')
+    if update_template_path is not None:
+        _require_size(update_template_path, required_size, 'update_template_path')
     artifact_dir = _artifact_dir(runtime, config)
     result_path = config.get('result_path') or os.path.join(
         runtime.work_dir, 'issue41-client-result.json')
@@ -206,6 +209,9 @@ def client_main(runtime, config):
 def train(model_path, output_update_path, config):
     """占位训练边界；真实实现应读取模型和本地数据并写出 update。"""
     inspect_artifact(model_path)
+    if config.get('file_simulation') is True:
+        archive_file(model_path, output_update_path)
+        return output_update_path
     update_template_path = _required_artifact(
         config.get('update_template_path'), 'update_template_path')
     delay_ms = _training_delay_ms(config)
@@ -230,6 +236,24 @@ def aggregate(model_path, updates_by_node, output_model_path, config):
         time.sleep(delay_ms / 1000.0)
 
     # 当前不改变模型内容；替换真实聚合时在 output_model_path 写入新模型。
+    archive_file(model_path, output_model_path)
+    return output_model_path
+
+
+def copy_model(model_path, updates_by_node, output_model_path, config):
+    """文件仿真步骤必须保持模型内容不变。"""
+    model_path = inspect_artifact(model_path)
+    if not updates_by_node:
+        raise FLRuntimeError('algorithm_failed', '文件仿真 update 输入不能为空')
+    source_size = os.path.getsize(model_path)
+    source_digest = file_sha256(model_path)
+    for node_id, update_path in updates_by_node.items():
+        try:
+            update_path = inspect_artifact(update_path)
+        except FLRuntimeError as exc:
+            raise FLRuntimeError('algorithm_failed', f'节点 {node_id} 的 update 不可读取') from exc
+        if os.path.getsize(update_path) != source_size or file_sha256(update_path) != source_digest:
+            raise FLRuntimeError('algorithm_failed', '文件仿真 update 必须与本轮模型完全一致')
     archive_file(model_path, output_model_path)
     return output_model_path
 

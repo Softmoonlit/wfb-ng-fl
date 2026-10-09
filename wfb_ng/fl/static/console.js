@@ -27,6 +27,8 @@
     byId('job-id').textContent = job ? job.job_id : '暂无作业';
     byId('job-result').textContent = results[job ? job.execution_result : 'none'];
     byId('job-recovery').textContent = recovery[job ? job.recovery_state : 'not_required'];
+    byId('job-phase').textContent = job ? (job.server_phase || 'preparing') : '—';
+    byId('job-rounds').textContent = job ? `${job.current_round || 0} / ${job.rounds}（已完成 ${job.rounds_completed || 0}）` : '—';
     byId('job-config').textContent = job ? `${job.rounds || '未知'} 轮 · 节点 ${(job.target_nodes || []).join(', ')} · 模型 ${job.model_sha256 || '未知'}` : '—';
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';
     const radio=server.radio;

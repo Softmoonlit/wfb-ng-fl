@@ -219,6 +219,24 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
             except Exception:
                 logger.exception('Console radio operation failed')
                 self._error(503, 'RADIO_UNAVAILABLE', '射频操作失败，请检查当前状态')
+        elif path == '/api/v1/jobs':
+            if self.command != 'POST':
+                self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 POST', allow='POST')
+                return
+            try:
+                result = server.application.start_job(
+                    self._read_json(), self.headers.get('Idempotency-Key'))
+                self._send(202, json.dumps(result).encode(), 'application/json; charset=utf-8')
+            except FLRuntimeError as exc:
+                status = 409 if exc.error_code in ('IDEMPOTENCY_KEY_REUSED', 'preflight_engine_conflict') else 404 if exc.error_code == 'MODEL_NOT_FOUND' else 400
+                self._error(status, exc.error_code, exc.error_message, exc.details)
+            except ModelLibraryError as exc:
+                self._error(exc.status, exc.code, str(exc))
+            except Exception:
+                logger.exception('Console job creation failed')
+                self._error(503, 'JOB_UNAVAILABLE', '作业服务暂时不可用')
+        elif path.startswith('/api/v1/jobs/'):
+            self._error(410, 'ROUTE_REPLACED', '该路由已退出 Web 契约')
         elif path == '/api/v1/models' or path.startswith('/api/v1/models/'):
             try:
                 if path == '/api/v1/models':
