@@ -138,11 +138,23 @@ def _duration(start,end,limit):
 def _options(args):
     _require(isinstance(args,list) and all(isinstance(x,str) for x in args),'invalid link_args')
     values={}
+    target_nodes=set()
     for i,arg in enumerate(args):
         if not arg.startswith('--'):
             continue
-        _require(arg not in values,f'duplicate link option {arg}')
-        values[arg]=True if i+1==len(args) or args[i+1].startswith('--') else args[i+1]
+        value=True if i+1==len(args) or args[i+1].startswith('--') else args[i+1]
+        if arg=='--client-target':
+            fields=value.split(':') if isinstance(value,str) else []
+            _require(len(fields)==4 and all(fields) and re.fullmatch(r'[0-9]+',fields[0]),
+                     'invalid client-target')
+            node_id=int(fields[0])
+            _require(1<=node_id<=255,'invalid client-target')
+            _require(node_id not in target_nodes,'duplicate client-target node_id')
+            target_nodes.add(node_id)
+            values.setdefault(arg,[]).append(value)
+        else:
+            _require(arg not in values,f'duplicate link option {arg}')
+            values[arg]=value
     return values
 
 
@@ -160,6 +172,14 @@ def _role(value,node):
 
 def _link(args,node):
     options=_options(args)
+    if node:
+        _require('--client-target' not in options,'client link forbids --client-target')
+    else:
+        _require(options.get('--known-clients')=='1,2,3,4,5,6,7,8,9,10',
+                 'server known-clients mismatch')
+        targets={f'{n}:10.80.0.{10+n}:127.0.0.1:1' for n in range(1,11)}
+        _require(set(options.get('--client-target',[]))==targets,
+                 'server client-target topology mismatch')
     for option, expected in {'--radio-mcs-index':str(6 if node else 3),
         '--fec-k':'8','--fec-n':'14','--radio-bandwidth':'40',
         '--radio-short-gi':True}.items():

@@ -50,3 +50,6 @@ Stage 3 正式三机两轮 40 MiB 作业已多次完成，但终态资源复位�
 - 修复收集边界：复制后仅将目标树交还执行器调用用户，符号链接使用 `chown -h` 不跟随源。真实 sudo 复制回归先红后绿，源及相邻目录不变，runner 36 项通过；新提交和新 run/job ID 完整重跑。
 - 第二次 `stage3_20261009_200356_9d9fbd8055a7`（`d453875`）正常作业及射频恢复仍通过；`collect` 摘要校验被后续单文件 `sudo cp` 的 root/0600 配置阻塞。补齐 `collect_server_file`，使用一次 `sudo install` 明确目标 UID/GID 和 0600 权限，配置与聚合模型共用；真实 root/0600 源的摘要读取与 collect 调用边界测试通过，runner 38 项通过。失败清理无错误，沙箱均保留。
 - 为后续运行释放空间，上述诊断及两次失败的 `server-failure{,_role}` 目录已分别无损压缩为同目录 `.tar.gz`，每个压缩文件都通过 `tar --compare` 后才删除展开副本；日志、REST 时间线、失败分类与 Client evidence 保留，未修改为成功证据。
+- 第三次 `stage3_20261009_201312_7848145e1c79`（`2be0e72`）正常作业、射频回退、收集与停服全部通过；封口后 validator 将生产 Server 命令中合法重复的 `--client-target` 当作单值重复项，归档原 `validation.json` 为 failed 且保持未改。修复仅允许该参数多值，重复节点 ID 与其他单值重复仍拒绝；测试归档改用实际十节点 Server 命令构造器，先红后绿，archive/runner 合计 128 项通过。新校验器对旧档只读检查为 passed，诊断结果另存 `tests/logs/stage3_issue07_archive_diagnosis_20261009/validation.json`，正式结论仍等待新提交完整运行。
+- 独立审查要求 validator 同时验证固定 `known-clients=1,…,10` 与完整 canonical target 映射，额外/缺失节点、错误 TUN IP/host/port、Client 私带 target 均拒绝；已补完整归档负测，先红后绿，最终 archive/runner 138 项通过，独立复审无阻塞。
+- 前两次收集失败归档整体已无损压缩为同名 `.tar.gz` 并经 `tar --compare` 校验；第三次原封口归档保持原样，源沙箱在诊断目录中无损压缩保留。

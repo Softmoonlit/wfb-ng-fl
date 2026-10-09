@@ -11,6 +11,7 @@ from tests.fl_runtime.stage3_archive import (
 )
 from wfb_ng.fl.artifacts import file_sha256
 from wfb_ng.fl.errors import FLRuntimeError
+from wfb_ng.fl.server_daemon import build_v6_uplink_server_command
 from wfb_ng.fl.issue41_fixtures import generate_model_fixture, generate_client_fixture
 
 COMMIT = 'a' * 40
@@ -82,7 +83,8 @@ def archive(tmp_path, payloads):
     put(root, 'job/window.json', bind(services_started_at=1, nodes_ready_at=2,
         accepted_at=3, terminal_at=100, ready_nodes=[1, 2]))
     put(root, 'server/server_role.json', {k:v for k,v in role(0).items() if k not in ('channel','channel_width','radio_txpower_dbm','link_args')})
-    put(root, 'server/link.json', dict(argv=role(0)['link_args']))
+    put(root, 'server/link.json', dict(argv=build_v6_uplink_server_command(
+        '/usr/bin/wfb_v6_uplink', 'fl-s', '10.80.0.1/24', 'wlxabc')))
     put(root, 'server/radio.json', dict(channel=157,channel_width='HT40+',radio_txpower_dbm=12,source='server/iw.txt'))
     (root/'server/iw.txt').write_text('channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n txpower -12.00 dBm\n')
     (root/'server/link.log').write_text('v6_config radio_bandwidth=40 radio_mcs_index=3 radio_short_gi=1 fec_k=8 fec_n=14 grant_duration_ms=120 guard_interval_ms=10\n')
@@ -230,6 +232,89 @@ def archive(tmp_path, payloads):
 
 def test_complete_archive(archive):
     assert validate_archive(archive)['status'] == 'passed'
+
+
+def test_server_builder_targets_are_collected_as_list(archive):
+    from tests.fl_runtime.stage3_archive import _options
+    argv = json.loads((archive / 'server/link.json').read_text())['argv']
+    assert _options(argv)['--client-target'] == [
+        f'{n}:10.80.0.{10+n}:127.0.0.1:1' for n in range(1, 11)]
+
+
+@pytest.mark.parametrize('extra, message', [
+    (['--radio-mcs-index', '3'], 'duplicate link option --radio-mcs-index'),
+    (['--radio-short-gi'], 'duplicate link option --radio-short-gi'),
+    (['--client-target', '1:10.80.0.11:127.0.0.1:1'], 'duplicate client-target node_id'),
+    (['--client-target', '01:10.80.0.99:127.0.0.1:2'], 'duplicate client-target node_id'),
+    (['--client-target'], 'invalid client-target'),
+    (['--client-target', 'bad:10.80.0.99:127.0.0.1:1'], 'invalid client-target'),
+    (['--client-target', '11'], 'invalid client-target'),
+])
+def test_duplicate_or_invalid_link_options_fail_closed(archive, extra, message):
+    report = json.loads((archive / 'server/link.json').read_text())
+    report['argv'].extend(extra)
+    put(archive, 'server/link.json', report)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert dict(category='configuration', message=message) in result['errors']
+
+
+@pytest.mark.parametrize('kind', [
+    'extra', 'missing', 'wrong-ip', 'wrong-host', 'wrong-port',
+    'wrong-known-clients', 'missing-known-clients',
+])
+def test_server_target_topology_fails_closed(archive, kind):
+    report = json.loads((archive / 'server/link.json').read_text())
+    argv = report['argv']
+    target = argv.index('--client-target')
+    if kind == 'extra':
+        argv.extend(['--client-target', '11:10.80.0.21:127.0.0.1:1'])
+    elif kind == 'missing':
+        del argv[target:target+2]
+    elif kind.startswith('wrong-known'):
+        argv[argv.index('--known-clients')+1] = '1,2'
+    elif kind == 'missing-known-clients':
+        known = argv.index('--known-clients')
+        del argv[known:known+2]
+    else:
+        argv[target+1] = {
+            'wrong-ip': '1:10.80.0.99:127.0.0.1:1',
+            'wrong-host': '1:10.80.0.11:127.0.0.2:1',
+            'wrong-port': '1:10.80.0.11:127.0.0.1:2',
+        }[kind]
+    put(archive, 'server/link.json', report)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert any(e['category'] == 'configuration' for e in result['errors'])
+    assert all(e['category'] != 'archive_integrity' for e in result['errors'])
+
+
+def test_server_target_order_is_irrelevant(archive):
+    report = json.loads((archive / 'server/link.json').read_text())
+    argv = report['argv']
+    positions = [i+1 for i, arg in enumerate(argv) if arg == '--client-target']
+    targets = [argv[i] for i in positions]
+    for i, target in zip(positions, reversed(targets)):
+        argv[i] = target
+    put(archive, 'server/link.json', report)
+    reseal(archive)
+    assert validate_archive(archive)['status'] == 'passed'
+
+
+@pytest.mark.parametrize('node', [1, 2])
+def test_client_target_is_forbidden(archive, node):
+    path = f'clients/{node}/client_role.json'
+    report = json.loads((archive / path).read_text())
+    report['link_args'].extend(['--client-target', f'{node}:10.80.0.{10+node}:127.0.0.1:1'])
+    put(archive, path, report)
+    evidence_manifest(archive, node)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert dict(category='configuration', message='client link forbids --client-target') in result['errors']
+    assert all(e['category'] != 'archive_integrity' for e in result['errors'])
 
 
 @pytest.mark.parametrize('mac', ['fc:22:1c:50:0b:fe', 'fc:22:1c:10:01:19'])
