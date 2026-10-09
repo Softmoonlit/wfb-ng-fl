@@ -232,6 +232,15 @@ def test_complete_archive(archive):
     assert validate_archive(archive)['status'] == 'passed'
 
 
+@pytest.mark.parametrize('mac', ['fc:22:1c:50:0b:fe', 'fc:22:1c:10:01:19'])
+def test_adapter_mac_does_not_restrict_server_allocation(archive, mac):
+    topology = json.loads((archive / 'topology.json').read_text())
+    topology['server']['wireless']['mac'] = mac
+    put(archive, 'topology.json', topology)
+    reseal(archive)
+    assert validate_archive(archive)['status'] == 'passed'
+
+
 def test_postflight_is_required_even_with_valid_seal(archive):
     (archive / 'postflight.json').unlink(missing_ok=True)
     reseal(archive)
@@ -286,7 +295,7 @@ def test_resealed_invalid_lifecycle_evidence_is_rejected(archive,kind):
         if kind=='topology_missing_node': del report['client1']
         elif kind=='topology_identity': report['client2']['identity']['node_id']=1
         elif kind=='topology_usb': report['client2']['wireless']['usb_speed']='12'
-        elif kind=='topology_mac': report['server']['wireless']['mac']='00:11:22:33:44:55'
+        elif kind=='topology_mac': report['server']['wireless']['mac']='invalid-mac'
         elif kind=='topology_resources': report['client1']['resources']['tun_exists']=True
         put(archive,'topology.json',report)
         category='preflight'

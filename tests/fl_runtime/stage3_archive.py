@@ -255,7 +255,6 @@ def _preflight(root,env):
         _require(_number(float(wireless['usb_speed']))>=480,'preflight USB speed below 480 Mbps')
         mac=wireless.get('mac')
         _require(isinstance(mac,str) and re.fullmatch(r'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}',mac),'invalid adapter MAC')
-        _require(mac.lower()!='fc:22:1c:10:01:19' and (n!='0' or mac.lower()=='5c:ff:ff:af:6d:8c'),'physical adapter allocation mismatch')
         identity=raw.get('identity')
         if n=='0':
             _require(identity is None,'unexpected server node identity')

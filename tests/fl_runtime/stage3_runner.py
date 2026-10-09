@@ -224,8 +224,6 @@ class Stage3Runner:
             wireless = inspect_wireless_device(self.executor, role)
             if wireless['driver'] not in ('rtl88xxau_wfb', '88XXau_wfb') or wireless['usb_controller'] != 'xhci_hcd':
                 raise RuntimeError(role + ': requires rtl88xxau_wfb and xHCI')
-            if wireless['mac'].lower()=='fc:22:1c:10:01:19' or (role=='server' and wireless['mac'].lower()!='5c:ff:ff:af:6d:8c'):
-                raise RuntimeError(role+': physical adapter allocation mismatch')
             if float(wireless['usb_speed']) < 480:
                 raise RuntimeError(role + ': insufficient USB speed')
             ports = self.executor.checked(role, 'ss -H -tuln')
