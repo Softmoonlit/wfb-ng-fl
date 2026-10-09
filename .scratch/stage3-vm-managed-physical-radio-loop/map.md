@@ -31,6 +31,8 @@ Type: map
 - 不复用 Issue #41 的 SSH RoleService/Runtime 作业编排、五分区 envelope 或旧 validator 结论语义；Stage 3 的独立性仅限于证据结构和裁决规则。
 - 正式入口为 `tests/fl_runtime/stage3_vm_physical_loop.sh`。
 - 工单 04 已完成：Stage 3 独立 runner、envelope、严格 validator 和无硬件回归测试已交付；正式入口严格串联七个执行阶段后只读 validate，复用边界已记录在 `tests/fl_runtime/stage3三机真实射频执行器.md`。全量 pytest 326 项、Stage 3 定向 91 项通过，Mypy 和 shell/Python 静态检查通过。实体三机验收待工单 06。
+- 工单 05 已完成：Standards/Spec 独立审查并闭合 identifier 复用、运行后提交/unit 绑定、原始 preflight 拓扑、job-scoped 终态证据、广播失败 fail-closed 与成功 lifecycle 负退出码语义；修复 E2E 测试重复寻频竞态。最终全量 355 项、定向 204 项通过，13 文件 Mypy、shell/Python 静态检查通过，两轴复审无阻塞。解除工单 06 的软件前置阻塞；未执行实体三机射频运行。
+
 ## Work graph
 
 1. [01 Client 节点本地 evidence](issues/01-client-local-evidence-archive.md)

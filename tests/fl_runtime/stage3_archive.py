@@ -16,7 +16,7 @@ import tempfile
 from functools import lru_cache
 import uuid
 
-from wfb_ng.fl.artifacts import file_sha256, read_json, write_json_atomic
+from wfb_ng.fl.artifacts import file_sha256, read_json, write_json_atomic, validate_path_safe_identifier
 from wfb_ng.fl.evidence import ROOT_FILES, ROUND_FILES, MAX_EVIDENCE_FILE_BYTES
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.runtime import validate_round_state
@@ -63,13 +63,10 @@ def _sha(value):
     return isinstance(value,str) and re.fullmatch('[0-9a-f]{64}',value) is not None
 
 
-def _identifier(value):
-    return isinstance(value,str) and re.fullmatch('[a-zA-Z0-9_-]+',value) is not None
-
-
 def init_envelope(archive_dir, *, run_id, job_id, commit):
     """Create a new archive only; never overwrite or resume an existing directory."""
-    _require(_identifier(run_id) and _identifier(job_id), 'unsafe run/job identity')
+    validate_path_safe_identifier(run_id, 'run_id')
+    validate_path_safe_identifier(job_id, 'job_id')
     _require(isinstance(commit,str) and re.fullmatch('[0-9a-f]{40}',commit), 'invalid commit')
     root=Path(archive_dir)
     root.mkdir(parents=True, exist_ok=False)
@@ -242,12 +239,34 @@ def validate_client_evidence(evidence_dir, *, run_id, job_id, node_id, commit):
 def _preflight(root,env):
     report=_json(root,'preflight.json');_binding(report,env)
     _require(set(report['nodes'])=={'0','1','2'},'preflight topology mismatch')
+    topology=_json(root,'topology.json')
+    _require(set(topology)=={'server','client1','client2'},'raw preflight topology mismatch')
     for n,node in report['nodes'].items():
         _equal_fields(node,dict(commit=env['commit'],clean=True,
             usb_driver='xhci_hcd',identity_valid=True,ports_clear=True,
             resources_clear=True,disk_ok=True,payload_matcher=True))
         _require(node.get('driver') in ('rtl88xxau_wfb','88XXau_wfb'),'incorrect wireless driver')
         _require(isinstance(node.get('interface'),str) and node['interface'].startswith('wlx'),'interface must be dynamically discovered wlx*')
+        role='server' if n=='0' else f'client{n}'
+        raw=topology[role]
+        _equal_fields(raw,dict(commit=env['commit'],workspace_clean=True))
+        wireless=raw['wireless']
+        _equal_fields(wireless,dict(interface=node['interface'],driver=node['driver'],usb_controller=node['usb_driver']))
+        _require(_number(float(wireless['usb_speed']))>=480,'preflight USB speed below 480 Mbps')
+        mac=wireless.get('mac')
+        _require(isinstance(mac,str) and re.fullmatch(r'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}',mac),'invalid adapter MAC')
+        _require(mac.lower()!='fc:22:1c:10:01:19' and (n!='0' or mac.lower()=='5c:ff:ff:af:6d:8c'),'physical adapter allocation mismatch')
+        identity=raw.get('identity')
+        if n=='0':
+            _require(identity is None,'unexpected server node identity')
+        else:
+            _require(isinstance(identity,dict),'missing client node identity')
+            _equal_fields(identity,dict(node_id=int(n)))
+            _require(identity.get('tun_ip') in (f'10.80.0.{10+int(n)}',f'10.80.0.{10+int(n)}/24'),'client TUN identity mismatch')
+        resources=raw['resources']
+        _stopped_resources(resources)
+        _require(_process_counts(resources.get('processes'))==dict(daemon=0,role_service=0,wfb_v6_uplink=0,uftp=0)
+                 and resources.get('tuns')==[],'preflight residual process/TUN')
 
 
 def _installation(root,env):
@@ -269,6 +288,30 @@ def _installation(root,env):
             _require(info.get('package_sha256')==package['sha256'] and _sha(info.get('installed_sha256'))
                      and info['installed_sha256']==info.get('expected_sha256'),f'installed artifact mismatch: {name}')
     _require(len(set(versions))==1,'package version mismatch')
+    postflight=_json(root,'postflight.json');_binding(postflight,env)
+    _require(set(postflight['nodes'])=={'0','1','2'},'postflight topology mismatch')
+    for n,node in postflight['nodes'].items():
+        _equal_fields(node,dict(commit=env['commit'],clean=True))
+        role='server' if n=='0' else f'client{n}'
+        initial=_json(root,f'nodes/{role}/unit.json')
+        _require(node.get('unit')==initial,'active unit changed during run')
+        unit=initial
+        name='wfb-fl-'+('server' if n=='0' else 'client')+'-daemon.service'
+        files=report['nodes'][n]['files']
+        paths=[p for p in files if p.endswith('/'+name)]
+        _require(len(paths)==1,'missing/ambiguous unit package provenance')
+        path=paths[0]
+        _equal_fields(unit,dict(package_path=path,package_sha256=package['sha256'],
+                               sha256=files[path]['installed_sha256']))
+        props=unit.get('properties')
+        _require(isinstance(props,dict),'missing active unit properties')
+        _equal_fields(props,dict(KillMode='control-group',DropInPaths=''))
+        fragment=props.get('FragmentPath')
+        _require(fragment in (path,'/usr'+path if path.startswith('/lib/') else path.removeprefix('/usr')),
+                 'active unit fragment outside package')
+        executable=re.search(r'path=([^ ;]+)',props.get('ExecStart',''))
+        entry='/usr/bin/wfb-fl-'+('server' if n=='0' else 'client')+'-daemon'
+        _require(executable is not None and executable[1]==entry,'active unit executable mismatch')
 
 
 def _startup_config(root,path,mcs):
@@ -403,7 +446,43 @@ def _observation(root,path,expected,node):
             _require((record.get('round'),record.get('node_id')) in known,'mixed observation identity')
 
 
+def _job_terminal(root,env):
+    for path in ('job-idle.json','collected-status.json'):
+        status=_json(root,path)
+        _require('active_job' in status,'terminal active_job fact missing')
+        _equal_fields(status,dict(server_state='IDLE',active_job=None))
+        _require(status.get('link_process',{}).get('running') is True,'terminal persistent server link missing')
+        _equal_fields(status.get('radio',{}),{k:FIXED_CONFIG[k] for k in ('channel','radio_txpower_dbm','downlink_mcs','uplink_mcs','uftp_rate_kbps')})
+        for n in (1,2):
+            _equal_fields(status.get('nodes',{}).get(str(n),{}),dict(reported_state='IDLE',readiness='READY',current_channel=157))
+    window=_window(root,env)
+    collected=_json(root,'stages/collect.json')['ended_at']
+    job=re.escape(env['job_id'])
+    patterns={'server':(rf'作业终态广播成功 type=JOB_COMPLETED job_id={job}(?:\s|$)',
+                        rf'作业 {job} 终态收口完成 \(outcome=completed,'),
+              'client1':(rf'回收作业 {job} 资源 \(exit_code=(-?\d+)\)',),
+              'client2':(rf'回收作业 {job} 资源 \(exit_code=(-?\d+)\)',)}
+    for role,required in patterns.items():
+        lines=_file(root,f'nodes/{role}/daemon.log').read_text().splitlines()
+        times=[]
+        for pattern in required:
+            matching=[line for line in lines if re.search(pattern,line)]
+            _require(len(matching)==1,f'missing/ambiguous job terminal journal: {role}/{pattern}')
+            if role!='server':
+                code=re.search(pattern,matching[0])
+                manifest=_json(root,f'clients/{role[-1]}/evidence_manifest.json')
+                _require(code is not None and type(manifest.get('returncode')) is int
+                         and int(code[1])==manifest['returncode'],'client cleanup/evidence returncode mismatch')
+            timestamp=re.match(r'^(\d+(?:\.\d+)?)\s',matching[0])
+            _require(timestamp is not None,'terminal journal timestamp missing')
+            observed=_number(float(timestamp[1]))
+            _require(window['accepted_at']<=observed<=collected,'terminal journal outside job/collection window')
+            times.append(observed)
+        _require(times==sorted(times),'terminal broadcast/finalization order mismatch')
+
+
 def _runtime(root,env):
+    _job_terminal(root,env)
     coordinator=_json(root,'job/coordinator.json');_binding(coordinator,env)
     _equal_fields(coordinator,dict(schema_version=1,status='succeeded',mode='sync',
         rounds_total=2,rounds_completed=2,target_nodes=[1,2],final_model_size_bytes=40*1024*1024))
@@ -470,7 +549,7 @@ def _radio(root,env):
     _equal_fields(result,dict(status='rolled_back',target_channel=149,unresponsive_nodes=[2]))
     _require(result.get('failed_phase') in ('commit','COMMIT'),'unexpected radio failure phase')
     _require(result.get('effective_config',{}).get('channel')==157,'server did not rollback')
-    sid=result.get('session_id');_require(_identifier(sid),'invalid radio session')
+    sid=validate_path_safe_identifier(result.get('session_id'), 'session_id')
     fault=_json(root,'radio/fault.json');_binding(fault,env)
     _equal_fields(fault,dict(node_id=2,drop_types=['NEW_CHANNEL_PING','RADIO_SWITCH_FINALIZED'],present=False))
     installed,removed=_number(fault['installed_at']),_number(fault['removed_at'])
@@ -563,6 +642,18 @@ def _process_counts(processes):
     return counts
 
 
+def _stopped_resources(raw):
+    _equal_fields(raw,dict(clean=True,is_inactive=True,unit_status='inactive',
+        cgroup_clean=True,tun_exists=False,cgroup_procs=[],orphan_processes=[]))
+    _require(raw.get('tasks_current') in (0,None),'stopped cgroup task leak')
+    evidence=raw.get('raw_evidence',{})
+    _require(evidence.get('is_active')=='inactive','unit raw active state mismatch')
+    props=evidence.get('show_props',{})
+    _require(props.get('ActiveState')=='inactive' and props.get('MainPID')=='0','unit show evidence mismatch')
+    _require(props.get('TasksCurrent') in ('0','[not set]'),'unit raw task count mismatch')
+    _require('mtu' not in evidence.get('tun_out','').lower(),'raw TUN still present')
+
+
 def _resources(root,env):
     for mode in ('idle','stopped'):
         report=_json(root,f'resources/{mode}.json');_binding(report,env)
@@ -572,15 +663,7 @@ def _resources(root,env):
             _require(_process_counts(raw.get('processes'))==node['processes'],'raw process counts mismatch')
             _require(raw.get('tuns')==node.get('tuns'),'raw TUN table mismatch')
             if mode=='stopped':
-                _equal_fields(raw,dict(clean=True,is_inactive=True,unit_status='inactive',
-                    cgroup_clean=True,tun_exists=False,cgroup_procs=[],orphan_processes=[]))
-                _require(raw.get('tasks_current') in (0,None),'stopped cgroup task leak')
-                evidence=raw.get('raw_evidence',{})
-                _require(evidence.get('is_active')=='inactive','unit raw active state mismatch')
-                props=evidence.get('show_props',{})
-                _require(props.get('ActiveState')=='inactive' and props.get('MainPID')=='0','unit show evidence mismatch')
-                _require(props.get('TasksCurrent') in ('0','[not set]'),'unit raw task count mismatch')
-                _require('mtu' not in evidence.get('tun_out','').lower(),'raw TUN still present')
+                _stopped_resources(raw)
             else:
                 _require(raw.get('unit_status')=='active' and not raw.get('is_inactive'),'idle daemon unit not active')
                 _require(raw.get('tun_exists') is True,'idle raw TUN absent')
@@ -644,7 +727,8 @@ def validate_archive(archive_dir):
     try:
         env=_json(root,'envelope.json')
         _equal_fields(env,dict(schema_version=1,kind='stage3'))
-        _require(_identifier(env.get('run_id')) and _identifier(env.get('job_id')),'unsafe run/job identity')
+        validate_path_safe_identifier(env.get('run_id'), 'run_id')
+        validate_path_safe_identifier(env.get('job_id'), 'job_id')
         _require(isinstance(env.get('commit'),str) and re.fullmatch('[0-9a-f]{40}',env['commit']),'invalid envelope commit')
         config=env.get('resolved_config');_require(isinstance(config,dict) and set(config)==set(FIXED_CONFIG),'fixed config fields mismatch')
         _equal_fields(config,FIXED_CONFIG)

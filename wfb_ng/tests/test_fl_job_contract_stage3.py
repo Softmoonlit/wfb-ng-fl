@@ -382,9 +382,14 @@ class TestStage3JobContractAndTerminalConsistency(unittest.TestCase):
         daemon.control_plane.broadcast_downlink = lambda msg: broadcasted_messages.append(msg)
 
         with mock.patch.object(daemon, "_stop_link_process") as mock_stop_link, \
-             mock.patch.object(daemon, "_start_link_process") as mock_start_link:
+             mock.patch.object(daemon, "_start_link_process") as mock_start_link, \
+             self.assertLogs("wfb_fl_server_daemon", level="INFO") as logs:
             res = daemon.abort_job(reason="operator_abort")
 
+        self.assertIn(
+            "作业终态广播成功 type=JOB_ABORT job_id=job_term_abort",
+            "\n".join(logs.output),
+        )
         self.assertEqual(res["status"], "aborted")
         self.assertEqual(res["job_id"], "job_term_abort")
         self.assertEqual(daemon.server_state, ServerState.IDLE)
@@ -405,6 +410,64 @@ class TestStage3JobContractAndTerminalConsistency(unittest.TestCase):
         self.assertEqual(len(abort_msgs), 1)
         self.assertEqual(abort_msgs[0]["job_id"], "job_term_abort")
         self.assertEqual(abort_msgs[0]["reason"], "operator_abort")
+
+    def test_abort_job_fails_closed_when_terminal_broadcast_fails(self):
+        daemon = ServerDaemon(
+            config=ServerDaemonConfig(work_dir=self.temp_dir, enable_link_process=False),
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.active_job = {"job_id": "job_broadcast_fail"}
+        daemon.server_state = ServerState.RUNNING
+        events = daemon.event_bus.subscribe()
+
+        with mock.patch.object(
+            daemon.control_plane, "broadcast_downlink", side_effect=OSError("network unavailable")
+        ), self.assertLogs("wfb_fl_server_daemon", level="WARNING") as logs:
+            with self.assertRaises(FLRuntimeError) as ctx:
+                daemon.abort_job(reason="operator_abort")
+
+        self.assertEqual(ctx.exception.error_code, "terminal_broadcast_failed")
+        self.assertEqual(daemon.server_state, ServerState.STOPPED)
+        self.assertIsNone(daemon.active_job)
+        self.assertTrue(events.empty())
+        self.assertIn("job_broadcast_fail", "\n".join(logs.output))
+
+    def test_terminal_paths_fail_closed_on_unavailable_broadcast(self):
+        for outcome in ("completed", "failed", "aborted"):
+            for missing_control_plane in (False, True):
+                with self.subTest(outcome=outcome, missing_control_plane=missing_control_plane):
+                    daemon = ServerDaemon(
+                        config=ServerDaemonConfig(work_dir=self.temp_dir, enable_link_process=False),
+                        network_adapter=self.adapter,
+                        survey_backend=self.survey_backend,
+                    )
+                    job_id = f"job_terminal_{outcome}"
+                    daemon.active_job = {"job_id": job_id}
+                    daemon.server_state = ServerState.RUNNING
+                    events = daemon.event_bus.subscribe()
+                    if missing_control_plane:
+                        daemon.control_plane = None
+                    else:
+                        daemon.control_plane.broadcast_downlink = mock.Mock(
+                            side_effect=OSError("network unavailable")
+                        )
+
+                    with self.assertLogs("wfb_fl_server_daemon", level="INFO") as logs:
+                        with self.assertRaises(FLRuntimeError) as ctx:
+                            if outcome == "completed":
+                                daemon._on_job_completed(job_id, {})
+                            elif outcome == "failed":
+                                daemon._on_job_failed(job_id, RuntimeError("training failed"))
+                            else:
+                                daemon.abort_job(reason="operator_abort")
+
+                    self.assertEqual(ctx.exception.error_code, "terminal_broadcast_failed")
+                    self.assertEqual(daemon.server_state, ServerState.STOPPED)
+                    self.assertIsNone(daemon.active_job)
+                    self.assertTrue(events.empty())
+                    self.assertIn(job_id, "\n".join(logs.output))
+                    self.assertFalse(any("终态广播成功" in line or "终态收口完成" in line for line in logs.output))
 
     def test_server_daemon_abort_handles_link_reset_failure_without_masking(self):
         cfg = ServerDaemonConfig(
@@ -552,13 +615,20 @@ class TestStage3JobContractAndTerminalConsistency(unittest.TestCase):
             network_adapter=self.adapter,
             survey_backend=self.survey_backend,
         )
+        broadcasted_messages: List[Dict[str, Any]] = []
+        daemon.control_plane.broadcast_downlink = broadcasted_messages.append
         # Test completion cleans active_job, server_role, and coordinator
         daemon.active_job = {"job_id": "job_comp"}
         daemon.server_state = ServerState.RUNNING
         daemon.coordinator = mock.Mock()
         mock_role = mock.Mock()
         daemon.server_role = mock_role
-        daemon._on_job_completed("job_comp", {"schema_version": 1})
+        with self.assertLogs("wfb_fl_server_daemon", level="INFO") as completed_logs:
+            daemon._on_job_completed("job_comp", {"schema_version": 1})
+        self.assertIn(
+            "作业终态广播成功 type=JOB_COMPLETED job_id=job_comp",
+            "\n".join(completed_logs.output),
+        )
         self.assertIsNone(daemon.active_job)
         self.assertIsNone(daemon.server_role)
         self.assertIsNone(daemon.coordinator)
@@ -571,12 +641,21 @@ class TestStage3JobContractAndTerminalConsistency(unittest.TestCase):
         daemon.coordinator = mock.Mock()
         mock_role2 = mock.Mock()
         daemon.server_role = mock_role2
-        daemon._on_job_failed("job_fail", RuntimeError("simulated error"))
+        with self.assertLogs("wfb_fl_server_daemon", level="INFO") as failed_logs:
+            daemon._on_job_failed("job_fail", RuntimeError("simulated error"))
+        self.assertIn(
+            "作业终态广播成功 type=JOB_ABORT job_id=job_fail",
+            "\n".join(failed_logs.output),
+        )
         self.assertIsNone(daemon.active_job)
         self.assertIsNone(daemon.server_role)
         self.assertIsNone(daemon.coordinator)
         self.assertEqual(daemon.server_state, ServerState.IDLE)
         mock_role2.close.assert_called_once()
+        self.assertEqual(
+            [(msg["type"], msg["job_id"]) for msg in broadcasted_messages],
+            [("JOB_COMPLETED", "job_comp"), ("JOB_ABORT", "job_fail")],
+        )
 
     def test_finalize_job_ignores_when_active_job_none_or_server_stopped(self):
         cfg = ServerDaemonConfig(

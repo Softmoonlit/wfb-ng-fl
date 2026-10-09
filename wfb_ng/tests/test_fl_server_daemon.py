@@ -314,10 +314,11 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
         with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), patch.object(
             daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")
-        ):
+        ), patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
             daemon._finalize_job(outcome="completed", job_id="terminal-reset")
 
-        self.assertEqual(calls, ["role_close", "link_stop", "link_start"])
+        self.assertEqual(calls, ["role_close", "link_stop", "link_start", "terminal_broadcast"])
+        self.assertEqual(broadcast.call_args.args[0]["job_id"], "terminal-reset")
         self.assertEqual(daemon.server_state, ServerState.IDLE)
         self.assertIsNone(daemon.active_job)
         self.assertIsNone(daemon.server_role)

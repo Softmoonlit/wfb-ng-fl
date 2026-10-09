@@ -10,6 +10,7 @@ from tests.fl_runtime.stage3_archive import (
     FIXED_CONFIG, init_envelope, validate_archive, validate_client_evidence,
 )
 from wfb_ng.fl.artifacts import file_sha256
+from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.issue41_fixtures import generate_model_fixture, generate_client_fixture
 
 COMMIT = 'a' * 40
@@ -170,6 +171,16 @@ def archive(tmp_path, payloads):
                     raw_evidence=dict(is_active='active' if idle else 'inactive',
                         show_props=dict(ActiveState='active' if idle else 'inactive',MainPID='10' if idle else '0',TasksCurrent='2' if idle else '0'),tun_out='mtu 1500' if idle else 'Device does not exist')))
         put(root,f'resources/{mode}.json',bind(nodes=nodes))
+    topology={}
+    stopped=json.loads((root/'resources/stopped.json').read_text())['nodes']
+    for n in (0,1,2):
+        role_name='server' if n==0 else f'client{n}'
+        topology[role_name]=dict(commit=COMMIT,workspace_clean=True,
+            wireless=dict(interface='wlxabc',driver='rtl88xxau_wfb',usb_controller='xhci_hcd',
+                usb_speed='480',mac='5c:ff:ff:af:6d:8c' if n==0 else f'00:11:22:33:44:0{n}'),
+            identity=None if n==0 else dict(node_id=n,tun_ip=f'10.80.0.{10+n}'),
+            resources=stopped[str(n)]['raw'])
+    put(root,'topology.json',topology)
     from tests.fl_runtime.stage3_archive import STAGES
     times=[(0,.8),(.8,.9),(1,2),(3,100),(101,140),(141,142),(143,144),(145,146)]
     for stage,(start,end) in zip(STAGES[:-1],times):
@@ -194,12 +205,122 @@ def archive(tmp_path, payloads):
     for node in install['nodes'].values():
         node['files']['wfb_ng/fl/build_identity.json'].update(installed_sha256=identity,expected_sha256=identity)
     put(root,'installation.json',install)
+    postflight={}
+    for n in (0,1,2):
+        role_name='server' if n==0 else f'client{n}'
+        daemon='server' if n==0 else 'client'
+        path=f'/lib/systemd/system/wfb-fl-{daemon}-daemon.service'
+        unit=dict(package_path=path,package_sha256=digest,sha256=digest,
+            properties=dict(FragmentPath=path,KillMode='control-group',DropInPaths='',
+                ExecStart='{ path=/usr/bin/wfb-fl-'+daemon+'-daemon ; argv[]=/usr/bin/wfb-fl-'+daemon+'-daemon ; }'))
+        put(root,f'nodes/{role_name}/unit.json',unit)
+        postflight[str(n)]=dict(commit=COMMIT,clean=True,unit=unit)
+    put(root,'postflight.json',bind(nodes=postflight))
+    status=dict(server_state='IDLE',active_job=None,link_process=dict(running=True),
+        radio={k:FIXED_CONFIG[k] for k in ('channel','radio_txpower_dbm','downlink_mcs','uplink_mcs','uftp_rate_kbps')},
+        nodes={str(n):dict(reported_state='IDLE',readiness='READY',current_channel=157) for n in (1,2)})
+    put(root,'job-idle.json',status)
+    put(root,'collected-status.json',status)
+    (root/'nodes/server/daemon.log').write_text('99.000 vm0 daemon: 作业终态广播成功 type=JOB_COMPLETED job_id=job_test\n99.100 vm0 daemon: 作业 job_test 终态收口完成 (outcome=completed, reason=None)\n')
+    for n in (1,2):
+        (root/f'nodes/client{n}/daemon.log').write_text(f'99.200 vm{n} daemon: 回收作业 job_test 资源 (exit_code=0)\n')
     seal_archive(root)
     return root
 
 
 def test_complete_archive(archive):
     assert validate_archive(archive)['status'] == 'passed'
+
+
+def test_postflight_is_required_even_with_valid_seal(archive):
+    (archive / 'postflight.json').unlink(missing_ok=True)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert any(e['category'] == 'installation' for e in result['errors'])
+
+
+def test_raw_preflight_topology_is_required(archive):
+    (archive / 'topology.json').unlink(missing_ok=True)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert any(e['category'] == 'preflight' for e in result['errors'])
+
+
+def test_job_terminal_evidence_is_required(archive):
+    (archive / 'job-idle.json').unlink(missing_ok=True)
+    reseal(archive)
+    result = validate_archive(archive)
+    assert result['status'] == 'failed'
+    assert any(e['category'] == 'runtime_evidence' for e in result['errors'])
+
+
+@pytest.mark.parametrize('kind', [
+    'postflight_commit','postflight_dirty','unit_digest','unit_package','unit_exec',
+    'unit_fragment','unit_dropin','unit_killmode','unit_changed',
+    'topology_missing_node','topology_identity','topology_usb','topology_mac','topology_resources',
+    'terminal_active_job','terminal_active_job_missing','terminal_client_not_ready',
+    'terminal_wrong_job','terminal_missing_broadcast','terminal_exit_code_mismatch',
+])
+def test_resealed_invalid_lifecycle_evidence_is_rejected(archive,kind):
+    if kind.startswith('postflight') or kind.startswith('unit'):
+        path='postflight.json'
+        report=json.loads((archive/path).read_text())
+        if kind=='postflight_commit': report['nodes']['1']['commit']='b'*40
+        elif kind=='postflight_dirty': report['nodes']['2']['clean']=False
+        elif kind=='unit_changed': report['nodes']['0']['unit']['sha256']='b'*64
+        else:
+            unit=report['nodes']['0']['unit']
+            if kind=='unit_digest': unit['sha256']='b'*64
+            elif kind=='unit_package': unit['package_sha256']='b'*64
+            elif kind=='unit_exec': unit['properties']['ExecStart']='{ path=/usr/bin/other ; }'
+            elif kind=='unit_fragment': unit['properties']['FragmentPath']='/tmp/foreign.service'
+            elif kind=='unit_dropin': unit['properties']['DropInPaths']='/etc/systemd/system/override.conf'
+            elif kind=='unit_killmode': unit['properties']['KillMode']='process'
+            put(archive,'nodes/server/unit.json',unit)
+        put(archive,path,report)
+        category='installation'
+    elif kind.startswith('topology'):
+        report=json.loads((archive/'topology.json').read_text())
+        if kind=='topology_missing_node': del report['client1']
+        elif kind=='topology_identity': report['client2']['identity']['node_id']=1
+        elif kind=='topology_usb': report['client2']['wireless']['usb_speed']='12'
+        elif kind=='topology_mac': report['server']['wireless']['mac']='00:11:22:33:44:55'
+        elif kind=='topology_resources': report['client1']['resources']['tun_exists']=True
+        put(archive,'topology.json',report)
+        category='preflight'
+    else:
+        if kind in ('terminal_active_job','terminal_active_job_missing','terminal_client_not_ready'):
+            status=json.loads((archive/'job-idle.json').read_text())
+            if kind=='terminal_active_job': status['active_job']={'job_id':'job_test'}
+            elif kind=='terminal_active_job_missing': del status['active_job']
+            else: status['nodes']['2']['readiness']='NOT_READY'
+            put(archive,'job-idle.json',status)
+        elif kind=='terminal_exit_code_mismatch':
+            path=archive/'nodes/client2/daemon.log'
+            path.write_text(path.read_text().replace('exit_code=0','exit_code=-15'))
+        else:
+            path=archive/'nodes/server/daemon.log'
+            text=path.read_text()
+            path.write_text(text.replace('job_id=job_test','job_id=other') if kind=='terminal_wrong_job'
+                            else '\n'.join(line for line in text.splitlines() if '广播成功' not in line)+'\n')
+        category='runtime_evidence'
+    reseal(archive)
+    result=validate_archive(archive)
+    assert result['status']=='failed'
+    assert any(e['category']==category for e in result['errors'])
+
+
+@pytest.mark.parametrize('returncode', [-15,-9])
+def test_completed_job_can_have_terminated_role_exit_code(archive,returncode):
+    path=archive/'clients/2/evidence_manifest.json'
+    manifest=json.loads(path.read_text());manifest['returncode']=returncode
+    put(archive,'clients/2/evidence_manifest.json',manifest)
+    log=archive/'nodes/client2/daemon.log'
+    log.write_text(log.read_text().replace('exit_code=0',f'exit_code={returncode}'))
+    reseal(archive)
+    assert validate_archive(archive)['status']=='passed'
 
 
 def test_init_never_overwrites(archive):
@@ -211,7 +332,7 @@ def test_init_never_overwrites(archive):
 def test_invalid_identity(tmp_path, field, value):
     args = dict(run_id='run',job_id='job',commit=COMMIT)
     args[field] = value
-    with pytest.raises(ValueError):
+    with pytest.raises(FLRuntimeError if field in ('run_id','job_id') else ValueError):
         init_envelope(tmp_path/'new', **args)
 
 
@@ -271,7 +392,7 @@ def test_failure_outcome_matrix(archive):
     assert validate_client_evidence(base,run_id='run_test',job_id='job_test',node_id=1,commit=COMMIT)==[]
     result=validate_archive(archive)
     assert result['status']=='failed'
-    assert 'lifecycle' in str(result['errors'])
+    assert any(e['category']=='runtime_evidence' for e in result['errors'])
 
 
 def test_duplicate_json_key_rejected(archive):

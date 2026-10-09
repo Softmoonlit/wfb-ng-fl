@@ -8,6 +8,7 @@ import pytest
 
 from tests.fl_runtime import stage3_runner as module
 from tests.fl_runtime.stage3_archive import init_envelope
+from wfb_ng.fl.errors import FLRuntimeError
 
 
 @pytest.fixture
@@ -250,8 +251,23 @@ def test_initialization_rejects_reused_or_unsafe_run_id(tmp_path,monkeypatch):
     with pytest.raises(FileExistsError):
         module.initialize(tmp_path,tmp_path,run_id='stage3_unique')
     for name in ('../bad','dot.name','/tmp/unsafe'):
-        with pytest.raises(ValueError,match='unsafe'):
+        with pytest.raises(FLRuntimeError,match='run_id'):
             module.initialize(tmp_path,tmp_path,run_id=name)
+
+
+def test_initialization_rejects_run_id_that_overflows_job_directory(tmp_path,monkeypatch):
+    monkeypatch.setattr(module.subprocess,'check_output',lambda *args,**kwargs:'a'*40+'\n')
+    with pytest.raises(ValueError,match='目录'):
+        module.initialize(tmp_path,tmp_path,run_id='a'*251)
+    assert not (tmp_path/('a'*251)).exists()
+
+
+def test_initialization_accepts_identifier_length_boundary(tmp_path,monkeypatch):
+    monkeypatch.setattr(module.subprocess,'check_output',lambda *args,**kwargs:'a'*40+'\n')
+    archive=module.initialize(tmp_path,tmp_path,run_id='a'*111)
+    assert json.loads((archive/'envelope.json').read_text())['job_id']=='a'*111+'_sync'
+    with pytest.raises(ValueError,match='目录'):
+        module.initialize(tmp_path,tmp_path,run_id='a'*112)
 
 
 def test_shell_has_fixed_phases_and_failure_trap():

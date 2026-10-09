@@ -263,15 +263,23 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         self.assertIsNotNone(iface)
         client_daemon.start_control_plane()
 
-        # Execute channel hunt to lock Channel 157 with retries
-        found = False
-        for _ in range(5):
-            if client_daemon.control_plane.hunt_once(ladder=[157]):
-                found = True
-                break
-            time.sleep(0.05)
-        self.assertTrue(found, f"Node {client_daemon.config.node_id} failed to lock channel 157")
-        self.assertEqual(client_daemon.control_plane.state, ClientNodeState.IDLE)
+        # start_control_plane owns hunting and the uplink socket. Calling
+        # hunt_once here races its supervisory loop and can send a newer HUNTING
+        # heartbeat after the server has already observed IDLE/READY.
+        self._wait_until(
+            lambda: (
+                client_daemon.control_plane.locked_channel == 157
+                and client_daemon.control_plane.state == ClientNodeState.IDLE
+                and (
+                    record := self.server_daemon.control_plane.registry.get_node(
+                        client_daemon.config.node_id
+                    )
+                ) is not None
+                and record.readiness == NodeReadiness.READY
+                and record.reported_state == ClientNodeState.IDLE.value
+            ),
+            msg=f"node {client_daemon.config.node_id} autonomously locking channel 157 and reaching READY",
+        )
 
     def test_e2e_dual_client_sync_two_rounds_40mib_success(self):
         """
@@ -318,7 +326,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
 
         # 3. 提交任务启动
         code, body = self._http_post("/api/v1/jobs/start", job_payload)
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 200, body)
         self.assertEqual(body["status"], "accepted")
         self.assertEqual(self.server_daemon.server_state, ServerState.RUNNING)
 
@@ -402,7 +410,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         }
 
         code, body = self._http_post("/api/v1/jobs/start", job_payload)
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 200, body)
 
         coord = self.server_daemon.coordinator
         self.assertIsNotNone(coord)
@@ -475,7 +483,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
         }
 
         code, body = self._http_post("/api/v1/jobs/start", job_payload)
-        self.assertEqual(code, 200)
+        self.assertEqual(code, 200, body)
         self.assertEqual(self.server_daemon.server_state, ServerState.RUNNING)
 
         # 确定性等待运行时进入 wait_for_updates 状态
@@ -483,7 +491,7 @@ class TestAirgappedE2ECluster(unittest.TestCase):
 
         # 触发主动中止
         abort_code, abort_body = self._http_post("/api/v1/jobs/abort", {"reason": "test_operator_abort"})
-        self.assertEqual(abort_code, 200)
+        self.assertEqual(abort_code, 200, abort_body)
         self.assertEqual(abort_body["status"], "aborted")
 
         # 客户端沙箱安全回收，无僵尸进程与残留 TUN

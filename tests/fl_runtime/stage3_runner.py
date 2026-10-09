@@ -25,7 +25,7 @@ import uuid
 import urllib.request
 import urllib.error
 
-from wfb_ng.fl.artifacts import file_sha256, write_json_atomic
+from wfb_ng.fl.artifacts import file_sha256, write_json_atomic, validate_path_safe_identifier
 from tests.fl_runtime.issue41_lifecycle import LifecycleConfig, audit_stopped_node
 
 from tests.fl_runtime.stage3_archive import STAGES
@@ -412,7 +412,7 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
             args = repr(self.fixture_root + '/' + name)
             if role != 'server':
                 args += ', ' + role[-1]
-            code = f'import json; from wfb_ng.fl.issue41_fixtures import {fn}; print(json.dumps({fn}({args}, size_bytes=41943040)))'
+            code = f'import json; from wfb_ng.fl.issue41_fixtures import {fn}; print(json.dumps({fn}({args}, size_bytes={FIXED_CONFIG["artifact_size_bytes"]})))'
             records[role] = json.loads(self.executor.checked(role, 'cd / && ' + python_command(code), timeout=120))
         if records['client1']['sha256'] == records['client2']['sha256']:
             raise RuntimeError('node-specific canonical update digests must differ')
@@ -457,9 +457,10 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
         self.save('services-ready.json', dict(started_at=started, ready_at=time.time(), status=status))
 
     def run_sync(self):
-        payload = dict(run_id=self.run_id, job_id=self.job_id, mode='sync', rounds=2,
-            target_nodes=[1,2], model_path=self.fixture_root+'/model.bin', model_size_bytes=41943040,
-            round_timeout_seconds=120, io_timeout_seconds=120, live_observation=True,
+        payload = dict(run_id=self.run_id, job_id=self.job_id,
+            **{k: FIXED_CONFIG[k] for k in ('mode','rounds','target_nodes',
+               'round_timeout_seconds','io_timeout_seconds','live_observation')},
+            model_path=self.fixture_root+'/model.bin', model_size_bytes=FIXED_CONFIG['artifact_size_bytes'],
             algorithm='wfb_ng.fl.issue41_algorithm:client_main',
             algorithm_config=dict(update_template_path=self.fixture_root+'/update-client{node_id}-template.bin'))
         self.save('job-request.json', payload)
@@ -795,11 +796,15 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
 
 def initialize(root: Path, repo: Path, run_id=None):
     run_id=run_id or 'stage3_'+time.strftime('%Y%m%d_%H%M%S')+'_'+uuid.uuid4().hex[:12]
-    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]{0,110}',run_id):
-        raise ValueError('unsafe run_id')
+    validate_path_safe_identifier(run_id, 'run_id')
+    job_id=run_id+'_sync'
+    # Keep the existing 111-character run limit: job_<id>_role then uses
+    # 125 bytes, leaving ample room for evidence's .<id>.<random> names.
+    if len(run_id)>111:
+        raise ValueError('run_id 超过作业与 evidence 临时目录的安全长度上限 111')
     archive=root.resolve()/run_id
     commit=subprocess.check_output(['git','-C',str(repo),'rev-parse','HEAD'],text=True).strip()
-    meta=init_envelope(archive,run_id=run_id,job_id=run_id+'_sync',commit=commit)
+    meta=init_envelope(archive,run_id=run_id,job_id=job_id,commit=commit)
     meta.update(created_at=time.time(),completed_stages=[],
               conclusion_scope='作业运行时无 SSH 依赖',topology={'server':'local','client1':'vm1','client2':'vm2'})
     write_json_atomic(str(archive/'envelope.json'),meta)

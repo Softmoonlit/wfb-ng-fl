@@ -22,6 +22,8 @@ bash tests/fl_runtime/stage3_vm_physical_loop.sh run-all
 
 Client 证据直接来自 `/var/lib/wfb-ng-fl/evidence/<job_id>/` 的原始小型文件；不通过 SSH 抢救运行中的沙箱，不复制 Client 模型/update 本体。Server 保存实际模型、update 和聚合输出，供离线 SHA-256 核验。Transport 配置、Coordinator 配置、链路启动配置、journal 和终态资源核查均从实际运行结果回读。
 
+离线 validator 同时核对原始 preflight 拓扑、运行后三端提交与干净工作树、活动 unit 与 Debian 制品摘要，以及终态 REST 快照和作业身份绑定的 daemon journal。终态广播失败时 Server 停止接单；Client 的成功 lifecycle 允许完成信令终止角色产生 `-15/-9`，但清理日志退出码必须与 evidence manifest 一致。归档封口只提供完整性，不能替代这些语义检查。
+
 收集先保存空闲期资源，停服后追加三端进程、cgroup 和 TUN 核查，最后封口并验证。离线复核：
 
 ```bash

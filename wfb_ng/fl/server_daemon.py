@@ -938,7 +938,7 @@ class ServerDaemon:
         """
         Unified terminal helper for all job termination paths (completed, failed, aborted).
         Closes coordinator/role, broadcasts terminal downlink with job_id, resets persistent link,
-        and restores IDLE state. Fails closed if link reset fails.
+        and restores IDLE state. Fails closed if link reset or terminal broadcast fails.
         """
         target_job_id = job_id
         coord = None
@@ -1004,23 +1004,31 @@ class ServerDaemon:
             raise FLRuntimeError("link_reset_failed", f"作业终态重置服务端链路失败: {link_reset_error}")
 
         # 4. Broadcast terminal message only after persistent link reset succeeds
-        if self.control_plane is not None and target_job_id is not None:
-            try:
-                if outcome == "completed":
-                    self.control_plane.broadcast_downlink({
-                        "type": "JOB_COMPLETED",
-                        "job_id": target_job_id,
-                        "timestamp_ms": int(time.time() * 1000),
-                    })
-                else:
-                    self.control_plane.broadcast_downlink({
-                        "type": "JOB_ABORT",
-                        "job_id": target_job_id,
-                        "reason": reason or error,
-                        "timestamp_ms": int(time.time() * 1000),
-                    })
-            except Exception as broadcast_exc:
-                logger.warning("广播终态消息失败: %s", broadcast_exc)
+        terminal_type = "JOB_COMPLETED" if outcome == "completed" else "JOB_ABORT"
+        try:
+            if self.control_plane is None or target_job_id is None:
+                raise RuntimeError("终态广播缺少控制面或 job_id")
+            terminal_message = {
+                "type": terminal_type,
+                "job_id": target_job_id,
+                "timestamp_ms": int(time.time() * 1000),
+            }
+            if outcome != "completed":
+                terminal_message["reason"] = reason or error
+            self.control_plane.broadcast_downlink(terminal_message)
+        except Exception as broadcast_exc:
+            with self._lock:
+                self.server_state = ServerState.STOPPED
+            logger.error(
+                "作业终态广播失败 type=%s job_id=%s: %s",
+                terminal_type, target_job_id, broadcast_exc,
+            )
+            raise FLRuntimeError(
+                "terminal_broadcast_failed", f"作业终态广播失败: {broadcast_exc}"
+            ) from broadcast_exc
+        logger.info(
+            "作业终态广播成功 type=%s job_id=%s", terminal_type, target_job_id
+        )
 
         with self._lock:
             if not self._stop_event.is_set():
