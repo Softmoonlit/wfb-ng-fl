@@ -59,7 +59,6 @@
       if (selectBtn.style) selectBtn.style.marginLeft = '6px';
       selectBtn.title = '选定此模型并在监控页创建同步作业';
 
-      // Keep remove as operation.children[0] for backward-compatible test assertions
       operation.append(remove, selectBtn);
       row.append(item('td', model.filename), digest, item('td', String(model.size_bytes)),
         item('td', model.created_at), item('td', model.referenced ? '已引用 · 禁止删除' : '未引用'), operation);
@@ -80,8 +79,8 @@
       }
 
       if (byId('hud-radio')) {
-        const r = server.radio;
-        byId('hud-radio').textContent = r ? `CH${r.channel} · ${r.radio_txpower_dbm}dBm · MCS${r.downlink_mcs}` : '未确认';
+        const radioConfig = server.radio;
+        byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
       }
 
       if (byId('hud-job')) {

@@ -16,7 +16,8 @@
 
   let fetching = false;
   let lastState = null;
-  let connected = true;
+  let sseConnected = true;
+  let httpConnected = true;
   let startSubmitting = false;
   let instanceId = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('wfb-console-instance') : null;
   const item = (tag, text) => { const node = document.createElement(tag); node.textContent = text; return node; };
@@ -30,22 +31,22 @@
   }
 
   function updateTimers() {
-    if (!connected || !lastState) return;
+    if (!sseConnected || !httpConnected || !lastState) return;
     const job = lastState.current_job || (lastState.job && lastState.job.execution_result === 'running' ? lastState.job : null);
     if (job && lastState.server && lastState.server.state === 'running') {
       const now = Date.now() / 1000;
-      const jSec = job.started_at ? Math.max(0, now - job.started_at) : 0;
-      const rSec = job.round_started_at ? Math.max(0, now - job.round_started_at) : 0;
-      const pSec = job.phase_started_at ? Math.max(0, now - job.phase_started_at) : (job.round_started_at ? Math.max(0, now - job.round_started_at) : jSec);
-      const jStr = formatSeconds(jSec);
-      const rStr = formatSeconds(rSec);
-      const pStr = formatSeconds(pSec);
-      if (byId('job-elapsed')) byId('job-elapsed').textContent = jStr;
-      if (byId('round-elapsed')) byId('round-elapsed').textContent = rStr;
-      if (byId('phase-elapsed')) byId('phase-elapsed').textContent = pStr;
+      const jobElapsedSeconds = job.started_at ? Math.max(0, now - job.started_at) : 0;
+      const roundElapsedSeconds = job.round_started_at ? Math.max(0, now - job.round_started_at) : 0;
+      const phaseElapsedSeconds = job.phase_started_at ? Math.max(0, now - job.phase_started_at) : (job.round_started_at ? Math.max(0, now - job.round_started_at) : jobElapsedSeconds);
+      const jobElapsedStr = formatSeconds(jobElapsedSeconds);
+      const roundElapsedStr = formatSeconds(roundElapsedSeconds);
+      const phaseElapsedStr = formatSeconds(phaseElapsedSeconds);
+      if (byId('job-elapsed')) byId('job-elapsed').textContent = jobElapsedStr;
+      if (byId('round-elapsed')) byId('round-elapsed').textContent = roundElapsedStr;
+      if (byId('phase-elapsed')) byId('phase-elapsed').textContent = phaseElapsedStr;
       if (byId('hud-job')) {
         const phText = phases[job.server_phase] || job.server_phase || '准备任务';
-        byId('hud-job').textContent = `轮次 ${job.current_round || 0}/${job.rounds} · ${phText} · ${pStr}`;
+        byId('hud-job').textContent = `轮次 ${job.current_round || 0}/${job.rounds} · ${phText} · ${phaseElapsedStr}`;
       }
     } else {
       if (byId('job-elapsed')) byId('job-elapsed').textContent = '00:00';
@@ -156,13 +157,8 @@
 
     let targetDigest = '';
     if (typeof window !== 'undefined' && window.location && window.location.search) {
-      if (typeof URLSearchParams !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        targetDigest = (params.get('model') || '').trim();
-      } else {
-        const match = window.location.search.match(/[?&]model=([^&]+)/);
-        if (match) targetDigest = decodeURIComponent(match[1]).trim();
-      }
+      const params = new URLSearchParams(window.location.search);
+      targetDigest = (params.get('model') || '').trim();
     }
 
     try {
@@ -182,15 +178,7 @@
       );
       select.value = targetDigest || (models.length > 0 ? models[0].sha256 : '');
     } catch {
-      // In standalone tests or when models API is stubbed, keep any existing/preselected option
-      if (targetDigest) {
-        const opt = document.createElement('option');
-        opt.value = targetDigest;
-        opt.textContent = `${targetDigest} (从链接选定)`;
-        opt.selected = true;
-        select.append(opt);
-        select.value = targetDigest;
-      }
+      // In isolated tests where models endpoint is unmocked
     }
   }
 
@@ -201,11 +189,11 @@
       const response = await fetch('/api/v1/state', {cache: 'no-store'});
       const state = await response.json();
       if (!response.ok) throw new Error(`${state.error.code}: ${state.error.message}`);
-      connected = true;
+      httpConnected = true;
       render(state);
-      byId('connection-error').hidden = true;
+      if (sseConnected) byId('connection-error').hidden = true;
     } catch (error) {
-      connected = false;
+      httpConnected = false;
       byId('connection-error').textContent = `无法刷新，状态可能已过时。${error.message}。请重试刷新状态。`;
       byId('connection-error').hidden = false;
     } finally {
@@ -280,9 +268,7 @@
       if (byId('start-job')) byId('start-job').disabled = true;
       if (statusBox) statusBox.textContent = '正在提交并启动同步作业…';
 
-      const idempotencyKey = (typeof crypto !== 'undefined' && crypto.randomUUID) ?
-        crypto.randomUUID() :
-        `req-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      const idempotencyKey = crypto.randomUUID();
 
       try {
         const response = await fetch('/api/v1/jobs', {
@@ -322,22 +308,21 @@
   if (typeof EventSource !== 'undefined') {
     const stream = new EventSource('/api/v1/events');
     stream.addEventListener('snapshot', event => {
-      connected = true;
+      sseConnected = true;
       try {
         render(JSON.parse(event.data));
-        byId('connection-error').hidden = true;
+        if (httpConnected) byId('connection-error').hidden = true;
       } catch (error) {
         byId('connection-error').textContent = `状态帧非法。${error.message}`;
         byId('connection-error').hidden = false;
       }
     });
     stream.addEventListener('operator-event', event => {
-      connected = true;
       if (event.lastEventId) byId('snapshot-time').textContent = `事件帧 ${event.lastEventId} · 等待状态快照`;
     });
     stream.onerror = () => {
-      connected = false;
-      byId('connection-error').textContent = '实时连接中断，浏览器正在重连；状态快照仍可手动刷新。';
+      sseConnected = false;
+      byId('connection-error').textContent = '实时连接中断，浏览器正在重连；本地计时已暂停，状态快照仍可手动刷新。';
       byId('connection-error').hidden = false;
     };
   }

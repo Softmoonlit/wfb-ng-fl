@@ -89,13 +89,13 @@
       return row;
     }));
     if (byId('hud-server-state')) {
-      const s = states[state.server.state] || state.server.state;
-      byId('hud-server-state').textContent = s;
+      const serverStateText = states[state.server.state] || state.server.state;
+      byId('hud-server-state').textContent = serverStateText;
       byId('hud-server-state').className = `badge ${state.server.state === 'idle' ? 'badge-green' : state.server.state === 'running' ? 'badge-blue' : state.server.state === 'starting' || state.server.state === 'preparing' ? 'badge-yellow' : 'badge-red'}`;
     }
     if (byId('hud-radio')) {
-      const r = state.server.radio;
-      byId('hud-radio').textContent = r ? `CH${r.channel} · ${r.radio_txpower_dbm}dBm · MCS${r.downlink_mcs}` : '未确认';
+      const radioConfig = state.server.radio;
+      byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
     }
     if (byId('hud-job')) {
       if (state.current_job && state.server.state === 'running') {

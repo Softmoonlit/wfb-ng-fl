@@ -98,6 +98,7 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
     confirm: confirmCallback || (() => true),
     EventSource,
     URLSearchParams,
+    crypto: globalThis.crypto,
     window: {
       location: { search: '?model=' + 'a'.repeat(64) }
     },

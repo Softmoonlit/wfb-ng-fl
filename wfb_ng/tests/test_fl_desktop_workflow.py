@@ -272,3 +272,75 @@ def test_e2e_desktop_console_api_flow(tmp_path):
         server.shutdown()
         worker.join()
         server.server_close()
+
+
+def test_desktop_console_real_sse_and_node_http_integration(tmp_path):
+    """Verifies real wire HTTP and SSE streaming with Node runtime and Python server."""
+    daemon = make_daemon()
+    daemon.server_state = ServerState.IDLE
+    register_idle(daemon)
+    daemon.console.models.root = tmp_path / 'models'
+    daemon.console.models.root.mkdir(parents=True, exist_ok=True)
+
+    server = ConsoleHTTPServer(('127.0.0.1', 0), ConsoleRequestHandler)
+    server.application = daemon.console
+    worker = threading.Thread(target=server.serve_forever)
+    worker.start()
+
+    host, port = server.server_address
+    base_url = f'http://{host}:{port}'
+    try:
+        # 1. Verify real SSE stream header and initial snapshot over HTTP
+        conn = http.client.HTTPConnection(host, port, timeout=5)
+        conn.request('GET', '/api/v1/events')
+        resp = conn.getresponse()
+        assert resp.status == 200
+        assert 'text/event-stream' in resp.getheader('Content-Type')
+        line1 = resp.readline()
+        assert line1.startswith(b'id: ')
+        line2 = resp.readline()
+        assert line2 == b'event: snapshot\n'
+        data_line = resp.readline()
+        assert data_line.startswith(b'data: {')
+        conn.close()
+
+        # 2. Run Node script performing real HTTP fetch against the live server
+        node = shutil.which('node')
+        assert node, 'Existing Node runtime required'
+        node_script = f"""
+        const assert = require('node:assert/strict');
+        (async () => {{
+            const base = '{base_url}';
+            // Verify static assets
+            const assetRes = await fetch(base + '/assets/console.js');
+            assert.equal(assetRes.status, 200);
+            assert.ok(assetRes.headers.get('content-type').includes('javascript'));
+
+            // Verify state snapshot
+            const stateRes = await fetch(base + '/api/v1/state');
+            assert.equal(stateRes.status, 200);
+            const state = await stateRes.json();
+            assert.equal(state.server.state, 'idle');
+            assert.equal(state.server.can_start_job, true);
+
+            // Verify models endpoint
+            const modelsRes = await fetch(base + '/api/v1/models');
+            assert.equal(modelsRes.status, 200);
+            const models = await modelsRes.json();
+            assert.deepEqual(models.models, []);
+
+            console.log('Real Node HTTP communication verified successfully');
+        }})().catch(err => {{
+            console.error(err);
+            process.exit(1);
+        }});
+        """
+        result = subprocess.run([node, '-e', node_script], capture_output=True, text=True, timeout=15)
+        assert result.returncode == 0, f"STDOUT: {result.stdout}\nSTDERR: {result.stderr}"
+        assert 'Real Node HTTP communication verified successfully' in result.stdout
+
+    finally:
+        server.shutdown()
+        worker.join()
+        server.server_close()
+
