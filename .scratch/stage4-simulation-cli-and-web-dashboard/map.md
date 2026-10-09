@@ -33,6 +33,7 @@ Type: map
 - Stage 2/3 已有的 `/api/v1/status`、`/api/v1/logs/stream`、`/api/v1/survey`、`/api/v1/radio/reconfigure`、`/api/v1/jobs/start` 和 `/api/v1/jobs/abort` 是 Stage 4 控制台的现有基础契约。Stage 4 新增的是模型库、Web 管理入口和面向操作者的状态语义，不复制这些领域逻辑。
 - Stage 2 和 Stage 3 的实体测试拓扑均限定为本机 Server、`vm1`（Client 1）和 `vm2`（Client 2）；1～10 节点是协议、配置和界面容量约束，不是 Stage 4 的实体硬件验收规模。
 - Stage 4 的 40 MiB 闭环使用 canonical fixture 生成验收输入，直接跳过训练和聚合，只验证模型下发、update 上传、固定次数推进、状态恢复和急停，不宣称真实机器学习训练、FedAvg 或收敛效果。
+- Web 通过 Server Daemon、带内控制面和 Client Daemon 控制集群级射频参数（`channel`、`radio_txpower_dbm`、`downlink_mcs`、`uplink_mcs`）以及 FL 作业启动、观察和急停；不得直接访问 Client、WFB 底座、TUN、UFTP 或 HTTP PUT 数据面。
 
 
 ## Decisions so far
@@ -43,8 +44,8 @@ Type: map
 
 - [定义控制台运行状态与进度语义](issues/03-console-state-and-progress-semantics.md#answer)：首版只展示真实轮次、Server 阶段、耗时、节点粗状态、错误、最近关键事件和资源恢复状态；快照恢复页面，细粒度节点阶段、虚假百分比、链路遥测与历史持久化延期。
 
+- [定义扫频与集群射频准备流程](issues/04-radio-preparation-workflow.md#answer)：首版延期扫频推荐，采用手动扁平参数、Server 校验、UFTP 越界二次确认和空闲集群应用；复用双最终屏障，commit 前回退 157，commit 后确认不完整进入 `RADIO_ERROR`。
 
-- Web 通过 Server Daemon、带内控制面和 Client Daemon 控制集群级射频参数（`channel`、`radio_txpower_dbm`、`downlink_mcs`、`uplink_mcs`）以及 FL 作业启动、观察和急停；不得直接访问 Client、WFB 底座、TUN、UFTP 或 HTTP PUT 数据面。
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
 
