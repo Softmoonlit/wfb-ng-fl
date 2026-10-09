@@ -46,6 +46,8 @@ Type: map
 
 - [定义扫频与集群射频准备流程](issues/04-radio-preparation-workflow.md#answer)：首版延期扫频推荐，采用手动扁平参数、Server 校验、UFTP 越界二次确认和空闲集群应用；复用双最终屏障，commit 前回退 157，commit 后确认不完整进入 `RADIO_ERROR`。
 
+- [定义无外网直连管理网部署契约](issues/05-direct-link-management-network.md#answer)：保留 `127.0.0.1:9090` 本机 IPC，新增显式 `web_host` 与固定 `web_port: 8080` 的同源 Web listener；地址不可用时仅降级 Web listener，核心 daemon 持续运行并在地址就绪后恢复；浏览器只通过 `http://<web_host>:8080/` 访问 Server Daemon。
+
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
 
