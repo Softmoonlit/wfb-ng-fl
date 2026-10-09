@@ -600,6 +600,12 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
         self.save('radio/fault.json', self.bound(node_id=2,drop_types=['NEW_CHANNEL_PING','RADIO_SWITCH_FINALIZED'],
                  present=False,installed_at=installed,removed_at=removed))
 
+    def collect_server_file(self, source, dest):
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        self.executor.checked('server', 'sudo -n install -o ' + str(os.getuid())
+                              + ' -g ' + str(os.getgid()) + ' -m 0600 -- '
+                              + shlex.quote(str(source)) + ' ' + shlex.quote(str(dest)), timeout=60)
+
     def collect_tree(self, role, source, dest):
         # Server binaries remain available for offline SHA checking. Client
         # evidence remains the daemon's small, original whitelist archive.
@@ -683,13 +689,13 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
                 self.collect_tree(role,str(self.job_root),node/'job')
                 self.collect_tree(role,str(self.job_root)+'_role',self.archive/'server')
                 # Copy actual JobConfig emitted by the coordinator.
-                self.executor.checked(role,'sudo -n cp '+shlex.quote(str(self.job_root/'job_config.json'))
-                                      +' '+shlex.quote(str(self.archive/'server/job_config.json')))
+                self.collect_server_file(self.job_root/'job_config.json',
+                                         self.archive/'server/job_config.json')
                 (self.archive/'server/models').mkdir(exist_ok=True)
                 summary=json.loads((self.archive/'job/coordinator.json').read_text())
                 for index,r in enumerate(summary['rounds'],1):
-                    self.executor.checked(role,'sudo -n cp '+shlex.quote(r['output_model_path'])+' '
-                               +shlex.quote(str(self.archive/f'server/models/{index}.bin')),timeout=60)
+                    self.collect_server_file(r['output_model_path'],
+                                             self.archive/f'server/models/{index}.bin')
                 links=[p['args'] for p in idle[role]['processes'] if p['comm']=='wfb_v6_uplink']
                 if len(links)!=1: raise RuntimeError('server must have exactly one persistent link')
                 self.collect_idle_link(role)

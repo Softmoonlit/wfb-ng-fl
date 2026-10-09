@@ -638,3 +638,52 @@ def test_server_collect_tree_keeps_archive_writable_and_root_source_unchanged(ru
     finally:
         subprocess.run(['sudo','-n','chown','-R',f'{os.getuid()}:{os.getgid()}',
                         str(source),str(destination),str(sibling)],check=True)
+
+
+def test_server_single_files_after_tree_copy_are_readable_without_changing_root600_sources(runner,tmp_path):
+    import hashlib
+    import os
+    import stat
+    source=tmp_path/'root source'
+    source.mkdir()
+    files={'job_config.json':b'{"io_timeout_seconds":120}\n',
+           'output model.bin':b'root-owned model fixture'}
+    for name,content in files.items():
+        (source/name).write_bytes(content)
+        (source/name).chmod(0o600)
+    subprocess.run(['sudo','-n','chown','-R','0:0',str(source)],check=True)
+    before={name:(source/name).stat() for name in files}
+    destination=runner.archive/'server'
+    runner.executor.backend=None
+    try:
+        runner.collect_tree('server',str(source),destination)
+        for name,relative in [('job_config.json','job_config.json'),('output model.bin','models/1.bin')]:
+            target=destination/relative
+            runner.collect_server_file(str(source/name),target)
+            assert module.file_sha256(str(target))==hashlib.sha256(files[name]).hexdigest()
+            copied=target.stat()
+            assert (copied.st_uid,copied.st_gid,stat.S_IMODE(copied.st_mode))==(os.getuid(),os.getgid(),0o600)
+            original=(source/name).stat()
+            assert (original.st_uid,original.st_gid,original.st_mode,original.st_mtime_ns)==(
+                before[name].st_uid,before[name].st_gid,before[name].st_mode,before[name].st_mtime_ns)
+            assert subprocess.check_output(['sudo','-n','cat','--',str(source/name)])==files[name]
+    finally:
+        subprocess.run(['sudo','-n','chown','-R',f'{os.getuid()}:{os.getgid()}',str(source),str(destination)],check=True)
+
+
+def test_collect_routes_server_config_and_models_through_owned_file_copy(runner,monkeypatch):
+    monkeypatch.setattr(runner,'rest',ready_status)
+    monkeypatch.setattr(runner,'resources',lambda *args,**kwargs:dict(processes=[],tuns=[]))
+    monkeypatch.setattr(runner,'collect_wireless',lambda role:None)
+    monkeypatch.setattr(runner,'collect_tree',lambda role,source,dest:dest.mkdir(parents=True,exist_ok=True))
+    runner.save('job/coordinator.json',dict(rounds=[dict(output_model_path='/root/output-model.bin')]))
+    copies=[]
+    def copy(source,dest):
+        copies.append((str(source),dest.relative_to(runner.archive).as_posix()))
+        if len(copies)==2: raise RuntimeError('copy boundary reached')
+    monkeypatch.setattr(runner,'collect_server_file',copy)
+    with pytest.raises(RuntimeError,match='copy boundary reached'):
+        runner.collect()
+    assert copies==[(str(runner.job_root/'job_config.json'),'server/job_config.json'),
+                    ('/root/output-model.bin','server/models/1.bin')]
+    assert not any('sudo -n cp ' in command for _,command in runner.calls)
