@@ -1,0 +1,41 @@
+Status: ready-for-agent
+Type: map
+
+# Stage 3 虚拟机管理下真实射频闭环实施路线
+
+## Destination
+
+在 vm0、vm1、vm2 三台 Linux VM 与 USB 直通真实无线网卡上，形成一组绑定提交、配置和 `run_id` 的正式证据，证明双 Client、两轮、40 MiB、`sync` 作业运行时无 SSH 依赖，并通过 SSH 受控故障注入验证射频两阶段切换的 15 秒租约回退。
+
+## Canonical spec
+
+[Stage 3 规格](spec.md)
+
+## Decisions so far
+
+- 管理以太网与 SSH 保持可达；不声明 air-gapped 或管理网物理隔离。
+- 不执行 VM reboot，不验收 daemon 开机自启。
+- 正常作业观察窗口内 Stage 3 执行器禁止连接 vm1/vm2；SSH 只用于准备、指定故障注入和事后取证。
+- 正常场景固定为双 Client、两轮、40 MiB、`sync` 和确定性占位算法。
+- 射频场景固定为 157→149，在 Client 2 预置精确控制消息丢弃规则，验证 Server 与 Client 自动回退 157。
+- Client 在终态清理前持久化白名单小型证据，不复制模型/update 本体。
+- 增加正式本地 `POST /api/v1/radio/reconfigure`，不增加 CLI。
+- 正式入口为 `tests/fl_runtime/stage3_vm_physical_loop.sh`。
+- 当前 vm0、vm1、vm2 尚未出现 `wlx*` 接口，正式硬件运行需操作者先完成 USB 直通。
+
+## Work graph
+
+1. [01 Client 节点本地 evidence](issues/01-client-local-evidence-archive.md)
+2. [02 射频重配 REST](issues/02-radio-reconfigure-rest.md)
+3. [03 作业 I/O/观测参数贯通与终态一致性](issues/03-job-parameters-and-terminal-consistency.md)
+4. [04 Stage 3 执行器、envelope 与 validator](issues/04-stage3-runner-envelope-validator.md)，依赖 01、02、03
+5. [05 软件回归与双轴审查](issues/05-software-regression-and-review.md)，依赖 01、02、03、04
+6. [06 三机正式硬件验收](issues/06-three-vm-formal-hardware-acceptance.md)，依赖 05，并等待 USB 无线网卡直通
+
+## Out of scope
+
+- 管理网物理隔离、拔线或真正 air-gapped 运行。
+- VM reboot、systemd 开机自启或冷启动自治。
+- 真实训练、FedAvg、评估或收敛。
+- `semi_async`、`async` 或多于两个 Client 的真实硬件验收。
+- Web、CLI、生产鉴权和历史归档浏览。

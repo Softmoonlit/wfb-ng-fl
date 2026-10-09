@@ -8,7 +8,7 @@
 
 ## 四个本机接口
 
-Runtime 以本地库接口表达严格同步轮次语义：
+Runtime 以本地库接口表达严格同步轮次语义。外层 Daemon 的 `job_id`、`TASK_ANNOUNCE`、`TASK_READY`、空闲链路和任务链路所有权均不进入 Runtime API；Daemon 只有在作业级就绪屏障达成后才允许算法协调逻辑调用这些接口：
 
 - server：`publish_model(model_path) -> None`
 - server：`wait_for_updates() -> updates_by_node`
@@ -160,7 +160,9 @@ server 只把同时满足以下条件的 update 记为有效：`round_id` 匹配
 
 进程重启发现非终态轮次时，把它原子改写为 `failed` 并记录 `error_code: "runtime_restarted"`，保留标识、manifest、已归档文件和错误记录，但不恢复等待、传输或提交上下文。当前成功或失败终态恢复为对应结果接口的待消费结果，不恢复任何活动 operation；结果消费后，新进程必须以新的 `round_id` 开始下一轮。临时或未校验文件不得恢复为有效交付。v8 运行前提是部署管理器在启动新角色进程前已经终止旧实例及其 Transport 启动的全部 UFTP 子进程；Runtime 和 Transport 不持久化 UFTP PID，不扫描、接管或恢复旧下行 operation。
 
-终态目录默认不自动删除。托管路径只承诺在当前部署和工作目录位置下有效，调用方不得原地修改、重命名或删除；清理只能处理可确认终态，不能删除活动轮次。Runtime 不提供在线清理、历史查询或跨进程恢复接口。
+终态轮次目录默认不由 Runtime 自动删除。托管路径只承诺在当前作业角色和工作目录位置下有效，调用方不得原地修改、重命名或删除；清理只能处理可确认终态，不能删除活动轮次。Runtime 不提供在线清理、历史查询或跨进程恢复接口。
+
+外层 Client Daemon 可以在 RoleService 已退出后清理整个作业沙箱，但必须先完成规格要求的节点本地审计证据复制，且只能复制白名单内的小型日志、配置、状态和 manifest。该证据副本不用于 Runtime 结果重放，不能成为文件交付成功判据，也不能追溯改写 Runtime 终态。归档失败时应保留原沙箱供诊断，同时仍由 Daemon 恢复空闲链路。
 
 ## 错误顺序和失败传播
 

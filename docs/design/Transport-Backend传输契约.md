@@ -6,7 +6,7 @@
 
 本文档唯一拥有文件交换到具体 Transport 的映射、UFTP/HTTP 资源和元数据、传输完成条件、响应边界和传输失败语义。它不拥有 FL Runtime 的轮次状态机，也不拥有 READY、GRANT、Token Passing 或物理层机制。
 
-角色主进程、Runtime 与 Transport 的进程边界由[系统分层与跨层契约](系统分层与跨层契约.md#cross-layer-contracts)拥有。Transport 在角色进程启动时先初始化并创建角色所需的常驻接收器；Transport 报告 ready 后 Runtime 四接口才可用。client Transport 常驻运行一个原生 `uftpd` 子进程接收下行，server Transport 在主进程内常驻运行 HTTP listener 接收上行。常驻只描述接收器生命周期：server 的 `uftp` 发送进程仍由每次 `publish_model(...)` 对应的下行 operation 按需启动，client 的 HTTP PUT 仍由每次 `submit_update(...)` 对应的提交 operation 单独发起。接收器的启动、监控和停止均属于 Transport 实现，Runtime 不直接管理 `uftpd`、HTTP listener 或连接。
+作业角色、Runtime 与 Transport 的进程和生命周期边界由[系统分层与跨层契约](系统分层与跨层契约.md#cross-layer-contracts)拥有。这里的“角色启动”只表示单项作业的 ServerRole 或 Client RoleService 启动，不表示跨作业常驻 Daemon 启动：空闲 Daemon 链路不创建本作业的 UFTP/HTTP Transport。作业角色初始化时先创建所需接收器；Transport 报告 ready 后 Runtime 四接口才可用。client 作业 Transport 运行一个任务期 `uftpd` 子进程接收下行，server 作业 Transport 在 ServerRole 中运行任务期 HTTP listener 接收上行。server 的 `uftp` 发送进程仍由每次 `publish_model(...)` 对应的下行 operation 按需启动，client 的 HTTP PUT 仍由每次 `submit_update(...)` 对应的提交 operation 单独发起。接收器的启动、监控和停止均属于作业 Transport 实现，Runtime 与外层 Daemon 都不直接管理 `uftpd`、HTTP listener 或连接。
 
 ## 下行 UFTP
 
@@ -21,7 +21,7 @@ UFTP 必须启用 `-q` 和 `-S status_file`。每个下行 operation 在固定�
 
 `STATS` 只用于观测，不能替代逐 client、逐文件结果矩阵。status 文件只参与本次 operation 的自然完成结果校验，不能判断取消请求是否成功，也不能替代 Transport 对取消与自然完成先后关系的裁决。UFTP 已报告文件交付成功，不等于 client Runtime 的 manifest、参与集合和 SHA-256 校验成功；client 必须独立校验。
 
-client `uftpd` 不通过公开 `wait_for_model()` 启动或停止；它由 client Transport 在服务启动阶段启动并持续接收候选下行文件。client `uftpd` 必须使用与 server `uftp` 一致的公共组播地址加入下行接收组；该地址属于 client Transport 配置，不由 Runtime 轮次接口传递。`wait_for_model()` 只等待和消费 Transport 已提交的候选交付物，再由 Runtime 执行 manifest、参与集合和 SHA-256 校验。v8 每个 client Transport 实例只运行一个 `uftpd`；其意外退出使当前模型等待明确失败，不定义进程内自动恢复状态机，由服务重启恢复。
+client `uftpd` 不通过公开 `wait_for_model()` 启动或停止；它由 client 作业 Transport 在 RoleService 启动阶段创建，并在该作业的多个轮次间持续接收候选下行文件。client `uftpd` 必须使用与 server `uftp` 一致的公共组播地址加入下行接收组；该地址属于 client Transport 配置，不由 Runtime 轮次接口传递。`wait_for_model()` 只等待和消费 Transport 已提交的候选交付物，再由 Runtime 执行 manifest、参与集合和 SHA-256 校验。每个 client 作业 Transport 实例只运行一个 `uftpd`；其意外退出使当前模型等待明确失败，不定义进程内自动恢复状态机，由外层 Client Daemon 在作业终态回收 RoleService 并恢复空闲链路。
 
 下行反馈机会由链路层调度。Client 可以先行训练和提交 update，但 Transport 只有确认全部预期目标的模型文件结果后，才向 Runtime 交付下行完成结果。
 
@@ -76,7 +76,7 @@ client 固定使用 `Expect: 100-continue`，在收到 `100 Continue` 前不得�
 
 Transport 只向 Runtime 交付同时满足以下条件的有效 update：`round_id` 匹配该操作接受时持有的准入上下文快照、`NODE_ID` 属于该快照的参与集合、传输完成、完整性校验通过。最终 `update.manifest.json` 的原子出现是该成功结果的持久权威事实；Transport 随后可以发送进程内通知以立即唤醒 Runtime，但通知允许丢失、不承载唯一状态，也不要求 Runtime 同步回调成功。Runtime 只按自身当前轮的固定路径幂等发现和消费匹配结果；旧轮操作在新准入上下文安装后完成时，其结果仍属于原 `round_id`，不能计入新轮。迟到、未知节点和重复提交拒收并留痕，不计入收齐。
 
-server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它由 server Transport 在服务启动阶段启动并持续监听。每个 HTTP PUT 仍是由远端 client 单独发起并由 listener 接受的一次请求 operation，不维护长期 HTTP session。client 可以在下行仍处于发布状态时提前提交，Transport 持久化有效结果并报告其状态，但下行完成屏障之前不能使 Runtime 成功。
+server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它由 ServerRole 的作业 Transport 在任务角色启动阶段创建，并在该作业内持续监听。每个 HTTP PUT 仍是由远端 client 单独发起并由 listener 接受的一次请求 operation，不维护长期 HTTP session。client 可以在下行仍处于发布状态时提前提交，Transport 持久化有效结果并报告其状态，但下行完成屏障之前不能使 Runtime 成功。作业终态关闭 ServerRole 后，该 listener 必须退出；Server Daemon 的空闲链路不保留任务 HTTP listener。
 
 ## 失败和状态码
 
@@ -108,7 +108,7 @@ server HTTP listener 不通过公开 `wait_for_updates()` 启动或停止；它�
 
 HTTP 请求和 TCP 连接可以跨多个链路层 grant 保持；grant 到期只暂停空口发送，连接、请求和暂存文件继续保持，后续 grant 从同一 body 继续。Transport 依赖[链路层空口调度与反压](链路层空口调度与反压.md#link-contract)提供发送机会和有限队列，不调用链路层 Token API。
 
-HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都必须设置有界的连接与 I/O 等待期限，使每次请求 operation 最终形成成功或失败裁决。默认连接和 I/O timeout 为 10 秒；该期限必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应。具体数值由实现和目标运行环境冻结，不与 Runtime 轮次等待混同。优先使用 HTTP 库、socket 或事件循环提供的连接、读写和响应 timeout，不要求新增独立 watchdog 组件。
+HTTP/TCP 的连接建立、等待 `100 Continue`、body 读写和最终响应都必须设置有界的连接与 I/O 等待期限，使每次请求 operation 最终形成成功或失败裁决。现行 daemon 作业路径必须把部署配置显式贯通到两端 Transport；Stage 3 基准固定为 120 秒，不能由任一角色静默退回 10 秒构造默认值。该期限必须覆盖 Token 调度下的最坏正常轮换等待，不能把正常 grant 排队误判为 Transport 无响应，且不与 Coordinator 的轮次 timeout 混同。优先使用 HTTP 库、socket 或事件循环提供的连接、读写和响应 timeout，不要求新增独立 watchdog 组件。
 
 一条连接最多承载一个 PUT，client 使用 `Connection: close`，不使用 pipelining。HTTP client 库必须禁用全部自动重试；一次 `submit_update(...)` 只建立一次连接、发送一次 PUT。connect、body、最终响应缺失和全部 `4xx`/`5xx` 都是明确失败，不能自动重发。
 

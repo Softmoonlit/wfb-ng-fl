@@ -225,15 +225,21 @@ ssh vm1 "sudo systemd-run \
 python3 - <<'PY'
 import json
 import urllib.request
+import uuid
 
+run_id = f'stage2_hw_{uuid.uuid4().hex}'
+job_id = f'{run_id}_sync_2round_4mib'
 payload = {
-    'job_id': 'hw_sync_2round_4mib',
+    'run_id': run_id,
+    'job_id': job_id,
     'mode': 'sync',
     'rounds': 2,
     'target_nodes': [1, 2],
     'model_path': '/var/tmp/wfb-fl-hw/model-4mib.bin',
     'model_size_bytes': 4 * 1024 * 1024,
     'round_timeout_seconds': 60.0,
+    'io_timeout_seconds': 120.0,
+    'live_observation': True,
     'algorithm': 'wfb_ng.fl.issue41_algorithm:client_main',
     'algorithm_config': {
         'update_template_path': '/tmp/wfb-ng-fl/client/update-client{node_id}-template.bin',
@@ -246,6 +252,7 @@ request = urllib.request.Request(
     method='POST',
 )
 with urllib.request.urlopen(request, timeout=20) as response:
+    print(f'run_id={run_id} job_id={job_id}')
     print(response.read().decode())
 PY
 ```
