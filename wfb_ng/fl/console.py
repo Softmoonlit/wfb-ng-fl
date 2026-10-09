@@ -3,10 +3,19 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import threading
 import uuid
+import time
 from pathlib import Path
 from typing import Any, BinaryIO, Callable, Dict, Optional
 
 from .model_library import ModelLibrary, ModelLibraryError
+from .radio import ALLOWED_PATCH_KEYS, ALLOWED_MCS_VALUES, get_downlink_rate_bounds, validate_radio_config
+
+
+class RadioPreparationError(Exception):
+    def __init__(self, code: str, message: str, status: int = 400) -> None:
+        super().__init__(message)
+        self.code = code
+        self.status = status
 
 
 SERVER_STATES = {
@@ -38,7 +47,8 @@ class ConsoleApplicationService:
     """Project daemon facts into one recoverable, detached Web snapshot."""
 
     def __init__(self, read_status: Callable[[], Dict[str, Any]], source_lock: Any,
-                 model_root: Optional[Path] = None) -> None:
+                 model_root: Optional[Path] = None,
+                 apply_radio: Optional[Callable[[str, bool], Dict[str, Any]]] = None) -> None:
         self.instance_id = str(uuid.uuid4())
         self._read_status = read_status
         self._source_lock = source_lock
@@ -50,6 +60,77 @@ class ConsoleApplicationService:
         self._node_online: Dict[int, bool] = {}
         self._web_status: Optional[tuple] = None
         self.models = ModelLibrary(model_root or Path('/var/lib/wfb-ng-fl/models'))
+        self._apply_radio = apply_radio
+        self._radio_confirmation: Optional[Dict[str, Any]] = None
+
+    def radio_configuration(self) -> Dict[str, Any]:
+        state = self.snapshot()
+        return {'config': state['server']['radio'], 'snapshot': state,
+                'rate_bounds': {str(mcs): get_downlink_rate_bounds(mcs).as_dict()
+                                for mcs in ALLOWED_MCS_VALUES}}
+
+    def _radio_targets(self, state: Dict[str, Any]) -> list:
+        blockers = state['server']['start_blockers']
+        targets = [node for node in state['nodes'] if node['reported_state'] is not None]
+        if blockers or not targets or any(
+                node['state'] != 'idle' or node['readiness'] != 'READY'
+                or node['error_code'] or node['last_heartbeat_ago_seconds'] is None
+                or node['last_heartbeat_ago_seconds'] > 10 for node in targets):
+            raise RadioPreparationError('RADIO_NOT_READY', '集群必须空闲，节点与链路资源必须就绪', 409)
+        return sorted(node['node_id'] for node in targets)
+
+    def validate_radio_configuration(self, body: Any) -> Dict[str, Any]:
+        if (not isinstance(body, dict) or set(body) != {'config'}
+                or not isinstance(body['config'], dict) or set(body['config']) != ALLOWED_PATCH_KEYS
+                or any(type(value) is not int for value in body['config'].values())):
+            raise RadioPreparationError('INVALID_RADIO_CONFIG', '必须提供完整的五项扁平射频参数')
+        try:
+            config = validate_radio_config(body['config'])
+        except (TypeError, ValueError) as exc:
+            raise RadioPreparationError('INVALID_RADIO_CONFIG', str(exc)) from exc
+        bounds = get_downlink_rate_bounds(config.downlink_mcs)
+        warning = (None if bounds.min_rate_kbps <= config.uftp_rate_kbps <= bounds.max_rate_kbps
+                   else 'UFTP 速率超出安全范围，可能导致队列丢包或传输停滞；必须明确确认风险')
+        with self._source_lock:
+            state = self.snapshot()
+            targets = self._radio_targets(state)
+            patch = {key: value for key, value in config.to_dict().items()
+                     if key in ALLOWED_PATCH_KEYS and value != state['server']['radio'][key]}
+            if not patch:
+                raise RadioPreparationError('RADIO_CONFIG_UNCHANGED', '配置未变化，无需应用')
+            confirmation = {'token': str(uuid.uuid4()), 'instance_id': self.instance_id,
+                            'state_version': state['state_version'], 'expires_in_seconds': 60}
+            self._radio_confirmation = {'confirmation': confirmation, 'expires_at': time.monotonic() + 60,
+                                        'patch': patch, 'targets': targets, 'warning': warning}
+            return {'config': config.to_dict(), 'rate_bounds': bounds.as_dict(),
+                    'warning': warning, 'confirmation': deepcopy(confirmation)}
+
+    def consume_radio_confirmation(self, token: str, confirm_risk: bool) -> Dict[str, Any]:
+        """Daemon calls under its admission lock, immediately before reserving radio ownership."""
+        with self._source_lock:
+            context = self._radio_confirmation
+            state = self.snapshot()
+            if (context is None or context['confirmation']['token'] != token
+                    or context['confirmation']['instance_id'] != self.instance_id
+                    or context['confirmation']['state_version'] != state['state_version']
+                    or time.monotonic() >= context['expires_at']):
+                raise RadioPreparationError('RADIO_CONFIRMATION_EXPIRED', '确认已失效，请重新校验配置', 409)
+            targets = self._radio_targets(state)
+            if targets != context['targets']:
+                raise RadioPreparationError('RADIO_CONFIRMATION_EXPIRED', '目标节点已变化，请重新校验配置', 409)
+            if context['warning'] and not confirm_risk:
+                raise RadioPreparationError('RADIO_RISK_CONFIRMATION_REQUIRED', context['warning'], 409)
+            self._radio_confirmation = None
+            return {'confirmed': True, 'patch': deepcopy(context['patch']), 'target_nodes': targets}
+
+    def apply_radio_configuration(self, body: Any) -> Dict[str, Any]:
+        if (not isinstance(body, dict) or set(body) != {'confirmation_token', 'confirm_risk'}
+                or not isinstance(body['confirmation_token'], str) or type(body['confirm_risk']) is not bool):
+            raise RadioPreparationError('INVALID_RADIO_REQUEST', '必须提供确认令牌和布尔风险确认')
+        if self._apply_radio is None:
+            raise RadioPreparationError('RADIO_UNAVAILABLE', '射频服务不可用', 503)
+        return self._apply_radio(body['confirmation_token'], body['confirm_risk'])
+
 
     def _referenced_models(self) -> set:
         raw = self._read_status()

@@ -25,7 +25,7 @@ import subprocess
 import sys
 import threading
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
@@ -51,6 +51,7 @@ from .radio import (
     FIXED_BANDWIDTH,
     FORBIDDEN_CHANNELS,
     RECOMMENDED_UPLINK_MCS,
+    RadioConfig,
     find_wl_interfaces,
     validate_radio_config,
 )
@@ -817,6 +818,10 @@ class ClientDaemon:
         _link_process_factory: Optional[Callable[..., subprocess.Popen]] = None,
     ):
         self.config = config
+        self._effective_radio = RadioConfig(
+            channel=config.channel, radio_txpower_dbm=config.radio_txpower_dbm,
+            uplink_mcs=config.uplink_mcs,
+        )
         self.network_adapter = network_adapter or LinuxNetworkAdapter()
         self.sandbox = JobSandbox(
             work_dir=config.work_dir,
@@ -906,9 +911,9 @@ class ClientDaemon:
                 try:
                     self.network_adapter.configure_wireless(
                         iface=target_iface,
-                        channel=self.config.channel,
-                        channel_width=self.config.channel_width,
-                        txpower_dbm=self.config.radio_txpower_dbm,
+                        channel=self._effective_radio.channel,
+                        channel_width="HT20" if self._effective_radio.channel == 165 else "HT40+",
+                        txpower_dbm=self._effective_radio.radio_txpower_dbm,
                     )
                     self.network_adapter.setup_tun(
                         self.config.tun_name, self.config.tun_cidr
@@ -917,8 +922,8 @@ class ClientDaemon:
                     logger.info(
                         "网卡 %s 接管就绪 (Channel=%d, TXPower=%d dBm, TUN=%s)",
                         target_iface,
-                        self.config.channel,
-                        self.config.radio_txpower_dbm,
+                        self._effective_radio.channel,
+                        self._effective_radio.radio_txpower_dbm,
                         self.config.tun_name,
                     )
                 except Exception as exc:
@@ -966,9 +971,9 @@ class ClientDaemon:
                 tun_name=self.config.tun_name,
                 tun_addr=self.config.tun_cidr,
                 air_interface=self.current_interface,
-                uplink_mcs=self.config.uplink_mcs,
+                uplink_mcs=self._effective_radio.uplink_mcs,
                 link_id=self.config.link_id,
-                channel_width=self.config.channel_width,
+                channel_width="HT20" if self._effective_radio.channel == 165 else "HT40+",
             )
             os.makedirs(self.config.work_dir, exist_ok=True)
             log_path = os.path.join(self.config.work_dir, "wfb_uplink.log")
@@ -1061,6 +1066,8 @@ class ClientDaemon:
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
         """Start a job in the sandbox using the active wireless interface."""
         with self._lock:
+            if self.control_plane is not None and self.control_plane.radio_switch_pending:
+                raise FLRuntimeError('radio_switch_pending', '射频切换未完成，拒绝启动作业')
             if self.state == DaemonState.STOPPED:
                 raise FLRuntimeError('sandbox_stopped', '任务资源清理失败，拒绝启动新作业')
             if self.current_interface is None:
@@ -1087,6 +1094,15 @@ class ClientDaemon:
                     "invalid_job_config",
                     f"作业 link_id ({job_config.link_id}) 与守护进程 link_id ({self.config.link_id}) 不符",
                 )
+            channel = (self.control_plane.current_channel if self.control_plane is not None
+                       else self._effective_radio.channel)
+            job_config = replace(
+                job_config,
+                channel=channel,
+                channel_width="HT20" if channel == 165 else "HT40+",
+                radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
+                uplink_mcs=self._effective_radio.uplink_mcs,
+            )
             self._stop_idle_link()
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
@@ -1141,6 +1157,9 @@ class ClientDaemon:
         with self._lock:
             target_nodes = msg.get("target_nodes")
             if target_nodes and self.config.node_id not in target_nodes:
+                return
+            if self.control_plane is not None and self.control_plane.radio_switch_pending:
+                logger.warning("射频切换未完成，忽略 TASK_ANNOUNCE")
                 return
             if self.state != DaemonState.IDLE:
                 logger.warning("收到 TASK_ANNOUNCE 但节点非 IDLE (当前: %s)，忽略", self.state)
@@ -1235,14 +1254,16 @@ class ClientDaemon:
                     tun_ip=self.config.tun_ip,
                     network_adapter=self.network_adapter,
                     air_interface=self.current_interface,
-                    initial_channel=self.config.channel,
-                    cached_channel=self._last_locked_channel or self.config.channel,
-                    txpower_dbm=self.config.radio_txpower_dbm,
-                    uplink_mcs=self.config.uplink_mcs,
+                    initial_channel=self._effective_radio.channel,
+                    cached_channel=self._last_locked_channel or self._effective_radio.channel,
+                    txpower_dbm=self._effective_radio.radio_txpower_dbm,
+                    uplink_mcs=self._effective_radio.uplink_mcs,
                     server_host=self.config.server_control_host,
                     server_port=self.config.server_control_port,
                     broadcast_port=self.config.broadcast_port,
+                    state_lock=self._lock,
                 )
+                self.control_plane.on_radio_applied = self._on_radio_applied
                 self.control_plane.on_radio_finalized = self._on_radio_finalized
                 self.control_plane.register_broadcast_handler(
                     "TASK_ANNOUNCE", self._handle_task_announce
@@ -1254,6 +1275,19 @@ class ClientDaemon:
                     "JOB_COMPLETED", lambda msg: self._handle_job_terminal(msg, aborted=False)
                 )
                 self.control_plane.start()
+
+    def _on_radio_applied(self, new_config: RadioConfig) -> None:
+        """Synchronously apply link startup parameters under the shared state lock."""
+        with self._lock:
+            if self.sandbox.is_running:
+                raise FLRuntimeError('radio_job_active', '作业运行时拒绝重建空闲射频链路')
+            old = self._effective_radio
+            self._effective_radio = new_config
+            if (old.uplink_mcs != new_config.uplink_mcs
+                or (old.channel == 165) != (new_config.channel == 165)):
+                self._stop_idle_link()
+            # Also retry a previously failed start when rolling back/reapplying.
+            self._ensure_idle_transport()
 
     def _on_radio_finalized(self, new_config: Any) -> None:
         """Handle finalized radio reconfiguration by persisting channel cache."""

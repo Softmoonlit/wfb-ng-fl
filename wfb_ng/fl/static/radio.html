@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>射频准备 · WFB 文件仿真控制台</title>
+  <link rel="stylesheet" href="/assets/console.css">
+  <link rel="stylesheet" href="/assets/radio.css">
+  <script defer src="/assets/radio.js"></script>
+</head>
+<body>
+<header>
+  <div><h1>射频准备</h1><nav aria-label="控制台导航"><a href="/">运行监控</a> · <a href="/models">模型库</a> · <a href="/radio" aria-current="page">射频准备</a></nav></div>
+  <div class="header-actions"><button id="refresh" type="button">刷新状态</button><button id="emergency-stop" class="danger" type="button" disabled>急停当前作业</button></div>
+</header>
+<main>
+  <p id="connection-error" role="alert" hidden></p>
+  <p id="instance-notice" role="status" hidden></p>
+  <section aria-labelledby="state-heading">
+    <h2 id="state-heading">集群状态</h2>
+    <dl class="metrics"><div><dt>Server</dt><dd id="server-state">加载中…</dd></div><div><dt>资源</dt><dd id="resources">加载中…</dd></div><div><dt>作业执行结果</dt><dd id="job-result">加载中…</dd></div><div><dt>资源恢复</dt><dd id="recovery-state">加载中…</dd></div></dl>
+    <p id="snapshot-time" class="muted"></p><p id="job-error" role="status"></p>
+    <ul id="nodes" aria-label="节点状态"></ul>
+    <p id="stop-status" role="status"></p><p id="stop-error" role="alert" hidden></p>
+  </section>
+  <div class="columns">
+    <section aria-labelledby="config-heading">
+      <h2 id="config-heading">填写射频配置</h2>
+      <p class="muted">近距台面推荐 12 dBm。仅在空闲且资源恢复后应用；信道与参数变更须由你明确确认。</p>
+      <form id="radio-form">
+        <div class="radio-fields">
+          <div><label for="channel">信道</label><select id="channel" name="channel" required aria-describedby="channel-note"><option value="149">149</option><option value="153">153</option><option value="157" selected>157</option><option value="165">165</option></select></div>
+          <div><label for="radio_txpower_dbm">发射功率（dBm）</label><input id="radio_txpower_dbm" name="radio_txpower_dbm" type="number" min="10" max="20" step="1" value="12" required></div>
+          <div><label for="downlink_mcs">下行 MCS</label><select id="downlink_mcs" name="downlink_mcs" required aria-describedby="rate-range"><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
+          <div><label for="uplink_mcs">上行 MCS</label><select id="uplink_mcs" name="uplink_mcs" required><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div>
+          <div class="wide"><label for="uftp_rate_kbps">UFTP 下行速率（kbps）</label><input id="uftp_rate_kbps" name="uftp_rate_kbps" type="number" min="1" step="1" required aria-describedby="rate-range rate-warning"></div>
+        </div>
+        <p id="channel-note" class="muted">仅允许 149 / 153 / 157 / 165；Channel 161 已禁止。</p>
+        <p id="rate-range" role="status">正在读取 MCS 安全速率范围…</p>
+        <p id="rate-warning" role="alert" hidden></p>
+        <button id="validate" type="submit" disabled>校验配置</button>
+      </form>
+    </section>
+    <section aria-labelledby="apply-heading">
+      <h2 id="apply-heading">核对并应用</h2>
+      <h3>当前已确认配置</h3><p id="current-config">加载中…</p>
+      <h3>本次校验的规范配置</h3><p id="validated-config">请校验配置，再明确点击应用。</p>
+      <p id="confirmation-status" role="status"></p>
+      <div id="risk-confirmation" hidden><input id="confirm-risk" type="checkbox" disabled><label for="confirm-risk">我已了解速率越界可能导致丢包及传输失败，确认承担风险。</label></div>
+      <p id="apply-blockers" role="status">正在读取集群应用条件…</p>
+      <button id="apply" type="button" disabled>应用已校验配置</button>
+      <p id="action-status" role="status"></p><p id="action-error" role="alert" hidden></p>
+      <details><summary>最近射频事务结果</summary><pre id="transaction-result">尚无事务结果</pre></details>
+      <p class="muted">输入更改、集群状态变化、断线或确认过期后，必须重新校验。应用失败时，以 Server 最新状态和事务结果为准。</p>
+    </section>
+  </div>
+</main>
+<noscript>请启用 JavaScript 以读取状态、校验和应用射频配置。</noscript>
+</body>
+</html>

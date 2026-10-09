@@ -14,12 +14,16 @@ from urllib.parse import urlparse
 
 from pyroute2 import IPRoute
 
-from .console import ConsoleApplicationService
+from .console import ConsoleApplicationService, RadioPreparationError
+from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
 
 logger = logging.getLogger(__name__)
 ASSETS = Path(__file__).with_name('static')
 STATIC_ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
+                 '/radio': ('radio.html', 'text/html; charset=utf-8'),
+                 '/assets/radio.js': ('radio.js', 'text/javascript; charset=utf-8'),
+                 '/assets/radio.css': ('radio.css', 'text/css; charset=utf-8'),
                  '/models': ('models.html', 'text/html; charset=utf-8'),
                  '/assets/models.js': ('models.js', 'text/javascript; charset=utf-8'),
                  '/assets/models.css': ('models.css', 'text/css; charset=utf-8'),
@@ -150,6 +154,28 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
         else:
             self._error(code, 'INVALID_REQUEST', 'HTTP 请求非法')
 
+    def _read_json(self) -> Any:
+        lengths: list = self.headers.get_all('Content-Length', [])
+        types: list = self.headers.get_all('Content-Type', [])
+        if (len(lengths) != 1 or re.fullmatch('[0-9]{1,5}', lengths[0]) is None
+                or not 0 < int(lengths[0]) <= 8192 or self.headers.get_all('Transfer-Encoding')
+                or len(types) != 1 or types[0].split(';')[0].strip().lower() != 'application/json'):
+            raise RadioPreparationError('INVALID_REQUEST', '必须提供不超过 8 KiB 的 JSON 请求体')
+        def unique_object(pairs: list) -> dict:
+            result: dict = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError('重复 JSON 字段')
+                result[key] = value
+            return result
+        try:
+            data = self.rfile.read(int(lengths[0]))
+            if len(data) != int(lengths[0]):
+                raise ValueError('请求体不完整')
+            return json.loads(data, object_pairs_hook=unique_object)
+        except (ValueError, UnicodeError, TimeoutError) as exc:
+            raise RadioPreparationError('INVALID_REQUEST', 'JSON 请求体非法或不完整') from exc
+
     def _dispatch(self) -> None:
         server: ConsoleHTTPServer = self.server  # type: ignore[assignment]
         path = urlparse(self.path).path
@@ -172,6 +198,27 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
                 self._error(503, 'STATE_UNAVAILABLE', '暂时无法读取状态')
                 return
             self._send(200, payload, 'application/json; charset=utf-8')
+        elif path in ('/api/v1/radio/config', '/api/v1/radio/config/validate', '/api/v1/radio/config/apply'):
+            method = 'GET' if path == '/api/v1/radio/config' else 'POST'
+            if self.command != method:
+                self._error(405, 'METHOD_NOT_ALLOWED', f'该资源仅支持 {method}', allow=method)
+                return
+            try:
+                if method == 'GET':
+                    result = server.application.radio_configuration()
+                elif path.endswith('/validate'):
+                    result = server.application.validate_radio_configuration(self._read_json())
+                else:
+                    result = server.application.apply_radio_configuration(self._read_json())
+                self._send(200, json.dumps(result).encode(), 'application/json; charset=utf-8')
+            except RadioPreparationError as exc:
+                self._error(exc.status, exc.code, str(exc))
+            except FLRuntimeError as exc:
+                status = 409 if exc.error_code in ('engine_busy', 'radio_target_nodes_not_ready') else 400
+                self._error(status, exc.error_code.upper(), str(exc), exc.details)
+            except Exception:
+                logger.exception('Console radio operation failed')
+                self._error(503, 'RADIO_UNAVAILABLE', '射频操作失败，请检查当前状态')
         elif path == '/api/v1/models' or path.startswith('/api/v1/models/'):
             try:
                 if path == '/api/v1/models':

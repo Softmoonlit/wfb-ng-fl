@@ -556,6 +556,7 @@ class ServerDaemon:
         # Link Process management
         self._link_process: Optional[subprocess.Popen] = None
         self._link_log_file: Optional[Any] = None
+        self._link_radio_config: Optional[RadioConfig] = None
         self._link_thread: Optional[threading.Thread] = None
 
         # Control Plane Engine
@@ -575,6 +576,7 @@ class ServerDaemon:
             broadcast_addr=self.config.control_broadcast_addr,
             broadcast_port=self.config.control_broadcast_port,
             on_heartbeat_received=self._on_node_heartbeat,
+            on_radio_applied=self._apply_radio_runtime,
         )
 
         # HTTP REST IPC Server
@@ -583,7 +585,7 @@ class ServerDaemon:
         self.actual_ipc_port: int = self.config.ipc_port
         self._web_state = ("management_web_unavailable", "WEB_HOST_NOT_CONFIGURED" if self.config.web_host is None else None)
         self.console = ConsoleApplicationService(self.get_status_report, self._lock,
-                                                 Path(self.config.model_library_dir))
+                                                 Path(self.config.model_library_dir), self._apply_console_radio)
         self._web = ManagementWebListener(
             self.config.web_host, self.config.web_port, self.console,
             lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),
@@ -695,8 +697,18 @@ class ServerDaemon:
                 "nodes": nodes_dict,
             }
 
+    def _apply_console_radio(self, token: str, confirm_risk: bool) -> Dict[str, Any]:
+        with self._lock:
+            payload = self.console.consume_radio_confirmation(token, confirm_risk)
+            self._reserve_radio_reconfiguration(payload)
+        return self._execute_radio_reconfiguration(payload['patch'], payload['target_nodes'])
+
     def reconfigure_radio(self, payload: Any) -> Dict[str, Any]:
         """接受人工确认请求；协议执行期间释放锁以便状态查询和冲突响应。"""
+        self._reserve_radio_reconfiguration(payload)
+        return self._execute_radio_reconfiguration(payload['patch'], payload['target_nodes'])
+
+    def _reserve_radio_reconfiguration(self, payload: Any) -> None:
         if not isinstance(payload, dict):
             raise FLRuntimeError("invalid_radio_request", "请求体必须为 JSON object")
         if set(payload) != {"confirmed", "patch", "target_nodes"}:
@@ -736,6 +748,7 @@ class ServerDaemon:
                 )
             self.server_state = ServerState.SWITCHING_RADIO
 
+    def _execute_radio_reconfiguration(self, patch: Dict[str, Any], targets: List[int]) -> Dict[str, Any]:
         try:
             result = self.control_plane.reconfigure_radio(patch, target_nodes=targets)
         except Exception:
@@ -905,6 +918,7 @@ class ServerDaemon:
                     live_observation=job.live_observation,
                     observation_path=obs_path,
                     io_timeout=job.io_timeout_seconds,
+                    uftp_rate_kbps=self.radio_config.uftp_rate_kbps,
                 )
                 try:
                     server_role.start()
@@ -1175,8 +1189,21 @@ class ServerDaemon:
         """Forcefully abort active job and reset server state to IDLE."""
         return self._finalize_job(outcome="aborted", reason=reason)
 
-    def _start_link_process(self) -> None:
+    def _apply_radio_runtime(self, config: RadioConfig) -> None:
+        """Apply startup-only link parameters before the reversible final barrier."""
+        with self._lock:
+            if self.server_state == ServerState.STOPPED:
+                raise FLRuntimeError('daemon_stopped', 'Server 已停止，无法应用射频')
+            active = self._link_radio_config
+            if self.config.enable_link_process and (active is None
+                    or active.downlink_mcs != config.downlink_mcs
+                    or (active.channel == 165) != (config.channel == 165)):
+                self._stop_link_process()
+                self._start_link_process(config)
+
+    def _start_link_process(self, radio: Optional[RadioConfig] = None) -> None:
         """Launch wfb_v6_uplink server background process with pre-allocated slots."""
+        radio = radio or self.radio_config
         executable = shutil.which("wfb_v6_uplink")
         if not executable:
             # Check local build directory
@@ -1193,8 +1220,8 @@ class ServerDaemon:
             tun_name=self.config.tun_name,
             tun_addr=self.config.tun_cidr,
             air_interface=iface,
-            channel=self.radio_config.channel,
-            downlink_mcs=self.radio_config.downlink_mcs,
+            channel=radio.channel,
+            downlink_mcs=radio.downlink_mcs,
             link_id=self.config.link_id,
             known_clients=self.config.known_clients,
         )
@@ -1234,6 +1261,7 @@ class ServerDaemon:
                 f"wfb_v6_uplink 未能在超时时间内创建 TUN 接口: {self.config.tun_name}",
             )
 
+        self._link_radio_config = radio
         try:
             self.adapter.set_tun_txqueuelen(self.config.tun_name, self.config.tun_txqueuelen)
             logger.info("已设置 TUN %s txqueuelen=%d", self.config.tun_name, self.config.tun_txqueuelen)
@@ -1242,6 +1270,7 @@ class ServerDaemon:
 
     def _stop_link_process(self) -> None:
         """Safely terminate wfb_v6_uplink process, close log file, and clean up TUN."""
+        self._link_radio_config = None
         if self._link_process is not None:
             try:
                 self._link_process.terminate()

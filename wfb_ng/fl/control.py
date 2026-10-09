@@ -621,6 +621,7 @@ class ControlPlaneServer:
         broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT,
         offline_threshold_seconds: float = NODE_OFFLINE_THRESHOLD_SECONDS,
         on_heartbeat_received: Optional[Callable[[NodeHeartbeat, NodeRecord], None]] = None,
+        on_radio_applied: Optional[Callable[[RadioConfig], None]] = None,
     ):
         self.active_radio_config = active_radio_config
         # Latched fail-closed state, also set by the daemon on unexpected escape.
@@ -633,6 +634,7 @@ class ControlPlaneServer:
         self.broadcast_port = broadcast_port
         self.offline_threshold_seconds = offline_threshold_seconds
         self.on_heartbeat_received = on_heartbeat_received
+        self.on_radio_applied = on_radio_applied
         self.registry = NodeHorizonRegistry(offline_threshold_seconds=offline_threshold_seconds)
 
         self._stop_event = threading.Event()
@@ -955,6 +957,8 @@ class ControlPlaneServer:
                     self._apply_channel_switch(updated.channel)
                 if updated.radio_txpower_dbm != previous.radio_txpower_dbm:
                     self._apply_txpower_switch(updated.radio_txpower_dbm)
+                if self.on_radio_applied is not None:
+                    self.on_radio_applied(updated)
                 self.update_radio_config(updated)
                 deadline = time.monotonic() + commit_timeout_seconds
                 while True:
@@ -1008,6 +1012,7 @@ class ControlPlaneServer:
                     for restore in (
                         lambda: self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL),
                         lambda: self._apply_txpower_switch(previous.radio_txpower_dbm),
+                        lambda: self.on_radio_applied(fallback) if self.on_radio_applied is not None else None,
                     ):
                         try:
                             restore()
@@ -1114,6 +1119,7 @@ class ControlPlaneClient:
         max_attempts_per_channel: int = HUNTING_RETRIES_PER_CHANNEL,
         idle_interval_seconds: float = IDLE_HEARTBEAT_INTERVAL_SECONDS,
         active_interval_seconds: float = ACTIVE_HEARTBEAT_INTERVAL_SECONDS,
+        state_lock: Optional[Any] = None,
     ):
         self.node_id = node_id
         self.tun_ip = tun_ip
@@ -1143,7 +1149,9 @@ class ControlPlaneClient:
         self._loop_thread: Optional[threading.Thread] = None
         self._stop_event = threading.Event()
         self._wake_event = threading.Event()
-        self._lock = threading.RLock()
+        # The daemon calls control while holding its state lock. Sharing that
+        # RLock permits synchronous radio callbacks without reversing lock order.
+        self._lock = state_lock if state_lock is not None else threading.RLock()
         self._broadcast_handlers: Dict[str, List[Callable[[Dict[str, Any]], None]]] = {}
 
         # 15s Lease Watchdog & radio switch tracking (ADR-0012, ADR-0014, Ticket 04)
@@ -1152,6 +1160,7 @@ class ControlPlaneClient:
             on_expired=self._on_lease_watchdog_expired,
             name=f"wfb-client-{node_id}-watchdog",
         )
+        self.on_radio_applied: Optional[Callable[[RadioConfig], None]] = None
         self.on_radio_finalized: Optional[Callable[[RadioConfig], None]] = None
         self._pending_switch_session_id: Optional[str] = None
         self._pending_switch_patch: Optional[Dict[str, Any]] = None
@@ -1250,11 +1259,16 @@ class ControlPlaneClient:
                 return
             updated = validate_radio_patch(safe_patch, base=base)
 
-            if updated.radio_txpower_dbm != self.txpower_dbm:
-                self._apply_txpower_switch(updated.radio_txpower_dbm)
-
-            if updated.uplink_mcs != self.uplink_mcs:
+            try:
+                if updated.radio_txpower_dbm != self.txpower_dbm:
+                    self._apply_txpower_switch(updated.radio_txpower_dbm)
                 self.uplink_mcs = updated.uplink_mcs
+                self._notify_radio_applied()
+            except Exception:
+                self._apply_txpower_switch(base.radio_txpower_dbm)
+                self.uplink_mcs = base.uplink_mcs
+                self._notify_radio_applied()
+                raise
 
     def hunt_once(self, ladder: Optional[List[int]] = None) -> bool:
         """
@@ -1532,6 +1546,7 @@ class ControlPlaneClient:
                         self._apply_txpower_switch(norm_patch["radio_txpower_dbm"])
                     if "uplink_mcs" in norm_patch:
                         self.uplink_mcs = norm_patch["uplink_mcs"]
+                    self._notify_radio_applied()
                     self._switch_applied = True
                     logger.info("节点 %d COMMIT session=%s channel=%d", self.node_id, session_id, self.current_channel)
                 except Exception as exc:
@@ -1609,12 +1624,34 @@ class ControlPlaneClient:
             except Exception as exc:
                 logger.warning("on_radio_finalized 执行失败: %s", exc)
 
+    @property
+    def radio_switch_pending(self) -> bool:
+        with self._lock:
+            return self._pending_switch_session_id is not None
+
+    def _notify_radio_applied(self) -> None:
+        """Apply process parameters synchronously, before acknowledging success.
+
+        Invoked with the state lock held. An owning daemon must share this lock
+        so callbacks and task handoffs cannot race or invert the lock order.
+        Exceptions leave the saved configuration available for lease recovery.
+        """
+        if self.on_radio_applied is not None:
+            self.on_radio_applied(RadioConfig(
+                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
+                uplink_mcs=self.uplink_mcs,
+            ))
+
     def _rollback_switch(self) -> None:
         """Restore the benchmark and all pre-switch client parameters."""
+        # An interrupted restore cannot acknowledge the abandoned target config.
+        self._switch_applied = False
+        self._finalized_proposal_session = None
         self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL)
         if self._pre_switch_config is not None:
             self._apply_txpower_switch(self._pre_switch_config.radio_txpower_dbm)
             self.uplink_mcs = self._pre_switch_config.uplink_mcs
+        self._notify_radio_applied()
         self._clear_pending_switch()
         self.locked_channel = None
         self.state = ClientNodeState.HUNTING
