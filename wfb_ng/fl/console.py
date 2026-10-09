@@ -1,6 +1,7 @@
 """Authoritative console state and operator history, independent of HTTP."""
 from copy import deepcopy
 from datetime import datetime, timezone
+import queue
 import threading
 import uuid
 import time
@@ -51,7 +52,8 @@ class ConsoleApplicationService:
     def __init__(self, read_status: Callable[[], Dict[str, Any]], source_lock: Any,
                  model_root: Optional[Path] = None,
                  apply_radio: Optional[Callable[[str, bool], Dict[str, Any]]] = None,
-                 start_job: Optional[Callable[[Dict[str, Any], str], Dict[str, Any]]] = None) -> None:
+                 start_job: Optional[Callable[[Dict[str, Any], str], Dict[str, Any]]] = None,
+                 abort_job: Optional[Callable[[str, str], Dict[str, Any]]] = None) -> None:
         self.instance_id = str(uuid.uuid4())
         self._read_status = read_status
         self._source_lock = source_lock
@@ -65,8 +67,11 @@ class ConsoleApplicationService:
         self.models = ModelLibrary(model_root or Path('/var/lib/wfb-ng-fl/models'))
         self._apply_radio = apply_radio
         self._start_job = start_job
+        self._abort_job = abort_job
         self._job_requests: Dict[str, tuple] = {}
         self._radio_confirmation: Optional[Dict[str, Any]] = None
+        self._stream_subscribers: list = []
+        self._initializing_stream = False
 
     def start_job(self, body: Any, idempotency_key: Optional[str]) -> Dict[str, Any]:
         if self._start_job is None:
@@ -106,6 +111,59 @@ class ConsoleApplicationService:
             result = self._start_job(payload, idempotency_key)
             self._job_requests[idempotency_key] = (canonical, deepcopy(result))
             return result
+
+    def abort_job(self, job_id: str, reason: str) -> Dict[str, Any]:
+        if self._abort_job is None:
+            raise FLRuntimeError('JOB_UNAVAILABLE', '作业服务不可用')
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError('INVALID_ABORT_REQUEST', '作业标识无效')
+        if not isinstance(reason, str) or not 1 <= len(reason) <= 200:
+            raise FLRuntimeError('INVALID_ABORT_REQUEST', '急停原因无效')
+        state = self.snapshot()
+        if not state['current_job'] or state['current_job']['job_id'] != job_id:
+            raise FLRuntimeError('JOB_NOT_ACTIVE', '目标作业不处于运行中', details={})
+        return self._abort_job(job_id, reason)
+
+    def subscribe_events(self) -> queue.Queue:
+        subscriber: queue.Queue = queue.Queue(maxsize=100)
+        with self._lock:
+            self._stream_subscribers.append(subscriber)
+        return subscriber
+
+    def unsubscribe_events(self, subscriber: queue.Queue) -> None:
+        with self._lock:
+            if subscriber in self._stream_subscribers:
+                self._stream_subscribers.remove(subscriber)
+
+    def _publish_stream_frame_locked(self, frame: Dict[str, Any]) -> None:
+        for subscriber in list(self._stream_subscribers):
+            try:
+                subscriber.put_nowait(frame)
+            except queue.Full:
+                # A slow browser must not retain unbounded state or block the daemon.
+                while True:
+                    try:
+                        subscriber.get_nowait()
+                    except queue.Empty:
+                        break
+                subscriber.put_nowait({'kind': 'overflow'})
+                self._stream_subscribers.remove(subscriber)
+
+    def initial_stream_frame(self, last_event_id: Optional[int]) -> Dict[str, Any]:
+        # Keep the daemon -> console lock order and hold both locks until the
+        # initial frame receives its sequence number. No earlier frame can queue.
+        with self._source_lock:
+            with self._lock:
+                self._initializing_stream = True
+                try:
+                    state = self._snapshot_locked()
+                    missed = last_event_id is not None and last_event_id < self._event_sequence
+                    self._event_sequence += 1
+                    return {'id': self._event_sequence, 'kind': 'snapshot', 'snapshot': state,
+                            'resync': missed}
+                finally:
+                    self._initializing_stream = False
+
 
     def radio_configuration(self) -> Dict[str, Any]:
         state = self.snapshot()
@@ -218,7 +276,8 @@ class ConsoleApplicationService:
             if self._web_status == (status, error):
                 return
             self._web_status = (status, error)
-            self.record_event({"type": "MANAGEMENT_WEB_CHANGED", "message": status})
+            msg = f"{status}: {error}" if error else status
+            self.record_event({"type": "MANAGEMENT_WEB_CHANGED", "message": msg, "error": error})
 
     def record_event(self, event: Dict[str, Any]) -> None:
         if event.get("type") == "NODE_HEARTBEAT":
@@ -226,9 +285,9 @@ class ConsoleApplicationService:
         with self._lock:
             # Daemon and coordinator can report the same start/terminal fact.
             identity = (event.get("type"), event.get("job_id") or event.get("job", {}).get("job_id"),
-                        event.get("round_id"))
-            if (identity[0] in ("JOB_STARTED", "JOB_COMPLETED", "JOB_FAILED", "JOB_ABORTED")
-                    and identity[1] and any(e["identity"] == identity for e in self._events)):
+                        event.get("round_id"), event.get("node_id"),
+                        event.get("message") or event.get("reason") or event.get("error"))
+            if any(e["identity"] == identity for e in self._events):
                 return
             self._event_sequence += 1
             self._events.append({"identity": identity, "event": {
@@ -239,6 +298,8 @@ class ConsoleApplicationService:
                 "message": event.get("message") or event.get("reason") or event.get("error") or event.get("type"),
             }})
             del self._events[:-100]
+            self._publish_stream_frame_locked({'id': self._event_sequence, 'kind': 'event',
+                                               'event': deepcopy(self._events[-1]['event'])})
 
     def snapshot(self) -> Dict[str, Any]:
         # All publishers use daemon -> service order. Reading and publishing
@@ -296,9 +357,16 @@ class ConsoleApplicationService:
                 "events": [entry["event"] for entry in self._events],
             }
             facts = (_state_facts(state), raw["server_state"])
-            if facts != self._facts:
-                self._version += 1
-                self._facts = deepcopy(facts)
             state["state_version"] = self._version
             state["generated_at"] = datetime.now(timezone.utc).isoformat()
+            if facts != self._facts:
+                self._version += 1
+                state["state_version"] = self._version
+                self._facts = deepcopy(facts)
+                if self._stream_subscribers and not self._initializing_stream:
+                    self._event_sequence += 1
+                    self._publish_stream_frame_locked({
+                        'id': self._event_sequence, 'kind': 'snapshot',
+                        'snapshot': deepcopy(state), 'resync': False})
+            state["state_version"] = self._version
             return deepcopy(state)

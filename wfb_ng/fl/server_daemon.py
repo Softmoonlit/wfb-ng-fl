@@ -587,7 +587,7 @@ class ServerDaemon:
         self._web_state = ("management_web_unavailable", "WEB_HOST_NOT_CONFIGURED" if self.config.web_host is None else None)
         self.console = ConsoleApplicationService(self.get_status_report, self._lock,
                                                  Path(self.config.model_library_dir), self._apply_console_radio,
-                                                 self._start_console_job)
+                                                 self._start_console_job, self._abort_console_job)
         self._web = ManagementWebListener(
             self.config.web_host, self.config.web_port, self.console,
             lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),
@@ -610,6 +610,24 @@ class ServerDaemon:
         result = self.start_job(payload)
         result['idempotency_key'] = idempotency_key
         return result
+
+    def _abort_console_job(self, job_id: str, reason: str) -> Dict[str, Any]:
+        with self._lock:
+            if self.active_job is None or self.active_job.get('job_id') != job_id:
+                raise FLRuntimeError('JOB_NOT_ACTIVE', '目标作业不处于运行中')
+        self.publish_event({'type': 'JOB_ABORT_REQUESTED', 'job_id': job_id, 'reason': reason})
+
+        def run_abort() -> None:
+            try:
+                result = self._finalize_job(outcome='aborted', job_id=job_id, reason=reason)
+                if result.get('status') == 'ignored':
+                    self.publish_event({'type': 'JOB_ABORT_SUPERSEDED', 'job_id': job_id,
+                                        'reason': 'job_already_terminal'})
+            except Exception:
+                logger.exception('Web 急停执行失败 (job=%s)', job_id)
+
+        threading.Thread(target=run_abort, name='wfb-console-abort', daemon=True).start()
+        return {'status': 'accepted', 'job_id': job_id, 'execution_result': 'pending'}
 
     def _on_web_status(self, status: str, error: Optional[str]) -> None:
         # Listener status cannot wait behind a potentially slow snapshot reader.

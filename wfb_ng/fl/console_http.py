@@ -3,6 +3,7 @@ import ipaddress
 import json
 import logging
 from email.parser import Parser
+import queue
 from pathlib import Path
 import re
 import socket
@@ -176,6 +177,47 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeError, TimeoutError) as exc:
             raise RadioPreparationError('INVALID_REQUEST', 'JSON 请求体非法或不完整') from exc
 
+    def _handle_events(self, application: ConsoleApplicationService) -> None:
+        subscriber = application.subscribe_events()
+        raw_last_id = self.headers.get('Last-Event-ID')
+        try:
+            last_id = int(raw_last_id) if raw_last_id is not None else None
+        except ValueError:
+            last_id = None
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store')
+        self.send_header('Connection', 'keep-alive')
+        self.send_header('X-Accel-Buffering', 'no')
+        self.end_headers()
+
+        def send_frame(frame: Dict[str, Any]) -> None:
+            event_name = 'snapshot' if frame['kind'] == 'snapshot' else 'operator-event'
+            payload = frame.get('snapshot', frame.get('event'))
+            if frame.get('resync'):
+                payload = dict(payload)
+                payload['stream_resync'] = True
+            text = f"id: {frame['id']}\nevent: {event_name}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+            self.wfile.write(text.encode('utf-8'))
+            self.wfile.flush()
+
+        try:
+            send_frame(application.initial_stream_frame(last_id))
+            while True:
+                try:
+                    frame = subscriber.get(timeout=15.0)
+                except queue.Empty:
+                    self.wfile.write(b': keepalive\n\n')
+                    self.wfile.flush()
+                    continue
+                if frame.get('kind') == 'overflow':
+                    break
+                send_frame(frame)
+        except (BrokenPipeError, ConnectionResetError, TimeoutError, OSError):
+            pass
+        finally:
+            application.unsubscribe_events(subscriber)
+
     def _dispatch(self) -> None:
         server: ConsoleHTTPServer = self.server  # type: ignore[assignment]
         path = urlparse(self.path).path
@@ -219,6 +261,11 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
             except Exception:
                 logger.exception('Console radio operation failed')
                 self._error(503, 'RADIO_UNAVAILABLE', '射频操作失败，请检查当前状态')
+        elif path == '/api/v1/events':
+            if self.command != 'GET':
+                self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 GET', allow='GET')
+                return
+            self._handle_events(server.application)
         elif path == '/api/v1/jobs':
             if self.command != 'POST':
                 self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 POST', allow='POST')
@@ -236,7 +283,27 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
                 logger.exception('Console job creation failed')
                 self._error(503, 'JOB_UNAVAILABLE', '作业服务暂时不可用')
         elif path.startswith('/api/v1/jobs/'):
-            self._error(410, 'ROUTE_REPLACED', '该路由已退出 Web 契约')
+            match = re.fullmatch(r'/api/v1/jobs/([^/]+)/abort', path)
+            if match is None:
+                self._error(410, 'ROUTE_REPLACED', '该路由已退出 Web 契约')
+                return
+            if self.command != 'POST':
+                self._error(405, 'METHOD_NOT_ALLOWED', '该资源仅支持 POST', allow='POST')
+                return
+            try:
+                body = self._read_json()
+                if not isinstance(body, dict) or set(body) != {'reason'}:
+                    raise RadioPreparationError('INVALID_ABORT_REQUEST', '只允许 reason 字段')
+                result = server.application.abort_job(match.group(1), body['reason'])
+                self._send(202, json.dumps(result).encode(), 'application/json; charset=utf-8')
+            except RadioPreparationError as exc:
+                self._error(exc.status, exc.code, str(exc))
+            except FLRuntimeError as exc:
+                status = 409 if exc.error_code == 'JOB_NOT_ACTIVE' else 400
+                self._error(status, exc.error_code, exc.error_message, exc.details)
+            except Exception:
+                logger.exception('Console job abort failed')
+                self._error(503, 'JOB_UNAVAILABLE', '急停服务暂时不可用')
         elif path == '/api/v1/models' or path.startswith('/api/v1/models/'):
             try:
                 if path == '/api/v1/models':

@@ -8,9 +8,11 @@
   const results = {none:'未执行', running:'执行中', succeeded:'成功', failed:'失败', aborted:'已急停'};
   const recovery = {not_required:'无需恢复', recovering:'正在恢复待命', ready:'已恢复待命', blocked:'恢复受阻'};
   let fetching = false;
+  let lastState = null;
   let instanceId = sessionStorage.getItem('wfb-console-instance');
   const item = (tag, text) => {const node=document.createElement(tag); node.textContent=text; return node;};
   function render(state) {
+    lastState = state;
     if (instanceId && instanceId !== state.instance_id) byId('instance-notice').hidden = false;
     instanceId = state.instance_id;
     sessionStorage.setItem('wfb-console-instance', instanceId);
@@ -31,6 +33,8 @@
     byId('job-rounds').textContent = job ? `${job.current_round || 0} / ${job.rounds}（已完成 ${job.rounds_completed || 0}）` : '—';
     byId('job-config').textContent = job ? `${job.rounds || '未知'} 轮 · 节点 ${(job.target_nodes || []).join(', ')} · 模型 ${job.model_sha256 || '未知'}` : '—';
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';
+    const abortButton = byId('abort-job');
+    if (abortButton) abortButton.disabled = !state.current_job || server.state !== 'running';
     const radio=server.radio;
     byId('radio').textContent = radio ? `信道 ${radio.channel} · ${radio.radio_txpower_dbm} dBm · 下行 MCS ${radio.downlink_mcs} · 上行 MCS ${radio.uplink_mcs}` : '射频配置未确认';
     byId('nodes').replaceChildren(...state.nodes.map(node => {
@@ -59,7 +63,38 @@
     }
   }
   byId('refresh').addEventListener('click', refresh);
+  const abortButton = byId('abort-job');
+  if (abortButton) abortButton.addEventListener('click', async () => {
+    const job = lastState && lastState.current_job;
+    if (!job) return;
+    abortButton.disabled = true;
+    try {
+      const response = await fetch(`/api/v1/jobs/${encodeURIComponent(job.job_id)}/abort`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({reason: 'operator_requested'})
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(`${result.error.code}: ${result.error.message}`);
+      byId('connection-error').hidden = true;
+    } catch (error) {
+      byId('connection-error').textContent = `急停未受理。${error.message}`;
+      byId('connection-error').hidden = false;
+    }
+  });
   refresh();
-  // Issue 01 uses complete snapshots; the later SSE slice owns streaming.
+  if (typeof EventSource !== 'undefined') {
+    const stream = new EventSource('/api/v1/events');
+    stream.addEventListener('snapshot', event => {
+      try { render(JSON.parse(event.data)); byId('connection-error').hidden = true; }
+      catch (error) { byId('connection-error').textContent = `状态帧非法。${error.message}`; byId('connection-error').hidden = false; }
+    });
+    stream.addEventListener('operator-event', event => {
+      if (event.lastEventId) byId('snapshot-time').textContent = `事件帧 ${event.lastEventId} · 等待状态快照`;
+    });
+    stream.onerror = () => {
+      byId('connection-error').textContent = '实时连接中断，浏览器正在重连；状态快照仍可手动刷新。';
+      byId('connection-error').hidden = false;
+    };
+  }
   setInterval(refresh, 3000);
 })();

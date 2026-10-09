@@ -22,15 +22,23 @@ const snapshot = {
 function openPage(responses) {
   const elements = {};
   let tick;
+  function EventSource(url) {
+    this.url = url;
+    this.listeners = {};
+    EventSource.instance = this;
+  }
+  EventSource.prototype.addEventListener = function(name, callback) {this.listeners[name] = callback;};
+  EventSource.prototype.emit = function(name, data) {this.listeners[name]({data, lastEventId:'9'});};
   const context = {document:{getElementById(id){return elements[id] ||= element();}, createElement:element},
     fetch:async(path) => {
       assert.equal(path, '/api/v1/state');
       const value=responses.shift();
       if (value instanceof Error) throw value;
       return {ok:value.ok !== false, json:async()=>value.body || value};
-    }, setInterval(callback){tick=callback;}, sessionStorage:{getItem(){return null;},setItem(){}}, console};
+    }, setInterval(callback){tick=callback;}, EventSource,
+    sessionStorage:{getItem(){return null;},setItem(){}}, console};
   vm.runInNewContext(script, context);
-  return {elements, tick:()=>tick()};
+  return {elements, tick:()=>tick(), stream:EventSource.instance};
 }
 async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
 (async()=>{
@@ -44,6 +52,10 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   assert.match(page.elements['start-blockers'].children[0].textContent,/资源恢复未完成/);
   assert.match(page.elements['radio'].textContent,/157/);
   assert.equal(page.elements['nodes'].children.length,1);
+  assert.equal(page.stream.url, '/api/v1/events');
+  page.stream.emit('snapshot', JSON.stringify(snapshot));
+  await flush();
+  assert.match(page.elements['job-id'].textContent,/job-1/);
   await page.tick(); await flush();
   assert.equal(page.elements['connection-error'].hidden,false);
   assert.match(page.elements['connection-error'].textContent,/过时/);
