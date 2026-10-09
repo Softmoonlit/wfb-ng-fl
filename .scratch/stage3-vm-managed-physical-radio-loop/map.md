@@ -11,6 +11,10 @@ Type: map
 
 [Stage 3 规格](spec.md)
 
+## References
+
+- [Stage 2 三机无 SSH 运行时自治验收指南](../../docs/acceptance/stage2三机无SSH运行时自治验收指南.md)：重要实施与诊断参考，但不是 Stage 3 基线、规格或通过依据；冲突时以 Stage 3 `spec.md` 和工单为准。
+
 ## Decisions so far
 
 - 管理以太网与 SSH 保持可达；不声明 air-gapped 或管理网物理隔离。
@@ -20,6 +24,9 @@ Type: map
 - 射频场景固定为 157→149，在 Client 2 预置精确控制消息丢弃规则，验证 Server 与 Client 自动回退 157。
 - Client 在终态清理前持久化白名单小型证据，不复制模型/update 本体。
 - 增加正式本地 `POST /api/v1/radio/reconfigure`，不增加 CLI。
+- Stage 3 直接复用 Stage 2 已实现的双 daemon、控制面、RoleService、Coordinator、Runtime、UFTP/HTTP 数据面、`TASK_READY` 和终态复位，不另建平行运行时。
+- Issue #41 的硬件预检、独立构建安装、canonical fixture、SHA-256、资源核查和失败归档能力应直接调用或小范围提取；禁止无理由复制。
+- 不复用 Issue #41 的 SSH RoleService/Runtime 作业编排、五分区 envelope 或旧 validator 结论语义；Stage 3 的独立性仅限于证据结构和裁决规则。
 - 正式入口为 `tests/fl_runtime/stage3_vm_physical_loop.sh`。
 - 当前 vm0、vm1、vm2 尚未出现 `wlx*` 接口，正式硬件运行需操作者先完成 USB 直通。
 

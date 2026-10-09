@@ -14,6 +14,12 @@ Status: ready-for-agent
 
 本阶段的正式结论术语是**作业运行时无 SSH 依赖**。不得把结果表述为 `air-gapped`、真正断网、纯断网物理环境或无网络运行，因为 WFB/TUN 带内网络与以太网管理平面都实际存在。
 
+## 参考资料
+
+[Stage 2 三机无 SSH 运行时自治验收指南](../../docs/acceptance/stage2三机无SSH运行时自治验收指南.md)是 Stage 3 实施与现场诊断的重要参考，记录了现有双 daemon 自治运行时已经验证的结论边界、作业级 `TASK_READY` 屏障、空闲链路与任务链路所有权、作业终态复位、运行期 SSH 禁止事项、故障诊断顺序和资源清理方法。Stage 3 应复用其中仍适用的经验，避免重新引入已解决的生命周期与链路问题。
+
+该指南属于 Stage 2，不是 Stage 3 的验收基线、规格或通过依据。其 4 MiB、人工 `systemd-run`、终态前沙箱取证等内容不得直接套用为 Stage 3 要求；两者不一致时，以本规格及 Stage 3 工单为准。
+
 ## Problem Statement
 
 Stage 2 已在 vm0、vm1、vm2 上完成 4 MiB、两轮 `sync` 的真实射频自治闭环，证明 Server Daemon 能通过带内 UDP 发布任务，Client Daemon 能自主派生 RoleService，UFTP/HTTP 数据面能够完成双向传输，并在终态恢复空闲链路。然而该结果不证明以下能力：
@@ -31,6 +37,14 @@ Stage 2 已在 vm0、vm1、vm2 上完成 4 MiB、两轮 `sync` 的真实射频�
 2. 增加仅在 Server `IDLE` 状态接受的人工确认射频重配 REST 入口。
 3. 交付单一 Stage 3 验收执行器，完成 preflight、安装、服务启动、40 MiB `sync` 作业、射频租约回退、证据收集、机械验证和停服清理。
 4. 在当前三机拓扑上形成一次绑定提交、配置和 `run_id` 的正式通过归档；失败尝试同样保留并使用新 `run_id` 重跑。
+
+## 复用边界
+
+Stage 3 是对 Stage 2 自治运行时的增量完善，不另建第二套 Server/Client Daemon、控制面、RoleService、Coordinator、Runtime 或 UFTP/HTTP 数据面。现有作业发布、`TASK_READY` 屏障、Client 自主派生 RoleService、空闲链路与任务链路所有权切换以及作业终态复位必须直接复用；实现改动只用于补齐本规格明确要求的节点 evidence、射频可靠最终屏障、作业参数贯通和验收可观测性。
+
+Stage 2 三机验收指南是上述现有运行时的人工开发验收方法，不是可直接裁决 Stage 3 的机械化执行器。现有 `tests/fl_runtime/issue41_fl_runtime_loop.sh` 及其 Python helper 已沉淀真实硬件预检、独立构建安装、确定性 fixture、SHA-256、资源核查和失败归档能力；Stage 3 实现前必须先识别并直接调用或小范围提取这些通用能力，禁止无理由复制实现。只有在现有 helper 与 Issue #41 的 SSH RoleService 编排、五分区目录或旧结论模型耦合且无法保持清晰接口时，才编写 Stage 3 专用逻辑。
+
+Stage 3 不得复用 Issue #41 通过 SSH 启动 Client RoleService/Runtime、搬运模型或 update、促成作业成功的编排路径，也不得沿用其五分区 envelope 和 validator 结论语义。独立 Stage 3 envelope 与 validator 表示证据结构和裁决规则独立，不表示重写底层运行时或重复实现通用验收工具。
 
 ## Fixed Configuration
 

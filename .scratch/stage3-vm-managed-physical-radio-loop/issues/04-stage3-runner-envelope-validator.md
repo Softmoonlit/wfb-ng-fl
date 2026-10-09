@@ -6,10 +6,13 @@ Blocked by: 01, 02, 03
 
 ## What to build
 
-新增唯一正式入口 `tests/fl_runtime/stage3_vm_physical_loop.sh` 及必要的结构化 Python helper，严格串联 `preflight -> install -> start-services -> run-sync -> run-radio-recovery -> collect -> stop-services -> validate`。执行器使用独立 Stage 3 envelope，不继承 Issue #41 的 SSH RoleService 编排或五分区假设，但复用 canonical fixture 与通用完整性能力。
+新增唯一正式入口 `tests/fl_runtime/stage3_vm_physical_loop.sh` 及必要的结构化 Python helper，严格串联 `preflight -> install -> start-services -> run-sync -> run-radio-recovery -> collect -> stop-services -> validate`。执行器直接驱动 Stage 2 已实现的双 daemon 自治运行时，不新增平行的 RoleService、Runtime 或数据面实现。它使用独立 Stage 3 envelope，不继承 Issue #41 的 SSH RoleService 编排、五分区目录或旧 validator 结论语义；实现前先审计 `issue41_fl_runtime_loop.sh` 及其 helper，直接调用或小范围提取其中与编排语义解耦的硬件预检、独立构建安装、canonical fixture、SHA-256、资源核查和失败归档能力，禁止无理由复制。
 
 ## Acceptance criteria
 
+- 提交中明确列出复用、提取和 Stage 3 专用实现的边界；不得复制已有通用 helper 后仅改名，也不得为 Stage 3 新建第二套 daemon、RoleService、Coordinator、Runtime、UFTP 或 HTTP Transport。
+- 实现和现场诊断须参考 [Stage 2 三机无 SSH 运行时自治验收指南](../../../docs/acceptance/stage2三机无SSH运行时自治验收指南.md)中仍适用的生命周期、`TASK_READY`、SSH 边界、诊断顺序和资源清理经验；不得把该 Stage 2 指南当作 Stage 3 基线或通过依据，冲突时以 Stage 3 规格和本工单为准。
+- `run-sync` 只通过 Server Daemon 本地 REST 发起作业，由现有带内 `TASK_ANNOUNCE`、Client Daemon 自主派生和 `TASK_READY` 屏障推进；禁止退回 Issue #41 的 SSH 作业启动路径。
 - `preflight` 在 destructive action 前验证三端提交一致、工作树干净、身份配置、`wlx*`/驱动/xHCI、payload matcher、端口、磁盘和无旧资源。
 - `install` 在 vm0 的临时独立 clean build worktree 中对目标提交执行 `make deb`，要求唯一 Debian 包并记录 SHA-256；同一包复制到三端后用系统包管理器安装，再核对 `dpkg-query`、daemon entry point、unit 文件和 `wfb_v6_uplink` 均来自该制品。禁止污染/借用运行工作树、使用不安装 daemon unit 的 `make install_v8`，或复用无法绑定本次包摘要的遗留二进制。
 - `start-services` 受审计地启动正式 daemon unit，不使用 `systemd-run`。
