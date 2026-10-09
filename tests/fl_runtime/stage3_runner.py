@@ -606,6 +606,12 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
         if role=='server':
             dest.mkdir(parents=True,exist_ok=True)
             self.executor.checked(role,'sudo -n cp -a '+shlex.quote(source+'/.')+' '+shlex.quote(str(dest)),timeout=120)
+            # cp -a also preserves the source directory's root ownership on
+            # dest. Return only the copied tree to the archive caller; do not
+            # follow copied symlinks into runtime paths or other archives.
+            self.executor.checked(role,'sudo -n chown -R -h -- '
+                                  +str(os.getuid())+':'+str(os.getgid())+' '
+                                  +shlex.quote(str(dest)),timeout=120)
             return
         code = """import base64,io,pathlib,tarfile
 root=pathlib.Path(SOURCE)

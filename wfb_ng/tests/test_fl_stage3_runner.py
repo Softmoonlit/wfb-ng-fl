@@ -605,3 +605,36 @@ def test_sync_real_twenty_second_recovery_failure_preserves_rest_timeline(runner
     assert json.loads((runner.archive/'job/coordinator.json').read_text())==summary
     assert json.loads((runner.archive/'job/recovery.json').read_text())['status']=='failed'
     assert not runner.executor.job_window
+
+
+def test_server_collect_tree_keeps_archive_writable_and_root_source_unchanged(runner,tmp_path):
+    import os
+    source=tmp_path/'root-owned-source'
+    source.mkdir()
+    (source/'nested').mkdir()
+    (source/'nested/config.json').write_bytes(b'{"fixture":true}\n')
+    (source/'model.bin').write_bytes(b'copied server artifact')
+    subprocess.run(['sudo','-n','chown','-R','0:0',str(source)],check=True)
+    destination=runner.archive/'server'
+    sibling=runner.archive/'untouched-root-sibling'
+    sibling.mkdir()
+    subprocess.run(['sudo','-n','chown','0:0',str(sibling)],check=True)
+    def snapshot(root):
+        return {str(path.relative_to(root)):(path.stat().st_uid,path.stat().st_gid,
+                    path.stat().st_mode,path.read_bytes() if path.is_file() else None)
+                for path in [root,*sorted(root.rglob('*'))]}
+    original=snapshot(source)
+    runner.executor.backend=None
+    try:
+        runner.collect_tree('server',str(source),destination)
+        assert snapshot(source)==original
+        assert sibling.stat().st_uid==0 and sibling.stat().st_gid==0
+        for path in [destination,*destination.rglob('*')]:
+            assert (path.stat().st_uid,path.stat().st_gid)==(os.getuid(),os.getgid())
+        (destination/'models').mkdir()
+        (destination/'models/1.bin').write_bytes(b'follow-up collection')
+        (destination/'nested/config.json').write_bytes(b'caller can update copied evidence')
+        assert (destination/'model.bin').read_bytes()==b'copied server artifact'
+    finally:
+        subprocess.run(['sudo','-n','chown','-R',f'{os.getuid()}:{os.getgid()}',
+                        str(source),str(destination),str(sibling)],check=True)

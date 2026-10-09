@@ -46,3 +46,5 @@ Stage 3 正式三机两轮 40 MiB 作业已多次完成，但终态资源复位�
 - 首轮 Python 全量 372 项通过；独立审查发现缺失/无效 timestamp 可绕过新鲜度检查，已追加生产 datagram 回归并严格校验必填正整数，相关 93 项通过。
 - 最终 Python 全量 374 项通过，Python 独立复审通过。C++ 新增跟踪源码回归与 `make test_session_recovery` 入口，真实原 HEAD TX/RX 恢复断言已复现失败；当前实现验证 DATA 启动会话、source/FEC 隔离、退役包拒绝、GRANT → IPC → 授权及独立 scheduler/READY 入口。`make build_v6 all_bin` 通过。
 - C++ 首轮独立审查发现过期 IPC 新会话会错误退役当前授权、重启 nonce 复用导致 unique 漏计、会话拒绝计数未进入日志，均已补回归修复。最终 C++ 独立复审通过，新增真实 libsodium keypair/session-key/DATA/FEC 加密往返与认证篡改拒绝测试，已纳入同一 make 回归入口并通过。三机正式验收待执行，暂不标记 resolved。
+- 首次修复后正式运行 `stage3_20261009_195532_f6d46383ad6c`（`e9bf7cd`）两轮成功 52.611 / 51.586 秒、无掉队，终态 READY 等待 0.256 秒；射频 COMMIT 后 rolled_back，Client 租约回退/READY 门禁通过。`collect` 因 `sudo cp -a` 保留 root 目录所有权导致 `server/models` PermissionError，归档整体仍失败；failure cleanup 无错误，三端停服清理完成。原沙箱和 Client evidence 已补存到同一失败归档，不拼接成通过证据。
+- 修复收集边界：复制后仅将目标树交还执行器调用用户，符号链接使用 `chown -h` 不跟随源。真实 sudo 复制回归先红后绿，源及相邻目录不变，runner 36 项通过；新提交和新 run/job ID 完整重跑。
