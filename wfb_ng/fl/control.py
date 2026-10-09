@@ -690,6 +690,7 @@ class ControlPlaneServer:
             # Broadcast sender socket
             self._broadcast_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self._broadcast_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            self._broadcast_sock.bind((self.bind_host, 0))
 
             self._recv_thread = threading.Thread(
                 target=self._recv_loop,

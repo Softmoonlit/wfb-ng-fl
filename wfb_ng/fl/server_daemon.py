@@ -138,7 +138,7 @@ class ServerDaemonConfig:
     tun_ip: str = DEFAULT_TUN_IP
     tun_cidr: str = DEFAULT_TUN_CIDR
     tun_txqueuelen: int = DEFAULT_TUN_TXQUEUELEN
-    control_bind_host: str = "0.0.0.0"
+    control_bind_host: str = DEFAULT_TUN_IP
     control_bind_port: int = CLIENT_UPLINK_DEFAULT_PORT
     control_broadcast_addr: str = SERVER_CONTROL_BROADCAST_ADDR
     control_broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT
@@ -211,7 +211,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         tun_ip=data.get("tun_ip", DEFAULT_TUN_IP),
         tun_cidr=data.get("tun_cidr", DEFAULT_TUN_CIDR),
         tun_txqueuelen=int(data.get("tun_txqueuelen", DEFAULT_TUN_TXQUEUELEN)),
-        control_bind_host=data.get("control_bind_host", "0.0.0.0"),
+        control_bind_host=data.get("control_bind_host", DEFAULT_TUN_IP),
         control_bind_port=int(data.get("control_bind_port", CLIENT_UPLINK_DEFAULT_PORT)),
         control_broadcast_addr=data.get("control_broadcast_addr", SERVER_CONTROL_BROADCAST_ADDR),
         control_broadcast_port=int(data.get("control_broadcast_port", SERVER_CONTROL_BROADCAST_PORT)),

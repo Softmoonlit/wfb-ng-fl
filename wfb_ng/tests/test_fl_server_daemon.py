@@ -208,6 +208,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             radio_txpower_dbm=12,
             downlink_mcs=3,
             uplink_mcs=6,
+            control_bind_host="127.0.0.1",
             control_bind_port=self.control_bind_port,
             control_broadcast_port=self.control_broadcast_port,
             work_dir=self.temp_dir,
