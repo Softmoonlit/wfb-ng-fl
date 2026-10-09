@@ -9,7 +9,25 @@
   <script defer src="/assets/models.js"></script>
 </head>
 <body>
-<header><div><h1>模型库</h1><p>上传与管理用于文件仿真的普通文件</p></div><nav aria-label="控制台导航"><a href="/">运行监控</a> · <a href="/models" aria-current="page">模型库</a> · <a href="/radio">射频准备</a></nav></header>
+<header class="command-bar">
+  <div class="brand-group">
+    <h1><a href="/" class="brand-link">WFB 文件仿真控制台</a></h1>
+    <nav class="main-nav" aria-label="控制台导航">
+      <a href="/" id="nav-monitor">🎯 运行监控</a>
+      <a href="/models" id="nav-models" aria-current="page">📦 模型库</a>
+      <a href="/radio" id="nav-radio">📡 射频准备</a>
+    </nav>
+  </div>
+  <div class="hud-group" aria-label="集群微缩状态">
+    <div class="hud-item"><span class="hud-label">Server</span><span id="hud-server-state" class="badge badge-gray">待命</span></div>
+    <div class="hud-item"><span class="hud-label">射频</span><span id="hud-radio" class="mono">CH157 · 12dBm · MCS3</span></div>
+    <div class="hud-item"><span class="hud-label">活动作业</span><span id="hud-job" class="mono">空闲待命</span></div>
+  </div>
+  <div class="actions-group">
+    <button id="refresh-models" type="button" class="btn btn-secondary">刷新清单</button>
+    <button id="abort-job" type="button" class="btn btn-danger" disabled>急停 (ABORT)</button>
+  </div>
+</header>
 <main>
   <section aria-labelledby="upload-heading">
     <h2 id="upload-heading">上传模型</h2>
@@ -17,18 +35,32 @@
     <form id="upload-form">
       <label for="model-file">模型文件</label>
       <input id="model-file" name="file" type="file" required aria-describedby="upload-note">
-      <button id="upload" type="submit">上传模型</button>
+      <button id="upload" type="submit" class="btn btn-primary">上传模型</button>
     </form>
     <p id="upload-note" class="muted">上传完成后显示 Server 计算的完整 SHA-256。上传和刷新清单在作业运行期间仍可使用。</p>
     <p id="action-status" role="status"></p>
     <p id="action-error" role="alert" hidden></p>
   </section>
   <section aria-labelledby="models-heading">
-    <div class="models-toolbar"><h2 id="models-heading">模型清单</h2><button id="refresh-models" type="button">刷新清单</button></div>
+    <div class="models-toolbar">
+      <h2 id="models-heading">模型清单</h2>
+    </div>
     <p class="muted">按入库时间从新到旧排列，同一时间按 SHA-256 升序排列。被作业引用的模型禁止删除。</p>
     <p id="list-status" role="status">正在读取清单…</p>
     <p id="list-error" role="alert" hidden></p>
-    <table aria-label="模型清单"><thead><tr><th scope="col">文件名</th><th scope="col" class="digest-column">完整 SHA-256</th><th scope="col">大小（字节）</th><th scope="col">入库时间</th><th scope="col">引用状态</th><th scope="col">操作</th></tr></thead><tbody id="models"></tbody></table>
+    <table aria-label="模型清单">
+      <thead>
+        <tr>
+          <th scope="col">文件名</th>
+          <th scope="col" class="digest-column">完整 SHA-256</th>
+          <th scope="col">大小（字节）</th>
+          <th scope="col">入库时间</th>
+          <th scope="col">引用状态</th>
+          <th scope="col">操作</th>
+        </tr>
+      </thead>
+      <tbody id="models"></tbody>
+    </table>
   </section>
 </main>
 <noscript>请启用 JavaScript 以上传和管理模型。</noscript>

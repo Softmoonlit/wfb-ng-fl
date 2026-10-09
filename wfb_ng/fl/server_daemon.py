@@ -657,13 +657,17 @@ class ServerDaemon:
                     self.active_job['current_round'] = event.get('round_index')
                     self.active_job['server_phase'] = 'preparing'
                     self.active_job['round_started_at'] = time.time()
+                    self.active_job['phase_started_at'] = time.time()
                 elif event_type in ('MODEL_PUBLISH_START', 'MODEL_PUBLISH_STARTED'):
                     self.active_job['server_phase'] = 'publishing_model'
+                    self.active_job['phase_started_at'] = time.time()
                 elif event_type == 'WAIT_FOR_UPDATES_START':
                     self.active_job['server_phase'] = 'waiting_updates'
+                    self.active_job['phase_started_at'] = time.time()
                 elif event_type == 'ROUND_COMPLETED':
                     self.active_job['rounds_completed'] = event.get('round_index', 0)
                     self.active_job['server_phase'] = 'preparing'
+                    self.active_job['phase_started_at'] = time.time()
             self.console.record_event(event)
             self._best_effort_console_refresh()
         self.event_bus.publish(event)
@@ -985,6 +989,7 @@ class ServerDaemon:
             job_dict['current_round'] = 0
             job_dict['rounds_completed'] = 0
             job_dict['server_phase'] = 'preparing'
+            job_dict['phase_started_at'] = time.time()
             self.active_job = job_dict
             self.server_state = ServerState.RUNNING
             self.server_role = server_role
@@ -1106,6 +1111,7 @@ class ServerDaemon:
             self._recent_job.update(
                 execution_result={"completed": "succeeded", "failed": "failed", "aborted": "aborted"}[outcome],
                 recovery_state="recovering", server_phase="recovering", reason=reason, error=error,
+                phase_started_at=time.time(),
             )
             self.console.record_event({"type": "RECOVERY_STARTED", "job_id": target_job_id})
 
@@ -1193,6 +1199,7 @@ class ServerDaemon:
                 recovery_error = recovery_error or "DAEMON_STOPPED"
             self._recent_job["recovery_state"] = "blocked" if recovery_error else "ready"
             self._recent_job["server_phase"] = "recovery_blocked" if recovery_error else "ready"
+            self._recent_job["phase_started_at"] = time.time()
             if recovery_error:
                 self._recent_job["recovery_error"] = recovery_error
             self.console.record_event({"type": "RECOVERY_BLOCKED" if recovery_error else "RECOVERY_COMPLETED",

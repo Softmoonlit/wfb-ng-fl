@@ -8,26 +8,121 @@
   <script defer src="/assets/console.js"></script>
 </head>
 <body>
-<header><div><h1>WFB 文件仿真控制台</h1><p>Server、节点与当前 / 最近作业 · <a href="/models">模型库</a> · <a href="/radio">射频准备</a></p></div><button id="refresh" type="button">刷新状态</button></header>
+<header class="command-bar">
+  <div class="brand-group">
+    <h1><a href="/" class="brand-link">WFB 文件仿真控制台</a></h1>
+    <nav class="main-nav" aria-label="控制台主导航">
+      <a href="/" id="nav-monitor" aria-current="page">🎯 运行监控</a>
+      <a href="/models" id="nav-models">📦 模型库</a>
+      <a href="/radio" id="nav-radio">📡 射频准备</a>
+    </nav>
+  </div>
+  <div class="hud-group" aria-label="集群微缩状态">
+    <div class="hud-item"><span class="hud-label">Server</span><span id="hud-server-state" class="badge badge-gray">待命</span></div>
+    <div class="hud-item"><span class="hud-label">射频</span><span id="hud-radio" class="mono">CH157 · 12dBm · MCS3</span></div>
+    <div class="hud-item"><span class="hud-label">活动作业</span><span id="hud-job" class="mono">空闲待命</span></div>
+  </div>
+  <div class="actions-group">
+    <button id="refresh" type="button" class="btn btn-secondary">刷新状态</button>
+    <button id="abort-job" type="button" class="btn btn-danger" disabled>急停 (ABORT)</button>
+  </div>
+</header>
 <main>
   <p id="connection-error" role="alert" hidden></p>
   <p id="instance-notice" role="status" hidden>服务已重启，前次作业状态不可用</p>
-  <section aria-labelledby="server-heading"><h2 id="server-heading">运行状态</h2>
-    <dl class="metrics"><div><dt>Server</dt><dd id="server-state">加载中…</dd></div><div><dt>管理 Web</dt><dd id="web-state">加载中…</dd></div><div><dt>资源</dt><dd id="resources">加载中…</dd></div></dl>
-    <p id="snapshot-time" class="muted"></p>
-    <h3>启动条件</h3><ul id="start-blockers"></ul>
-  </section>
+
   <div class="columns">
-    <section aria-labelledby="job-heading"><h2 id="job-heading">当前 / 最近作业</h2>
-      <dl><dt>作业</dt><dd id="job-id">暂无作业</dd><dt>执行结果</dt><dd id="job-result">未执行</dd><dt>Server 阶段</dt><dd id="job-phase">—</dd><dt>轮次</dt><dd id="job-rounds">—</dd><dt>资源恢复</dt><dd id="job-recovery">无需恢复</dd><dt>配置</dt><dd id="job-config">—</dd></dl>
-      <button id="abort-job" type="button" disabled>急停当前作业</button>
-      <p id="job-error" role="status"></p>
-    </section>
-    <section aria-labelledby="radio-heading"><h2 id="radio-heading">已确认射频配置</h2><p id="radio">加载中…</p>
-      <p class="muted">信道与射频配置由操作者明确确认。</p></section>
+    <!-- Left Column: Job Monitor & Job Start -->
+    <div class="col-main">
+      <section id="job-monitor-section" aria-labelledby="job-heading">
+        <div class="section-header">
+          <h2 id="job-heading">🎯 同步文件仿真作业监控</h2>
+          <span id="job-result-badge" class="badge badge-gray">未执行</span>
+        </div>
+        <dl class="job-grid">
+          <div><dt>作业</dt><dd id="job-id">暂无作业</dd></div>
+          <div><dt>执行结果</dt><dd id="job-result">未执行</dd></div>
+          <div><dt>Server 阶段</dt><dd id="job-phase">—</dd></div>
+          <div><dt>同步轮次</dt><dd id="job-rounds">—</dd></div>
+          <div><dt>资源恢复</dt><dd id="job-recovery">无需恢复</dd></div>
+          <div><dt>作业配置</dt><dd id="job-config">—</dd></div>
+        </dl>
+        <div class="job-timers-bar">
+          <div class="timer-box"><span class="timer-label">总耗时</span><span id="job-elapsed" class="timer-val mono">00:00</span></div>
+          <div class="timer-box"><span class="timer-label">本轮耗时</span><span id="round-elapsed" class="timer-val mono">00:00</span></div>
+          <div class="timer-box"><span class="timer-label">阶段耗时</span><span id="phase-elapsed" class="timer-val mono">00:00</span></div>
+        </div>
+        <p id="job-error" role="status"></p>
+      </section>
+
+      <section id="job-start-section" aria-labelledby="start-job-heading">
+        <h2 id="start-job-heading">🚀 新建同步文件仿真作业</h2>
+        <p class="muted">选择不可变模型制品，固定目标 Client 节点与同步轮数。启动时将校验目标节点 TASK_READY 屏障。</p>
+        <form id="job-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="job-model">模型制品 (SHA-256)</label>
+              <div class="input-with-action">
+                <select id="job-model" name="model_sha256" required>
+                  <option value="">-- 请选择模型制品 --</option>
+                </select>
+                <a href="/models" class="btn btn-sm btn-subtle">去模型库上传</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="job-target-nodes">目标节点 (逗号分隔)</label>
+              <input id="job-target-nodes" name="target_nodes" type="text" value="1, 2" placeholder="1, 2" required>
+            </div>
+            <div class="form-group">
+              <label for="job-rounds-input">固定同步轮数</label>
+              <input id="job-rounds-input" name="rounds" type="number" min="1" max="100" value="3" required>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="start-job" type="submit" class="btn btn-primary" disabled>启动作业</button>
+            <span id="job-form-status" role="status"></span>
+          </div>
+          <p id="job-form-error" role="alert" hidden></p>
+        </form>
+        <div class="blockers-card">
+          <h3>启动门禁条件</h3>
+          <ul id="start-blockers"></ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column: Nodes & System & Events -->
+    <div class="col-side">
+      <section aria-labelledby="nodes-heading">
+        <h2 id="nodes-heading">📡 参与节点健康度</h2>
+        <table aria-label="参与节点状态">
+          <thead><tr><th>节点</th><th>在线</th><th>粗状态</th><th>就绪</th><th>错误</th></tr></thead>
+          <tbody id="nodes"></tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="server-heading">
+        <h2 id="server-heading">⚙️ 运行状态与射频</h2>
+        <dl class="metrics">
+          <div><dt>Server</dt><dd id="server-state">加载中…</dd></div>
+          <div><dt>管理 Web</dt><dd id="web-state">加载中…</dd></div>
+          <div><dt>底层资源</dt><dd id="resources">加载中…</dd></div>
+        </dl>
+        <p id="snapshot-time" class="muted"></p>
+        <div class="radio-summary-box">
+          <dt>已确认射频</dt>
+          <dd id="radio">加载中…</dd>
+          <a href="/radio" class="btn btn-sm btn-subtle" style="margin-top: 6px;">前往射频准备</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="events-heading">
+        <h2 id="events-heading">📋 操作者关键事件 (最新 100 条)</h2>
+        <ol id="events" class="events-list"></ol>
+        <p class="muted">仅记录关键阶段跃迁与错误事实，周期心跳不刷屏，无虚构进度。</p>
+      </section>
+    </div>
   </div>
-  <section aria-labelledby="nodes-heading"><h2 id="nodes-heading">节点</h2><table><thead><tr><th>节点</th><th>在线</th><th>粗状态</th><th>就绪</th><th>错误</th></tr></thead><tbody id="nodes"></tbody></table></section>
-  <section aria-labelledby="events-heading"><h2 id="events-heading">最近关键事件</h2><ol id="events"></ol></section>
 </main>
 <noscript>请启用 JavaScript 以读取 Server 状态。</noscript>
 </body>

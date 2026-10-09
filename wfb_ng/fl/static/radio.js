@@ -88,6 +88,31 @@
       row.textContent = `节点 ${node.node_id} · ${node.online ? '在线' : '离线'} · ${node.state} · ${node.readiness}${node.error_code ? ' · ' + node.error_code : ''}`;
       return row;
     }));
+    if (byId('hud-server-state')) {
+      const s = states[state.server.state] || state.server.state;
+      byId('hud-server-state').textContent = s;
+      byId('hud-server-state').className = `badge ${state.server.state === 'idle' ? 'badge-green' : state.server.state === 'running' ? 'badge-blue' : state.server.state === 'starting' || state.server.state === 'preparing' ? 'badge-yellow' : 'badge-red'}`;
+    }
+    if (byId('hud-radio')) {
+      const r = state.server.radio;
+      byId('hud-radio').textContent = r ? `CH${r.channel} · ${r.radio_txpower_dbm}dBm · MCS${r.downlink_mcs}` : '未确认';
+    }
+    if (byId('hud-job')) {
+      if (state.current_job && state.server.state === 'running') {
+        byId('hud-job').textContent = `轮次 ${state.current_job.current_round || 0}/${state.current_job.rounds} · 运行中`;
+      } else {
+        const recent = state.recent_job || state.job;
+        if (recent && recent.execution_result === 'aborted') {
+          byId('hud-job').textContent = recent.recovery_state === 'ready' ? '作业已急停 · 链路已就绪' : '作业已急停 · 恢复待命中';
+        } else if (recent && recent.execution_result === 'failed') {
+          byId('hud-job').textContent = recent.recovery_state === 'ready' ? '作业失败 · 链路已就绪' : '作业失败 · 恢复待命中';
+        } else if (recent && recent.execution_result === 'succeeded') {
+          byId('hud-job').textContent = '作业成功 · 已完成';
+        } else {
+          byId('hud-job').textContent = '空闲待命';
+        }
+      }
+    }
   }
   async function refresh() {
     if (busy) return;

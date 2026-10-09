@@ -9,9 +9,24 @@
   <script defer src="/assets/radio.js"></script>
 </head>
 <body>
-<header>
-  <div><h1>射频准备</h1><nav aria-label="控制台导航"><a href="/">运行监控</a> · <a href="/models">模型库</a> · <a href="/radio" aria-current="page">射频准备</a></nav></div>
-  <div class="header-actions"><button id="refresh" type="button">刷新状态</button><button id="emergency-stop" class="danger" type="button" disabled>急停当前作业</button></div>
+<header class="command-bar">
+  <div class="brand-group">
+    <h1><a href="/" class="brand-link">WFB 文件仿真控制台</a></h1>
+    <nav class="main-nav" aria-label="控制台导航">
+      <a href="/" id="nav-monitor">🎯 运行监控</a>
+      <a href="/models" id="nav-models">📦 模型库</a>
+      <a href="/radio" id="nav-radio" aria-current="page">📡 射频准备</a>
+    </nav>
+  </div>
+  <div class="hud-group" aria-label="集群微缩状态">
+    <div class="hud-item"><span class="hud-label">Server</span><span id="hud-server-state" class="badge badge-gray">待命</span></div>
+    <div class="hud-item"><span class="hud-label">射频</span><span id="hud-radio" class="mono">CH157 · 12dBm · MCS3</span></div>
+    <div class="hud-item"><span class="hud-label">活动作业</span><span id="hud-job" class="mono">空闲待命</span></div>
+  </div>
+  <div class="header-actions actions-group">
+    <button id="refresh" type="button" class="btn btn-secondary">刷新状态</button>
+    <button id="emergency-stop" class="btn btn-danger danger" type="button" disabled>急停当前作业</button>
+  </div>
 </header>
 <main>
   <p id="connection-error" role="alert" hidden></p>

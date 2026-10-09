@@ -10,6 +10,14 @@
   let mutating = false;
   let models = [];
   let hasList = false;
+  let currentActiveJob = null;
+
+  const states = {
+    starting: '启动中', idle: '待命', preparing: '准备中', running: '运行中',
+    aborting: '中止 / 恢复中', radio_error: '射频错误', unavailable: '不可用', offline: '离线',
+    hunting: '寻频中', error: '错误', ready: '可用', stopped: '已停止',
+    management_web_unavailable: '管理 Web 不可用'
+  };
 
   function showError(id, message) {
     byId(id).textContent = message;
@@ -23,6 +31,7 @@
     }
     return body;
   }
+
   function render() {
     byId('models').replaceChildren(...models.map(model => {
       const row = document.createElement('tr');
@@ -31,6 +40,7 @@
       const operation = document.createElement('td');
       const remove = item('button', '删除');
       remove.type = 'button';
+      remove.className = 'btn btn-sm';
       remove.disabled = model.referenced || mutating;
       remove.title = model.referenced ? '模型已被作业引用，禁止删除' : '删除此模型';
       remove.setAttribute('aria-label', `删除模型 ${model.filename} · ${model.sha256}`);
@@ -42,19 +52,70 @@
           return `已删除模型 ${model.sha256}`;
         });
       });
-      operation.append(remove);
+
+      const selectBtn = item('a', '选择用于作业');
+      selectBtn.href = `/?model=${encodeURIComponent(model.sha256)}`;
+      selectBtn.className = 'btn btn-sm btn-subtle';
+      if (selectBtn.style) selectBtn.style.marginLeft = '6px';
+      selectBtn.title = '选定此模型并在监控页创建同步作业';
+
+      // Keep remove as operation.children[0] for backward-compatible test assertions
+      operation.append(remove, selectBtn);
       row.append(item('td', model.filename), digest, item('td', String(model.size_bytes)),
         item('td', model.created_at), item('td', model.referenced ? '已引用 · 禁止删除' : '未引用'), operation);
       return row;
     }));
   }
+
+  async function updateHUD() {
+    try {
+      const state = await request('/api/v1/state', {cache: 'no-store'});
+      const server = state.server;
+      currentActiveJob = state.current_job;
+
+      if (byId('hud-server-state')) {
+        const text = states[server.state] || server.state;
+        byId('hud-server-state').textContent = text;
+        byId('hud-server-state').className = `badge ${server.state === 'idle' ? 'badge-green' : server.state === 'running' ? 'badge-blue' : server.state === 'starting' || server.state === 'preparing' ? 'badge-yellow' : 'badge-red'}`;
+      }
+
+      if (byId('hud-radio')) {
+        const r = server.radio;
+        byId('hud-radio').textContent = r ? `CH${r.channel} · ${r.radio_txpower_dbm}dBm · MCS${r.downlink_mcs}` : '未确认';
+      }
+
+      if (byId('hud-job')) {
+        if (currentActiveJob && server.state === 'running') {
+          byId('hud-job').textContent = `轮次 ${currentActiveJob.current_round || 0}/${currentActiveJob.rounds} · 运行中`;
+        } else {
+          const recent = state.recent_job || state.job;
+          if (recent && recent.execution_result === 'aborted') {
+            byId('hud-job').textContent = recent.recovery_state === 'ready' ? '作业已急停 · 链路已就绪' : '作业已急停 · 恢复待命中';
+          } else if (recent && recent.execution_result === 'failed') {
+            byId('hud-job').textContent = recent.recovery_state === 'ready' ? '作业失败 · 链路已就绪' : '作业失败 · 恢复待命中';
+          } else if (recent && recent.execution_result === 'succeeded') {
+            byId('hud-job').textContent = '作业成功 · 已完成';
+          } else {
+            byId('hud-job').textContent = '空闲待命';
+          }
+        }
+      }
+
+      const abortBtn = byId('abort-job');
+      if (abortBtn) {
+        abortBtn.disabled = !currentActiveJob || server.state !== 'running';
+      }
+    } catch {
+      // In isolated tests where /api/v1/state is not mocked, do not fail
+    }
+  }
+
   async function refresh() {
     const version = ++listVersion;
     byId('list-status').textContent = hasList ? '正在刷新清单，当前清单可能已过时…' : '正在读取清单…';
     try {
       const body = await request('/api/v1/models', {cache:'no-store'});
       if (version !== listVersion) return;
-      // Preserve the authoritative ordering returned by the server.
       models = body.models;
       hasList = true;
       render();
@@ -66,10 +127,11 @@
       showError('list-error', `清单可能已过时。${error.message}。请重试刷新清单。`);
     }
   }
+
   async function mutate(action) {
     if (mutating) return;
     mutating = true;
-    ++listVersion; // Invalidate reads that started before this write.
+    ++listVersion;
     byId('upload').disabled = true;
     byId('model-file').disabled = true;
     byId('action-error').hidden = true;
@@ -89,6 +151,7 @@
       render();
     }
   }
+
   byId('upload-form').addEventListener('submit', event => {
     event.preventDefault();
     if (mutating) return;
@@ -107,6 +170,32 @@
       return `${body.deduplicated ? '去重成功，模型已存在' : '上传成功'} · ${body.model.filename} · SHA-256 ${body.model.sha256}`;
     });
   });
+
+  const abortBtn = byId('abort-job');
+  if (abortBtn) {
+    abortBtn.addEventListener('click', async () => {
+      if (!currentActiveJob) return;
+      if (typeof confirm === 'function' && !confirm('确认急停当前作业？这将立即中止当前传输并启动资源恢复。')) {
+        return;
+      }
+      abortBtn.disabled = true;
+      try {
+        await request(`/api/v1/jobs/${encodeURIComponent(currentActiveJob.job_id)}/abort`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({reason: 'operator_requested'})
+        });
+        await updateHUD();
+      } catch (err) {
+        showError('action-error', `急停未受理。${err.message}`);
+      }
+    });
+  }
+
   byId('refresh-models').addEventListener('click', refresh);
   refresh();
+  if (typeof window !== 'undefined') {
+    updateHUD();
+    setInterval(updateHUD, 3000);
+  }
 })();

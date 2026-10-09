@@ -42,7 +42,7 @@ def _job_view(job: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         return None
     fields = {"job_id", "run_id", "model_sha256", "model_size_bytes", "target_nodes", "rounds",
               "started_at", "execution_result", "recovery_state", "error", "reason", "recovery_error",
-              "current_round", "rounds_completed", "server_phase", "round_started_at"}
+              "current_round", "rounds_completed", "server_phase", "round_started_at", "phase_started_at"}
     return {k: deepcopy(v) for k, v in job.items() if k in fields}
 
 
