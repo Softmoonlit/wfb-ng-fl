@@ -163,6 +163,9 @@ def test_sync_uses_local_rest_and_keeps_ssh_blocked_through_terminal(runner,monk
     assert payload['live_observation'] is True
     assert not any(path=='jobs/abort' for path,_ in requests)
     assert json.loads((runner.archive/'job/coordinator.json').read_text())==summary
+    recovery=json.loads((runner.archive/'job/recovery.json').read_text())
+    assert recovery['status']=='passed' and recovery['timeout_seconds']==20
+    assert recovery['idle_status']==ready_status()
 
 
 def test_failed_sync_aborts_locally_before_unlocking_ssh(runner,monkeypatch):
@@ -474,3 +477,131 @@ def test_cleanup_retry_keeps_original_failure_and_raw_snapshots(runner,monkeypat
     assert json.loads(retries[0].read_text())['reason']=='cleanup retry'
     assert (runner.archive/'nodes/server/failure-daemon.log').exists()
     assert len(list((runner.archive/'nodes/server').glob('failure-daemon-*.log')))==1
+
+
+def test_ready_timeout_retains_every_sample_last_status_and_rest_errors(runner,monkeypatch):
+    runner.executor.stage='run-sync'
+    now=[0.0]
+    monkeypatch.setattr(module.time,'monotonic',lambda:now[0])
+    monkeypatch.setattr(module.time,'sleep',lambda seconds:now.__setitem__(0,now[0]+seconds))
+    offline=ready_status()
+    offline['nodes']['2'].update(readiness='OFFLINE',last_seen=123,reported_state='IDLE')
+    answers=iter([offline,urllib.error.URLError('refused'),offline,offline])
+    def rest():
+        value=next(answers)
+        if isinstance(value,Exception): raise value
+        return value
+    monkeypatch.setattr(runner,'rest',rest)
+    with pytest.raises(TimeoutError,match='IDLE/READY'):
+        runner.wait_ready(1)
+    root=runner.archive/'readiness/run-sync'
+    assert json.loads((root/'last-status.json').read_text())==offline
+    samples=[json.loads(line) for line in (root/'timeline.jsonl').read_text().splitlines()]
+    assert len(samples)==4
+    assert [sample['elapsed_seconds'] for sample in samples]==[0,.25,.5,.75]
+    assert samples[0]['status']==offline and samples[-1]['status']==offline
+    assert samples[1]['error_type']=='URLError' and 'refused' in samples[1]['error']
+    assert all(sample['run_id']==runner.run_id and sample['job_id']==runner.job_id for sample in samples)
+    result=json.loads((root/'result.json').read_text())
+    assert result['status']=='failed' and result['timeout_seconds']==1
+    assert result['last_status']==offline and result['samples']==4
+
+
+def test_ready_success_retains_initial_errors_and_ready_sample(runner,monkeypatch):
+    runner.executor.stage='start-services'
+    answers=iter([urllib.error.URLError('refused'),ready_status()])
+    def rest():
+        value=next(answers)
+        if isinstance(value,Exception): raise value
+        return value
+    monkeypatch.setattr(runner,'rest',rest)
+    monkeypatch.setattr(module.time,'sleep',lambda _:None)
+    assert runner.wait_ready(1)==ready_status()
+    root=runner.archive/'readiness/start-services'
+    samples=[json.loads(line) for line in (root/'timeline.jsonl').read_text().splitlines()]
+    assert len(samples)==2 and samples[-1]['status']==ready_status()
+    assert json.loads((root/'result.json').read_text())['status']=='passed'
+
+
+def test_sync_recovery_failure_keeps_coordinator_success_and_independent_recovery(runner,monkeypatch):
+    runner.executor.stage='run-sync'
+    runner.job_root.mkdir()
+    summary=dict(status='succeeded',rounds_completed=2)
+    (runner.job_root/'coordinator_summary.json').write_text(json.dumps(summary))
+    runner.save('services-ready.json',dict(started_at=1,ready_at=2))
+    monkeypatch.setattr(runner,'rest',lambda path='status',*args,**kwargs:
+                        dict(status='accepted') if path=='jobs/start' else ready_status())
+    def fail_ready(timeout):
+        assert timeout==20 and not runner.executor.job_window
+        raise TimeoutError('cluster did not restore IDLE/READY')
+    monkeypatch.setattr(runner,'wait_ready',fail_ready)
+    with pytest.raises(TimeoutError,match='IDLE/READY'):
+        runner.run_sync()
+    assert json.loads((runner.archive/'job/coordinator.json').read_text())==summary
+    assert json.loads((runner.archive/'job/window.json').read_text())['terminal_at']>0
+    recovery=json.loads((runner.archive/'job/recovery.json').read_text())
+    assert recovery['status']=='failed' and recovery['timeout_seconds']==20
+    assert recovery['started_at']<=recovery['ended_at']
+    assert 'IDLE/READY' in recovery['error']
+    assert not (runner.archive/'job-idle.json').exists()
+    assert not runner.calls
+
+
+def test_failure_cleanup_collects_all_idle_logs_even_when_journal_fails(runner,monkeypatch):
+    runner.executor.stage='run-sync'
+    runner.save('services-managed.json',dict(run_id=runner.run_id))
+    seen=[]
+    monkeypatch.setattr(runner,'stop_services',lambda:seen.append('stop'))
+    monkeypatch.setattr(runner,'resources',lambda *args,**kwargs:dict(clean=True))
+    def checked(role,command,**kwargs):
+        if 'journalctl' in command: raise RuntimeError('journal unavailable')
+        assert 'wfb_uplink.log' in command
+        seen.append(role)
+        return role+' idle DATA/GRANT diagnostics\n'
+    monkeypatch.setattr(runner.executor,'checked',checked)
+    runner.failure_cleanup(RuntimeError('not ready'))
+    assert seen==['stop',*module.ROLES]
+    for role in module.ROLES:
+        path=runner.archive/'nodes'/role/'failure-idle-link.log'
+        assert path.read_text()==role+' idle DATA/GRANT diagnostics\n'
+    originals={role:(runner.archive/'nodes'/role/'failure-idle-link.log').read_bytes() for role in module.ROLES}
+    runner.failure_cleanup(RuntimeError('retry cleanup'))
+    for role in module.ROLES:
+        node=runner.archive/'nodes'/role
+        assert (node/'failure-idle-link.log').read_bytes()==originals[role]
+        assert len(list(node.glob('failure-idle-link-*.log')))==1
+
+
+def test_sync_real_twenty_second_recovery_failure_preserves_rest_timeline(runner,monkeypatch):
+    runner.executor.stage='run-sync'
+    runner.job_root.mkdir()
+    summary=dict(status='succeeded',rounds_completed=2)
+    (runner.job_root/'coordinator_summary.json').write_text(json.dumps(summary))
+    runner.save('services-ready.json',dict(started_at=1,ready_at=2))
+    offline=ready_status()
+    offline['nodes']['2']['readiness']='OFFLINE'
+    now=[0.0]
+    monkeypatch.setattr(module.time,'monotonic',lambda:now[0])
+    sleeps=[]
+    def sleep(seconds):
+        sleeps.append(seconds)
+        now[0]+=seconds
+    monkeypatch.setattr(module.time,'sleep',sleep)
+    def rest(path='status',*args,**kwargs):
+        assert not runner.calls
+        return dict(status='accepted') if path=='jobs/start' else offline
+    monkeypatch.setattr(runner,'rest',rest)
+    with pytest.raises(TimeoutError,match='IDLE/READY'):
+        runner.run_sync()
+    root=runner.archive/'readiness/run-sync'
+    samples=[json.loads(line) for line in (root/'timeline.jsonl').read_text().splitlines()]
+    assert len(samples)==80 and samples[-1]['elapsed_seconds']==19.75
+    assert all(sample['status']==offline for sample in samples)
+    assert sleeps==[.25]*80
+    assert json.loads((root/'last-status.json').read_text())==offline
+    result=json.loads((root/'result.json').read_text())
+    assert result['timeout_seconds']==20 and result['elapsed_seconds']==20
+    assert result['status']=='failed'
+    assert json.loads((runner.archive/'job/coordinator.json').read_text())==summary
+    assert json.loads((runner.archive/'job/recovery.json').read_text())['status']=='failed'
+    assert not runner.executor.job_window

@@ -35,3 +35,14 @@ Stage 3 正式三机两轮 40 MiB 作业已多次完成，但终态资源复位�
 ## Comments
 
 2026-10-09：工单 06 的后续正式验收被此问题阻塞。磁盘已通过缓存清理和旧归档无损压缩恢复空间；不需要换网卡。
+
+### 2026-10-09 诊断与软件修复
+
+- 已将原服务端失败沙箱无损移出预检路径，并保存三端空闲 `wfb_uplink.log` 到 `tests/logs/stage3_issue07_diagnosis_20261009/`，操作记录在该诊断目录的 orchestration log；它属于诊断证据，不构成正式通过归档。
+- 最新失败的 Client 1 空闲底座先接受旧 Server GRANT `sequence=760`，随后最后一组 `GRANT_FILTER` 为 `71:1:0:47:0:23:0`，包含 23 次 stale 拒绝。Server 重启后序号从零开始，Client 序号水位未同步复位，是已取得实际日志支持的根因。
+- 通过真实 `ControlPlaneServer.handle_datagram()` 入口、可控 monotonic 时钟稳定复现另一条恢复阻塞：已 READY/ACTIVE 节点静默 11 秒后连续发送新鲜 IDLE，每次收到 ACK 却一直 CONNECTING；OFFLINE 投影同时丢弃 timestamp，使旧 HUNTING/RUNNING 能刷新活性。完成握手的身份现已与 OFFLINE 活性分离，投影完整保留原字段；陌生直接 IDLE 不放行。
+- 现有 Client daemon 所有权回归实际复现自然退出先恢复空闲链路、终态回调再启动第三条链路。修复为复用已健康的空闲链路，重复/旧作业终态消息保持幂等。
+- canonical spec 新增 3.1 终态会话与重新就绪契约；执行器补齐逐样本 REST 时间线、最后状态、Coordinator 成功与终态恢复的独立记录，并在失败清理保存三端空闲日志。正常终态恢复仍为 20 秒，不扩大 timeout。
+- 首轮 Python 全量 372 项通过；独立审查发现缺失/无效 timestamp 可绕过新鲜度检查，已追加生产 datagram 回归并严格校验必填正整数，相关 93 项通过。
+- 最终 Python 全量 374 项通过，Python 独立复审通过。C++ 新增跟踪源码回归与 `make test_session_recovery` 入口，真实原 HEAD TX/RX 恢复断言已复现失败；当前实现验证 DATA 启动会话、source/FEC 隔离、退役包拒绝、GRANT → IPC → 授权及独立 scheduler/READY 入口。`make build_v6 all_bin` 通过。
+- C++ 首轮独立审查发现过期 IPC 新会话会错误退役当前授权、重启 nonce 复用导致 unique 漏计、会话拒绝计数未进入日志，均已补回归修复。最终 C++ 独立复审通过，新增真实 libsodium keypair/session-key/DATA/FEC 加密往返与认证篡改拒绝测试，已纳入同一 make 回归入口并通过。三机正式验收待执行，暂不标记 resolved。

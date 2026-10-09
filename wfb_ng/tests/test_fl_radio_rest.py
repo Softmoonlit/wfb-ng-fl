@@ -44,7 +44,7 @@ class TestRadioReconfigureREST(unittest.TestCase):
     def ready_node(self, node_id=1):
         for state in (ClientNodeState.HUNTING, ClientNodeState.IDLE):
             self.daemon.control_plane.handle_datagram(
-                NodeHeartbeat(node_id, state.value, 0, 157, 12, 6).to_bytes(),
+                NodeHeartbeat(node_id, state.value, 0, 157, 12, 6, timestamp_ms=1000 + (state == ClientNodeState.IDLE)).to_bytes(),
                 ("127.0.0.1", 10000 + node_id),
             )
 
@@ -133,7 +133,7 @@ class TestRadioReconfigureREST(unittest.TestCase):
         _, report = self.request(None, "/api/v1/status", "GET")
         self.assertEqual(report["server_state"], "RADIO_ERROR")
         replies = self.daemon.control_plane.handle_datagram(
-            NodeHeartbeat(1, "IDLE", 0, 149, 18, 5).to_bytes(), ("127.0.0.1", 10001),
+            NodeHeartbeat(1, "IDLE", 0, 149, 18, 5, timestamp_ms=2000).to_bytes(), ("127.0.0.1", 10001),
         )
         self.assertEqual(len(replies), 1)
         self.assertEqual(self.request(payload)[0], 409)

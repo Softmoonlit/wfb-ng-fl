@@ -10,7 +10,7 @@ import socket
 import threading
 import time
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Literal, Optional, Sequence, Set, Tuple
 
@@ -161,6 +161,9 @@ class NodeHeartbeat:
         if "uplink_mcs" not in data or type(data["uplink_mcs"]) is not int:
             raise ValueError(f"Invalid or missing uplink_mcs: {data.get('uplink_mcs')}")
 
+        if type(data.get("timestamp_ms")) is not int or data["timestamp_ms"] <= 0:
+            raise ValueError(f"Invalid or missing timestamp_ms: {data.get('timestamp_ms')}")
+
         # Strict validation of RF parameters using existing canonical validator
         validate_radio_config({
             "channel": data["current_channel"],
@@ -176,7 +179,7 @@ class NodeHeartbeat:
             txpower_dbm=data["txpower_dbm"],
             uplink_mcs=data["uplink_mcs"],
             error_code=data.get("error_code"),
-            timestamp_ms=data.get("timestamp_ms"),
+            timestamp_ms=data["timestamp_ms"],
         )
 
     @classmethod
@@ -471,6 +474,8 @@ class NodeHorizonRegistry:
     def __init__(self, offline_threshold_seconds: float = NODE_OFFLINE_THRESHOLD_SECONDS):
         self.offline_threshold_seconds = offline_threshold_seconds
         self._nodes: Dict[int, NodeRecord] = {}
+        # Successful HUNTING -> IDLE identity survives OFFLINE liveness views.
+        self._verified_nodes: Set[int] = set()
         self._awaiting_idle_confirmation: Dict[int, bool] = {}
         self._hunting_timestamps: Dict[int, int] = {}
         self._lock = threading.RLock()
@@ -507,14 +512,9 @@ class NodeHorizonRegistry:
                 )
                 return HeartbeatAck(ack=True), None
 
-            is_currently_active_or_ready = (
-                existing_node is not None
-                and existing_node.readiness in (NodeReadiness.READY, NodeReadiness.ACTIVE)
-            )
-
             # Two-Army Gate:
-            # 1. HUNTING -> CONNECTING, marks awaiting_idle_confirmation = True
-            # 2. IDLE -> READY only if preceding HUNTING was acknowledged or node was already authenticated!
+            # HUNTING opens confirmation; only its IDLE closure verifies identity.
+            # Silence changes liveness, never this daemon-lifetime identity.
             if heartbeat.state == ClientNodeState.HUNTING.value:
                 readiness = NodeReadiness.CONNECTING
                 self._awaiting_idle_confirmation[node_id] = True
@@ -526,8 +526,9 @@ class NodeHorizonRegistry:
                 if hunting_ts is not None and heartbeat.timestamp_ms is not None:
                     ts_valid = heartbeat.timestamp_ms >= hunting_ts
 
-                if (self._awaiting_idle_confirmation.get(node_id, False) and ts_valid) or is_currently_active_or_ready:
+                if (self._awaiting_idle_confirmation.get(node_id, False) and ts_valid) or node_id in self._verified_nodes:
                     readiness = NodeReadiness.READY
+                    self._verified_nodes.add(node_id)
                     self._awaiting_idle_confirmation[node_id] = False
                 else:
                     # Unsolicited IDLE without prior HUNTING handshake stays in CONNECTING
@@ -576,20 +577,7 @@ class NodeHorizonRegistry:
             if node is None:
                 return None
             if time.monotonic() - node.last_heartbeat_time > self.offline_threshold_seconds:
-                return NodeRecord(
-                    node_id=node.node_id,
-                    tun_ip=node.tun_ip,
-                    reported_state=node.reported_state,
-                    readiness=NodeReadiness.OFFLINE,
-                    elapsed_ms=node.elapsed_ms,
-                    current_channel=node.current_channel,
-                    txpower_dbm=node.txpower_dbm,
-                    uplink_mcs=node.uplink_mcs,
-                    error_code=node.error_code,
-                    last_heartbeat_time=node.last_heartbeat_time,
-                    last_heartbeat_wall_time=node.last_heartbeat_wall_time,
-                    addr=node.addr,
-                )
+                return replace(node, readiness=NodeReadiness.OFFLINE)
             return node
 
     def get_all_nodes(self) -> Dict[int, NodeRecord]:

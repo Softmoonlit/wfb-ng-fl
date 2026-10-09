@@ -25,7 +25,8 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const string &host,
                                                      int snd_buf,
                                                      uint8_t local_node_id,
                                                      int fec_k,
-                                                     int fec_n)
+                                                     int fec_n,
+                                                     uint64_t session_id)
     : impl_(new Impl())
 {
     impl_->transmitter.reset(new UdpTransmitter(fec_k,
@@ -41,7 +42,8 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const string &host,
                                                 0,
                                                 snd_buf,
                                                 local_node_id,
-                                                true));
+                                                true,
+                                                session_id));
 }
 
 V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const vector<string> &interfaces,
@@ -49,7 +51,8 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const vector<string> &inter
                                                      uint8_t local_node_id,
                                                      const V6PlaintextFecRadioConfig &radio_config,
                                                      int fec_k,
-                                                     int fec_n)
+                                                     int fec_n,
+                                                     uint64_t session_id)
     : impl_(new Impl())
 {
     radiotap_header_t radiotap_header = init_radiotap_header(0,
@@ -74,7 +77,8 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const vector<string> &inter
                                                       0,
                                                       0,
                                                       local_node_id,
-                                                      true));
+                                                      true,
+                                                      session_id));
 }
 
 V6PlaintextFecTransmitter::~V6PlaintextFecTransmitter() = default;

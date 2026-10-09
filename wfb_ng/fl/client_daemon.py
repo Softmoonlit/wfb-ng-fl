@@ -1106,8 +1106,7 @@ class ClientDaemon:
             if not isinstance(job_id, str) or job_id != self._current_job_id:
                 return
             self.sandbox.abort(outcome='aborted' if aborted else 'succeeded')
-            self._stop_idle_link()
-            self.start_idle_link()
+            self._ensure_idle_transport()
             self._current_job_id = None
             if self.control_plane is not None:
                 if aborted:

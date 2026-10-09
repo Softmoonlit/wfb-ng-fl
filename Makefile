@@ -75,7 +75,7 @@ wfb_tun: src/wfb_tun.o
 	$(CC) -o $@ $^ $(LDFLAGS) -levent_core
 
 wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_authorization_ipc.o src/wifibroadcast.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(_LDFLAGS)
 
 wfb_v6_uplink: src/v6_uplink.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
@@ -123,4 +123,20 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+	rm -rf env session_recovery_test encrypted_session_test wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+
+.PHONY: test_session_recovery
+# Compile actual production TX/RX and IPC sources; never reuse legacy test objects.
+session_recovery_test: tests/cpp/session_recovery_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+
+test_session_recovery: session_recovery_test encrypted_session_test
+	./session_recovery_test
+	./encrypted_session_test
+
+.PHONY: test_encrypted_session
+encrypted_session_test: tests/cpp/encrypted_session_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+
+test_encrypted_session: encrypted_session_test
+	./encrypted_session_test

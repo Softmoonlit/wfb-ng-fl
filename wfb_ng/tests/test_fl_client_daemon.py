@@ -652,10 +652,12 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         daemon._handle_job_terminal({"job_id": "stale"}, aborted=False)
         self.assertEqual(len(link_processes), 2)
         daemon._handle_job_terminal({"job_id": "handoff"}, aborted=False)
-        self.assertEqual(link_processes[1].returncode, 0)
+        self.assertIsNone(link_processes[1].returncode)
         self.assertTrue(daemon.is_idle_link_running)
-        self.assertEqual(len(link_processes), 3)
+        self.assertEqual(len(link_processes), 2)
         self.assertIsNone(daemon._current_job_id)
+        daemon._handle_job_terminal({"job_id": "handoff"}, aborted=False)
+        self.assertEqual(len(link_processes), 2)
         daemon.stop()
 
     def test_client_link_command_and_job_share_server_link_id(self):

@@ -52,6 +52,11 @@ ControlEnvelopeParseStatus parse_control_envelope(const uint8_t *buf,
         return ControlEnvelopeParseStatus::invalid_version;
     }
 
+    if (be64toh(envelope->session_id) == 0)
+    {
+        return ControlEnvelopeParseStatus::invalid_session;
+    }
+
     if (envelope->control_type != WFB_CONTROL_TYPE_GRANT && envelope->control_type != WFB_CONTROL_TYPE_READY)
     {
         return ControlEnvelopeParseStatus::invalid_control_type;
@@ -78,6 +83,7 @@ ControlEnvelopeParseStatus parse_control_envelope(const uint8_t *buf,
         out->source_node = envelope->source_node;
         out->target_node = envelope->target_node;
         out->sequence = be64toh(envelope->sequence);
+        out->session_id = be64toh(envelope->session_id);
 
         if (envelope->control_type == WFB_CONTROL_TYPE_GRANT)
         {
@@ -111,12 +117,36 @@ GrantDecision filter_grant(const ControlEnvelopeView &envelope,
         return GrantDecision::ignore_wrong_target;
     }
 
+
+    if (envelope.session_id == 0)
+    {
+        if (counters) increment_counter(&counters->ignored_invalid_session);
+        return GrantDecision::ignore_invalid_session;
+    }
     if (envelope.grant_expires_at_ms <= now_ms)
     {
         if (counters) increment_counter(&counters->ignored_expired);
         return GrantDecision::ignore_expired;
     }
 
+    if (!state->has_session)
+    {
+        state->has_session = true;
+        state->session_id = envelope.session_id;
+        state->has_last_sequence = false;
+    }
+    else if (state->session_id != envelope.session_id)
+    {
+        if (state->retired_sessions.count(envelope.session_id) != 0)
+        {
+            if (counters) increment_counter(&counters->ignored_retired_session);
+            return GrantDecision::ignore_retired_session;
+        }
+
+        state->retired_sessions.insert(state->session_id);
+        state->session_id = envelope.session_id;
+        state->has_last_sequence = false;
+    }
     if (state->has_last_sequence)
     {
         if (envelope.sequence == state->last_sequence)

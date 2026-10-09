@@ -6,6 +6,7 @@
 struct TokenAuthorizationEvent {
     uint8_t node_id;
     uint8_t reserved[7];
+    uint64_t session_id;
     uint64_t sequence;
     uint32_t duration_ms;
     uint32_t reserved2;

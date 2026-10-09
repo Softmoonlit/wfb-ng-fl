@@ -176,17 +176,40 @@ class Stage3Runner:
             and status['nodes'][str(n)].get('current_channel') == channel for n in (1, 2))
 
     def wait_ready(self, timeout):
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            try:
-                status = self.rest()
-            except (urllib.error.URLError,TimeoutError,ConnectionError):
+        started = time.monotonic()
+        deadline = started + timeout
+        prefix = 'readiness/' + self.executor.stage
+        timeline = self.archive / prefix / 'timeline.jsonl'
+        timeline.parent.mkdir(parents=True, exist_ok=True)
+        wait_id = uuid.uuid4().hex
+        result = self.bound(wait_id=wait_id, started_at=time.time(), timeout_seconds=timeout,
+                            status='failed', samples=0, last_status=None)
+        try:
+            while time.monotonic() < deadline:
+                sample = self.bound(wait_id=wait_id, observed_at=time.time(),
+                                    elapsed_seconds=time.monotonic() - started)
+                try:
+                    status = self.rest()
+                except (urllib.error.URLError,TimeoutError,ConnectionError) as exc:
+                    sample.update(error_type=type(exc).__name__, error=str(exc))
+                else:
+                    sample['status'] = status
+                    result['last_status'] = status
+                    self.save(prefix + '/last-status.json', status)
+                with timeline.open('a') as stream:
+                    stream.write(json.dumps(sample, ensure_ascii=False) + '\n')
+                result['samples'] += 1
+                if 'status' in sample and self.ready(sample['status']):
+                    result['status'] = 'passed'
+                    return sample['status']
                 time.sleep(.25)
-                continue
-            if self.ready(status):
-                return status
-            time.sleep(.25)
-        raise TimeoutError('cluster did not restore IDLE/READY')
+            raise TimeoutError('cluster did not restore IDLE/READY')
+        except BaseException as exc:
+            result.update(error_type=type(exc).__name__, error=str(exc))
+            raise
+        finally:
+            result.update(ended_at=time.time(), elapsed_seconds=time.monotonic() - started)
+            self.save(prefix + '/result.json', result)
 
     def stage(self, name):
         if name not in STAGES:
@@ -501,13 +524,24 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
                     self.executor.job_window = not (self.archive/'job-window.json').exists()
             else:
                 self.executor.job_window = False
-        self.save('job-idle.json', self.wait_ready(20))
         services=json.loads((self.archive/'services-ready.json').read_text())
         window=json.loads((self.archive/'job-window.json').read_text())
         self.save('job/window.json',self.bound(services_started_at=services['started_at'],
             nodes_ready_at=services['ready_at'],ready_nodes=[1,2],
             accepted_at=window['accepted_at'],terminal_at=window['ended_at']))
         self.save('job/coordinator.json',summary)
+        recovery = self.bound(started_at=time.time(), timeout_seconds=20, status='failed',
+                              evidence='readiness/' + self.executor.stage)
+        try:
+            idle = self.wait_ready(20)
+            self.save('job-idle.json', idle)
+            recovery.update(status='passed', idle_status=idle)
+        except BaseException as exc:
+            recovery.update(error_type=type(exc).__name__, error=str(exc))
+            raise
+        finally:
+            recovery['ended_at'] = time.time()
+            self.save('job/recovery.json', recovery)
 
     def radio_journal(self, role):
         # Only fixed, observational fault-scenario commands are allowed here.
@@ -616,6 +650,15 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
             nodes[str(i)]=node
         return self.bound(nodes=nodes)
 
+    def collect_idle_link(self, role, destination=None):
+        root = 'server' if role == 'server' else 'client'
+        output = self.executor.checked(role, 'sudo -n cat /tmp/wfb-ng-fl/' + root + '/wfb_uplink.log')
+        destination = destination or ('server/link.log' if role == 'server'
+                                      else 'nodes/' + role + '/idle-link.log')
+        path = self.archive / destination
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(output)
+
     def collect(self):
         from tests.fl_runtime.stage3_archive import CONFIG_PATHS
         status=self.rest()
@@ -643,14 +686,12 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
                                +shlex.quote(str(self.archive/f'server/models/{index}.bin')),timeout=60)
                 links=[p['args'] for p in idle[role]['processes'] if p['comm']=='wfb_v6_uplink']
                 if len(links)!=1: raise RuntimeError('server must have exactly one persistent link')
-                self.executor.checked(role,'sudo -n cp /tmp/wfb-ng-fl/server/wfb_uplink.log '
-                                      +shlex.quote(str(self.archive/'server/link.log')))
+                self.collect_idle_link(role)
                 self.save('server/link.json',dict(argv=links[0]))
                 physical=json.loads((self.archive/'nodes/server/radio.json').read_text())
                 self.save('server/radio.json',physical)
             else:
-                link_log=self.executor.checked(role,'sudo -n cat /tmp/wfb-ng-fl/client/wfb_uplink.log')
-                (node/'idle-link.log').write_text(link_log)
+                self.collect_idle_link(role)
                 self.collect_tree(role,'/var/lib/wfb-ng-fl/evidence/'+self.job_id,self.archive/'clients'/role[-1])
             repo=shlex.quote(str(self.repo))
             head=self.executor.checked(role,'git -C '+repo+' rev-parse HEAD').strip()
@@ -774,10 +815,15 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
         retry_token=str(time.time_ns()) if had_primary else ''
         log_name='failure-daemon'+('-'+retry_token if retry_token else '')+'.log'
         resource_name='failure-resources'+('-'+retry_token if retry_token else '')+'.json'
+        idle_name='failure-idle-link'+('-'+retry_token if retry_token else '')+'.log'
         for role in ROLES:
+            node=self.archive/'nodes'/role
+            node.mkdir(parents=True,exist_ok=True)
             try:
-                node=self.archive/'nodes'/role
-                node.mkdir(parents=True,exist_ok=True)
+                self.collect_idle_link(role, 'nodes/' + role + '/' + idle_name)
+            except Exception as exc:
+                errors.append(role + ': idle link log: ' + str(exc))
+            try:
                 out=self.executor.checked(role,'sudo -n journalctl -u '+self.lifecycle.unit_for_role(role)
                      +' --since @'+str(self.meta['created_at'])+' --no-pager -o short-unix')
                 (node/log_name).write_text(out)

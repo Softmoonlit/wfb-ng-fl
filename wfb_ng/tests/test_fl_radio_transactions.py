@@ -146,7 +146,7 @@ class TestRadioTransaction(unittest.TestCase):
                 result, server, _ = self.run_switch(drop="RADIO_SWITCH_CONFIRMED", adapter=adapter)
                 self.assertEqual(result.status, "radio_error")
                 self.assertTrue(server.radio_error)
-                hb = NodeHeartbeat(1, "IDLE", 0, 157, 15, 5)
+                hb = NodeHeartbeat(1, "IDLE", 0, 157, 15, 5, timestamp_ms=2000)
                 replies = server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001))
                 self.assertEqual(len(replies), 1)
 
@@ -308,13 +308,19 @@ class TestClientFinalBarrier(unittest.TestCase):
 
 class TestHeartbeatIsolation(unittest.TestCase):
     def test_server_does_not_align_target_during_session(self):
+        from dataclasses import replace
         from wfb_ng.fl.control import NodeHeartbeat
         server = ControlPlaneServer(RadioConfig(channel=157, radio_txpower_dbm=12))
-        hb = NodeHeartbeat(1, "IDLE", 0, 149, 15, 5)
+        hb = NodeHeartbeat(1, "IDLE", 0, 149, 15, 5, timestamp_ms=2000)
         observed = []
 
+        def heartbeat():
+            nonlocal hb
+            hb = replace(hb, timestamp_ms=hb.timestamp_ms + 1)
+            return server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001))
+
         def broadcast(msg):
-            observed.append(server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001)))
+            observed.append(heartbeat())
             kind = {"CONFIG_RADIO_PREPARE": "PREPARE_ACK",
                     "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
                     "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
@@ -329,5 +335,5 @@ class TestHeartbeatIsolation(unittest.TestCase):
             prepare_timeout_seconds=.01, commit_delay_seconds=0, commit_timeout_seconds=.02)
         self.assertEqual(result.status, "finalized")
         self.assertTrue(all(len(replies) == 1 for replies in observed))
-        replies = server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001))
+        replies = heartbeat()
         self.assertEqual(json.loads(replies[-1])["type"], "CONFIG_RADIO_ALIGN")

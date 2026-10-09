@@ -439,8 +439,14 @@ void Aggregator::init_source_state(rx_source_state_t *state, uint8_t source_node
     assert(state != NULL);
     assert(source_node != 0);
 
-    memset(state, '\0', sizeof(*state));
     state->source_node = source_node;
+    state->seq = 0;
+    state->has_session = false;
+    state->session_id = 0;
+    state->retired_sessions.clear();
+    state->rx_ring_front = 0;
+    state->rx_ring_alloc = 0;
+    state->stats = {};
     state->last_known_block = (uint64_t)-1;
 
     for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
@@ -462,18 +468,53 @@ void Aggregator::init_source_state(rx_source_state_t *state, uint8_t source_node
 void Aggregator::deinit_source_state(rx_source_state_t *state)
 {
     assert(state != NULL);
-
-    for(int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
+    for (int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
     {
         delete[] state->rx_ring[ring_idx].fragment_map;
         state->rx_ring[ring_idx].fragment_map = NULL;
-        for(int i=0; i < fec_n; i++)
+        for (int i = 0; i < fec_n; i++)
         {
             free(state->rx_ring[ring_idx].fragments[i]);
         }
         delete[] state->rx_ring[ring_idx].fragments;
         state->rx_ring[ring_idx].fragments = NULL;
     }
+}
+
+void Aggregator::reset_source_reassembly(rx_source_state_t *state)
+{
+    assert(state != NULL);
+    state->seq = 0;
+    state->rx_ring_front = 0;
+    state->rx_ring_alloc = 0;
+    state->last_known_block = (uint64_t)-1;
+    for (int ring_idx = 0; ring_idx < RX_RING_SIZE; ring_idx++)
+    {
+        state->rx_ring[ring_idx].block_idx = 0;
+        state->rx_ring[ring_idx].fragment_to_send_idx = 0;
+        state->rx_ring[ring_idx].has_fragments = 0;
+        memset(state->rx_ring[ring_idx].fragment_map, '\0', fec_n * sizeof(size_t));
+    }
+}
+
+bool Aggregator::accept_data_session(rx_source_state_t *state, uint64_t session_id, uint64_t block_idx)
+{
+    assert(state != NULL);
+    if (session_id == 0) return false;
+    if (state->has_session && state->session_id != session_id)
+    {
+        if (state->retired_sessions.count(session_id) != 0)
+        {
+            WFB_ERR("DATA_REJECT reason=retired_session source_node=%u source_local_block_idx=0x%" PRIx64 " session_id=0x%" PRIx64 "\n",
+                    static_cast<unsigned>(state->source_node), block_idx, session_id);
+            return false;
+        }
+        state->retired_sessions.insert(state->session_id);
+        reset_source_reassembly(state);
+    }
+    state->has_session = true;
+    state->session_id = session_id;
+    return true;
 }
 
 void Aggregator::clear_source_states(void)
@@ -682,14 +723,16 @@ void Aggregator::dump_stats(void)
                 static_cast<unsigned>(node_id),
                 raw_p, raw_b, fec_rec, lost, out_p, out_b);
     }
-    IPC_MSG("%" PRIu64 "\tGRANT_FILTER\t%u:%u:%u:%u:%u:%u:%u\n", ts,
+    IPC_MSG("%" PRIu64 "\tGRANT_FILTER\t%u:%u:%u:%u:%u:%u:%u:%u:%u\n", ts,
             grant_filter_counters_.received,
             grant_filter_counters_.accepted,
             grant_filter_counters_.ignored_invalid_source,
             grant_filter_counters_.ignored_wrong_target,
             grant_filter_counters_.ignored_duplicate_sequence,
             grant_filter_counters_.ignored_stale_sequence,
-            grant_filter_counters_.ignored_expired);
+            grant_filter_counters_.ignored_expired,
+            grant_filter_counters_.ignored_invalid_session,
+            grant_filter_counters_.ignored_retired_session);
     IPC_MSG("%" PRIu64 "\tREADY_FILTER\t%u:%u:%u:%u:%u\n", ts,
             ready_filter_counters_.received,
             ready_filter_counters_.accepted,
@@ -831,6 +874,16 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
             WFB_ERR("Short packet (fec header)\n");
             count_p_bad += 1;
             return;
+        }
+        {
+            const wblock_hdr_t *header = reinterpret_cast<const wblock_hdr_t *>(buf);
+            if (be16toh(header->magic) != WFB_DATA_MAGIC || header->version != WFB_DATA_VERSION ||
+                be64toh(header->session_id) == 0)
+            {
+                WFB_ERR("DATA_REJECT reason=invalid_protocol_or_session\n");
+                count_p_bad += 1;
+                return;
+            }
         }
         break;
 
@@ -1020,7 +1073,7 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
     const uint64_t block_idx = data_nonce_source_local_block_idx(data_nonce);
     const uint8_t fragment_idx = data_nonce_fragment_idx(data_nonce);
 
-    count_p_uniq.insert(data_nonce);
+    count_p_uniq.insert(std::make_pair(be64toh(block_hdr->session_id), data_nonce));
 
     if (source_node == 0)
     {
@@ -1044,6 +1097,8 @@ void Aggregator::process_packet(const uint8_t *buf, size_t size, uint8_t wlan_id
 
     rx_source_state_t *state = get_source_state(source_node, true);
     assert(state != NULL);
+
+    if (!accept_data_session(state, be64toh(block_hdr->session_id), block_idx)) return;
 
     state->stats.count_p_raw += 1;
     state->stats.count_b_raw += size;

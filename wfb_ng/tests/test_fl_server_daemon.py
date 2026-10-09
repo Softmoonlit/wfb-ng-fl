@@ -411,6 +411,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=407,
         )
         sock.sendto(hb.to_bytes(), ("127.0.0.1", self.control_bind_port))
         sock.close()
@@ -644,6 +645,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=640,
         )
         sock.sendto(hb_unsolicited.to_bytes(), ("127.0.0.1", self.control_bind_port))
         sock.close()

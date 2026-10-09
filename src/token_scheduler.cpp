@@ -18,6 +18,7 @@ using namespace std;
 #include <map>
 #include <memory>
 #include "token_authorization_ipc.hpp"
+#include "wifibroadcast.hpp"
 
 namespace {
 
@@ -131,6 +132,7 @@ vector<uint8_t> drain_ready_declarations(TokenAuthorizationDatagramReceiver *rec
         {
             break;
         }
+        if (event.session_id == 0 || event.node_id == 0) continue;
         ready_nodes.push_back(event.node_id);
     }
 
@@ -463,7 +465,7 @@ void TokenScheduler::remove_active_node_at(size_t index)
     next_index %= active_node_ids.size();
 }
 
-TokenGrantDispatcher::TokenGrantDispatcher(const TokenSchedulerConfig &config)
+TokenGrantDispatcher::TokenGrantDispatcher(const TokenSchedulerConfig &config) : session_id(generate_session_id())
 {
     if (!config.socket_path.empty())
     {
@@ -480,6 +482,9 @@ bool TokenGrantDispatcher::send_grant(const TokenGrant &grant, uint64_t now_ms) 
 {
     TokenAuthorizationEvent event = {};
     event.node_id = grant.node_id;
+    event.session_id = session_id;
+    event.sequence = grant.sequence;
+    event.duration_ms = grant.duration_ms;
     event.expires_at_ms = now_ms + grant.duration_ms;
 
     map<uint8_t, unique_ptr<TokenAuthorizationDatagramSender> >::const_iterator sender = node_senders.find(grant.node_id);

@@ -154,6 +154,15 @@ Content-Type: application/json
 - 生成的 Server/Client 配置摘要必须进入 run envelope 和 evidence 交叉校验；
 - 人工 `jobs/abort` 与自然完成、Coordinator 失败使用同一 Server 终态收口：关闭 Coordinator/ServerRole、重置持久链路、广播带 `job_id` 的终态并恢复 `IDLE`。
 
+### 3.1 终态链路会话与重新就绪契约
+
+- 每次底座进程启动必须拥有独立的明文链路会话身份；DATA 的重组水位按 source 与会话隔离，接收新会话时释放该 source 的旧重组状态，已退役会话的迟到包不得重新激活旧水位。不得用固定延迟或时间戳块号掩盖重启。
+- GRANT 序号属于 Server 底座会话；Client 必须能接受新 Server 会话的从零授权，同时拒绝旧会话迟到授权与当前会话重复/乱序序号。新协议直接切换，禁止旧帧 fallback。
+- Client 自然退出与作业终态消息共用空闲链路接管：已经恢复且健康的空闲链路不得因同一作业终态再重启；任务资源仍由原沙箱负责释放，同一时刻只有一个链路所有者。
+- registry 将已完成 HUNTING → IDLE 闭环的节点身份与 10 秒活性投影分开。OFFLINE 不撤销本 Server Daemon 生命周期内的已验证身份；已验证节点的新鲜 IDLE 可恢复 READY，陌生节点直接 IDLE 仍为 CONNECTING。OFFLINE 视图必须保留心跳时间戳，重复/乱序消息不得刷新活性或重新打开握手门禁。
+- 正常作业终态恢复门限仍为 20 秒。执行器保存每次就绪轮询的本地 REST 时间线和最后状态，失败归档必须包含三端空闲底座日志，用于区分 DATA 会话、GRANT 门禁和 registry 推导。
+- 回归从实际 TX→RX、GRANT 过滤入口、daemon 任务退出→终态回调以及控制面 datagram→registry 入口驱动，分别验证重启恢复和旧帧拒绝；正式结论仍需三端同提交、干净工作树执行唯一硬件入口。
+
 ### 4. 唯一正式验收入口
 
 新增 `tests/fl_runtime/stage3_vm_physical_loop.sh`，只提供以下正式阶段：

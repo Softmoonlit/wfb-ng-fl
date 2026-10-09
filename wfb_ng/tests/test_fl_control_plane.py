@@ -215,6 +215,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=211,
         )
         ack, patch = self.registry.update_heartbeat(
             hb, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
@@ -238,6 +239,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=234,
         )
         self.registry.update_heartbeat(
             hb_hunting, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
@@ -252,6 +254,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=248,
         )
         self.registry.update_heartbeat(
             hb_idle, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
@@ -275,6 +278,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=271,
         )
         self.registry.update_heartbeat(
             hb_unsolicited_idle,
@@ -295,6 +299,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=20,
             uplink_mcs=3,
+            timestamp_ms=291,
         )
         ack, patch = self.registry.update_heartbeat(
             hb_mismatch, client_addr=("10.80.0.12", 50000), server_radio=self.server_radio
@@ -316,6 +321,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=312,
         )
         self.registry.update_heartbeat(
             hb_hunt, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
@@ -327,6 +333,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             current_channel=157,
             txpower_dbm=12,
             uplink_mcs=6,
+            timestamp_ms=323,
         )
         self.registry.update_heartbeat(
             hb_idle, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
