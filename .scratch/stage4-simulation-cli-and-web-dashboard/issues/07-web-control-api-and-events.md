@@ -6,4 +6,4 @@ Blocked by: 01 (定义平台编排与算法插件运行契约), 02 (定义内容
 
 ## Question
 
-为静态 Web 控制台提供支持时，`wfb-fl-server-daemon` 应以哪些版本化 REST 资源、请求响应 Schema、错误模型、静态资源路由和 SSE 事件契约暴露模型库、插件目录、拓扑、射频准备、作业控制与状态恢复；如何保持 handler 仅作为适配器而不承载领域逻辑？
+在 Stage 2 已有版本化 REST 路由和 `/api/v1/logs/stream` SSE 基础上，`wfb-fl-server-daemon` 还需要哪些版本化资源、请求响应 Schema、错误模型、静态资源路由和状态恢复契约来支持模型库、插件目录、拓扑、射频准备与作业控制；如何保持 handler 只做 Web 适配而不复制 Stage 2/3 领域逻辑？
