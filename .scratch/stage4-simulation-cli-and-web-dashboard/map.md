@@ -41,7 +41,9 @@ Type: map
 
 - [定义内容寻址模型库契约](issues/02-content-addressed-model-library.md#answer)：以 SHA-256 唯一标识不可变制品，明确上传去重、容量、列表选择与作业引用保护及手动删除边界。
 
-- Stage 4 Web 控制台由同一个 `wfb-fl-server-daemon` 托管；保留 `127.0.0.1:9090` 本机 IPC，并增加绑定明确管理网 IP 的 Web HTTP listener。两个 listener 共用同一套 REST handler、状态快照和领域逻辑，禁止绑定 `0.0.0.0`。管理网地址暂不可用时，管理 listener 进入不可用/降级状态，但不得阻止 Server Daemon 核心运行时或 Client Daemon 开机自启；网络地址就绪后由服务生命周期恢复管理 listener。
+- [定义控制台运行状态与进度语义](issues/03-console-state-and-progress-semantics.md#answer)：首版只展示真实轮次、Server 阶段、耗时、节点粗状态、错误、最近关键事件和资源恢复状态；快照恢复页面，细粒度节点阶段、虚假百分比、链路遥测与历史持久化延期。
+
+
 - Web 通过 Server Daemon、带内控制面和 Client Daemon 控制集群级射频参数（`channel`、`radio_txpower_dbm`、`downlink_mcs`、`uplink_mcs`）以及 FL 作业启动、观察和急停；不得直接访问 Client、WFB 底座、TUN、UFTP 或 HTTP PUT 数据面。
 - Client 的物理网卡选择、`node.json` 身份、TUN/IP 映射、驱动、USB/xHCI、软件包、systemd 和私有数据集/凭据属于部署维护面。Web 只展示其就绪状态和错误原因，不提供动态修改或 SSH 终端。
 - 正常 FL 作业从浏览器到 Server Daemon，再经控制面和 Client Daemon 完成；运行时禁止通过管理网 SSH 启动、复制数据、补发控制消息或恢复作业。
