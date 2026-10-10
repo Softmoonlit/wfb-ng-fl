@@ -268,9 +268,9 @@
       if (byId('start-job')) byId('start-job').disabled = true;
       if (statusBox) statusBox.textContent = '正在提交并启动同步作业…';
 
-      const idempotencyKey = crypto.randomUUID();
-
       try {
+        const idempotencyKey = Array.from(crypto.getRandomValues(new Uint8Array(16)),
+          value => value.toString(16).padStart(2, '0')).join('');
         const response = await fetch('/api/v1/jobs', {
           method: 'POST',
           headers: {

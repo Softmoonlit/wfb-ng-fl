@@ -98,7 +98,8 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
     confirm: confirmCallback || (() => true),
     EventSource,
     URLSearchParams,
-    crypto: globalThis.crypto,
+    // 普通 HTTP 管理地址有 getRandomValues，但没有安全上下文限定的 randomUUID。
+    crypto: { getRandomValues: values => globalThis.crypto.getRandomValues(values) },
     window: {
       location: { search: '?model=' + 'a'.repeat(64) }
     },
@@ -285,7 +286,8 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   assert.equal(postedJobs[0].body.model_sha256, modelSha);
   assert.deepEqual(postedJobs[0].body.target_nodes, [1, 2]);
   assert.equal(postedJobs[0].body.rounds, 3);
-  assert.ok(postedJobs[0].headers['Idempotency-Key'], 'Idempotency-Key must be included');
+  assert.match(postedJobs[0].headers['Idempotency-Key'], /^[0-9a-f]{32}$/,
+    '普通 HTTP 环境必须能够生成幂等键并完成提交');
 
   console.log('--- Step 3: Running State Observation & Gate Invariants ---');
   // Refresh view with running job
