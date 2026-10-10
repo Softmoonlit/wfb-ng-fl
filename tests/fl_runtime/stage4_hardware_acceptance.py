@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import shlex
@@ -16,15 +17,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from wfb_ng.fl.artifacts import file_sha256, write_json_atomic
+from wfb_ng.fl.artifacts import file_sha256, write_json_atomic, validate_path_safe_identifier
 from wfb_ng.fl.issue41_fixtures import generate_model_fixture
 from tests.fl_runtime.hardware import inspect_wireless_device
-from tests.fl_runtime.stage4_hardware_archive import STAGES, init_archive, record_stage, seal_archive
+from tests.fl_runtime.evidence_collection import collect_tree, collect_server_file
+from tests.fl_runtime.stage4_hardware_archive import STAGES, init_archive, record_stage, seal_archive, validate_job_evidence, validate_terminal_state, validate_archive
 
 ROOT = Path(__file__).resolve().parents[2]
-ROLES = ("server", "client1", "client2")
+CLIENTS = {"client1": 1, "client2": 2}
+ROLES = ("server", *CLIENTS)
+TARGET_NODES = list(CLIENTS.values())
 UNITS = {"server": "wfb-fl-server-daemon.service", "client1": "wfb-fl-client-daemon.service", "client2": "wfb-fl-client-daemon.service"}
 CANONICAL_MODEL_SHA256 = "a544c81f86c7a9e089dc45b3b0d3ff6490b933bb76153d8a8478c1a7703c7841"
+
+
+class WebRequestError(RuntimeError):
+    def __init__(self, status: int, detail: Any) -> None:
+        super().__init__(f"HTTP {status}: {detail}")
+        self.status, self.detail = status, detail
 
 
 class AuditedExecutor:
@@ -76,7 +86,7 @@ def _request(base: str, path: str, *, method: str = "GET", body: bytes | None = 
             detail = json.loads(raw.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError):
             detail = raw.decode("utf-8", errors="replace")
-        raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
+        raise WebRequestError(exc.code, detail) from exc
 
 
 def _multipart(path: Path) -> tuple[bytes, str]:
@@ -87,7 +97,7 @@ def _multipart(path: Path) -> tuple[bytes, str]:
     return prefix + content + f"\r\n--{boundary}--\r\n".encode(), boundary
 
 
-def _poll(base: str, predicate, timeout: float, archive: Path, name: str) -> dict[str, Any]:
+def _poll(base: str, predicate, timeout: float, archive: Path, name: str, *, interval: float = 1) -> dict[str, Any]:
     deadline = time.monotonic() + timeout
     samples: list[dict[str, Any]] = []
     while time.monotonic() < deadline:
@@ -96,7 +106,7 @@ def _poll(base: str, predicate, timeout: float, archive: Path, name: str) -> dic
         if predicate(state):
             write_json_atomic(archive / "management-web" / f"{name}.json", {"status": "passed", "samples": samples})
             return state
-        time.sleep(1)
+        time.sleep(interval)
     write_json_atomic(archive / "management-web" / f"{name}.json", {"status": "failed", "samples": samples})
     raise TimeoutError(f"timeout waiting for {name}")
 
@@ -109,6 +119,8 @@ class Stage4HardwareRunner:
         self.last_evidence: dict[str, Any] = {}
         self.active_job_id: str | None = None
         self.model: dict[str, Any] = {}
+        self.job_window_started_at: float | None = None
+        self.pending_create: tuple[bytes, str] | None = None
 
     def save(self, relative: str, value: Any) -> None:
         write_json_atomic(self.archive / relative, value)
@@ -125,18 +137,23 @@ class Stage4HardwareRunner:
             identity = None
             if role != "server":
                 identity = json.loads(self.executor.checked(role, "sudo -n cat /etc/wfb-ng-fl/node.json"))
-                if identity.get("node_id") != int(role[-1]):
+                if identity.get("node_id") != CLIENTS[role]:
                     raise RuntimeError(f"{role}: node identity mismatch")
             active = self.executor.checked(role, f"sudo -n systemctl is-active {UNITS[role]}").strip()
             if active != "active":
                 raise RuntimeError(f"{role}: daemon is not active")
+            sockets = self.executor.checked(role, "sudo -n ss -H -lunp")
+            (self.archive / "control-plane" / f"{role}-udp-sockets.txt").write_text(sockets, encoding="utf-8")
+            config_path = "/etc/wfb-ng-fl/server.json" if role == "server" else "/etc/wfb-ng-fl/node.json"
+            config = json.loads(self.executor.checked(role, "sudo -n cat " + config_path))
+            self.save(f"control-plane/{role}-deployment.json", config)
             topology[role] = {"commit": head, "workspace_clean": clean, "wireless": wireless, "identity": identity,
                               "unit": UNITS[role], "service_active": True}
         status_code, state = _request(self.web_url, "/api/v1/state")
         if status_code != 200 or state.get("server", {}).get("management_web", {}).get("status") != "ready":
             raise RuntimeError("management Web is not ready")
-        target_nodes = [node for node in state.get("nodes", []) if node.get("node_id") in (1, 2)]
-        if ({node.get("node_id") for node in target_nodes} != {1, 2} or
+        target_nodes = [node for node in state.get("nodes", []) if node.get("node_id") in TARGET_NODES]
+        if ({node.get("node_id") for node in target_nodes} != set(TARGET_NODES) or
                 not all(node.get("readiness") == "READY" and node.get("state") == "idle"
                         for node in target_nodes)):
             raise RuntimeError("all target nodes must be IDLE/READY")
@@ -161,104 +178,156 @@ class Stage4HardwareRunner:
         self.save("management-web/upload.json", {"status": "passed", "http_status": status, "model": self.model})
         return digest
 
-    def _read_client_evidence(self, role: str, job_id: str, *, require_rounds: bool = True) -> dict[str, Any]:
-        script = '''import hashlib,json,pathlib,sys
-root=pathlib.Path('/var/lib/wfb-ng-fl/evidence')/sys.argv[1]
-require_rounds=sys.argv[4]=='1'
-manifest=json.loads((root/'evidence_manifest.json').read_text())
-assert manifest['job_id']==sys.argv[1] and manifest['node_id']==int(sys.argv[2])
-assert manifest['runtime_commit']==sys.argv[3]
-for rel,info in manifest['files'].items():
- p=(root/rel).resolve(); p.relative_to(root.resolve())
- assert p.is_file() and p.stat().st_size==info['size_bytes']
- h=hashlib.sha256(p.read_bytes()).hexdigest(); assert h==info['sha256']
-updates=[]
-for p in root.glob('rounds/*/update.manifest.json'):
- updates.append(json.loads(p.read_text()))
-assert (not require_rounds) or len(updates) == 2
-print(json.dumps({'manifest':manifest,'updates':updates}))'''
-        command = "python3 -c " + shlex.quote(script) + " " + " ".join(shlex.quote(value) for value in (job_id, role[-1], self.meta["commit"], "1" if require_rounds else "0"))
-        result = json.loads(self.executor.checked(role, "sudo -n " + command, timeout=60))
-        self.save(f"data-plane/{role}-evidence-manifest.json", result)
-        return result
-
     def _verify_job_evidence(self, job_id: str, digest: str, *, aborted: bool,
                              terminal_state: dict[str, Any]) -> dict[str, Any]:
-        """Read daemon evidence after the protected window and verify both planes."""
-        if aborted:
-            control_tokens = ("JOB_ABORTED",)
-        else:
-            control_tokens = ("JOB_STARTED", "ROUND_STARTED", "ROUND_COMPLETED")
-        if (not all(node.get("node_id") in (1, 2) and node.get("readiness") == "READY"
-                    for node in terminal_state.get("nodes", [])) or
-                {node.get("node_id") for node in terminal_state.get("nodes", [])} != {1, 2}):
-            raise RuntimeError("terminal Web state does not contain exactly two ready target nodes")
-        events = terminal_state.get("events", [])
-        event_types = {event.get("type") for event in events if isinstance(event, dict)}
-        if not all(token in event_types for token in control_tokens):
-            raise RuntimeError(f"Web state lacks control-plane/runtime events: {sorted(event_types)}")
-        journals: dict[str, str] = {}
-        client_evidence: dict[int, dict[str, Any]] = {}
+        """Collect original files after recovery; the offline validator decides the verdict."""
+        validate_path_safe_identifier(job_id, "job_id")
+        validate_terminal_state(terminal_state, job_id, TARGET_NODES, aborted=aborted)
+        job = terminal_state["recent_job"]
+        if job.get("model_sha256") != digest:
+            raise RuntimeError("terminal model identity mismatch")
+        root = self.archive / "data-plane" / "jobs" / job_id
+        self.save(str(root.relative_to(self.archive) / "binding.json"), {
+            "job_id": job_id, "run_id": job["run_id"], "target_nodes": TARGET_NODES,
+            "window_started_at": self.job_window_started_at, "window_ended_at": time.time()})
+        self.save(str(root.relative_to(self.archive) / "terminal.json"), terminal_state)
         for role in ROLES:
-            journals[role] = self.executor.checked(
-                role, f"sudo -n journalctl -u {UNITS[role]} --no-pager -o cat | tail -n 400", timeout=60)
-            self.save(f"control-plane/{role}-journal-{job_id}.txt", journals[role])
-            client_evidence[int(role[-1])] = self._read_client_evidence(role, job_id, require_rounds=not aborted)
+            journal = self.executor.checked(role, f"sudo -n journalctl -u {UNITS[role]} "
+                f"--since @{job['started_at']} --no-pager -o short-unix", timeout=60)
+            (root / f"{role}-journal.txt").write_text(journal, encoding="utf-8")
+            if role in CLIENTS:
+                collect_tree(self.executor, role, "/var/lib/wfb-ng-fl/evidence/" + job_id,
+                                          root / "clients" / str(CLIENTS[role]))
         if not aborted:
-            summary_text = self.executor.checked(
-                "server", "find /tmp/wfb-ng-fl/server -type f -name coordinator_summary.json "
-                f"-path {shlex.quote('*job_' + job_id + '*')} -print -quit | xargs -r cat", timeout=60)
-            summary = json.loads(summary_text)
-            rounds = summary.get("rounds", [])
-            if summary.get("conclusion") != "succeeded" or len(rounds) != 2:
-                raise RuntimeError("coordinator evidence is not a successful two-round run")
-            for round_data in rounds:
-                if round_data.get("update_node_ids") != [1, 2] or round_data.get("input_model_sha256") != digest:
-                    raise RuntimeError("round barrier or model digest evidence mismatch")
-                updates = round_data.get("updates", [])
-                if len(updates) != 2 or any(u.get("size_bytes") != 40 * 1024 * 1024 for u in updates):
-                    raise RuntimeError("update size evidence is incomplete")
-                if {u.get("node_id") for u in updates} != {1, 2} or len({u.get("sha256") for u in updates}) != 2:
-                    raise RuntimeError("per-node update digest evidence is incomplete")
-            expected_updates = {node: [item["sha256"] for round_data in rounds for item in round_data["updates"] if item["node_id"] == node]
-                               for node in (1, 2)}
-            actual_updates = {node: [item.get("sha256") for update in client_evidence[node]["updates"] for item in [update]]
-                              for node in (1, 2)}
-            self.save("data-plane/coordinator-summary.json", summary)
-            return {"control_plane_verified": True, "data_plane_verified": True,
-                    "rounds": rounds, "update_count": 4}
-        return {"control_plane_verified": True, "data_plane_verified": False}
+            # These are the production daemon's two separate job directories.
+            job_root = Path("/tmp/wfb-ng-fl/server") / ("job_" + job_id)
+            collect_server_file(self.executor, job_root / "coordinator_summary.json", root / "coordinator_summary.json")
+            collect_tree(self.executor, "server", str(job_root) + "_role", root / "server-role")
+            summary = json.loads((root / "coordinator_summary.json").read_text())
+            for index, round_data in enumerate(summary["rounds"], 1):
+                collect_server_file(self.executor, round_data["output_model_path"], root / "output-models" / f"{index}.bin", source_root=job_root)
+        return validate_job_evidence(root, commit=self.meta["commit"], aborted=aborted)
+
+    def _probe_recovery_gate(self, state: dict[str, Any], job_id: str, request: bytes, key: str) -> None:
+        recent = state.get("recent_job") or {}
+        if state.get("current_job") is not None or recent.get("job_id") != job_id or recent.get("recovery_state") != "recovering":
+            return
+        probe_key = key + "-recovery-probe"
+        self.pending_create = (request, probe_key)
+        try:
+            _, accepted = _request(self.web_url, "/api/v1/jobs", method="POST", body=request,
+                                  headers={"Content-Type": "application/json", "Idempotency-Key": probe_key})
+        except WebRequestError as exc:
+            self.pending_create = None
+            code = exc.detail.get("error", {}).get("code") if isinstance(exc.detail, dict) else None
+            passed = exc.status == 409 and code == "preflight_engine_conflict"
+            self.save("control-plane/recovery-gate.json", {"status": "passed" if passed else "failed",
+                "job_id": job_id, "sample": state, "http_status": exc.status, "error_code": code, "response": exc.detail})
+            if not passed:
+                raise RuntimeError("recovery probe failed with an unexpected HTTP error") from exc
+        else:
+            # Recovery can finish between observation and POST. Clean up a real accepted probe;
+            # neither that race nor a successful POST proves a rejection gate.
+            validate_path_safe_identifier(accepted["job_id"], "job_id")
+            self.active_job_id = accepted["job_id"]
+            self.pending_create = None
+            raise RuntimeError("recovery probe accepted a new job; recovery rejection was not established")
+
+    def _resolve_create(self) -> str:
+        """Resolve a possibly accepted POST with its original idempotency key."""
+        request, key = self.pending_create
+        status, accepted = _request(self.web_url, "/api/v1/jobs", method="POST", body=request,
+                                   headers={"Content-Type": "application/json", "Idempotency-Key": key})
+        job_id = accepted["job_id"]
+        validate_path_safe_identifier(job_id, "job_id")
+        if status != 202:
+            raise RuntimeError("unexpected job acceptance response")
+        self.active_job_id = job_id
+        self.pending_create = None
+        return job_id
+
+    def _cleanup_job(self) -> None:
+        if self.pending_create is not None:
+            self._resolve_create()
+        job_id = self.active_job_id
+        if job_id is None:
+            return
+        validate_path_safe_identifier(job_id, "job_id")
+        _, state = _request(self.web_url, "/api/v1/state")
+        recent = state.get("recent_job") or {}
+        if (state.get("current_job") or {}).get("job_id") == job_id:
+            _request(self.web_url, f"/api/v1/jobs/{job_id}/abort", method="POST",
+                     body=b'{"reason":"Stage 4 acceptance failure cleanup"}',
+                     headers={"Content-Type": "application/json"})
+        elif recent.get("job_id") != job_id:
+            raise RuntimeError("cannot establish accepted job identity for cleanup")
+        _poll(self.web_url, lambda value: value.get("current_job") is None and
+              (value.get("recent_job") or {}).get("job_id") == job_id and
+              (value.get("recent_job") or {}).get("recovery_state") == "ready",
+              60, self.archive, "failure-recovery")
+        self.executor.job_window = False
+        self.active_job_id = None
 
     def job(self, digest: str, *, abort: bool = False) -> dict[str, Any]:
         key = "stage4-" + ("abort" if abort else "normal") + "-" + self.meta["run_id"]
-        request = json.dumps({"model_sha256": digest, "target_nodes": [1, 2], "rounds": 2}).encode()
-        _, accepted = _request(self.web_url, "/api/v1/jobs", method="POST", body=request,
-                               headers={"Content-Type": "application/json", "Idempotency-Key": key})
-        job_id = accepted["job_id"]
-        self.active_job_id = job_id
+        request = json.dumps({"model_sha256": digest, "target_nodes": TARGET_NODES, "rounds": 2}).encode()
+        self.job_window_started_at = time.time()
         self.executor.job_window = True
+        self.pending_create = (request, key)
+        try:
+            job_id = self._resolve_create()
+        except (TimeoutError, urllib.error.URLError):
+            job_id = self._resolve_create()
+        abort_pool = ThreadPoolExecutor(max_workers=1) if abort else None
+        abort_future = None
         try:
             if abort:
                 # First observe the active job through Web, then request the stop through Web.
-                _poll(self.web_url, lambda state: (state.get("current_job") or {}).get("job_id") == job_id,
-                      60, self.archive, "abort-active")
+                _poll(self.web_url, lambda state: (state.get("current_job") or {}).get("job_id") == job_id and
+                      (state.get("current_job") or {}).get("server_phase") == "publishing_model",
+                      60, self.archive, "abort-active", interval=0.05)
+                self.save("control-plane/recovery-gate.json", {"status": "not_observed", "job_id": job_id,
+                    "reason": "No recovering snapshot with a confirmed rejection has been sampled"})
+                abort_future = abort_pool.submit(
+                    _request, self.web_url, f"/api/v1/jobs/{job_id}/abort", method="POST",
+                    body=b'{"reason":"Stage 4 formal emergency stop"}',
+                    headers={"Content-Type": "application/json"})
+            gate_observed = False
+            def recovered(state: dict[str, Any]) -> bool:
+                nonlocal gate_observed
+                if abort_future is not None and abort_future.done():
+                    abort_future.result()  # Surface HTTP failures immediately, rather than timing out.
+                recent = state.get("recent_job") or {}
+                if recent.get("job_id") != job_id:
+                    return False
+                if abort and not gate_observed and recent.get("recovery_state") == "recovering":
+                    self._probe_recovery_gate(state, job_id, request, key)
+                    gate_observed = True
+                if recent.get("recovery_state") == "blocked":
+                    raise RuntimeError("job recovery is blocked")
+                if recent.get("execution_result") not in (None, "aborted" if abort else "succeeded"):
+                    raise RuntimeError("unexpected job execution result")
+                if recent.get("recovery_state") != "ready":
+                    return False
                 try:
-                    _request(self.web_url, "/api/v1/jobs", method="POST", body=request,
-                             headers={"Content-Type": "application/json", "Idempotency-Key": key + "-blocked"})
-                except RuntimeError as exc:
-                    self.save("control-plane/recovery-gate.json", {"new_job_rejected_before_recovery": True,
-                                                                     "error": str(exc)})
-                else:
-                    raise RuntimeError("new job was accepted before abort recovery")
-                _, abort_result = _request(self.web_url, f"/api/v1/jobs/{job_id}/abort", method="POST",
-                                           body=b'{"reason":"Stage 4 formal emergency stop"}',
-                                           headers={"Content-Type": "application/json"})
+                    validate_terminal_state(state, job_id, TARGET_NODES, aborted=abort)
+                except ValueError:
+                    return False
+                expected_event = "JOB_ABORTED" if abort else "JOB_COMPLETED"
+                return any(e.get("job_id") == job_id and e.get("type") == expected_event for e in state.get("events", []))
+            terminal = _poll(self.web_url, recovered, 600, self.archive,
+                             "abort-terminal" if abort else "normal-terminal", interval=0.1)
+            if abort_future is not None:
+                status, abort_result = abort_future.result()
                 self.save("control-plane/abort-request.json", abort_result)
-            terminal = _poll(self.web_url, lambda state: state.get("current_job") is None and
-                             state.get("recent_job", {}).get("job_id") == job_id, 600, self.archive,
-                             "abort-terminal" if abort else "normal-terminal")
+                if status != 202 or abort_result.get("job_id") != job_id or abort_result.get("status") != "accepted":
+                    raise RuntimeError("unexpected abort acceptance response")
         finally:
-            self.executor.job_window = False
+            if abort_pool is not None:
+                abort_pool.shutdown(wait=True)
+            # Keep the no-SSH boundary on failure until Web cleanup confirms recovery.
+            if "terminal" in locals():
+                self.executor.job_window = False
         job = terminal.get("recent_job") or {}
         self.active_job_id = None
         evidence = self._verify_job_evidence(job_id, digest, aborted=abort, terminal_state=terminal)
@@ -269,20 +338,32 @@ print(json.dumps({'manifest':manifest,'updates':updates}))'''
             self.save("control-plane/abort-job.json", {"stage": "abort-job", "status": "passed", "detail": control})
         else:
             detail = {"execution_result": job.get("execution_result"), "rounds_completed": job.get("rounds_completed"),
-                      "job_id": job_id, **evidence, "model_sha256": digest, "target_nodes": [1, 2]}
+                      "job_id": job_id, **evidence, "model_sha256": digest, "target_nodes": TARGET_NODES}
             self.save("data-plane/normal-job.json", {"stage": "normal-job", "status": "passed", "detail": detail})
         return job
 
     def collect(self) -> None:
         resources: dict[str, Any] = {}
+        # Match process argv tokens, not a ps/awk command containing its own search text.
+        probe = """import json,pathlib,subprocess
+rows=[]
+for line in subprocess.check_output(['ps','-eo','pid=,comm='],text=True).splitlines():
+ pid,comm=line.split()
+ try: argv=(pathlib.Path('/proc')/pid/'cmdline').read_bytes().decode().strip('\\0').split('\\0')
+ except (OSError,UnicodeError): continue
+ if comm in ('uftp','uftpd') or any(x in argv for x in ('wfb_ng.fl.role_service','wfb_ng.fl.service')):
+  rows.append(dict(pid=int(pid),comm=comm,args=argv))
+print(json.dumps(rows))"""
         for role in ROLES:
-            resources[role] = {"transient_processes": self.executor.checked(
-                                   role, "ps -eo comm=,args= | awk '$1 == \"uftp\" || $1 == \"uftpd\" || $0 ~ /wfb_ng\\.fl\\.role_service/'"
-                               ).splitlines(),
-                               "tuns": self.executor.checked(role, "ip -o link show | awk -F': ' '$2 ~ /^fl-(s|c[0-9]+)/ {split($2,a,\"@\"); print a[1]}'").splitlines(),
-                               "service": self.executor.checked(role, f"sudo -n systemctl is-active {UNITS[role]}").strip()}
+            resources[role] = {
+                "transient_processes": json.loads(self.executor.checked(role, "python3 -I -c " + shlex.quote(probe))),
+                "tuns": self.executor.checked(role, "ip -o link show | awk -F': ' '$2 ~ /^fl-(s|c[0-9]+)(@[^:]+)?$/ {split($2,a,\"@\"); print a[1]}'").splitlines(),
+                "job_sandboxes": (json.loads(self.executor.checked(role,
+                    "sudo -n python3 -I -c " + shlex.quote("import json,pathlib; print(json.dumps([str(p) for p in pathlib.Path('/tmp/wfb-ng-fl/client').glob('job_*')]))")))
+                    if role in CLIENTS else []),
+                "service": self.executor.checked(role, f"sudo -n systemctl is-active {UNITS[role]}").strip()}
         expected_tuns = {"server": ["fl-s"], "client1": ["fl-c1"], "client2": ["fl-c2"]}
-        if any(value["transient_processes"] or sorted(value["tuns"]) != expected_tuns[role]
+        if any(value["service"] != "active" or value["job_sandboxes"] or value["transient_processes"] or sorted(value["tuns"]) != expected_tuns[role]
                for role, value in resources.items()):
             raise RuntimeError("temporary job resources remain or idle TUN was not restored")
         self.save("lifecycle/resources.json", resources)
@@ -294,42 +375,53 @@ print(json.dumps({'manifest':manifest,'updates':updates}))'''
         try:
             self.preflight()
             record_stage(self.archive, "preflight", status="passed", detail={"topology": "summary/topology.json"})
+            self.executor.stage = "web-upload"
             digest = self.upload(fixture)
             record_stage(self.archive, "web-upload", status="passed", detail=self.model)
+            self.executor.stage = "normal-job"
             normal = self.job(digest)
-            record_stage(self.archive, "normal-job", status="passed", detail={"execution_result": normal.get("execution_result"),
+            record_stage(self.archive, "normal-job", status="passed", detail={"job_id": normal["job_id"], "execution_result": normal.get("execution_result"),
                                                                                 "rounds_completed": normal.get("rounds_completed"),
                                                                                 **self.last_evidence})
+            self.executor.stage = "abort-job"
             aborted = self.job(digest, abort=True)
-            record_stage(self.archive, "abort-job", status="passed", detail={"execution_result": aborted.get("execution_result"),
+            record_stage(self.archive, "abort-job", status="passed", detail={"job_id": aborted["job_id"], "execution_result": aborted.get("execution_result"),
                                                                               "recovery_state": aborted.get("recovery_state"),
                                                                               **self.last_evidence})
+            self.executor.stage = "collect"
             self.collect()
             record_stage(self.archive, "collect", status="passed", detail={"resources_recovered": True})
+            self.executor.stage = "summary"
+            gate = json.loads((self.archive / "control-plane/recovery-gate.json").read_text())
+            if gate.get("status") != "passed":
+                raise RuntimeError("recovery rejection gate not observed; hardware acceptance is incomplete")
             record_stage(self.archive, "summary", status="passed", detail={"conclusion": "passed"})
             seal_archive(self.archive, conclusion="passed")
+            errors = validate_archive(self.archive)
+            if errors:
+                raise RuntimeError("offline archive validation failed: " + "; ".join(errors))
             return 0
         except BaseException as exc:
             failure = str(exc)
-            if self.active_job_id is not None:
+            if self.active_job_id is not None or self.pending_create is not None:
                 try:
-                    self.executor.job_window = False
-                    _request(self.web_url, f"/api/v1/jobs/{self.active_job_id}/abort", method="POST",
-                             body=b'{"reason":"Stage 4 acceptance failure cleanup"}',
-                             headers={"Content-Type": "application/json"})
-                    _poll(self.web_url, lambda state: state.get("current_job") is None,
-                          60, self.archive, "failure-recovery")
+                    self._cleanup_job()
                 except Exception as cleanup_error:
                     failure += f"; cleanup failed: {cleanup_error}"
-                finally:
-                    self.active_job_id = None
+            failed_stage = self.executor.stage
             completed = json.loads((self.archive / "envelope.json").read_text(encoding="utf-8"))["stages"]
             while len(completed) < len(STAGES) - 1:
                 stage = STAGES[len(completed)]
                 record_stage(self.archive, stage, status="skipped", detail={"blocked_by": failure})
                 completed.append(stage)
-            record_stage(self.archive, "summary", status="failed", detail={"conclusion": "failed", "failure": failure})
-            seal_archive(self.archive, conclusion="failed", failure_boundary=STAGES[len(completed) - 1])
+            if len(completed) == len(STAGES):
+                envelope = json.loads((self.archive / "envelope.json").read_text())
+                envelope["stages"][-1].update(status="failed", detail={"conclusion": "failed", "failure": failure})
+                self.save("envelope.json", envelope)
+                self.save("summary/06-summary.json", envelope["stages"][-1])
+            else:
+                record_stage(self.archive, "summary", status="failed", detail={"conclusion": "failed", "failure": failure})
+            seal_archive(self.archive, conclusion="failed", failure_boundary=failed_stage)
             return 1
 
 

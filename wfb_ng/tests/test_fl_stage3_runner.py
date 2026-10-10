@@ -626,7 +626,7 @@ def test_server_collect_tree_keeps_archive_writable_and_root_source_unchanged(ru
     original=snapshot(source)
     runner.executor.backend=None
     try:
-        runner.collect_tree('server',str(source),destination)
+        module.collect_tree(runner.executor, 'server',str(source),destination)
         assert snapshot(source)==original
         assert sibling.stat().st_uid==0 and sibling.stat().st_gid==0
         for path in [destination,*destination.rglob('*')]:
@@ -656,10 +656,10 @@ def test_server_single_files_after_tree_copy_are_readable_without_changing_root6
     destination=runner.archive/'server'
     runner.executor.backend=None
     try:
-        runner.collect_tree('server',str(source),destination)
+        module.collect_tree(runner.executor, 'server',str(source),destination)
         for name,relative in [('job_config.json','job_config.json'),('output model.bin','models/1.bin')]:
             target=destination/relative
-            runner.collect_server_file(str(source/name),target)
+            module.collect_server_file(runner.executor, str(source/name),target)
             assert module.file_sha256(str(target))==hashlib.sha256(files[name]).hexdigest()
             copied=target.stat()
             assert (copied.st_uid,copied.st_gid,stat.S_IMODE(copied.st_mode))==(os.getuid(),os.getgid(),0o600)
@@ -675,13 +675,13 @@ def test_collect_routes_server_config_and_models_through_owned_file_copy(runner,
     monkeypatch.setattr(runner,'rest',ready_status)
     monkeypatch.setattr(runner,'resources',lambda *args,**kwargs:dict(processes=[],tuns=[]))
     monkeypatch.setattr(runner,'collect_wireless',lambda role:None)
-    monkeypatch.setattr(runner,'collect_tree',lambda role,source,dest:dest.mkdir(parents=True,exist_ok=True))
+    monkeypatch.setattr(module,'collect_tree',lambda executor,role,source,dest:dest.mkdir(parents=True,exist_ok=True))
     runner.save('job/coordinator.json',dict(rounds=[dict(output_model_path='/root/output-model.bin')]))
     copies=[]
-    def copy(source,dest):
+    def copy(executor,source,dest):
         copies.append((str(source),dest.relative_to(runner.archive).as_posix()))
         if len(copies)==2: raise RuntimeError('copy boundary reached')
-    monkeypatch.setattr(runner,'collect_server_file',copy)
+    monkeypatch.setattr(module,'collect_server_file',copy)
     with pytest.raises(RuntimeError,match='copy boundary reached'):
         runner.collect()
     assert copies==[(str(runner.job_root/'job_config.json'),'server/job_config.json'),

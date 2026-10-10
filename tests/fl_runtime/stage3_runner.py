@@ -9,7 +9,6 @@ connection can survive into the protected job window.
 from __future__ import annotations
 
 import argparse
-import io
 import inspect
 import json
 import os
@@ -18,7 +17,6 @@ import re
 import shlex
 import signal
 import subprocess
-import tarfile
 import tempfile
 import time
 import uuid
@@ -28,6 +26,7 @@ import urllib.error
 from wfb_ng.fl.artifacts import file_sha256, write_json_atomic, validate_path_safe_identifier
 from tests.fl_runtime.issue41_lifecycle import LifecycleConfig, audit_stopped_node
 
+from tests.fl_runtime.evidence_collection import collect_server_file, collect_tree
 from tests.fl_runtime.stage3_archive import STAGES
 
 ROLES = ('server', 'client1', 'client2')
@@ -609,49 +608,6 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
         self.save('radio/fault.json', self.bound(node_id=2,drop_types=['NEW_CHANNEL_PING','RADIO_SWITCH_FINALIZED'],
                  present=False,installed_at=installed,removed_at=removed))
 
-    def collect_server_file(self, source, dest):
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        self.executor.checked('server', 'sudo -n install -o ' + str(os.getuid())
-                              + ' -g ' + str(os.getgid()) + ' -m 0600 -- '
-                              + shlex.quote(str(source)) + ' ' + shlex.quote(str(dest)), timeout=60)
-
-    def collect_tree(self, role, source, dest):
-        # Server binaries remain available for offline SHA checking. Client
-        # evidence remains the daemon's small, original whitelist archive.
-        if role=='server':
-            dest.mkdir(parents=True,exist_ok=True)
-            self.executor.checked(role,'sudo -n cp -a '+shlex.quote(source+'/.')+' '+shlex.quote(str(dest)),timeout=120)
-            # cp -a also preserves the source directory's root ownership on
-            # dest. Return only the copied tree to the archive caller; do not
-            # follow copied symlinks into runtime paths or other archives.
-            self.executor.checked(role,'sudo -n chown -R -h -- '
-                                  +str(os.getuid())+':'+str(os.getgid())+' '
-                                  +shlex.quote(str(dest)),timeout=120)
-            return
-        code = """import base64,io,pathlib,tarfile
-root=pathlib.Path(SOURCE)
-assert root.is_dir(),str(root)
-buf=io.BytesIO()
-with tarfile.open(fileobj=buf,mode='w:gz') as tar:
- for p in sorted(root.rglob('*')):
-  if p.is_symlink(): raise RuntimeError('symlink in evidence')
-  if p.is_file():
-   if p.suffix=='.bin' or p.stat().st_size>16*1024*1024: raise RuntimeError('large binary in client evidence')
-   tar.add(p,arcname=str(p.relative_to(root)),recursive=False)
-print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source),1)
-        import base64
-        blob = base64.b64decode(self.executor.checked(role, python_command(code),timeout=120))
-        dest.mkdir(parents=True,exist_ok=True)
-        with tarfile.open(fileobj=io.BytesIO(blob),mode='r:gz') as tar:
-            for member in tar.getmembers():
-                relative=Path(member.name)
-                if not member.isfile() or relative.is_absolute() or '..' in relative.parts:
-                    raise RuntimeError('unsafe evidence archive member')
-                target=dest/relative
-                target.parent.mkdir(parents=True,exist_ok=True)
-                with tar.extractfile(member) as src:
-                    target.write_bytes(src.read())
-
     def resource_report(self, raw, idle=False, status=None):
         nodes={}
         for i,role in enumerate(ROLES):
@@ -695,15 +651,15 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
             idle[role] = self.resources(role)
             self.collect_wireless(role)
             if role=='server':
-                self.collect_tree(role,str(self.job_root),node/'job')
-                self.collect_tree(role,str(self.job_root)+'_role',self.archive/'server')
+                collect_tree(self.executor, role,str(self.job_root),node/'job')
+                collect_tree(self.executor, role,str(self.job_root)+'_role',self.archive/'server')
                 # Copy actual JobConfig emitted by the coordinator.
-                self.collect_server_file(self.job_root/'job_config.json',
+                collect_server_file(self.executor, self.job_root/'job_config.json',
                                          self.archive/'server/job_config.json')
                 (self.archive/'server/models').mkdir(exist_ok=True)
                 summary=json.loads((self.archive/'job/coordinator.json').read_text())
                 for index,r in enumerate(summary['rounds'],1):
-                    self.collect_server_file(r['output_model_path'],
+                    collect_server_file(self.executor, r['output_model_path'],
                                              self.archive/f'server/models/{index}.bin')
                 links=[p['args'] for p in idle[role]['processes'] if p['comm']=='wfb_v6_uplink']
                 if len(links)!=1: raise RuntimeError('server must have exactly one persistent link')
@@ -713,7 +669,7 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
                 self.save('server/radio.json',physical)
             else:
                 self.collect_idle_link(role)
-                self.collect_tree(role,'/var/lib/wfb-ng-fl/evidence/'+self.job_id,self.archive/'clients'/role[-1])
+                collect_tree(self.executor, role,'/var/lib/wfb-ng-fl/evidence/'+self.job_id,self.archive/'clients'/role[-1])
             repo=shlex.quote(str(self.repo))
             head=self.executor.checked(role,'git -C '+repo+' rev-parse HEAD').strip()
             clean=not self.executor.checked(role,'git -C '+repo+' status --porcelain').strip()

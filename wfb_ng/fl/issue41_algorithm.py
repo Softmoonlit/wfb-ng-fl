@@ -199,7 +199,8 @@ def client_main(runtime, config):
         'algorithm_version': ALGORITHM_VERSION,
         'node_id': node_id,
         'update_template_path': update_template_path,
-        'update_template_sha256': file_sha256(update_template_path),
+        'update_template_sha256': (file_sha256(update_template_path)
+                                   if update_template_path is not None else None),
         'rounds': rounds_result,
         'events': events,
         'conclusion': 'succeeded',

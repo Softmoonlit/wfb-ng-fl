@@ -1121,6 +1121,8 @@ class ClientDaemon:
         with self._lock:
             if not isinstance(job_id, str) or job_id != self._current_job_id:
                 return
+            logger.info("收到作业终态 type=%s job_id=%s node_id=%s",
+                        "JOB_ABORT" if aborted else "JOB_COMPLETED", job_id, self.config.node_id)
             self.sandbox.abort(outcome='aborted' if aborted else 'succeeded')
             self._ensure_idle_transport()
             self._current_job_id = None

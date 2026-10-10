@@ -799,7 +799,11 @@ class ControlPlaneServer:
                     job_id == self._task_ready_job_id
                     and node_id in self._task_ready_expected_nodes
                 ):
+                    first_ready = node_id not in self._task_ready_nodes
                     self._task_ready_nodes.add(node_id)
+                    if first_ready:
+                        logger.info("TASK_READY job_id=%s node_id=%s source=%s:%s", job_id, node_id,
+                                    client_addr[0], client_addr[1])
                     if self._task_ready_expected_nodes.issubset(self._task_ready_nodes):
                         self._task_ready_event.set()
             return [HeartbeatAck(ack=True).to_bytes()]
@@ -1452,6 +1456,8 @@ class ControlPlaneClient:
                     sock.sendto(message, (self.server_host, self.server_port))
                     data, _ = sock.recvfrom(4096)
                     if HeartbeatAck.from_bytes(data).ack:
+                        logger.info("TASK_READY_ACK job_id=%s node_id=%s server=%s:%s",
+                                    job_id, self.node_id, self.server_host, self.server_port)
                         return
                 except (socket.timeout, BlockingIOError, ValueError, OSError):
                     continue
