@@ -133,7 +133,7 @@ class Stage4HardwareRunner:
             topology[role] = {"commit": head, "workspace_clean": clean, "wireless": wireless, "identity": identity,
                               "unit": UNITS[role], "service_active": True}
         status_code, state = _request(self.web_url, "/api/v1/state")
-        if status_code != 200 or state.get("server", {}).get("management_web", {}).get("status") != "management_web_ready":
+        if status_code != 200 or state.get("server", {}).get("management_web", {}).get("status") != "ready":
             raise RuntimeError("management Web is not ready")
         if not all(node.get("readiness") == "READY" and node.get("state") == "idle" for node in state.get("nodes", [])):
             raise RuntimeError("all target nodes must be IDLE/READY")
