@@ -21,7 +21,7 @@ from wfb_ng.fl.artifacts import file_sha256, write_json_atomic, validate_path_sa
 from wfb_ng.fl.issue41_fixtures import generate_model_fixture
 from tests.fl_runtime.hardware import inspect_wireless_device
 from tests.fl_runtime.evidence_collection import collect_tree, collect_server_file
-from tests.fl_runtime.stage4_hardware_archive import STAGES, init_archive, record_stage, seal_archive, validate_job_evidence, validate_terminal_state, validate_archive
+from tests.fl_runtime.stage4_hardware_archive import STAGES, init_archive, record_stage, seal_archive, validate_job_evidence, validate_terminal_state, validate_archive, validate_transfer_start
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENTS = {"client1": 1, "client2": 2}
@@ -233,6 +233,31 @@ class Stage4HardwareRunner:
             self.pending_create = None
             raise RuntimeError("recovery probe accepted a new job; recovery rejection was not established")
 
+    def _sample_uftp(self, job_id: str) -> dict[str, Any] | None:
+        validate_path_safe_identifier(job_id, "job_id")
+        script = """import json,pathlib,time
+rows=[]
+for process in pathlib.Path('/proc').iterdir():
+ if not process.name.isdigit(): continue
+ try:
+  if (process/'comm').read_text().strip() != 'uftp': continue
+  argv=(process/'cmdline').read_bytes().decode().strip('\\0').split('\\0')
+  cwd=str((process/'cwd').resolve(strict=True))
+  stat=(process/'stat').read_text().rsplit(')',1)[1].split()
+  if stat[0] == 'Z': continue
+  rows.append(dict(pid=int(process.name),start_ticks=int(stat[19]),argv=argv,cwd=cwd))
+ except (OSError,UnicodeError,ValueError): continue
+print(json.dumps(dict(observed_at=time.time(),processes=rows)))"""
+        sample = json.loads(self.executor.checked("server", "sudo -n python3 -I -c " + shlex.quote(script)))
+        for process in sample["processes"]:
+            evidence = dict(job_id=job_id, observed_at=sample["observed_at"], **process)
+            try:
+                validate_transfer_start(evidence, job_id)
+            except (ValueError, KeyError, TypeError):
+                continue
+            return evidence
+        return None
+
     def _resolve_create(self) -> str:
         """Resolve a possibly accepted POST with its original idempotency key."""
         request, key = self.pending_create
@@ -283,9 +308,16 @@ class Stage4HardwareRunner:
         try:
             if abort:
                 # First observe the active job through Web, then request the stop through Web.
-                _poll(self.web_url, lambda state: (state.get("current_job") or {}).get("job_id") == job_id and
-                      (state.get("current_job") or {}).get("server_phase") == "publishing_model",
-                      60, self.archive, "abort-active", interval=0.05)
+                def transfer_running(state: dict[str, Any]) -> bool:
+                    current = state.get("current_job") or {}
+                    if current.get("job_id") != job_id or current.get("server_phase") != "publishing_model":
+                        return False
+                    transfer = self._sample_uftp(job_id)
+                    if transfer is None:
+                        return False
+                    self.save("control-plane/abort-transfer-start.json", transfer)
+                    return True
+                _poll(self.web_url, transfer_running, 60, self.archive, "abort-active", interval=0.05)
                 self.save("control-plane/recovery-gate.json", {"status": "not_observed", "job_id": job_id,
                     "reason": "No recovering snapshot with a confirmed rejection has been sampled"})
                 abort_future = abort_pool.submit(
@@ -366,6 +398,19 @@ print(json.dumps(rows))"""
         if any(value["service"] != "active" or value["job_sandboxes"] or value["transient_processes"] or sorted(value["tuns"]) != expected_tuns[role]
                for role, value in resources.items()):
             raise RuntimeError("temporary job resources remain or idle TUN was not restored")
+        transfer = json.loads((self.archive / "control-plane/abort-transfer-start.json").read_text())
+        probe = """import json,pathlib
+p=pathlib.Path('/proc')/str(PID)
+try:
+ stat=(p/'stat').read_text().rsplit(')',1)[1].split()
+ alive=int(stat[19]) == START
+except (OSError,ValueError): alive=False
+print(json.dumps(dict(pid=PID,start_ticks=START,original_process_present=alive)))""".replace('PID', str(transfer['pid'])).replace('START', str(transfer['start_ticks']))
+        gone = json.loads(self.executor.checked("server", "sudo -n python3 -I -c " + shlex.quote(probe)))
+        gone.update(job_id=transfer["job_id"], observed_at=time.time())
+        self.save("lifecycle/abort-transfer-exit.json", gone)
+        if gone["original_process_present"]:
+            raise RuntimeError("aborted UFTP process remains")
         self.save("lifecycle/resources.json", resources)
         self.save("lifecycle/05-collect.json", {"stage": "collect", "status": "passed",
                                                   "detail": {"resources_recovered": True, "recovery_state": "ready"}})

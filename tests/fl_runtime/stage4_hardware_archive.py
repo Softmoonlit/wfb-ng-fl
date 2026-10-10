@@ -85,6 +85,28 @@ def validate_control_bindings(root: Path) -> None:
         _require(control <= expected, f"{role}: unexpected UDP control bind")
 
 
+def validate_transfer_start(value: dict[str, Any], job_id: str) -> None:
+    validate_path_safe_identifier(job_id, "job_id")
+    _require(value.get("job_id") == job_id and type(value.get("pid")) is int and value["pid"] > 0
+             and type(value.get("start_ticks")) is int and value["start_ticks"] > 0, "invalid actual UFTP process identity")
+    _require(type(value.get("observed_at")) in (int, float) and math.isfinite(value["observed_at"]), "invalid UFTP observation time")
+    argv = value["argv"]
+    _require(isinstance(argv, list) and argv and Path(argv[0]).name == "uftp", "missing actual UFTP argv")
+    def option(name):
+        _require(argv.count(name) == 1 and argv.index(name) + 1 < len(argv), f"missing UFTP {name}")
+        return argv[argv.index(name) + 1]
+    rid = option("-D")
+    _require(str(uuid.UUID(rid)) == rid, "invalid UFTP round UUID")
+    expected = Path("/tmp/wfb-ng-fl/server") / ("job_" + job_id + "_role") / "rounds" / rid
+    _require(value.get("cwd") == str(expected), "UFTP cwd belongs to another job")
+    for flag in ("-L", "-S"):
+        path = Path(option(flag))
+        _require(path.parent == expected and '..' not in path.parts, "UFTP evidence path belongs to another job")
+    _require(option("-p") == "1044" and option("-I") == "10.80.0.1"
+             and option("-M") == "239.80.41.1" and option("-P") == "239.80.41.2"
+             and argv[-2:] == ["model.bin", "model.manifest.json"], "UFTP data-plane argv mismatch")
+
+
 def validate_job_evidence(root: Path, *, commit: str, aborted: bool) -> dict[str, Any]:
     """Offline validation of original runtime files; never trusts runner verdict flags."""
     binding = evidence_json(root, "binding.json")
@@ -339,6 +361,14 @@ def validate_archive(root: Path) -> list[str]:
                 raise ValueError("invalid orchestration record")
             if transport == "ssh" and any(start <= last and end >= first for first, last in windows):
                 raise ValueError("SSH overlaps protected job window")
+        transfer = evidence_json(root, "control-plane/abort-transfer-start.json")
+        validate_transfer_start(transfer, abort_id)
+        abort_binding = evidence_json(root / "data-plane" / "jobs" / abort_id, "binding.json")
+        _require(abort_binding["window_started_at"] <= transfer["observed_at"] <= abort_binding["window_ended_at"],
+                 "UFTP observation outside job window")
+        gone = evidence_json(root, "lifecycle/abort-transfer-exit.json")
+        _equal_fields(gone, dict(job_id=abort_id, pid=transfer["pid"], start_ticks=transfer["start_ticks"], original_process_present=False))
+        _require(gone["observed_at"] >= abort_binding["window_ended_at"], "UFTP exit observation before recovery")
         lifecycle = _json(root / "lifecycle" / "05-collect.json")
         if lifecycle.get("detail", {}).get("resources_recovered") is not True:
             raise ValueError("resource recovery evidence missing")

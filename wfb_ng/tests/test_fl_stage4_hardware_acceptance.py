@@ -20,6 +20,14 @@ from wfb_ng.fl.evidence import archive_client_evidence
 from wfb_ng.fl.issue41_fixtures import generate_model_fixture
 
 
+def transfer_fixture(job_id):
+    rid = "00000000-0000-0000-0000-000000000001"
+    cwd = f"/tmp/wfb-ng-fl/server/job_{job_id}_role/rounds/{rid}"
+    return dict(job_id=job_id, pid=4242, start_ticks=1234, observed_at=15, cwd=cwd,
+        argv=["/usr/bin/uftp", "-I", "10.80.0.1", "-M", "239.80.41.1", "-P", "239.80.41.2", "-p", "1044",
+              "-L", cwd + "/uftp-log", "-S", cwd + "/uftp-status", "-D", rid, "model.bin", "model.manifest.json"])
+
+
 class Stage4OfflineEvidenceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -126,6 +134,9 @@ class Stage4OfflineEvidenceTests(unittest.TestCase):
     def seal_valid_archive(self) -> None:
         (self.archive / "summary/orchestration.jsonl").write_text(json.dumps(dict(target="vm1", transport="ssh",
             started_at=21, ended_at=22, stage="collect", returncode=0, command="read evidence")) + "\n")
+        write_json_atomic(self.archive / "control-plane/abort-transfer-start.json", transfer_fixture("web-abort"))
+        write_json_atomic(self.archive / "lifecycle/abort-transfer-exit.json", dict(job_id="web-abort", pid=4242,
+            start_ticks=1234, original_process_present=False, observed_at=21))
         self.link(self.archive / "data-plane/model-fixture.bin")
         write_json_atomic(self.archive / "data-plane/fixture.json", dict(size_bytes=40 * 1024 * 1024, sha256=CANONICAL_MODEL_SHA256))
         write_json_atomic(self.archive / "lifecycle/resources.json", {
@@ -184,6 +195,26 @@ class Stage4OfflineEvidenceTests(unittest.TestCase):
         write_json_atomic(path, resources)
         seal_archive(self.archive, conclusion="passed")
         self.assertIn("resource recovery", ";".join(validate_archive(self.archive)))
+
+    def test_full_archive_rejects_missing_actual_transfer_and_wrong_job_process(self) -> None:
+        self.seal_valid_archive()
+        path = self.archive / "control-plane/abort-transfer-start.json"
+        path.unlink()
+        seal_archive(self.archive, conclusion="passed")
+        self.assertTrue(validate_archive(self.archive))
+        wrong = transfer_fixture("another-job")
+        wrong["job_id"] = "web-abort"
+        write_json_atomic(path, wrong)
+        seal_archive(self.archive, conclusion="passed")
+        self.assertIn("another job", ";".join(validate_archive(self.archive)))
+
+    def test_full_archive_rejects_aborted_transfer_process_still_present(self) -> None:
+        self.seal_valid_archive()
+        path = self.archive / "lifecycle/abort-transfer-exit.json"
+        value = json.loads(path.read_text()); value["original_process_present"] = True
+        write_json_atomic(path, value)
+        seal_archive(self.archive, conclusion="passed")
+        self.assertTrue(validate_archive(self.archive))
 
     def test_full_archive_rejects_unobserved_recovery_gate(self) -> None:
         self.seal_valid_archive()
@@ -316,7 +347,8 @@ class Stage4HardwareToolTests(unittest.TestCase):
                     return 200, {"current_job": None, "recent_job": {"job_id": "job", "recovery_state": "recovering"}}
                 return 200, terminal
             with patch("tests.fl_runtime.stage4_hardware_acceptance._request", side_effect=request), patch.object(
-                    runner, "_verify_job_evidence", return_value={"control_plane_verified": True, "data_plane_verified": False}):
+                    runner, "_verify_job_evidence", return_value={"control_plane_verified": True, "data_plane_verified": False}), patch.object(
+                    runner, "_sample_uftp", return_value=transfer_fixture("job")):
                 self.assertEqual(runner.job("b" * 64, abort=True)["execution_result"], "aborted")
             self.assertTrue(gate_sampled.is_set())
             self.assertEqual(json.loads((root / "control-plane/recovery-gate.json").read_text())["status"], "passed")
