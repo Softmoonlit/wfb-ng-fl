@@ -166,3 +166,27 @@ def test_http_storage_failure_and_static_model_page(tmp_path, monkeypatch):
             response = conn.getresponse()
             assert response.status == 200 and response.read()
             conn.close()
+
+
+def test_reference_initial_model_upload_digest_reuse_and_readonly_loading(tmp_path):
+    pytest.importorskip('torch')
+    from wfb_ng.fl.artifacts import file_sha256
+    from wfb_ng.fl.reference_model import initialize_model, load_model
+    path = tmp_path / 'initial.pt'
+    digest = initialize_model(path, seed=7)
+    content = path.read_bytes()
+    with model_server(tmp_path / 'library') as (daemon, _, request):
+        headers = {'Content-Type': 'multipart/form-data; boundary=model-boundary'}
+        status, uploaded = request('POST', body=multipart(content, 'initial.pt'), headers=headers)
+        assert status == 201
+        assert uploaded['model']['sha256'] == digest
+        assert len(digest) == 64
+        stored_path = daemon.console.models.artifact_path(digest)
+        assert load_model(stored_path).sha256 == digest
+        assert load_model(stored_path).initialization_seed == 7
+        duplicate_status, duplicate = request('POST', body=multipart(content, 'reused.pt'), headers=headers)
+        assert duplicate_status == 200
+        assert duplicate['deduplicated'] is True
+        assert duplicate['model']['sha256'] == digest
+        assert request('GET')[1]['models'] == [uploaded['model']]
+        assert file_sha256(stored_path) == digest

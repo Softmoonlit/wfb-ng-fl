@@ -19,6 +19,7 @@
 | 任务 | 入口 | 证据边界 |
 | --- | --- | --- |
 | ARMv8 集群部署与现场演示 | [ARMv8 操作手册](deployment/ARMv8集群部署与演示操作手册.md)、[演示脚本与指标工具](../tests/demo/README.md) | 展示真实无线文件传输与遥测；不能替代正式 Runtime 验收。 |
+| 生成并上传 MNIST 初始模型 | [参考初始模型工具与文件格式](deployment/MNIST参考初始模型.md) | 固定结构、CPU 初始化、严格读取和既有模型库上传；训练与板端验收由后续工单完成。 |
 | 安装角色服务、配置算法入口、停服与清理 | [部署与运行基准](deployment/部署与运行基准.md) | 宿主机依赖和 systemd 服务生命周期。 |
 | Stage 2 三机无 SSH 运行时自治验收 | [三机自治验收指南](acceptance/stage2三机无SSH运行时自治验收指南.md) | 验证任务发布、RoleService 自主派生、多轮 Runtime、双向数据面和终态复位；确定性 fixture 不代表真实训练或 FedAvg。 |
 | Stage 3/4 Web 与后续扩展验收 | [三机经验与后续验证指南](acceptance/stage3-stage4三机验收经验与后续验证指南.md)、[Runtime 验收导航](../tests/fl_runtime/README.md) | 记录三机闭环、射频、Windows HTTP 修复和通过/失败证据；单网线物理拓扑与 10 Client 实体规模需另外验收。 |
