@@ -144,6 +144,14 @@ step1_apt_dependencies() {
         pkg-config
         python3
         python3-pip
+        python3-setuptools
+        python3-twisted
+        python3-pyroute2
+        python3-serial
+        python3-msgpack
+        python3-jinja2
+        python3-yaml
+        socat
         libssl-dev
         libsodium-dev
         libpcap-dev

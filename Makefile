@@ -25,11 +25,15 @@ export VERSION COMMIT SOURCE_DATE_EPOCH
 _LDFLAGS := $(LDFLAGS) -lrt -lsodium
 _CFLAGS := $(CFLAGS) -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"$(VERSION)-$(shell /bin/bash -c '_tmp=$(COMMIT); echo $${_tmp::8}')"'
 
-.PHONY: all build_v6 version all_bin kcp_tools install_v8 acceptance_v6_realhw rpm deb bdist check pylint clean
+.PHONY: all build_v6 build_identity version all_bin kcp_tools install_v8 acceptance_v6_realhw rpm deb bdist check pylint clean
 
 all: build_v6
 
 build_v6: wfb_v6_uplink
+
+# 复用打包入口生成当前提交身份，供直接安装脚本使用。
+build_identity:
+	$(PYTHON) setup.py --name >/dev/null
 
 version:
 	@echo -e "RELEASE=$(RELEASE)\nCOMMIT=$(COMMIT)\nVERSION=$(VERSION)\nSOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH)"
