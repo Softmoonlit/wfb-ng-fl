@@ -135,7 +135,10 @@ class Stage4HardwareRunner:
         status_code, state = _request(self.web_url, "/api/v1/state")
         if status_code != 200 or state.get("server", {}).get("management_web", {}).get("status") != "ready":
             raise RuntimeError("management Web is not ready")
-        if not all(node.get("readiness") == "READY" and node.get("state") == "idle" for node in state.get("nodes", [])):
+        target_nodes = [node for node in state.get("nodes", []) if node.get("node_id") in (1, 2)]
+        if ({node.get("node_id") for node in target_nodes} != {1, 2} or
+                not all(node.get("readiness") == "READY" and node.get("state") == "idle"
+                        for node in target_nodes)):
             raise RuntimeError("all target nodes must be IDLE/READY")
         self.save("summary/topology.json", topology)
         self.save("summary/preflight.json", {"status": "passed", "commit": commit, "state": state,
