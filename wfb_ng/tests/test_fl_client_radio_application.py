@@ -83,6 +83,17 @@ class TestClientRadioApplication(unittest.TestCase):
     def mcs_commands(self):
         return [cmd[cmd.index('--radio-mcs-index') + 1] for cmd in self.commands]
 
+    def test_idle_link_waits_for_address_and_server_route(self):
+        self.daemon._stop_idle_link()
+        checks = []
+        def ready(name, cidr, destination):
+            checks.append((name, cidr, destination))
+            return len(checks) >= 3
+        with mock.patch.object(self.adapter, 'is_tun_ready', side_effect=ready, create=True):
+            self.daemon.start_idle_link()
+        self.assertGreaterEqual(len(checks), 3)
+        self.assertTrue(all(item == ('fl-c1', '10.80.0.11/24', '10.80.0.1') for item in checks))
+
     def test_task_role_uses_confirmed_effective_mcs_and_power(self):
         self.commit()
         self.dispatch('RADIO_SWITCH_FINALIZED')

@@ -120,6 +120,9 @@ class VirtualNetworkAdapter(NetworkAdapter):
     def is_tun_active(self, tun_name):
         return tun_name in self.active_tuns
 
+    def is_tun_ready(self, tun_name, tun_cidr, destination):
+        return tun_name in self.active_tuns
+
     def set_tun_txqueuelen(self, tun_name, txqueuelen=5000):
         pass
 

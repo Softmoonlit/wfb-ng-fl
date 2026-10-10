@@ -140,3 +140,47 @@ def test_next_job_uses_confirmed_uftp_rate_in_sender_command(tmp_path):
             send = next(command for command in commands if '-R' in command)
             assert send[send.index('-R')+1] == '17000'
             daemon.abort_job()
+
+
+def test_mcs_rebuild_waits_for_address_and_broadcast_route_before_ping(tmp_path):
+    """An existing TUN without its address/route must not release the transaction."""
+    with running_server(tmp_path) as (daemon, commands, _):
+        peer = radio_rest.TestRadioReconfigureREST()
+        peer.daemon = daemon
+        checks = []
+        ready = False
+        def network_ready(tun_name, tun_cidr, destination):
+            nonlocal ready
+            checks.append((tun_name, tun_cidr, destination))
+            ready = len(checks) >= 3
+            return ready
+        def respond(message):
+            if message['type'] == 'NEW_CHANNEL_PING' and not ready:
+                raise OSError(101, 'Network is unreachable')
+            peer.protocol_peer(message)
+        with patch.object(daemon.adapter, 'is_tun_ready', side_effect=network_ready, create=True), patch.object(
+                daemon.control_plane, 'broadcast_downlink', side_effect=respond):
+            result = daemon.reconfigure_radio({'confirmed':True, 'patch':{'downlink_mcs':4}, 'target_nodes':[1]})
+        assert result['status'] == 'finalized'
+        assert len(commands) == 2
+        assert len(checks) >= 3
+        assert all(item == ('fl-s', '10.80.0.1/24', '255.255.255.255') for item in checks)
+
+
+@pytest.mark.parametrize('failure', ['timeout', 'netlink-error'])
+def test_server_readiness_failure_releases_link_and_log(tmp_path, failure):
+    from wfb_ng.fl.errors import FLRuntimeError
+    with running_server(tmp_path) as (daemon, _, _):
+        daemon._stop_link_process()
+        with patch.object(daemon.adapter, 'is_tun_ready', return_value=False,
+                          side_effect=OSError('netlink query failed') if failure == 'netlink-error' else None):
+            if failure == 'timeout':
+                with patch('wfb_ng.fl.server_daemon.time.monotonic', side_effect=[0, 4]):
+                    with pytest.raises(FLRuntimeError, match='控制路由未就绪'):
+                        daemon._start_link_process()
+            else:
+                with pytest.raises(OSError, match='netlink query failed'):
+                    daemon._start_link_process()
+        assert daemon._link_process is None
+        assert daemon._link_log_file is None
+        assert not daemon.adapter.is_tun_active('fl-s')
