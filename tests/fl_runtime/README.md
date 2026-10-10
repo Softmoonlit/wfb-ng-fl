@@ -16,6 +16,15 @@ python3 -m tests.fl_runtime.stage4_hardware_archive tests/logs/<run_id>
 
 实体验收要求 Server 与两个 Client 提交一致、工作树干净、无线接口动态发现为 `wl*`，并由现有硬件探测器确认 `rtl88xxau_wfb` 与 `xhci_hcd`。管理 Web 成功不会替代控制面或数据面门禁；任一门禁失败，归档结论均为 `failed`。
 
+Web 射频变更另使用[射频补充验收说明](stage4射频补充验收.md)中的入口：验证实际 MCS/功率、165 HT20 与 157 HT40+ 重建、控制链路连续性、受控回退，以及后续作业的真实 UFTP 速率。它生成独立归档，不替代正常/急停闭环；生产包身份与执行器提交分别记录。上传请求由 Server 执行器访问管理 IP 只能证明 Web 接缝，用户电脑单网线直连拓扑需要现场单独验证。
+
+```bash
+NO_PROXY=192.168.108.100,127.0.0.1 no_proxy=192.168.108.100,127.0.0.1 \
+python3 -m tests.fl_runtime.stage4_radio_acceptance --execute \
+  --web-url http://192.168.108.100:8080 --client 1=vm1 --client 2=vm2 --include-rollback
+python3 -m tests.fl_runtime.stage4_radio_acceptance --recheck tests/logs/<射频归档>
+```
+
 `issue41_fl_runtime_loop.sh run-all` 是完整验收总入口：依次执行预检、安装、连续三周期双向数据面 Gate、配置等价性核验、正式 Runtime 闭环、systemd 生命周期审计、证据采集和归档校验。正式闭环通过 `publish_model()`、`wait_for_model()`、`submit_update()`、`wait_for_updates()` 完成；任何关键阶段或证据失败，总结论都不能通过。
 
 [完整现场手册](v8_issue41_SSH编排真实硬件FL闭环验收手册.md) 保留原验收步骤、参数及证据要求。手册包含历史现场基线；本次运行的客户端集合、文件大小、轮数与无线参数以现役脚本和操作者显式配置为准，本次目录迁移不改变这些值。当前脚本默认客户端集合为 `client1 client2 client3 client4 client6 client7`，管理别名为对应 `vmN`；可通过 `ISSUE41_CLIENT_ROLES` 配置现场参与集合。
