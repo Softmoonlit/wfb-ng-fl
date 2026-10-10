@@ -38,7 +38,6 @@ Labels: wayfinder:map
 ## Decisions so far
 
 - [确定真实 FedAvg 参考任务与效果判据](issues/01-fedavg-reference-task.md#answer)：采用 Jetson Orin Nano 上的 PyTorch GPU／MNIST 小型卷积模型，执行五轮同步 FedAvg，以真实训练、加权聚合、跨轮模型关联和整体效果改善分别验证。
-- 后续实施（2026-10-10）：用户按 01 票启动参考计算实现，并确认当前已有 Jetson 开发板；固定模型、初始化、GPU 训练、加权聚合和评估已落地，fl00 完成五轮单板计算。见[参考计算说明](../../docs/usage/MNIST参考计算.md)及[实测报告](../../docs/reports/mnist-reference-compute-check.md)。这不改变本地图的历史决策范围，也不表示 06 跨层接入或 07 多节点无线验收已交付。
 - [确定首版 MNIST 本地数据最小接入](issues/02-client-dataset-library.md#answer)：采用本地目录配置、固定 MNIST 文件检查与作业准备确认，满足参考任务即可，不展开通用数据集库。
 - [定义算法可调用的无线配置接口与轮次间重配边界](issues/04-algorithm-radio-configuration.md#answer)：算法通过作业绑定同步调用调整统一发射配置，信道由操作者固定；轮次间屏障后在线更新，保留任务资源并明确失败与停止作业边界。
 - [定义 Web 在线节点展示与失联作业呈现](issues/05-online-client-view.md#answer)：在线候选显式勾选，状态变化不自动加入目标；固定作业参与者的失联事实独立保留，管理连接异常不冒充无线离线。
