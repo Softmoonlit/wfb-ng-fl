@@ -2,7 +2,7 @@
 
 本文给出 Stage 2 常驻双守护架构在真实无线硬件上的开发验收方法，供后续修改 Server Daemon、Client Daemon、控制面、RoleService、FL Coordinator、Runtime 或 Transport 时复用。
 
-本文负责验收边界、执行流程、通过标准和诊断经验，不替代设计文档。架构规则以[系统分层与跨层契约](../design/系统分层与跨层契约.md)、[FL Runtime 轮次与文件契约](../design/FL-Runtime轮次与文件契约.md)、[Transport Backend 传输契约](../design/Transport-Backend传输契约.md)和 [ADR-0012](../adr/0012-脱离ssh的带内双向udp自愈与常驻双守护架构.md)为准。
+本文负责验收边界、执行流程、通过标准和诊断经验，不替代设计文档。后续 Stage 3/4 的真实复验、Web 文件仿真、Windows 普通 HTTP 接入及电脑直连/10 Client 计划，参见[三机验收经验与后续验证指南](stage3-stage4三机验收经验与后续验证指南.md)；本指南的节点特定 update fixture 不能套用为 Stage 4 的不同 SHA 判据。架构规则以[系统分层与跨层契约](../design/系统分层与跨层契约.md)、[FL Runtime 轮次与文件契约](../design/FL-Runtime轮次与文件契约.md)、[Transport Backend 传输契约](../design/Transport-Backend传输契约.md)和 [ADR-0012](../adr/0012-脱离ssh的带内双向udp自愈与常驻双守护架构.md)为准。
 
 ## 1. 验收结论的准确含义
 
@@ -68,7 +68,7 @@ Client Daemon 在作业完成、中止、启动失败或异常退出时，先把
 | Client 1 | `vm1` | 1 | `10.80.0.11` | `/etc/wfb-ng-fl/node.json` |
 | Client 2 | `vm2` | 2 | `10.80.0.12` | `/etc/wfb-ng-fl/node.json` |
 
-无线接口必须通过 `wlx*` 动态发现，不得把当前接口名写入通用脚本。当前台面测试使用信道 157、发射功率 12 dBm；变更射频参数时遵循现行射频设计与人工确认规则。
+无线接口必须通过 `wl*` 动态发现，不得把当前接口名写入通用脚本。当前台面测试使用信道 157、发射功率 12 dBm；变更射频参数时遵循现行射频设计与人工确认规则。
 
 平台支持 1～10 号节点身份和槽位，不等于已完成对应实体节点验收。三机结果只能声明 1 个 Server 加 2 个 Client。
 

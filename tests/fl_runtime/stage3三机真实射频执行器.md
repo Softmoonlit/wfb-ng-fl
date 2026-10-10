@@ -1,10 +1,10 @@
 # Stage 3 三机真实射频执行器
 
-正式入口是 `tests/fl_runtime/stage3_vm_physical_loop.sh`，固定使用本机 vm0 Server 和 SSH 别名 vm1、vm2 Client。正式规格为 [Stage 3 spec](../../.scratch/stage3-vm-managed-physical-radio-loop/spec.md)，生命周期和现场诊断参考 [Stage 2 指南](../../docs/acceptance/stage2三机无SSH运行时自治验收指南.md)。Stage 2 的 4 MiB 和临时 unit 结果不能作为 Stage 3 通过依据。
+正式入口是 `tests/fl_runtime/stage3_vm_physical_loop.sh`，固定使用本机 vm0 Server 和 SSH 别名 vm1、vm2 Client。后续真实复验经验与 Stage 4 接缝参见[三机验收经验与后续验证指南](../../docs/acceptance/stage3-stage4三机验收经验与后续验证指南.md)。正式规格为 [Stage 3 spec](../../.scratch/stage3-vm-managed-physical-radio-loop/spec.md)，生命周期和现场诊断参考 [Stage 2 指南](../../docs/acceptance/stage2三机无SSH运行时自治验收指南.md)。Stage 2 的 4 MiB 和临时 unit 结果不能作为 Stage 3 通过依据。
 
 ## 执行
 
-先通过 `git fetch` 和 `git merge --ff-only` 同步三端提交，保证工作树干净；将三端真实无线网卡直通到 xHCI，保证唯一 `wlx*` 接口。Client 的 `/etc/wfb-ng-fl/node.json` 分别使用 `node_id=1/2` 和 `tun_ip=10.80.0.11/12`。不要用脚本清理无法确认归属的旧进程、TUN 或任务沙箱；预检发现这些资源会拒绝运行。
+先通过 `git fetch` 和 `git merge --ff-only` 同步三端提交，保证工作树干净；将三端真实无线网卡直通到 xHCI，保证唯一 `wl*` 接口。Client 的 `/etc/wfb-ng-fl/node.json` 分别使用 `node_id=1/2` 和 `tun_ip=10.80.0.11/12`。不要用脚本清理无法确认归属的旧进程、TUN 或任务沙箱；预检发现这些资源会拒绝运行。
 
 ```bash
 bash tests/fl_runtime/stage3_vm_physical_loop.sh run-all
