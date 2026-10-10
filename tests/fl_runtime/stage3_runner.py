@@ -336,6 +336,8 @@ print(json.dumps(rows))"""
                 if actual != digest:
                     raise RuntimeError('package transfer digest mismatch')
                 self.audit_package_scripts(role,remote)
+                units = 'wfb-fl-client-daemon.service wfb-fl-client.service wfb-fl-server-daemon.service wfb-fl-server.service'
+                self.executor.checked(role, 'sudo -n systemctl mask --runtime --now ' + units)
                 self.executor.checked(role, 'sudo -n env DEBIAN_FRONTEND=noninteractive dpkg --force-confold --force-confdef -i ' + shlex.quote(remote), timeout=180)
                 if role!='server':
                     before=json.loads((self.archive/'topology.json').read_text())[role]['identity']
@@ -346,7 +348,7 @@ print(json.dumps(rows))"""
                 if not self.resources(role,stopped=True)['clean']:
                     self.save('services-managed.json',dict(run_id=self.run_id,reason='package unexpectedly started managed services'))
                     raise RuntimeError('package install unexpectedly started resources')
-                self.executor.checked(role, 'sudo -n systemctl daemon-reload')
+                self.executor.checked(role, 'sudo -n systemctl unmask ' + units + ' && sudo -n systemctl daemon-reload')
                 package_records[role] = self.verify_package(role, remote)
             self.save('install.json', dict(package_sha256=digest, package_path=str(dest.relative_to(self.archive)),
                                           commit=self.meta['commit'], nodes=package_records))
