@@ -434,7 +434,11 @@ def _ssh(root,env):
             from tests.fl_runtime.stage3_runner import fault_rules
             fixed={fault_rules('install',env['run_id'])} if entry['category']=='fault-install' else {fault_rules('remove',env['run_id']),fault_rules('observe',env['run_id'])} if entry['category']=='fault-remove' else {fault_rules('observe',env['run_id'])}
             journal=r'sudo -n journalctl -u wfb-fl-client-daemon\.service --since @\d+(?:\.\d+)? --no-pager -o short-unix'
-            _require(entry['command'] in fixed or (entry['category']=='fault-observe' and re.fullmatch(journal,entry['command'])), 'SSH command outside fixed radio fault contract')
+            _require(entry['command'] in fixed, 'SSH command outside fixed radio fault contract')
+        elif entry['category']=='fault-observe':
+            _require(start>=window['terminal_at'],'radio observation before job terminal')
+            journal=r'sudo -n journalctl -u wfb-fl-client-daemon\.service --since @\d+(?:\.\d+)? --no-pager -o short-unix'
+            _require(re.fullmatch(journal,entry['command']) is not None, 'SSH command outside fixed radio fault contract')
 
 
 def _manifest(value,rid,kind,sha,node=None):
