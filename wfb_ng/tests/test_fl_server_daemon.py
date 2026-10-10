@@ -12,6 +12,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+from dataclasses import replace
 from typing import Any, Dict, List, Optional, Tuple
 from unittest.mock import MagicMock, patch
 
@@ -178,6 +179,66 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         )
         self.assertIn("--radio-bandwidth", cmd)
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "20")
+
+
+class TestHeartbeatTaskReadinessConcurrency(unittest.TestCase):
+    def test_preparing_heartbeat_does_not_block_task_ready_under_daemon_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            daemon = ServerDaemon(ServerDaemonConfig(
+                control_bind_host="127.0.0.1", control_bind_port=0,
+                enable_link_process=False, model_library_dir=root,
+            ), network_adapter=MockNetworkAdapter())
+            control = daemon.control_plane
+            entered_callback = threading.Event()
+            original_callback = control.on_heartbeat_received
+
+            def on_heartbeat(hb, record):
+                entered_callback.set()
+                original_callback(hb, record)
+
+            control.on_heartbeat_received = on_heartbeat
+            diagnostic = daemon.event_bus.subscribe()
+            control.start()
+            try:
+                address = control._server_sock.getsockname()
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                    client.settimeout(1.0)
+                    control.prepare_task_readiness("startup-job", [1])
+                    hb = NodeHeartbeat(
+                        node_id=1, state="PREPARING", elapsed_ms=0,
+                        current_channel=157, txpower_dbm=12, uplink_mcs=6,
+                        timestamp_ms=1000,
+                    )
+                    # This is the lock held by start_job while awaiting TASK_READY.
+                    with daemon._lock:
+                        client.sendto(hb.to_bytes(), address)
+                        self.assertTrue(entered_callback.wait(1.0))
+                        client.sendto(json.dumps({
+                            "type": "TASK_READY", "job_id": "startup-job", "node_id": 1,
+                        }).encode(), address)
+                        self.assertTrue(control.wait_for_task_readiness(1.0),
+                                        "PREPARING diagnostic blocked UDP TASK_READY reception")
+                        self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
+                        self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
+                        event = diagnostic.get(timeout=1.0)
+                        self.assertEqual(event["type"], "NODE_HEARTBEAT")
+                        self.assertEqual(event["state"], "PREPARING")
+                    state = daemon.console.snapshot()
+                    self.assertEqual(state["nodes"][0]["state"], "preparing")
+                    self.assertEqual(state["events"], [])
+                    # With no state mutation holding the lock, heartbeats still
+                    # push live snapshots as well as the diagnostic SSE event.
+                    snapshots = daemon.console.subscribe_events()
+                    hb = replace(hb, state="RUNNING", timestamp_ms=hb.timestamp_ms + 1)
+                    client.sendto(hb.to_bytes(), address)
+                    self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
+                    self.assertEqual(diagnostic.get(timeout=1.0)["state"], "RUNNING")
+                    frame = snapshots.get(timeout=1.0)
+                    self.assertEqual(frame["kind"], "snapshot")
+                    self.assertEqual(frame["snapshot"]["nodes"][0]["state"], "running")
+                    self.assertEqual(frame["snapshot"]["events"], [])
+            finally:
+                control.stop()
 
 
 class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):

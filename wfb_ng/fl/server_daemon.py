@@ -650,6 +650,18 @@ class ServerDaemon:
 
     def publish_event(self, event: Dict[str, Any]) -> None:
         """Keep diagnostic stream and console operator history separate."""
+        if event.get('type') == 'NODE_HEARTBEAT':
+            # The UDP receiver must keep processing TASK_READY while start_job
+            # holds the daemon lock at the readiness barrier. Heartbeats are
+            # diagnostic only; their authoritative facts are already in registry.
+            self.event_bus.publish(event)
+            if self._lock.acquire(blocking=False):
+                try:
+                    self._best_effort_console_refresh()
+                finally:
+                    self._lock.release()
+            return
+
         with self._lock:
             if self.active_job is not None:
                 event_type = event.get('type')
