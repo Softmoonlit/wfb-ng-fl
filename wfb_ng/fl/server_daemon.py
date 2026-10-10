@@ -1321,22 +1321,26 @@ class ServerDaemon:
                 self._link_log_file = None
             raise FLRuntimeError("link_process_start_failed", f"拉起 wfb_v6_uplink 进程失败: {exc}") from exc
 
-        # Wait briefly for TUN interface creation and configure txqueuelen
-        deadline = time.monotonic() + 3.0
-        while time.monotonic() < deadline:
-            rc = self._link_process.poll()
-            if rc is not None:
-                raise FLRuntimeError("link_process_start_failed", f"wfb_v6_uplink 启动期异常退出，退出码: {rc}")
-            if self.adapter.is_tun_active(self.config.tun_name):
-                break
-            time.sleep(0.05)
+        try:
+            # Wait for link-up, configured address and broadcast routing, not just TUNSETIFF.
+            deadline = time.monotonic() + 3.0
+            while time.monotonic() < deadline:
+                rc = self._link_process.poll()
+                if rc is not None:
+                    raise FLRuntimeError("link_process_start_failed", f"wfb_v6_uplink 启动期异常退出，退出码: {rc}")
+                if self.adapter.is_tun_ready(
+                        self.config.tun_name, self.config.tun_cidr, self.control_plane.broadcast_addr):
+                    break
+                time.sleep(0.05)
 
-        if not self.adapter.is_tun_active(self.config.tun_name):
+            else:
+                raise FLRuntimeError(
+                    "link_tun_failed",
+                    f"wfb_v6_uplink TUN 地址或控制路由未就绪: {self.config.tun_name}",
+                )
+        except Exception:
             self._stop_link_process()
-            raise FLRuntimeError(
-                "link_tun_failed",
-                f"wfb_v6_uplink 未能在超时时间内创建 TUN 接口: {self.config.tun_name}",
-            )
+            raise
 
         self._link_radio_config = radio
         try:

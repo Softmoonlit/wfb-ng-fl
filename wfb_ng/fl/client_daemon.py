@@ -29,6 +29,8 @@ from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
+from pyroute2 import IPRoute, NetlinkError
+
 from .artifacts import validate_path_safe_identifier, write_json_atomic
 from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
@@ -233,6 +235,10 @@ class NetworkAdapter:
     def is_tun_active(self, tun_name: str) -> bool:
         raise NotImplementedError
 
+    def is_tun_ready(self, tun_name: str, tun_cidr: str, destination: str) -> bool:
+        """Whether the configured UP/address/control-route contract is satisfied."""
+        raise NotImplementedError
+
     def set_tun_txqueuelen(self, tun_name: str, txqueuelen: int = 5000) -> None:
         pass
 
@@ -338,6 +344,33 @@ class LinuxNetworkAdapter(NetworkAdapter):
 
     def is_tun_active(self, tun_name: str) -> bool:
         return os.path.exists(f"/sys/class/net/{tun_name}")
+
+    def is_tun_ready(self, tun_name: str, tun_cidr: str, destination: str) -> bool:
+        """TUNSETIFF exposes the name before link-up and address/route creation."""
+        address = ipaddress.IPv4Interface(tun_cidr)
+        with IPRoute() as ip:
+            ip.get_timeout = 1.0
+            ip.get_timeout_exception = TimeoutError
+            ip.settimeout(1.0)
+            indexes = ip.link_lookup(ifname=tun_name)
+            if not indexes:
+                return False
+            index = indexes[0]
+            links = ip.get_links(index)
+            if not links or not links[0]['flags'] & 1:  # IFF_UP
+                return False
+            if not any(a.get_attr('IFA_LOCAL') == str(address.ip)
+                       and a['prefixlen'] == address.network.prefixlen
+                       for a in ip.get_addr(index=index, family=socket.AF_INET)):
+                return False
+            try:
+                routes = ip.route('get', dst=destination, src=str(address.ip))
+            except NetlinkError as exc:
+                if exc.code in (3, 19, 99, 101):  # removed device/address or no route
+                    return False
+                raise
+            return bool(routes) and all(
+                route.get_attr('RTA_OIF') == index for route in routes)
 
     def set_tun_txqueuelen(self, tun_name: str, txqueuelen: int = 5000) -> None:
         self._run_cmd(["ip", "link", "set", "dev", tun_name, "txqueuelen", str(txqueuelen)])
@@ -994,12 +1027,13 @@ class ClientDaemon:
                             "link_process_start_failed",
                             f"客户端 wfb_v6_uplink 启动期异常退出，退出码: {returncode}",
                         )
-                    if self.network_adapter.is_tun_active(self.config.tun_name):
+                    if self.network_adapter.is_tun_ready(
+                            self.config.tun_name, self.config.tun_cidr, self.config.server_control_host):
                         return
                     time.sleep(0.05)
                 raise FLRuntimeError(
                     "link_tun_failed",
-                    f"客户端链路未创建 TUN: {self.config.tun_name}",
+                    f"客户端链路 TUN 地址或控制路由未就绪: {self.config.tun_name}",
                 )
             except Exception:
                 self._stop_idle_link()

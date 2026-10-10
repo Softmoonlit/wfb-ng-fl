@@ -95,6 +95,9 @@ class MockNetworkAdapter(NetworkAdapter):
     def is_tun_active(self, tun_name):
         return tun_name in self.tun_interfaces
 
+    def is_tun_ready(self, tun_name, tun_cidr, destination):
+        return self.tun_interfaces.get(tun_name) == tun_cidr
+
 
 class TestNodeIdentity(unittest.TestCase):
     def setUp(self):
