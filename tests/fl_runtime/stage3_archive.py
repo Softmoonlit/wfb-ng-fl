@@ -580,8 +580,11 @@ def _radio(root,env):
     _require(window['terminal_at']<=installed<removed,'fault chronology invalid')
     events=_lines(root,'radio/events.jsonl');_require(events,'missing radio journal events')
     selected={}
-    required={('PREPARE',0):157,('LEASE_ARM',2):157,('COMMIT',2):149,('SERVER_ROLLBACK',0):157,
-              ('LEASE_TIMEOUT',2):157,('IDLE_READY',1):157,('IDLE_READY',2):157}
+    recovered=_json(root,'radio-recovered.json')
+    lease_node=recovered.get('lease_node_id')
+    _require(lease_node in (1,2),'invalid lease expiry node')
+    required={('PREPARE',0):157,('LEASE_ARM',lease_node):157,('COMMIT',lease_node):149,('SERVER_ROLLBACK',0):157,
+              ('LEASE_TIMEOUT',lease_node):157,('IDLE_READY',1):157,('IDLE_READY',2):157}
     for e in events:
         _require(e.get('session_id')==sid,'mixed radio session')
         _require(type(e.get('node_id')) is int and e['node_id'] in (0,1,2),'invalid journal node')
@@ -618,8 +621,8 @@ def _radio(root,env):
             selected[key]=e
     _require(set(selected)==set(required),'radio causal chain incomplete')
     prepare=selected['PREPARE',0]['timestamp'];commit=selected['COMMIT',2]['timestamp']
-    rollback=selected['SERVER_ROLLBACK',0]['timestamp'];lease=selected['LEASE_TIMEOUT',2]
-    armed=selected['LEASE_ARM',2]
+    rollback=selected['SERVER_ROLLBACK',0]['timestamp'];lease=selected['LEASE_TIMEOUT',lease_node]
+    armed=selected['LEASE_ARM',lease_node]
     _require(installed<=prepare<=armed['timestamp']<=commit<=rollback<=lease['timestamp']<=removed,'radio causal/time order mismatch')
     _require(_same(armed.get('lease_seconds'),15),'lease must be 15 seconds')
     raw_seconds=re.search(r'lease_seconds=(\d+(?:\.\d+)?)',armed['line'])

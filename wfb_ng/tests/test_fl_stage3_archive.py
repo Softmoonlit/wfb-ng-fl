@@ -145,6 +145,7 @@ def archive(tmp_path, payloads):
         final_model_sha256=model_sha, final_model_size_bytes=40*1024*1024))
     put(root, 'radio/result.json', dict(session_id='radio_test', status='rolled_back',
         target_channel=149, failed_phase='commit', unresponsive_nodes=[2], effective_config={'channel':157}))
+    put(root, 'radio-recovered.json', dict(lease_expired_at=118, lease_node_id=2, ready_at=120, status='IDLE'))
     put(root, 'radio/fault.json', bind(node_id=2, drop_types=['NEW_CHANNEL_PING','RADIO_SWITCH_FINALIZED'], installed_at=101, removed_at=140, present=False))
     put(root, 'fault-state.json', dict(installed=False,run_id='run_test',checked_at=140,rules='-P INPUT ACCEPT\n'))
     events = []

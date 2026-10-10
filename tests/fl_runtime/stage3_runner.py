@@ -568,19 +568,26 @@ print(json.dumps({'package':name,'version':version,'files':files}))""".replace('
             session = result['session_id']
             deadline = time.monotonic()+35
             lease_at = None
+            lease_node = None
             while time.monotonic() < deadline:
-                journal = self.radio_journal('client2')
-                (self.archive/'radio-client2.log').write_text(journal)
-                matching = [line for line in journal.splitlines() if session in line and '射频租约耗尽' in line]
-                if matching:
-                    lease_at = float(matching[-1].split()[0])
+                for node_id in (1, 2):
+                    journal = self.radio_journal('client' + str(node_id))
+                    (self.archive / f'radio-client{node_id}.log').write_text(journal)
+                    matching = [line for line in journal.splitlines() if session in line and '射频租约耗尽' in line]
+                    if matching:
+                        if lease_at is not None:
+                            raise RuntimeError('multiple clients reported session-bound lease expiry')
+                        lease_at = float(matching[-1].split()[0])
+                        lease_node = node_id
+                if lease_at is not None:
                     break
                 time.sleep(.25)
-            if lease_at is None:
+            if lease_at is None or lease_node is None:
                 raise TimeoutError('no session-bound client lease expiry evidence')
             ready = self.wait_ready(max(0, 20-(time.time()-lease_at)))
             observed=time.time()
-            self.save('radio-recovered.json', dict(lease_expired_at=lease_at, ready_at=observed, status=ready))
+            self.save('radio-recovered.json', dict(lease_expired_at=lease_at, lease_node_id=lease_node,
+                                                     ready_at=observed, status=ready))
             status_line=json.dumps(dict(observed_at=observed,status=ready))
             (self.archive/'radio').mkdir(exist_ok=True)
             (self.archive/'radio/status.jsonl').write_text(status_line+'\n')
@@ -738,10 +745,12 @@ print(base64.b64encode(buf.getvalue()).decode())""".replace('SOURCE',repr(source
     def radio_events(self):
         result=json.loads((self.archive/'radio/result.json').read_text())
         sid=result['session_id']
+        recovery=json.loads((self.archive/'radio-recovered.json').read_text())
+        lease_node=recovery['lease_node_id']
         events=[]
-        specs=[('PREPARE',0,'PREPARE',157),('LEASE_ARM',2,'LEASE_ARM',157),
-               ('COMMIT',2,'COMMIT session=',149),('SERVER_ROLLBACK',0,'回退至 Channel',157),
-               ('LEASE_TIMEOUT',2,'射频租约耗尽',157)]
+        specs=[('PREPARE',0,'PREPARE',157),('LEASE_ARM',lease_node,'LEASE_ARM',157),
+               ('COMMIT',lease_node,'COMMIT session=',149),('SERVER_ROLLBACK',0,'回退至 Channel',157),
+               ('LEASE_TIMEOUT',lease_node,'射频租约耗尽',157)]
         for event,n,token,ch in specs:
             source='nodes/'+('server' if n==0 else 'client'+str(n))+'/daemon.log'
             lines=(self.archive/source).read_text().splitlines()
