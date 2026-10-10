@@ -2,11 +2,25 @@
 
 Stage 3 常驻双 daemon 的唯一正式入口为 `stage3_vm_physical_loop.sh`，参见 [Stage 3 三机执行器](stage3三机真实射频执行器.md)。它使用独立 envelope 和 validator，通过 Server 本地 REST 发起作业并验证作业运行时无 SSH 依赖。以下内容介绍 Issue #41 的 SSH 编排验收，属于另一套验收边界。
 
+Stage 4 三机实体 Web 闭环的唯一入口为 `stage4_hardware_acceptance.sh`。它固定使用本机 Server、`vm1`、`vm2`，从 Web 上传 canonical 40 MiB fixture，正常执行两轮同步文件作业，再通过 Web 发起一次急停；客户端 SSH 在作业窗口内由执行器硬拒绝。归档分为 `management-web/`、`control-plane/`、`data-plane/`、`lifecycle/` 和 `summary/`，离线校验命令为：
+
+```bash
+bash tests/fl_runtime/stage4_hardware_acceptance.sh
+```
+
+管理网地址通过 `STAGE4_WEB_URL` 指定。分阶段复核已有归档时：
+
+```bash
+python3 -m tests.fl_runtime.stage4_hardware_archive tests/logs/<run_id>
+```
+
+实体验收要求 Server 与两个 Client 提交一致、工作树干净、无线接口动态发现为 `wl*`，并由现有硬件探测器确认 `rtl88xxau_wfb` 与 `xhci_hcd`。管理 Web 成功不会替代控制面或数据面门禁；任一门禁失败，归档结论均为 `failed`。
+
 `issue41_fl_runtime_loop.sh run-all` 是完整验收总入口：依次执行预检、安装、连续三周期双向数据面 Gate、配置等价性核验、正式 Runtime 闭环、systemd 生命周期审计、证据采集和归档校验。正式闭环通过 `publish_model()`、`wait_for_model()`、`submit_update()`、`wait_for_updates()` 完成；任何关键阶段或证据失败，总结论都不能通过。
 
 [完整现场手册](v8_issue41_SSH编排真实硬件FL闭环验收手册.md) 保留原验收步骤、参数及证据要求。手册包含历史现场基线；本次运行的客户端集合、文件大小、轮数与无线参数以现役脚本和操作者显式配置为准，本次目录迁移不改变这些值。当前脚本默认客户端集合为 `client1 client2 client3 client4 client6 client7`，管理别名为对应 `vmN`；可通过 `ISSUE41_CLIENT_ROLES` 配置现场参与集合。
 
-现场需要真实 server/client 无线角色机，每台恰好一个可动态发现的 `wlx*` 无线接口、匹配驱动、monitor/原始帧发送与 TUN 支持；需要 SSH 管理连接、sudo、systemd、`ip`、`iw`、Python 3、构建工具和 `uftp`/`uftpd` 等手册规定依赖。所有节点必须使用同一分支与提交，工作区干净。管理网只用于编排和采集，模型/update 必须经过 WFB/TUN 无线链路。
+现场需要真实 server/client 无线角色机，每台恰好一个可动态发现的 `wl*` 无线接口、匹配驱动、monitor/原始帧发送与 TUN 支持；需要 SSH 管理连接、sudo、systemd、`ip`、`iw`、Python 3、构建工具和 `uftp`/`uftpd` 等手册规定依赖。所有节点必须使用同一分支与提交，工作区干净。管理网只用于编排和采集，模型/update 必须经过 WFB/TUN 无线链路。
 
 仓库与远端版本已同步、依赖及输入文件已准备好时，从仓库根执行：
 

@@ -6,11 +6,11 @@ from typing import Any, Dict
 
 
 def discover_wireless_interface(executor: Any, target: str) -> str:
-    """要求成功发现唯一的 wlx* 接口，禁止猜测接口名。"""
+    """要求成功发现唯一的 wl* 接口，禁止猜测接口名。"""
     rc, output, error = executor.run(target, "iw dev")
-    interfaces = sorted(set(re.findall(r"^\s*Interface\s+(wlx[0-9a-zA-Z]+)\s*$", output, re.MULTILINE)))
+    interfaces = sorted(set(re.findall(r"^\s*Interface\s+(wl(?!an)[0-9a-zA-Z]+)\s*$", output, re.MULTILINE)))
     if rc != 0 or len(interfaces) != 1:
-        raise RuntimeError(f"{target} 必须恰好发现一个 wlx* 网卡：{interfaces}；{error}")
+        raise RuntimeError(f"{target} 必须恰好发现一个 wl* 网卡：{interfaces}；{error}")
     return interfaces[0]
 
 
