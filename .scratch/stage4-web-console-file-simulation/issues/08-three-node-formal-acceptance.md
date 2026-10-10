@@ -18,4 +18,6 @@
 
 - 2026-10-10 现场复验先恢复 Stage 3 基线，再继续本工单。三端在 `stage4` 当前提交保持一致；Stage 3 已通过 preflight、install、start-services，真实作业同样在 `TASK_READY` 屏障超时（归档 `tests/logs/stage3_20261010_102343_0e37a57891b8/`）。正在以并发回归测试核验 Server 作业启动状态锁与 UDP 心跳回调之间的阻塞；修复前不声明 Stage 3 或 Stage 4 通过。早前 Client1 无法就绪还受到本机 Server 上误启动 Client daemon 的干扰，已停止该服务；现有证据不足以判定网卡硬件故障。
 
+- 2026-10-10 Stage 3 基线已恢复并通过：`tests/logs/stage3_20261010_105422_df2452879ccb/`。Stage 4 正常两轮及真实 UFTP 运行期间 Web 急停已通过：`tests/logs/stage4-hardware-20261010T035439Z-40dd3c5d/`，执行提交 `90b7211`。独立归档校验 `valid=true`，正常四份 40 MiB update 与 canonical 模型 SHA 相同；正常 Client 生命周期均 `succeeded/0`，急停均 `aborted/0`。恢复中实测拒启为 `409 preflight_engine_conflict`，三端最终 `IDLE/READY`。本次 HTTP 请求由 Server 上的执行器访问明确管理 IP 发出，未验证用户电脑单网线直连拓扑；射频变更补充实体验收仍在执行，工单保持未完成。
+
 - 工单 03 修复了射频事务中上下行 MCS 仅更新记录而未作用常驻链路的问题，并使后续任务读取已生效的功率／MCS 和 UFTP 速率。验收需覆盖 Web 配置后实际链路参数、MCS／165 信道频宽变更触发的 TUN 重建、既有控制 socket 在重建后继续收发、可回退失败恢复，以及后续作业使用确认后的速率；这些运行时变更不能仅以旧 Stage 2/3 射频归档代替。软件测试已覆盖进程命令、回退与实际 `uftp -R` 参数，但尚无本次硬件证据。
