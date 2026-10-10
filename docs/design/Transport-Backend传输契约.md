@@ -12,6 +12,8 @@
 
 Runtime 把托管模型文件和 model manifest 交给 Transport；Transport 根据本轮参与客户端集合建立 closed group，调用原生 UFTP 完成下行，并维护显式的 `NODE_ID -> UFTP` 目标映射。Runtime 不直接调用 UFTP、拼接 UFTP 命令或解析 UFTP 输出；model manifest 不承载 UFTP 目标身份。
 
+算法重配后的速率承接属于已确认、尚未实现或实测的目标：Transport 仅在下一次下行 operation 启动时，固定采用经 Daemon 合并与校验后的 `uftp_rate_kbps`；活动 operation 始终沿用启动时的值。Transport 不控制网卡，也不选择或校验无线组合对应的速率；该门禁统一由[算法无线配置与跨层重配边界](系统分层与跨层契约.md#算法无线配置与跨层重配边界)拥有。本节不提供速率表，不能据此声称已完成 20 MHz 标定。
+
 UFTP 必须启用 `-q` 和 `-S status_file`。每个下行 operation 在固定工作目录中使用一个全新、专属且不与其他轮次复用的 status 文件；启动前该路径必须不存在，不能在旧内容后追加本轮记录。UFTP 子进程自然退出并被回收后，Transport 才对该文件进行最终解析。进程退出码为 `0` 只是自然成功的必要条件，不能单独证明全部目标完成；下行自然成功必须同时满足：
 
 - 每个预期 UFTP client 都有且只有一个 `CONNECT;success`。

@@ -1,0 +1,44 @@
+Figure 2: Send Permission Round-Robin Mechanism in IEEE Communications Magazine Style.
+Format: Double-column, landscape aspect ratio (approximately 504 pt x 200 pt, ratio ~2.5:1).
+Style: Rigorous minimalist academic engineering diagram (#1A365D navy blue, #2B6CB0 science blue, #4A5568 slate gray, #EBF8FF ice blue, #E2E8F0 light gray guard interval). Clean vector geometry, crisp borders, subtle rounded corners, horizontal timeline.
+
+CRITICAL INSTRUCTION - MINIMAL TEXT LABELS:
+- DO NOT include long explanatory sentences, descriptive paragraphs, or banner titles. All mechanisms are already detailed in the main paper text.
+- Use ONLY ultra-concise noun tags, symbols, or math labels (1 to 3 words maximum per label).
+- NO large header or footer title banners across the image.
+
+1. Layout (Left-Right Split):
+- Left Section (~25% width): Server Scheduling (服务端控制)
+- Right Section (~75% width): Channel Timeline (信道时序)
+
+2. Left Section: Server Scheduling
+- Clean server rack icon labeled simply: "服务端 (Server)"
+- Active queue box showing ordered nodes: "[C1, C2, C3, ···]"
+- Circular arrow loop for round-robin scheduler
+- A single concise outgoing control arrow pointing to the timeline, labeled: "发送许可 (TX Grant)"
+
+3. Right Section: Wireless Channel Timeline
+- Horizontal Time Axis with arrow: "时间 (Time) →"
+- Two cycles marked below the axis: "Round k" and "Round k+1"
+
+- Elements in "Round k":
+  a. Client 1 TX window: Solid science blue box labeled "C1" (duration marked with bracket as "Twin")
+  b. Right boundary of C1: Distinct vertical red line with a small stop glyph, labeled simply: "到期停发 (Stop TX)"
+  c. Narrow gray hatched gap between C1 and C2, labeled simply: "Δt" (Switching Guard Interval)
+  d. Client 2 TX window: Cyan box labeled "C2"
+  e. Narrow gap "Δt"
+  f. Node continuation box: "C3 ··· CN"
+
+- Elements in "Round k+1":
+  a. Client 1 TX window: Blue box labeled "C1"
+  b. Narrow gap "Δt"
+  c. Client 2 TX window: Cyan box labeled "C2"
+
+- Cross-Round Transfer (跨窗口接力):
+  - A clean, smooth dashed curved arc connects from the end of C1 in Round k to C1 in Round k+1.
+  - Labeled with ONLY three words: "跨窗口续传 (Cross-Window)"
+
+4. Aesthetics:
+- Pure, clean, minimalist IEEE journal visual presentation.
+- Focus entirely on the timing division, guard interval gap, truncation point, and cross-round arrow.
+- Absolutely NO sentences, NO explanations, NO redundant titles.

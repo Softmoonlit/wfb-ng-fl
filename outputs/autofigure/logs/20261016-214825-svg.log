@@ -1,0 +1,133 @@
+
+============================================================
+Paper Method 到 SVG 图标替换流程 (Label 模式增强版 + Box合并)
+============================================================
+Provider: custom
+输出目录: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg
+输入模式: imported_figure
+导入图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214134/figure.png
+SVG模型: gemini-3.8-flash
+SAM提示词: icon
+最低置信度: 0.5
+SAM后端: roboflow
+执行到步骤: 5
+占位符模式: label
+优化迭代次数: 0
+Box合并阈值: 0.9
+4K等比例放大: 关闭
+============================================================
+============================================================
+步骤一：跳过生图，使用已有的第一阶段图片
+============================================================
+输入图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214134/figure.png
+4K等比例放大: 关闭
+图片已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/figure.png
+
+============================================================
+步骤二：SAM3 分割 + 灰色填充+黑色边框+序号标记
+============================================================
+原图尺寸: 1456 x 720
+使用的 prompts: ['icon']
+SAM3 Roboflow API 模式: format=polygon
+
+  正在检测: 'icon'
+    对象 1: (853, 316, 907, 358), score=0.840
+    对象 2: (1260, 281, 1401, 429), score=0.859
+    对象 3: (1112, 439, 1253, 586), score=0.863
+    对象 4: (519, 265, 581, 331), score=0.520
+    对象 5: (442, 240, 656, 484), score=0.848
+    对象 6: (1112, 143, 1253, 290), score=0.855
+  'icon' 检测到 6 个有效对象
+
+总计检测: 6 个对象 (来自 1 个 prompts)
+
+  合并重叠的boxes (阈值: 0.9)...
+    迭代 1: 合并 box 3 和 box 4 (重叠比例: 1.00)
+  合并完成: 6 -> 5 (合并了 1 个)
+
+  合并后的boxes:
+    <AF>01: (853, 316, 907, 358)
+    <AF>02: (1260, 281, 1401, 429)
+    <AF>03: (1112, 439, 1253, 586)
+    <AF>04: (1112, 143, 1253, 290)
+    <AF>05: (442, 240, 656, 484)
+
+  绘制 samed.png (使用 5 个boxes)...
+标记图片已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/samed.png
+Box 信息已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/boxlib.json
+
+检测到 5 个图标
+
+============================================================
+步骤三：裁切 + RMBG2 去背景
+============================================================
+从 HuggingFace 加载 RMBG-2.0 模型...
+检测到 HF_TOKEN，使用鉴权访问 gated 模型。
+/home/kilome/projects/AutoFigure-Edit/.venv/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/home/kilome/projects/AutoFigure-Edit/.venv/lib/python3.12/site-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
+/home/kilome/projects/AutoFigure-Edit/.venv/lib/python3.12/site-packages/timm/models/registry.py:4: FutureWarning: Importing from timm.models.registry is deprecated, please import via timm.models
+  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.models", FutureWarning)
+  <AF>01: 裁切并去背景完成 -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/icons/icon_AF01_nobg.png
+  <AF>02: 裁切并去背景完成 -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/icons/icon_AF02_nobg.png
+  <AF>03: 裁切并去背景完成 -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/icons/icon_AF03_nobg.png
+  <AF>04: 裁切并去背景完成 -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/icons/icon_AF04_nobg.png
+  <AF>05: 裁切并去背景完成 -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/icons/icon_AF05_nobg.png
+
+============================================================
+步骤四：多模态调用生成 SVG
+============================================================
+Provider: custom
+模型: gemini-3.8-flash
+占位符模式: label
+原图尺寸: 1456 x 720
+发送多模态请求到: http://186.244.209.168:8317/v1
+
+--------------------------------------------------
+步骤 4.5：SVG 语法验证（使用 lxml XML 解析器）
+--------------------------------------------------
+  SVG 语法验证通过！
+SVG 模板已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/template.svg
+
+============================================================
+步骤 4.6：LLM 优化 SVG（位置和样式对齐）
+============================================================
+Provider: custom
+模型: gemini-3.8-flash
+最大迭代次数: 0
+  迭代次数为 0，跳过 LLM 优化
+  直接复制模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/template.svg -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/optimized_template.svg
+
+--------------------------------------------------
+步骤 4.7：坐标系对齐
+--------------------------------------------------
+原图尺寸: 1456 x 720
+SVG 尺寸: 1456.0 x 720.0
+尺寸匹配，使用 1:1 坐标映射
+
+============================================================
+步骤五：图标替换到 SVG
+============================================================
+匹配模式: 序号匹配
+  <AF>01: 替换成功 (序号匹配 <g>) at (854.0, 315.0) size 52.0x43.0
+  <AF>02: 替换成功 (序号匹配 <g>) at (1260.0, 280.0) size 141.0x150.0
+  <AF>03: 替换成功 (序号匹配 <g>) at (1112.0, 441.0) size 141.0x150.0
+  <AF>04: 替换成功 (序号匹配 <g>) at (1112.0, 141.0) size 141.0x150.0
+  <AF>05: 替换成功 (序号匹配 <g>) at (443.0, 240.0) size 213.0x248.0
+最终 SVG 已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/final.svg
+
+============================================================
+流程完成！
+============================================================
+原始图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/figure.png
+标记图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/samed.png
+Box信息: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/boxlib.json
+图标数量: 5
+SVG模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/template.svg
+优化后模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/optimized_template.svg
+最终SVG: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/final.svg
+实际去背景图标数：5
+SVG： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/final.svg
+预览： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/preview.png
+PNG： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-214825-svg/figure.png

@@ -1,0 +1,292 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1408 768" width="1408" height="768">
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 26px; fill: #000; text-anchor: middle; }
+      .tag { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 28px; fill: #000; font-weight: 400; }
+      .axis-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; fill: #000; text-anchor: middle; }
+      .tick-label { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 19px; fill: #000; }
+      .ylabel { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; fill: #000; text-anchor: end; }
+      .data-bold { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 21px; font-weight: bold; fill: #000; }
+      .data-bold-white { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 21px; font-weight: bold; fill: #fff; }
+      .data-regular { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; fill: #000; }
+      .data-regular-white { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; fill: #fff; }
+      .subtext { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 18px; fill: #000; }
+      .legend-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 17px; fill: #000; }
+      .caption { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 18px; fill: #000; }
+      .grid { stroke: #ededed; stroke-width: 1.2px; }
+      .axis-line { stroke: #111; stroke-width: 1.6px; fill: none; }
+      .tick { stroke: #111; stroke-width: 1.6px; }
+    </style>
+    <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#777777" stroke-width="1.8" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1408" height="768" fill="#ffffff" />
+
+  <!-- ==================== SUBPLOT (a) ==================== -->
+  <text x="8" y="28" class="tag">(a)</text>
+  <text x="285" y="27" class="title">Downlink goodput</text>
+
+  <!-- Grid lines for (a) -->
+  <line x1="227" y1="48" x2="227" y2="308" class="grid" />
+  <line x1="291" y1="48" x2="291" y2="308" class="grid" />
+  <line x1="354" y1="48" x2="354" y2="308" class="grid" />
+  <line x1="418" y1="48" x2="418" y2="308" class="grid" />
+
+  <!-- Y-axis labels for (a) -->
+  <text x="150" y="85" class="ylabel">Robustness-</text>
+  <text x="150" y="108" class="ylabel">oriented</text>
+  <text x="150" y="177" class="ylabel">Balanced</text>
+  <text x="150" y="241" class="ylabel">Throughput-</text>
+  <text x="150" y="264" class="ylabel">oriented</text>
+
+  <!-- Bars for (a) -->
+  <!-- 11.2 Mbps -> 11.2 * 3.1875 = 35.7 -->
+  <rect x="163" y="68" width="35.7" height="49" fill="#3675a3" />
+  <text x="206" y="102" class="data-bold">11.2</text>
+
+  <!-- 22.4 Mbps -> 22.4 * 3.1875 = 71.4 -->
+  <rect x="163" y="145" width="71.4" height="49" fill="#22887a" />
+  <text x="242" y="179" class="data-bold">22.4</text>
+
+  <!-- 68.5 Mbps -> 68.5 * 3.1875 = 218.3 -->
+  <rect x="163" y="222" width="218.3" height="49" fill="#cb7e35" />
+  <text x="350" y="256" class="data-bold" text-anchor="middle">68.5</text>
+
+  <!-- Columns: IQR and Delivery in (a) -->
+  <text x="390" y="47" class="data-regular" text-anchor="middle">IQR</text>
+  <text x="390" y="70" class="subtext" text-anchor="middle">(Mbps)</text>
+  <text x="390" y="102" class="data-regular" text-anchor="middle">0.6</text>
+  <text x="390" y="179" class="data-regular" text-anchor="middle">2.2</text>
+  <text x="390" y="256" class="data-regular" text-anchor="middle">6.8</text>
+
+  <text x="465" y="47" class="data-regular" text-anchor="middle">Delivery</text>
+  <text x="465" y="70" class="subtext" text-anchor="middle">(s)</text>
+  <text x="465" y="102" class="data-regular" text-anchor="middle">30.0</text>
+  <text x="465" y="179" class="data-regular" text-anchor="middle">15.0</text>
+  <text x="465" y="256" class="data-regular" text-anchor="middle">4.9</text>
+
+  <!-- Axes for (a) -->
+  <line x1="163" y1="48" x2="163" y2="308" class="axis-line" />
+  <line x1="163" y1="308" x2="418" y2="308" class="axis-line" />
+
+  <!-- Ticks for (a) -->
+  <line x1="163" y1="92" x2="157" y2="92" class="tick" />
+  <line x1="163" y1="170" x2="157" y2="170" class="tick" />
+  <line x1="163" y1="247" x2="157" y2="247" class="tick" />
+
+  <line x1="163" y1="308" x2="163" y2="314" class="tick" />
+  <line x1="227" y1="308" x2="227" y2="314" class="tick" />
+  <line x1="291" y1="308" x2="291" y2="314" class="tick" />
+  <line x1="354" y1="308" x2="354" y2="314" class="tick" />
+  <line x1="418" y1="308" x2="418" y2="314" class="tick" />
+
+  <text x="163" y="331" class="tick-label" text-anchor="middle">0</text>
+  <text x="227" y="331" class="tick-label" text-anchor="middle">20</text>
+  <text x="291" y="331" class="tick-label" text-anchor="middle">40</text>
+  <text x="354" y="331" class="tick-label" text-anchor="middle">60</text>
+  <text x="418" y="331" class="tick-label" text-anchor="middle">80</text>
+
+  <text x="290" y="367" class="axis-label">Goodput (Mbps)</text>
+
+
+  <!-- ==================== SUBPLOT (b) ==================== -->
+  <text x="715" y="28" class="tag">(b)</text>
+  <text x="1080" y="27" class="title">Client update submission</text>
+
+  <!-- Grid lines for (b) -->
+  <line x1="865" y1="92" x2="1365" y2="92" class="grid" />
+  <line x1="865" y1="170" x2="1365" y2="170" class="grid" />
+  <line x1="865" y1="247" x2="1365" y2="247" class="grid" />
+
+  <line x1="948.3" y1="48" x2="948.3" y2="308" class="grid" />
+  <line x1="1031.7" y1="48" x2="1031.7" y2="308" class="grid" />
+  <line x1="1115" y1="48" x2="1115" y2="308" class="grid" />
+  <line x1="1198.3" y1="48" x2="1198.3" y2="308" class="grid" />
+  <line x1="1281.7" y1="48" x2="1281.7" y2="308" class="grid" />
+  <line x1="1365" y1="48" x2="1365" y2="308" class="grid" />
+
+  <!-- Y-axis labels for (b) -->
+  <text x="852" y="85" class="ylabel">Robustness-</text>
+  <text x="852" y="108" class="ylabel">oriented</text>
+  <text x="852" y="177" class="ylabel">Balanced</text>
+  <text x="852" y="241" class="ylabel">Throughput-</text>
+  <text x="852" y="264" class="ylabel">oriented</text>
+
+  <!-- Content for (b) -->
+  <text x="1145" y="85" class="data-regular" text-anchor="middle">Median not reported</text>
+  <text x="1145" y="112" class="subtext" text-anchor="middle">Client submission-time IQR: 1.8 s</text>
+
+  <!-- 39.6 s -> 865 + 39.6 * 4.1667 = 1030.0 -->
+  <text x="1030" y="152" class="data-regular" text-anchor="middle">39.6</text>
+  <circle cx="1030" cy="170" r="7.5" fill="#22887a" />
+
+  <!-- 76.2 s -> 865 + 76.2 * 4.1667 = 1182.5 -->
+  <text x="1182.5" y="230" class="data-regular" text-anchor="middle">76.2</text>
+  <circle cx="1182.5" cy="247" r="7.5" fill="#cb7e35" />
+
+  <!-- Max 104.5 s -> 865 + 104.5 * 4.1667 = 1300.4 -->
+  <text x="1300.4" y="230" class="data-regular" text-anchor="middle">Max 104.5</text>
+  <polygon points="1300.4,239.5 1307.9,247 1300.4,254.5 1292.9,247" fill="#ffffff" stroke="#cb7e35" stroke-width="2" />
+
+  <text x="1180" y="286" class="legend-text" text-anchor="middle">Dot: median | Diamond: maximum</text>
+
+  <!-- Axes for (b) -->
+  <line x1="865" y1="48" x2="865" y2="308" class="axis-line" />
+  <line x1="865" y1="308" x2="1365" y2="308" class="axis-line" />
+
+  <!-- Ticks for (b) -->
+  <line x1="865" y1="92" x2="859" y2="92" class="tick" />
+  <line x1="865" y1="170" x2="859" y2="170" class="tick" />
+  <line x1="865" y1="247" x2="859" y2="247" class="tick" />
+
+  <line x1="865" y1="308" x2="865" y2="314" class="tick" />
+  <line x1="948.3" y1="308" x2="948.3" y2="314" class="tick" />
+  <line x1="1031.7" y1="308" x2="1031.7" y2="314" class="tick" />
+  <line x1="1115" y1="308" x2="1115" y2="314" class="tick" />
+  <line x1="1198.3" y1="308" x2="1198.3" y2="314" class="tick" />
+  <line x1="1281.7" y1="308" x2="1281.7" y2="314" class="tick" />
+  <line x1="1365" y1="308" x2="1365" y2="314" class="tick" />
+
+  <text x="865" y="331" class="tick-label" text-anchor="middle">0</text>
+  <text x="948.3" y="331" class="tick-label" text-anchor="middle">20</text>
+  <text x="1031.7" y="331" class="tick-label" text-anchor="middle">40</text>
+  <text x="1115" y="331" class="tick-label" text-anchor="middle">60</text>
+  <text x="1198.3" y="331" class="tick-label" text-anchor="middle">80</text>
+  <text x="1281.7" y="331" class="tick-label" text-anchor="middle">100</text>
+  <text x="1365" y="331" class="tick-label" text-anchor="middle">120</text>
+
+  <text x="1115" y="367" class="axis-label">Slowest-client submission time (s)</text>
+
+
+  <!-- ==================== SUBPLOT (c) ==================== -->
+  <text x="8" y="420" class="tag">(c)</text>
+  <text x="380" y="416" class="title">Round duration</text>
+
+  <!-- Grid lines for (c) -->
+  <line x1="246.3" y1="435" x2="246.3" y2="670" class="grid" />
+  <line x1="329.7" y1="435" x2="329.7" y2="670" class="grid" />
+  <line x1="413" y1="435" x2="413" y2="670" class="grid" />
+  <line x1="496.3" y1="435" x2="496.3" y2="670" class="grid" />
+  <line x1="579.7" y1="435" x2="579.7" y2="670" class="grid" />
+  <line x1="663" y1="435" x2="663" y2="670" class="grid" />
+
+  <!-- Y-axis labels for (c) -->
+  <text x="150" y="473" class="ylabel">Robustness-</text>
+  <text x="150" y="496" class="ylabel">oriented</text>
+  <text x="150" y="563" class="ylabel">Balanced</text>
+  <text x="150" y="626" class="ylabel">Throughput-</text>
+  <text x="150" y="649" class="ylabel">oriented</text>
+
+  <!-- Bars for (c) -->
+  <!-- 96.5 s -> 96.5 * 4.1667 = 402.1 -->
+  <rect x="163" y="452" width="402.1" height="54" fill="#3675a3" />
+  <text x="548" y="487" class="data-bold-white" text-anchor="end">96.5</text>
+  <text x="575" y="486" class="data-regular">IQR 3.5 s</text>
+
+  <!-- 52.8 s -> 52.8 * 4.1667 = 220.0 -->
+  <rect x="163" y="525" width="220" height="54" fill="#22887a" />
+  <text x="368" y="560" class="data-bold-white" text-anchor="end">52.8</text>
+  <text x="393" y="559" class="data-regular">IQR 4.8 s</text>
+
+  <text x="175" y="639" class="data-regular">Not reported</text>
+
+  <!-- Axes for (c) -->
+  <line x1="163" y1="435" x2="163" y2="670" class="axis-line" />
+  <line x1="163" y1="670" x2="663" y2="670" class="axis-line" />
+
+  <!-- Ticks for (c) -->
+  <line x1="163" y1="479" x2="157" y2="479" class="tick" />
+  <line x1="163" y1="552" x2="157" y2="552" class="tick" />
+  <line x1="163" y1="634" x2="157" y2="634" class="tick" />
+
+  <line x1="163" y1="670" x2="163" y2="676" class="tick" />
+  <line x1="246.3" y1="670" x2="246.3" y2="676" class="tick" />
+  <line x1="329.7" y1="670" x2="329.7" y2="676" class="tick" />
+  <line x1="413" y1="670" x2="413" y2="676" class="tick" />
+  <line x1="496.3" y1="670" x2="496.3" y2="676" class="tick" />
+  <line x1="579.7" y1="670" x2="579.7" y2="676" class="tick" />
+  <line x1="663" y1="670" x2="663" y2="676" class="tick" />
+
+  <text x="163" y="693" class="tick-label" text-anchor="middle">0</text>
+  <text x="246.3" y="693" class="tick-label" text-anchor="middle">20</text>
+  <text x="329.7" y="693" class="tick-label" text-anchor="middle">40</text>
+  <text x="413" y="693" class="tick-label" text-anchor="middle">60</text>
+  <text x="496.3" y="693" class="tick-label" text-anchor="middle">80</text>
+  <text x="579.7" y="693" class="tick-label" text-anchor="middle">100</text>
+  <text x="663" y="693" class="tick-label" text-anchor="middle">120</text>
+
+  <text x="413" y="730" class="axis-label">Round duration (s)</text>
+
+
+  <!-- ==================== SUBPLOT (d) ==================== -->
+  <text x="715" y="420" class="tag">(d)</text>
+  <text x="1080" y="416" class="title">Training outcomes</text>
+
+  <!-- Legend for (d) -->
+  <rect x="1108" y="438" width="16" height="16" fill="#3675a3" />
+  <text x="1130" y="452" class="legend-text">Completed</text>
+  <rect x="1238" y="438" width="16" height="16" fill="#e5e5e5" />
+  <rect x="1238" y="438" width="16" height="16" fill="url(#diagonalHatch)" stroke="#888888" stroke-width="0.8" />
+  <text x="1260" y="452" class="legend-text">Timed out</text>
+
+  <!-- Grid lines for (d) -->
+  <line x1="965" y1="465" x2="965" y2="670" class="grid" />
+  <line x1="1065" y1="465" x2="1065" y2="670" class="grid" />
+  <line x1="1165" y1="465" x2="1165" y2="670" class="grid" />
+  <line x1="1265" y1="465" x2="1265" y2="670" class="grid" />
+  <line x1="1365" y1="465" x2="1365" y2="670" class="grid" />
+
+  <!-- Y-axis labels for (d) -->
+  <text x="852" y="473" class="ylabel">Robustness-</text>
+  <text x="852" y="496" class="ylabel">oriented</text>
+  <text x="852" y="563" class="ylabel">Balanced</text>
+  <text x="852" y="626" class="ylabel">Throughput-</text>
+  <text x="852" y="649" class="ylabel">oriented</text>
+
+  <!-- Bars for (d) -->
+  <!-- 10 completed -> width = 500 -->
+  <rect x="865" y="468" width="500" height="54" fill="#3675a3" />
+  <text x="1115" y="503" class="data-regular-white" text-anchor="middle">10 completed / 0 timed out</text>
+
+  <!-- 10 completed -> width = 500 -->
+  <rect x="865" y="541" width="500" height="54" fill="#22887a" />
+  <text x="1115" y="576" class="data-regular-white" text-anchor="middle">10 completed / 0 timed out</text>
+
+  <!-- 8 completed (400px), 2 timed out (100px) -->
+  <rect x="865" y="614" width="400" height="54" fill="#cb7e35" />
+  <rect x="1265" y="614" width="100" height="54" fill="#e5e5e5" />
+  <rect x="1265" y="614" width="100" height="54" fill="url(#diagonalHatch)" stroke="#888888" stroke-width="0.8" />
+  <text x="1065" y="649" class="data-regular-white" text-anchor="middle">8 completed / 2 timed out</text>
+
+  <!-- Axes for (d) -->
+  <line x1="865" y1="465" x2="865" y2="670" class="axis-line" />
+  <line x1="865" y1="670" x2="1365" y2="670" class="axis-line" />
+
+  <!-- Ticks for (d) -->
+  <line x1="865" y1="495" x2="859" y2="495" class="tick" />
+  <line x1="865" y1="568" x2="859" y2="568" class="tick" />
+  <line x1="865" y1="641" x2="859" y2="641" class="tick" />
+
+  <line x1="865" y1="670" x2="865" y2="676" class="tick" />
+  <line x1="965" y1="670" x2="965" y2="676" class="tick" />
+  <line x1="1065" y1="670" x2="1065" y2="676" class="tick" />
+  <line x1="1165" y1="670" x2="1165" y2="676" class="tick" />
+  <line x1="1265" y1="670" x2="1265" y2="676" class="tick" />
+  <line x1="1365" y1="670" x2="1365" y2="676" class="tick" />
+
+  <text x="865" y="693" class="tick-label" text-anchor="middle">0</text>
+  <text x="965" y="693" class="tick-label" text-anchor="middle">2</text>
+  <text x="1065" y="693" class="tick-label" text-anchor="middle">4</text>
+  <text x="1165" y="693" class="tick-label" text-anchor="middle">6</text>
+  <text x="1265" y="693" class="tick-label" text-anchor="middle">8</text>
+  <text x="1365" y="693" class="tick-label" text-anchor="middle">10</text>
+
+  <text x="1115" y="730" class="axis-label">Independent training attempts</text>
+
+
+  <!-- ==================== FOOTER CAPTION ==================== -->
+  <text x="8" y="757" class="caption">10 independent training attempts per configuration; 5 rounds per attempt. IQR: interquartile range.</text>
+</svg>

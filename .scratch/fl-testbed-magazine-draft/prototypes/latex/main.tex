@@ -1,0 +1,67 @@
+% IEEEtran 在类初始化时使用传统字体编码；正文随后由 fontspec 切换至 Unicode 字体。
+\RequirePackage[T1]{fontenc}
+\documentclass[journal,10pt,a4paper]{IEEEtran}
+
+% 中文使用 TeX Live / Overleaf 随附的 Fandol 字体，保留 IEEEtran 标题与双栏格式。
+\usepackage[UTF8,scheme=plain,fontset=none]{ctex}
+\setmainfont{texgyretermes-regular.otf}[
+  BoldFont=texgyretermes-bold.otf,
+  ItalicFont=texgyretermes-italic.otf,
+  BoldItalicFont=texgyretermes-bolditalic.otf
+]
+\setsansfont{texgyreheros-regular.otf}[
+  BoldFont=texgyreheros-bold.otf,
+  ItalicFont=texgyreheros-italic.otf,
+  BoldItalicFont=texgyreheros-bolditalic.otf
+]
+% 为 IEEEtran 使用的粗斜体和小型大写样式明确指定中文对应字形。
+\setCJKmainfont{FandolSong-Regular.otf}[
+  BoldFont=FandolSong-Bold.otf,
+  ItalicFont=FandolKai-Regular.otf,
+  BoldItalicFont=FandolHei-Bold.otf,
+  SmallCapsFont=FandolSong-Regular.otf
+]
+\setCJKsansfont{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]
+\setCJKmonofont{FandolFang-Regular.otf}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+% 允许跨栏图表在页顶或页底排版，并在所属章节收束。
+\usepackage{stfloats}
+\usepackage[section]{placeins}
+\usepackage[hidelinks,unicode]{hyperref}
+
+\renewcommand{\abstractname}{摘要}
+\renewcommand{\figurename}{Figure}
+\renewcommand{\tablename}{Table}
+\renewcommand{\thetable}{\arabic{table}}
+\graphicspath{{figures/}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+% 仅为窄栏中的长英文词提供适量断行余量。
+\setlength{\emergencystretch}{1em}
+\setcounter{secnumdepth}{0}
+\setcounter{dbltopnumber}{1}
+\setcounter{dblbotnumber}{1}
+\pagestyle{plain}
+\raggedbottom
+
+\title{面向真实物理无线链路的联邦学习实验平台设计与性能评估}
+% 源稿没有作者及单位信息，确认后在此填写 \author{...}。
+\author{}
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+
+\begin{abstract}
+[待定稿后撰写]
+\end{abstract}
+
+\input{sections/01-introduction}
+\input{sections/02-platform-comparison}
+\input{sections/03-architecture}
+\input{sections/04-experiments}
+\input{sections/05-discussion}
+
+\end{document}

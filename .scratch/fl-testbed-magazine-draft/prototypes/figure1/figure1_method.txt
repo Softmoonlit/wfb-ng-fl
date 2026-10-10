@@ -1,0 +1,40 @@
+Figure 1: WFB-FL System Architecture and End-to-End Workflow in IEEE Communications Magazine Style.
+Format: Double-column, landscape aspect ratio (around 504 pt x 220 pt). Clean academic blue-gray engineering palette (#1A365D navy, #2B6CB0 blue, #EBF8FF light blue, #4A5568 slate gray, #CBD5E0 border gray).
+Visual Priority: Highly diagrammatic and visual, minimal text labels. NO long straight arrows or harsh lines across the canvas; ALL connections must use smooth, gently curved short arcs and Bezier splines.
+
+1. Top-Left Corner: Mini Architecture Stack (Small Micro-Callout)
+- A compact vertical box in the top-left corner showing the 5-layer collaborative stack:
+  1. FL Algorithm Layer
+  2. FL Runtime Layer
+  3. Transport Layer (UFTP / TCP)
+  - - - [Dashed TUN Interface Boundary] - - -
+  4. Link Control Layer
+  5. Radio Transceiver Layer (TX Frame Injection / RX Monitor)
+- A short, gently curved downward dashed arc line points from this mini stack to the Server below.
+
+2. Middle-Left: Parameter Server (Server)
+- A detailed vector line-art server rack with blade modules, blue/green status LEDs, and a top transmitting antenna.
+- Labeled compactly: "参数服务端 (Server)".
+- Top outgoing antenna emits downward/outward radio waves.
+- Bottom terminal connects to a short curved downward arrow for "⑥ 全局聚合 (Aggregation)".
+
+3. Right: Edge Clients Cluster (Clients)
+- Multiple single-board edge computing nodes with external Wi-Fi dipole antennas vertically arranged:
+  - "边缘客户端 1 (Client 1)"
+  - "边缘客户端 2 (Client 2)"
+  - "边缘客户端 3 (Client 3)"
+  - Vertical ellipsis dots "···"
+  - "边缘客户端 N (Client N)"
+- Beside each client, a small clockwise circular loop arrow with a tiny neural network icon symbolizes "④ 本地训练 (Local Training, ResNet-18)".
+- Client 1 has a short curved indicator: "③ 解耦启动 (Decoupled Start)".
+- STRICT REQUIREMENT: Absolutely no third-party sniffing or dedicated monitor nodes.
+
+4. Communication Channels (Curved Arcs & Waves, No Long Straight Lines)
+- Downlink Broadcast (Step ②):
+  - Radio waves (concentric smooth blue arcs) emanate from Server toward the clients.
+  - From the wavefront, smooth curved short arcs branch into each client's antenna.
+  - Labeled compactly: "② 下行广播 (UFTP Broadcast / 40 MiB)".
+- Uplink Transmission (Step ⑤):
+  - Smooth, gently curved Bezier splines flow from clients back to Server, representing sequential token-passing uploads.
+  - Accompanied by a parallel thin dashed gray curved line for reverse TCP ACKs: "服务端反向 ACK".
+  - Labeled compactly: "⑤ 轮转上行 (HTTP PUT / TCP)".
