@@ -111,6 +111,32 @@ def _poll(base: str, predicate, timeout: float, archive: Path, name: str, *, int
     raise TimeoutError(f"timeout waiting for {name}")
 
 
+def sample_uftp(executor, job_id: str) -> dict[str, Any] | None:
+    validate_path_safe_identifier(job_id, "job_id")
+    script = """import json,pathlib,time
+rows=[]
+for process in pathlib.Path('/proc').iterdir():
+ if not process.name.isdigit(): continue
+ try:
+  if (process/'comm').read_text().strip() != 'uftp': continue
+  argv=(process/'cmdline').read_bytes().decode().strip('\\0').split('\\0')
+  cwd=str((process/'cwd').resolve(strict=True))
+  stat=(process/'stat').read_text().rsplit(')',1)[1].split()
+  if stat[0] == 'Z': continue
+  rows.append(dict(pid=int(process.name),start_ticks=int(stat[19]),argv=argv,cwd=cwd))
+ except (OSError,UnicodeError,ValueError): continue
+print(json.dumps(dict(observed_at=time.time(),processes=rows)))"""
+    sample = json.loads(executor.checked("server", "sudo -n python3 -I -c " + shlex.quote(script)))
+    for process in sample["processes"]:
+        evidence = dict(job_id=job_id, observed_at=sample["observed_at"], **process)
+        try:
+            validate_transfer_start(evidence, job_id)
+        except (ValueError, KeyError, TypeError):
+            continue
+        return evidence
+    return None
+
+
 class Stage4HardwareRunner:
     def __init__(self, archive: Path, web_url: str, repo: Path) -> None:
         self.archive, self.web_url, self.repo = archive, web_url.rstrip("/"), repo
@@ -234,29 +260,7 @@ class Stage4HardwareRunner:
             raise RuntimeError("recovery probe accepted a new job; recovery rejection was not established")
 
     def _sample_uftp(self, job_id: str) -> dict[str, Any] | None:
-        validate_path_safe_identifier(job_id, "job_id")
-        script = """import json,pathlib,time
-rows=[]
-for process in pathlib.Path('/proc').iterdir():
- if not process.name.isdigit(): continue
- try:
-  if (process/'comm').read_text().strip() != 'uftp': continue
-  argv=(process/'cmdline').read_bytes().decode().strip('\\0').split('\\0')
-  cwd=str((process/'cwd').resolve(strict=True))
-  stat=(process/'stat').read_text().rsplit(')',1)[1].split()
-  if stat[0] == 'Z': continue
-  rows.append(dict(pid=int(process.name),start_ticks=int(stat[19]),argv=argv,cwd=cwd))
- except (OSError,UnicodeError,ValueError): continue
-print(json.dumps(dict(observed_at=time.time(),processes=rows)))"""
-        sample = json.loads(self.executor.checked("server", "sudo -n python3 -I -c " + shlex.quote(script)))
-        for process in sample["processes"]:
-            evidence = dict(job_id=job_id, observed_at=sample["observed_at"], **process)
-            try:
-                validate_transfer_start(evidence, job_id)
-            except (ValueError, KeyError, TypeError):
-                continue
-            return evidence
-        return None
+        return sample_uftp(self.executor, job_id)
 
     def _resolve_create(self) -> str:
         """Resolve a possibly accepted POST with its original idempotency key."""

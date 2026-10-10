@@ -22,15 +22,15 @@ from tests.fl_runtime.hardware import inspect_wireless_device
 from tests.fl_runtime.evidence_collection import collect_tree
 from tests.fl_runtime.stage3_runner import fault_rules
 from tests.fl_runtime.stage4_hardware_acceptance import (
-    CANONICAL_MODEL_SHA256, Stage4HardwareRunner, _request,
+    CANONICAL_MODEL_SHA256, WebRequestError, sample_uftp, _request,
 )
 from tests.fl_runtime.stage4_hardware_archive import validate_terminal_state, validate_transfer_start
-from wfb_ng.fl.artifacts import write_json_atomic
+from wfb_ng.fl.artifacts import write_json_atomic, validate_path_safe_identifier
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINE = dict(channel=157, radio_txpower_dbm=12, downlink_mcs=3,
                 uplink_mcs=6, uftp_rate_kbps=15000)
-CHANGED = dict(channel=157, radio_txpower_dbm=11, downlink_mcs=4,
+CHANGED = dict(channel=157, radio_txpower_dbm=12, downlink_mcs=4,
                uplink_mcs=5, uftp_rate_kbps=18000)
 
 # Read live process argv, not ps text containing its own search expression.
@@ -47,6 +47,41 @@ for p in pathlib.Path('/proc').iterdir():
   rows.append(dict(pid=int(p.name),start_ticks=int(stat[19]),argv=argv))
  except (OSError,UnicodeError,ValueError): continue
 print(json.dumps(rows))"""
+
+
+
+# -I and cwd=/ ensure evidence resolves installed production modules.
+PRODUCTION_PROBE = """import hashlib,importlib.util,json,pathlib,shutil,subprocess,time
+from wfb_ng.conf import settings
+import wfb_ng.fl
+root=pathlib.Path(wfb_ng.fl.__file__).parent
+identity_path=root/'build_identity.json'
+identity=json.loads(identity_path.read_text())
+files={}
+for name in ('server_daemon','client_daemon','console','console_http','control','radio','service','transport'):
+ path=pathlib.Path(importlib.util.find_spec('wfb_ng.fl.'+name).origin)
+ files[name]=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+link=pathlib.Path(shutil.which('wfb_v6_uplink'))
+files['wfb_v6_uplink']=dict(path=str(link),sha256=hashlib.sha256(link.read_bytes()).hexdigest())
+unit=UNIT
+properties=subprocess.check_output(['systemctl','show',unit,'--property=MainPID,ExecStart,FragmentPath'],text=True)
+pid=int(next(line.split('=',1)[1] for line in properties.splitlines() if line.startswith('MainPID=')))
+p=pathlib.Path('/proc')/str(pid)
+argv=p.joinpath('cmdline').read_bytes().decode().rstrip('\\0').split('\\0')
+print(json.dumps(dict(observed_at=time.time(),build_identity=identity,identity_path=str(identity_path),
+ version=settings.common.version,config_commit=settings.common.commit,files=files,
+ unit=unit,unit_properties=properties,daemon_pid=pid,daemon_argv=argv,daemon_exe=str((p/'exe').resolve()))))"""
+
+
+def validate_production(value, commit):
+    if not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit) or value.get('build_identity') != {'schema_version': 1, 'commit': commit} or value.get('config_commit') != commit:
+        raise ValueError('installed production commit mismatch')
+    if not value.get('version') or value.get('daemon_pid', 0) <= 0 or not value.get('daemon_argv'):
+        raise ValueError('missing production version/live daemon identity')
+    for key in ('server_daemon', 'client_daemon', 'console', 'console_http', 'control', 'radio', 'service', 'transport', 'wfb_v6_uplink'):
+        entry = value.get('files', {}).get(key, {})
+        if not entry.get('path', '').startswith('/') or not re.fullmatch(r'[0-9a-f]{64}', entry.get('sha256', '')):
+            raise ValueError('missing installed production source/binary hash')
 
 
 def ready(state, nodes):
@@ -142,25 +177,38 @@ class RadioRunner:
         self.executor = Executor(archive, self.clients)
         self.run_id = archive.name
         self.started = time.time()
+        self.pending_create = None
+        self.active_job_id = None
+        self.baseline_verified = False
+        self.commit = None
 
     def save(self, path, value):
         write_json_atomic(self.archive / path, value)
 
     def web(self, path, body=None, *, headers=None, timeout=60):
-        status, response = _request(self.web_url, '/api/v1/' + path,
-            method='GET' if body is None else 'POST',
-            body=None if body is None else json.dumps(body).encode(),
-            headers={'Content-Type': 'application/json', **(headers or {})}, timeout=timeout)
-        with (self.archive / 'management-web/requests.jsonl').open('a') as stream:
-            stream.write(json.dumps(dict(at=time.time(), path=path, request=body,
-                                         status=status, response=response)) + '\n')
-        return response
+        record = dict(at=time.time(), path=path, request=body)
+        try:
+            status, response = _request(self.web_url, '/api/v1/' + path,
+                method='GET' if body is None else 'POST',
+                body=None if body is None else json.dumps(body).encode(),
+                headers={'Content-Type': 'application/json', **(headers or {})}, timeout=timeout)
+            record.update(status=status, response=response)
+            return response
+        except WebRequestError as exc:
+            record.update(status=exc.status, response=exc.detail)
+            raise
+        except Exception as exc:
+            record['transport_error'] = str(exc)
+            raise
+        finally:
+            with (self.archive / 'management-web/requests.jsonl').open('a') as stream:
+                stream.write(json.dumps(record) + '\n')
 
     def wait_ready(self, config, name, timeout=60):
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             state = self.web('state')
-            config_matches = all(state['server']['radio'][k] == v for k, v in config.items())
+            config_matches = all((state['server']['radio'] or {}).get(k) == v for k, v in config.items())
             node_matches = all(n.get('current_channel') == config['channel']
                                and n.get('txpower_dbm') == config['radio_txpower_dbm']
                                and n.get('uplink_mcs') == config['uplink_mcs']
@@ -245,13 +293,13 @@ class RadioRunner:
         self.executor.job_window = True
         # Stable key lets the parent resolve ambiguous HTTP acceptance without a new job.
         self.save('data-plane/job-request.json', dict(request=body, idempotency_key=self.run_id))
-        accepted = self.web('jobs', body, headers={'Idempotency-Key': self.run_id})
-        job_id = accepted['job_id']
+        self.pending_create = body
+        job_id = self.resolve_create()
         deadline = time.monotonic() + 600
         transfer = None
         while time.monotonic() < deadline:
             if transfer is None:
-                transfer = Stage4HardwareRunner._sample_uftp(self, job_id)
+                transfer = sample_uftp(self.executor, job_id)
                 if transfer:
                     self.save('data-plane/uftp-argv.json', transfer)
             state = self.web('state')
@@ -259,6 +307,7 @@ class RadioRunner:
             if state['current_job'] is None and recent.get('job_id') == job_id and recent.get('recovery_state') == 'ready':
                 self.save('data-plane/job-terminal.json', state)
                 self.executor.job_window = False
+                self.active_job_id = None
                 validate_terminal_state(state, job_id, self.nodes, aborted=False)
                 break
             time.sleep(.05)
@@ -274,12 +323,114 @@ class RadioRunner:
             raise ValueError('missing job-bound real UFTP argv with confirmed -R')
         self.capture('post-job', CHANGED)
 
+    def production_identity(self, role):
+        unit = 'wfb-fl-server-daemon.service' if role == 'server' else 'wfb-fl-client-daemon.service'
+        code = PRODUCTION_PROBE.replace('UNIT', repr(unit))
+        raw = self.executor.checked(role, 'cd / && sudo -n /usr/bin/python3 -I -c ' + shlex.quote(code))
+        self.save(f'summary/{role}-production.json', json.loads(raw))
+
+    def resolve_create(self):
+        body = self.pending_create
+        try:
+            accepted = self.web('jobs', body, headers={'Idempotency-Key': self.run_id})
+        except WebRequestError as exc:
+            if exc.status < 500:  # A definite admission rejection did not accept a job.
+                self.pending_create = None
+                self.executor.job_window = False
+            raise
+        job_id = validate_path_safe_identifier(accepted['job_id'], 'job_id')
+        self.save('data-plane/job-accepted.json', accepted)
+        self.active_job_id = job_id
+        self.pending_create = None
+        return job_id
+
+    def cleanup(self):
+        """Only Web mutations; resolve uncertain acceptance with the ORIGINAL key."""
+        if self.pending_create is not None:
+            self.resolve_create()
+        job_id = self.active_job_id
+        if job_id:
+            state = self.web('state')
+            if (state.get('current_job') or {}).get('job_id') == job_id:
+                self.web(f'jobs/{job_id}/abort', {'reason': 'Issue08 radio acceptance failure cleanup'})
+            elif (state.get('recent_job') or {}).get('job_id') != job_id:
+                raise RuntimeError('cannot establish accepted job identity for cleanup')
+            deadline = time.monotonic() + 90
+            while time.monotonic() < deadline:
+                state = self.web('state')
+                if state.get('current_job') is None and (state.get('recent_job') or {}).get('job_id') == job_id and (state.get('recent_job') or {}).get('recovery_state') == 'ready':
+                    self.save('data-plane/failure-job-recovered.json', state)
+                    self.executor.job_window = False
+                    self.active_job_id = None
+                    break
+                time.sleep(.5)
+            else:
+                raise TimeoutError('accepted job recovery not confirmed; no SSH or radio mutation allowed')
+        if not self.baseline_verified:
+            return
+        deadline = time.monotonic() + 60
+        while True:
+            state = self.web('state')
+            if ready(state, self.nodes):
+                break
+            if time.monotonic() >= deadline:
+                raise RuntimeError('baseline cleanup requires idle READY; leaving evidence for diagnosis')
+            time.sleep(.5)
+        if any((state['server']['radio'] or {}).get(k) != v for k, v in BASELINE.items()):
+            self.apply(BASELINE, 'failure-restore-baseline')
+        self.wait_ready(BASELINE, 'failure-restored-baseline')
+        self.capture('failure-restored-baseline', BASELINE)
+
+    def failure_evidence(self, name):
+        """Best effort, each failed query is explicit; unknown job state forbids SSH."""
+        report = {'errors': {}, 'ssh_skipped': True}
+        state = None
+        try:
+            state = self.web('state')
+            self.save(f'control-plane/{name}-state.json', state)
+        except Exception as exc:
+            report['errors']['web_state'] = str(exc)
+        no_job = (state is not None and 'current_job' in state and state['current_job'] is None
+                  and not self.executor.job_window and self.pending_create is None)
+        if no_job:
+            report['ssh_skipped'] = False
+            for role, node in self.roles.items():
+                unit = 'wfb-fl-client-daemon.service' if node else 'wfb-fl-server-daemon.service'
+                try:
+                    journal = self.executor.checked(role,
+                        f'sudo -n journalctl -u {unit} --since @{self.started} --no-pager -o short-unix', timeout=60)
+                    (self.archive / f'control-plane/{name}-{role}-journal.txt').write_text(journal)
+                except Exception as exc:
+                    report['errors'][role + '_journal'] = str(exc)
+                if not (self.archive / f'summary/{role}-production.json').exists():
+                    try:
+                        self.production_identity(role)
+                    except Exception as exc:
+                        self.save(f'summary/{role}-production.json', {'collection_error': str(exc)})
+                        report['errors'][role + '_production'] = str(exc)
+        self.save(f'summary/{name}-collection.json', report)
+        return report
+
     def run(self, digest, include_rollback):
         commit = subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip()
+        self.commit = commit
+        # Collect every installed identity before any parity gate or mutation.
+        source_sha256 = {name: hashlib.sha256((ROOT / 'wfb_ng/fl' / (name + '.py')).read_bytes()).hexdigest()
+                         for name in ('server_daemon', 'client_daemon', 'console', 'console_http', 'control', 'radio', 'service', 'transport')}
+        self.save('summary/run-identity.json', dict(run_id=self.run_id, commit=commit, source_sha256=source_sha256))
+        for role in self.roles:
+            try:
+                self.production_identity(role)
+            except Exception as exc:
+                self.save(f'summary/{role}-production.json', {'collection_error': str(exc)})
         for role, node in self.roles.items():
             head = self.executor.checked(role, f'git -C {shlex.quote(str(ROOT))} rev-parse HEAD').strip()
             dirty = self.executor.checked(role, f'git -C {shlex.quote(str(ROOT))} status --porcelain').strip()
             self.save(f'summary/{role}-checkout.json', dict(commit=head, dirty=dirty))
+            production = json.loads((self.archive / f'summary/{role}-production.json').read_text())
+            validate_production(production, production.get('build_identity', {}).get('commit'))
+            if any(production['files'][name]['sha256'] != digest for name, digest in source_sha256.items()):
+                raise ValueError(f'{role}: installed production source differs from checkout')
             if head != commit or dirty:
                 raise RuntimeError(f'{role}: formal evidence requires commit parity and clean worktree')
             if node:
@@ -287,11 +438,20 @@ class RadioRunner:
                 self.save(f'summary/{role}-identity.json', identity)
                 if identity['node_id'] != node:
                     raise ValueError('node identity mismatch')
+        signatures = []
+        for role in self.roles:
+            production = json.loads((self.archive / f'summary/{role}-production.json').read_text())
+            signatures.append((production['build_identity']['commit'], {key: value['sha256'] for key, value in production['files'].items()}))
+        if any(value != signatures[0] for value in signatures[1:]):
+            raise ValueError('installed production hashes differ across nodes')
         before = self.capture('baseline', BASELINE)
-        for name, config in [('mcs-power', CHANGED), ('165-HT20', {**CHANGED, 'channel': 165}), ('157-HT40', CHANGED)]:
+        self.baseline_verified = True
+        for name, config in [('mcs-only', CHANGED), ('power-only-13', {**CHANGED, 'radio_txpower_dbm': 13}),
+                             ('power-restore-12', CHANGED), ('165-HT20', {**CHANGED, 'channel': 165}), ('157-HT40', CHANGED)]:
             self.apply(config, name)
             after = self.capture(name, config)
-            validate_rebuild(before, after)
+            if name in ('mcs-only', '165-HT20', '157-HT40'):
+                validate_rebuild(before, after)
             before = after
         if include_rollback:
             self.rollback()
@@ -308,15 +468,33 @@ class RadioRunner:
 
 
 
-def recheck(archive):
+def recheck_evidence(archive):
     """只读取已归档事实，重新判断射频、重建、故障回退和真实 -R。"""
     def read(name):
         return json.loads((archive / name).read_text())
     request = read('summary/request.json')
     nodes = sorted(int(n) for n in request['clients'])
     roles = {'server': 0, **{f'client{n}': n for n in nodes}}
+    identity = read('summary/run-identity.json')
+    if identity['run_id'] != request['run_id']:
+        raise ValueError('run identity mismatch')
+    signatures = []
+    for role, node in roles.items():
+        checkout = read(f'summary/{role}-checkout.json')
+        if checkout['commit'] != identity['commit'] or checkout['dirty']:
+            raise ValueError('archived checkout parity/clean gate failed')
+        production = read(f'summary/{role}-production.json')
+        validate_production(production, production.get('build_identity', {}).get('commit'))
+        if any(production['files'][name]['sha256'] != digest for name, digest in identity['source_sha256'].items()):
+            raise ValueError('installed production source differs from recorded checkout')
+        signatures.append((production['build_identity']['commit'], {key: value['sha256'] for key, value in production['files'].items()}))
+        if node and read(f'summary/{role}-identity.json')['node_id'] != node:
+            raise ValueError('archived node identity mismatch')
+    if any(value != signatures[0] for value in signatures[1:]):
+        raise ValueError('installed production hashes differ across nodes')
     previous = None
-    steps = [('baseline', BASELINE), ('mcs-power', CHANGED),
+    steps = [('baseline', BASELINE), ('mcs-only', CHANGED),
+             ('power-only-13', {**CHANGED, 'radio_txpower_dbm': 13}), ('power-restore-12', CHANGED),
              ('165-HT20', {**CHANGED, 'channel': 165}), ('157-HT40', CHANGED)]
     if request['include_rollback']:
         steps.append(('rollback-restored', CHANGED))
@@ -332,9 +510,11 @@ def recheck(archive):
         rows = {role: read(f'lifecycle/{name}-{role}.json') for role in roles}
         for role, node in roles.items():
             validate_observation(rows[role], config, node)
-        if name in ('mcs-power', '165-HT20', '157-HT40'):
+        if name in ('mcs-only', '165-HT20', '157-HT40'):
             validate_rebuild(previous, rows)
-            result = read(f'control-plane/{name}-result.json')
+        if name not in ('baseline', 'rollback-restored', 'post-job'):
+            result_name = 'restore-baseline' if name == 'restored-baseline' else name
+            result = read(f'control-plane/{result_name}-result.json')
             if result['status'] != 'finalized' or any(result['effective_config'][k] != v for k, v in config.items()):
                 raise ValueError('archived finalized result mismatch')
         previous = rows
@@ -353,7 +533,16 @@ def recheck(archive):
         if fault['installed'] or request['run_id'] in fault['rules']:
             raise ValueError('fault rules remain')
     terminal = read('data-plane/job-terminal.json')
-    job_id = terminal['recent_job']['job_id']
+    acceptance = read('data-plane/job-accepted.json')
+    job_request = read('data-plane/job-request.json')
+    job_id = validate_path_safe_identifier(acceptance['job_id'], 'job_id')
+    if acceptance.get('status') != 'accepted' or acceptance.get('idempotency_key') != job_request['idempotency_key'] or job_request['idempotency_key'] != request['run_id']:
+        raise ValueError('accepted job/key does not belong to this run')
+    expected_body = dict(model_sha256=request['model_sha256'], target_nodes=nodes, rounds=2)
+    if job_request['request'] != expected_body:
+        raise ValueError('saved job request mismatch')
+    if any(terminal['recent_job'].get(key) != value for key, value in expected_body.items()):
+        raise ValueError('terminal job configuration mismatch')
     validate_terminal_state(terminal, job_id, nodes, aborted=False)
     transfer = read('data-plane/uftp-argv.json')
     validate_transfer_start(transfer, job_id)
@@ -363,13 +552,34 @@ def recheck(archive):
         Path('/tmp/wfb-ng-fl/server') / ('job_' + job_id + '_role'))
     if not log.is_file() or not log.stat().st_size:
         raise ValueError('actual UFTP argv lacks original log')
-    seal_path = archive / 'summary/seal.json'
-    if seal_path.exists():
-        files = {str(p.relative_to(archive)): hashlib.sha256(p.read_bytes()).hexdigest()
-                 for p in archive.rglob('*') if p.is_file() and p != seal_path}
-        if files != read('summary/seal.json')['files']:
-            raise ValueError('archive hash inventory mismatch')
     return {'status': 'passed', 'scope': 'Issue08 supplementary radio evidence only'}
+
+
+def recheck(archive):
+    """封存归档只读重判：失败、缺证据、哈希错误均返回failed，CLI退出1。"""
+    errors = []
+    try:
+        seal = json.loads((archive / 'summary/seal.json').read_text())
+        files = {str(p.relative_to(archive)): hashlib.sha256(p.read_bytes()).hexdigest()
+                 for p in archive.rglob('*') if p.is_file() and p != archive / 'summary/seal.json'}
+        if files != seal['files']:
+            errors.append('archive hash inventory mismatch')
+        request = json.loads((archive / 'summary/request.json').read_text())
+        if seal['run_id'] != request['run_id']:
+            errors.append('seal/run identity mismatch')
+        verdict = json.loads((archive / 'summary/verdict.json').read_text())
+        if verdict['status'] != 'passed':
+            errors.append('recorded execution failed: ' + verdict.get('error', 'unknown'))
+            for role in ('server', *(f'client{n}' for n in request['clients'])):
+                path = archive / f'summary/{role}-production.json'
+                if not path.exists() or 'collection_error' in json.loads(path.read_text()):
+                    errors.append(f'{role}: installed production identity unavailable')
+        else:
+            recheck_evidence(archive)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        errors.append(str(exc))
+    return dict(status='failed' if errors else 'passed', errors=errors,
+                scope='Issue08 supplementary radio evidence only')
 
 
 def main(argv=None):
@@ -384,8 +594,9 @@ def main(argv=None):
     parser.add_argument('--archive-root', type=Path, default=ROOT / 'tests/logs', help='新补充归档的父目录，不覆盖既有归档')
     args = parser.parse_args(argv)
     if args.recheck:
-        print(json.dumps(recheck(args.recheck), ensure_ascii=False))
-        return 0
+        result = recheck(args.recheck)
+        print(json.dumps(result, ensure_ascii=False))
+        return 0 if result['status'] == 'passed' else 1
     if not args.web_url or not args.client:
         parser.error('执行必须提供 --web-url 和 --client')
     if not args.execute:
@@ -412,10 +623,17 @@ def main(argv=None):
                 model_sha256=args.model_sha256, include_rollback=args.include_rollback))
     try:
         verdict = runner.run(args.model_sha256, args.include_rollback)
-        recheck(archive)
+        recheck_evidence(archive)
     except (Exception, KeyboardInterrupt) as exc:
+        runner.failure_evidence('failure-before-cleanup')
+        cleanup_error = None
+        try:
+            runner.cleanup()
+        except Exception as cleanup_exc:
+            cleanup_error = str(cleanup_exc)
+        collection = runner.failure_evidence('failure-after-cleanup')
         verdict = dict(status='failed', error=str(exc), job_window_open=runner.executor.job_window,
-                       recovery='Use Web state/abort if job_window_open; inspect archived fault intent before cleanup')
+                       cleanup_error=cleanup_error, collection=collection)
     runner.save('summary/verdict.json', verdict)
     inventory = {str(p.relative_to(archive)): hashlib.sha256(p.read_bytes()).hexdigest()
                  for p in archive.rglob('*') if p.is_file()}
