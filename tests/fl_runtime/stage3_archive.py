@@ -427,7 +427,7 @@ def _ssh(root,env):
             'run-radio-recovery':{'fault-install','fault-observe','fault-remove'}}
         _require(entry['stage'] in categories and entry['category'] in categories[entry['stage']],'SSH category outside stage matrix')
         _require(end<window['accepted_at'] or start>window['terminal_at'],'SSH overlaps normal job window')
-        if entry['stage']=='run-radio-recovery' or entry['category']=='fault-remove':
+        if entry['category'] in ('fault-install','fault-remove'):
             _require(entry['target']=='vm2','fault command must target client2')
             _require(start>=window['terminal_at'],'radio fault before job terminal')
             # Share the exact runner command contract instead of a keyword denylist.
