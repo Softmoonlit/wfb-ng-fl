@@ -6,7 +6,7 @@
 
 **Blocked by:** 12 — 重写第 1 节研究问题与平台定位（前置工单已结单为 `resolved`，阻塞解除）
 
-**Status:** need-for-review
+**Status:** resolved
 
 ## 执行范围
 
