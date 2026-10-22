@@ -17,7 +17,7 @@ Labels: wayfinder:map
 - 第一版完成一个明确的真实 FedAvg 参考任务，保留训练和聚合调用入口；不先建立通用算法插件注册、动态安装或多算法平台。
 - 无线配置的权限、调用及重配边界由[定义算法可调用的无线配置接口与轮次间重配边界](issues/04-algorithm-radio-configuration.md#answer)拥有。
 - 数据接入的最小范围由[确定首版 MNIST 本地数据最小接入](issues/02-client-dataset-library.md#answer)拥有，具体作业接入由训练作业契约票落实。不设计服务器端分区规则、区间配置或索引下发；FedAvg 所需的样本权重须与实际使用的本地数据一致。
-- Web 在线节点列表和候选节点只展示在线客户端。运行中节点失联不自动缩减当前作业的固定参与集合，仍须在作业状态或事件中保留失联原因。在线与训练就绪分别判断。
+- Web 在线列表、目标选择与失联作业呈现由[定义 Web 在线节点展示与失联作业呈现](issues/05-online-client-view.md#answer)拥有。
 - 建图阶段只记录待决策问题，不将建议写成已验证能力；`Decisions so far` 只索引后续正式解决的决策票，首轮范围共识保留在本节。
 - 每次只处理一个非 research 决策票；领取时在票中填写 `Assignee:` 并记录领取信息。只有 `Blocked by:` 中所有前置票均为 `resolved` 才可进入该票。
 - 决策会话使用 grilling 与 domain-modeling；设计接口时按需使用 codebase-design，需要具体交互样稿时按需使用 prototype。
@@ -40,6 +40,7 @@ Labels: wayfinder:map
 - [确定真实 FedAvg 参考任务与效果判据](issues/01-fedavg-reference-task.md#answer)：采用 Jetson Orin Nano 上的 PyTorch GPU／MNIST 小型卷积模型，执行五轮同步 FedAvg，以真实训练、加权聚合、跨轮模型关联和整体效果改善分别验证。
 - [确定首版 MNIST 本地数据最小接入](issues/02-client-dataset-library.md#answer)：采用本地目录配置、固定 MNIST 文件检查与作业准备确认，满足参考任务即可，不展开通用数据集库。
 - [定义算法可调用的无线配置接口与轮次间重配边界](issues/04-algorithm-radio-configuration.md#answer)：算法通过作业绑定同步调用调整统一发射配置，信道由操作者固定；轮次间屏障后在线更新，保留任务资源并明确失败与停止作业边界。
+- [定义 Web 在线节点展示与失联作业呈现](issues/05-online-client-view.md#answer)：在线候选显式勾选，状态变化不自动加入目标；固定作业参与者的失联事实独立保留，管理连接异常不冒充无线离线。
 
 ## Not yet specified
 
