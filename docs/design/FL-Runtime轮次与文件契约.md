@@ -8,7 +8,7 @@
 
 ## 四个本机接口
 
-Runtime 以本地库接口表达严格同步轮次语义。外层 Daemon 的 `job_id`、`TASK_ANNOUNCE`、`TASK_READY`、空闲链路和任务链路所有权均不进入 Runtime API；Daemon 只有在作业级就绪屏障达成后才允许算法协调逻辑调用这些接口：
+Runtime 以本地库接口表达严格同步轮次语义。外层 Daemon 的 `job_id`、`TASK_ANNOUNCE`、`TASK_READY`、准备检查、算法上下文、无线配置和链路所有权均不进入 Runtime API。服务端只有在作业级就绪屏障达成后才首次发布；客户端在本机准备结果被接受后可等待模型，整体发布门禁由[跨层执行序列](系统分层与跨层契约.md#常驻服务作业角色与执行序列)拥有：
 
 - server：`publish_model(model_path) -> None`
 - server：`wait_for_updates() -> updates_by_node`
@@ -72,7 +72,7 @@ server 初始化时持有非空默认训练客户端集合，成员是 `NODE_ID`
 }
 ```
 
-只接受整数 `schema_version: 1`。必需字段缺失、重复、类型错误、值域非法或出现未知字段时失败；字段顺序无语义。改变既有字段含义或作不兼容变更必须新增 schema 版本，不能静默重定义。manifest 不签名、不加密；`sha256` 只表示文件完整性。
+只接受整数 `schema_version: 1`。必需字段缺失、重复、类型错误、值域非法或出现未知字段时失败；字段顺序无语义。改变既有字段含义或作不兼容变更必须新增 schema 版本，不能静默重定义。manifest 不签名、不加密；`sha256` 只表示文件完整性。真实训练的模型参数、样本数、损失、设备信息和算法本地轮序属于不透明模型／update 内容，不扩展本 manifest；训练格式见[算法层专题](FL-算法层设计.md#初始模型与算法文件)。
 
 Runtime 通过 Transport 收到“全部预期目标的模型文件交付成功”结果后，才把 `publish_model(...)` 视为成功。Runtime 保存启动下行时取得的不透明操作句柄，只通过 Transport 的句柄接口等待结果或请求取消，不直接管理 UFTP 子进程和 PID。单个 client 在本机完整校验模型后可以先返回 `wait_for_model()` 并训练，不需要等待其他 client。
 
