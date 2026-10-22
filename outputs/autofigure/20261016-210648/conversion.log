@@ -1,0 +1,86 @@
+
+============================================================
+Paper Method 到 SVG 图标替换流程 (Label 模式增强版 + Box合并)
+============================================================
+Provider: custom
+输出目录: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg
+输入模式: imported_figure
+导入图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210122/figure-native.png
+SVG模型: gemini-3.8-flash
+SAM提示词: icon
+最低置信度: 0.5
+SAM后端: roboflow
+执行到步骤: 5
+占位符模式: label
+优化迭代次数: 0
+Box合并阈值: 0.9
+4K等比例放大: 关闭
+============================================================
+============================================================
+步骤一：跳过生图，使用已有的第一阶段图片
+============================================================
+输入图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210122/figure-native.png
+4K等比例放大: 关闭
+图片已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/figure.png
+
+============================================================
+步骤二：SAM3 分割 + 灰色填充+黑色边框+序号标记
+============================================================
+原图尺寸: 1408 x 768
+使用的 prompts: ['icon']
+SAM3 Roboflow API 模式: format=polygon
+
+  正在检测: 'icon'
+  'icon' 检测到 0 个有效对象
+
+总计检测: 0 个对象 (来自 1 个 prompts)
+
+  绘制 samed.png (使用 0 个boxes)...
+标记图片已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/samed.png
+Box 信息已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/boxlib.json
+
+警告: 没有检测到有效的图标，切换到纯 SVG 回退模式
+步骤三跳过：当前为无图标回退模式
+
+============================================================
+步骤四：多模态调用生成 SVG
+============================================================
+Provider: custom
+模型: gemini-3.8-flash
+占位符模式: label
+无图标模式: 启用纯 SVG 复现回退
+原图尺寸: 1408 x 768
+发送多模态请求到: http://186.244.209.168:8317/v1
+
+--------------------------------------------------
+步骤 4.5：SVG 语法验证（使用 lxml XML 解析器）
+--------------------------------------------------
+  SVG 语法验证通过！
+SVG 模板已保存: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/template.svg
+
+============================================================
+步骤 4.6：LLM 优化 SVG（位置和样式对齐）
+============================================================
+Provider: custom
+模型: gemini-3.8-flash
+最大迭代次数: 0
+无图标模式: 优化时禁止引入占位框
+  迭代次数为 0，跳过 LLM 优化
+  直接复制模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/template.svg -> /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/optimized_template.svg
+无图标模式：跳过图标替换，直接输出 SVG
+
+============================================================
+流程完成！
+============================================================
+原始图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/figure.png
+标记图片: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/samed.png
+Box信息: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/boxlib.json
+图标数量: 0
+SVG模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/template.svg
+优化后模板: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/optimized_template.svg
+最终SVG: /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/final.svg
+实际去背景图标数：0
+本次没有检测到图标，走无图标回退；未执行 RMBG 去背景。
+SVG： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/final.svg
+预览： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/preview.png
+PNG： /home/kilome/projects/wfb-ng-fl/outputs/autofigure/20261016-210648/svg/figure.png

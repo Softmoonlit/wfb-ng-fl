@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 1544" width="3840" height="1544">
+  <defs>
+    <!-- Hatch Pattern for Delta t -->
+    <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="24" height="24" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="24" stroke="#9caec0" stroke-width="4.5" />
+    </pattern>
+
+    <!-- Marker for Cross-Window Arc Arrow -->
+    <marker id="arcArrow" viewBox="0 0 16 16" refX="10" refY="8" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 1 L 16 8 L 0 15 z" fill="#1b395d"/>
+    </marker>
+
+    <!-- Marker for TX Grant Arrow -->
+    <marker id="grantArrow" viewBox="0 0 16 16" refX="12" refY="8" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M 0 1 L 16 8 L 0 15 z" fill="#1b395d"/>
+    </marker>
+
+    <!-- Marker for Timeline Axis -->
+    <marker id="axisArrow" viewBox="0 0 16 16" refX="12" refY="8" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M 0 1 L 16 8 L 0 15 z" fill="#000000"/>
+    </marker>
+  </defs>
+
+  <style>
+    text {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+  </style>
+
+  <!-- Background Canvas -->
+  <rect width="3840" height="1544" fill="#eef2f7" />
+
+  <!-- Left Card Container -->
+  <path d="M 0,0 L 1145,0 Q 1215,0 1215,70 L 1215,1474 Q 1215,1544 1145,1544 L 0,1544 Z" fill="#f8fafc" />
+
+  <!-- Right Card Container -->
+  <path d="M 1435,0 Q 1365,0 1365,70 L 1365,1474 Q 1365,1544 1435,1544 L 3840,1544 L 3840,0 Z" fill="#f8fafc" />
+
+  <!-- Left Header -->
+  <text x="85" y="195" font-size="64" font-weight="bold" fill="#0b1528">Send Permission (服务端控制)</text>
+  <line x1="85" y1="268" x2="1150" y2="268" stroke="#d5e0eb" stroke-width="4.5" />
+
+  <!-- Right Header -->
+  <text x="2560" y="195" text-anchor="middle" font-size="64" font-weight="bold" fill="#0b1528">Channel Thannel 信道时序</text>
+  <line x1="1440" y1="268" x2="3760" y2="268" stroke="#d5e0eb" stroke-width="4.5" />
+
+  <!-- Active Queue Section -->
+  <text x="760" y="445" text-anchor="middle" font-size="48" font-weight="600" fill="#111827">Active queue</text>
+  <line x1="430" y1="486" x2="1095" y2="486" stroke="#111827" stroke-width="6" />
+  <line x1="430" y1="670" x2="1095" y2="670" stroke="#111827" stroke-width="6" />
+
+  <!-- Queue Brackets -->
+  <path d="M 465,540 L 448,540 L 448,616 L 465,616" fill="none" stroke="#111827" stroke-width="6" />
+  <path d="M 1060,540 L 1077,540 L 1077,616 L 1060,616" fill="none" stroke="#111827" stroke-width="6" />
+
+  <!-- Queue Blocks -->
+  <rect x="490" y="515" width="128" height="126" rx="14" fill="#2465ab" stroke="#103a6d" stroke-width="4" />
+  <text x="554" y="595" text-anchor="middle" font-size="46" font-weight="bold" fill="#ffffff">C1</text>
+
+  <rect x="634" y="515" width="128" height="126" rx="14" fill="#2973bc" stroke="#103a6d" stroke-width="4" />
+  <text x="698" y="595" text-anchor="middle" font-size="46" font-weight="bold" fill="#ffffff">C2</text>
+
+  <rect x="778" y="515" width="128" height="126" rx="14" fill="#2bd8ec" stroke="#009cb2" stroke-width="4" />
+  <text x="842" y="595" text-anchor="middle" font-size="46" font-weight="bold" fill="#ffffff">C3</text>
+
+  <!-- Queue Ellipsis -->
+  <circle cx="950" cy="578" r="7" fill="#111827" />
+  <circle cx="985" cy="578" r="7" fill="#111827" />
+  <circle cx="1020" cy="578" r="7" fill="#111827" />
+
+  <!-- Baby Mascot Peeking Beside AF01 -->
+  <g transform="translate(376, 895)">
+    <circle cx="28" cy="42" r="28" fill="#ffffff" stroke="#222222" stroke-width="3" />
+    <circle cx="28" cy="42" r="4.5" fill="#222222" />
+    <path d="M 38 48 Q 42 54 48 50" fill="none" stroke="#222222" stroke-width="2.5" />
+    <path d="M 18 16 Q 16 6 24 10" fill="none" stroke="#222222" stroke-width="3" />
+    <path d="M 28 70 C 28 85 52 95 62 95" fill="none" stroke="#222222" stroke-width="3" />
+    <circle cx="36" cy="53" r="3.5" fill="#ffb4b4" />
+  </g>
+
+  <!-- Placeholder AF01 -->
+  <g id="AF01">
+    <rect x="125" y="616" width="258" height="380" fill="#808080" stroke="black" stroke-width="2" />
+    <text x="254" y="806" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="42" font-weight="bold">&lt;AF&gt;01</text>
+  </g>
+
+  <!-- Server Label Below AF01 -->
+  <text x="254" y="1062" text-anchor="middle" font-size="54" font-weight="bold" fill="#111827">服务端</text>
+  <text x="254" y="1126" text-anchor="middle" font-size="44" font-weight="600" fill="#111827">(Server)</text>
+
+  <!-- Round-robin Scheduler (Circular Arrows) -->
+  <g transform="translate(775, 915)">
+    <!-- Arc 1 (Top-Left to Bottom-Left) -->
+    <path d="M -8, -112 A 114 114 0 0 0 -105, 48" fill="none" stroke="#1b395d" stroke-width="17" stroke-linecap="round" />
+    <!-- Arrowhead at bottom-left pointing up-left -->
+    <path d="M -118, 48 L -82, 42 L -105, 5 Z" fill="#1b395d" />
+
+    <!-- Arc 2 (Bottom-Right to Top-Right) -->
+    <path d="M 8, 112 A 114 114 0 0 0 105, -48" fill="none" stroke="#1b395d" stroke-width="17" stroke-linecap="round" />
+    <!-- Arrowhead at top-right pointing down-right -->
+    <path d="M 118, -48 L 82, -42 L 105, -5 Z" fill="#1b395d" />
+  </g>
+  <text x="775" y="1120" text-anchor="middle" font-size="48" font-weight="bold" fill="#111827">Round-robin</text>
+  <text x="775" y="1182" text-anchor="middle" font-size="48" font-weight="bold" fill="#111827">Scheduler</text>
+
+  <!-- Send Permission Arrow (TX Grant) -->
+  <text x="1235" y="812" text-anchor="middle" font-size="48" font-weight="bold" fill="#111827">发送许可</text>
+  <text x="1235" y="872" text-anchor="middle" font-size="44" font-weight="600" fill="#111827">(TX Grant)</text>
+  <line x1="970" y1="915" x2="1455" y2="915" stroke="#1b395d" stroke-width="10" marker-end="url(#grantArrow)" />
+
+  <!-- Timeline Baseline Axis -->
+  <line x1="1410" y1="1046" x2="3750" y2="1046" stroke="#111827" stroke-width="6" marker-end="url(#axisArrow)" />
+
+  <!-- Timeline Blocks (Round k & Round k+1) -->
+  <!-- Block 1: C1 -->
+  <rect x="1475" y="776" width="413" height="270" fill="#2465ab" stroke="#111827" stroke-width="5" />
+  <text x="1681" y="930" text-anchor="middle" font-size="56" font-weight="bold" fill="#ffffff">C1</text>
+
+  <!-- Twin Brace above C1 -->
+  <path d="M 1475,720 Q 1495,698 1530,698 L 1645,698 Q 1670,698 1681,678 Q 1692,698 1717,698 L 1833,698 Q 1868,698 1888,720" fill="none" stroke="#111827" stroke-width="4.5" />
+  <text x="1681" y="640" text-anchor="middle" font-size="48" font-weight="bold" fill="#111827">Twin</text>
+
+  <!-- Stop TX Marker Line & Lollipop Pin -->
+  <line x1="1888" y1="655" x2="1888" y2="1046" stroke="#c82333" stroke-width="9" />
+  <rect x="1872" y="620" width="32" height="32" rx="7" fill="#ffffff" stroke="#c82333" stroke-width="8" />
+  <text x="1888" y="465" text-anchor="middle" font-size="52" font-weight="bold" fill="#111827">到期停发</text>
+  <text x="1888" y="530" text-anchor="middle" font-size="44" font-weight="bold" fill="#111827">(Stop TX)</text>
+
+  <!-- Delta t Block 1 (Hatch) -->
+  <rect x="1888" y="776" width="105" height="270" fill="#f0f3f6" stroke="#111827" stroke-width="5" />
+  <rect x="1888" y="776" width="105" height="270" fill="url(#diagonalHatch)" stroke="#111827" stroke-width="5" />
+
+  <!-- Block 2: C2 -->
+  <rect x="1993" y="776" width="352" height="270" fill="#00d2e8" stroke="#111827" stroke-width="5" />
+  <text x="2169" y="930" text-anchor="middle" font-size="56" font-weight="bold" fill="#111827">C2</text>
+
+  <!-- Delta t Block 2 (Hatch) -->
+  <rect x="2345" y="776" width="105" height="270" fill="#f0f3f6" stroke="#111827" stroke-width="5" />
+  <rect x="2345" y="776" width="105" height="270" fill="url(#diagonalHatch)" stroke="#111827" stroke-width="5" />
+
+  <!-- Block 3: C3 ... CN -->
+  <rect x="2450" y="776" width="398" height="270" fill="#eff3f8" stroke="#111827" stroke-width="5" />
+  <text x="2649" y="930" text-anchor="middle" font-size="54" font-weight="bold" fill="#111827">C3 ··· C<tspan font-size="38" dy="10">N</tspan></text>
+
+  <!-- Cross-Window Dashed Curved Arrow -->
+  <path d="M 1898,756 C 1960,400 3000,400 3046,750" fill="none" stroke="#1b395d" stroke-width="8" stroke-dasharray="26, 16" marker-end="url(#arcArrow)" />
+  <text x="2490" y="525" text-anchor="middle" font-size="52" font-weight="bold" fill="#111827">跨窗口续传</text>
+  <text x="2490" y="592" text-anchor="middle" font-size="44" font-weight="bold" fill="#111827">(Cross-Window)</text>
+
+  <!-- Block 4: C1 (Round k+1) -->
+  <rect x="2848" y="776" width="385" height="270" fill="#2465ab" stroke="#111827" stroke-width="5" />
+  <text x="3040" y="930" text-anchor="middle" font-size="56" font-weight="bold" fill="#ffffff">C1</text>
+
+  <!-- Delta t Block 3 (Hatch) -->
+  <rect x="3233" y="776" width="105" height="270" fill="#f0f3f6" stroke="#111827" stroke-width="5" />
+  <rect x="3233" y="776" width="105" height="270" fill="url(#diagonalHatch)" stroke="#111827" stroke-width="5" />
+
+  <!-- Block 5: C2 (Round k+1) -->
+  <rect x="3338" y="776" width="340" height="270" fill="#00d2e8" stroke="#111827" stroke-width="5" />
+  <text x="3508" y="930" text-anchor="middle" font-size="56" font-weight="bold" fill="#111827">C2</text>
+
+  <!-- Sub-Timeline Labels (Delta t) -->
+  <text x="1940" y="1135" text-anchor="middle" font-size="56" font-weight="bold" fill="#111827">Δt</text>
+  <text x="2398" y="1135" text-anchor="middle" font-size="56" font-weight="bold" fill="#111827">Δt</text>
+  <text x="3285" y="1135" text-anchor="middle" font-size="56" font-weight="bold" fill="#111827">Δt</text>
+  <text x="3485" y="1135" font-size="48" font-weight="bold" fill="#111827">时间 (Time) ➔</text>
+
+  <!-- Round k Brace & Label -->
+  <path d="M 1475,1190 Q 1495,1220 1540,1220 L 2110,1220 Q 2145,1220 2161,1248 Q 2177,1220 2212,1220 L 2783,1220 Q 2828,1220 2848,1190" fill="none" stroke="#111827" stroke-width="5" />
+  <text x="2161" y="1328" text-anchor="middle" font-size="52" font-weight="bold" fill="#111827">Round k</text>
+
+  <!-- Round k+1 Brace & Label -->
+  <path d="M 2848,1190 Q 2868,1220 2913,1220 L 3300,1220 Q 3330,1220 3345,1248 Q 3360,1220 3390,1220 L 3730,1220 Q 3755,1220 3770,1190" fill="none" stroke="#111827" stroke-width="5" />
+  <text x="3345" y="1328" text-anchor="middle" font-size="52" font-weight="bold" fill="#111827">Round k+1</text>
+</svg>
