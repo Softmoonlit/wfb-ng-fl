@@ -3,7 +3,7 @@ Type: grilling
 Labels: wayfinder:grilling
 Parent: ../map.md
 Assignee: unassigned
-Blocked by: 01, 02, 04, 08
+Blocked by: 01, 02, 04, 08, 09
 
 # 定义真实训练作业的算法接入与跨层契约
 
@@ -25,6 +25,7 @@ Blocked by: 01, 02, 04, 08
 - [确定首版 MNIST 本地数据最小接入](02-client-dataset-library.md#answer)。
 - [定义算法可调用的无线配置接口与轮次间重配边界](04-algorithm-radio-configuration.md)。
 - [核实 Jetson GPU 训练环境与依赖约束](08-jetson-training-environment.md)。
+- [标定 20 MHz 下行注入速率范围与推荐值](09-20mhz-uftp-rate-calibration.md)：取得按带宽与下行 MCS 组合校验所需的真实速率表，不用旧单维表或未经验证的折算值代替。
 
 ## Comments
 
@@ -33,3 +34,4 @@ Blocked by: 01, 02, 04, 08
 - 数据划分已按用户要求移出本地图，移除对应前置依赖；本票继续明确真实训练所需的本地数据与样本权重。
 - 参考任务确定为 Jetson GPU 训练后，新增实际软件环境核实前置依赖；不能在目标环境未知时冻结 PyTorch 部署组合。
 - 已发现权威文档冲突：`docs/design/FL-算法层设计.md` 的“算法作业与入口”仍写 server 与 client 算法入口分别拥有多轮循环，而 `CONTEXT.md` 与 `docs/design/系统分层与跨层契约.md` 明确由 FL Coordinator 拥有服务端多轮推进。此冲突影响服务端真实算法接入，本票须先向用户报告并明确裁决，受影响设计不得静默选边或直接实施。推荐沿现有 Coordinator 注入训练任务所需聚合／评估能力，并同步统一设计正文；这只是待裁决建议，不是已确认决策。
+- 无线配置前置已结单，按其 Answer 接入作业绑定同步调用、初始与轮次间门禁、保留任务资源的在线重配、结构化结果和停止作业协调；算法不配置或自动选择信道。具体入口装配、带宽字段、结果承载及正式设计唯一所有者更新由本票统一落实，不再重新裁决已确认范围。新增 20 MHz 标定前置未结单前，本票仍被阻塞。
