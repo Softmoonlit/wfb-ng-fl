@@ -26,7 +26,7 @@ Blocked by: none
 ## Context
 
 - [确定真实 FedAvg 参考任务与效果判据](01-fedavg-reference-task.md)确定数据任务与权重要求。
-- [定义客户端本地数据集库与服务器可见清单](02-client-dataset-library.md)确定数据身份与各端内容。
+- [确定首版 MNIST 本地数据最小接入](02-client-dataset-library.md#answer)已收窄为固定参考任务的数据接入；通用数据身份与各端内容管理须在未来独立工作中重新评审。
 - 已有算法配置可承载小型区间计划；大型枚举索引不能直接塞进当前 4096 字节控制消息。
 
 ## Comments
