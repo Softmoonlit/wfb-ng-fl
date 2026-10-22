@@ -3,7 +3,7 @@ Type: grilling
 Labels: wayfinder:grilling
 Parent: ../map.md
 Assignee: unassigned
-Blocked by: 01, 02, 04
+Blocked by: 01, 02, 04, 08
 
 # 定义真实训练作业的算法接入与跨层契约
 
@@ -24,8 +24,11 @@ Blocked by: 01, 02, 04
 - [确定真实 FedAvg 参考任务与效果判据](01-fedavg-reference-task.md)。
 - [定义客户端本地数据集库与服务器可见清单](02-client-dataset-library.md)。
 - [定义算法可调用的无线配置接口与轮次间重配边界](04-algorithm-radio-configuration.md)。
+- [核实 Jetson GPU 训练环境与依赖约束](08-jetson-training-environment.md)。
 
 ## Comments
 
 - 建图时创建，待全部前置决策结单后领取。
 - 数据划分已按用户要求移出本地图，移除对应前置依赖；本票继续明确真实训练所需的本地数据与样本权重。
+- 参考任务确定为 Jetson GPU 训练后，新增实际软件环境核实前置依赖；不能在目标环境未知时冻结 PyTorch 部署组合。
+- 已发现权威文档冲突：`docs/design/FL-算法层设计.md` 的“算法作业与入口”仍写 server 与 client 算法入口分别拥有多轮循环，而 `CONTEXT.md` 与 `docs/design/系统分层与跨层契约.md` 明确由 FL Coordinator 拥有服务端多轮推进。此冲突影响服务端真实算法接入，本票须先向用户报告并明确裁决，受影响设计不得静默选边或直接实施。推荐沿现有 Coordinator 注入训练任务所需聚合／评估能力，并同步统一设计正文；这只是待裁决建议，不是已确认决策。
