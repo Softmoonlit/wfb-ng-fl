@@ -1,0 +1,17 @@
+[Unit]
+Description=WFB-ng FL server persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

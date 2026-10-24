@@ -17,7 +17,7 @@ else
     VERSION := $(or $(VERSION), $(shell basename $(PWD) | grep -E -o '[0-9]+.[0-9]+(.[0-9]+)?$$'), 0.0.0)
 endif
 
-ENV ?= $(PWD)/env
+ENV ?= $(CURDIR)/env
 STDEB ?= "git+https://github.com/svpcom/stdeb"
 
 export VERSION COMMIT SOURCE_DATE_EPOCH
@@ -36,7 +36,7 @@ version:
 
 $(ENV):
 	$(PYTHON) -m venv --clear $(ENV)
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) -m pip install --upgrade pip setuptools $(STDEB)
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) -m pip install --upgrade pip setuptools $(STDEB)
 
 all_bin: wfb_rx wfb_tx wfb_keygen wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_v6_uplink
 
@@ -75,7 +75,7 @@ wfb_tun: src/wfb_tun.o
 	$(CC) -o $@ $^ $(LDFLAGS) -levent_core
 
 wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_authorization_ipc.o src/wifibroadcast.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(_LDFLAGS)
 
 wfb_v6_uplink: src/v6_uplink.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
@@ -100,17 +100,17 @@ acceptance_v6_realhw:
 
 rpm: build_v6 $(ENV)
 	rm -rf dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py bdist_rpm --force-arch $(ARCH) --requires python3-twisted,python3-pyroute2,python3-pyserial,python3-msgpack,python3-jinja2,python3-yaml,socat,iw,uftp,iproute,libsodium,libpcap
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py bdist_rpm --force-arch $(ARCH) --requires python3-twisted,python3-pyroute2,python3-pyserial,python3-msgpack,python3-jinja2,python3-yaml,socat,iw,uftp,iproute,libsodium,libpcap
 	rm -rf wfb_ng.egg-info/
 
 deb: build_v6 $(ENV)
 	rm -rf deb_dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py --command-packages=stdeb.command sdist_dsc --debian-version 0~$(OS_CODENAME) bdist_deb
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py --command-packages=stdeb.command sdist_dsc --debian-version 0~$(OS_CODENAME) bdist_deb
 	rm -rf wfb_ng.egg-info/ wfb-ng-$(VERSION).tar.gz
 
 bdist: build_v6 $(ENV)
 	rm -rf dist
-	$$(PATH=$(ENV)/bin:$(ENV)/local/bin:$(PATH) which python3) ./setup.py bdist --plat-name linux-$(ARCH)
+	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) ./setup.py bdist --plat-name linux-$(ARCH)
 	rm -rf wfb_ng.egg-info/
 
 check:
@@ -123,4 +123,20 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+	rm -rf env session_recovery_test encrypted_session_test wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+
+.PHONY: test_session_recovery
+# Compile actual production TX/RX and IPC sources; never reuse legacy test objects.
+session_recovery_test: tests/cpp/session_recovery_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+
+test_session_recovery: session_recovery_test encrypted_session_test
+	./session_recovery_test
+	./encrypted_session_test
+
+.PHONY: test_encrypted_session
+encrypted_session_test: tests/cpp/encrypted_session_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+
+test_encrypted_session: encrypted_session_test
+	./encrypted_session_test

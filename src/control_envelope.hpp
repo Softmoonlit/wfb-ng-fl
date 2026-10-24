@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <set>
 
 enum class ControlEnvelopeParseStatus {
     ok,
@@ -11,12 +12,15 @@ enum class ControlEnvelopeParseStatus {
     invalid_version,
     invalid_control_type,
     invalid_field,
+    invalid_session,
 };
 
 enum class GrantDecision {
     accept,
     ignore_invalid_source,
     ignore_wrong_target,
+    ignore_invalid_session,
+    ignore_retired_session,
     ignore_expired,
     ignore_duplicate_sequence,
     ignore_stale_sequence,
@@ -34,13 +38,17 @@ struct ControlEnvelopeView {
     uint8_t source_node;
     uint8_t target_node;
     uint64_t sequence;
+    uint64_t session_id;
     uint32_t grant_duration_ms;
     uint64_t grant_expires_at_ms;
 };
 
 struct GrantFilterState {
+    bool has_session;
+    uint64_t session_id;
     bool has_last_sequence;
     uint64_t last_sequence;
+    std::set<uint64_t> retired_sessions;
 };
 
 struct ReadyRejectedCounters {
@@ -60,6 +68,8 @@ struct GrantFilterCounters {
     uint32_t accepted;
     uint32_t ignored_invalid_source;
     uint32_t ignored_wrong_target;
+    uint32_t ignored_invalid_session;
+    uint32_t ignored_retired_session;
     uint32_t ignored_expired;
     uint32_t ignored_duplicate_sequence;
     uint32_t ignored_stale_sequence;

@@ -19,13 +19,15 @@ public:
                               int snd_buf,
                               uint8_t local_node_id,
                               int fec_k,
-                              int fec_n);
+                              int fec_n,
+                              uint64_t session_id);
     V6PlaintextFecTransmitter(const std::vector<std::string> &interfaces,
                               uint32_t channel_id,
                               uint8_t local_node_id,
                               const V6PlaintextFecRadioConfig &radio_config,
                               int fec_k,
-                              int fec_n);
+                              int fec_n,
+                              uint64_t session_id);
     ~V6PlaintextFecTransmitter();
 
     bool send_payload(const uint8_t *payload, size_t payload_size);

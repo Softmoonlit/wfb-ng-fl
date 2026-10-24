@@ -4,6 +4,7 @@
 import hashlib
 import json
 import os
+import re
 import stat
 import tempfile
 
@@ -13,7 +14,19 @@ from .errors import FLRuntimeError
 CHUNK_SIZE = 64 * 1024
 
 
-def _fsync_directory(path):
+def validate_path_safe_identifier(value, name="identifier"):
+    """Validate that value is a strictly path-safe non-empty identifier ([a-zA-Z0-9_-]+)."""
+    if not isinstance(value, str) or not value:
+        raise FLRuntimeError(f"invalid_{name}", f"{name} 必须为非空字符串")
+    if not re.fullmatch(r"[a-zA-Z0-9_\-]+", value):
+        raise FLRuntimeError(
+            f"invalid_{name}",
+            f"{name} 包含非法字符，必须为路径安全的字母数字下划线或连字符: {value!r}",
+        )
+    return value
+
+
+def fsync_directory(path):
     directory_fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
         os.fsync(directory_fd)
@@ -105,7 +118,7 @@ def archive_open_file(source, source_stat, target_path, max_size_bytes=None):
 
         os.replace(temp_path, target_path)
         temp_path = None
-        _fsync_directory(os.path.dirname(target_path))
+        fsync_directory(os.path.dirname(target_path))
         return size_bytes, digest.hexdigest()
     finally:
         if temp_path is not None:
@@ -133,7 +146,7 @@ def write_json_atomic(path, value):
             os.fsync(fh.fileno())
         os.replace(temp_path, path)
         temp_path = None
-        _fsync_directory(os.path.dirname(path))
+        fsync_directory(os.path.dirname(path))
     finally:
         if temp_path is not None:
             try:

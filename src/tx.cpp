@@ -52,7 +52,7 @@ using namespace std;
 #include "tx_token_gate.hpp"
 
 Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
-                         vector<tags_item_t> &tags, uint8_t local_node_id, bool trusted_plaintext) : \
+                         vector<tags_item_t> &tags, uint8_t local_node_id, bool trusted_plaintext, uint64_t data_session_id) : \
     fec_p(NULL), fec_k(-1), fec_n(-1),
     block_idx(0), fragment_idx(0),
     max_packet_size(0),
@@ -61,6 +61,7 @@ Transmitter::Transmitter(int k, int n, const string &keypair, uint64_t epoch, ui
     fec_delay(fec_delay),
     local_node_id(local_node_id),
     trusted_plaintext(trusted_plaintext),
+    data_session_id(data_session_id != 0 ? data_session_id : generate_session_id()),
     tx_secretkey{},
     rx_publickey{},
     session_key{},
@@ -212,8 +213,8 @@ void Transmitter::init_session(int k, int n)
 RawSocketTransmitter::RawSocketTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                            vector<tags_item_t> &tags, const vector<string> &wlans, radiotap_header_t &radiotap_header,
                                            uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, uint32_t inject_retries, uint32_t inject_retry_delay,
-                                           uint8_t local_node_id, bool trusted_plaintext) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext),
+                                           uint8_t local_node_id, bool trusted_plaintext, uint64_t data_session_id) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext, data_session_id),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),
@@ -474,8 +475,8 @@ RawSocketTransmitter::~RawSocketTransmitter()
 
 RemoteTransmitter::RemoteTransmitter(int k, int n, const string &keypair, uint64_t epoch, uint32_t channel_id, uint32_t fec_delay,
                                      vector<tags_item_t> &tags, const vector<pair<string, vector<uint16_t>>> &remote_hosts, radiotap_header_t &radiotap_header,
-                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext) : \
-    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext),
+                                     uint8_t frame_type, bool use_qdisc, uint32_t fwmark_base, int snd_buf_size, uint8_t local_node_id, bool trusted_plaintext, uint64_t data_session_id) : \
+    Transmitter(k, n, keypair, epoch, channel_id, fec_delay, tags, local_node_id, trusted_plaintext, data_session_id),
     channel_id(channel_id),
     current_output(0),
     ieee80211_seq(0),
@@ -644,6 +645,9 @@ void Transmitter::send_block_fragment(size_t packet_size)
     assert(packet_size <= MAX_FEC_PAYLOAD);
 
     block_hdr->packet_type = WFB_PACKET_DATA;
+    block_hdr->magic = htobe16(WFB_DATA_MAGIC);
+    block_hdr->version = WFB_DATA_VERSION;
+    block_hdr->session_id = htobe64(data_session_id);
     block_hdr->data_nonce = htobe64(make_data_nonce(local_node_id, block_idx, fragment_idx));
 
     if (trusted_plaintext)
@@ -785,7 +789,7 @@ void drain_authorization_events(TokenAuthorizationDatagramReceiver *authorizatio
             break;
         }
 
-        authorization_state->apply_event(event);
+        authorization_state->apply_event(event, get_time_ms());
         IPC_MSG("token_received node_id=%u expires_at_ms=%" PRIu64 "\n",
                 static_cast<unsigned>(event.node_id),
                 event.expires_at_ms);
@@ -842,6 +846,7 @@ bool process_data_packet(Transmitter &t,
             {
                 TokenAuthorizationEvent event = {};
                 event.node_id = ready_state->node_id;
+                event.session_id = t.session_id();
                 if (ready_state->sender->send_event(event))
                 {
                     const ReadyDeclarationState::Phase phase_before = ready_state->phase;

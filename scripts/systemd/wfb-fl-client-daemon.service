@@ -1,0 +1,17 @@
+[Unit]
+Description=WFB-ng FL client persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

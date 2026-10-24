@@ -167,7 +167,8 @@ static const uint8_t ieee80211_header[] __attribute__((unused)) = {
  radiotap_header:
    ieee_80211_header:
      1. Data packet:
-        wblock_hdr_t   { packet_type = 1, nonce = (source_node << 56) | (source_local_block_idx << 8) | fragment_idx }
+        wblock_hdr_t   { packet_type = 1, magic, version, session_id,
+                         nonce = (source_node << 56) | (source_local_block_idx << 8) | fragment_idx }
           wpacket_hdr_t  { flags, packet_size }  #
             data                                 #
                                                  +-- encrypted and authenticated by session key
@@ -214,8 +215,10 @@ static inline uint8_t data_nonce_fragment_idx(uint64_t data_nonce)
 #define WFB_PACKET_SESSION 0x2
 #define WFB_PACKET_CONTROL 0x3
 
+#define WFB_DATA_MAGIC 0x5742
+#define WFB_DATA_VERSION 0x1
 #define WFB_CONTROL_MAGIC 0x544b
-#define WFB_CONTROL_VERSION 0x1
+#define WFB_CONTROL_VERSION 0x2
 
 // control types
 #define WFB_CONTROL_TYPE_GRANT 0x1
@@ -281,6 +284,7 @@ typedef struct {
     uint8_t source_node;
     uint8_t target_node;
     uint8_t reserved;
+    uint64_t session_id;
     uint64_t sequence;
 } __attribute__ ((packed)) wcontrol_envelope_hdr_t;
 
@@ -290,6 +294,9 @@ typedef struct {
 
 typedef struct {
     uint8_t packet_type;
+    uint16_t magic;
+    uint8_t version;
+    uint64_t session_id;
     uint64_t data_nonce;  // big endian, data_nonce = (source_node << 56) | (source_local_block_idx << 8) | fragment_idx
 }  __attribute__ ((packed)) wblock_hdr_t;
 
@@ -308,6 +315,9 @@ typedef struct {
 #define MIN_DISTRIBUTION_PACKET_SIZE (sizeof(uint32_t) + sizeof(radiotap_header_ht) + sizeof(ieee80211_header))   // ht hdr < vht hdr
 #define MAX_DISTRIBUTION_PACKET_SIZE (sizeof(uint32_t) + sizeof(radiotap_header_vht) + WIFI_MTU)
 #define MAX_PCAP_PACKET_SIZE (WIFI_MTU + 256)  // radiotap header is variable but 8812au/eu has max rtap buffer size 256
+
+// Session identities are process boundaries, never derived from time or block numbers.
+uint64_t generate_session_id(void);
 
 #ifndef WFB_DBG
 #ifdef __DEBUG__

@@ -145,3 +145,13 @@ int open_unix_socket_for_rx(const char *socket_path, int rcv_buf_size, int socke
     }
     return fd;
 }
+
+uint64_t generate_session_id(void)
+{
+    uint64_t session_id = 0;
+    do
+    {
+        randombytes_buf(&session_id, sizeof(session_id));
+    } while (session_id == 0);
+    return session_id;
+}
