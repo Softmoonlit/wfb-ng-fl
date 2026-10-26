@@ -34,6 +34,7 @@ from pyroute2 import IPRoute, NetlinkError
 from .artifacts import validate_path_safe_identifier, write_json_atomic
 from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
+from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
     DEFAULT_UFTP_MULTICAST_HOST,
@@ -48,6 +49,10 @@ from .control import (
 )
 from .radio import (
     ALLOWED_5GHZ_CHANNELS,
+    ALLOWED_MCS_VALUES,
+    DEFAULT_BANDWIDTH_MHZ,
+    TXPOWER_MIN_DBM,
+    TXPOWER_MAX_DBM,
     DEFAULT_CHANNEL,
     DEFAULT_TXPOWER_DBM,
     FIXED_BANDWIDTH,
@@ -55,7 +60,6 @@ from .radio import (
     RECOMMENDED_UPLINK_MCS,
     RadioConfig,
     find_wl_interfaces,
-    validate_radio_config,
 )
 
 logger = logging.getLogger("wfb_fl_client_daemon")
@@ -72,6 +76,30 @@ DEFAULT_WORK_DIR = "/tmp/wfb-ng-fl/client"
 DEFAULT_LINK_ID = 7669206
 
 
+def _hardware_radio_config(channel: int, bandwidth_mhz: int, txpower_dbm: int,
+                           uplink_mcs: int = RECOMMENDED_UPLINK_MCS) -> RadioConfig:
+    # 硬件设置只校验物理参数，不承担普通作业的 UFTP 实测速率门禁。
+    if type(channel) is not int or channel not in ALLOWED_5GHZ_CHANNELS:
+        raise ValueError("射频信道不在允许列表中")
+    if type(txpower_dbm) is not int or not TXPOWER_MIN_DBM <= txpower_dbm <= TXPOWER_MAX_DBM:
+        raise ValueError("射频功率必须为 10..20 dBm 的整数")
+    if type(uplink_mcs) is not int or uplink_mcs not in ALLOWED_MCS_VALUES:
+        raise ValueError("上行 MCS 必须为 3、4、5 或 6")
+    radio = RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz,
+                        radio_txpower_dbm=txpower_dbm, uplink_mcs=uplink_mcs)
+    radio.channel_width  # 派生时拒绝不支持的信道与带宽组合。
+    return radio
+
+
+def _validate_hardware_width(channel: int, channel_width: str, txpower_dbm: int) -> None:
+    widths = {"HT20": 20, "HT40+": 40, "HT40-": 40}
+    if channel_width not in widths:
+        raise ValueError("网卡带宽必须为 HT20、HT40+ 或 HT40-")
+    radio = _hardware_radio_config(channel, widths[channel_width], txpower_dbm)
+    if radio.channel_width != channel_width:
+        raise ValueError("网卡 HT40 方向与固定信道不符")
+
+
 def build_v6_uplink_client_command(
     executable_path: str,
     node_id: int,
@@ -80,7 +108,8 @@ def build_v6_uplink_client_command(
     air_interface: str,
     uplink_mcs: int,
     link_id: int,
-    channel_width: str = FIXED_BANDWIDTH,
+    bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ,
+    radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT,
 ) -> List[str]:
     """Build the persistent client link command used by the control plane."""
     return [
@@ -94,7 +123,8 @@ def build_v6_uplink_client_command(
         "--downlink-stream", "2",
         "--fec-k", "8",
         "--fec-n", "14",
-        "--radio-bandwidth", "40" if "40" in channel_width else "20",
+        "--radio-bandwidth", str(bandwidth_mhz),
+        "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(uplink_mcs),
         "--radio-short-gi",
         "--air-interface", air_interface,
@@ -277,12 +307,7 @@ class LinuxNetworkAdapter(NetworkAdapter):
         channel_width: str = FIXED_BANDWIDTH,
         txpower_dbm: int = DEFAULT_TXPOWER_DBM,
     ) -> None:
-        validate_radio_config({
-            "channel": channel,
-            "radio_txpower_dbm": txpower_dbm,
-        })
-        if channel == 165:
-            channel_width = "HT20"
+        _validate_hardware_width(channel, channel_width, txpower_dbm)
 
         # 1. ip link set <iface> down
         self._run_cmd(["ip", "link", "set", iface, "down"])
@@ -302,13 +327,11 @@ class LinuxNetworkAdapter(NetworkAdapter):
         channel: int,
         channel_width: str = FIXED_BANDWIDTH,
     ) -> None:
-        validate_radio_config({"channel": channel})
-        if channel == 165:
-            channel_width = "HT20"
+        _validate_hardware_width(channel, channel_width, DEFAULT_TXPOWER_DBM)
         self._run_cmd(["iw", "dev", iface, "set", "channel", str(channel), channel_width])
 
     def set_txpower(self, iface: str, txpower_dbm: int) -> None:
-        validate_radio_config({"radio_txpower_dbm": txpower_dbm})
+        _hardware_radio_config(DEFAULT_CHANNEL, DEFAULT_BANDWIDTH_MHZ, txpower_dbm)
         override_path = "/sys/module/88XXau_wfb/parameters/rtw_tx_pwr_idx_override"
         if os.path.exists(override_path):
             try:
@@ -383,7 +406,7 @@ class ClientDaemonConfig:
     tun_cidr: str = ""
     tun_name: str = ""
     channel: int = DEFAULT_CHANNEL
-    channel_width: str = FIXED_BANDWIDTH
+    bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     work_dir: str = DEFAULT_WORK_DIR
@@ -395,19 +418,23 @@ class ClientDaemonConfig:
     link_id: int = DEFAULT_LINK_ID
     enable_control_plane: bool = True
     enable_link_process: bool = True
+    radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT
 
     def __post_init__(self):
         if not self.tun_cidr:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
         if not self.tun_name:
             object.__setattr__(self, "tun_name", f"{DEFAULT_TUN_PREFIX}{self.node_id}")
-        validate_radio_config({
-            "channel": self.channel,
-            "radio_txpower_dbm": self.radio_txpower_dbm,
-            "uplink_mcs": self.uplink_mcs,
-        })
+        _hardware_radio_config(self.channel, self.bandwidth_mhz,
+                               self.radio_txpower_dbm, self.uplink_mcs)
+        if type(self.radio_control_port) is not int or not 1 <= self.radio_control_port <= 65535:
+            raise ValueError("radio_control_port 必须为 1..65535 的整数")
         if type(self.link_id) is not int or self.link_id <= 0:
             raise ValueError("link_id 必须为正整数")
+
+    @property
+    def channel_width(self) -> str:
+        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz).channel_width
 
 
 @dataclass(frozen=True)
@@ -427,7 +454,7 @@ class ClientJobConfig:
     uftp_multicast_host: str = DEFAULT_UFTP_MULTICAST_HOST
     uftp_private_multicast_host: str = DEFAULT_UFTP_PRIVATE_MULTICAST_HOST
     channel: int = DEFAULT_CHANNEL
-    channel_width: str = FIXED_BANDWIDTH
+    bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     max_update_size_bytes: int = 1073741824
@@ -445,13 +472,14 @@ class ClientJobConfig:
             # Strip CIDR prefix if present
             clean_ip = self.tun_ip.split("/")[0]
             object.__setattr__(self, "uftp_bind_host", clean_ip)
-        validate_radio_config({
-            "channel": self.channel,
-            "radio_txpower_dbm": self.radio_txpower_dbm,
-            "uplink_mcs": self.uplink_mcs,
-        })
+        _hardware_radio_config(self.channel, self.bandwidth_mhz,
+                               self.radio_txpower_dbm, self.uplink_mcs)
         if type(self.link_id) is not int or self.link_id <= 0:
             raise ValueError("link_id 必须为正整数")
+
+    @property
+    def channel_width(self) -> str:
+        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz).channel_width
 
 
 class JobSandbox:
@@ -544,7 +572,7 @@ class JobSandbox:
                     "--fec-n",
                     "14",
                     "--radio-bandwidth",
-                    "40" if "40" in job.channel_width else "20",
+                    str(job.bandwidth_mhz),
                     "--radio-mcs-index",
                     str(job.uplink_mcs),
                     "--radio-short-gi",
@@ -853,8 +881,9 @@ class ClientDaemon:
         self.config = config
         self._effective_radio = RadioConfig(
             channel=config.channel, radio_txpower_dbm=config.radio_txpower_dbm,
-            uplink_mcs=config.uplink_mcs,
+            uplink_mcs=config.uplink_mcs, bandwidth_mhz=config.bandwidth_mhz,
         )
+        self._effective_radio_calibration = False
         self.network_adapter = network_adapter or LinuxNetworkAdapter()
         self.sandbox = JobSandbox(
             work_dir=config.work_dir,
@@ -945,7 +974,7 @@ class ClientDaemon:
                     self.network_adapter.configure_wireless(
                         iface=target_iface,
                         channel=self._effective_radio.channel,
-                        channel_width="HT20" if self._effective_radio.channel == 165 else "HT40+",
+                        channel_width=self._effective_radio.channel_width,
                         txpower_dbm=self._effective_radio.radio_txpower_dbm,
                     )
                     self.network_adapter.setup_tun(
@@ -1006,7 +1035,8 @@ class ClientDaemon:
                 air_interface=self.current_interface,
                 uplink_mcs=self._effective_radio.uplink_mcs,
                 link_id=self.config.link_id,
-                channel_width="HT20" if self._effective_radio.channel == 165 else "HT40+",
+                bandwidth_mhz=self._effective_radio.bandwidth_mhz,
+                radio_control_port=self.config.radio_control_port,
             )
             os.makedirs(self.config.work_dir, exist_ok=True)
             log_path = os.path.join(self.config.work_dir, "wfb_uplink.log")
@@ -1133,7 +1163,7 @@ class ClientDaemon:
             job_config = replace(
                 job_config,
                 channel=channel,
-                channel_width="HT20" if channel == 165 else "HT40+",
+                bandwidth_mhz=self._effective_radio.bandwidth_mhz,
                 radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
                 uplink_mcs=self._effective_radio.uplink_mcs,
             )
@@ -1290,10 +1320,9 @@ class ClientDaemon:
                     tun_ip=self.config.tun_ip,
                     network_adapter=self.network_adapter,
                     air_interface=self.current_interface,
-                    initial_channel=self._effective_radio.channel,
+                    initial_radio_config=self._effective_radio,
+                    calibration=self._effective_radio_calibration,
                     cached_channel=self._last_locked_channel or self._effective_radio.channel,
-                    txpower_dbm=self._effective_radio.radio_txpower_dbm,
-                    uplink_mcs=self._effective_radio.uplink_mcs,
                     server_host=self.config.server_control_host,
                     server_port=self.config.server_control_port,
                     broadcast_port=self.config.broadcast_port,
@@ -1313,17 +1342,27 @@ class ClientDaemon:
                 self.control_plane.start()
 
     def _on_radio_applied(self, new_config: RadioConfig) -> None:
-        """Synchronously apply link startup parameters under the shared state lock."""
+        """本机在线更新成功后才发布生效配置，失败交由原事务租约恢复。"""
         with self._lock:
             if self.sandbox.is_running:
-                raise FLRuntimeError('radio_job_active', '作业运行时拒绝重建空闲射频链路')
-            old = self._effective_radio
-            self._effective_radio = new_config
-            if (old.uplink_mcs != new_config.uplink_mcs
-                or (old.channel == 165) != (new_config.channel == 165)):
-                self._stop_idle_link()
-            # Also retry a previously failed start when rolling back/reapplying.
-            self._ensure_idle_transport()
+                raise FLRuntimeError('radio_job_active', '作业运行时拒绝更新空闲射频链路')
+            if self.is_idle_link_running:
+                # 每次都发送完整目标，包括失败后的回退，不能用缓存推断发射器状态。
+                apply_link_radio(self.config.radio_control_port,
+                                 new_config.bandwidth_mhz, new_config.uplink_mcs)
+                self._effective_radio = new_config
+            else:
+                previous = self._effective_radio
+                self._effective_radio = new_config
+                try:
+                    self._ensure_idle_transport()
+                except Exception:
+                    self._effective_radio = previous
+                    raise
+            # 与成功应用的完整快照一起保留模式，供网卡重入和控制面重建使用。
+            self._effective_radio_calibration = (
+                self.control_plane.calibration if self.control_plane is not None else False
+            )
 
     def _on_radio_finalized(self, new_config: Any) -> None:
         """Handle finalized radio reconfiguration by persisting channel cache."""
@@ -1442,6 +1481,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         default=RECOMMENDED_UPLINK_MCS,
         help=f"上行 MCS 调制索引 (默认: {RECOMMENDED_UPLINK_MCS})",
     )
+    parser.add_argument("--bandwidth-mhz", type=int, choices=(20, 40), default=DEFAULT_BANDWIDTH_MHZ)
+    parser.add_argument("--radio-control-port", type=int, default=DEFAULT_RADIO_CONTROL_PORT)
     parser.add_argument(
         "--link-id",
         type=int,
@@ -1493,6 +1534,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         channel=args.channel,
         radio_txpower_dbm=args.radio_txpower_dbm,
         uplink_mcs=args.uplink_mcs,
+        bandwidth_mhz=args.bandwidth_mhz,
+        radio_control_port=args.radio_control_port,
         link_id=args.link_id,
         work_dir=args.work_dir,
         poll_interval_seconds=args.poll_interval,

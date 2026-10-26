@@ -59,19 +59,33 @@ class TestRadioTransaction(unittest.TestCase):
             reply_type = {"CONFIG_RADIO_PREPARE": "PREPARE_ACK",
                           "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
                           "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
-                          "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK"}.get(kind)
+                          "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK",
+                          "CONFIG_RADIO_ABORT": "RADIO_SWITCH_ROLLBACK_ACK"}.get(kind)
             if reply_type:
                 reply = {"type": reply_type, "node_id": 1,
                          "session_id": msg["session_id"], "current_channel": 149,
-                         "channel": 149, "ok": True}
+                         "channel": msg.get("channel", 149), "ok": True,
+                         "config": msg["config"], "calibration": msg["calibration"]}
                 if ack_transform:
                     reply = ack_transform(reply)
                 server.handle_datagram(json.dumps(reply).encode(), ("10.80.0.11", 9001))
         server.broadcast_downlink = broadcast
         result = server.reconfigure_radio({"channel": 149, "radio_txpower_dbm": 18}, [1],
             prepare_timeout_seconds=.01, commit_delay_seconds=0,
-            commit_timeout_seconds=.02, ping_interval_seconds=.005)
+            commit_timeout_seconds=.02, lease_timeout_seconds=.03, ping_interval_seconds=.005)
         return result, server, messages
+
+    def test_rollback_ack_requires_full_config_and_mode(self):
+        for mutation in ({'config': {}}, {'calibration': True}, {'session_id': 'stale'},
+                         {'node_id': 2}, {'channel': 149}):
+            with self.subTest(mutation=mutation):
+                def transform(reply):
+                    return dict(reply, **mutation) if reply['type'] == 'RADIO_SWITCH_ROLLBACK_ACK' else reply
+                result, server, _ = self.run_switch(drop='RADIO_SWITCH_FINALIZED', ack_transform=transform)
+                self.assertEqual(result.status, 'radio_error')
+                self.assertIsNone(result.effective_config)
+                self.assertEqual(result.unresponsive_nodes, [1])
+                self.assertTrue(server.radio_error)
 
     def test_complete_barriers(self):
         result, server, messages = self.run_switch()
@@ -136,6 +150,18 @@ class TestRadioTransaction(unittest.TestCase):
                 self.assertEqual(result.failed_phase, "FINALIZED")
                 self.assertEqual(result.unresponsive_nodes, [1])
 
+    def test_confirmation_rejects_matching_channel_with_wrong_complete_config(self):
+        for kind in ("COMMIT_SUCCESS", "RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK"):
+            with self.subTest(kind=kind):
+                def transform(reply):
+                    if reply["type"] == kind:
+                        reply["config"] = dict(reply["config"], bandwidth_mhz=20)
+                    return reply
+                result, _, _ = self.run_switch(ack_transform=transform)
+                self.assertFalse(result.success)
+                self.assertEqual(result.status, "radio_error" if kind.endswith("CONFIRMED_ACK")
+                                 else "rolled_back")
+
     def test_radio_error_disables_alignment_even_after_transaction_cleanup(self):
         from wfb_ng.fl.control import NodeHeartbeat
         for hardware_unknown in (False, True):
@@ -154,9 +180,10 @@ class TestRadioTransaction(unittest.TestCase):
         server = ControlPlaneServer(RadioConfig(channel=149, radio_txpower_dbm=12))
         sent = []
         server.broadcast_downlink = sent.append
-        result = server.reconfigure_radio({"channel": 153}, [1], prepare_timeout_seconds=.001)
-        self.assertEqual(result.status, "rolled_back")
-        self.assertEqual(result.effective_config.channel, 157)
+        result = server.reconfigure_radio({"channel": 153}, [1], prepare_timeout_seconds=.001,
+                                          commit_timeout_seconds=.01, ping_interval_seconds=.002)
+        self.assertEqual(result.status, "radio_error")
+        self.assertIsNone(result.effective_config)
         aborts = [msg for msg in sent if msg["type"] == "CONFIG_RADIO_ABORT"]
         self.assertEqual(aborts[0]["channel"], 149)
         self.assertEqual(aborts[-1]["channel"], 157)
@@ -169,16 +196,18 @@ class TestRadioTransaction(unittest.TestCase):
             kind = {"CONFIG_RADIO_PREPARE": "PREPARE_ACK",
                     "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
                     "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
-                    "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK"}.get(msg["type"])
+                    "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK",
+                          "CONFIG_RADIO_ABORT": "RADIO_SWITCH_ROLLBACK_ACK"}.get(msg["type"])
             if kind:
                 server.handle_datagram(json.dumps({"type": kind, "node_id": 1,
                     "session_id": msg["session_id"], "ok": True,
-                    "current_channel": 149, "channel": 149}).encode(), ("10.80.0.11", 9001))
+                    "current_channel": 149, "channel": 149,
+                    "config": msg["config"], "calibration": msg["calibration"]}).encode(), ("10.80.0.11", 9001))
 
         server.broadcast_downlink = respond
         result = server.reconfigure_radio({"channel": 149}, [1],
             prepare_timeout_seconds=.01, commit_delay_seconds=0,
-            commit_timeout_seconds=.02, ping_interval_seconds=.005)
+            commit_timeout_seconds=.02, lease_timeout_seconds=.03, ping_interval_seconds=.005)
         self.assertEqual(result.status, "finalized")
 
     def test_radio_error_latches_and_rejects_followup_reconfigure(self):
@@ -203,7 +232,9 @@ class TestClientFinalBarrier(unittest.TestCase):
 
         # Inject only the uplink transport; the full downlink protocol is public.
         self.client._send_unicast_datagram = record
-        self.msg = {"session_id": "session", "channel": 149, "target_nodes": [1]}
+        self.msg = {"session_id": "session", "channel": 149, "target_nodes": [1],
+                    "config": RadioConfig(channel=149, radio_txpower_dbm=18).to_dict(),
+                    "calibration": False}
         self.client.handle_broadcast({"type": "CONFIG_RADIO_PREPARE",
             "session_id": "session", "target_nodes": [1],
             "patch": {"channel": 149, "radio_txpower_dbm": 18}})
@@ -261,6 +292,14 @@ class TestClientFinalBarrier(unittest.TestCase):
         self.dispatch("RADIO_SWITCH_CONFIRMED")
         self.assertTrue(self.client.lease_watchdog.is_armed)
         self.dispatch("RADIO_SWITCH_FINALIZED", session_id="stale")
+        self.assertFalse(self.sent)
+
+    def test_confirmation_with_wrong_complete_config_keeps_lease(self):
+        self.dispatch("RADIO_SWITCH_FINALIZED")
+        self.sent.clear()
+        self.dispatch("RADIO_SWITCH_CONFIRMED",
+                      config=RadioConfig(channel=149, radio_txpower_dbm=18, bandwidth_mhz=20).to_dict())
+        self.assertTrue(self.client.lease_watchdog.is_armed)
         self.assertFalse(self.sent)
 
     def test_no_transaction_rejects_unsolicited_messages(self):
@@ -324,11 +363,13 @@ class TestHeartbeatIsolation(unittest.TestCase):
             kind = {"CONFIG_RADIO_PREPARE": "PREPARE_ACK",
                     "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
                     "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
-                    "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK"}.get(msg["type"])
+                    "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK",
+                          "CONFIG_RADIO_ABORT": "RADIO_SWITCH_ROLLBACK_ACK"}.get(msg["type"])
             if kind:
                 server.handle_datagram(json.dumps({"type": kind, "node_id": 1,
                     "session_id": msg["session_id"], "ok": True,
-                    "current_channel": 149, "channel": 149}).encode(), ("10.80.0.11", 9001))
+                    "current_channel": 149, "channel": 149,
+                    "config": msg["config"], "calibration": msg["calibration"]}).encode(), ("10.80.0.11", 9001))
 
         server.broadcast_downlink = broadcast
         result = server.reconfigure_radio({"channel": 149, "radio_txpower_dbm": 18}, [1],

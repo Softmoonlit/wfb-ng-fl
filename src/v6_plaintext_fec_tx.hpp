@@ -6,11 +6,9 @@
 #include <string>
 #include <vector>
 
-struct V6PlaintextFecRadioConfig {
-    uint8_t bandwidth = 20;
-    uint8_t mcs_index = 0;
-    bool short_gi = false;
-};
+#include "v6_radio_control.hpp"
+
+using V6PlaintextFecRadioConfig = V6RadioConfig;
 
 class V6PlaintextFecTransmitter {
 public:
@@ -18,6 +16,7 @@ public:
                               int port,
                               int snd_buf,
                               uint8_t local_node_id,
+                              const V6PlaintextFecRadioConfig &radio_config,
                               int fec_k,
                               int fec_n,
                               uint64_t session_id);
@@ -29,6 +28,8 @@ public:
                               int fec_n,
                               uint64_t session_id);
     ~V6PlaintextFecTransmitter();
+
+    void update_radio_config(const V6PlaintextFecRadioConfig &radio_config);
 
     bool send_payload(const uint8_t *payload, size_t payload_size);
     bool close_pending_block();

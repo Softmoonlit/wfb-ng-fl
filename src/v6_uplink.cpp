@@ -35,6 +35,7 @@
 #include "token_scheduler.hpp"
 #include "wifibroadcast.hpp"
 #include "v6_plaintext_fec_tx.hpp"
+#include "v6_radio_control.hpp"
 #include "v6_uplink_queue.hpp"
 
 using namespace std;
@@ -75,66 +76,39 @@ struct FeedbackWindowState {
     uint64_t close_count = 0;
     map<uint8_t, uint64_t> slot_hit_total_by_node;
 };
-struct RawAirRadioConfig {
-    uint8_t bandwidth = 20;
-    uint8_t mcs_index = 0;
-    bool short_gi = false;
-};
-
-vector<uint8_t> build_ht_radiotap_header(const RawAirRadioConfig &config)
-{
-    uint8_t flags = 0;
-    switch (config.bandwidth)
-    {
-    case 20:
-        flags |= IEEE80211_RADIOTAP_MCS_BW_20;
-        break;
-    case 40:
-        flags |= IEEE80211_RADIOTAP_MCS_BW_40;
-        break;
-    default:
-        throw invalid_argument("radio_bandwidth 只支持 HT 20/40 MHz");
-    }
-
-    if (config.mcs_index > 31)
-    {
-        throw invalid_argument("radio_mcs_index 只支持 HT MCS 0-31");
-    }
-    if (config.short_gi)
-    {
-        flags |= IEEE80211_RADIOTAP_MCS_SGI;
-    }
-
-    vector<uint8_t> header(radiotap_header_ht, radiotap_header_ht + sizeof(radiotap_header_ht));
-    header[MCS_FLAGS_OFF] = flags;
-    header[MCS_IDX_OFF] = config.mcs_index;
-    return header;
-}
-
+using RawAirRadioConfig = V6RadioConfig;
 
 struct AirTransmitter {
     int sockfd = -1;
     sockaddr_in saddr = {};
     vector<int> raw_sockfds;
     vector<uint8_t> raw_radiotap_header;
+    RawAirRadioConfig radio_config = {};
     uint32_t channel_id = 0;
     uint16_t ieee80211_seq = 0;
     uint8_t source_node = 0;
     const uint64_t session_id;
     int plaintext_fec_k = 1;
+    int plaintext_fec_n = 1;
     uint64_t fec_flush_deadline_ms = 0;
+    uint64_t radio_generation = 0;
+    bool data_frame_logged = false;
+    bool control_frame_logged = false;
     unique_ptr<V6PlaintextFecTransmitter> data_transmitter_;
 
     AirTransmitter(const string &host,
                    int port,
                    int snd_buf,
                    uint8_t source_node,
+                   const RawAirRadioConfig &radio_config,
                    int plaintext_fec_k,
                    int plaintext_fec_n,
                    uint64_t session_id)
-        : source_node(source_node),
+        : radio_config(radio_config),
+          source_node(source_node),
           session_id(session_id),
-          plaintext_fec_k(plaintext_fec_k)
+          plaintext_fec_k(plaintext_fec_k),
+          plaintext_fec_n(plaintext_fec_n)
     {
         sockfd = socket(AF_INET, SOCK_DGRAM, 0);
         if (sockfd < 0)
@@ -159,6 +133,7 @@ struct AirTransmitter {
                                                               port,
                                                               snd_buf,
                                                               source_node,
+                                                              radio_config,
                                                               plaintext_fec_k,
                                                               plaintext_fec_n,
                                                               session_id));
@@ -171,11 +146,13 @@ struct AirTransmitter {
                    int plaintext_fec_k,
                    int plaintext_fec_n,
                    uint64_t session_id)
-        : raw_radiotap_header(build_ht_radiotap_header(radio_config)),
+        : raw_radiotap_header(build_v6_radio_target(radio_config).control_radiotap),
+          radio_config(radio_config),
           channel_id(channel_id),
           source_node(source_node),
           session_id(session_id),
-          plaintext_fec_k(plaintext_fec_k)
+          plaintext_fec_k(plaintext_fec_k),
+          plaintext_fec_n(plaintext_fec_n)
     {
         if (interfaces.empty())
         {
@@ -186,14 +163,10 @@ struct AirTransmitter {
             raw_sockfds.push_back(open_raw_socket(interfaces[i]));
         }
 
-        V6PlaintextFecRadioConfig fec_radio = {};
-        fec_radio.bandwidth = radio_config.bandwidth;
-        fec_radio.mcs_index = radio_config.mcs_index;
-        fec_radio.short_gi = radio_config.short_gi;
         data_transmitter_.reset(new V6PlaintextFecTransmitter(interfaces,
                                                               channel_id,
                                                               source_node,
-                                                              fec_radio,
+                                                              radio_config,
                                                               plaintext_fec_k,
                                                               plaintext_fec_n,
                                                               session_id));
@@ -216,9 +189,11 @@ struct AirTransmitter {
         if (!raw_sockfds.empty())
         {
             send_raw_air_datagram(packet, packet_size);
+            log_radio_frame_once("control", &control_frame_logged);
             return;
         }
         send_udp_air_datagram(packet, packet_size);
+        log_radio_frame_once("control", &control_frame_logged);
     }
 
     void send_data(const uint8_t *payload, size_t payload_size)
@@ -231,6 +206,7 @@ struct AirTransmitter {
         {
             throw runtime_error("发送数据面 payload 失败");
         }
+        log_radio_frame_once("data", &data_frame_logged);
         if (plaintext_fec_k > 1)
         {
             fec_flush_deadline_ms = get_time_ms() + kFecFlushIdleMs;
@@ -260,6 +236,42 @@ struct AirTransmitter {
             return false;
         }
         return flush_data_block();
+    }
+
+    const RawAirRadioConfig &get_radio_config() const
+    {
+        return radio_config;
+    }
+
+    void apply_radio_config(const RawAirRadioConfig &target_config)
+    {
+        const V6RadioTarget target = build_v6_radio_target(target_config);
+        if (target_config.bandwidth == radio_config.bandwidth &&
+            target_config.mcs_index == radio_config.mcs_index &&
+            target_config.short_gi == radio_config.short_gi)
+        {
+            return;
+        }
+
+        // 先封闭当前 FEC block，再跨越无线配置代际；FEC 参数和受信任明文会话保持不变。
+        flush_data_block();
+        data_transmitter_->update_radio_config(target_config);
+        if (!raw_sockfds.empty())
+        {
+            raw_radiotap_header = target.control_radiotap;
+        }
+        radio_config = target_config;
+        radio_generation += 1;
+        data_frame_logged = false;
+        control_frame_logged = false;
+        WFB_INFO("v6_radio_update generation=%" PRIu64 " bandwidth=%u mcs_index=%u short_gi=%u radiotap_flags=0x%02x sync=data+control fec=%d/%d\n",
+                 radio_generation,
+                 static_cast<unsigned>(radio_config.bandwidth),
+                 static_cast<unsigned>(radio_config.mcs_index),
+                 static_cast<unsigned>(radio_config.short_gi),
+                 static_cast<unsigned>(target.control_radiotap[MCS_FLAGS_OFF]),
+                 plaintext_fec_k,
+                 plaintext_fec_n);
     }
 
     void send_ready(uint8_t source_node)
@@ -301,6 +313,22 @@ struct AirTransmitter {
     }
 
 private:
+    void log_radio_frame_once(const char *kind, bool *logged)
+    {
+        if (*logged)
+        {
+            return;
+        }
+        IPC_MSG("v6_radio_frame kind=%s generation=%" PRIu64 " bandwidth=%u mcs_index=%u short_gi=%u\n",
+                kind,
+                radio_generation,
+                static_cast<unsigned>(radio_config.bandwidth),
+                static_cast<unsigned>(radio_config.mcs_index),
+                static_cast<unsigned>(radio_config.short_gi));
+        IPC_MSG_SEND();
+        *logged = true;
+    }
+
     static int open_raw_socket(const string &interface)
     {
         int fd = socket(PF_PACKET, SOCK_RAW, 0);
@@ -349,8 +377,8 @@ private:
         memset(header->rssi, SCHAR_MIN, sizeof(header->rssi));
         memset(header->noise, SCHAR_MAX, sizeof(header->noise));
         header->wlan_idx = 0;
-        header->mcs_index = 1;
-        header->bandwidth = 20;
+        header->mcs_index = radio_config.mcs_index;
+        header->bandwidth = radio_config.bandwidth;
         header->freq = htons(4321);
         header->antenna[0] = 0;
         header->rssi[0] = -42;
@@ -405,6 +433,100 @@ private:
     AirTransmitter(const AirTransmitter &) = delete;
     AirTransmitter &operator=(const AirTransmitter &) = delete;
 };
+
+int open_radio_control_fd(int requested_port)
+{
+    const int fd = open_udp_socket_for_rx(requested_port, 0, 0x7f000001);
+    sockaddr_in address = {};
+    socklen_t address_size = sizeof(address);
+    if (getsockname(fd, reinterpret_cast<sockaddr *>(&address), &address_size) != 0)
+    {
+        close(fd);
+        throw runtime_error(string("读取 radio control 端口失败: ") + strerror(errno));
+    }
+
+    const int actual_port = ntohs(address.sin_port);
+    if (requested_port == 0)
+    {
+        IPC_MSG("LISTEN_UDP_CONTROL %d\n", actual_port);
+        IPC_MSG_SEND();
+    }
+    WFB_INFO("v6 radio control loopback port=%d\n", actual_port);
+    return fd;
+}
+
+typedef function<V6RadioConfig(void)> RadioConfigGetter;
+typedef function<void(const V6RadioConfig &)> RadioConfigApplier;
+
+void send_radio_command_response(int fd,
+                                 const cmd_resp_t &response,
+                                 size_t payload_size,
+                                 const sockaddr_in &address,
+                                 socklen_t address_size)
+{
+    const size_t response_size = offsetof(cmd_resp_t, u) + payload_size;
+    (void)sendto(fd,
+                 &response,
+                 response_size,
+                 MSG_DONTWAIT,
+                 reinterpret_cast<const sockaddr *>(&address),
+                 address_size);
+}
+
+void process_radio_control_requests(int fd,
+                                   const RadioConfigGetter &get_radio,
+                                   const RadioConfigApplier &apply_radio,
+                                   int fec_k,
+                                   int fec_n)
+{
+    for (;;)
+    {
+        cmd_req_t request = {};
+        sockaddr_in address = {};
+        socklen_t address_size = sizeof(address);
+        const ssize_t request_size = recvfrom(fd,
+                                              &request,
+                                              sizeof(request),
+                                              MSG_DONTWAIT,
+                                              reinterpret_cast<sockaddr *>(&address),
+                                              &address_size);
+        if (request_size < 0)
+        {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                return;
+            }
+            if (errno == EINTR)
+            {
+                continue;
+            }
+            throw runtime_error(string("读取 radio control 命令失败: ") + strerror(errno));
+        }
+        if (address_size > sizeof(address) ||
+            request_size < static_cast<ssize_t>(offsetof(cmd_req_t, u)))
+        {
+            continue;
+        }
+
+        const V6RadioCommandResponse command_response = handle_v6_radio_command(
+            request,
+            static_cast<size_t>(request_size),
+            get_radio(),
+            fec_k,
+            fec_n,
+            apply_radio);
+        WFB_INFO("v6_radio_command req_id=%u cmd_id=%u rc=%d payload_size=%zu\n",
+                 ntohl(request.req_id),
+                 static_cast<unsigned>(request.cmd_id),
+                 ntohl(command_response.response.rc),
+                 command_response.payload_size);
+        send_radio_command_response(fd,
+                                    command_response.response,
+                                    command_response.payload_size,
+                                    address,
+                                    address_size);
+    }
+}
 
 struct ClientTarget {
     uint8_t node_id = 0;
@@ -466,6 +588,7 @@ struct Config {
     int air_listen_port = 0;
     string air_target_host;
     int air_target_port = 0;
+    int radio_control_port = 0;
     vector<string> air_interfaces;
     RawAirRadioConfig raw_air_radio;
     uint32_t grant_duration_ms = 120;
@@ -693,7 +816,7 @@ void print_usage(const char *progname)
             "     { --air-listen-port PORT --air-target HOST:PORT | --air-interface IFACE[,IFACE...] } \\\n"
             "     [--uplink-pause-threshold-bytes BYTES] [--uplink-resume-threshold-bytes BYTES] \\\n"
             "     [--uplink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
-            "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
+            "     [--radio-short-gi] [--radio-control-port PORT] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n"
             "  %s --role server --tun-name NAME --tun-addr IP/CIDR --node-id N --link-id ID \\\n"
             "     --uplink-stream US --downlink-stream DS \\\n"
             "     { --air-listen-port PORT | --air-interface IFACE[,IFACE...] } --known-clients N1,N2 \\\n"
@@ -701,7 +824,7 @@ void print_usage(const char *progname)
             "     [--guard-interval-ms MS] [--feedback-window-period-ms MS] [--feedback-window-duration-ms MS] \\\n"
             "     [--downlink-pause-threshold-bytes BYTES] [--downlink-resume-threshold-bytes BYTES] \\\n"
             "     [--downlink-queue-packets-limit N] [--radio-bandwidth 20|40] [--radio-mcs-index N] \\\n"
-            "     [--radio-short-gi] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
+            "     [--radio-short-gi] [--radio-control-port PORT] [--queue-summary-file PATH] [--epoch E] [--fec-k K --fec-n N]\n",
             progname,
             progname);
 }
@@ -712,6 +835,7 @@ enum LongOptionId {
     OPT_RADIO_BANDWIDTH,
     OPT_RADIO_MCS_INDEX,
     OPT_RADIO_SHORT_GI,
+    OPT_RADIO_CONTROL_PORT,
 };
 
 
@@ -753,6 +877,7 @@ Config parse_args(int argc, char **argv)
         {"radio-bandwidth", required_argument, 0, OPT_RADIO_BANDWIDTH},
         {"radio-mcs-index", required_argument, 0, OPT_RADIO_MCS_INDEX},
         {"radio-short-gi", no_argument, 0, OPT_RADIO_SHORT_GI},
+        {"radio-control-port", required_argument, 0, OPT_RADIO_CONTROL_PORT},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0},
     };
@@ -874,6 +999,16 @@ Config parse_args(int argc, char **argv)
         case OPT_RADIO_SHORT_GI:
             config.raw_air_radio.short_gi = true;
             break;
+        case OPT_RADIO_CONTROL_PORT:
+        {
+            const uint32_t port = parse_u32(optarg, "radio_control_port", true);
+            if (port > 65535)
+            {
+                throw invalid_argument("radio_control_port 超出 0..65535 范围");
+            }
+            config.radio_control_port = static_cast<int>(port);
+            break;
+        }
         case 'h':
             print_usage(argv[0]);
             exit(0);
@@ -915,7 +1050,7 @@ Config parse_args(int argc, char **argv)
         throw invalid_argument("fec k/n 必须满足 1 <= k <= n < 256");
     }
     const bool raw_air_mode = !config.air_interfaces.empty();
-    (void)build_ht_radiotap_header(config.raw_air_radio);
+    (void)build_v6_radio_target(config.raw_air_radio);
     if (!raw_air_mode && config.air_listen_port <= 0)
     {
         throw invalid_argument("air-listen-port 必填");
@@ -1518,6 +1653,7 @@ void run_client(const Config &config, uint64_t session_id)
     const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
     const int air_fd = raw_air_mode ? -1 : open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
+    const int radio_control_fd = open_radio_control_fd(config.radio_control_port);
 
     unique_ptr<AirTransmitter> uplink;
     if (raw_air_mode)
@@ -1536,6 +1672,7 @@ void run_client(const Config &config, uint64_t session_id)
                                         config.air_target_port,
                                         config.snd_buf,
                                         config.node_id,
+                                        config.raw_air_radio,
                                         config.plaintext_fec_k,
                                         config.plaintext_fec_n,
                                         session_id));
@@ -1554,7 +1691,10 @@ void run_client(const Config &config, uint64_t session_id)
     downlink_aggregator.set_token_control_listener(&grant_listener);
 
     vector<unique_ptr<Receiver>> raw_receivers;
-    vector<pollfd> fds(1 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    vector<pollfd> fds(2 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    const size_t radio_control_idx = fds.size() - 1;
+    fds[radio_control_idx].fd = radio_control_fd;
+    fds[radio_control_idx].events = POLLIN;
     fds[0].fd = tun_fd;
     if (raw_air_mode)
     {
@@ -1619,6 +1759,20 @@ void run_client(const Config &config, uint64_t session_id)
             IPC_MSG_SEND();
             sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
             log_send_ts = now_ms + config.log_interval;
+        }
+
+        if (rc > 0 && (fds[radio_control_idx].revents & (POLLERR | POLLNVAL)))
+        {
+            throw runtime_error("radio control client socket error");
+        }
+        if (rc > 0 && (fds[radio_control_idx].revents & POLLIN))
+        {
+            process_radio_control_requests(
+                radio_control_fd,
+                [&]() { return uplink->get_radio_config(); },
+                [&](const V6RadioConfig &target) { uplink->apply_radio_config(target); },
+                config.plaintext_fec_k,
+                config.plaintext_fec_n);
         }
 
         if (rc > 0)
@@ -1708,6 +1862,7 @@ void run_server(Config config, uint64_t session_id)
     const bool raw_air_mode = !config.air_interfaces.empty();
     const int tun_fd = open_tun(config.tun_name, config.tun_addr);
     const int air_fd = raw_air_mode ? -1 : open_udp_socket_for_rx(config.air_listen_port, config.rcv_buf);
+    const int radio_control_fd = open_radio_control_fd(config.radio_control_port);
 
     TokenSchedulerConfig scheduler_config = {};
     scheduler_config.node_ids = config.known_clients;
@@ -1728,7 +1883,10 @@ void run_server(Config config, uint64_t session_id)
     uplink_aggregator.set_known_client_node_ids(set<uint8_t>(config.known_clients.begin(), config.known_clients.end()));
 
     vector<unique_ptr<Receiver>> raw_receivers;
-    vector<pollfd> fds(1 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    vector<pollfd> fds(2 + (raw_air_mode ? config.air_interfaces.size() : 1));
+    const size_t radio_control_idx = fds.size() - 1;
+    fds[radio_control_idx].fd = radio_control_fd;
+    fds[radio_control_idx].events = POLLIN;
     fds[0].fd = tun_fd;
     if (raw_air_mode)
     {
@@ -1766,6 +1924,7 @@ void run_server(Config config, uint64_t session_id)
                                                                  target.port,
                                                                  config.snd_buf,
                                                                  config.node_id,
+                                                                 config.raw_air_radio,
                                                                  config.plaintext_fec_k,
                                                                  config.plaintext_fec_n,
                                                                  session_id));
@@ -1830,6 +1989,30 @@ void run_server(Config config, uint64_t session_id)
             uplink_aggregator.dump_stats();
             sync_queue_summary_or_throw(downlink_queue, config.queue_summary_file, "server", config.node_id);
             log_send_ts = now_ms + config.log_interval;
+        }
+
+        if (rc > 0 && (fds[radio_control_idx].revents & (POLLERR | POLLNVAL)))
+        {
+            throw runtime_error("radio control server socket error");
+        }
+        if (rc > 0 && (fds[radio_control_idx].revents & POLLIN))
+        {
+            process_radio_control_requests(
+                radio_control_fd,
+                [&]() { return config.client_targets.front().transmitter->get_radio_config(); },
+                [&](const V6RadioConfig &target) {
+                    set<AirTransmitter *> seen;
+                    for (size_t i = 0; i < config.client_targets.size(); ++i)
+                    {
+                        AirTransmitter *transmitter = config.client_targets[i].transmitter.get();
+                        if (transmitter != nullptr && seen.insert(transmitter).second)
+                        {
+                            transmitter->apply_radio_config(target);
+                        }
+                    }
+                },
+                config.plaintext_fec_k,
+                config.plaintext_fec_n);
         }
 
         if (rc > 0)
@@ -1960,7 +2143,7 @@ void run_server(Config config, uint64_t session_id)
     }
 }
 
-} // namespace
+} // 命名空间
 
 #ifndef __WFB_V6_UPLINK_TEST__
 int main(int argc, char **argv)

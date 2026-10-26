@@ -4,21 +4,64 @@ from unittest.mock import patch
 import threading
 import subprocess
 import json
+import socket
+import struct
 
 import pytest
 
+from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 from wfb_ng.tests.test_fl_console import register_idle
 from wfb_ng.tests import test_fl_radio_rest as radio_rest
 
 
+class ObservedNetworkAdapter(MockNetworkAdapter):
+    def __init__(self):
+        super().__init__(['wlx-test'])
+        self.tun_events = []
+
+    def setup_tun(self, name, cidr):
+        self.tun_events.append(('setup', name, cidr))
+        super().setup_tun(name, cidr)
+
+    def teardown_tun(self, name):
+        self.tun_events.append(('teardown', name))
+        super().teardown_tun(name)
+
+
+def tun_snapshot(daemon):
+    # 同时观察网卡调用，防止删除后重建同名 TUN 被误判为保留。
+    return daemon.adapter.tun_interfaces.copy(), list(daemon.adapter.tun_events)
+
+
 @contextmanager
-def running_server(tmp_path, fail_spawns=(), **config):
+def running_server(tmp_path, reject_updates=(), **config):
+    # 模拟 v6 的本机 UDP 端点，生产 updater 原样参与测试。
+    udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp.bind(('127.0.0.1', 0))
+    udp.settimeout(0.1)
+    updates = []
+    stopped = threading.Event()
+
+    def serve():
+        while not stopped.is_set():
+            try:
+                data, address = udp.recvfrom(4096)
+            except socket.timeout:
+                continue
+            request = struct.unpack('!IB7B', data)
+            updates.append(request[1:])
+            status = 22 if len(updates) in reject_updates else 0
+            udp.sendto(struct.pack('!II', request[0], status), address)
+
+    worker = threading.Thread(target=serve, daemon=True)
+    worker.start()
     daemon = ServerDaemon(ServerDaemonConfig(ipc_port=0, enable_control_plane=False,
                          enable_link_process=True, air_interface='wlx-test',
+                         radio_control_port=udp.getsockname()[1],
                          model_library_dir=str(tmp_path / 'models'), work_dir=str(tmp_path), **config),
-                         MockNetworkAdapter(['wlx-test']))
+                         ObservedNetworkAdapter())
     commands = []
     uftp_started = threading.Event()
     class Process:
@@ -36,8 +79,6 @@ def running_server(tmp_path, fail_spawns=(), **config):
             return 0
     def spawn(command, **kwargs):
         commands.append(command)
-        if len(commands) in fail_spawns:
-            raise OSError('链路进程启动失败')
         if '-R' in command:
             uftp_started.set()
         else:
@@ -48,36 +89,44 @@ def running_server(tmp_path, fail_spawns=(), **config):
         daemon.start()
         register_idle(daemon)
         try:
-            yield daemon, commands, uftp_started
+            yield daemon, commands, uftp_started, updates
         finally:
             daemon.stop()
+            stopped.set()
+            worker.join(2)
+            udp.close()
 
 
 @pytest.mark.parametrize('fail_at,expected_status,expected_mcs', [
-    (None, 'finalized', ['3','4']),
-    ('RADIO_SWITCH_FINALIZED', 'rolled_back', ['3','4','3']),
-    ('RADIO_SWITCH_CONFIRMED', 'radio_error', ['3','4']),
+    (None, 'finalized', [4]),
+    ('RADIO_SWITCH_FINALIZED', 'rolled_back', [4, 3]),
+    ('RADIO_SWITCH_CONFIRMED', 'radio_error', [4]),
 ])
 def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_on_rollback(
         tmp_path, fail_at, expected_status, expected_mcs):
-    with running_server(tmp_path) as (daemon, commands, _):
+    with running_server(tmp_path) as (daemon, commands, _, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
+        initial_link = daemon.console.snapshot()['server']['link_process'].copy()
+        initial_tun = tun_snapshot(daemon)
         current = daemon.console.radio_configuration()['config']
-        config = {key:current[key] for key in ('channel','radio_txpower_dbm','downlink_mcs','uplink_mcs','uftp_rate_kbps')}
+        config = {key:current[key] for key in ('channel','bandwidth_mhz','radio_txpower_dbm','downlink_mcs','uplink_mcs','uftp_rate_kbps')}
         config.update(downlink_mcs=4, uftp_rate_kbps=22000)
         checked = daemon.console.validate_radio_configuration({'config':config})
         def respond(message):
             if message['type'] == fail_at:
                 raise OSError('最终屏障广播失败')
             if message['type'] == 'RADIO_SWITCH_FINALIZED':
-                assert commands[-1][commands[-1].index('--radio-mcs-index') + 1] == '4'
+                assert updates[-1] == (2, 0, 0, 1, 40, 4, 0, 1)
             peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
             result = daemon.console.apply_radio_configuration({
                 'confirmation_token':checked['confirmation']['token'], 'confirm_risk':False})
         assert result['status'] == expected_status
-        assert [cmd[cmd.index('--radio-mcs-index')+1] for cmd in commands] == expected_mcs
+        assert [update[5] for update in updates] == expected_mcs
+        assert len(commands) == 1
+        assert daemon.console.snapshot()['server']['link_process'] == initial_link
+        assert tun_snapshot(daemon) == initial_tun
         assert daemon.console.snapshot()['server']['link_process']['running']
         expected_phase = {'RADIO_SWITCH_FINALIZED':'FINALIZED', 'RADIO_SWITCH_CONFIRMED':'CONFIRMED'}.get(fail_at)
         assert result['failed_phase'] == expected_phase
@@ -86,17 +135,22 @@ def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_
         assert state['state'] == ('radio_error' if expected_status == 'radio_error' else 'idle')
 
 
-@pytest.mark.parametrize('fail_spawns,status', [((2,), 'rolled_back'), ((2,3), 'radio_error')])
-def test_server_link_apply_failure_restores_old_mcs_or_fails_closed(tmp_path, fail_spawns, status):
-    with running_server(tmp_path, fail_spawns=fail_spawns) as (daemon, commands, _):
+@pytest.mark.parametrize('reject_updates,status', [((1,), 'rolled_back'), ((1,2), 'radio_error')])
+def test_server_update_rejection_restores_old_mcs_or_fails_closed(tmp_path, reject_updates, status):
+    with running_server(tmp_path, reject_updates=reject_updates) as (daemon, commands, _, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
+        initial_link = daemon.console.snapshot()['server']['link_process'].copy()
+        initial_tun = tun_snapshot(daemon)
         payload = {'confirmed':True, 'patch':{'downlink_mcs':4}, 'target_nodes':[1]}
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=peer.protocol_peer):
             result = daemon.reconfigure_radio(payload)
         assert result['status'] == status
         assert result['failed_phase'] == 'COMMIT'
-        assert [cmd[cmd.index('--radio-mcs-index')+1] for cmd in commands] == ['3','4','3']
+        assert [update[5] for update in updates] == [4, 3]
+        assert len(commands) == 1
+        assert daemon.console.snapshot()['server']['link_process'] == initial_link
+        assert tun_snapshot(daemon) == initial_tun
         state = daemon.console.snapshot()['server']
         if status == 'rolled_back':
             assert state['radio']['downlink_mcs'] == 3
@@ -105,24 +159,53 @@ def test_server_link_apply_failure_restores_old_mcs_or_fails_closed(tmp_path, fa
         else:
             assert state['radio'] is None
             assert state['state'] == 'radio_error'
-            assert not state['link_process']['running']
+            assert state['link_process']['running']
 
 
-def test_channel_165_updates_server_link_bandwidth_with_same_mcs(tmp_path):
-    with running_server(tmp_path) as (daemon, commands, _):
+def test_channel_165_ht40_is_rejected_before_hardware_or_link_mutation(tmp_path):
+    with running_server(tmp_path) as (daemon, commands, _, updates):
+        initial_tun = tun_snapshot(daemon)
+        initial_channels = daemon.adapter.channel_history.copy()
+        with pytest.raises(FLRuntimeError) as rejected:
+            daemon.reconfigure_radio({'confirmed': True, 'patch': {'channel': 165}, 'target_nodes': [1]})
+        assert rejected.value.error_code == 'invalid_radio_request'
+        assert updates == []
+        assert len(commands) == 1
+        assert daemon.adapter.channel_history == initial_channels
+        assert tun_snapshot(daemon) == initial_tun
+
+
+def test_controlled_ht20_calibration_updates_hardware_and_link_without_restart(tmp_path):
+    with running_server(tmp_path) as (daemon, commands, _, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
+        initial_link = daemon.console.snapshot()['server']['link_process'].copy()
+        initial_tun = tun_snapshot(daemon)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=peer.protocol_peer):
-            result = daemon.reconfigure_radio({'confirmed':True, 'patch':{'channel':165}, 'target_nodes':[1]})
+            result = daemon.calibrate_radio({'confirmed': True, 'target_nodes': [1],
+                'patch': {'bandwidth_mhz': 20, 'downlink_mcs': 4, 'uftp_rate_kbps': 1000}})
         assert result['status'] == 'finalized'
-        assert [cmd[cmd.index('--radio-bandwidth')+1] for cmd in commands] == ['40', '20']
+        assert updates == [(2, 0, 0, 1, 20, 4, 0, 1)]
+        assert daemon.adapter.wireless_states['wlx-test']['channel_width'] == 'HT20'
+        assert len(commands) == 1
+        assert daemon.console.snapshot()['server']['link_process'] == initial_link
+        assert tun_snapshot(daemon) == initial_tun
 
 
-def test_next_job_uses_confirmed_uftp_rate_in_sender_command(tmp_path):
-    with running_server(tmp_path, tun_ip='127.0.0.1') as (daemon, commands, uftp_started):
+@pytest.mark.parametrize('fail_at,status,expected_rate', [
+    (None, 'finalized', '17000'),
+    ('RADIO_SWITCH_FINALIZED', 'rolled_back', '15000'),
+])
+def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fail_at, status, expected_rate):
+    with running_server(tmp_path, tun_ip='127.0.0.1') as (daemon, commands, uftp_started, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
+        initial_link = daemon.console.snapshot()['server']['link_process'].copy()
+        initial_tun = tun_snapshot(daemon)
+
         def respond(message):
+            if message['type'] == fail_at:
+                raise OSError('最终屏障广播失败')
             if message['type'] == 'TASK_ANNOUNCE':
                 daemon.control_plane.handle_datagram(json.dumps({
                     'type':'TASK_READY', 'node_id':1, 'job_id':message['job_id']}).encode(), ('127.0.0.1',10001))
@@ -130,7 +213,11 @@ def test_next_job_uses_confirmed_uftp_rate_in_sender_command(tmp_path):
                 peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
             result = daemon.reconfigure_radio({'confirmed':True, 'patch':{'uftp_rate_kbps':17000}, 'target_nodes':[1]})
-            assert result['status'] == 'finalized'
+            assert result['status'] == status
+            assert result['effective_config']['uftp_rate_kbps'] == int(expected_rate)
+            assert daemon.console.snapshot()['server']['link_process'] == initial_link
+            assert tun_snapshot(daemon) == initial_tun
+            assert len(commands) == 1
             model = tmp_path / 'model.bin'
             model.write_bytes(b'ordinary model')
             daemon.start_job({'job_id':'rate-job', 'run_id':'rate-run', 'target_nodes':[1],
@@ -138,39 +225,36 @@ def test_next_job_uses_confirmed_uftp_rate_in_sender_command(tmp_path):
                               'server_http_port':0, 'io_timeout_seconds':5, 'live_observation':False})
             assert uftp_started.wait(3)
             send = next(command for command in commands if '-R' in command)
-            assert send[send.index('-R')+1] == '17000'
+            assert send[send.index('-R')+1] == expected_rate
             daemon.abort_job()
 
 
-def test_mcs_rebuild_waits_for_address_and_broadcast_route_before_ping(tmp_path):
-    """An existing TUN without its address/route must not release the transaction."""
-    with running_server(tmp_path) as (daemon, commands, _):
+def test_mcs_update_is_acknowledged_before_new_channel_ping(tmp_path):
+    with running_server(tmp_path) as (daemon, commands, _, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
-        checks = []
-        ready = False
-        def network_ready(tun_name, tun_cidr, destination):
-            nonlocal ready
-            checks.append((tun_name, tun_cidr, destination))
-            ready = len(checks) >= 3
-            return ready
+        initial_link = daemon.console.snapshot()['server']['link_process'].copy()
+        initial_tun = tun_snapshot(daemon)
+        pings = []
+
         def respond(message):
-            if message['type'] == 'NEW_CHANNEL_PING' and not ready:
-                raise OSError(101, 'Network is unreachable')
+            if message['type'] == 'NEW_CHANNEL_PING':
+                assert updates == [(2, 0, 0, 1, 40, 4, 0, 1)]
+                assert daemon.console.snapshot()['server']['link_process'] == initial_link
+                assert tun_snapshot(daemon) == initial_tun
+                pings.append(message)
             peer.protocol_peer(message)
-        with patch.object(daemon.adapter, 'is_tun_ready', side_effect=network_ready, create=True), patch.object(
-                daemon.control_plane, 'broadcast_downlink', side_effect=respond):
-            result = daemon.reconfigure_radio({'confirmed':True, 'patch':{'downlink_mcs':4}, 'target_nodes':[1]})
+
+        with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
+            result = daemon.reconfigure_radio({'confirmed': True, 'patch': {'downlink_mcs': 4}, 'target_nodes': [1]})
         assert result['status'] == 'finalized'
-        assert len(commands) == 2
-        assert len(checks) >= 3
-        assert all(item == ('fl-s', '10.80.0.1/24', '255.255.255.255') for item in checks)
+        assert pings
+        assert len(commands) == 1
 
 
 @pytest.mark.parametrize('failure', ['timeout', 'netlink-error'])
 def test_server_readiness_failure_releases_link_and_log(tmp_path, failure):
-    from wfb_ng.fl.errors import FLRuntimeError
-    with running_server(tmp_path) as (daemon, _, _):
+    with running_server(tmp_path) as (daemon, _, _, _):
         daemon._stop_link_process()
         with patch.object(daemon.adapter, 'is_tun_ready', return_value=False,
                           side_effect=OSError('netlink query failed') if failure == 'netlink-error' else None):

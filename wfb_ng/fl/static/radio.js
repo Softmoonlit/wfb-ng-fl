@@ -1,16 +1,18 @@
 (() => {
   'use strict';
   const byId = id => document.getElementById(id);
-  const fields = ['channel', 'radio_txpower_dbm', 'downlink_mcs', 'uplink_mcs', 'uftp_rate_kbps'];
+  const fields = ['channel', 'bandwidth_mhz', 'radio_txpower_dbm', 'downlink_mcs', 'uplink_mcs', 'uftp_rate_kbps'];
   const states = {idle:'待命', starting:'启动中', preparing:'准备中', running:'运行中', aborting:'中止 / 恢复中', radio_error:'射频错误 RADIO_ERROR', unavailable:'不可用'};
   const recoveries = {not_required:'无需恢复', recovering:'正在恢复待命', ready:'已恢复待命', blocked:'恢复受阻'};
   const results = {none:'未执行', running:'执行中', succeeded:'成功', failed:'失败', aborted:'已急停'};
   let snapshot = null, rateBounds = {}, initialized = false, connected = false;
   let confirmation = null, busy = false, stopping = false, fetching = false;
   let readVersion = 0, editVersion = 0, lastRefresh = 0;
+  let rateCombination = '';
+  const combination = () => `${byId('bandwidth_mhz').value}/${byId('downlink_mcs').value}`;
 
   function describe(config) {
-    return config ? `信道 ${config.channel} · ${config.radio_txpower_dbm} dBm · 下行 MCS ${config.downlink_mcs} · 上行 MCS ${config.uplink_mcs} · UFTP ${config.uftp_rate_kbps} kbps` : '射频配置未确认';
+    return config ? `信道 ${config.channel} · ${config.bandwidth_mhz} MHz · ${config.radio_txpower_dbm} dBm · 下行 MCS ${config.downlink_mcs} · 上行 MCS ${config.uplink_mcs} · UFTP ${config.uftp_rate_kbps} kbps` : '射频配置未确认';
   }
   function showError(id, message) {
     byId(id).textContent = message;
@@ -26,7 +28,6 @@
   }
   function clearConfirmation(message = '请校验配置，再明确点击应用。') {
     confirmation = null;
-    byId('confirm-risk').checked = false;
     byId('validated-config').textContent = message;
     byId('confirmation-status').textContent = '';
   }
@@ -49,20 +50,21 @@
   function outside(config, bounds) {
     return bounds && (config.uftp_rate_kbps < bounds.min_rate_kbps || config.uftp_rate_kbps > bounds.max_rate_kbps);
   }
+  function selectedBounds() {
+    const bandwidth = rateBounds[byId('bandwidth_mhz').value];
+    return bandwidth && bandwidth[byId('downlink_mcs').value];
+  }
   function render() {
     if (confirmation && Date.now() >= confirmation.expiresAt) clearConfirmation('确认已过期，请重新校验配置。');
-    const bounds = rateBounds[byId('downlink_mcs').value];
-    byId('rate-range').textContent = bounds ? `安全范围 ${bounds.min_rate_kbps}–${bounds.max_rate_kbps} kbps · 推荐 ${bounds.default_rate_kbps} kbps` : '该 MCS 的速率范围尚不可用，请刷新状态。';
+    const bounds = selectedBounds();
+    byId('rate-range').textContent = bounds ? `安全范围 ${bounds.min_rate_kbps}–${bounds.max_rate_kbps} kbps · 推荐 ${bounds.default_rate_kbps} kbps` : `${byId('bandwidth_mhz').value} MHz / MCS ${byId('downlink_mcs').value} 的实测速率范围不可用；缺少标定表时后端拒绝普通配置。`;
     const localRisk = outside({uftp_rate_kbps:Number(byId('uftp_rate_kbps').value)}, bounds);
-    byId('rate-warning').textContent = confirmation && confirmation.warning ? confirmation.warning :
-      localRisk ? '强告警：UFTP 速率超出安全范围，可能造成丢包；校验后必须勾选风险确认。' : '';
-    byId('rate-warning').hidden = !byId('rate-warning').textContent;
-    byId('risk-confirmation').hidden = !confirmation || !confirmation.risky;
-    byId('confirm-risk').disabled = busy || !confirmation || !confirmation.risky;
+    byId('rate-warning').textContent = localRisk ? 'UFTP 速率超出安全范围，后端将拒绝配置；请调整速率。' : '';
+    byId('rate-warning').hidden = !localRisk;
     const reasons = blockers();
     byId('apply-blockers').textContent = reasons.length ? reasons.join(' · ') : '集群空闲；应用仍由 Server 校验最新状态并协调节点。';
     byId('validate').disabled = busy || !!reasons.length;
-    byId('apply').disabled = busy || !!reasons.length || !confirmation || (confirmation.risky && !byId('confirm-risk').checked);
+    byId('apply').disabled = busy || !!reasons.length || !confirmation;
     byId('emergency-stop').disabled = stopping || !activeJob();
     if (confirmation) byId('confirmation-status').textContent = `已校验 · 确认剩余 ${Math.max(0, Math.ceil((confirmation.expiresAt - Date.now()) / 1000))} 秒`;
   }
@@ -95,7 +97,7 @@
     }
     if (byId('hud-radio')) {
       const radioConfig = state.server.radio;
-      byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
+      byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.bandwidth_mhz}MHz · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
     }
     if (byId('hud-job')) {
       if (state.current_job && state.server.state === 'running') {
@@ -127,6 +129,7 @@
       byId('current-config').textContent = describe(body.config);
       if (!initialized) {
         if (body.config && editVersion === 0) fields.forEach(field => {byId(field).value = String(body.config[field]);});
+        rateCombination = combination();
         initialized = true;
       }
       connected = true;
@@ -145,14 +148,14 @@
     const config = {};
     fields.forEach(field => {
       const value = byId(field).value.trim();
-      if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value))) throw new Error('请完整填写五项整数参数。');
+      if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value))) throw new Error('请完整填写六项整数参数。');
       config[field] = Number(value);
     });
     if (![149,153,157,165].includes(config.channel)) throw new Error('仅允许信道 149、153、157、165；禁止 Channel 161。');
+    if (![20,40].includes(config.bandwidth_mhz)) throw new Error('带宽必须为 20 或 40 MHz。');
     if (config.radio_txpower_dbm < 10 || config.radio_txpower_dbm > 20) throw new Error('发射功率必须为 10–20 dBm。');
     if (![3,4,5,6].includes(config.downlink_mcs) || ![3,4,5,6].includes(config.uplink_mcs)) throw new Error('上下行 MCS 必须为 3–6。');
     if (config.uftp_rate_kbps <= 0) throw new Error('UFTP 速率必须为正整数。');
-    if (!rateBounds[config.downlink_mcs]) throw new Error('当前 MCS 范围不可用，请刷新状态。');
     return config;
   }
   byId('radio-form').addEventListener('submit', async event => {
@@ -175,8 +178,7 @@
       if (body.confirmation.instance_id !== instance || body.confirmation.state_version !== stateVersion) {
         throw new Error('Server 状态已变化，请刷新后重新校验。');
       }
-      confirmation = {...body.confirmation, expiresAt:Date.now() + body.confirmation.expires_in_seconds * 1000,
-        risky:!!body.warning || !!outside(body.config, body.rate_bounds), warning:body.warning};
+      confirmation = {...body.confirmation, expiresAt:Date.now() + body.confirmation.expires_in_seconds * 1000};
       byId('validated-config').textContent = describe(body.config);
       byId('action-status').textContent = '校验完成。请核对规范配置，再明确点击应用。';
     } catch (error) {
@@ -188,7 +190,7 @@
   byId('apply').addEventListener('click', async () => {
     render();
     if (byId('apply').disabled) return;
-    const token = confirmation.token, confirmRisk = confirmation.risky && byId('confirm-risk').checked;
+    const token = confirmation.token;
     clearConfirmation('应用请求已发出；再次应用需要重新校验。');
     busy = true;
     ++readVersion;
@@ -197,7 +199,7 @@
     byId('action-status').textContent = '正在应用射频，请等待事务结果…';
     render();
     try {
-      const result = await request('/api/v1/radio/config/apply', {confirmation_token:token, confirm_risk:!!confirmRisk});
+      const result = await request('/api/v1/radio/config/apply', {confirmation_token:token, confirm_risk:false});
       byId('action-status').textContent = `射频事务结果：${result.status || '已返回'}${result.error_message ? ' · ' + result.error_message : ''}`;
       byId('transaction-result').textContent = JSON.stringify(result, null, 2);
       busy = false;
@@ -226,11 +228,20 @@
     } finally {stopping = false;render();}
   });
   fields.forEach(field => {
-    const changed = () => {++editVersion;clearConfirmation('输入已变化，请重新校验配置。');render();};
+    // input 与 change 可能先后到达，只在组合实际改变时采用推荐值。
+    const changed = () => {
+      if (rateCombination !== combination() && ['bandwidth_mhz', 'downlink_mcs'].includes(field)) {
+        const bounds = selectedBounds();
+        byId('uftp_rate_kbps').value = bounds ? String(bounds.default_rate_kbps) : '';
+      }
+      rateCombination = combination();
+      ++editVersion;
+      clearConfirmation('输入已变化，请重新校验配置。');
+      render();
+    };
     byId(field).addEventListener('input', changed);
     byId(field).addEventListener('change', changed);
   });
-  byId('confirm-risk').addEventListener('change', render);
   byId('refresh').addEventListener('click', refresh);
   render();
   refresh();

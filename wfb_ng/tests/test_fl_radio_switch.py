@@ -599,6 +599,92 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.assertEqual(self.client1_adapter.wireless_states["wlan1"]["channel"], DEFAULT_BENCHMARK_CHANNEL)
         self.assertEqual(self.client1_adapter.wireless_states["wlan1"]["txpower_dbm"], 12)
 
+    def _calibrate_ht20(self):
+        return self.server.calibrate_radio(
+            {"bandwidth_mhz": 20, "downlink_mcs": 4, "uplink_mcs": 5,
+             "radio_txpower_dbm": 16, "uftp_rate_kbps": 7000}, [1, 2],
+            prepare_timeout_seconds=.5, commit_delay_seconds=.02,
+            commit_timeout_seconds=.4, lease_timeout_seconds=1,
+            ping_interval_seconds=.025)
+
+    def test_calibration_full_config_heartbeat_and_normal_ht40_return(self):
+        self._bring_clients_online()
+        applied = []
+        finalized = []
+        final_callback = threading.Event()
+
+        def record_finalized(config):
+            finalized.append(config)
+            final_callback.set()
+
+        self.client1.on_radio_applied = applied.append
+        self.client1.on_radio_finalized = record_finalized
+        result = self._calibrate_ht20()
+        self.assertTrue(result, result.error_message)
+        expected = result.effective_config
+        self.assertEqual(expected.bandwidth_mhz, 20)
+        self.assertEqual(expected.uftp_rate_kbps, 7000)
+        self.assertEqual(applied[-1], expected)
+        self.assertTrue(final_callback.wait(.5))
+        self.assertEqual(finalized[-1], expected)
+        for client, adapter, iface in ((self.client1, self.client1_adapter, "wlan1"),
+                                       (self.client2, self.client2_adapter, "wlan2")):
+            self.assertTrue(client.calibration)
+            self.assertEqual(adapter.wireless_states[iface]["channel_width"], "HT20")
+            self.assertIsNotNone(client.send_heartbeat_once(timeout=.2))
+            node = self.server.registry.get_node(client.node_id)
+            self.assertEqual(node.bandwidth_mhz, 20)
+            self.assertEqual(node.uftp_rate_kbps, 7000)
+            self.assertTrue(node.calibration)
+        with self.assertRaises(ValueError):
+            self.server.reconfigure_radio({"radio_txpower_dbm": 17}, [1, 2])
+        result = self.server.reconfigure_radio({"bandwidth_mhz": 40}, [1, 2],
+            prepare_timeout_seconds=.5, commit_delay_seconds=.02,
+            commit_timeout_seconds=.4, ping_interval_seconds=.025)
+        self.assertTrue(result, result.error_message)
+        self.assertEqual(result.effective_config.uftp_rate_kbps, 22000)
+        self.assertFalse(self.server.calibration)
+        self.assertFalse(self.client1.calibration)
+        self.assertEqual(self.client1.bandwidth_mhz, 40)
+        self.assertEqual(self.client1_adapter.wireless_states["wlan1"]["channel_width"], "HT40+")
+
+    def test_calibration_alignment_and_failed_return_restore_unmeasured_config(self):
+        self._bring_clients_online()
+        self.assertTrue(self._calibrate_ht20())
+        saved = self.server.active_radio_config
+        # 模拟重入节点使用启动配置，现有心跳闭环应传播完整标定配置。
+        self.client1.bandwidth_mhz = 40
+        self.client1.downlink_mcs = 3
+        self.client1.uftp_rate_kbps = 15000
+        self.client1.calibration = False
+        self.assertIsNotNone(self.client1.send_heartbeat_once(timeout=.2))
+        self.assertEqual(self.client1.bandwidth_mhz, 20)
+        self.assertEqual(self.client1.downlink_mcs, 4)
+        self.assertEqual(self.client1.uftp_rate_kbps, 7000)
+        self.assertTrue(self.client1.calibration)
+        self._drop_client2_broadcast("RADIO_SWITCH_FINALIZED")
+        result = self.server.reconfigure_radio({"bandwidth_mhz": 40}, [1, 2],
+            prepare_timeout_seconds=.5, commit_delay_seconds=.02,
+            commit_timeout_seconds=.15, lease_timeout_seconds=.3,
+            ping_interval_seconds=.025)
+        self.assertEqual(result.status, "rolled_back")
+        self.assertEqual(result.effective_config, saved)
+        self.assertTrue(self.server.calibration)
+        deadline = time.monotonic() + 1
+        while time.monotonic() < deadline and self.client2.bandwidth_mhz != 20:
+            time.sleep(.01)
+        self.assertEqual(self.client2.bandwidth_mhz, 20)
+        self.assertEqual(self.client2.uftp_rate_kbps, 7000)
+        self.assertTrue(self.client2.calibration)
+
+    def test_normal_ht20_and_incompatible_channel_reject_before_broadcast(self):
+        sent = []
+        self.server.broadcast_downlink = sent.append
+        for candidate in ({"bandwidth_mhz": 20}, {"channel": 165}):
+            with self.subTest(candidate=candidate), self.assertRaises(ValueError):
+                self.server.reconfigure_radio(candidate, [1, 2])
+        self.assertEqual(sent, [])
+
     def _short_switch(self):
         return self.server.reconfigure_radio(
             {"channel": 149}, [1, 2], prepare_timeout_seconds=.5,
@@ -655,9 +741,59 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.server.broadcast_downlink = fail_after_proposal
         result = self._short_switch()
         self.assertEqual(result.status, "rolled_back")
-        self.assertTrue(self.client1.lease_watchdog.is_armed)
+        self.assertFalse(self.client1.lease_watchdog.is_armed)
         self._wait_client_fallback(self.client1)
         self._wait_client_fallback(self.client2)
+
+    def test_first_rollback_ack_loss_recovers_through_repeated_abort(self):
+        self._bring_clients_online()
+        self._drop_client2_broadcast('RADIO_SWITCH_FINALIZED')
+        send = self.client2._send_unicast_datagram
+        dropped = threading.Event()
+
+        def drop_first_ack(data):
+            if json.loads(data)['type'] == 'RADIO_SWITCH_ROLLBACK_ACK' and not dropped.is_set():
+                dropped.set()
+                return
+            send(data)
+
+        self.client2._send_unicast_datagram = drop_first_ack
+        result = self._short_switch()
+        self.assertTrue(dropped.is_set())
+        self.assertEqual(result.status, 'rolled_back')
+        self.assertEqual(result.effective_config.channel, 157)
+        self.assertFalse(self.client2.radio_switch_pending)
+        self.assertFalse(self.server.radio_error)
+
+    def test_lost_abort_and_rollback_ack_cannot_claim_cluster_recovered(self):
+        self._bring_clients_online()
+        receive = self.client2.handle_broadcast
+        self.client2.handle_broadcast = lambda msg: receive(msg) if msg['type'] not in (
+            'RADIO_SWITCH_FINALIZED', 'CONFIG_RADIO_ABORT') else None
+        send = self.client2._send_unicast_datagram
+        self.client2._send_unicast_datagram = lambda data: send(data) if json.loads(data)['type'] != (
+            'RADIO_SWITCH_ROLLBACK_ACK') else None
+        result = self._short_switch()
+        self.assertEqual(result.status, 'radio_error')
+        self.assertIsNone(result.effective_config)
+        self.assertTrue(self.server.radio_error)
+
+    def test_failed_client_restore_cannot_claim_cluster_recovered(self):
+        self._bring_clients_online()
+        self._drop_client2_broadcast('RADIO_SWITCH_FINALIZED')
+        set_channel = self.client2_adapter.set_channel
+
+        def reject_restore(iface, channel, channel_width):
+            if channel == 157:
+                raise OSError('restore unavailable')
+            set_channel(iface, channel, channel_width)
+
+        self.client2_adapter.set_channel = reject_restore
+        result = self._short_switch()
+        self.assertEqual(result.status, 'radio_error')
+        self.assertIsNone(result.effective_config)
+        self.assertTrue(self.server.radio_error)
+        self.assertTrue(self.client2.radio_switch_pending)
 
     def test_confirmed_loss_keeps_server_committed(self):
         self._bring_clients_online()

@@ -24,7 +24,7 @@ from wfb_ng.fl.radio import (
     RECOMMENDED_UPLINK_MCS,
     RadioConfig,
     normalize_radio_patch,
-    validate_radio_config,
+    validate_radio_calibration_patch,
     validate_radio_patch,
 )
 
@@ -115,6 +115,10 @@ class NodeHeartbeat:
     uplink_mcs: int
     error_code: Optional[str] = None
     timestamp_ms: Optional[int] = None
+    bandwidth_mhz: int = 40
+    downlink_mcs: int = 3
+    uftp_rate_kbps: int = 15000
+    calibration: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         res: Dict[str, Any] = {
@@ -125,6 +129,10 @@ class NodeHeartbeat:
             "current_channel": self.current_channel,
             "txpower_dbm": self.txpower_dbm,
             "uplink_mcs": self.uplink_mcs,
+            "bandwidth_mhz": self.bandwidth_mhz,
+            "downlink_mcs": self.downlink_mcs,
+            "uftp_rate_kbps": self.uftp_rate_kbps,
+            "calibration": self.calibration,
         }
         if self.error_code is not None:
             res["error_code"] = self.error_code
@@ -166,11 +174,17 @@ class NodeHeartbeat:
             raise ValueError(f"Invalid or missing timestamp_ms: {data.get('timestamp_ms')}")
 
         # Strict validation of RF parameters using existing canonical validator
-        validate_radio_config({
+        if type(data.get("calibration")) is not bool:
+            raise ValueError("calibration must be a boolean")
+        validator = validate_radio_calibration_patch if data["calibration"] else validate_radio_patch
+        validator({
             "channel": data["current_channel"],
             "radio_txpower_dbm": data["txpower_dbm"],
             "uplink_mcs": data["uplink_mcs"],
-        })
+            "bandwidth_mhz": data["bandwidth_mhz"],
+            "downlink_mcs": data["downlink_mcs"],
+            "uftp_rate_kbps": data["uftp_rate_kbps"],
+        }, base=RadioConfig())
 
         return cls(
             node_id=data["node_id"],
@@ -179,6 +193,10 @@ class NodeHeartbeat:
             current_channel=data["current_channel"],
             txpower_dbm=data["txpower_dbm"],
             uplink_mcs=data["uplink_mcs"],
+            bandwidth_mhz=data["bandwidth_mhz"],
+            downlink_mcs=data["downlink_mcs"],
+            uftp_rate_kbps=data["uftp_rate_kbps"],
+            calibration=data["calibration"],
             error_code=data.get("error_code"),
             timestamp_ms=data["timestamp_ms"],
         )
@@ -271,6 +289,8 @@ class CommitSuccess:
     session_id: str
     current_channel: int
     timestamp_ms: Optional[int] = None
+    config: Optional[Dict[str, Any]] = None
+    calibration: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         res: Dict[str, Any] = {
@@ -278,6 +298,8 @@ class CommitSuccess:
             "node_id": self.node_id,
             "session_id": self.session_id,
             "current_channel": self.current_channel,
+            "config": self.config,
+            "calibration": self.calibration,
         }
         if self.timestamp_ms is not None:
             res["timestamp_ms"] = self.timestamp_ms
@@ -301,6 +323,8 @@ class CommitSuccess:
             session_id=data["session_id"],
             current_channel=data["current_channel"],
             timestamp_ms=data.get("timestamp_ms"),
+            config=data.get("config"),
+            calibration=data.get("calibration", False),
         )
 
     @classmethod
@@ -444,6 +468,10 @@ class NodeRecord:
     last_heartbeat_time: float = field(default_factory=time.monotonic)
     last_heartbeat_wall_time: float = field(default_factory=time.time)
     addr: Optional[Tuple[str, int]] = None
+    bandwidth_mhz: int = 40
+    downlink_mcs: int = 3
+    uftp_rate_kbps: int = 15000
+    calibration: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -455,6 +483,10 @@ class NodeRecord:
             "current_channel": self.current_channel,
             "txpower_dbm": self.txpower_dbm,
             "uplink_mcs": self.uplink_mcs,
+            "bandwidth_mhz": self.bandwidth_mhz,
+            "downlink_mcs": self.downlink_mcs,
+            "uftp_rate_kbps": self.uftp_rate_kbps,
+            "calibration": self.calibration,
             "error_code": self.error_code,
             "timestamp_ms": self.timestamp_ms,
             "last_heartbeat_time": self.last_heartbeat_time,
@@ -553,6 +585,10 @@ class NodeHorizonRegistry:
                 current_channel=heartbeat.current_channel,
                 txpower_dbm=heartbeat.txpower_dbm,
                 uplink_mcs=heartbeat.uplink_mcs,
+                bandwidth_mhz=heartbeat.bandwidth_mhz,
+                downlink_mcs=heartbeat.downlink_mcs,
+                uftp_rate_kbps=heartbeat.uftp_rate_kbps,
+                calibration=heartbeat.calibration,
                 error_code=heartbeat.error_code,
                 timestamp_ms=heartbeat.timestamp_ms,
                 last_heartbeat_time=now,
@@ -567,7 +603,14 @@ class NodeHorizonRegistry:
             if heartbeat.uplink_mcs != server_radio.uplink_mcs:
                 align_patch["uplink_mcs"] = server_radio.uplink_mcs
 
+            for key in ("bandwidth_mhz", "downlink_mcs", "uftp_rate_kbps"):
+                if getattr(heartbeat, key) != getattr(server_radio, key):
+                    align_patch[key] = getattr(server_radio, key)
             if align_patch:
+                # 对齐传播完整逻辑配置，信道仍由操作者和寻频流程控制。
+                align_patch = {k: v for k, v in server_radio.to_dict().items()
+                               if k in ("radio_txpower_dbm", "uplink_mcs", "downlink_mcs",
+                                        "bandwidth_mhz", "uftp_rate_kbps")}
                 return HeartbeatAck(ack=True), align_patch
             return HeartbeatAck(ack=True), None
 
@@ -631,6 +674,7 @@ class ControlPlaneServer:
         on_radio_applied: Optional[Callable[[RadioConfig], None]] = None,
     ):
         self.active_radio_config = active_radio_config
+        self.calibration = False
         # Latched fail-closed state, also set by the daemon on unexpected escape.
         self.radio_error = False
         self.network_adapter = network_adapter
@@ -654,6 +698,8 @@ class ControlPlaneServer:
         self._switch_lock = threading.Lock()
         self._active_switch_session: Optional[str] = None
         self._target_switch_channel: Optional[int] = None
+        self._target_switch_config: Optional[Dict[str, Any]] = None
+        self._target_switch_calibration = False
         self._prepare_acks: Dict[int, PrepareAck] = {}
         self._commit_successes: Dict[int, CommitSuccess] = {}
         self._prepare_event = threading.Event()
@@ -662,6 +708,7 @@ class ControlPlaneServer:
         self._switch_phase: Optional[str] = None
         self._finalized_acks: Set[int] = set()
         self._confirmed_acks: Set[int] = set()
+        self._rollback_acks: Set[int] = set()
         self._barrier_event = threading.Event()
 
         # Job-scoped client RoleService readiness synchronization
@@ -718,10 +765,12 @@ class ControlPlaneServer:
                     pass
                 self._broadcast_sock = None
 
-    def _apply_channel_switch(self, channel: int) -> None:
+    def _apply_channel_switch(self, channel: int, bandwidth_mhz: Optional[int] = None) -> None:
         """Switch server physical interface channel via network adapter. Fail closed on error."""
         if self.network_adapter is not None and self.air_interface is not None:
-            width = "HT20" if channel == 165 else "HT40+"
+            width = RadioConfig(channel=channel, bandwidth_mhz=(
+                self.active_radio_config.bandwidth_mhz if bandwidth_mhz is None else bandwidth_mhz
+            )).channel_width
             self.network_adapter.set_channel(
                 self.air_interface, channel=channel, channel_width=width
             )
@@ -783,8 +832,11 @@ class ControlPlaneServer:
         if not isinstance(payload, dict):
             return None
         msg_type = payload.get("type")
-        if msg_type in ("RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK"):
-            phase = "FINALIZED" if msg_type == "RADIO_SWITCH_FINALIZED_ACK" else "CONFIRMED"
+        if msg_type in ("RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK",
+                        "RADIO_SWITCH_ROLLBACK_ACK"):
+            phase = {"RADIO_SWITCH_FINALIZED_ACK": "FINALIZED",
+                     "RADIO_SWITCH_CONFIRMED_ACK": "CONFIRMED",
+                     "RADIO_SWITCH_ROLLBACK_ACK": "ROLLBACK"}[msg_type]
             node_id = payload.get("node_id")
             with self._lock:
                 if (
@@ -795,8 +847,12 @@ class ControlPlaneServer:
                     and node_id in self._expected_target_nodes
                     and type(payload.get("channel")) is int
                     and payload["channel"] == self._target_switch_channel
+                    and payload.get("config") == self._target_switch_config
+                    and payload.get("calibration") is self._target_switch_calibration
                 ):
-                    acks = self._finalized_acks if phase == "FINALIZED" else self._confirmed_acks
+                    acks = {"FINALIZED": self._finalized_acks,
+                            "CONFIRMED": self._confirmed_acks,
+                            "ROLLBACK": self._rollback_acks}[phase]
                     acks.add(node_id)
                     if self._expected_target_nodes.issubset(acks):
                         self._barrier_event.set()
@@ -843,6 +899,8 @@ class ControlPlaneServer:
                     and cs.node_id in self._expected_target_nodes
                     and self._target_switch_channel is not None
                     and cs.current_channel == self._target_switch_channel
+                    and cs.config == self._target_switch_config
+                    and cs.calibration is self._target_switch_calibration
                 ):
                     self._commit_successes[cs.node_id] = cs
                     if self._expected_target_nodes and self._expected_target_nodes.issubset(
@@ -863,6 +921,12 @@ class ControlPlaneServer:
             ):
                 align_patch = None
 
+            if (not self.radio_error and self._active_switch_session is None
+                and hb.calibration != self.calibration):
+                align_patch = {k: v for k, v in self.active_radio_config.to_dict().items()
+                               if k in ("radio_txpower_dbm", "uplink_mcs", "downlink_mcs",
+                                        "bandwidth_mhz", "uftp_rate_kbps")}
+
         record = self.registry.get_node(hb.node_id)
         if self.on_heartbeat_received is not None and record is not None:
             try:
@@ -875,6 +939,7 @@ class ControlPlaneServer:
             align_msg = {
                 "type": "CONFIG_RADIO_ALIGN",
                 "patch": align_patch,
+                "calibration": self.calibration,
             }
             replies.append(json.dumps(align_msg).encode("utf-8"))
         return replies
@@ -889,6 +954,27 @@ class ControlPlaneServer:
         lease_timeout_seconds: float = LEASE_TIMEOUT_DEFAULT_SECONDS,
         ping_interval_seconds: float = NEW_CHANNEL_PING_INTERVAL_SECONDS,
     ) -> RadioSwitchResult:
+        """通过正常组合表门禁执行重配。"""
+        return self._reconfigure_radio(patch, target_nodes, prepare_timeout_seconds,
+            commit_delay_seconds, commit_timeout_seconds, lease_timeout_seconds,
+            ping_interval_seconds, calibration=False)
+
+    def calibrate_radio(self, patch: Dict[str, Any], target_nodes: Sequence[int],
+                        **timing: Any) -> RadioSwitchResult:
+        """专用受控 HT20 标定入口，复用完整事务与租约。"""
+        return self._reconfigure_radio(patch, target_nodes, calibration=True, **timing)
+
+    def _reconfigure_radio(
+        self,
+        patch: Dict[str, Any],
+        target_nodes: Optional[Sequence[int]] = None,
+        prepare_timeout_seconds: float = PREPARE_TIMEOUT_DEFAULT_SECONDS,
+        commit_delay_seconds: float = COMMIT_DELAY_DEFAULT_SECONDS,
+        commit_timeout_seconds: float = COMMIT_TIMEOUT_DEFAULT_SECONDS,
+        lease_timeout_seconds: float = LEASE_TIMEOUT_DEFAULT_SECONDS,
+        ping_interval_seconds: float = NEW_CHANNEL_PING_INTERVAL_SECONDS,
+        *, calibration: bool = False,
+    ) -> RadioSwitchResult:
         """Run the lease-protected transaction and reliable final confirmation barriers.
 
         FINALIZED acknowledgements precede the irreversible commit. After that
@@ -901,7 +987,12 @@ class ControlPlaneServer:
                 raise FLRuntimeError("radio_error", "射频状态不可确认，禁止后续射频重配")
             norm_patch = normalize_radio_patch(patch)
             previous = self.active_radio_config
-            updated = validate_radio_patch(norm_patch, base=previous)
+            previous_calibration = self.calibration
+            validator = validate_radio_calibration_patch if calibration else validate_radio_patch
+            updated = validator(norm_patch, base=previous)
+            transaction_patch = {k: v for k, v in updated.to_dict().items()
+                                 if k in ("channel", "radio_txpower_dbm", "downlink_mcs",
+                                          "uplink_mcs", "bandwidth_mhz", "uftp_rate_kbps")}
             targets = set(target_nodes or [
                 nid for nid, record in self.registry.get_all_nodes().items()
                 if record.readiness in (NodeReadiness.READY, NodeReadiness.ACTIVE)
@@ -918,20 +1009,26 @@ class ControlPlaneServer:
             commit_sent = False
             phase = "PREPARE"
             missing = sorted(targets)
+            recovery_unresponsive: Optional[List[int]] = None
             with self._lock:
                 self._active_switch_session = session_id
                 self._target_switch_channel = updated.channel
+                self._target_switch_config = updated.to_dict()
+                self._target_switch_calibration = calibration
                 self._expected_target_nodes = targets
                 self._prepare_acks.clear()
                 self._commit_successes.clear()
                 self._finalized_acks.clear()
                 self._confirmed_acks.clear()
+                self._rollback_acks.clear()
                 self._prepare_event.clear()
                 self._commit_event.clear()
                 self._barrier_event.clear()
                 self._switch_phase = phase
 
             def message(kind: str, **fields: Any) -> Dict[str, Any]:
+                fields.setdefault("config", updated.to_dict())
+                fields.setdefault("calibration", calibration)
                 return dict(type=kind, session_id=session_id,
                             target_nodes=sorted(targets), **fields)
 
@@ -953,7 +1050,7 @@ class ControlPlaneServer:
 
             try:
                 logger.info("射频重配 PREPARE session=%s targets=%s patch=%s", session_id, sorted(targets), norm_patch)
-                self.broadcast_downlink(message("CONFIG_RADIO_PREPARE", patch=norm_patch,
+                self.broadcast_downlink(message("CONFIG_RADIO_PREPARE", patch=transaction_patch,
                                                 timeout_seconds=prepare_timeout_seconds))
                 self._prepare_event.wait(prepare_timeout_seconds)
                 with self._lock:
@@ -966,14 +1063,15 @@ class ControlPlaneServer:
                     self._switch_phase = phase
                 # Set before sending: a send may partly succeed before raising.
                 commit_sent = True
-                self.broadcast_downlink(message("CONFIG_RADIO_COMMIT", patch=norm_patch,
+                self.broadcast_downlink(message("CONFIG_RADIO_COMMIT", patch=transaction_patch,
                     delay_ms=int(commit_delay_seconds * 1000), lease_timeout_seconds=lease_timeout_seconds))
                 if commit_delay_seconds > 0:
                     time.sleep(commit_delay_seconds)
-                if updated.channel != previous.channel:
-                    self._apply_channel_switch(updated.channel)
+                if (updated.channel, updated.bandwidth_mhz) != (previous.channel, previous.bandwidth_mhz):
+                    self._apply_channel_switch(updated.channel, updated.bandwidth_mhz)
                 if updated.radio_txpower_dbm != previous.radio_txpower_dbm:
                     self._apply_txpower_switch(updated.radio_txpower_dbm)
+                self.calibration = calibration
                 if self.on_radio_applied is not None:
                     self.on_radio_applied(updated)
                 self.update_radio_config(updated)
@@ -1014,20 +1112,29 @@ class ControlPlaneServer:
                 effective: Optional[RadioConfig] = updated if committed else previous
                 status: Literal["rolled_back", "radio_error"] = "radio_error" if committed else "rolled_back"
                 if not committed:
-                    fallback = validate_radio_patch({"channel": DEFAULT_BENCHMARK_CHANNEL}, base=previous)
+                    # 已保存配置已被受理校验；恢复不重新套用正常速率门禁。
+                    fallback = replace(previous, channel=DEFAULT_BENCHMARK_CHANNEL)
+                    recovery_required = commit_sent or previous.channel != fallback.channel
+                    with self._lock:
+                        self._switch_phase = "ROLLBACK"
+                        self._target_switch_channel = fallback.channel
+                        self._target_switch_config = fallback.to_dict()
+                        self._target_switch_calibration = previous_calibration
+                        self._rollback_acks.clear()
+                        self._barrier_event.clear()
                     if not commit_sent:
-                        # Prepared clients on a nonbenchmark channel have no
-                        # lease yet. Notify them before leaving that channel.
+                        # 非基准信道上的已准备客户端尚未持有租约，离开该信道前先通知中止。
                         try:
                             self.broadcast_downlink(message("CONFIG_RADIO_ABORT",
-                                channel=previous.channel, reason=error))
+                                channel=previous.channel, config=previous.to_dict(),
+                                calibration=previous_calibration, reason=error))
                         except Exception as abort_exc:
                             logger.warning("射频 prepare abort 发送失败 session=%s: %s", session_id, abort_exc)
-                    # Attempt both physical restores even when one fails; do not
-                    # infer hardware state from the last successfully cached config.
+                    # 即使其中一项恢复失败，也尝试恢复另一项；不以配置缓存推断硬件状态。
+                    self.calibration = previous_calibration
                     rollback_errors = []
                     for restore in (
-                        lambda: self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL),
+                        lambda: self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL, previous.bandwidth_mhz),
                         lambda: self._apply_txpower_switch(previous.radio_txpower_dbm),
                         lambda: self.on_radio_applied(fallback) if self.on_radio_applied is not None else None,
                     ):
@@ -1041,15 +1148,35 @@ class ControlPlaneServer:
                         error += "; 硬件回退无法确认: " + "; ".join(rollback_errors)
                     else:
                         effective = fallback
+                        self.calibration = previous_calibration
                         self.update_radio_config(fallback)
                         logger.warning("射频重配回退至 Channel %d session=%s", DEFAULT_BENCHMARK_CHANNEL, session_id)
-                    # All reversible failures converge on the benchmark.
-                    for _ in range(2):
+                    # 服务端本机恢复不等于全网恢复；等每个冻结目标确认完整旧配置。
+                    # ABORT 可能因物理信道隔离而不可达，留出客户端租约自然到期的时间。
+                    recovery_deadline = time.monotonic() + commit_timeout_seconds
+                    if commit_sent:
+                        recovery_deadline += lease_timeout_seconds + commit_delay_seconds
+                    while True:
                         try:
                             self.broadcast_downlink(message("CONFIG_RADIO_ABORT",
-                                channel=DEFAULT_BENCHMARK_CHANNEL, reason=error))
+                                channel=DEFAULT_BENCHMARK_CHANNEL, config=fallback.to_dict(),
+                                calibration=previous_calibration, reason=error))
                         except Exception as abort_exc:
                             logger.warning("射频 abort 发送失败 session=%s: %s", session_id, abort_exc)
+                        with self._lock:
+                            recovery_missing = sorted(targets - self._rollback_acks)
+                            self._barrier_event.clear()
+                        if not recovery_required or not recovery_missing or rollback_errors:
+                            break
+                        remaining = recovery_deadline - time.monotonic()
+                        if remaining <= 0:
+                            break
+                        self._barrier_event.wait(min(ping_interval_seconds, remaining))
+                    if recovery_required and recovery_missing:
+                        status = "radio_error"
+                        effective = None
+                        recovery_unresponsive = recovery_missing
+                        error += f"; 全网恢复确认缺失: {recovery_missing}"
                 with self._lock:
                     if status == "radio_error":
                         self.radio_error = True
@@ -1063,6 +1190,8 @@ class ControlPlaneServer:
                         missing = sorted(targets - self._finalized_acks)
                     elif phase == "CONFIRMED":
                         missing = sorted(targets - self._confirmed_acks)
+                    if recovery_unresponsive is not None:
+                        missing = recovery_unresponsive
                 return RadioSwitchResult(
                     success=False, status=status, session_id=session_id,
                     target_channel=updated.channel, applied_patch=norm_patch,
@@ -1073,12 +1202,15 @@ class ControlPlaneServer:
                 with self._lock:
                     self._active_switch_session = None
                     self._target_switch_channel = None
+                    self._target_switch_config = None
+                    self._target_switch_calibration = False
                     self._switch_phase = None
                     self._expected_target_nodes = set()
                     self._prepare_acks.clear()
                     self._commit_successes.clear()
                     self._finalized_acks.clear()
                     self._confirmed_acks.clear()
+                    self._rollback_acks.clear()
                     self._prepare_event.clear()
                     self._commit_event.clear()
                     self._barrier_event.clear()
@@ -1137,7 +1269,31 @@ class ControlPlaneClient:
         idle_interval_seconds: float = IDLE_HEARTBEAT_INTERVAL_SECONDS,
         active_interval_seconds: float = ACTIVE_HEARTBEAT_INTERVAL_SECONDS,
         state_lock: Optional[Any] = None,
+        bandwidth_mhz: int = 40,
+        downlink_mcs: int = 3,
+        uftp_rate_kbps: int = 15000,
+        initial_radio_config: Optional[RadioConfig] = None,
+        calibration: bool = False,
     ):
+        if type(calibration) is not bool:
+            raise ValueError("calibration must be a boolean")
+        if calibration and initial_radio_config is None:
+            raise ValueError("标定状态恢复必须提供完整 initial_radio_config")
+        if initial_radio_config is not None:
+            if not isinstance(initial_radio_config, RadioConfig):
+                raise TypeError("initial_radio_config must be a RadioConfig")
+            # 重建仅恢复调用方保存的完整状态；普通初始化仍经过正常组合门禁。
+            initial_patch = {k: v for k, v in initial_radio_config.to_dict().items()
+                             if k in ("channel", "radio_txpower_dbm", "downlink_mcs",
+                                      "uplink_mcs", "bandwidth_mhz", "uftp_rate_kbps")}
+            validator = validate_radio_calibration_patch if calibration else validate_radio_patch
+            initial_radio_config = validator(initial_patch, base=RadioConfig())
+            initial_channel = initial_radio_config.channel
+            txpower_dbm = initial_radio_config.radio_txpower_dbm
+            uplink_mcs = initial_radio_config.uplink_mcs
+            bandwidth_mhz = initial_radio_config.bandwidth_mhz
+            downlink_mcs = initial_radio_config.downlink_mcs
+            uftp_rate_kbps = initial_radio_config.uftp_rate_kbps
         self.node_id = node_id
         self.tun_ip = tun_ip
         self.network_adapter = network_adapter
@@ -1147,6 +1303,12 @@ class ControlPlaneClient:
         self.locked_channel: Optional[int] = None
         self.txpower_dbm = txpower_dbm
         self.uplink_mcs = uplink_mcs
+        self.bandwidth_mhz = bandwidth_mhz
+        self.downlink_mcs = downlink_mcs
+        self.uftp_rate_kbps = uftp_rate_kbps
+        self.calibration = calibration
+        self._pre_switch_calibration = False
+        self._pending_switch_calibration = False
         self.server_host = server_host
         self.server_port = server_port
         self.broadcast_port = broadcast_port
@@ -1186,6 +1348,7 @@ class ControlPlaneClient:
         self._finalized_proposal_session: Optional[str] = None
         self._confirmed_switch_session: Optional[str] = None
         self._confirmed_switch_channel: Optional[int] = None
+        self._rolled_back_switch_session: Optional[str] = None
 
         # Register radio switch broadcast handlers
         self.register_broadcast_handler(
@@ -1241,14 +1404,18 @@ class ControlPlaneClient:
         finally:
             sock.setblocking(True)
 
-    def _apply_channel_switch(self, channel: int) -> None:
+    def _apply_channel_switch(self, channel: int, bandwidth_mhz: Optional[int] = None) -> None:
         """Switch physical interface channel via network adapter. Fail closed on error."""
         if self.network_adapter is not None and self.air_interface is not None:
-            width = "HT20" if channel == 165 else "HT40+"
+            width = replace(self._current_radio_config(), channel=channel, bandwidth_mhz=(
+                self.bandwidth_mhz if bandwidth_mhz is None else bandwidth_mhz
+            )).channel_width
             self.network_adapter.set_channel(
                 self.air_interface, channel=channel, channel_width=width
             )
         self.current_channel = channel
+        if bandwidth_mhz is not None:
+            self.bandwidth_mhz = bandwidth_mhz
 
     def _apply_txpower_switch(self, txpower_dbm: int) -> None:
         """Switch physical interface txpower via network adapter. Fail closed on error."""
@@ -1256,7 +1423,7 @@ class ControlPlaneClient:
             self.network_adapter.set_txpower(self.air_interface, txpower_dbm=txpower_dbm)
         self.txpower_dbm = txpower_dbm
 
-    def apply_alignment(self, patch: Dict[str, Any]) -> None:
+    def apply_alignment(self, patch: Dict[str, Any], *, calibration: bool = False) -> None:
         """
         Apply incremental alignment directives for txpower and MCS.
         Channel hopping is prohibited here per project rule #89.
@@ -1265,25 +1432,30 @@ class ControlPlaneClient:
             if self._pre_switch_config is not None or not isinstance(patch, dict) or not patch:
                 return
 
-            base = RadioConfig(
-                channel=self.current_channel,
-                radio_txpower_dbm=self.txpower_dbm,
-                uplink_mcs=self.uplink_mcs,
-            )
+            base = self._current_radio_config()
             # Exclude channel if mistakenly present
             safe_patch = {k: v for k, v in patch.items() if k != "channel"}
             if not safe_patch:
                 return
-            updated = validate_radio_patch(safe_patch, base=base)
+            if type(calibration) is not bool:
+                raise ValueError("calibration must be a boolean")
+            validator = validate_radio_calibration_patch if calibration else validate_radio_patch
+            updated = validator(safe_patch, base=base)
+            previous_calibration = self.calibration
 
             try:
                 if updated.radio_txpower_dbm != self.txpower_dbm:
                     self._apply_txpower_switch(updated.radio_txpower_dbm)
-                self.uplink_mcs = updated.uplink_mcs
+                if updated.bandwidth_mhz != self.bandwidth_mhz:
+                    self._apply_channel_switch(updated.channel, updated.bandwidth_mhz)
+                self._set_radio_fields(updated)
+                self.calibration = calibration
                 self._notify_radio_applied()
             except Exception:
                 self._apply_txpower_switch(base.radio_txpower_dbm)
-                self.uplink_mcs = base.uplink_mcs
+                self._apply_channel_switch(base.channel, base.bandwidth_mhz)
+                self._set_radio_fields(base)
+                self.calibration = previous_calibration
                 self._notify_radio_applied()
                 raise
 
@@ -1305,6 +1477,10 @@ class ControlPlaneClient:
             with self._lock:
                 if self._pre_switch_config is not None:
                     return False
+                try:
+                    replace(self._current_radio_config(), channel=ch).channel_width
+                except ValueError:
+                    continue
                 self._apply_channel_switch(ch)
 
             for attempt in range(1, self.max_attempts_per_channel + 1):
@@ -1319,6 +1495,10 @@ class ControlPlaneClient:
                     current_channel=ch,
                     txpower_dbm=self.txpower_dbm,
                     uplink_mcs=self.uplink_mcs,
+                    bandwidth_mhz=self.bandwidth_mhz,
+                    downlink_mcs=self.downlink_mcs,
+                    uftp_rate_kbps=self.uftp_rate_kbps,
+                    calibration=self.calibration,
                     timestamp_ms=self._next_timestamp_ms(),
                 )
 
@@ -1372,7 +1552,7 @@ class ControlPlaneClient:
         try:
             msg = json.loads(extra_data.decode("utf-8"))
             if msg.get("type") == "CONFIG_RADIO_ALIGN" and "patch" in msg:
-                self.apply_alignment(msg["patch"])
+                self.apply_alignment(msg["patch"], calibration=msg.get("calibration", False))
         except Exception as exc:
             logger.warning("解析或应用对齐指令失败: %s", exc)
 
@@ -1388,6 +1568,10 @@ class ControlPlaneClient:
             current_channel=self.current_channel,
             txpower_dbm=self.txpower_dbm,
             uplink_mcs=self.uplink_mcs,
+            bandwidth_mhz=self.bandwidth_mhz,
+            downlink_mcs=self.downlink_mcs,
+            uftp_rate_kbps=self.uftp_rate_kbps,
+            calibration=self.calibration,
             timestamp_ms=self._next_timestamp_ms(),
         )
 
@@ -1511,19 +1695,22 @@ class ControlPlaneClient:
         if self.node_id not in msg.get("target_nodes", [self.node_id]):
             return
         with self._lock:
-            # An active lease cannot be superseded by a delayed/new PREPARE.
+            # 延迟到达或新的 PREPARE 不得覆盖当前有效租约。
             if self._pre_switch_config is not None:
                 return
             try:
                 norm_patch = normalize_radio_patch(msg.get("patch", {}))
-                validate_radio_patch(norm_patch, base=RadioConfig(
-                    channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
-                    uplink_mcs=self.uplink_mcs,
-                ))
+                calibration = msg.get("calibration", False)
+                if type(calibration) is not bool:
+                    raise ValueError("calibration must be a boolean")
+                validator = validate_radio_calibration_patch if calibration else validate_radio_patch
+                validator(norm_patch, base=self._current_radio_config())
+                self._rolled_back_switch_session = None
                 self._pending_switch_session_id = session_id
                 self._pending_switch_patch = norm_patch
+                self._pending_switch_calibration = calibration
                 self._finalized_proposal_session = None
-                # A new transaction invalidates the previous re-ACK receipt.
+                # 新事务使上一事务的重复确认收据失效。
                 self._confirmed_switch_session = None
                 self._confirmed_switch_channel = None
                 ack = PrepareAck(self.node_id, session_id, ok=True,
@@ -1539,12 +1726,11 @@ class ControlPlaneClient:
                 return
             session_id = self._pending_switch_session_id
             norm_patch = normalize_radio_patch(msg.get("patch") or self._pending_switch_patch or {})
-            if norm_patch != self._pending_switch_patch:
+            if (norm_patch != self._pending_switch_patch
+                or msg.get("calibration", False) is not self._pending_switch_calibration):
                 return
-            self._pre_switch_config = RadioConfig(
-                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
-                uplink_mcs=self.uplink_mcs,
-            )
+            self._pre_switch_config = self._current_radio_config()
+            self._pre_switch_calibration = self.calibration
             delay_sec = max(0.0, int(msg.get("delay_ms", 2000)) / 1000.0)
             self._switch_applied = False
             lease_seconds = float(msg.get("lease_timeout_seconds", LEASE_TIMEOUT_DEFAULT_SECONDS))
@@ -1556,20 +1742,25 @@ class ControlPlaneClient:
             if delay_sec > 0:
                 time.sleep(delay_sec)
             with self._lock:
-                if session_id != self._pending_switch_session_id or not self.lease_watchdog.is_armed:
+                previous = self._pre_switch_config
+                if (session_id != self._pending_switch_session_id
+                    or not self.lease_watchdog.is_armed or previous is None):
                     return
                 try:
-                    if "channel" in norm_patch:
-                        self._apply_channel_switch(norm_patch["channel"])
+                    validator = (validate_radio_calibration_patch if self._pending_switch_calibration
+                                 else validate_radio_patch)
+                    updated = validator(norm_patch, base=previous)
+                    if (updated.channel, updated.bandwidth_mhz) != (self.current_channel, self.bandwidth_mhz):
+                        self._apply_channel_switch(updated.channel, updated.bandwidth_mhz)
                     if "radio_txpower_dbm" in norm_patch:
                         self._apply_txpower_switch(norm_patch["radio_txpower_dbm"])
-                    if "uplink_mcs" in norm_patch:
-                        self.uplink_mcs = norm_patch["uplink_mcs"]
+                    self._set_radio_fields(updated)
+                    self.calibration = self._pending_switch_calibration
                     self._notify_radio_applied()
                     self._switch_applied = True
                     logger.info("节点 %d COMMIT session=%s channel=%d", self.node_id, session_id, self.current_channel)
                 except Exception as exc:
-                    # Keep the lease armed so an incomplete physical apply heals.
+                    # 物理应用未完成时保留租约，以便自动恢复。
                     logger.error("节点 %d COMMIT 硬件应用失败: %s", self.node_id, exc)
                     self._pending_switch_patch = None
 
@@ -1578,7 +1769,7 @@ class ControlPlaneClient:
     def _handle_new_channel_ping(self, msg: Dict[str, Any]) -> None:
         with self._lock:
             if (not self._matches_pending_switch(msg)
-                or msg.get("channel") != self.current_channel
+                or not self._matches_current_radio(msg)
                 or self._pending_switch_patch is None
                 or not self._switch_applied
                 or not self.lease_watchdog.refresh()):
@@ -1586,19 +1777,28 @@ class ControlPlaneClient:
             success = CommitSuccess(
                 node_id=self.node_id, session_id=self._pending_switch_session_id or "",
                 current_channel=self.current_channel, timestamp_ms=self._next_timestamp_ms(),
+                config=self._current_radio_config().to_dict(), calibration=self.calibration,
             )
             self._send_unicast_datagram(success.to_bytes())
+
+    def _matches_current_radio(self, msg: Dict[str, Any]) -> bool:
+        """完整配置一致才允许续租或确认，防止同信道错配被接受。"""
+        return (msg.get("channel") == self.current_channel
+                and msg.get("config") == self._current_radio_config().to_dict()
+                and msg.get("calibration") is self.calibration)
 
     def _send_final_barrier_ack(self, kind: str, session_id: str) -> None:
         self._send_unicast_datagram(json.dumps({
             "type": kind, "session_id": session_id, "node_id": self.node_id,
             "channel": self.current_channel,
+            "config": self._current_radio_config().to_dict(),
+            "calibration": self.calibration,
         }).encode("utf-8"))
 
     def _handle_radio_switch_finalized(self, msg: Dict[str, Any]) -> None:
         with self._lock:
             if (not self._matches_pending_switch(msg)
-                or msg.get("channel") != self.current_channel
+                or not self._matches_current_radio(msg)
                 or self._pending_switch_patch is None
                 or not self._switch_applied
                 or not self.lease_watchdog.refresh()):
@@ -1613,7 +1813,7 @@ class ControlPlaneClient:
             if not isinstance(session_id, str) or not session_id:
                 return
             if (self.node_id not in msg.get("target_nodes", [self.node_id])
-                or msg.get("channel") != self.current_channel):
+                or not self._matches_current_radio(msg)):
                 return
             if (session_id == self._confirmed_switch_session
                 and self.current_channel == self._confirmed_switch_channel):
@@ -1630,10 +1830,7 @@ class ControlPlaneClient:
             self._clear_pending_switch()
             self.state = ClientNodeState.IDLE
             self._state_enter_time = time.monotonic()
-            new_config = RadioConfig(
-                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
-                uplink_mcs=self.uplink_mcs,
-            )
+            new_config = self._current_radio_config()
             self._send_final_barrier_ack("RADIO_SWITCH_CONFIRMED_ACK", session_id)
             self._wake_event.set()
             logger.info("节点 %d CONFIRMED session=%s channel=%d", self.node_id, session_id, self.current_channel)
@@ -1648,56 +1845,77 @@ class ControlPlaneClient:
         with self._lock:
             return self._pending_switch_session_id is not None
 
-    def _notify_radio_applied(self) -> None:
-        """Apply process parameters synchronously, before acknowledging success.
+    def _current_radio_config(self) -> RadioConfig:
+        """读取当前完整逻辑配置；标定状态单独保存在控制协议中。"""
+        return RadioConfig(channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
+                           downlink_mcs=self.downlink_mcs, uplink_mcs=self.uplink_mcs,
+                           bandwidth_mhz=self.bandwidth_mhz, uftp_rate_kbps=self.uftp_rate_kbps)
 
-        Invoked with the state lock held. An owning daemon must share this lock
-        so callbacks and task handoffs cannot race or invert the lock order.
-        Exceptions leave the saved configuration available for lease recovery.
+    def _set_radio_fields(self, config: RadioConfig) -> None:
+        """同步完整逻辑配置，避免回调和租约恢复丢失带宽或下行参数。"""
+        self.bandwidth_mhz = config.bandwidth_mhz
+        self.downlink_mcs = config.downlink_mcs
+        self.uplink_mcs = config.uplink_mcs
+        self.uftp_rate_kbps = config.uftp_rate_kbps
+
+    def _notify_radio_applied(self) -> None:
+        """确认成功前同步应用进程参数。
+
+        调用时持有状态锁，所属守护进程须共享此锁，避免回调与任务切换竞争或锁序反转。
+        应用异常时保留旧配置快照，供租约恢复使用。
         """
         if self.on_radio_applied is not None:
-            self.on_radio_applied(RadioConfig(
-                channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
-                uplink_mcs=self.uplink_mcs,
-            ))
+            self.on_radio_applied(self._current_radio_config())
 
     def _rollback_switch(self) -> None:
-        """Restore the benchmark and all pre-switch client parameters."""
-        # An interrupted restore cannot acknowledge the abandoned target config.
+        """恢复基准信道及切换前的完整客户端配置。"""
+        # 恢复尚未完成时，不得确认已放弃的目标配置。
         self._switch_applied = False
         self._finalized_proposal_session = None
-        self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL)
-        if self._pre_switch_config is not None:
-            self._apply_txpower_switch(self._pre_switch_config.radio_txpower_dbm)
-            self.uplink_mcs = self._pre_switch_config.uplink_mcs
+        session_id = self._pending_switch_session_id
+        previous = self._pre_switch_config
+        self._apply_channel_switch(DEFAULT_BENCHMARK_CHANNEL,
+                                   previous.bandwidth_mhz if previous is not None else self.bandwidth_mhz)
+        if previous is not None:
+            self._apply_txpower_switch(previous.radio_txpower_dbm)
+            self._set_radio_fields(previous)
+            self.calibration = self._pre_switch_calibration
         self._notify_radio_applied()
         self._clear_pending_switch()
         self.locked_channel = None
         self.state = ClientNodeState.HUNTING
         self._state_enter_time = time.monotonic()
         self._wake_event.set()
+        self._rolled_back_switch_session = session_id
+        if session_id is not None:
+            self._send_final_barrier_ack("RADIO_SWITCH_ROLLBACK_ACK", session_id)
 
     def _handle_radio_abort(self, msg: Dict[str, Any]) -> None:
         with self._lock:
+            if (self._rolled_back_switch_session is not None
+                and msg.get("session_id") == self._rolled_back_switch_session
+                and self.node_id in msg.get("target_nodes", [self.node_id])
+                and self._matches_current_radio(msg)):
+                self._send_final_barrier_ack("RADIO_SWITCH_ROLLBACK_ACK", self._rolled_back_switch_session)
+                return
             if not self._matches_pending_switch(msg):
                 return
             logger.warning("节点 %d 射频 ABORT session=%s", self.node_id, self._pending_switch_session_id)
-            # Physical-channel isolation also applies to direct protocol dispatch.
+            # 直接分发协议消息时，同样遵守物理信道隔离。
             if msg.get("channel", self.current_channel) != self.current_channel:
                 return
-            # Restore before disarming: a failed restore retains the watchdog.
+            # 先恢复再解除租约，恢复失败时保留看门狗。
             self._rollback_switch()
             self.lease_watchdog.disarm()
 
     def _on_lease_watchdog_expired(self) -> None:
         with self._lock:
-            # A queued expiration callback cannot undo a newer lease or a
-            # confirmation that won the atomic watchdog deadline check.
+            # 排队中的到期回调不得撤销新租约或已通过原子截止时间检查的确认。
             if not self.lease_watchdog.is_expired or self._pending_switch_session_id is None:
                 return
             logger.warning("节点 %d: 射频租约耗尽 session=%s，回退至 Channel %d", self.node_id,
                            self._pending_switch_session_id, DEFAULT_BENCHMARK_CHANNEL)
-            # Wake the existing supervisor even if this first restore raises.
+            # 即使首次恢复抛出异常，也唤醒现有监督循环以便重试。
             self._wake_event.set()
             self._rollback_switch()
 
@@ -1818,10 +2036,8 @@ class ControlPlaneClient:
             with self._lock:
                 switching = self._pre_switch_config is not None
                 if switching and self.lease_watchdog.is_expired:
-                    # Expiration callbacks may fail on transient adapter errors.
-                    # Preserve the saved config until every restore succeeds and
-                    # retry through the existing supervisory loop while hunting
-                    # remains suspended.
+                    # 到期回调可能遭遇短暂网卡故障；全部恢复成功前保留旧配置快照，
+                    # 暂停寻频，并通过现有监督循环重试。
                     try:
                         self._rollback_switch()
                         switching = False

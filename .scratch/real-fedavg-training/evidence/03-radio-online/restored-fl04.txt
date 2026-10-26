@@ -1,0 +1,130 @@
+16959
+phy#1
+	Interface wlxfc221c500a88
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:50:0a:88
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+12900489	PKT_SRC	255:0:0:0:0:0:0
+12900489	GRANT_FILTER	3514:1565:0:1949:0:0:0:0:0
+12900489	READY_FILTER	0:0:0:0:0
+12900489	REASSEMBLY	0:40
+12900489	TOKEN_AUTH	1565:0:119:355
+v6_radio_update generation=3 bandwidth=40 mcs_index=4 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14
+v6_radio_command req_id=4205295650 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=3 bandwidth=40 mcs_index=4 short_gi=1
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=12901488
+12901489	RX_ANT	5785:3:40	1	14:-54:-52:-52:13:16:18
+12901489	RX_ANT	5785:3:40	0	14:-54:-53:-52:13:15:18
+12901489	PKT	21:3255:0:0:14:14:0:0:0:1:391
+12901489	PKT_SRC	255:14:3059:0:0:1:391
+12901489	GRANT_FILTER	3521:1565:0:1956:0:0:0:0:0
+12901489	READY_FILTER	0:0:0:0:0
+12901489	REASSEMBLY	0:40
+12901489	TOKEN_AUTH	1565:0:119:356
+grant_accept node_id=4 sequence=4353 duration_ms=120 expires_at_ms=12901749
+v6_radio_frame kind=data generation=3 bandwidth=40 mcs_index=4 short_gi=1
+grant_accept node_id=4 sequence=4355 duration_ms=120 expires_at_ms=12902009
+grant_accept node_id=4 sequence=4357 duration_ms=120 expires_at_ms=12902269
+grant_accept node_id=4 sequence=4358 duration_ms=120 expires_at_ms=12902400
+grant_accept node_id=4 sequence=4359 duration_ms=120 expires_at_ms=12902530
+12902489	RX_ANT	5785:3:40	1	50:-54:-52:-52:11:15:19
+12902489	RX_ANT	5785:3:40	0	50:-54:-53:-52:6:15:20
+12902489	PKT	58:4890:0:0:50:50:4:0:0:4:514
+12902489	PKT_SRC	255:50:4666:4:0:4:514
+12902489	GRANT_FILTER	3529:1570:0:1959:0:0:0:0:0
+12902489	READY_FILTER	0:0:0:0:0
+12902489	REASSEMBLY	0:40
+12902489	TOKEN_AUTH	1570:0:121:362
+grant_accept node_id=4 sequence=4360 duration_ms=120 expires_at_ms=12902661
+grant_accept node_id=4 sequence=4361 duration_ms=120 expires_at_ms=12902791
+grant_accept node_id=4 sequence=4362 duration_ms=120 expires_at_ms=12902921
+grant_accept node_id=4 sequence=4363 duration_ms=120 expires_at_ms=12903051
+grant_accept node_id=4 sequence=4364 duration_ms=120 expires_at_ms=12903182
+grant_accept node_id=4 sequence=4365 duration_ms=120 expires_at_ms=12903311
+grant_accept node_id=4 sequence=4366 duration_ms=120 expires_at_ms=12903441
+grant_accept node_id=4 sequence=4367 duration_ms=120 expires_at_ms=12903571
+12903489	RX_ANT	5785:3:40	1	25:-54:-52:-52:12:15:18
+12903489	RX_ANT	5785:3:40	0	25:-54:-53:-52:12:15:18
+12903489	PKT	33:3782:0:0:25:25:2:0:0:2:432
+12903489	PKT_SRC	255:25:3558:2:0:2:432
+12903489	GRANT_FILTER	3537:1578:0:1959:0:0:0:0:0
+12903489	READY_FILTER	0:0:0:0:0
+12903489	REASSEMBLY	0:40
+12903489	TOKEN_AUTH	1578:0:122:362
+grant_accept node_id=4 sequence=4368 duration_ms=120 expires_at_ms=12903701
+grant_accept node_id=4 sequence=4369 duration_ms=120 expires_at_ms=12903832
+grant_accept node_id=4 sequence=4370 duration_ms=120 expires_at_ms=12903962
+grant_accept node_id=4 sequence=4371 duration_ms=120 expires_at_ms=12904092
+grant_accept node_id=4 sequence=4372 duration_ms=120 expires_at_ms=12904223
+grant_accept node_id=4 sequence=4373 duration_ms=120 expires_at_ms=12904353
+grant_accept node_id=4 sequence=4374 duration_ms=120 expires_at_ms=12904483
+12904489	RX_ANT	5785:3:40	1	23:-54:-52:-52:13:15:18
+12904489	RX_ANT	5785:3:40	0	23:-54:-53:-52:13:14:18
+12904489	PKT	30:3317:0:0:23:23:3:0:0:2:432
+12904489	PKT_SRC	255:23:3121:3:0:2:432
+12904489	GRANT_FILTER	3544:1585:0:1959:0:0:0:0:0
+12904489	READY_FILTER	0:0:0:0:0
+12904489	REASSEMBLY	0:40
+12904489	TOKEN_AUTH	1585:0:123:362
+grant_accept node_id=4 sequence=4375 duration_ms=120 expires_at_ms=12904613
+grant_accept node_id=4 sequence=4376 duration_ms=120 expires_at_ms=12904743
+grant_accept node_id=4 sequence=4377 duration_ms=120 expires_at_ms=12904873
+grant_accept node_id=4 sequence=4378 duration_ms=120 expires_at_ms=12905004
+grant_accept node_id=4 sequence=4379 duration_ms=120 expires_at_ms=12905134
+grant_accept node_id=4 sequence=4380 duration_ms=120 expires_at_ms=12905264
+grant_accept node_id=4 sequence=4381 duration_ms=120 expires_at_ms=12905395
+grant_accept node_id=4 sequence=4382 duration_ms=120 expires_at_ms=12905525
+12905489	RX_ANT	5785:3:40	1	28:-52:-52:-52:14:16:20
+12905489	RX_ANT	5785:3:40	0	28:-54:-53:-52:14:15:19
+12905489	PKT	36:3892:0:0:28:28:0:0:0:2:432
+12905489	PKT_SRC	255:28:3668:0:0:2:432
+12905489	GRANT_FILTER	3552:1593:0:1959:0:0:0:0:0
+12905489	READY_FILTER	0:0:0:0:0
+12905489	REASSEMBLY	0:40
+12905489	TOKEN_AUTH	1593:0:124:362
+grant_accept node_id=4 sequence=4383 duration_ms=120 expires_at_ms=12905656
+grant_accept node_id=4 sequence=4384 duration_ms=120 expires_at_ms=12905786
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=12905800
+grant_accept node_id=4 sequence=4387 duration_ms=120 expires_at_ms=12906177
+grant_accept node_id=4 sequence=4389 duration_ms=120 expires_at_ms=12906437
+grant_accept node_id=4 sequence=4390 duration_ms=120 expires_at_ms=12906567
+12906489	RX_ANT	5785:3:40	1	50:-54:-52:-52:13:16:20
+12906489	RX_ANT	5785:3:40	0	50:-54:-53:-52:13:15:19
+12906489	PKT	58:6704:0:0:50:50:5:0:0:12:1666
+12906489	PKT_SRC	255:50:6480:5:0:12:1666
+12906489	GRANT_FILTER	3560:1598:0:1962:0:0:0:0:0
+12906489	READY_FILTER	0:0:0:0:0
+12906489	REASSEMBLY	0:40
+12906489	TOKEN_AUTH	1598:0:127:372
+grant_accept node_id=4 sequence=4391 duration_ms=120 expires_at_ms=12906697
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=12906719
+grant_accept node_id=4 sequence=4394 duration_ms=120 expires_at_ms=12907088
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=12907103
+grant_accept node_id=4 sequence=4397 duration_ms=120 expires_at_ms=12907478
+12907489	RX_ANT	5785:3:40	1	89:-54:-52:-52:10:15:21
+12907489	RX_ANT	5785:3:40	0	89:-54:-53:-52:6:15:21
+12907489	PKT	97:11740:0:0:89:89:3:0:0:13:2305
+12907489	PKT_SRC	255:89:11516:3:0:13:2305
+12907489	GRANT_FILTER	3568:1601:0:1967:0:0:0:0:0
+12907489	READY_FILTER	0:0:0:0:0
+12907489	REASSEMBLY	0:40
+12907489	TOKEN_AUTH	1601:0:131:388
+grant_accept node_id=4 sequence=4400 duration_ms=120 expires_at_ms=12907868
+grant_accept node_id=4 sequence=4403 duration_ms=120 expires_at_ms=12908258
+12908489	PKT	7:196:0:0:0:0:0:0:0:0:0
+12908489	PKT_SRC	255:0:0:0:0:0:0
+12908489	GRANT_FILTER	3575:1603:0:1972:0:0:0:0:0
+12908489	READY_FILTER	0:0:0:0:0
+12908489	REASSEMBLY	0:40
+12908489	TOKEN_AUTH	1603:0:131:388
+12909489	PKT	8:224:0:0:0:0:0:0:0:0:0
+12909489	PKT_SRC	255:0:0:0:0:0:0
+12909489	GRANT_FILTER	3583:1603:0:1980:0:0:0:0:0
+12909489	READY_FILTER	0:0:0:0:0
+12909489	REASSEMBLY	0:40
+12909489	TOKEN_AUTH	1603:0:131:388
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=12909844

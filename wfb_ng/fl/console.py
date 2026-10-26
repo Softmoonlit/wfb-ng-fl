@@ -10,7 +10,7 @@ from typing import Any, BinaryIO, Callable, Dict, Optional
 
 from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
-from .radio import ALLOWED_PATCH_KEYS, ALLOWED_MCS_VALUES, get_downlink_rate_bounds, validate_radio_config
+from .radio import ALLOWED_BANDWIDTH_MHZ, ALLOWED_PATCH_KEYS, ALLOWED_MCS_VALUES, get_downlink_rate_bounds, validate_radio_config
 
 
 class RadioPreparationError(Exception):
@@ -50,9 +50,11 @@ def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
     participant_fields = ("node_id", "online", "state", "readiness", "reported_state",
                           "error_code", "can_select", "selection_blockers")
     view["participants"] = []
+    job_id = job.get("job_id")
+    job_disconnections = disconnections.get(job_id, []) if isinstance(job_id, str) else []
     for node_id in target_nodes:
         disconnection_events = [
-            deepcopy(event) for event in disconnections.get(job.get("job_id"), [])
+            deepcopy(event) for event in job_disconnections
             if event.get("node_id") == node_id
         ]
         node = nodes.get(node_id)
@@ -199,9 +201,18 @@ class ConsoleApplicationService:
 
     def radio_configuration(self) -> Dict[str, Any]:
         state = self.snapshot()
+        # 缺少实测表的组合显式置空，页面不能借用其它带宽的数据。
+        rate_bounds: Dict[str, Dict[str, Optional[Dict[str, object]]]] = {}
+        for bandwidth in ALLOWED_BANDWIDTH_MHZ:
+            rate_bounds[str(bandwidth)] = {}
+            for mcs in ALLOWED_MCS_VALUES:
+                try:
+                    bounds = get_downlink_rate_bounds(mcs, bandwidth).as_dict()
+                except ValueError:
+                    bounds = None
+                rate_bounds[str(bandwidth)][str(mcs)] = bounds
         return {'config': state['server']['radio'], 'snapshot': state,
-                'rate_bounds': {str(mcs): get_downlink_rate_bounds(mcs).as_dict()
-                                for mcs in ALLOWED_MCS_VALUES}}
+                'rate_bounds': rate_bounds}
 
 
     def _radio_targets(self, state: Dict[str, Any]) -> list:
@@ -218,14 +229,12 @@ class ConsoleApplicationService:
         if (not isinstance(body, dict) or set(body) != {'config'}
                 or not isinstance(body['config'], dict) or set(body['config']) != ALLOWED_PATCH_KEYS
                 or any(type(value) is not int for value in body['config'].values())):
-            raise RadioPreparationError('INVALID_RADIO_CONFIG', '必须提供完整的五项扁平射频参数')
+            raise RadioPreparationError('INVALID_RADIO_CONFIG', '必须提供完整的六项扁平射频参数')
         try:
             config = validate_radio_config(body['config'])
+            bounds = get_downlink_rate_bounds(config.downlink_mcs, config.bandwidth_mhz)
         except (TypeError, ValueError) as exc:
             raise RadioPreparationError('INVALID_RADIO_CONFIG', str(exc)) from exc
-        bounds = get_downlink_rate_bounds(config.downlink_mcs)
-        warning = (None if bounds.min_rate_kbps <= config.uftp_rate_kbps <= bounds.max_rate_kbps
-                   else 'UFTP 速率超出安全范围，可能导致队列丢包或传输停滞；必须明确确认风险')
         with self._source_lock:
             state = self.snapshot()
             targets = self._radio_targets(state)
@@ -236,9 +245,9 @@ class ConsoleApplicationService:
             confirmation = {'token': str(uuid.uuid4()), 'instance_id': self.instance_id,
                             'state_version': state['state_version'], 'expires_in_seconds': 60}
             self._radio_confirmation = {'confirmation': confirmation, 'expires_at': time.monotonic() + 60,
-                                        'patch': patch, 'targets': targets, 'warning': warning}
+                                        'patch': patch, 'targets': targets}
             return {'config': config.to_dict(), 'rate_bounds': bounds.as_dict(),
-                    'warning': warning, 'confirmation': deepcopy(confirmation)}
+                    'confirmation': deepcopy(confirmation)}
 
     def consume_radio_confirmation(self, token: str, confirm_risk: bool) -> Dict[str, Any]:
         """Daemon calls under its admission lock, immediately before reserving radio ownership."""
@@ -253,8 +262,6 @@ class ConsoleApplicationService:
             targets = self._radio_targets(state)
             if targets != context['targets']:
                 raise RadioPreparationError('RADIO_CONFIRMATION_EXPIRED', '目标节点已变化，请重新校验配置', 409)
-            if context['warning'] and not confirm_risk:
-                raise RadioPreparationError('RADIO_RISK_CONFIRMATION_REQUIRED', context['warning'], 409)
             self._radio_confirmation = None
             return {'confirmed': True, 'patch': deepcopy(context['patch']), 'target_nodes': targets}
 

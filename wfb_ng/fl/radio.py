@@ -1,14 +1,4 @@
-"""
-wfb_ng.fl.radio: Flat radio parameter model, dynamic rate bounds, and 5GHz spectrum survey.
-
-Per ADR-0014:
-- 5GHz channels: strictly UNII-3 pool [149, 153, 157, 165], default 157.
-- Channel 161 is permanently blacklisted (rtl88xxau driver PHY_GetTxPowerIndexBase crash).
-- Radio TX power: independent parameter, range 10 ~ 20 dBm (desktop near-field recommended 12 dBm).
-- Decoupled downlink MCS (3..6, default 3) and uplink MCS (3..6, recommended 6).
-- Solidified FEC (k=8, n=14), bandwidth (HT40+), guard interval (Short GI, 400ns).
-- Dynamic UFTP downlink injection rate bounds mapped to downlink_mcs.
-"""
+"""射频配置模型、带宽与 MCS 组合速率校验及 5 GHz 频谱扫描。"""
 
 import argparse
 import json
@@ -42,6 +32,8 @@ RECOMMENDED_UPLINK_MCS: int = 6
 
 FIXED_FEC_K: int = 8
 FIXED_FEC_N: int = 14
+DEFAULT_BANDWIDTH_MHZ: int = 40
+ALLOWED_BANDWIDTH_MHZ: Tuple[int, ...] = (20, 40)
 FIXED_BANDWIDTH: str = "HT40+"
 FIXED_GUARD_INTERVAL: str = "short"
 
@@ -51,6 +43,7 @@ ALLOWED_CONFIG_KEYS: Set[str] = {
     "downlink_mcs",
     "uplink_mcs",
     "uftp_rate_kbps",
+    "bandwidth_mhz",
     "fec_k",
     "fec_n",
     "channel_width",
@@ -63,6 +56,7 @@ ALLOWED_PATCH_KEYS: Set[str] = {
     "downlink_mcs",
     "uplink_mcs",
     "uftp_rate_kbps",
+    "bandwidth_mhz",
 }
 
 
@@ -72,6 +66,7 @@ class RateBounds:
     min_rate_kbps: int
     max_rate_kbps: int
     default_rate_kbps: int
+    bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
 
     @property
     def min_rate_mbps(self) -> float:
@@ -87,6 +82,7 @@ class RateBounds:
 
     def as_dict(self) -> Dict[str, object]:
         return {
+            "bandwidth_mhz": self.bandwidth_mhz,
             "downlink_mcs": self.downlink_mcs,
             "min_rate_kbps": self.min_rate_kbps,
             "max_rate_kbps": self.max_rate_kbps,
@@ -97,12 +93,12 @@ class RateBounds:
         }
 
 
-# Dynamic rate bounds table per ADR-0014
-_DOWNLINK_RATE_BOUNDS: Dict[int, RateBounds] = {
-    3: RateBounds(downlink_mcs=3, min_rate_kbps=12000, max_rate_kbps=18000, default_rate_kbps=15000),
-    4: RateBounds(downlink_mcs=4, min_rate_kbps=18000, max_rate_kbps=26000, default_rate_kbps=22000),
-    5: RateBounds(downlink_mcs=5, min_rate_kbps=24000, max_rate_kbps=35000, default_rate_kbps=28000),
-    6: RateBounds(downlink_mcs=6, min_rate_kbps=32000, max_rate_kbps=45000, default_rate_kbps=38000),
+# 只保留已有 40 MHz 数值；20 MHz 待票09交付实测表，禁止折算。
+_DOWNLINK_RATE_BOUNDS: Dict[Tuple[int, int], RateBounds] = {
+    (40, 3): RateBounds(downlink_mcs=3, min_rate_kbps=12000, max_rate_kbps=18000, default_rate_kbps=15000),
+    (40, 4): RateBounds(downlink_mcs=4, min_rate_kbps=18000, max_rate_kbps=26000, default_rate_kbps=22000),
+    (40, 5): RateBounds(downlink_mcs=5, min_rate_kbps=24000, max_rate_kbps=35000, default_rate_kbps=28000),
+    (40, 6): RateBounds(downlink_mcs=6, min_rate_kbps=32000, max_rate_kbps=45000, default_rate_kbps=38000),
 }
 
 __all__ = (
@@ -121,6 +117,9 @@ __all__ = (
     "FIXED_GUARD_INTERVAL",
     "RateBounds",
     "get_downlink_rate_bounds",
+    "DEFAULT_BANDWIDTH_MHZ",
+    "ALLOWED_BANDWIDTH_MHZ",
+    "validate_radio_calibration_patch",
     "RadioConfig",
     "validate_radio_config",
     "normalize_radio_patch",
@@ -136,16 +135,32 @@ __all__ = (
 )
 
 
-def get_downlink_rate_bounds(downlink_mcs: int) -> RateBounds:
-    """
-    Return dynamic UFTP downlink injection rate bounds and recommended default for a given downlink MCS.
-    Raises ValueError if downlink_mcs is not in ALLOWED_MCS_VALUES (3..6).
-    """
-    if downlink_mcs not in _DOWNLINK_RATE_BOUNDS:
+def get_downlink_rate_bounds(
+    downlink_mcs: int, bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ,
+) -> RateBounds:
+    """按逻辑带宽与下行 MCS 查询范围；未取得实测表的组合明确拒绝。"""
+    if type(downlink_mcs) is not int or downlink_mcs not in ALLOWED_MCS_VALUES:
+        raise ValueError(f"Invalid downlink_mcs={downlink_mcs!r}. Must be one of {ALLOWED_MCS_VALUES}.")
+    if type(bandwidth_mhz) is not int or bandwidth_mhz not in ALLOWED_BANDWIDTH_MHZ:
+        raise ValueError("bandwidth_mhz must be integer 20 or 40")
+    bounds = _DOWNLINK_RATE_BOUNDS.get((bandwidth_mhz, downlink_mcs))
+    if bounds is None:
         raise ValueError(
-            f"Invalid downlink_mcs={downlink_mcs!r}. Must be one of {ALLOWED_MCS_VALUES}."
+            f"bandwidth_mhz={bandwidth_mhz}, downlink_mcs={downlink_mcs}: "
+            "measured rate calibration table unavailable"
         )
-    return _DOWNLINK_RATE_BOUNDS[downlink_mcs]
+    return bounds
+
+
+def _derive_channel_width(channel: int, bandwidth_mhz: int) -> str:
+    # 只派生合法方向，不隐式换信道或降低带宽；161 仍由信道黑名单拒绝。
+    if type(bandwidth_mhz) is not int or bandwidth_mhz not in ALLOWED_BANDWIDTH_MHZ:
+        raise ValueError("bandwidth_mhz must be integer 20 or 40")
+    if bandwidth_mhz == 20:
+        return "HT20"
+    if channel == 165:
+        raise ValueError("channel 165 is incompatible with bandwidth_mhz=40")
+    return "HT40-" if channel == 153 else "HT40+"
 
 
 @dataclass(frozen=True)
@@ -155,6 +170,7 @@ class RadioConfig:
     downlink_mcs: int = DEFAULT_DOWNLINK_MCS
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     uftp_rate_kbps: int = field(default=15000)
+    bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
 
     @property
     def fec_k(self) -> int:
@@ -166,7 +182,7 @@ class RadioConfig:
 
     @property
     def channel_width(self) -> str:
-        return FIXED_BANDWIDTH
+        return _derive_channel_width(self.channel, self.bandwidth_mhz)
 
     @property
     def guard_interval(self) -> str:
@@ -175,6 +191,7 @@ class RadioConfig:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "channel": self.channel,
+            "bandwidth_mhz": self.bandwidth_mhz,
             "radio_txpower_dbm": self.radio_txpower_dbm,
             "downlink_mcs": self.downlink_mcs,
             "uplink_mcs": self.uplink_mcs,
@@ -187,17 +204,12 @@ class RadioConfig:
 
 
 def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
-    """
-    Validate and construct a RadioConfig instance from dictionary config.
-    Enforces ADR-0014 flat radio parameter rules:
-    - channel strictly in ALLOWED_5GHZ_CHANNELS (149, 153, 157, 165).
-    - Channel 161 is strictly forbidden with an explicit error.
-    - radio_txpower_dbm in [10, 20].
-    - downlink_mcs in [3, 4, 5, 6].
-    - uplink_mcs in [3, 4, 5, 6].
-    - uftp_rate_kbps: defaults to recommended default for downlink_mcs if omitted.
-      Per ADR-0014, backend executes received configuration directly without gate barriers.
-    """
+    """校验普通配置；未标定带宽始终拒绝，不提供强制旁路参数。"""
+    return _validate_radio_config(config, calibration=False)
+
+
+def _validate_radio_config(config: Dict[str, Any], *, calibration: bool) -> RadioConfig:
+    """共用物理参数校验；标定只允许由专用 patch 入口显式调用。"""
     if not isinstance(config, dict):
         raise TypeError(f"Config must be a dict, got {type(config).__name__}")
 
@@ -220,6 +232,14 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
         raise ValueError(
             f"Invalid channel {raw_channel}. Must be in legal 5 GHz UNII-3 pool {ALLOWED_5GHZ_CHANNELS}."
         )
+
+    bandwidth_mhz = config.get("bandwidth_mhz", DEFAULT_BANDWIDTH_MHZ)
+    channel_width = _derive_channel_width(raw_channel, bandwidth_mhz)
+    # 接受完整快照回读，但派生字段与固定参数不能形成第二套配置真值。
+    for key, expected in {"channel_width": channel_width, "fec_k": FIXED_FEC_K,
+                          "fec_n": FIXED_FEC_N, "guard_interval": FIXED_GUARD_INTERVAL}.items():
+        if key in config and (type(config[key]) is not type(expected) or config[key] != expected):
+            raise ValueError(f"{key} must be {expected!r}")
 
     raw_txpower = config.get("radio_txpower_dbm", DEFAULT_TXPOWER_DBM)
     if not isinstance(raw_txpower, int) or isinstance(raw_txpower, bool):
@@ -245,9 +265,11 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
             f"uplink_mcs={raw_uplink_mcs} invalid. Must be one of {ALLOWED_MCS_VALUES}."
         )
 
-    bounds = get_downlink_rate_bounds(raw_downlink_mcs)
+    bounds = None if calibration else get_downlink_rate_bounds(raw_downlink_mcs, bandwidth_mhz)
     raw_rate = config.get("uftp_rate_kbps")
-    if raw_rate is None:
+    if "uftp_rate_kbps" not in config:
+        if bounds is None:
+            raise ValueError("Calibration requires explicit uftp_rate_kbps")
         rate = bounds.default_rate_kbps
     else:
         if not isinstance(raw_rate, int) or isinstance(raw_rate, bool):
@@ -255,9 +277,16 @@ def validate_radio_config(config: Dict[str, Any]) -> RadioConfig:
         if raw_rate <= 0:
             raise ValueError(f"uftp_rate_kbps must be positive, got {raw_rate}")
         rate = raw_rate
+        if bounds is not None and not (bounds.min_rate_kbps <= rate <= bounds.max_rate_kbps):
+            raise ValueError(
+                f"uftp_rate_kbps={rate} outside bandwidth_mhz={bandwidth_mhz}, "
+                f"downlink_mcs={raw_downlink_mcs} range "
+                f"[{bounds.min_rate_kbps}, {bounds.max_rate_kbps}] Kbps"
+            )
 
     return RadioConfig(
         channel=raw_channel,
+        bandwidth_mhz=bandwidth_mhz,
         radio_txpower_dbm=raw_txpower,
         downlink_mcs=raw_downlink_mcs,
         uplink_mcs=raw_uplink_mcs,
@@ -289,11 +318,7 @@ def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
-    """
-    Validate and apply an incremental radio reconfiguration patch onto a base RadioConfig.
-    Per ADR-0014, base state is required and unmentioned attributes strictly remain untouched.
-    Unknown keys fail closed.
-    """
+    """先合并完整配置，再按目标组合校验；组合变化且省略速率时取推荐值。"""
     if not isinstance(patch, dict):
         raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
     if not isinstance(base, RadioConfig):
@@ -305,8 +330,35 @@ def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfi
             raise ValueError(f"Unknown patch key: {k!r}")
 
     merged = base.to_dict()
+    merged.pop("channel_width")
     merged.update(norm_patch)
+    # 只有组合实际变化才重取推荐值，同值 patch 保留当前速率。
+    if "uftp_rate_kbps" not in norm_patch and any(
+        merged[key] != getattr(base, key) for key in ("bandwidth_mhz", "downlink_mcs")
+    ):
+        merged.pop("uftp_rate_kbps")
     return validate_radio_config(merged)
+
+
+def validate_radio_calibration_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
+    """校验专用 HT20 测量候选；空闲、确认及消息标记由守护进程专用入口负责。"""
+    if not isinstance(patch, dict):
+        raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+    if not isinstance(base, RadioConfig):
+        raise TypeError(f"Base must be a RadioConfig instance, got {type(base).__name__}")
+    required = {"bandwidth_mhz", "downlink_mcs", "uftp_rate_kbps"}
+    if not required.issubset(patch):
+        raise ValueError("Calibration requires explicit bandwidth_mhz, downlink_mcs and uftp_rate_kbps")
+    if type(patch["bandwidth_mhz"]) is not int or patch["bandwidth_mhz"] != 20:
+        raise ValueError("Calibration requires bandwidth_mhz=20")
+    # 专用入口只接受规范字段，不扩张历史 alias 兼容范围。
+    for key in patch:
+        if key not in ALLOWED_PATCH_KEYS:
+            raise ValueError(f"Unknown calibration patch key: {key!r}")
+    merged = base.to_dict()
+    merged.pop("channel_width")
+    merged.update(patch)
+    return _validate_radio_config(merged, calibration=True)
 
 
 @dataclass(frozen=True)

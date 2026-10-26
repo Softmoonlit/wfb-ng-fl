@@ -8,6 +8,7 @@ import urllib.request
 
 from unittest.mock import patch
 
+from wfb_ng.fl.radio import RadioConfig
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.control import ClientNodeState, NodeHeartbeat
 from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig, ServerState
@@ -48,6 +49,71 @@ class TestRadioReconfigureREST(unittest.TestCase):
                 ("127.0.0.1", 10000 + node_id),
             )
 
+    def test_cannot_exclude_an_online_client_from_cluster_configuration(self):
+        self.ready_node(1)
+        self.ready_node(2)
+        with patch.object(self.daemon.control_plane, "broadcast_downlink", side_effect=OSError("不应开始事务")):
+            code, result = self.request({
+                "confirmed": True, "patch": {"radio_txpower_dbm": 14}, "target_nodes": [1],
+            })
+        self.assertEqual(code, 409, result)
+        self.assertEqual(result["error"], "radio_target_set_changed")
+        self.assertEqual(result["expected_nodes"], [1, 2])
+        self.assertEqual(self.daemon.get_status_report()["server_state"], "IDLE")
+
+    def test_calibration_is_explicit_and_prevents_normal_jobs(self):
+        self.ready_node()
+        candidate = {"bandwidth_mhz": 20, "downlink_mcs": 3, "uftp_rate_kbps": 4000}
+        payload = {"confirmed": True, "patch": candidate, "target_nodes": [1]}
+        self.assertEqual(self.request(payload)[0], 400)
+        with patch.object(self.daemon.control_plane, "broadcast_downlink", side_effect=self.protocol_peer):
+            code, result = self.request(payload, "/api/v1/radio/calibrate")
+            self.assertEqual(code, 200, result)
+            self.assertEqual(result["status"], "finalized")
+            self.assertTrue(result["calibration"])
+            self.assertEqual(result["effective_config"]["channel_width"], "HT20")
+            with self.assertRaises(FLRuntimeError) as raised:
+                self.daemon.start_job({"job_id": "cal-job", "run_id": "cal-run", "target_nodes": [1],
+                    "model_path": "/missing/model", "model_size_bytes": 1,
+                    "io_timeout_seconds": 120, "live_observation": False})
+            self.assertEqual(raised.exception.error_code, "radio_calibration_active")
+            code, result = self.request({"confirmed": True, "patch": {"bandwidth_mhz": 40},
+                                         "target_nodes": [1]})
+        self.assertEqual(code, 200, result)
+        self.assertEqual(result["status"], "finalized")
+        self.assertFalse(result["calibration"])
+        self.assertEqual(result["effective_config"]["uftp_rate_kbps"], 15000)
+
+    def test_saved_operator_configuration_is_used_after_restart(self):
+        import tempfile
+        from pathlib import Path
+        from wfb_ng.fl.server_daemon import load_server_config
+        with tempfile.TemporaryDirectory() as work:
+            path = Path(work) / "server.json"
+            path.write_text('{"channel":157,"downlink_mcs":3,"model_library_dir":"/keep/models"}')
+            daemon = ServerDaemon(load_server_config(str(path)), MockNetworkAdapter(["wlx-test"]))
+            daemon.server_state = ServerState.IDLE
+            daemon.radio_config = RadioConfig(
+                channel=153, downlink_mcs=4, uftp_rate_kbps=22000)
+            result = daemon.save_radio_configuration({"confirmed": True})
+            self.assertEqual(result["saved_config"]["channel"], 153)
+            restarted = load_server_config(str(path))
+            self.assertEqual(restarted.channel, 153)
+            self.assertEqual(restarted.downlink_mcs, 4)
+            self.assertEqual(restarted.uftp_rate_kbps, 22000)
+            self.assertEqual(restarted.model_library_dir, "/keep/models")
+
+    def test_boot_configuration_rejects_incompatible_channel_and_bandwidth(self):
+        with self.assertRaises(FLRuntimeError):
+            ServerDaemonConfig(channel=165, bandwidth_mhz=40)
+
+    def test_server_startup_uses_explicit_bandwidth(self):
+        config = ServerDaemonConfig(bandwidth_mhz=40, uftp_rate_kbps=17000)
+        self.assertEqual(config.bandwidth_mhz, 40)
+        daemon = ServerDaemon(config, MockNetworkAdapter(["wlx-test"]))
+        self.assertEqual(daemon.radio_config.uftp_rate_kbps, 17000)
+        self.assertEqual(daemon.radio_config.bandwidth_mhz, 40)
+
     def test_unready_nodes_are_conflicts(self):
         payload = {"confirmed": True, "patch": {"channel": 149}, "target_nodes": [1, 2]}
         self.ready_node()
@@ -62,6 +128,7 @@ class TestRadioReconfigureREST(unittest.TestCase):
             "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
             "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
             "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK",
+            "CONFIG_RADIO_ABORT": "RADIO_SWITCH_ROLLBACK_ACK",
         }
         kind = kinds.get(message["type"])
         if kind:
@@ -70,6 +137,8 @@ class TestRadioReconfigureREST(unittest.TestCase):
                     "type": kind, "node_id": nid, "session_id": message["session_id"],
                     "current_channel": message.get("channel", 149),
                     "channel": message.get("channel", 149), "ok": True,
+                    **({"config": message["config"], "calibration": message["calibration"]}
+                       if kind != "PREPARE_ACK" else {}),
                 }).encode(), ("127.0.0.1", 10000 + nid))
 
     def test_finalized_result_and_status_report_effective_config(self):

@@ -24,11 +24,19 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const string &host,
                                                      int port,
                                                      int snd_buf,
                                                      uint8_t local_node_id,
+                                                     const V6PlaintextFecRadioConfig &radio_config,
                                                      int fec_k,
                                                      int fec_n,
                                                      uint64_t session_id)
     : impl_(new Impl())
 {
+    radiotap_header_t radiotap_header = init_radiotap_header(0,
+                                                             false,
+                                                             radio_config.short_gi,
+                                                             radio_config.bandwidth,
+                                                             radio_config.mcs_index,
+                                                             false,
+                                                             1);
     impl_->transmitter.reset(new UdpTransmitter(fec_k,
                                                 fec_n,
                                                 WFB_TRUSTED_PLAINTEXT_KEYPAIR,
@@ -44,6 +52,7 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const string &host,
                                                 local_node_id,
                                                 true,
                                                 session_id));
+    impl_->transmitter->update_radiotap_header(radiotap_header);
 }
 
 V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const vector<string> &interfaces,
@@ -82,6 +91,18 @@ V6PlaintextFecTransmitter::V6PlaintextFecTransmitter(const vector<string> &inter
 }
 
 V6PlaintextFecTransmitter::~V6PlaintextFecTransmitter() = default;
+
+void V6PlaintextFecTransmitter::update_radio_config(const V6PlaintextFecRadioConfig &radio_config)
+{
+    radiotap_header_t radiotap_header = init_radiotap_header(0,
+                                                             false,
+                                                             radio_config.short_gi,
+                                                             radio_config.bandwidth,
+                                                             radio_config.mcs_index,
+                                                             false,
+                                                             1);
+    impl_->transmitter->update_radiotap_header(radiotap_header);
+}
 
 bool V6PlaintextFecTransmitter::send_payload(const uint8_t *payload, size_t payload_size)
 {

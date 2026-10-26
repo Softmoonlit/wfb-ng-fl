@@ -44,10 +44,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from urllib.parse import parse_qs, urlparse
 
+from .artifacts import write_json_atomic
 from .client_daemon import (
     LinuxNetworkAdapter,
     NetworkAdapter,
 )
+from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio
 from .coordinator import FLCoordinator, JobConfig, VALID_FL_MODES
 from .issue41_algorithm import copy_model
 from .transport import (
@@ -83,6 +85,7 @@ from .radio import (
     find_wl_interfaces,
     survey_spectrum,
     validate_radio_config,
+    validate_radio_calibration_patch,
     validate_radio_patch,
 )
 
@@ -137,6 +140,7 @@ def calculate_file_sha256(path: str, cancel_event: Optional[threading.Event] = N
 @dataclass(frozen=True)
 class ServerDaemonConfig:
     ipc_host: str = DEFAULT_IPC_HOST
+    startup_config_path: str = DEFAULT_SERVER_CONFIG_PATH
     ipc_port: int = DEFAULT_IPC_PORT
     web_host: Optional[str] = None
     web_port: int = DEFAULT_WEB_PORT
@@ -144,6 +148,9 @@ class ServerDaemonConfig:
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     downlink_mcs: int = DEFAULT_DOWNLINK_MCS
     uplink_mcs: int = DEFAULT_UPLINK_MCS
+    bandwidth_mhz: int = 40
+    radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT
+    uftp_rate_kbps: Optional[int] = None
     tun_name: str = DEFAULT_TUN_NAME
     tun_ip: str = DEFAULT_TUN_IP
     tun_cidr: str = DEFAULT_TUN_CIDR
@@ -164,14 +171,20 @@ class ServerDaemonConfig:
     def __post_init__(self) -> None:
         # Validate radio parameters fail-closed per ADR-0014
         try:
-            validate_radio_config({
+            radio = validate_radio_config({
                 "channel": self.channel,
+                "bandwidth_mhz": self.bandwidth_mhz,
                 "radio_txpower_dbm": self.radio_txpower_dbm,
                 "downlink_mcs": self.downlink_mcs,
                 "uplink_mcs": self.uplink_mcs,
+                **({"uftp_rate_kbps": self.uftp_rate_kbps} if self.uftp_rate_kbps is not None else {}),
             })
+            object.__setattr__(self, "uftp_rate_kbps", radio.uftp_rate_kbps)
         except Exception as exc:
             raise FLRuntimeError("invalid_radio_configuration", str(exc)) from exc
+
+        if type(self.radio_control_port) is not int or not 1 <= self.radio_control_port <= 65535:
+            raise FLRuntimeError("invalid_radio_control_port", "本机射频端口必须为 1..65535 的整数")
 
         # Validate IP addresses
         try:
@@ -233,6 +246,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         )
 
     return ServerDaemonConfig(
+        startup_config_path=path,
         ipc_host=data.get("ipc_host", DEFAULT_IPC_HOST),
         ipc_port=int(data.get("ipc_port", DEFAULT_IPC_PORT)),
         web_host=data.get("web_host"),
@@ -241,6 +255,9 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         radio_txpower_dbm=int(data.get("radio_txpower_dbm", DEFAULT_TXPOWER_DBM)),
         downlink_mcs=int(data.get("downlink_mcs", DEFAULT_DOWNLINK_MCS)),
         uplink_mcs=int(data.get("uplink_mcs", DEFAULT_UPLINK_MCS)),
+        radio_control_port=data.get("radio_control_port", DEFAULT_RADIO_CONTROL_PORT),
+        bandwidth_mhz=data.get("bandwidth_mhz", 40),
+        uftp_rate_kbps=data.get("uftp_rate_kbps"),
         tun_name=data.get("tun_name", DEFAULT_TUN_NAME),
         tun_ip=data.get("tun_ip", DEFAULT_TUN_IP),
         tun_cidr=data.get("tun_cidr", DEFAULT_TUN_CIDR),
@@ -270,6 +287,8 @@ def build_v6_uplink_server_command(
     link_id: int = DEFAULT_LINK_ID,
     known_clients: Sequence[int] = ALL_KNOWN_CLIENT_IDS,
     epoch: Optional[int] = None,
+    bandwidth_mhz: int = 40,
+    radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT,
 ) -> List[str]:
     """
     Construct command line arguments for wfb_v6_uplink running as server.
@@ -278,7 +297,7 @@ def build_v6_uplink_server_command(
     - Pre-allocates all client-target mappings (--client-target nid:10.80.0.{10+nid}:127.0.0.1:1)
     - OMIT --grant-duration-ms and --guard-interval-ms to rely on built-in 120ms/10ms defaults.
     """
-    bandwidth = "20" if channel == 165 else "40"
+    RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz).channel_width
     cmd = [
         executable_path,
         "--role", "server",
@@ -290,7 +309,8 @@ def build_v6_uplink_server_command(
         "--downlink-stream", "2",
         "--fec-k", "8",
         "--fec-n", "14",
-        "--radio-bandwidth", bandwidth,
+        "--radio-bandwidth", str(bandwidth_mhz),
+        "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(downlink_mcs),
         "--radio-short-gi",
         "--air-interface", air_interface,
@@ -392,8 +412,14 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
                 )
                 return
 
-        if path == "/api/v1/radio/reconfigure":
-            self._handle_radio_reconfigure(daemon, body)
+        if path in ("/api/v1/radio/reconfigure", "/api/v1/radio/calibrate"):
+            self._handle_radio_reconfigure(daemon, body, calibration=path.endswith("/calibrate"))
+        elif path == "/api/v1/radio/save":
+            try:
+                self._send_json_response(200, daemon.save_radio_configuration(body))
+            except FLRuntimeError as exc:
+                self._send_json_response(409 if exc.error_code == "engine_busy" else 400,
+                                         {"error": exc.error_code, "message": exc.error_message})
         elif path == "/api/v1/survey":
             self._handle_survey(daemon, body)
         elif path == "/api/v1/jobs/start":
@@ -407,11 +433,11 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
         status_data = daemon.get_status_report()
         self._send_json_response(200, status_data)
 
-    def _handle_radio_reconfigure(self, daemon: "ServerDaemon", body: Any) -> None:
+    def _handle_radio_reconfigure(self, daemon: "ServerDaemon", body: Any, *, calibration: bool = False) -> None:
         try:
-            result = daemon.reconfigure_radio(body)
+            result = daemon.calibrate_radio(body) if calibration else daemon.reconfigure_radio(body)
         except FLRuntimeError as exc:
-            code = 409 if exc.error_code in ("engine_busy", "radio_target_nodes_not_ready") else 400
+            code = 409 if exc.error_code in ("engine_busy", "radio_target_nodes_not_ready", "radio_target_set_changed") else 400
             self._send_json_response(code, {
                 "error": exc.error_code, "message": exc.error_message,
                 **(exc.details or {}),
@@ -652,12 +678,14 @@ class ServerDaemon:
         self._link_thread: Optional[threading.Thread] = None
 
         # Control Plane Engine
-        self.radio_config = RadioConfig(
-            channel=self.config.channel,
-            radio_txpower_dbm=self.config.radio_txpower_dbm,
-            downlink_mcs=self.config.downlink_mcs,
-            uplink_mcs=self.config.uplink_mcs,
-        )
+        self.radio_config = validate_radio_config({
+            "channel": self.config.channel,
+            "bandwidth_mhz": self.config.bandwidth_mhz,
+            "uftp_rate_kbps": self.config.uftp_rate_kbps,
+            "radio_txpower_dbm": self.config.radio_txpower_dbm,
+            "downlink_mcs": self.config.downlink_mcs,
+            "uplink_mcs": self.config.uplink_mcs,
+        })
         self._radio_config_confirmed = True
         self.control_plane = ControlPlaneServer(
             active_radio_config=self.radio_config,
@@ -907,7 +935,34 @@ class ServerDaemon:
         self._reserve_radio_reconfiguration(payload)
         return self._execute_radio_reconfiguration(payload['patch'], payload['target_nodes'])
 
-    def _reserve_radio_reconfiguration(self, payload: Any) -> None:
+    def save_radio_configuration(self, payload: Any) -> Dict[str, Any]:
+        """操作者显式保存已确认的正常配置；在线调整本身不写启动文件。"""
+        if not isinstance(payload, dict) or payload != {"confirmed": True} or payload["confirmed"] is not True:
+            raise FLRuntimeError("invalid_radio_request", "保存只接受 confirmed=true")
+        with self._lock:
+            if self.server_state != ServerState.IDLE or self.active_job is not None:
+                raise FLRuntimeError("engine_busy", "仅待命状态允许保存启动配置")
+            if not self._radio_config_confirmed or self.control_plane.calibration:
+                raise FLRuntimeError("invalid_radio_request", "不能保存未确认或标定配置")
+            radio = validate_radio_config(self.radio_config.to_dict())
+            path = Path(self.config.startup_config_path)
+            try:
+                data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+                if not isinstance(data, dict):
+                    raise ValueError("启动配置必须为 JSON object")
+                data.update({key: value for key, value in radio.to_dict().items()
+                             if key in {"channel", "bandwidth_mhz", "radio_txpower_dbm", "downlink_mcs", "uplink_mcs", "uftp_rate_kbps"}})
+                write_json_atomic(str(path), data)
+            except (OSError, ValueError) as exc:
+                raise FLRuntimeError("radio_config_save_failed", f"保存启动配置失败: {exc}") from exc
+            return {"saved_config": radio.to_dict()}
+
+    def calibrate_radio(self, payload: Any) -> Dict[str, Any]:
+        """仅本机受控标定入口；普通作业不能使用未标定的速率。"""
+        self._reserve_radio_reconfiguration(payload, calibration=True)
+        return self._execute_radio_reconfiguration(payload['patch'], payload['target_nodes'], calibration=True)
+
+    def _reserve_radio_reconfiguration(self, payload: Any, *, calibration: bool = False) -> None:
         if not isinstance(payload, dict):
             raise FLRuntimeError("invalid_radio_request", "请求体必须为 JSON object")
         if set(payload) != {"confirmed", "patch", "target_nodes"}:
@@ -925,9 +980,10 @@ class ServerDaemon:
         ):
             raise FLRuntimeError("invalid_radio_request", "target_nodes 必须为不重复的 1~10 节点列表")
 
-        with self._lock:
+        with self._lock, self.control_plane.registry.admission_window():
             try:
-                validate_radio_patch(patch, base=self.radio_config)
+                validator = validate_radio_calibration_patch if calibration else validate_radio_patch
+                validator(patch, base=self.radio_config)
             except (TypeError, ValueError) as exc:
                 raise FLRuntimeError("invalid_radio_request", str(exc)) from exc
             if self.server_state != ServerState.IDLE or self.active_job is not None:
@@ -945,11 +1001,21 @@ class ServerDaemon:
                     "radio_target_nodes_not_ready", "目标节点必须全部 IDLE/READY",
                     details={"unready_nodes": sorted(unready)},
                 )
+            online = sorted(
+                nid for nid, record in self.control_plane.registry.get_all_nodes().items()
+                if record.readiness != NodeReadiness.OFFLINE
+            )
+            if online != sorted(targets):
+                raise FLRuntimeError(
+                    "radio_target_set_changed", "必须包含受理时全部在线客户端",
+                    details={"expected_nodes": online},
+                )
             self.server_state = ServerState.SWITCHING_RADIO
 
-    def _execute_radio_reconfiguration(self, patch: Dict[str, Any], targets: List[int]) -> Dict[str, Any]:
+    def _execute_radio_reconfiguration(self, patch: Dict[str, Any], targets: List[int], *, calibration: bool = False) -> Dict[str, Any]:
         try:
-            result = self.control_plane.reconfigure_radio(patch, target_nodes=targets)
+            operation = self.control_plane.calibrate_radio if calibration else self.control_plane.reconfigure_radio
+            result = operation(patch, target_nodes=targets)
         except Exception:
             with self._lock:
                 self.radio_config = self.control_plane.active_radio_config
@@ -966,6 +1032,7 @@ class ServerDaemon:
                 self.server_state = ServerState.RADIO_ERROR if result.status == "radio_error" else ServerState.IDLE
             self.console.record_event({"type": "RADIO_APPLY_RESULT", "message": result.status})
             return {
+                "calibration": self.control_plane.calibration,
                 "session_id": result.session_id,
                 "status": result.status,
                 "target_channel": result.target_channel,
@@ -1011,6 +1078,8 @@ class ServerDaemon:
         preparation_started_at = time.monotonic()
 
         with self._lock:
+            if self.control_plane.calibration:
+                raise FLRuntimeError("radio_calibration_active", "受控标定配置仅用于测量，请先恢复正常无线配置")
             preparation_timeout_seconds = self.config.preparation_timeout_seconds
             # Check 3: Current engine is idle, no concurrent job conflict
             if self.server_state != ServerState.IDLE or self.active_job is not None:
@@ -1525,16 +1594,15 @@ class ServerDaemon:
         return self._finalize_job(outcome="aborted", reason=reason)
 
     def _apply_radio_runtime(self, config: RadioConfig) -> None:
-        """Apply startup-only link parameters before the reversible final barrier."""
+        """在线应用完整发射配置，保留链路进程、TUN 和调度会话。"""
         with self._lock:
             if self.server_state == ServerState.STOPPED:
                 raise FLRuntimeError('daemon_stopped', 'Server 已停止，无法应用射频')
-            active = self._link_radio_config
-            if self.config.enable_link_process and (active is None
-                    or active.downlink_mcs != config.downlink_mcs
-                    or (active.channel == 165) != (config.channel == 165)):
-                self._stop_link_process()
-                self._start_link_process(config)
+            if self.config.enable_link_process:
+                if self._link_process is None or self._link_process.poll() is not None:
+                    raise FLRuntimeError('link_not_running', '链路进程未运行，不能确认射频应用')
+                apply_link_radio(self.config.radio_control_port, config.bandwidth_mhz, config.downlink_mcs)
+                self._link_radio_config = config
 
     def _start_link_process(self, radio: Optional[RadioConfig] = None) -> None:
         """Launch wfb_v6_uplink server background process with pre-allocated slots."""
@@ -1559,6 +1627,8 @@ class ServerDaemon:
             downlink_mcs=radio.downlink_mcs,
             link_id=self.config.link_id,
             known_clients=self.config.known_clients,
+            bandwidth_mhz=radio.bandwidth_mhz,
+            radio_control_port=self.config.radio_control_port,
         )
 
         logger.info("启动 wfb_v6_uplink 链路底座: %s", " ".join(cmd))
@@ -1653,7 +1723,7 @@ class ServerDaemon:
                     logger.warning("未检测到物理无线网卡，将以无网卡模式运行")
 
             if self.current_interface:
-                width = "HT20" if self.config.channel == 165 else FIXED_BANDWIDTH
+                width = self.radio_config.channel_width
                 self.adapter.configure_wireless(
                     iface=self.current_interface,
                     channel=self.config.channel,
@@ -1800,6 +1870,9 @@ def main() -> None:
     parser.add_argument("--txpower", type=int, default=None, help="Radio TX power in dBm")
     parser.add_argument("--downlink-mcs", type=int, default=None, help="Downlink MCS index (3..6)")
     parser.add_argument("--uplink-mcs", type=int, default=None, help="Uplink MCS index (3..6)")
+    parser.add_argument("--bandwidth-mhz", type=int, choices=(20, 40), default=None)
+    parser.add_argument("--uftp-rate-kbps", type=int, default=None)
+    parser.add_argument("--radio-control-port", type=int, default=None)
     parser.add_argument("--interface", type=str, default=None, help="Air wireless interface name")
     parser.add_argument("--tun-name", type=str, default=None, help="Server TUN device name")
 
@@ -1822,13 +1895,23 @@ def main() -> None:
         overrides["downlink_mcs"] = args.downlink_mcs
     if args.uplink_mcs is not None:
         overrides["uplink_mcs"] = args.uplink_mcs
+    if args.bandwidth_mhz is not None:
+        overrides["bandwidth_mhz"] = args.bandwidth_mhz
+    if args.uftp_rate_kbps is not None:
+        overrides["uftp_rate_kbps"] = args.uftp_rate_kbps
+    if args.radio_control_port is not None:
+        overrides["radio_control_port"] = args.radio_control_port
     if args.interface is not None:
         overrides["air_interface"] = args.interface
     if args.tun_name is not None:
         overrides["tun_name"] = args.tun_name
 
     if overrides:
-        merged = {**config.__dict__, **overrides}
+        radio_keys = {"channel", "bandwidth_mhz", "radio_txpower_dbm", "downlink_mcs", "uplink_mcs", "uftp_rate_kbps"}
+        base_radio = validate_radio_config({key: value for key, value in config.__dict__.items() if key in radio_keys})
+        target_radio = validate_radio_patch({key: value for key, value in overrides.items() if key in radio_keys}, base_radio)
+        merged = {**config.__dict__, **overrides,
+                  **{key: value for key, value in target_radio.to_dict().items() if key in radio_keys}}
         config = ServerDaemonConfig(**merged)
 
     daemon = ServerDaemon(config=config)

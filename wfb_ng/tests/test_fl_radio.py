@@ -19,6 +19,7 @@ from wfb_ng.fl.radio import (
     RadioConfig,
     validate_radio_config,
     validate_radio_patch,
+    validate_radio_calibration_patch,
     ChannelSurveyResult,
     SpectrumSurveyReport,
     LiveRadioSurveyBackend,
@@ -80,6 +81,20 @@ class TestDownlinkRateBounds(unittest.TestCase):
             with self.assertRaises(ValueError):
                 get_downlink_rate_bounds(invalid_mcs)
 
+    def test_bandwidth_specific_bounds_and_missing_measurements(self):
+        for mcs in ALLOWED_MCS_VALUES:
+            bounds = get_downlink_rate_bounds(mcs, bandwidth_mhz=40)
+            self.assertEqual(bounds.bandwidth_mhz, 40)
+            self.assertEqual(bounds.as_dict()["bandwidth_mhz"], 40)
+            with self.assertRaisesRegex(ValueError, "20.*calibrat"):
+                get_downlink_rate_bounds(mcs, bandwidth_mhz=20)
+        for invalid in [True, 40.0, "40", 80]:
+            with self.subTest(value=invalid), self.assertRaises(ValueError):
+                get_downlink_rate_bounds(3, bandwidth_mhz=invalid)
+        for invalid in [3.0, "3", True, None, []]:
+            with self.subTest(value=invalid), self.assertRaises(ValueError):
+                get_downlink_rate_bounds(invalid)
+
 
 class TestRadioConfigValidator(unittest.TestCase):
     def test_default_config_valid(self):
@@ -94,11 +109,27 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(config.channel_width, "HT40+")
         self.assertEqual(config.guard_interval, "short")
 
-    def test_channel_width_fixed_ht40_plus(self):
-        config157 = validate_radio_config({"channel": 157})
-        self.assertEqual(config157.channel_width, "HT40+")
-        config165 = validate_radio_config({"channel": 165})
-        self.assertEqual(config165.channel_width, "HT40+")
+    def test_bandwidth_and_channel_width(self):
+        for channel, width in [(149, "HT40+"), (153, "HT40-"), (157, "HT40+")]:
+            config = validate_radio_config({"channel": channel, "bandwidth_mhz": 40})
+            self.assertEqual(config.bandwidth_mhz, 40)
+            self.assertEqual(config.channel_width, width)
+            self.assertEqual(config.to_dict()["bandwidth_mhz"], 40)
+        with self.assertRaisesRegex(ValueError, "165.*40"):
+            validate_radio_config({"channel": 165, "bandwidth_mhz": 40})
+
+    def test_invalid_bandwidth_rejected(self):
+        for value in [True, 20.0, "40", 10, 80, None]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                validate_radio_config({"bandwidth_mhz": value})
+
+    def test_derived_and_fixed_fields_cannot_override_model(self):
+        for field, value in [("channel_width", "HT20"), ("fec_k", 9),
+                             ("fec_n", 15), ("guard_interval", "long")]:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_radio_config({field: value})
+        config = validate_radio_config({})
+        self.assertEqual(validate_radio_config(config.to_dict()), config)
 
     def test_unknown_keys_fail_closed(self):
         with self.assertRaises(ValueError) as ctx:
@@ -185,10 +216,10 @@ class TestRadioConfigValidator(unittest.TestCase):
         self.assertEqual(patched_pwr.radio_txpower_dbm, 15)
         self.assertEqual(patched_pwr.channel, 157)
 
-        # Patch downlink_mcs alone: ADR-0014 incremental patch contract preserves omitted uftp_rate without gate rejection
+        # 组合变化且未传速率时，取目标组合推荐值。
         patched_mcs = validate_radio_patch({"downlink_mcs": 5}, base=base)
         self.assertEqual(patched_mcs.downlink_mcs, 5)
-        self.assertEqual(patched_mcs.uftp_rate_kbps, 15000)
+        self.assertEqual(patched_mcs.uftp_rate_kbps, 28000)
 
         # Patch downlink_mcs and uftp_rate explicitly
         patched_mcs_rate = validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": 28000}, base=base)
@@ -206,6 +237,109 @@ class TestRadioConfigValidator(unittest.TestCase):
         # Patch with forbidden channel 161 rejected
         with self.assertRaises(ValueError):
             validate_radio_patch({"channel": 161}, base=base)
+
+    def test_normal_rates_enforced_for_all_combinations(self):
+        for mcs in ALLOWED_MCS_VALUES:
+            bounds = get_downlink_rate_bounds(mcs)
+            for rate in [bounds.min_rate_kbps, bounds.max_rate_kbps]:
+                cfg = validate_radio_config({"downlink_mcs": mcs, "uftp_rate_kbps": rate})
+                self.assertEqual(cfg.uftp_rate_kbps, rate)
+            for rate in [bounds.min_rate_kbps - 1, bounds.max_rate_kbps + 1, True, 15000.0]:
+                with self.subTest(mcs=mcs, rate=rate), self.assertRaises(ValueError):
+                    validate_radio_config({"downlink_mcs": mcs, "uftp_rate_kbps": rate})
+        for rate in [None, 1000]:
+            with self.assertRaisesRegex(ValueError, "20.*calibrat"):
+                validate_radio_config({"bandwidth_mhz": 20, "uftp_rate_kbps": rate})
+
+    def test_patch_rate_merge_rules(self):
+        base = validate_radio_config({"uftp_rate_kbps": 16000})
+        for patch in [{"radio_txpower_dbm": 14}, {"uplink_mcs": 4},
+                      {"channel": 149}, {"downlink_mcs": 3}, {"bandwidth_mhz": 40}]:
+            self.assertEqual(validate_radio_patch(patch, base).uftp_rate_kbps, 16000)
+        with self.assertRaises(ValueError):
+            validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": 16000}, base)
+        with self.assertRaises(ValueError):
+            validate_radio_patch({"bandwidth_mhz": 20}, base)
+        with self.assertRaises(ValueError):
+            validate_radio_patch({"channel_width": "HT20"}, base)
+        self.assertEqual(base.uftp_rate_kbps, 16000)
+
+    def test_explicit_null_rate_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_radio_config({"uftp_rate_kbps": None})
+        with self.assertRaises(ValueError):
+            validate_radio_patch({"downlink_mcs": 5, "uftp_rate_kbps": None},
+                                 validate_radio_config({}))
+
+
+class TestRadioCalibrationValidator(unittest.TestCase):
+    def test_candidate_is_explicit_and_never_enables_normal_path(self):
+        for mcs in ALLOWED_MCS_VALUES:
+            candidate = validate_radio_calibration_patch(
+                {"bandwidth_mhz": 20, "downlink_mcs": mcs, "uftp_rate_kbps": 1},
+                validate_radio_config({}))
+            self.assertEqual(candidate.bandwidth_mhz, 20)
+            self.assertEqual(candidate.channel_width, "HT20")
+            self.assertEqual(candidate.uftp_rate_kbps, 1)
+            self.assertEqual(candidate.fec_k, FIXED_FEC_K)
+            self.assertEqual(candidate.fec_n, FIXED_FEC_N)
+            self.assertEqual(candidate.guard_interval, FIXED_GUARD_INTERVAL)
+            self.assertNotIn("calibration", candidate.to_dict())
+            with self.assertRaisesRegex(ValueError, "calibration table unavailable"):
+                validate_radio_config(candidate.to_dict())
+            with self.assertRaises(ValueError):
+                validate_radio_patch({}, candidate)
+
+    def test_requires_full_candidate_each_time(self):
+        patch = {"bandwidth_mhz": 20, "downlink_mcs": 3, "uftp_rate_kbps": 1}
+        base = validate_radio_config({})
+        for key in patch:
+            incomplete = dict(patch)
+            incomplete.pop(key)
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                validate_radio_calibration_patch(incomplete, base)
+        for key, values in {
+            "bandwidth_mhz": [40, True, 20.0],
+            "downlink_mcs": [2, 7, True, 3.0],
+            "uftp_rate_kbps": [None, True, 0, -1, 1.0, "1"],
+            "channel": [161, 36],
+            "radio_txpower_dbm": [9, 21, True],
+            "uplink_mcs": [2, 7],
+            "channel_width": ["HT20"],
+            "calibration": [True],
+            "confirmed": [True],
+        }.items():
+            for value in values:
+                with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                    validate_radio_calibration_patch(dict(patch, **{key: value}), base)
+        with self.assertRaises(TypeError):
+            validate_radio_calibration_patch(patch, None)
+        with self.assertRaises(TypeError):
+            validate_radio_calibration_patch(None, base)
+
+    def test_merge_before_derivation_and_return_to_normal(self):
+        base = validate_radio_config({"channel": 153, "uftp_rate_kbps": 16000})
+        patch = {"bandwidth_mhz": 20, "downlink_mcs": 6, "uftp_rate_kbps": 1,
+                 "channel": 165, "radio_txpower_dbm": 14, "uplink_mcs": 4}
+        candidate = validate_radio_calibration_patch(patch, base)
+        self.assertEqual(candidate.channel, 165)
+        self.assertEqual(candidate.channel_width, "HT20")
+        self.assertEqual(candidate.radio_txpower_dbm, 14)
+        self.assertEqual(candidate.uplink_mcs, 4)
+        with self.assertRaisesRegex(ValueError, "165.*40"):
+            validate_radio_patch({"bandwidth_mhz": 40}, candidate)
+        normal = validate_radio_patch({"channel": 153, "bandwidth_mhz": 40}, candidate)
+        self.assertEqual(normal.uftp_rate_kbps, 38000)
+        self.assertEqual(normal.channel_width, "HT40-")
+        self.assertEqual(base.uftp_rate_kbps, 16000)
+        self.assertEqual(patch["uftp_rate_kbps"], 1)
+
+    def test_normal_request_cannot_select_calibration(self):
+        for flag in ["calibration", "force", "confirmed"]:
+            with self.subTest(flag=flag), self.assertRaises(ValueError):
+                validate_radio_config({flag: True})
+            with self.subTest(flag=flag), self.assertRaises(ValueError):
+                validate_radio_patch({flag: True}, validate_radio_config({}))
 
 
 class MockSurveyBackend:

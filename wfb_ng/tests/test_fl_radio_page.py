@@ -30,11 +30,12 @@ def test_radio_page_has_accessible_controls_and_local_assets():
     page = Page()
     page.feed((STATIC / 'radio.html').read_text())
     by_id = {attrs['id']: (tag, attrs) for tag, attrs in page.tags if 'id' in attrs}
-    for name in ('channel', 'radio_txpower_dbm', 'downlink_mcs', 'uplink_mcs', 'uftp_rate_kbps', 'confirm-risk'):
+    for name in ('channel', 'bandwidth_mhz', 'radio_txpower_dbm', 'downlink_mcs', 'uplink_mcs', 'uftp_rate_kbps'):
         assert by_id[name][0] in ('select', 'input')
         assert any(tag == 'label' and attrs.get('for') == name for tag, attrs in page.tags)
-    assert by_id['confirm-risk'][1]['type'] == 'checkbox'
-    assert 'checked' not in by_id['confirm-risk'][1]
+    assert 'confirm-risk' not in by_id
+    assert 'risk-confirmation' not in by_id
+    assert any(tag == 'option' and attrs.get('value') == '20' for tag, attrs in page.tags)
     assert by_id['validate'][1]['type'] == 'submit'
     for name in ('apply', 'emergency-stop', 'refresh'):
         assert by_id[name][1]['type'] == 'button'

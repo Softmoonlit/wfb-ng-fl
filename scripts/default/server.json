@@ -5,6 +5,8 @@
   "web_port": 8080,
   "model_library_dir": "/var/lib/wfb-ng-fl/models",
   "channel": 157,
+  "bandwidth_mhz": 40,
+  "radio_control_port": 9200,
   "radio_txpower_dbm": 12,
   "downlink_mcs": 3,
   "uplink_mcs": 6,

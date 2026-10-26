@@ -168,13 +168,16 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         self.assertNotIn("--grant-duration-ms", cmd)
         self.assertNotIn("--guard-interval-ms", cmd)
 
-    def test_channel_165_sets_narrow_bandwidth(self):
+    def test_channel_165_requires_explicit_narrow_bandwidth(self):
+        with self.assertRaises(ValueError):
+            build_v6_uplink_server_command("/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0", channel=165)
         cmd = build_v6_uplink_server_command(
             executable_path="/usr/bin/wfb_v6_uplink",
             tun_name="fl-s",
             tun_addr="10.80.0.1/24",
             air_interface="wlan0",
             channel=165,
+            bandwidth_mhz=20,
             downlink_mcs=3,
         )
         self.assertIn("--radio-bandwidth", cmd)

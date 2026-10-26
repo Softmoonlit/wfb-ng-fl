@@ -8,8 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from wfb_ng.fl.console_http import ConsoleHTTPServer, ConsoleRequestHandler
-from wfb_ng.tests.test_fl_radio_console import CONFIG, prepared
-from wfb_ng.tests import test_fl_radio_rest as radio_rest
+from wfb_ng.tests.test_fl_radio_console import CONFIG, prepared, protocol_peer
 
 
 @contextmanager
@@ -43,13 +42,11 @@ def test_http_read_validate_and_confirm_configuration(tmp_path):
         status, current = request('GET')
         assert status == 200
         assert current['config']['channel'] == 157
-        assert current['rate_bounds']['6']['default_rate_kbps'] == 38000
+        assert current['rate_bounds']['40']['6']['default_rate_kbps'] == 38000
         status, checked = request('POST', '/api/v1/radio/config/validate', {'config':CONFIG})
         assert status == 200
         assert checked['confirmation']['instance_id'] == current['snapshot']['instance_id']
-        peer = radio_rest.TestRadioReconfigureREST()
-        peer.daemon = daemon
-        with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=peer.protocol_peer):
+        with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda message: protocol_peer(daemon, message)):
             status, applied = request('POST', '/api/v1/radio/config/apply', {
                 'confirmation_token':checked['confirmation']['token'], 'confirm_risk':False})
         assert status == 200 and applied['status'] == 'finalized'
@@ -63,6 +60,8 @@ def test_http_read_validate_and_confirm_configuration(tmp_path):
 @pytest.mark.parametrize('method,path,body,status,code', [
     ('POST','/api/v1/radio/config',{},405,'METHOD_NOT_ALLOWED'),
     ('GET','/api/v1/radio/config/validate',None,405,'METHOD_NOT_ALLOWED'),
+    ('POST','/api/v1/radio/config/validate',{'config':dict(CONFIG, bandwidth_mhz=20)},400,'INVALID_RADIO_CONFIG'),
+    ('POST','/api/v1/radio/config/validate',{'config':dict(CONFIG, uftp_rate_kbps=19000)},400,'INVALID_RADIO_CONFIG'),
     ('POST','/api/v1/radio/config/validate',{'config':dict(CONFIG, channel=161)},400,'INVALID_RADIO_CONFIG'),
     ('POST','/api/v1/radio/config/validate',{'config':{'channel':149}},400,'INVALID_RADIO_CONFIG'),
     ('POST','/api/v1/radio/config/apply',{'confirmed':True,'config':CONFIG},400,'INVALID_RADIO_REQUEST'),

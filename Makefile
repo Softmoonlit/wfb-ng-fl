@@ -25,7 +25,7 @@ export VERSION COMMIT SOURCE_DATE_EPOCH
 _LDFLAGS := $(LDFLAGS) -lrt -lsodium
 _CFLAGS := $(CFLAGS) -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"$(VERSION)-$(shell /bin/bash -c '_tmp=$(COMMIT); echo $${_tmp::8}')"'
 
-.PHONY: all build_v6 build_identity version all_bin kcp_tools install_v8 acceptance_v6_realhw rpm deb bdist check pylint clean
+.PHONY: all build_v6 build_identity version all_bin kcp_tools install_v8 acceptance_v6_realhw rpm deb bdist check pylint clean test_session_recovery test_encrypted_session test_v6_radio_update
 
 all: build_v6
 
@@ -81,7 +81,7 @@ wfb_tun: src/wfb_tun.o
 wfb_token_scheduler: src/main_token_scheduler.o src/token_scheduler.o src/token_authorization_ipc.o src/wifibroadcast.o
 	$(CXX) -o $@ $^ $(_LDFLAGS)
 
-wfb_v6_uplink: src/v6_uplink.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o
+wfb_v6_uplink: src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o
 	$(CXX) -o $@ $^ $(_LDFLAGS) -lpcap
 
 kcp_tools: kcp_small_sender kcp_small_receiver
@@ -127,7 +127,13 @@ pylint:
 	pylint --disable=R,C wfb_ng/*.py
 
 clean:
-	rm -rf env session_recovery_test encrypted_session_test wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+	rm -rf env session_recovery_test encrypted_session_test v6_radio_update_test wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
+
+v6_radio_update_test: tests/cpp/v6_radio_update_test.cpp src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+
+test_v6_radio_update: v6_radio_update_test
+	./v6_radio_update_test
 
 .PHONY: test_session_recovery
 # Compile actual production TX/RX and IPC sources; never reuse legacy test objects.

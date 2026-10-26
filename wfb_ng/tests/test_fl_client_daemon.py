@@ -15,7 +15,7 @@ from unittest import mock
 
 from wfb_ng.fl.service import _read_config
 from wfb_ng.fl.errors import FLRuntimeError
-from wfb_ng.fl.radio import ALLOWED_5GHZ_CHANNELS, FORBIDDEN_CHANNELS, validate_radio_config
+from wfb_ng.fl.radio import ALLOWED_5GHZ_CHANNELS, FORBIDDEN_CHANNELS, RadioConfig, validate_radio_config
 from wfb_ng.fl.client_daemon import (
     ClientDaemon,
     ClientDaemonConfig,
@@ -39,6 +39,14 @@ class MockNetworkAdapter(NetworkAdapter):
         self.channel_history = []
         self.tun_interfaces = {}
 
+    @staticmethod
+    def _validate_width(channel, channel_width):
+        if channel not in ALLOWED_5GHZ_CHANNELS:
+            raise ValueError('invalid channel')
+        width = RadioConfig(channel=channel, bandwidth_mhz=20 if channel_width == 'HT20' else 40).channel_width
+        if width != channel_width:
+            raise ValueError('invalid channel width')
+
     def set_interfaces(self, interfaces):
         self._interfaces = list(interfaces)
 
@@ -46,9 +54,8 @@ class MockNetworkAdapter(NetworkAdapter):
         return list(self._interfaces)
 
     def configure_wireless(self, iface, channel=157, channel_width="HT40+", txpower_dbm=12):
-        validate_radio_config({"channel": channel, "radio_txpower_dbm": txpower_dbm})
-        if channel == 165:
-            channel_width = "HT20"
+        validate_radio_config({"radio_txpower_dbm": txpower_dbm})
+        self._validate_width(channel, channel_width)
 
         self.channel_history.append(channel)
         self.wireless_states[iface] = {
@@ -60,7 +67,7 @@ class MockNetworkAdapter(NetworkAdapter):
         }
 
     def set_channel(self, iface, channel, channel_width="HT40+"):
-        validate_radio_config({"channel": channel})
+        self._validate_width(channel, channel_width)
         self.channel_history.append(channel)
         if iface in self.wireless_states:
             self.wireless_states[iface]["channel"] = channel
@@ -195,9 +202,9 @@ class TestNetworkAdapter(unittest.TestCase):
         with self.assertRaises(ValueError):
             adapter.configure_wireless("wlx001", channel=161)
 
-    def test_configure_wireless_sets_ht20_for_channel_165(self):
+    def test_configure_wireless_uses_explicit_ht20_for_channel_165(self):
         adapter = MockNetworkAdapter(interfaces=["wlx001"])
-        adapter.configure_wireless("wlx001", channel=165)
+        adapter.configure_wireless("wlx001", channel=165, channel_width="HT20")
         self.assertEqual(adapter.wireless_states["wlx001"]["channel_width"], "HT20")
 
     @mock.patch("subprocess.run")
@@ -213,6 +220,32 @@ class TestNetworkAdapter(unittest.TestCase):
         self.assertTrue(any("monitor" in cmd for cmd in calls))
         self.assertTrue(any("channel" in cmd and "157" in cmd for cmd in calls))
         self.assertTrue(any("txpower" in cmd and "-1200" in cmd for cmd in calls))
+
+    @mock.patch("subprocess.run")
+    def test_linux_adapter_allows_calibration_ht20_without_rate_table(self, run):
+        run.return_value = mock.Mock(returncode=0, stdout="", stderr="")
+        adapter = LinuxNetworkAdapter(use_sudo=False)
+        with mock.patch("os.path.exists", return_value=False):
+            adapter.configure_wireless("wlx-test", channel=157, channel_width="HT20", txpower_dbm=14)
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertIn(["iw", "dev", "wlx-test", "set", "channel", "157", "HT20"], commands)
+
+    @mock.patch("subprocess.run")
+    def test_linux_adapter_rejects_165_ht40_before_hardware_mutation(self, run):
+        adapter = LinuxNetworkAdapter(use_sudo=False)
+        with self.assertRaises(ValueError):
+            adapter.configure_wireless("wlx-test", channel=165, channel_width="HT40+")
+        run.assert_not_called()
+
+    @mock.patch("subprocess.run")
+    def test_linux_adapter_preserves_derived_ht40_minus(self, run):
+        run.return_value = mock.Mock(returncode=0, stdout="", stderr="")
+        adapter = LinuxNetworkAdapter(use_sudo=False)
+        adapter.set_channel("wlx-test", 153, "HT40-")
+        run.assert_called_once()
+        self.assertEqual(run.call_args.args[0][-1], "HT40-")
+        with self.assertRaises(ValueError):
+            adapter.set_channel("wlx-test", 153, "HT40+")
 
     @mock.patch("wfb_ng.fl.client_daemon.find_wl_interfaces", return_value=["wlP1p2s0"])
     def test_linux_network_adapter_find_interfaces_delegates_to_find_wl_interfaces(self, mock_find):
@@ -663,6 +696,39 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertEqual(len(link_processes), 2)
         daemon.stop()
 
+    def test_startup_bandwidth_is_the_source_for_hardware_and_link(self):
+        for channel, bandwidth, width in ((157, 20, 'HT20'), (153, 40, 'HT40-')):
+            with self.subTest(channel=channel, bandwidth=bandwidth):
+                adapter = MockNetworkAdapter(['wlx-test'])
+                config = ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+                                            work_dir=self.temp_dir, channel=channel,
+                                            bandwidth_mhz=bandwidth, radio_control_port=9234,
+                                            enable_control_plane=False)
+                commands = []
+
+                def spawn(cmd, **kwargs):
+                    commands.append(cmd)
+                    proc = mock.Mock()
+                    proc.poll.return_value = None
+                    adapter.setup_tun(config.tun_name, config.tun_cidr)
+                    return proc
+
+                daemon = ClientDaemon(config, adapter, _link_process_factory=spawn)
+                self.addCleanup(daemon.stop)
+                daemon.poll_hardware_once()
+                with mock.patch('wfb_ng.fl.client_daemon.shutil.which', return_value='/bin/wfb_v6_uplink'):
+                    daemon.start_idle_link()
+                self.assertEqual(adapter.wireless_states['wlx-test']['channel_width'], width)
+                self.assertEqual(commands[0][commands[0].index('--radio-bandwidth') + 1], str(bandwidth))
+                self.assertEqual(commands[0][commands[0].index('--radio-control-port') + 1], '9234')
+
+    def test_config_rejects_165_ht40_instead_of_downgrading(self):
+        with self.assertRaises(ValueError):
+            ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11', channel=165, bandwidth_mhz=40)
+        with self.assertRaises(ValueError):
+            _make_client_job(channel=165, bandwidth_mhz=40)
+        self.assertEqual(_make_client_job(channel=165, bandwidth_mhz=20).channel_width, 'HT20')
+
     def test_client_link_command_and_job_share_server_link_id(self):
         cmd = build_v6_uplink_client_command(
             executable_path="/usr/bin/wfb_v6_uplink",
@@ -743,7 +809,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             server_http_host="10.80.0.1",
             server_http_port=8080,
             channel=157,
-            channel_width="HT40+",
+            bandwidth_mhz=20,
             radio_txpower_dbm=12,
             uplink_mcs=6,
         )
@@ -753,6 +819,10 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertTrue(os.path.exists(config_path))
 
         # Validate with service._read_config
+        with open(config_path, encoding='utf-8') as stream:
+            role = json.load(stream)
+        self.assertEqual(role['channel_width'], 'HT20')
+        self.assertEqual(role['link_args'][role['link_args'].index('--radio-bandwidth') + 1], '20')
         parsed_config = _read_config(config_path)
         self.assertEqual(parsed_config["role"], "client")
         self.assertEqual(parsed_config["node_id"], 3)
@@ -850,7 +920,10 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         daemon.trigger_job(job_config)
         self.assertEqual(daemon.state, DaemonState.RUNNING)
 
-        time.sleep(0.08)
+        # 等待可观察的作业回收状态，避免依赖宿主进程调度速度。
+        deadline = time.monotonic() + 2
+        while daemon.state != DaemonState.IDLE and time.monotonic() < deadline:
+            time.sleep(0.01)
         self.assertEqual(daemon.state, DaemonState.IDLE)
 
         # Hot unplug interface

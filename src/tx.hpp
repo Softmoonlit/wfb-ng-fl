@@ -309,8 +309,8 @@ private:
         memset(fwd_hdr.rssi, SCHAR_MIN, sizeof(fwd_hdr.rssi));
         memset(fwd_hdr.noise, SCHAR_MAX, sizeof(fwd_hdr.noise));
 
-        fwd_hdr.mcs_index = 1;
-        fwd_hdr.bandwidth = 20;
+        fwd_hdr.mcs_index = radiotap_header.header.empty() ? 1 : radiotap_header.mcs_index;
+        fwd_hdr.bandwidth = radiotap_header.header.empty() ? 20 : radiotap_header.bandwidth;
         fwd_hdr.freq = htons(4321);
         fwd_hdr.antenna[0] = (uint8_t)(rand() % 2);
         fwd_hdr.rssi[0] = -42;

@@ -20,7 +20,7 @@
   </div>
   <div class="hud-group" aria-label="集群微缩状态">
     <div class="hud-item"><span class="hud-label">Server</span><span id="hud-server-state" class="badge badge-gray">待命</span></div>
-    <div class="hud-item"><span class="hud-label">射频</span><span id="hud-radio" class="mono">CH157 · 12dBm · MCS3</span></div>
+    <div class="hud-item"><span class="hud-label">射频</span><span id="hud-radio" class="mono">CH157 · 40MHz · 12dBm · MCS3</span></div>
     <div class="hud-item"><span class="hud-label">活动作业</span><span id="hud-job" class="mono">空闲待命</span></div>
   </div>
   <div class="header-actions actions-group">
@@ -45,13 +45,14 @@
       <form id="radio-form">
         <div class="radio-fields">
           <div><label for="channel">信道</label><select id="channel" name="channel" required aria-describedby="channel-note"><option value="149">149</option><option value="153">153</option><option value="157" selected>157</option><option value="165">165</option></select></div>
+          <div><label for="bandwidth_mhz">带宽（MHz）</label><select id="bandwidth_mhz" name="bandwidth_mhz" required aria-describedby="rate-range"><option value="20">20</option><option value="40" selected>40</option></select></div>
           <div><label for="radio_txpower_dbm">发射功率（dBm）</label><input id="radio_txpower_dbm" name="radio_txpower_dbm" type="number" min="10" max="20" step="1" value="12" required></div>
           <div><label for="downlink_mcs">下行 MCS</label><select id="downlink_mcs" name="downlink_mcs" required aria-describedby="rate-range"><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
           <div><label for="uplink_mcs">上行 MCS</label><select id="uplink_mcs" name="uplink_mcs" required><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div>
           <div class="wide"><label for="uftp_rate_kbps">UFTP 下行速率（kbps）</label><input id="uftp_rate_kbps" name="uftp_rate_kbps" type="number" min="1" step="1" required aria-describedby="rate-range rate-warning"></div>
         </div>
-        <p id="channel-note" class="muted">仅允许 149 / 153 / 157 / 165；Channel 161 已禁止。</p>
-        <p id="rate-range" role="status">正在读取 MCS 安全速率范围…</p>
+        <p id="channel-note" class="muted">仅允许 149 / 153 / 157 / 165；Channel 161 已禁止；165 仅支持 20 MHz。</p>
+        <p id="rate-range" role="status">正在读取带宽与 MCS 组合的实测速率范围…</p>
         <p id="rate-warning" role="alert" hidden></p>
         <button id="validate" type="submit" disabled>校验配置</button>
       </form>
@@ -61,7 +62,6 @@
       <h3>当前已确认配置</h3><p id="current-config">加载中…</p>
       <h3>本次校验的规范配置</h3><p id="validated-config">请校验配置，再明确点击应用。</p>
       <p id="confirmation-status" role="status"></p>
-      <div id="risk-confirmation" hidden><input id="confirm-risk" type="checkbox" disabled><label for="confirm-risk">我已了解速率越界可能导致丢包及传输失败，确认承担风险。</label></div>
       <p id="apply-blockers" role="status">正在读取集群应用条件…</p>
       <button id="apply" type="button" disabled>应用已校验配置</button>
       <p id="action-status" role="status"></p><p id="action-error" role="alert" hidden></p>
