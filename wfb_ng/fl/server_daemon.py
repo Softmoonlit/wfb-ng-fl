@@ -15,7 +15,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
   maintaining in-memory NodeHorizonRegistry with two-army anti-desync gate.
 - Local REST IPC: Exposes http://127.0.0.1:9090 (/status, /survey, /jobs/start, /jobs/abort, /logs/stream).
 - 3 Deterministic Preflight Checks on /jobs/start:
-  1. Target nodes confirmed in IDLE within 10 seconds.
+  1. Target nodes must be READY/IDLE under the registry heartbeat facts; the configured preparation budget covers TASK_READY.
   2. Initial model file exists and validated (size matches).
   3. Engine is currently IDLE with no concurrent job conflict.
 """
@@ -26,6 +26,7 @@ import hashlib
 import ipaddress
 import json
 import logging
+import math
 import os
 import queue
 import shutil
@@ -57,7 +58,6 @@ from .transport import (
 from .control import (
     CLIENT_UPLINK_DEFAULT_ADDR,
     CLIENT_UPLINK_DEFAULT_PORT,
-    NODE_OFFLINE_THRESHOLD_SECONDS,
     SERVER_CONTROL_BROADCAST_ADDR,
     SERVER_CONTROL_BROADCAST_PORT,
     ClientNodeState,
@@ -120,11 +120,13 @@ class ServerState(str, Enum):
     STOPPED = "STOPPED"
 
 
-def calculate_file_sha256(path: str) -> str:
+def calculate_file_sha256(path: str, cancel_event: Optional[threading.Event] = None) -> str:
     """Compute deterministic SHA-256 checksum for a local file."""
     hasher = hashlib.sha256()
     with open(path, "rb") as f:
         while True:
+            if cancel_event is not None and cancel_event.is_set():
+                raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
             chunk = f.read(65536)
             if not chunk:
                 break
@@ -157,6 +159,7 @@ class ServerDaemonConfig:
     model_library_dir: str = "/var/lib/wfb-ng-fl/models"
     enable_link_process: bool = True
     enable_control_plane: bool = True
+    preparation_timeout_seconds: float = 30.0
 
     def __post_init__(self) -> None:
         # Validate radio parameters fail-closed per ADR-0014
@@ -187,6 +190,15 @@ class ServerDaemonConfig:
                 raise FLRuntimeError("invalid_web_host", "管理 Web 地址不得为回环、通配或 TUN 地址")
         if self.web_port != DEFAULT_WEB_PORT:
             raise FLRuntimeError("invalid_web_port", "管理 Web 端口固定为 8080")
+
+        # Validate preparation budget
+        try:
+            preparation_timeout = float(self.preparation_timeout_seconds)
+        except (TypeError, ValueError) as exc:
+            raise FLRuntimeError("invalid_preparation_timeout", "preparation_timeout_seconds 必须为正数") from exc
+        if not math.isfinite(preparation_timeout) or preparation_timeout <= 0:
+            raise FLRuntimeError("invalid_preparation_timeout", "preparation_timeout_seconds 必须为正数")
+        object.__setattr__(self, "preparation_timeout_seconds", preparation_timeout)
 
         # Validate known_clients
         if self.known_clients != ALL_KNOWN_CLIENT_IDS:
@@ -244,6 +256,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         model_library_dir=data.get("model_library_dir", "/var/lib/wfb-ng-fl/models"),
         enable_link_process=bool(data.get("enable_link_process", True)),
         enable_control_plane=bool(data.get("enable_control_plane", True)),
+        preparation_timeout_seconds=data.get("preparation_timeout_seconds", 30.0),
     )
 
 
@@ -508,6 +521,83 @@ class ServerIPCRequestHandler(BaseHTTPRequestHandler):
             daemon.event_bus.unsubscribe(event_queue)
 
 
+class _JobPreparation:
+    """在准备阶段管理可取消资源并等待其线程退出。"""
+
+    def __init__(self) -> None:
+        self._cancel_event = threading.Event()
+        self._done_event = threading.Event()
+        self._lock = threading.RLock()
+        self._thread: Optional[threading.Thread] = None
+        self._resource: Optional[Any] = None
+        self._result: Optional[Tuple[Any, Optional[Any]]] = None
+        self._error: Optional[BaseException] = None
+
+    @property
+    def cancellation_event(self) -> threading.Event:
+        return self._cancel_event
+
+    @property
+    def cancelled(self) -> bool:
+        return self._cancel_event.is_set()
+
+    def start(self, work: Callable[[], Tuple[Any, Optional[Any]]]) -> None:
+        self._thread = threading.Thread(target=self._run, args=(work,),
+                                        name="wfb-job-preparation", daemon=True)
+        self._thread.start()
+
+    def _run(self, work: Callable[[], Tuple[Any, Optional[Any]]]) -> None:
+        try:
+            self._result = work()
+        except BaseException as exc:
+            self._error = exc
+        finally:
+            self._done_event.set()
+
+    def register_resource(self, resource: Any) -> None:
+        with self._lock:
+            cancelled = self.cancelled
+            if not cancelled:
+                self._resource = resource
+        if cancelled:
+            resource.close()
+
+    def wait(self, timeout: float) -> bool:
+        return self._done_event.wait(timeout)
+
+    def result(self) -> Tuple[Any, Optional[Any]]:
+        if self._error is not None:
+            raise self._error
+        if self._result is None:
+            raise RuntimeError("作业准备线程未产生结果")
+        return self._result
+
+    def close_registered_resource(self, resource: Any) -> None:
+        if resource is None:
+            return
+        with self._lock:
+            if self._resource is resource:
+                self._resource = None
+        try:
+            resource.close()
+        except Exception:
+            logger.exception("关闭准备资源失败")
+
+    def cancel_and_wait(self) -> None:
+        self._cancel_event.set()
+        with self._lock:
+            resource = self._resource
+            self._resource = None
+            thread = self._thread
+        if resource is not None:
+            try:
+                resource.close()
+            except Exception:
+                logger.exception("取消作业准备资源失败")
+        if thread is not None:
+            thread.join()
+
+
 class ServerDaemon:
     """Persistent cluster owner with separate local IPC and console adapters."""
 
@@ -549,6 +639,7 @@ class ServerDaemon:
         self._recent_job: Optional[Dict[str, Any]] = None
         self.coordinator: Optional[Any] = None
         self.server_role: Optional[Any] = None
+        self._preparation: Optional[_JobPreparation] = None
 
         self.event_bus = ServerEventBus()
         self._stop_event = threading.Event()
@@ -684,6 +775,40 @@ class ServerDaemon:
             self._best_effort_console_refresh()
         self.event_bus.publish(event)
 
+    def _selection_blockers(self, node_id: int, record: Optional[NodeRecord]) -> List[Dict[str, str]]:
+        """复用注册表的实时就绪状态及其心跳超时判定。"""
+        blockers = []
+        if ((record is not None and record.tun_ip == self.config.tun_ip)
+                or (record is None and f"10.80.0.{10 + node_id}" == self.config.tun_ip)):
+            blockers.append({"code": "SERVER_NODE", "message": "Server 自身不能作为客户端目标"})
+        if record is None or record.readiness == NodeReadiness.OFFLINE:
+            blockers.append({"code": "NODE_OFFLINE", "message": "节点未上线或心跳已超时"})
+        else:
+            if record.readiness != NodeReadiness.READY:
+                blockers.append({"code": "NODE_NOT_READY", "message": f"基础未就绪: {record.readiness.value}"})
+            if record.reported_state != ClientNodeState.IDLE.value:
+                blockers.append({"code": "NODE_NOT_IDLE", "message": f"节点尚未待命: {record.reported_state}"})
+        if record is not None and record.error_code:
+            blockers.append({"code": "NODE_ERROR", "message": record.error_code})
+        return blockers
+
+    def _unready_target_nodes(self, target_nodes: Sequence[int]) -> Dict[str, Any]:
+        unready_nodes: Dict[str, Any] = {}
+        now = time.monotonic()
+        for nid in target_nodes:
+            record = self.control_plane.registry.get_node(nid)
+            blockers = self._selection_blockers(nid, record)
+            if blockers:
+                unready_nodes[str(nid)] = {
+                    "readiness": record.readiness.value if record else "OFFLINE",
+                    "reported_state": record.reported_state if record else None,
+                    "last_heartbeat_ago_seconds": (
+                        round(max(0.0, now - record.last_heartbeat_time), 2) if record else None),
+                    "selection_blockers": blockers,
+                    "reason": "; ".join(blocker["message"] for blocker in blockers),
+                }
+        return unready_nodes
+
     def get_status_report(self) -> Dict[str, Any]:
         """Generate structured status snapshot for GET /api/v1/status."""
         with self._lock:
@@ -691,7 +816,11 @@ class ServerDaemon:
             now = time.monotonic()
             nodes_dict: Dict[str, Any] = {}
             for nid in self.config.known_clients:
-                r = all_nodes.get(nid)
+                expected_ip = f"10.80.0.{10 + nid}"
+                record = all_nodes.get(nid)
+                if self.config.tun_ip == (record.tun_ip if record is not None else expected_ip):
+                    continue
+                r = record
                 if r is not None:
                     ago = max(0.0, now - r.last_heartbeat_time)
                     ts_ms = (
@@ -716,7 +845,7 @@ class ServerDaemon:
                 else:
                     nodes_dict[str(nid)] = {
                         "node_id": nid,
-                        "tun_ip": f"10.80.0.{10 + nid}",
+                        "tun_ip": expected_ip,
                         "reported_state": None,
                         "readiness": NodeReadiness.OFFLINE.value,
                         "elapsed_ms": 0,
@@ -728,6 +857,10 @@ class ServerDaemon:
                         "last_heartbeat_ago_seconds": None,
                         "error_code": None,
                     }
+
+                selection_blockers = self._selection_blockers(nid, r)
+                nodes_dict[str(nid)]["can_select"] = not selection_blockers
+                nodes_dict[str(nid)]["selection_blockers"] = selection_blockers
 
             web_status, web_error = self._web_state
             is_link_running = False
@@ -875,8 +1008,10 @@ class ServerDaemon:
         Execute 3 deterministic preflight checks and transition to active job execution.
         """
         job = JobConfig.from_dict(payload)
+        preparation_started_at = time.monotonic()
 
         with self._lock:
+            preparation_timeout_seconds = self.config.preparation_timeout_seconds
             # Check 3: Current engine is idle, no concurrent job conflict
             if self.server_state != ServerState.IDLE or self.active_job is not None:
                 conflict_id = self.active_job.get("job_id") if self.active_job else "unknown"
@@ -884,92 +1019,126 @@ class ServerDaemon:
                     "preflight_engine_conflict",
                     f"当前协同引擎正处于 {self.server_state.value} 状态，存在并发作业冲突 (作业: {conflict_id})",
                 )
+            if self._recent_job is not None and self._recent_job.get("recovery_state") != "ready":
+                raise FLRuntimeError(
+                    "preflight_engine_conflict",
+                    "上一项作业资源尚未恢复，不能受理新作业",
+                )
 
-            # Check 1: Target nodes check (within 10s confirmed IDLE)
-            unready_nodes: Dict[str, Any] = {}
-            now = time.monotonic()
-            for nid in job.target_nodes:
-                record = self.control_plane.registry.get_node(nid)
-                if record is None:
-                    unready_nodes[str(nid)] = {
-                        "readiness": "OFFLINE",
-                        "reported_state": None,
-                        "last_heartbeat_ago_seconds": None,
-                        "reason": "节点未上线或无任何心跳记录",
-                    }
-                elif record.readiness != NodeReadiness.READY:
-                    ago = round(now - record.last_heartbeat_time, 2)
-                    unready_nodes[str(nid)] = {
-                        "readiness": record.readiness.value,
-                        "reported_state": record.reported_state,
-                        "last_heartbeat_ago_seconds": ago,
-                        "reason": f"节点未就绪 (当前状态: {record.readiness.value})",
-                    }
-                elif (now - record.last_heartbeat_time) > NODE_OFFLINE_THRESHOLD_SECONDS:
-                    ago = round(now - record.last_heartbeat_time, 2)
-                    unready_nodes[str(nid)] = {
-                        "readiness": "OFFLINE",
-                        "reported_state": record.reported_state,
-                        "last_heartbeat_ago_seconds": ago,
-                        "reason": f"节点心跳超时 ({ago}s > 10s)",
-                    }
+            # 按 Web 候选使用的同一组事实整体校验提交目标。
+            unready_nodes = self._unready_target_nodes(job.target_nodes)
 
             if unready_nodes:
                 raise FLRuntimeError(
                     "preflight_target_nodes_not_ready",
-                    f"目标客户端未在 10 秒内确认处于 IDLE 状态: {list(unready_nodes.keys())}",
+                    f"目标客户端不可用: {list(unready_nodes.keys())}",
                     details={"unready_nodes": unready_nodes},
                 )
 
-            # Check 2: Initial model file exists, is non-empty, and strictly matches size
-            if not os.path.isfile(job.model_path):
-                raise FLRuntimeError(
-                    "preflight_model_file_not_found",
-                    f"初始模型文件不存在: {job.model_path}",
-                )
-
-            actual_file_size = os.path.getsize(job.model_path)
-            if actual_file_size <= 0:
-                raise FLRuntimeError(
-                    "preflight_model_empty",
-                    f"初始模型文件为空 (0 字节): {job.model_path}",
-                )
-
-            if actual_file_size != job.model_size_bytes:
-                raise FLRuntimeError(
-                    "preflight_model_validation_failed",
-                    f"模型大小不匹配: 期望 {job.model_size_bytes} 字节，实际 {actual_file_size} 字节",
-                )
-
-            # Check integrity sha256 if provided, or compute it
-            computed_sha256 = calculate_file_sha256(job.model_path)
-            if job.model_sha256 is not None and computed_sha256 != job.model_sha256:
-                raise FLRuntimeError(
-                    "preflight_model_checksum_failed",
-                    f"模型 SHA-256 校验不一致: 期望 {job.model_sha256}，实际 {computed_sha256}",
-                )
-
-            # All 3 preflight checks passed!
-            job_dict = job.to_dict()
-            job_dict["model_sha256"] = computed_sha256
-            job_dict["started_at"] = time.time()
-
-            # Instantiate runtime and coordinator
             uftp_port = int(payload.get("uftp_port", DEFAULT_UFTP_DATA_PORT))
             if uftp_port in (self.config.control_broadcast_port, self.config.control_bind_port):
                 raise FLRuntimeError(
                     "preflight_port_conflict",
                     "UFTP 数据端口不得与 UDP 控制面端口冲突",
                 )
+
+            # 模型读取和摘要也属于准备预算，交给可取消的准备句柄。
+            self.server_state = ServerState.PREPARING
+            model_preparation = _JobPreparation()
+            self._preparation = model_preparation
+
+            def prepare_model() -> Tuple[Any, Optional[Any]]:
+                if model_preparation.cancelled:
+                    raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                if not os.path.isfile(job.model_path):
+                    raise FLRuntimeError(
+                        "preflight_model_file_not_found",
+                        f"初始模型文件不存在: {job.model_path}",
+                    )
+                actual_size = os.path.getsize(job.model_path)
+                if actual_size <= 0:
+                    raise FLRuntimeError(
+                        "preflight_model_empty",
+                        f"初始模型文件为空 (0 字节): {job.model_path}",
+                    )
+                if actual_size != job.model_size_bytes:
+                    raise FLRuntimeError(
+                        "preflight_model_validation_failed",
+                        f"模型大小不匹配: 期望 {job.model_size_bytes} 字节，实际 {actual_size} 字节",
+                    )
+                digest = calculate_file_sha256(job.model_path, model_preparation.cancellation_event)
+                if job.model_sha256 is not None and digest != job.model_sha256:
+                    raise FLRuntimeError(
+                        "preflight_model_checksum_failed",
+                        f"模型 SHA-256 校验不一致: 期望 {job.model_sha256}，实际 {digest}",
+                    )
+                return actual_size, digest
+
+            model_preparation.start(prepare_model)
+            model_error: Optional[BaseException] = None
+            remaining_model_timeout = max(
+                0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
+            self._lock.release()
+            try:
+                if not model_preparation.wait(remaining_model_timeout):
+                    model_preparation.cancel_and_wait()
+                    model_error = FLRuntimeError(
+                        "preflight_preparation_timeout", "作业准备超过配置期限")
+                elif model_preparation.cancelled:
+                    model_preparation.cancel_and_wait()
+                    model_error = FLRuntimeError(
+                        "job_preparation_cancelled", "作业准备被停止")
+                else:
+                    actual_file_size, computed_sha256 = model_preparation.result()
+            except BaseException as exc:
+                model_preparation.cancel_and_wait()
+                model_error = exc
+            finally:
+                self._lock.acquire()
+
+            self._preparation = None
+            if model_error is not None:
+                if self.server_state == ServerState.PREPARING:
+                    self.server_state = ServerState.IDLE
+                raise model_error
+            if self.server_state != ServerState.PREPARING or self._stop_event.is_set():
+                raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+
+            # All 3 preflight checks passed!
+            job_dict = job.to_dict()
+            job_dict["model_sha256"] = computed_sha256
+            job_dict["started_at"] = time.time()
+            job_dict["preparation_timeout_seconds"] = preparation_timeout_seconds
+
+            # Instantiate runtime and coordinator
             runtime = None
             server_role = None
-            if self.runtime_factory is not None:
-                runtime = self.runtime_factory(job, payload)
-            elif self.config.enable_link_process:
+            self.server_state = ServerState.PREPARING
+            preparation = _JobPreparation()
+            self._preparation = preparation
+
+            def prepare_resources() -> Tuple[Any, Optional[Any]]:
+                if preparation.cancelled:
+                    raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                if self.runtime_factory is not None:
+                    prepared_runtime = self.runtime_factory(job, payload)
+                    if prepared_runtime is not None:
+                        preparation.register_resource(prepared_runtime)
+                    if preparation.cancelled:
+                        raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                    if payload.get('algorithm_config', {}).get('file_simulation') is True and prepared_runtime is not None:
+                        prepared_runtime.require_update_model_match = True
+                    if preparation.cancelled:
+                        preparation.close_registered_resource(prepared_runtime)
+                        raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                    return prepared_runtime, None
+                if not self.config.enable_link_process:
+                    return None, None
+
                 from .role import ServerRole
                 role_work_dir = os.path.join(self.config.work_dir, f"job_{job.job_id}_role")
                 obs_path = os.path.join(role_work_dir, "observation.jsonl") if job.live_observation else None
-                server_role = ServerRole(
+                prepared_role = ServerRole(
                     work_dir=role_work_dir,
                     participant_node_id=tuple(job.target_nodes),
                     participant_uftp_uid=tuple(job.target_nodes),
@@ -986,95 +1155,84 @@ class ServerDaemon:
                     io_timeout=job.io_timeout_seconds,
                     uftp_rate_kbps=self.radio_config.uftp_rate_kbps,
                 )
-                try:
-                    server_role.start()
-                    runtime = server_role.runtime
-                except Exception:
-                    server_role.close()
-                    raise
+                preparation.register_resource(prepared_role)
+                if preparation.cancelled:
+                    raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                prepared_role.start()
+                prepared_runtime = prepared_role.runtime
+                if payload.get('algorithm_config', {}).get('file_simulation') is True and prepared_runtime is not None:
+                    prepared_runtime.require_update_model_match = True
+                if preparation.cancelled:
+                    preparation.close_registered_resource(prepared_role)
+                    raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                return prepared_runtime, prepared_role
 
-            if payload.get('algorithm_config', {}).get('file_simulation') is True and runtime is not None:
-                runtime.require_update_model_match = True
+            preparation.start(prepare_resources)
+            preparation_error: Optional[BaseException] = None
+            remaining_preparation_timeout = max(
+                0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
+            self._lock.release()
+            try:
+                completed = preparation.wait(remaining_preparation_timeout)
+                if not completed:
+                    preparation.cancel_and_wait()
+                    preparation_error = FLRuntimeError(
+                        "preflight_preparation_timeout", "作业准备超过配置期限")
+                elif preparation.cancelled:
+                    preparation.cancel_and_wait()
+                    preparation_error = FLRuntimeError(
+                        "job_preparation_cancelled", "作业准备被停止")
+                else:
+                    runtime, server_role = preparation.result()
+            except BaseException as exc:
+                preparation.cancel_and_wait()
+                preparation_error = exc
+            finally:
+                self._lock.acquire()
 
-            # Only transition state and commit active_job after runtime is ready
-            self._recent_job = None
-            job_dict['current_round'] = 0
-            job_dict['rounds_completed'] = 0
-            job_dict['server_phase'] = 'preparing'
-            job_dict['phase_started_at'] = time.time()
-            self.active_job = job_dict
-            self.server_state = ServerState.RUNNING
-            self.server_role = server_role
+            if preparation_error is not None:
+                self._preparation = None
+                if self.server_state == ServerState.PREPARING:
+                    self.server_state = ServerState.IDLE
+                raise preparation_error
+            if self.server_state != ServerState.PREPARING or self._stop_event.is_set():
+                preparation.cancel_and_wait()
+                self._preparation = None
+                raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+            if time.monotonic() - preparation_started_at > preparation_timeout_seconds:
+                preparation.cancel_and_wait()
+                self._preparation = None
+                self.server_state = ServerState.IDLE
+                raise FLRuntimeError("preflight_preparation_timeout", "作业准备超过配置期限")
 
-            # Broadcast TASK_ANNOUNCE downlink to all clients (per spec line 108)
-            announce_msg = {
-                "type": "TASK_ANNOUNCE",
-                "run_id": job.run_id,
-                "job_id": job.job_id,
-                "mode": job.mode,
-                "rounds": job.rounds,
-                "target_nodes": list(job.target_nodes),
-                "min_updates": job.min_updates,
-                "max_staleness": job.max_staleness,
-                "round_timeout_seconds": job.round_timeout_seconds,
-                "io_timeout_seconds": job.io_timeout_seconds,
-                "live_observation": job.live_observation,
-                "model_size_bytes": actual_file_size,
-                "model_sha256": computed_sha256,
-                "server_http_host": self.config.tun_ip,
-                "server_http_port": int(payload.get("server_http_port", 8080)),
-                "uftp_port": uftp_port,
-                "link_id": self.config.link_id,
-                "algorithm": payload.get("algorithm", "wfb_ng.fl.issue41_algorithm:client_main"),
-                "algorithm_config": payload.get("algorithm_config", {}),
-                "timestamp_ms": int(time.time() * 1000),
-            }
-            self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes)
-            self.control_plane.broadcast_downlink(announce_msg)
-
-            if self.config.enable_link_process:
-                if not self.control_plane.wait_for_task_readiness(10.0):
-                    self.control_plane.clear_task_readiness()
-                    self._finalize_job(
-                        outcome="aborted",
-                        job_id=job.job_id,
-                        reason="client_startup_timeout",
+            # 仅在最终写入 active_job 的瞬间锁住注册表，避免目标在受理边界竞态失效。
+            admission_error: Optional[FLRuntimeError] = None
+            with self.control_plane.registry.admission_window():
+                unready_nodes = self._unready_target_nodes(job.target_nodes)
+                if unready_nodes:
+                    admission_error = FLRuntimeError(
+                        "preflight_target_nodes_not_ready",
+                        f"目标客户端不可用: {list(unready_nodes.keys())}",
+                        details={"unready_nodes": unready_nodes},
                     )
-                    raise FLRuntimeError(
-                        "client_startup_timeout",
-                        "目标客户端未在 10 秒内完成 RoleService 就绪",
-                    )
-            self.control_plane.clear_task_readiness()
+                else:
+                    self._recent_job = None
+                    job_dict['current_round'] = 0
+                    job_dict['rounds_completed'] = 0
+                    job_dict['server_phase'] = 'preparing'
+                    job_dict['phase_started_at'] = time.time()
+                    self.active_job = job_dict
+                    self.server_state = ServerState.RUNNING
+                    self.server_role = server_role
+                    self._preparation = None
 
-            # Broadcast SSE event
-            self.publish_event({
-                "type": "JOB_STARTED",
-                "job": job_dict,
-                "timestamp": time.time(),
-            })
+            if admission_error is not None:
+                self.server_state = ServerState.IDLE
+                preparation.cancel_and_wait()
+                self._preparation = None
+                raise admission_error
 
-            if runtime is not None:
-                self.coordinator = FLCoordinator(
-                    job=job,
-                    runtime=runtime,
-                    work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}"),
-                    on_event=self.publish_event,
-                    on_completed=lambda summary: self._on_job_completed(job.job_id, summary),
-                    on_failed=lambda exc: self._on_job_failed(job.job_id, exc),
-                    aggregation_fn=(copy_model if payload.get('algorithm_config', {}).get('file_simulation') is True else None),
-                )
-                self.coordinator.start()
-
-            logger.info(
-                "作业 %s 成功通过前置门禁并启动 (模式: %s, 轮次: %d, 节点: %s, 模型大小: %d B)",
-                job.job_id,
-                job.mode,
-                job.rounds,
-                list(job.target_nodes),
-                actual_file_size,
-            )
-
-            return {
+            accepted = {
                 "status": "accepted",
                 "run_id": job.run_id,
                 "job_id": job.job_id,
@@ -1084,7 +1242,107 @@ class ServerDaemon:
                 "min_updates": job.min_updates,
                 "model_size_bytes": actual_file_size,
                 "model_sha256": computed_sha256,
+                "preparation_timeout_seconds": preparation_timeout_seconds,
             }
+
+            def finalize_accepted_failure(reason: str, error: str) -> Dict[str, Any]:
+                """把已写入 active_job 的准备错误收口为最近作业事实。"""
+                try:
+                    self.control_plane.clear_task_readiness(job.job_id)
+                except Exception:
+                    logger.exception("清理作业就绪屏障失败 (job=%s)", job.job_id)
+                self._lock.release()
+                try:
+                    self._finalize_job(
+                        outcome="failed",
+                        job_id=job.job_id,
+                        reason=reason,
+                        error=error,
+                    )
+                except Exception:
+                    # 作业已受理；恢复错误保留在 recent_job，不能变成表单拒绝。
+                    logger.exception("已受理作业准备失败后的资源恢复异常 (job=%s)", job.job_id)
+                finally:
+                    self._lock.acquire()
+                return accepted
+
+            try:
+                # 广播 TASK_ANNOUNCE 下行并等待全部目标完成作业级就绪屏障。
+                announce_msg = {
+                    "type": "TASK_ANNOUNCE",
+                    "run_id": job.run_id,
+                    "job_id": job.job_id,
+                    "mode": job.mode,
+                    "rounds": job.rounds,
+                    "target_nodes": list(job.target_nodes),
+                    "min_updates": job.min_updates,
+                    "max_staleness": job.max_staleness,
+                    "round_timeout_seconds": job.round_timeout_seconds,
+                    "io_timeout_seconds": job.io_timeout_seconds,
+                    "live_observation": job.live_observation,
+                    "model_size_bytes": actual_file_size,
+                    "model_sha256": computed_sha256,
+                    "preparation_timeout_seconds": preparation_timeout_seconds,
+                    "server_http_host": self.config.tun_ip,
+                    "server_http_port": int(payload.get("server_http_port", 8080)),
+                    "uftp_port": uftp_port,
+                    "link_id": self.config.link_id,
+                    "algorithm": payload.get("algorithm", "wfb_ng.fl.issue41_algorithm:client_main"),
+                    "algorithm_config": payload.get("algorithm_config", {}),
+                    "timestamp_ms": int(time.time() * 1000),
+                }
+                self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes)
+                self.control_plane.broadcast_downlink(announce_msg)
+
+                if self.config.enable_link_process:
+                    remaining_preparation_timeout = max(
+                        0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
+                    self._lock.release()
+                    try:
+                        task_ready = self.control_plane.wait_for_task_readiness(
+                            remaining_preparation_timeout)
+                    finally:
+                        self._lock.acquire()
+                    if self.active_job is None or self.active_job.get("job_id") != job.job_id:
+                        self.control_plane.clear_task_readiness(job.job_id)
+                        return accepted
+                    if not task_ready:
+                        return finalize_accepted_failure(
+                            "client_startup_timeout",
+                            "目标客户端未在配置的准备期限内完成 RoleService 就绪",
+                        )
+                self.control_plane.clear_task_readiness(job.job_id)
+
+                # Broadcast SSE event
+                self.publish_event({
+                    "type": "JOB_STARTED",
+                    "job": job_dict,
+                    "timestamp": time.time(),
+                })
+
+                if runtime is not None:
+                    self.coordinator = FLCoordinator(
+                        job=job,
+                        runtime=runtime,
+                        work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}"),
+                        on_event=self.publish_event,
+                        on_completed=lambda summary: self._on_job_completed(job.job_id, summary),
+                        on_failed=lambda exc: self._on_job_failed(job.job_id, exc),
+                        aggregation_fn=(copy_model if payload.get('algorithm_config', {}).get('file_simulation') is True else None),
+                    )
+                    self.coordinator.start()
+
+                logger.info(
+                    "作业 %s 成功通过前置门禁并启动 (模式: %s, 轮次: %d, 节点: %s, 模型大小: %d B)",
+                    job.job_id,
+                    job.mode,
+                    job.rounds,
+                    list(job.target_nodes),
+                    actual_file_size,
+                )
+                return accepted
+            except Exception as exc:
+                return finalize_accepted_failure("job_preparation_failed", str(exc))
 
     def _finalize_job(
         self,
@@ -1135,7 +1393,7 @@ class ServerDaemon:
             self.coordinator = None
             self.active_job = None
             self.server_role = None
-
+            self.control_plane.cancel_task_readiness()
         recovery_error = None
         # 1. Stop coordinator if aborting from outside
         if coord is not None and outcome == "aborted":
@@ -1460,13 +1718,19 @@ class ServerDaemon:
             http_thread = self._http_thread
             coord = self.coordinator
             role_to_close = self.server_role
+            preparation_to_cancel = self._preparation
 
             self._httpd = None
             self._http_thread = None
             self.coordinator = None
             self.active_job = None
             self.server_role = None
+            self._preparation = None
+            self.control_plane.cancel_task_readiness()
             self._best_effort_console_refresh()
+
+        if preparation_to_cancel is not None:
+            preparation_to_cancel.cancel_and_wait()
 
         # Stop HTTP REST Server outside lock
         if httpd is not None:

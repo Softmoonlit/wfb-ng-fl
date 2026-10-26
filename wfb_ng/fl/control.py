@@ -3,6 +3,7 @@ Symmetric UDP control plane, three-tier hunting ladder, anti-desync state machin
 and NodeHorizon registry for WFB-ng Stage 2 (ADR-0012, ADR-0014, Ticket 03).
 """
 
+from contextlib import contextmanager
 import json
 import logging
 import os
@@ -590,6 +591,12 @@ class NodeHorizonRegistry:
                     res[nid] = record
             return res
 
+    @contextmanager
+    def admission_window(self):
+        """在目标终态提交的瞬间阻止心跳改写注册表事实。"""
+        with self._lock:
+            yield
+
     def is_node_ready(self, node_id: int) -> bool:
         """True if the node has confirmed IDLE state within offline threshold."""
         node = self.get_node(node_id)
@@ -739,8 +746,14 @@ class ControlPlaneServer:
     def wait_for_task_readiness(self, timeout: float) -> bool:
         return self._task_ready_event.wait(timeout)
 
-    def clear_task_readiness(self) -> None:
+    def cancel_task_readiness(self) -> None:
+        """唤醒等待中的作业准备屏障，由停止或急停路径调用。"""
+        self._task_ready_event.set()
+
+    def clear_task_readiness(self, job_id: Optional[str] = None) -> None:
         with self._lock:
+            if job_id is not None and self._task_ready_job_id != job_id:
+                return
             self._task_ready_job_id = None
             self._task_ready_expected_nodes.clear()
             self._task_ready_nodes.clear()

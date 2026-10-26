@@ -193,7 +193,7 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
 
         def send_frame(frame: Dict[str, Any]) -> None:
             event_name = 'snapshot' if frame['kind'] == 'snapshot' else 'operator-event'
-            payload = frame.get('snapshot', frame.get('event'))
+            payload = frame['snapshot'] if frame['kind'] == 'snapshot' else frame['event']
             if frame.get('resync'):
                 payload = dict(payload)
                 payload['stream_resync'] = True
@@ -275,7 +275,7 @@ class ConsoleRequestHandler(BaseHTTPRequestHandler):
                     self._read_json(), self.headers.get('Idempotency-Key'))
                 self._send(202, json.dumps(result).encode(), 'application/json; charset=utf-8')
             except FLRuntimeError as exc:
-                status = 409 if exc.error_code in ('IDEMPOTENCY_KEY_REUSED', 'preflight_engine_conflict') else 404 if exc.error_code == 'MODEL_NOT_FOUND' else 400
+                status = 409 if exc.error_code in ('IDEMPOTENCY_KEY_REUSED', 'preflight_engine_conflict', 'preflight_target_nodes_not_ready') else 404 if exc.error_code == 'MODEL_NOT_FOUND' else 400
                 self._error(status, exc.error_code, exc.error_message, exc.details)
             except ModelLibraryError as exc:
                 self._error(exc.status, exc.code, str(exc))

@@ -16,11 +16,60 @@
 
   let fetching = false;
   let lastState = null;
-  let sseConnected = true;
-  let httpConnected = true;
+  let sseConnected = false;
+  let httpConnected = false;
+  let stateFresh = false;
   let startSubmitting = false;
-  let instanceId = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('wfb-console-instance') : null;
+  let pendingJobId = null;
+  let instanceId = null;
+  const selectedNodes = new Set();
   const item = (tag, text) => { const node = document.createElement(tag); node.textContent = text; return node; };
+
+  function canStart() {
+    return Boolean(lastState && stateFresh && !pendingJobId && (httpConnected || sseConnected) && selectedNodes.size &&
+      lastState.server.can_start_job && lastState.server.state === 'idle' && !lastState.current_job);
+  }
+
+  function updateStartButton() {
+    const button = byId('start-job');
+    if (button) button.disabled = startSubmitting || !canStart();
+  }
+
+  function renderTargets(state) {
+    const online = state.nodes.filter(node => node.online).sort((a, b) => a.node_id - b.node_id);
+    const removed = [];
+    for (const id of selectedNodes) {
+      const node = online.find(candidate => candidate.node_id === id);
+      if (!node || !node.can_select) {
+        selectedNodes.delete(id);
+        const reason = node ? node.selection_blockers.map(blocker => blocker.message).join('；') : '节点已离线';
+        removed.push(`节点 ${id}：${reason}`);
+      }
+    }
+    if (removed.length) {
+      byId('selection-notice').textContent = `已取消失效选择，请重新确认：${removed.join('；')}`;
+      byId('selection-notice').hidden = false;
+    }
+    byId('job-target-nodes').replaceChildren(...(online.length ? online.map(node => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = 'target_nodes';
+      checkbox.value = String(node.node_id);
+      checkbox.checked = selectedNodes.has(node.node_id);
+      checkbox.disabled = !node.can_select || Boolean(state.current_job) || startSubmitting;
+      checkbox.addEventListener('change', () => {
+        if (checkbox.disabled) return;
+        if (checkbox.checked) selectedNodes.add(node.node_id);
+        else selectedNodes.delete(node.node_id);
+        updateStartButton();
+      });
+      const reasons = node.selection_blockers.map(blocker => blocker.message).join('；');
+      label.append(checkbox, item('span', `节点 ${node.node_id} · ${states[node.state] || node.state} · 基础 ${node.readiness}${reasons ? ` · ${reasons}` : ''}`));
+      return label;
+    }) : [item('p', '暂无在线客户端')]));
+    return online;
+  }
 
   function formatSeconds(sec) {
     if (isNaN(sec) || sec < 0) return '00:00';
@@ -31,7 +80,7 @@
   }
 
   function updateTimers() {
-    if (!sseConnected || !httpConnected || !lastState) return;
+    if ((!sseConnected && !httpConnected) || !lastState) return;
     const job = lastState.current_job || (lastState.job && lastState.job.execution_result === 'running' ? lastState.job : null);
     if (job && lastState.server && lastState.server.state === 'running') {
       const now = Date.now() / 1000;
@@ -67,11 +116,21 @@
     }
   }
 
-  function render(state) {
-    lastState = state;
-    if (instanceId && instanceId !== state.instance_id) byId('instance-notice').hidden = false;
+  function render(state, fresh = true) {
+    if (lastState && instanceId === state.instance_id && state.state_version < lastState.state_version) return;
+    if (fresh) stateFresh = true;
+    if (instanceId && instanceId !== state.instance_id) {
+      byId('instance-notice').hidden = false;
+      selectedNodes.clear();
+      byId('selection-notice').textContent = '服务实例已变化，目标选择已清空，请重新勾选。';
+      byId('selection-notice').hidden = false;
+    }
     instanceId = state.instance_id;
-    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('wfb-console-instance', instanceId);
+    lastState = state;
+    if (pendingJobId && [state.current_job, state.recent_job, state.job]
+        .some(job => job && job.job_id === pendingJobId)) {
+      pendingJobId = null;
+    }
 
     const server = state.server;
     const serverStateText = states[server.state] || server.state;
@@ -102,6 +161,12 @@
     byId('job-phase').textContent = job ? (phases[job.server_phase] || job.server_phase || 'preparing') : '—';
     byId('job-rounds').textContent = job ? `${job.current_round || 0} / ${job.rounds}（已完成 ${job.rounds_completed || 0}）` : '—';
     byId('job-config').textContent = job ? `${job.rounds || '未知'} 轮 · 节点 ${(job.target_nodes || []).join(', ')} · 模型 ${job.model_sha256 || '未知'}` : '—';
+    const participants = job ? job.participants : [];
+    byId('job-participants').textContent = participants.length ? participants.map(participant => {
+      const disconnections = (participant.disconnection_events || []).map(event => event.message).join('；');
+      const fact = participant.online ? (states[participant.state] || participant.state) : '离线';
+      return `节点 ${participant.node_id} · ${fact}${participant.error_code ? ` · ${participant.error_code}` : ''}${disconnections ? ` · 失联事件：${disconnections}` : ''}`;
+    }).join('；') : '—';
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';
 
     const abortButton = byId('abort-job');
@@ -113,7 +178,8 @@
       byId('hud-radio').textContent = radio ? `CH${radio.channel} · ${radio.radio_txpower_dbm}dBm · MCS${radio.downlink_mcs}` : '未确认';
     }
 
-    byId('nodes').replaceChildren(...state.nodes.map(node => {
+    const onlineNodes = renderTargets(state);
+    byId('nodes').replaceChildren(...onlineNodes.map(node => {
       const row = document.createElement('tr');
       row.append(...[node.node_id, node.online ? '在线' : '离线', states[node.state] || node.state,
         node.readiness, node.error_code || '—'].map(value => item('td', String(value))));
@@ -123,10 +189,8 @@
     byId('events').replaceChildren(...(state.events.length ? state.events.map(event =>
       item('li', `${event.timestamp} · ${event.message || event.type}`)) : [item('li', '暂无关键事件')]));
 
-    // Gate the job submission form against authoritative Server state
-    const canStart = Boolean(server.can_start_job && server.state === 'idle' && !state.current_job);
-    const startBtn = byId('start-job');
-    if (startBtn) startBtn.disabled = !canStart || startSubmitting;
+    // 启动门禁同时依赖最新管理状态和操作者明确勾选。
+    updateStartButton();
 
     const formStatus = byId('job-form-status');
     if (formStatus && !startSubmitting) {
@@ -135,16 +199,7 @@
       } else if (server.start_blockers.length) {
         formStatus.textContent = '启动门禁未满足：' + server.start_blockers.map(b => b.message).join('；');
       } else {
-        formStatus.textContent = '集群待命，可以启动作业。';
-      }
-    }
-
-    // Default target nodes from online nodes if empty
-    const targetNodesInput = byId('job-target-nodes');
-    if (targetNodesInput && (!targetNodesInput.value || targetNodesInput.value === '1, 2')) {
-      const onlineNodes = state.nodes.filter(n => n.online).map(n => n.node_id);
-      if (onlineNodes.length > 0) {
-        targetNodesInput.value = onlineNodes.join(', ');
+        formStatus.textContent = selectedNodes.size ? '已选择目标，可以提交；数据与 GPU 将在受理后检查。' : '请勾选目标客户端；基础就绪不代表本次训练准备通过。';
       }
     }
 
@@ -191,11 +246,15 @@
       if (!response.ok) throw new Error(`${state.error.code}: ${state.error.message}`);
       httpConnected = true;
       render(state);
-      if (sseConnected) byId('connection-error').hidden = true;
+      byId('connection-error').hidden = true;
     } catch (error) {
       httpConnected = false;
-      byId('connection-error').textContent = `无法刷新，状态可能已过时。${error.message}。请重试刷新状态。`;
+      if (!sseConnected) stateFresh = false;
+      byId('connection-error').textContent = sseConnected ?
+        `HTTP 刷新失败，继续使用实时状态。${error.message}` :
+        `无法刷新，状态可能已过时，已暂停启动。${error.message}。请重试刷新状态。`;
       byId('connection-error').hidden = false;
+      updateStartButton();
     } finally {
       fetching = false;
     }
@@ -238,7 +297,6 @@
       if (startSubmitting) return;
 
       const modelSelect = byId('job-model');
-      const targetNodesInput = byId('job-target-nodes');
       const roundsInput = byId('job-rounds-input');
       const errorBox = byId('job-form-error');
       const statusBox = byId('job-form-status');
@@ -251,15 +309,14 @@
         return;
       }
 
-      const targetNodesRaw = (targetNodesInput ? targetNodesInput.value : '').trim();
-      const targetNodes = targetNodesRaw.split(/[,，\s]+/).filter(Boolean).map(Number);
-      if (targetNodes.length === 0 || targetNodes.some(isNaN)) {
-        if (errorBox) { errorBox.textContent = '目标节点必须为合法的数字编号，如 1, 2'; errorBox.hidden = false; }
+      const targetNodes = [...selectedNodes].sort((a, b) => a - b);
+      if (!canStart()) {
+        if (errorBox) { errorBox.textContent = '作业未提交：请确认管理状态有效、启动门禁满足且已勾选目标客户端。'; errorBox.hidden = false; }
         return;
       }
 
-      const rounds = parseInt(roundsInput ? roundsInput.value : '3', 10);
-      if (isNaN(rounds) || rounds < 1) {
+      const rounds = Number(roundsInput ? roundsInput.value : '5');
+      if (!Number.isInteger(rounds) || rounds < 1) {
         if (errorBox) { errorBox.textContent = '同步轮数必须为大于 0 的整数'; errorBox.hidden = false; }
         return;
       }
@@ -268,6 +325,8 @@
       if (byId('start-job')) byId('start-job').disabled = true;
       if (statusBox) statusBox.textContent = '正在提交并启动同步作业…';
 
+      let requestAccepted = false;
+      let acceptedStatus = '';
       try {
         const idempotencyKey = Array.from(crypto.getRandomValues(new Uint8Array(16)),
           value => value.toString(16).padStart(2, '0')).join('');
@@ -284,18 +343,31 @@
           })
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(`${result.error.code}: ${result.error.message}`);
-        if (statusBox) statusBox.textContent = `作业 ${result.job_id} 已创建并受理，正在等待节点准备…`;
+        if (!response.ok) {
+          const reasons = Object.entries(result.error.details?.unready_nodes || {})
+            .map(([id, detail]) => `节点 ${id}：${detail.reason}`).join('；');
+          throw new Error(`${result.error.code}: ${result.error.message}${reasons ? `；${reasons}` : ''}`);
+        }
+        requestAccepted = true;
+        pendingJobId = result.job_id;
+        stateFresh = false;
+        acceptedStatus = `作业 ${result.job_id} 已受理，准备结果请查看作业详情。`;
+        if (statusBox) statusBox.textContent = acceptedStatus;
         await refresh();
       } catch (err) {
-        if (errorBox) { errorBox.textContent = `启动作业失败。${err.message}`; errorBox.hidden = false; }
-        if (statusBox) statusBox.textContent = '';
+        if (requestAccepted) {
+          acceptedStatus = '作业已受理，但状态快照暂不可用；请刷新核对当前作业。';
+          if (statusBox) statusBox.textContent = acceptedStatus;
+        } else {
+          if (errorBox) { errorBox.textContent = `提交未获受理确认，请刷新核对作业状态。${err.message}`; errorBox.hidden = false; }
+          if (statusBox) statusBox.textContent = '';
+          await refresh();
+        }
       } finally {
         startSubmitting = false;
-        if (byId('start-job') && lastState) {
-          const canStart = Boolean(lastState.server.can_start_job && lastState.server.state === 'idle' && !lastState.current_job);
-          byId('start-job').disabled = !canStart;
-        }
+        if (lastState) render(lastState, false);
+        if (acceptedStatus && statusBox) statusBox.textContent = acceptedStatus;
+        updateStartButton();
       }
     });
   }
@@ -308,11 +380,14 @@
   if (typeof EventSource !== 'undefined') {
     const stream = new EventSource('/api/v1/events');
     stream.addEventListener('snapshot', event => {
-      sseConnected = true;
       try {
-        render(JSON.parse(event.data));
-        if (httpConnected) byId('connection-error').hidden = true;
+        const state = JSON.parse(event.data);
+        sseConnected = true;
+        render(state);
+        byId('connection-error').hidden = true;
       } catch (error) {
+        sseConnected = false;
+        updateStartButton();
         byId('connection-error').textContent = `状态帧非法。${error.message}`;
         byId('connection-error').hidden = false;
       }
@@ -322,8 +397,11 @@
     });
     stream.onerror = () => {
       sseConnected = false;
-      byId('connection-error').textContent = '实时连接中断，浏览器正在重连；本地计时已暂停，状态快照仍可手动刷新。';
+      byId('connection-error').textContent = httpConnected ?
+        '实时连接中断，继续使用 HTTP 轮询的最新状态。' :
+        '管理连接中断，状态可能已过时，已暂停启动；正在重连。';
       byId('connection-error').hidden = false;
+      updateStartButton();
     };
   }
 

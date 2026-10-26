@@ -441,7 +441,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
     def test_preflight_gate_1_target_nodes_not_ready(self):
         """
-        Gate 1: target_nodes must be confirmed IDLE within 10 seconds.
+        Gate 1: target_nodes must be READY/IDLE under registry heartbeat facts; preparation budget covers TASK_READY.
         """
         # Node 1 is ready, but Node 2 has never checked in
         self._simulate_client_handshake(1)

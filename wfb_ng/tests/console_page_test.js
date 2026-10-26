@@ -15,8 +15,10 @@ const snapshot = {
     radio:{channel:157, radio_txpower_dbm:12, downlink_mcs:3, uplink_mcs:6},
     can_start_job:false, start_blockers:[{code:'JOB_RESOURCE_NOT_READY',message:'资源恢复未完成'}],
     tun:{is_active:true}, link_process:{running:true}},
-  nodes:[{node_id:1, state:'idle', readiness:'READY', online:true, error_code:null}],
-  job:{job_id:'job-1', execution_result:'failed', recovery_state:'blocked', error:'摘要错误', rounds:3, target_nodes:[1]},
+  nodes:[{node_id:1, state:'idle', readiness:'READY', online:true, error_code:null, can_select:true, selection_blockers:[]}],
+  job:{job_id:'job-1', execution_result:'failed', recovery_state:'blocked', error:'摘要错误', rounds:3, target_nodes:[1],
+    participants:[{node_id:1, online:false, state:'offline', readiness:'OFFLINE', reported_state:null,
+      error_code:null, can_select:false, selection_blockers:[{code:'NODE_OFFLINE', message:'节点未上线或心跳已超时'}]}]},
   events:[{sequence:1, type:'JOB_FAILED', message:'摘要错误', timestamp:'now'}]
 };
 function openPage(responses) {
@@ -56,14 +58,17 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   page.stream.emit('snapshot', JSON.stringify(snapshot));
   await flush();
   assert.match(page.elements['job-id'].textContent,/job-1/);
-  await page.tick(); await flush();
+  page.stream.onerror();
   assert.equal(page.elements['connection-error'].hidden,false);
-  assert.match(page.elements['connection-error'].textContent,/过时/);
+  assert.match(page.elements['connection-error'].textContent,/实时连接中断/);
   assert.match(page.elements['job-result'].textContent,/失败/);
+  await page.tick(); await flush();
+  assert.match(page.elements['connection-error'].textContent,/过时/);
   await page.elements['refresh'].listeners.click(); await flush();
   assert.equal(page.elements['connection-error'].hidden,true);
+  page.stream.onerror();
   await page.tick(); await flush();
-  assert.match(page.elements['connection-error'].textContent,/STATE_UNAVAILABLE/);
+  assert.match(page.elements['connection-error'].textContent,/过时/);
   const refreshed=openPage([snapshot]); await flush();
   assert.match(refreshed.elements['job-id'].textContent,/job-1/);
   assert.match(refreshed.elements['job-recovery'].textContent,/恢复受阻/);

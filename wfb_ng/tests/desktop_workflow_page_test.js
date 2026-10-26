@@ -80,9 +80,8 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   };
 
   elements['job-rounds-input'] = createElement('input');
-  elements['job-rounds-input'].value = '3';
-  elements['job-target-nodes'] = createElement('input');
-  elements['job-target-nodes'].value = '1, 2';
+  elements['job-rounds-input'].value = '5';
+  elements['job-target-nodes'] = createElement('div');
 
   const context = {
     document: {
@@ -206,8 +205,8 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
       air_interface: 'wlx00e04c000001'
     },
     nodes: [
-      { node_id: 1, online: true, state: 'idle', readiness: 'READY', error_code: null },
-      { node_id: 2, online: true, state: 'idle', readiness: 'READY', error_code: null }
+      { node_id: 1, online: true, state: 'idle', readiness: 'READY', can_select: true, selection_blockers: [], error_code: null },
+      { node_id: 2, online: true, state: 'idle', readiness: 'READY', can_select: true, selection_blockers: [], error_code: null }
     ],
     job: activeJob || recentJob,
     current_job: activeJob,
@@ -243,6 +242,8 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
         started_at: Date.now() / 1000 - 10,
         round_started_at: Date.now() / 1000 - 5,
         phase_started_at: Date.now() / 1000 - 2,
+        participants: body.target_nodes.map(node_id => ({node_id, online: true, state: 'idle', readiness: 'READY',
+          reported_state: 'IDLE', error_code: null, can_select: true, selection_blockers: []})),
         error: null,
         reason: null
       };
@@ -273,9 +274,14 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   await flush();
 
   assert.equal(cElements['job-model'].value, modelSha, 'URL ?model= was auto-selected');
-  assert.equal(cElements['job-rounds-input'].value, '3', 'Default rounds is 3');
-  assert.equal(cElements['job-target-nodes'].value, '1, 2', 'Default target nodes filled with ready nodes');
-  assert.equal(cElements['start-job'].disabled, false, 'Start button enabled when cluster is idle');
+  assert.equal(cElements['job-rounds-input'].value, '5', '默认五轮');
+  assert.ok(cElements['job-target-nodes'].children.every(label => !label.children[0].checked), '初始空选');
+  assert.equal(cElements['start-job'].disabled, true, '空选禁用启动');
+  for (const label of cElements['job-target-nodes'].children) {
+    label.children[0].checked = true;
+    label.children[0].listeners.change();
+  }
+  assert.equal(cElements['start-job'].disabled, false, '明确勾选后可以启动');
   assert.equal(cElements['abort-job'].disabled, true, 'Abort button disabled when no active job');
 
   // Submit job
@@ -285,7 +291,7 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   assert.equal(postedJobs.length, 1, 'Submitted job request');
   assert.equal(postedJobs[0].body.model_sha256, modelSha);
   assert.deepEqual(postedJobs[0].body.target_nodes, [1, 2]);
-  assert.equal(postedJobs[0].body.rounds, 3);
+  assert.equal(postedJobs[0].body.rounds, 5);
   assert.match(postedJobs[0].headers['Idempotency-Key'], /^[0-9a-f]{32}$/,
     '普通 HTTP 环境必须能够生成幂等键并完成提交');
 
@@ -298,7 +304,7 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   assert.equal(cElements['job-id'].textContent, 'sim-job-001');
   assert.equal(cElements['job-result'].textContent, '执行中');
   assert.equal(cElements['job-phase'].textContent, '准备任务');
-  assert.match(cElements['job-rounds'].textContent, /1 \/ 3/);
+  assert.match(cElements['job-rounds'].textContent, /1 \/ 5/);
   assert.equal(cElements['start-job'].disabled, true, 'Start job button disabled during active job');
   assert.equal(cElements['abort-job'].disabled, false, 'Abort button enabled during active job');
 
@@ -320,14 +326,14 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
   await flush();
   assert.equal(cElements['connection-error'].hidden, true);
 
-  // SSE disconnect triggers error banner and pauses timers
+  // SSE 单路中断时继续使用 HTTP 状态。
   const elapsedBeforeDisconnect = cElements['job-elapsed'].textContent;
   eventSourceHolder.instance.triggerError();
   await flush();
   assert.equal(cElements['connection-error'].hidden, false);
   assert.match(cElements['connection-error'].textContent, /实时连接中断/);
 
-  // Tick while disconnected does not advance timers
+  // HTTP 仍有效，页面继续从快照恢复。
   cTick();
   assert.equal(cElements['job-elapsed'].textContent, elapsedBeforeDisconnect, 'Timers paused during disconnection');
 

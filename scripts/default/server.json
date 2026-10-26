@@ -8,6 +8,7 @@
   "radio_txpower_dbm": 12,
   "downlink_mcs": 3,
   "uplink_mcs": 6,
+  "preparation_timeout_seconds": 30.0,
   "tun_name": "fl-s",
   "tun_ip": "10.80.0.1",
   "tun_cidr": "10.80.0.1/24",

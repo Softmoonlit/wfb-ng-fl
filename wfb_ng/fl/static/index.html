@@ -46,6 +46,7 @@
           <div><dt>同步轮次</dt><dd id="job-rounds">—</dd></div>
           <div><dt>资源恢复</dt><dd id="job-recovery">无需恢复</dd></div>
           <div><dt>作业配置</dt><dd id="job-config">—</dd></div>
+          <div><dt>参与者事实</dt><dd id="job-participants">—</dd></div>
         </dl>
         <div class="job-timers-bar">
           <div class="timer-box"><span class="timer-label">总耗时</span><span id="job-elapsed" class="timer-val mono">00:00</span></div>
@@ -69,13 +70,15 @@
                 <a href="/models" class="btn btn-sm btn-subtle">去模型库上传</a>
               </div>
             </div>
-            <div class="form-group">
-              <label for="job-target-nodes">目标节点 (逗号分隔)</label>
-              <input id="job-target-nodes" name="target_nodes" type="text" value="1, 2" placeholder="1, 2" required>
-            </div>
+            <fieldset class="form-group full-width">
+              <legend>目标客户端</legend>
+              <p class="muted">仅展示服务端判定在线的客户端。基础就绪仅表示可选，数据、GPU 与依赖将在作业受理后检查。</p>
+              <div id="job-target-nodes" class="target-choices"></div>
+              <p id="selection-notice" role="status" hidden></p>
+            </fieldset>
             <div class="form-group">
               <label for="job-rounds-input">固定同步轮数</label>
-              <input id="job-rounds-input" name="rounds" type="number" min="1" max="100" value="3" required>
+              <input id="job-rounds-input" name="rounds" type="number" min="1" max="100" value="5" required>
             </div>
           </div>
           <div class="form-actions">
@@ -94,8 +97,8 @@
     <!-- Right Column: Nodes & System & Events -->
     <div class="col-side">
       <section aria-labelledby="nodes-heading">
-        <h2 id="nodes-heading">📡 参与节点健康度</h2>
-        <table aria-label="参与节点状态">
+        <h2 id="nodes-heading">📡 在线客户端</h2>
+        <table aria-label="在线客户端状态">
           <thead><tr><th>节点</th><th>在线</th><th>粗状态</th><th>就绪</th><th>错误</th></tr></thead>
           <tbody id="nodes"></tbody>
         </table>

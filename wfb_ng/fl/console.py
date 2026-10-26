@@ -37,13 +37,42 @@ def _state_facts(value: Any) -> Any:
     return value
 
 
-def _job_view(job: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
+              disconnections: Dict[str, list]) -> Optional[Dict[str, Any]]:
     if job is None:
         return None
     fields = {"job_id", "run_id", "model_sha256", "model_size_bytes", "target_nodes", "rounds",
-              "started_at", "execution_result", "recovery_state", "error", "reason", "recovery_error",
+              "started_at", "preparation_timeout_seconds", "execution_result", "recovery_state", "error", "reason", "recovery_error",
               "current_round", "rounds_completed", "server_phase", "round_started_at", "phase_started_at"}
-    return {k: deepcopy(v) for k, v in job.items() if k in fields}
+    view = {k: deepcopy(v) for k, v in job.items() if k in fields}
+    target_nodes = view.get("target_nodes", [])
+    view["target_nodes"] = target_nodes
+    participant_fields = ("node_id", "online", "state", "readiness", "reported_state",
+                          "error_code", "can_select", "selection_blockers")
+    view["participants"] = []
+    for node_id in target_nodes:
+        disconnection_events = [
+            deepcopy(event) for event in disconnections.get(job.get("job_id"), [])
+            if event.get("node_id") == node_id
+        ]
+        node = nodes.get(node_id)
+        if node is None:
+            view["participants"].append({
+                "node_id": node_id,
+                "online": False,
+                "state": "offline",
+                "readiness": "OFFLINE",
+                "reported_state": None,
+                "error_code": None,
+                "can_select": False,
+                "selection_blockers": [{"code": "NODE_NOT_IN_SNAPSHOT", "message": "节点不在当前状态快照"}],
+                "disconnection_events": disconnection_events,
+            })
+        else:
+            participant = {key: deepcopy(node[key]) for key in participant_fields}
+            participant["disconnection_events"] = disconnection_events
+            view["participants"].append(participant)
+    return view
 
 
 class ConsoleApplicationService:
@@ -61,6 +90,7 @@ class ConsoleApplicationService:
         self._version = 0
         self._facts: Any = None
         self._events: list = []
+        self._job_disconnections: Dict[str, list] = {}
         self._event_sequence = 0
         self._node_online: Dict[int, bool] = {}
         self._web_status: Optional[tuple] = None
@@ -69,6 +99,7 @@ class ConsoleApplicationService:
         self._start_job = start_job
         self._abort_job = abort_job
         self._job_requests: Dict[str, tuple] = {}
+        self._job_request_lock = threading.Lock()
         self._radio_confirmation: Optional[Dict[str, Any]] = None
         self._stream_subscribers: list = []
         self._initializing_stream = False
@@ -93,7 +124,8 @@ class ConsoleApplicationService:
                 or type(rounds) is not int or rounds <= 0):
             raise FLRuntimeError('INVALID_JOB_REQUEST', 'target_nodes 必须为固定不重复节点集合，rounds 必须为正整数')
         canonical = (digest, tuple(nodes), rounds)
-        with self._source_lock:
+        # 幂等请求单独串行，不能让准备屏障占用守护进程状态锁。
+        with self._job_request_lock:
             previous = self._job_requests.get(idempotency_key)
             if previous is not None:
                 if previous[0] != canonical:
@@ -286,7 +318,8 @@ class ConsoleApplicationService:
             # Daemon and coordinator can report the same start/terminal fact.
             identity = (event.get("type"), event.get("job_id") or event.get("job", {}).get("job_id"),
                         event.get("round_id"), event.get("node_id"),
-                        event.get("message") or event.get("reason") or event.get("error"))
+                        event.get("message") or event.get("reason") or event.get("error"),
+                        event.get("event_key"))
             if any(e["identity"] == identity for e in self._events):
                 return
             self._event_sequence += 1
@@ -310,16 +343,38 @@ class ConsoleApplicationService:
     def _snapshot_locked(self) -> Dict[str, Any]:
         raw = deepcopy(self._read_status())
         with self._lock:
+            active_id = (raw["active_job"] or {}).get("job_id")
+            recent_id = (raw["recent_job"] or {}).get("job_id")
+            self._job_disconnections = {
+                job_id: events for job_id, events in self._job_disconnections.items()
+                if job_id in {active_id, recent_id}
+            }
             if self._web_status is not None:
                 raw["management_web"]["status"], raw["management_web"]["error"] = self._web_status
             nodes = []
-            for node in raw["nodes"].values():
+            for node in sorted(raw["nodes"].values(), key=lambda node: node["node_id"]):
                 node["state"] = ("offline" if node["readiness"] == "OFFLINE" else
                                  "error" if node["error_code"] else
                                  (node["reported_state"] or "HUNTING").lower())
                 node["online"] = node["readiness"] != "OFFLINE"
                 if self._node_online.get(node["node_id"]) is True and not node["online"]:
-                    self.record_event({"type": "NODE_OFFLINE", "node_id": node["node_id"],
+                    observed_job = raw["active_job"]
+                    if observed_job is None:
+                        recent_job = raw["recent_job"]
+                        observed_job = recent_job if recent_job and recent_job.get("recovery_state") != "ready" else {}
+                    active_job_id = observed_job.get("job_id") if node["node_id"] in observed_job.get("target_nodes", []) else None
+                    if active_job_id is not None:
+                        disconnection = {
+                            "type": "NODE_OFFLINE",
+                            "job_id": active_job_id,
+                            "node_id": node["node_id"],
+                            "message": f"节点 {node['node_id']} 离线",
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                        }
+                        self._job_disconnections.setdefault(active_job_id, []).append(disconnection)
+                    self.record_event({"type": "NODE_OFFLINE", "job_id": active_job_id,
+                                       "event_key": f"{active_job_id}:{node['node_id']}:{time.monotonic_ns()}",
+                                       "node_id": node["node_id"],
                                        "message": f"节点 {node['node_id']} 离线"})
                 self._node_online[node["node_id"]] = node["online"]
                 nodes.append(node)
@@ -333,15 +388,16 @@ class ConsoleApplicationService:
                     blockers.append({"code": "TUN_NOT_READY", "message": "TUN 尚未就绪"})
                 if not raw["link_process"]["running"]:
                     blockers.append({"code": "LINK_NOT_READY", "message": "无线链路进程尚未就绪"})
-            current = _job_view(raw["active_job"])
-            recent = _job_view(raw["recent_job"])
+            participant_nodes = {node["node_id"]: node for node in nodes}
+            current = _job_view(raw["active_job"], participant_nodes, self._job_disconnections)
+            recent = _job_view(raw["recent_job"], participant_nodes, self._job_disconnections)
             if current:
                 current["execution_result"] = "running"
                 current["recovery_state"] = "not_required"
                 blockers.append({"code": "JOB_RUNNING", "message": "作业正在运行"})
             if recent and recent["recovery_state"] != "ready":
                 blockers.append({"code": "JOB_RESOURCE_NOT_READY", "message": "上一项作业资源尚未恢复"})
-            if not any(n["state"] == "idle" and n["readiness"] == "READY" for n in nodes):
+            if not any(n["can_select"] for n in nodes):
                 blockers.append({"code": "NODES_NOT_READY", "message": "没有待命且就绪的节点"})
             state = {
                 "schema_version": 1, "instance_id": self.instance_id,
