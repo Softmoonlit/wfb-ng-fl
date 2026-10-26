@@ -340,6 +340,8 @@ class TestFLCoordinator(unittest.TestCase):
         self.assertEqual(raised.exception.error_code, "effect_criterion_not_met")
         summary = coordinator.get_summary()
         self.assertEqual(summary["status"], "failed")
+        self.assertEqual(summary["execution_result"], "succeeded")
+        self.assertTrue(summary['rounds'][0]['client_submission_returns_received'])
         self.assertEqual(summary["effect_result"]["verdict"], False)
         self.assertEqual(summary["effect_result"]["reason"], "fixture criterion not met")
         self.assertEqual(summary["rounds_completed"], 1)
@@ -427,6 +429,8 @@ class TestFLCoordinator(unittest.TestCase):
         summary = coordinator.get_summary()
         self.assertIsNotNone(summary)
         self.assertEqual(summary["status"], "failed")
+        self.assertEqual(summary['execution_result'], 'failed')
+        self.assertFalse(summary['rounds'][0]['client_submission_returns_received'])
         self.assertEqual(summary["rounds_completed"], 1)
 
     def test_strict_quorum_rejects_partial_updates(self):

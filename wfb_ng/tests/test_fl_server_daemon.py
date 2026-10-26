@@ -316,7 +316,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         payload.update(overrides)
         return payload
 
-    def test_terminal_job_resets_persistent_link_after_role_close(self):
+    def test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset(self):
         daemon = ServerDaemon(
             config=ServerDaemonConfig(
                 work_dir=self.temp_dir,
@@ -336,13 +336,27 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), \
                 patch.object(daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")), \
                 patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
-            daemon._finalize_job(outcome="completed", job_id="terminal-reset")
+            final_summary = {'rounds_completed': 5, 'final_model_sha256': 'a' * 64,
+                             'execution_result': 'succeeded'}
+            daemon._finalize_job(outcome="completed", job_id="terminal-reset", summary=final_summary)
+            duplicate = daemon._finalize_job(outcome="completed", job_id="terminal-reset")
 
-        self.assertEqual(calls, ["role_close", "link_stop", "link_start", "terminal_broadcast"])
+        self.assertEqual(duplicate['status'], 'ignored')
+        self.assertEqual(daemon.get_status_report()['recent_job']['summary'], final_summary)
+        self.assertEqual(calls, ["role_close", "terminal_broadcast"])
         self.assertEqual(broadcast.call_args.args[0]["job_id"], "terminal-reset")
         self.assertEqual(daemon.server_state, ServerState.IDLE)
         self.assertIsNone(daemon.active_job)
         self.assertIsNone(daemon.server_role)
+
+    def test_completed_terminal_requires_explicit_execution_summary(self):
+        self.daemon.active_job = {'job_id': 'missing-summary'}
+        self.daemon.server_state = ServerState.RUNNING
+        for summary in (None, {}, {'rounds_completed': 5}):
+            with self.subTest(summary=summary), self.assertRaises(FLRuntimeError) as raised:
+                self.daemon._finalize_job(outcome='completed', job_id='missing-summary', summary=summary)
+            self.assertEqual(raised.exception.error_code, 'invalid_coordinator_summary')
+            self.assertIsNotNone(self.daemon.active_job)
 
     def test_status_snapshot_returns_topology_and_radio(self):
         body = self.daemon.get_status_report()

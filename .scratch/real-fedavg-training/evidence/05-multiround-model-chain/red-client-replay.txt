@@ -1,0 +1,256 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___ test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffffacb65f90>
+terminal = 'JOB_COMPLETED'
+
+    @pytest.mark.parametrize('terminal', ['JOB_COMPLETED', 'JOB_ABORT', 'natural'])
+    def test_finished_job_cannot_be_restarted_by_delayed_announce(tmp_path, monkeypatch, terminal):
+        """带内终态和自然返回后，迟到的启动重试不得重新执行同一作业。"""
+        import subprocess
+        import sys
+        from unittest import mock
+        from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
+        from wfb_ng.fl.control import ControlPlaneClient
+        from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+    
+        daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+            work_dir=str(tmp_path), enable_link_process=False),
+            network_adapter=MockNetworkAdapter(['wlan0']))
+        daemon.poll_hardware_once()
+        with mock.patch.object(ControlPlaneClient, 'start'):
+            daemon.start_control_plane()
+        real_popen = subprocess.Popen
+        processes = []
+        daemon.sandbox.evidence_dir = str(tmp_path / 'evidence')
+        program = '''
+    import os, threading, time
+    from wfb_ng.fl.service import AlgorithmNotifications
+    n = AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job1', threading.Event(), timeout=4)
+    n.prepared({'ready': True})
+    n.round_complete(1)
+    '''
+        if terminal != 'natural':
+            program += 'time.sleep(30)\n'
+    
+        def spawn(cmd, **kwargs):
+            proc = real_popen([sys.executable, '-c', program], **kwargs)
+            processes.append(proc)
+            return proc
+    
+        monkeypatch.setattr(subprocess, 'Popen', spawn)
+        completed = threading.Event()
+        monkeypatch.setattr(daemon.control_plane, 'notify_task_ready', lambda *a, **kw: None)
+        monkeypatch.setattr(daemon.control_plane, 'notify_round_complete', lambda *a, **kw: completed.set())
+        announce = dict(type='TASK_ANNOUNCE', job_id='job1', run_id='run1', target_nodes=[1],
+            rounds=1, preparation_timeout_seconds=10, algorithm='wfb_ng.fl.mnist:client_entry',
+            algorithm_config={}, io_timeout_seconds=10, live_observation=False,
+            server_http_host='10.80.0.1', server_http_port=8080, uftp_port=1044, link_id=7669206)
+        try:
+            daemon.control_plane.handle_broadcast(announce)
+            assert completed.wait(3)
+            if terminal != 'natural':
+                daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job1'))
+            daemon._startup_thread.join(3)
+            assert not daemon.sandbox.is_running
+            daemon.control_plane.handle_broadcast(dict(type='JOB_COMPLETED', job_id='job1'))
+            daemon.control_plane.handle_broadcast(announce)
+            daemon._startup_thread.join(3)
+>           assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+E           AssertionError: 终态后重复启动消息不能再次创建任务角色
+E           assert 2 == 1
+E            +  where 2 = len([<Popen: returncode: -15 args: ['/usr/bin/python', '-c', "\nimport os, thread...>, <Popen: returncode: None args: ['/usr/bin/python', '-c', "\nimport os, threa...>])
+
+wfb_ng/tests/test_fl_client_service.py:576: AssertionError
+----------------------------- Captured stderr call -----------------------------
+作业 job1 evidence 归档失败，保留沙箱 /tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re0/job_job1
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_client_service.py", line 576, in test_finished_job_cannot_be_restarted_by_delayed_announce
+    assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+AssertionError: 终态后重复启动消息不能再次创建任务角色
+assert 2 == 1
+ +  where 2 = len([<Popen: returncode: -15 args: ['/usr/bin/python', '-c', "\nimport os, thread...>, <Popen: returncode: None args: ['/usr/bin/python', '-c', "\nimport os, threa...>])
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 920, in _finalize
+    archive_client_evidence(
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/evidence.py", line 103, in archive_client_evidence
+    raise FileExistsError(errno.EEXIST, '证据目录已存在', job_id)
+FileExistsError: [Errno 17] 证据目录已存在: 'job1'
+_____ test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_ABORT] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffffac89e4d0>
+terminal = 'JOB_ABORT'
+
+    @pytest.mark.parametrize('terminal', ['JOB_COMPLETED', 'JOB_ABORT', 'natural'])
+    def test_finished_job_cannot_be_restarted_by_delayed_announce(tmp_path, monkeypatch, terminal):
+        """带内终态和自然返回后，迟到的启动重试不得重新执行同一作业。"""
+        import subprocess
+        import sys
+        from unittest import mock
+        from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
+        from wfb_ng.fl.control import ControlPlaneClient
+        from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+    
+        daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+            work_dir=str(tmp_path), enable_link_process=False),
+            network_adapter=MockNetworkAdapter(['wlan0']))
+        daemon.poll_hardware_once()
+        with mock.patch.object(ControlPlaneClient, 'start'):
+            daemon.start_control_plane()
+        real_popen = subprocess.Popen
+        processes = []
+        daemon.sandbox.evidence_dir = str(tmp_path / 'evidence')
+        program = '''
+    import os, threading, time
+    from wfb_ng.fl.service import AlgorithmNotifications
+    n = AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job1', threading.Event(), timeout=4)
+    n.prepared({'ready': True})
+    n.round_complete(1)
+    '''
+        if terminal != 'natural':
+            program += 'time.sleep(30)\n'
+    
+        def spawn(cmd, **kwargs):
+            proc = real_popen([sys.executable, '-c', program], **kwargs)
+            processes.append(proc)
+            return proc
+    
+        monkeypatch.setattr(subprocess, 'Popen', spawn)
+        completed = threading.Event()
+        monkeypatch.setattr(daemon.control_plane, 'notify_task_ready', lambda *a, **kw: None)
+        monkeypatch.setattr(daemon.control_plane, 'notify_round_complete', lambda *a, **kw: completed.set())
+        announce = dict(type='TASK_ANNOUNCE', job_id='job1', run_id='run1', target_nodes=[1],
+            rounds=1, preparation_timeout_seconds=10, algorithm='wfb_ng.fl.mnist:client_entry',
+            algorithm_config={}, io_timeout_seconds=10, live_observation=False,
+            server_http_host='10.80.0.1', server_http_port=8080, uftp_port=1044, link_id=7669206)
+        try:
+            daemon.control_plane.handle_broadcast(announce)
+            assert completed.wait(3)
+            if terminal != 'natural':
+                daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job1'))
+            daemon._startup_thread.join(3)
+            assert not daemon.sandbox.is_running
+            daemon.control_plane.handle_broadcast(dict(type='JOB_COMPLETED', job_id='job1'))
+            daemon.control_plane.handle_broadcast(announce)
+            daemon._startup_thread.join(3)
+>           assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+E           AssertionError: 终态后重复启动消息不能再次创建任务角色
+E           assert 2 == 1
+E            +  where 2 = len([<Popen: returncode: -15 args: ['/usr/bin/python', '-c', "\nimport os, thread...>, <Popen: returncode: None args: ['/usr/bin/python', '-c', "\nimport os, threa...>])
+
+wfb_ng/tests/test_fl_client_service.py:576: AssertionError
+----------------------------- Captured stderr call -----------------------------
+客户端作业 job1 失败
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1478, in _run_job
+    self.sandbox.monitor(forward, stop_event)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 777, in monitor
+    raise FLRuntimeError('algorithm_incomplete', '角色退出或算法完成轮数不足')
+wfb_ng.fl.errors.FLRuntimeError: 角色退出或算法完成轮数不足
+作业 job1 evidence 归档失败，保留沙箱 /tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re1/job_job1
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_client_service.py", line 576, in test_finished_job_cannot_be_restarted_by_delayed_announce
+    assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+AssertionError: 终态后重复启动消息不能再次创建任务角色
+assert 2 == 1
+ +  where 2 = len([<Popen: returncode: -15 args: ['/usr/bin/python', '-c', "\nimport os, thread...>, <Popen: returncode: None args: ['/usr/bin/python', '-c', "\nimport os, threa...>])
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 920, in _finalize
+    archive_client_evidence(
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/evidence.py", line 103, in archive_client_evidence
+    raise FileExistsError(errno.EEXIST, '证据目录已存在', job_id)
+FileExistsError: [Errno 17] 证据目录已存在: 'job1'
+______ test_finished_job_cannot_be_restarted_by_delayed_announce[natural] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffffacb67820>
+terminal = 'natural'
+
+    @pytest.mark.parametrize('terminal', ['JOB_COMPLETED', 'JOB_ABORT', 'natural'])
+    def test_finished_job_cannot_be_restarted_by_delayed_announce(tmp_path, monkeypatch, terminal):
+        """带内终态和自然返回后，迟到的启动重试不得重新执行同一作业。"""
+        import subprocess
+        import sys
+        from unittest import mock
+        from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
+        from wfb_ng.fl.control import ControlPlaneClient
+        from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+    
+        daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+            work_dir=str(tmp_path), enable_link_process=False),
+            network_adapter=MockNetworkAdapter(['wlan0']))
+        daemon.poll_hardware_once()
+        with mock.patch.object(ControlPlaneClient, 'start'):
+            daemon.start_control_plane()
+        real_popen = subprocess.Popen
+        processes = []
+        daemon.sandbox.evidence_dir = str(tmp_path / 'evidence')
+        program = '''
+    import os, threading, time
+    from wfb_ng.fl.service import AlgorithmNotifications
+    n = AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job1', threading.Event(), timeout=4)
+    n.prepared({'ready': True})
+    n.round_complete(1)
+    '''
+        if terminal != 'natural':
+            program += 'time.sleep(30)\n'
+    
+        def spawn(cmd, **kwargs):
+            proc = real_popen([sys.executable, '-c', program], **kwargs)
+            processes.append(proc)
+            return proc
+    
+        monkeypatch.setattr(subprocess, 'Popen', spawn)
+        completed = threading.Event()
+        monkeypatch.setattr(daemon.control_plane, 'notify_task_ready', lambda *a, **kw: None)
+        monkeypatch.setattr(daemon.control_plane, 'notify_round_complete', lambda *a, **kw: completed.set())
+        announce = dict(type='TASK_ANNOUNCE', job_id='job1', run_id='run1', target_nodes=[1],
+            rounds=1, preparation_timeout_seconds=10, algorithm='wfb_ng.fl.mnist:client_entry',
+            algorithm_config={}, io_timeout_seconds=10, live_observation=False,
+            server_http_host='10.80.0.1', server_http_port=8080, uftp_port=1044, link_id=7669206)
+        try:
+            daemon.control_plane.handle_broadcast(announce)
+            assert completed.wait(3)
+            if terminal != 'natural':
+                daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job1'))
+            daemon._startup_thread.join(3)
+            assert not daemon.sandbox.is_running
+            daemon.control_plane.handle_broadcast(dict(type='JOB_COMPLETED', job_id='job1'))
+            daemon.control_plane.handle_broadcast(announce)
+            daemon._startup_thread.join(3)
+>           assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+E           AssertionError: 终态后重复启动消息不能再次创建任务角色
+E           assert 2 == 1
+E            +  where 2 = len([<Popen: returncode: 0 args: ['/usr/bin/python', '-c', "\nimport os, threadin...>, <Popen: returncode: 0 args: ['/usr/bin/python', '-c', "\nimport os, threadin...>])
+
+wfb_ng/tests/test_fl_client_service.py:576: AssertionError
+----------------------------- Captured stderr call -----------------------------
+作业 job1 evidence 归档失败，保留沙箱 /tmp/pytest-of-fl/pytest-153/test_finished_job_cannot_be_re2/job_job1
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 920, in _finalize
+    archive_client_evidence(
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/evidence.py", line 103, in archive_client_evidence
+    raise FileExistsError(errno.EEXIST, '证据目录已存在', job_id)
+FileExistsError: [Errno 17] 证据目录已存在: 'job1'
+=============================== warnings summary ===============================
+wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED]
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED]
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED]
+FAILED wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_ABORT]
+FAILED wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[natural]
+3 failed, 15 deselected, 2 warnings in 9.26s

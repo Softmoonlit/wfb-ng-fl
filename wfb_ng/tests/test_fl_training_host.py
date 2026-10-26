@@ -60,7 +60,8 @@ class ControlledRuntime:
         self.wait_calls += 1
         self.host.trace.append('collect')
         self.collected.set()
-        if self.host.auto_round_ready:
+        if self.host.auto_round_ready and not (
+                self.host.hold_final_reports and self.wait_calls == self.host.payload['rounds']):
             for node in (1, 2):
                 self.host.round_ready(node)
         nodes = (1,) if self.partial_first_collection and self.wait_calls == 1 else (1, 2)
@@ -86,6 +87,7 @@ class TrainingHost:
         self.start_done = threading.Event()
         self.auto_ready = auto_ready
         self.auto_round_ready = auto_round_ready
+        self.hold_final_reports = False
         self.evaluation_mode = 'normal'
         self.client_report = preparation_report() if reference_client else {'ready': True}
         self.initial_preparation = {'model_format': 'host-fixture', 'ready': True}
@@ -110,7 +112,7 @@ class TrainingHost:
             self.trace.append('aggregate')
             self.aggregate_contexts.append((dict(config), context, dict(updates)))
             Path(output).parent.mkdir(parents=True, exist_ok=True)
-            Path(output).write_bytes(b'explicit-test-aggregate-output')
+            Path(output).write_bytes(f'explicit-test-aggregate-output-{context.round_index}'.encode())
 
         def evaluate_entry(model_path, config, context):
             self.evaluate_contexts.append((dict(config), context))
@@ -131,9 +133,13 @@ class TrainingHost:
                         'preparation': dict(self.initial_preparation),
                         'verdict': None, 'reason': None}
             self.trace.append('final_evaluate')
-            self.final_evaluated.set()
+            if context.round_index == context.rounds:
+                self.final_evaluated.set()
+            final = context.round_index == context.rounds
+            verdict = self.evaluation_mode != 'effect_failed'
             return {'metrics': {'loss': 1.0, 'accuracy': 0.2},
-                    'preparation': None, 'verdict': True, 'reason': 'fixture improved'}
+                    'preparation': None, 'verdict': verdict if final else None,
+                    'reason': ('fixture improved' if verdict else 'fixture not improved') if final else None}
 
         module.client_entry = client_entry
         module.aggregate_entry = aggregate_entry
@@ -203,8 +209,9 @@ class TrainingHost:
         return self.send(payload)
 
     def round_ready(self, node):
+        index = self.runtime.wait_calls or 1
         return self.send(dict(type='ROUND_READY', job_id=self.payload['job_id'], node_id=node,
-                              report_id=f'round-1-{node}', round_index=1))
+                              report_id=f'round-{index}-{node}', round_index=index))
 
     def launch(self):
         def start():
@@ -431,3 +438,39 @@ def test_publication_uses_frozen_initial_model_after_original_is_changed(host_fa
     assert hashlib.sha256(host.runtime.model_contents[0]).hexdigest() == original_sha
     announce = next(message for message in host.messages if message['type'] == 'TASK_ANNOUNCE')
     assert announce['model_sha256'] == original_sha
+
+
+def test_effect_failure_preserves_successful_execution_and_independent_recovery(host_factory):
+    host = host_factory()
+    host.evaluation_mode = 'effect_failed'
+    host.launch()
+    recent = host.assert_succeeded()
+    assert recent['effect_result']['verdict'] is False
+    assert recent['summary']['status'] == 'failed'
+    assert recent['summary']['error_code'] == 'effect_criterion_not_met'
+    assert recent['summary']['rounds_completed'] == 1
+    assert recent['recovery_state'] == 'ready'
+    assert host.messages[-1]['type'] == 'JOB_ABORT', '效果失败仍应如实结束全局作业'
+
+
+def test_five_round_host_reuses_runtime_and_waits_for_all_final_submission_returns(host_factory):
+    host = host_factory()
+    host.payload['rounds'] = 5
+    host.hold_final_reports = True
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    assert not host.terminal.is_set()
+    assert not host.runtime.closed.is_set(), '末轮上传最终响应未返回前不能回收任务资源'
+    assert host.round_ready(1)['ok'] is True
+    assert host.round_ready(1)['ok'] is True
+    assert not host.terminal.is_set(), '单节点及其重复报告不能代替全员屏障'
+    assert host.round_ready(2)['ok'] is True
+    recent = host.assert_succeeded()
+    assert recent['summary']['rounds_completed'] == 5
+    assert host.trace.count('runtime') == 1
+    assert host.trace.count('announce') == 1
+    assert len(host.runtime.models) == 5
+    assert [context.round_index for _, context in host.evaluate_contexts] == [0, 1, 2, 3, 4, 5]
+    rows = recent['summary']['rounds']
+    assert host.runtime.models == [rows[0]['input_model_path']] + [row['output_model_path'] for row in rows[:4]]
+    assert recent['recovery_state'] == 'ready'

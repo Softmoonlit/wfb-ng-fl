@@ -1,0 +1,49 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ TestFLCoordinator.test_false_final_effect_fails_but_preserves_round_and_model _
+
+self = <wfb_ng.tests.test_fl_coordinator.TestFLCoordinator testMethod=test_false_final_effect_fails_but_preserves_round_and_model>
+
+    def test_false_final_effect_fails_but_preserves_round_and_model(self):
+        def evaluate_not_met(model_path, config, context):
+            return {
+                "metrics": {"loss": 3.0, "accuracy": 0.01},
+                "preparation": None,
+                "verdict": False,
+                "reason": "fixture criterion not met",
+            }
+    
+        coordinator = self._coordinator(rounds=1, evaluate=evaluate_not_met)
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.run()
+        self.assertEqual(raised.exception.error_code, "effect_criterion_not_met")
+        summary = coordinator.get_summary()
+        self.assertEqual(summary["status"], "failed")
+>       self.assertEqual(summary["execution_result"], "succeeded")
+E       KeyError: 'execution_result'
+
+wfb_ng/tests/test_fl_coordinator.py:343: KeyError
+_ TestFLCoordinator.test_final_round_completion_failure_preserves_computed_round_and_fails_job _
+
+self = <wfb_ng.tests.test_fl_coordinator.TestFLCoordinator testMethod=test_final_round_completion_failure_preserves_computed_round_and_fails_job>
+
+    def test_final_round_completion_failure_preserves_computed_round_and_fails_job(self):
+        def fail_completion(index):
+            raise FLRuntimeError("round_report_timeout", "末轮报告未收齐")
+    
+        coordinator = self._coordinator(rounds=1, round_completion=fail_completion)
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.run()
+        self.assertEqual(raised.exception.error_code, "round_report_timeout")
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        summary = coordinator.get_summary()
+        self.assertIsNotNone(summary)
+        self.assertEqual(summary["status"], "failed")
+>       self.assertEqual(summary['execution_result'], 'failed')
+E       KeyError: 'execution_result'
+
+wfb_ng/tests/test_fl_coordinator.py:432: KeyError
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_coordinator.py::TestFLCoordinator::test_false_final_effect_fails_but_preserves_round_and_model
+FAILED wfb_ng/tests/test_fl_coordinator.py::TestFLCoordinator::test_final_round_completion_failure_preserves_computed_round_and_fails_job
+2 failed, 17 deselected in 0.44s

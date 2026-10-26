@@ -1533,10 +1533,9 @@ class ServerDaemon:
         summary: Optional[Dict[str, Any]] = None,
         error: str = "",
     ) -> Dict[str, Any]:
-        """
-        Unified terminal helper for all job termination paths (completed, failed, aborted).
-        Closes coordinator/role, broadcasts terminal downlink with job_id, resets persistent link,
-        and restores IDLE state. Fails closed if link reset or terminal broadcast fails.
+        """统一收口任务终态，回收角色并保存独立结果，保留服务端持久链路。
+
+        终态广播失败或角色回收未获确认时，保留恢复失败事实。
         """
         target_job_id = job_id
         coord = None
@@ -1558,9 +1557,30 @@ class ServerDaemon:
             if target_job_id is None:
                 target_job_id = self.active_job.get("job_id")
 
+            terminal_summary = summary if summary is not None else self.active_job.get('summary', {})
+            effect_failed = (isinstance(terminal_summary, dict)
+                             and terminal_summary.get('error_code') == 'effect_criterion_not_met')
+            if outcome == 'completed' or (outcome == 'failed' and effect_failed):
+                if (not isinstance(terminal_summary, dict)
+                        or terminal_summary.get('execution_result') != 'succeeded'):
+                    raise FLRuntimeError('invalid_coordinator_summary', '完整执行终态缺少明确的执行成功事实')
+                execution_result = terminal_summary['execution_result']
+            elif outcome == 'failed':
+                execution_result = 'failed'
+            elif outcome == 'aborted':
+                execution_result = 'aborted'
+            else:
+                raise FLRuntimeError('invalid_job_outcome', '未知作业终态')
             self._recent_job = deepcopy(self.active_job)
+            if terminal_summary:
+                # 在清空 active_job 前保存权威终态，不能依赖稍后的终态事件回填。
+                self._recent_job['summary'] = deepcopy(terminal_summary)
+                self._recent_job['rounds_completed'] = terminal_summary.get(
+                    'rounds_completed', self._recent_job.get('rounds_completed', 0))
+                if 'effect_result' in terminal_summary:
+                    self._recent_job['effect_result'] = deepcopy(terminal_summary['effect_result'])
             self._recent_job.update(
-                execution_result={"completed": "succeeded", "failed": "failed", "aborted": "aborted"}[outcome],
+                execution_result=execution_result,
                 recovery_state="recovering", server_phase="recovering", reason=reason, error=error,
                 phase_started_at=time.time(),
             )
@@ -1595,28 +1615,8 @@ class ServerDaemon:
                 logger.warning("关闭 server_role 失败: %s", exc)
                 recovery_error = "ROLE_CLOSE_FAILED"
 
-        # 3. Reset persistent link process (fail-closed before broadcasting terminal signal)
-        link_reset_error = None
-        if self.config.enable_link_process:
-            with self._lock:
-                should_reset = not self._stop_event.is_set() and self.server_state != ServerState.STOPPED
-            if should_reset:
-                try:
-                    self._stop_link_process()
-                    self._start_link_process()
-                except Exception as exc:
-                    link_reset_error = exc
-                    logger.error("作业终态重置服务端链路失败: %s", exc)
-
-        if link_reset_error is not None:
-            with self._lock:
-                if not self._stop_event.is_set():
-                    self.server_state = ServerState.STOPPED
-                self._recent_job.update(recovery_state="blocked", recovery_error="LINK_RESET_FAILED")
-                self.console.record_event({"type": "RECOVERY_BLOCKED", "job_id": target_job_id})
-            raise FLRuntimeError("link_reset_failed", f"作业终态重置服务端链路失败: {link_reset_error}")
-
-        # 4. Broadcast terminal message only after persistent link reset succeeds
+        # 持久链路属于 Daemon；终态只关闭任务角色，不重启链路或恢复初始无线值。
+        # 下一项作业继续使用已确认的配置和同一条服务端链路。
         terminal_type = "JOB_COMPLETED" if outcome == "completed" else "JOB_ABORT"
         try:
             if self.control_plane is None or target_job_id is None:

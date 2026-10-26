@@ -1,0 +1,10 @@
+...                                                                      [100%]
+=============================== warnings summary ===============================
+wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED]
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+wfb_ng/tests/test_fl_client_service.py::test_finished_job_cannot_be_restarted_by_delayed_announce[JOB_COMPLETED]
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+3 passed, 16 deselected, 2 warnings in 4.47s

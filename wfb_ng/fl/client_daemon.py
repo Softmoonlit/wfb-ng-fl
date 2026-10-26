@@ -993,6 +993,8 @@ class ClientDaemon:
         self._link_process: Optional[subprocess.Popen] = None
         self._link_log_file: Optional[Any] = None
         self._current_job_id: Optional[str] = None
+        # 仅保留当前或最近一次受理事实，拦截该作业迟到的启动重试。
+        self._last_accepted_job_id: Optional[str] = None
         self._stop_event = threading.Event()
         self._job_stop_event = threading.Event()
         self._startup_thread: Optional[threading.Thread] = None
@@ -1273,6 +1275,7 @@ class ClientDaemon:
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
                 self._current_job_id = job_config.job_id
+                self._last_accepted_job_id = job_config.job_id
                 return proc
             except Exception:
                 self._current_job_id = None
@@ -1322,6 +1325,9 @@ class ClientDaemon:
     def _handle_task_announce(self, msg: Dict[str, Any]) -> None:
         """Handle incoming TASK_ANNOUNCE broadcast from server coordinator."""
         with self._lock:
+            announced_job_id = msg.get('job_id')
+            if isinstance(announced_job_id, str) and announced_job_id == self._last_accepted_job_id:
+                return
             target_nodes = msg.get("target_nodes")
             if (not isinstance(target_nodes, (list, tuple)) or not target_nodes or
                     any(type(node) is not int or not 1 <= node <= 255 for node in target_nodes) or
@@ -1437,6 +1443,7 @@ class ClientDaemon:
                 live_observation=live_observation,
             )
             self._current_job_id = job_id
+            self._last_accepted_job_id = job_id
             self._job_stop_event = threading.Event()
             self.sandbox.state = DaemonState.PREPARING
             self.sandbox.supervised = True

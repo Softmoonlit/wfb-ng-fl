@@ -1,0 +1,50 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_effect_failure_preserves_successful_execution_and_independent_recovery __
+
+host_factory = <function host_factory.<locals>.make at 0xffff87dcbac0>
+
+    def test_effect_failure_preserves_successful_execution_and_independent_recovery(host_factory):
+        host = host_factory()
+        host.evaluation_mode = 'effect_failed'
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_training_host.py:443: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffed3c0cf70>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+        assert not self.errors, f'start_job failed: {self.errors}'
+        assert self.terminal.wait(2), f'no terminal after complete reports; trace={self.trace}'
+        recent = self.daemon.get_status_report()['recent_job']
+>       assert recent and recent['execution_result'] == 'succeeded', recent
+E       AssertionError: {'algorithm': {'aggregate_entry': 'training_host_deployment_fixture:aggregate_entry', 'client_entry': 'training_host_d...{'metrics': {'accuracy': 0.2, 'loss': 1.0}, 'reason': 'fixture not improved', 'round_index': 1, 'verdict': False}, ...}
+E       assert ({'algorithm': {'aggregate_entry': 'training_host_deployment_fixture:aggregate_entry', 'client_entry': 'training_host_d...{'metrics': {'accuracy': 0.2, 'loss': 1.0}, 'reason': 'fixture not improved', 'round_index': 1, 'verdict': False}, ...} and 'failed' == 'succeeded'
+E         - succeeded
+E         + failed)
+
+wfb_ng/tests/test_fl_training_host.py:231: AssertionError
+----------------------------- Captured stderr call -----------------------------
+FLCoordinator execution failed for job training-host-job
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 290, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 556, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 714, in _run_synchronous_loop
+    raise FLRuntimeError(
+wfb_ng.fl.errors.FLRuntimeError: fixture not improved
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_training_host.py::test_effect_failure_preserves_successful_execution_and_independent_recovery
+1 failed, 18 deselected, 2 warnings in 3.64s

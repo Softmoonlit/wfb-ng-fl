@@ -23,7 +23,7 @@ from .algorithm import (
     freeze_algorithm_config,
     validate_evaluation_result,
 )
-from .artifacts import file_sha256, validate_path_safe_identifier, write_json_atomic
+from .artifacts import file_sha256, preflight_artifact, validate_path_safe_identifier, write_json_atomic
 from .errors import FLRuntimeError
 from .radio import validate_radio_config
 
@@ -381,6 +381,12 @@ class FLCoordinator:
                 "run_id": self.job.run_id,
                 "mode": self.job.mode,
                 "status": status,
+                # 计算和提交确认完整执行后，效果未改善仍单独保留执行成功事实。
+                "execution_result": (
+                    "succeeded" if len(self.rounds_summary) == self.job.rounds
+                    and all(item['client_submission_returns_received'] for item in self.rounds_summary)
+                    else status
+                ),
                 "rounds_total": self.job.rounds,
                 "rounds_completed": len(self.rounds_summary),
                 "target_nodes": list(self.job.target_nodes),
@@ -632,6 +638,16 @@ class FLCoordinator:
                     "sync_quorum_failed",
                     f"同步模式必须收齐全员: 期望 {list(target_nodes)}, 实际收齐 {submitted_nodes}",
                 )
+            # 固定本轮实际交付的全部制品引用，审计无需依赖 Runtime 轮次身份或目录排序。
+            update_artifacts = {}
+            for node, path in updates_by_node.items():
+                stream, source_stat = preflight_artifact(path)
+                stream.close()
+                update_artifacts[node] = {
+                    'path': os.path.abspath(path),
+                    'size_bytes': source_stat.st_size,
+                    'sha256': file_sha256(path),
+                }
             self._emit_event(
                 "UPDATES_COLLECTED",
                 round_index=round_index,
@@ -686,7 +702,9 @@ class FLCoordinator:
                 "output_model_path": output_model_path,
                 "output_model_sha256": output_sha256,
                 "committed_nodes": submitted_nodes,
+                "updates": update_artifacts,
                 "dropped_out_nodes": [],
+                "client_submission_returns_received": False,
                 "metrics": metrics,
                 "verdict": verdict,
                 "reason": reason,
@@ -698,6 +716,7 @@ class FLCoordinator:
                 self.state = CoordinatorState.WAITING_ROUND_REPORT
             self._emit_event("ROUND_REPORT_WAIT_START", round_index=round_index)
             self.round_completion(round_index)
+            round_summary['client_submission_returns_received'] = True
             self._emit_event("ROUND_REPORT_COMPLETED", round_index=round_index)
 
             self._emit_event("ROUND_COMPLETED", round_index=round_index, summary=round_summary)

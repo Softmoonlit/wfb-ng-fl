@@ -1,0 +1,78 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_five_round_coordinator_uses_real_fedavg_and_persists_m0_to_m5 ______
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-168/test_five_round_coordinator_us0')
+
+    def test_five_round_coordinator_uses_real_fedavg_and_persists_m0_to_m5(tmp_path):
+        """在公开发布/收齐边界交付受控张量，执行正式聚合而非复制版服务端循环。"""
+        import hashlib
+        from wfb_ng.fl.algorithm import AlgorithmContext
+        from wfb_ng.fl.coordinator import FLCoordinator, JobConfig
+        from wfb_ng.fl.mnist import aggregate_entry
+    
+        initial = tmp_path / 'M0.pt'
+        initialize_model(initial, 7)
+        published, evaluated, confirmations = [], [], []
+        # 独立手算：每轮两份更新样本数为 1:3，期望均值依次为 4、8、12、16、20。
+        inputs = [(1., 5.), (5., 9.), (9., 13.), (13., 17.), (17., 21.)]
+    
+        def publish(path):
+            published.append(load_model(path))
+    
+        def collect():
+            index = len(published)
+            paths = {}
+            for node, samples, number in zip((1, 2), (1, 3), inputs[index - 1]):
+                value = dict(model_format='mnist-two-conv-fp32-v1',
+                    state_dict={key: torch.full_like(tensor, number)
+                                for key, tensor in published[-1].model.state_dict().items()},
+                    base_model_sha256=published[-1].sha256, node_id=node, round_index=index,
+                    sample_count=samples, optimizer_steps=1, train_loss=2.,
+                    device=dict(type='cuda', name='controlled', torch_version='test', cuda_version='test'))
+                path = tmp_path / f'round-{index}-node-{node}.pt'
+                torch.save(value, path)
+                paths[node] = str(path)
+            return paths
+    
+        def evaluate(path, config, context):
+            artifact = load_model(path)
+            evaluated.append(artifact)
+            expected = [4., 8., 12., 16., 20.][context.round_index - 1]
+            for tensor in artifact.model.state_dict().values():
+                torch.testing.assert_close(tensor, torch.full_like(tensor, expected), rtol=0, atol=0)
+            final = context.round_index == 5
+            return dict(metrics={'loss': 1., 'accuracy': .5}, preparation=None,
+                        verdict=True if final else None, reason='受控软件检查' if final else None)
+    
+        job = JobConfig.from_dict(dict(job_id='five-round', run_id='five-round-run', target_nodes=[1, 2],
+            model_path=str(initial), model_size_bytes=initial.stat().st_size, rounds=5,
+            io_timeout_seconds=10, live_observation=False))
+        context = AlgorithmContext(job_id=job.job_id, node_id=255, target_nodes=(1, 2), rounds=5,
+            artifact_dir=str(tmp_path), stop_event=threading.Event(), local_config={
+                'client_preparation_reports': {1: preparation(1), 2: preparation(3)}})
+        coordinator = FLCoordinator(job, SimpleNamespace(publish_model=publish, wait_for_updates=collect),
+            work_dir=str(tmp_path / 'job'), aggregate_fn=aggregate_entry, evaluate_fn=evaluate,
+            algorithm_config={'data_seed': 1}, context=context, initial_metrics={'loss': 2., 'accuracy': .1},
+            prepare_round=lambda index: None, round_completion=confirmations.append)
+        summary = coordinator.run()
+        assert summary['execution_result'] == 'succeeded'
+        assert summary['rounds_completed'] == 5
+        assert confirmations == [1, 2, 3, 4, 5]
+        assert [item.sha256 for item in published] == [load_model(initial).sha256] + [
+            item.sha256 for item in evaluated[:4]]
+        assert len(set(item.sha256 for item in published + evaluated[-1:])) == 6
+        for row, source, output in zip(summary['rounds'], published, evaluated):
+            assert row['input_model_sha256'] == source.sha256
+            assert row['output_model_sha256'] == output.sha256
+            assert row['committed_nodes'] == [1, 2]
+            assert row['submission_returns_confirmed'] is True
+            assert load_model(row['input_model_path']).sha256 == source.sha256
+            assert load_model(row['output_model_path']).sha256 == output.sha256
+>           assert set(row['updates']) == {1, 2}
+E           KeyError: 'updates'
+
+wfb_ng/tests/test_fl_mnist.py:388: KeyError
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_mnist.py::test_five_round_coordinator_uses_real_fedavg_and_persists_m0_to_m5
+1 failed, 52 deselected in 3.02s

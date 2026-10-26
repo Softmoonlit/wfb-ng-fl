@@ -1,0 +1,49 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestServerDaemonRestIPCAndPreflight.test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset _
+
+self = <wfb_ng.tests.test_fl_server_daemon.TestServerDaemonRestIPCAndPreflight testMethod=test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset>
+
+    def test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset(self):
+        daemon = ServerDaemon(
+            config=ServerDaemonConfig(
+                work_dir=self.temp_dir,
+                enable_link_process=True,
+                enable_control_plane=False,
+            ),
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.active_job = {"job_id": "terminal-reset"}
+        daemon.server_state = ServerState.RUNNING
+        role = MagicMock()
+        daemon.server_role = role
+        calls = []
+        role.close.side_effect = lambda: calls.append("role_close")
+    
+        with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), \
+                patch.object(daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")), \
+                patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
+            final_summary = {'rounds_completed': 5, 'final_model_sha256': 'a' * 64,
+                             'execution_result': 'succeeded'}
+            daemon._finalize_job(outcome="completed", job_id="terminal-reset", summary=final_summary)
+            duplicate = daemon._finalize_job(outcome="completed", job_id="terminal-reset")
+    
+        self.assertEqual(duplicate['status'], 'ignored')
+>       self.assertEqual(daemon.get_status_report()['recent_job']['summary'], final_summary)
+E       KeyError: 'summary'
+
+wfb_ng/tests/test_fl_server_daemon.py:345: KeyError
+----------------------------- Captured stderr call -----------------------------
+忽略针对已失活作业 terminal-reset 的终态收口 (当前活跃: None)
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset
+1 failed, 22 deselected, 2 warnings in 1.38s

@@ -1,0 +1,1081 @@
+...................................................sss.................. [ 31%]
+........................................................................ [ 62%]
+.......................................................................F [ 93%]
+........FF.F.F                                                           [100%]
+=================================== FAILURES ===================================
+_ TestStage3JobContractAndTerminalConsistency.test_client_daemon_task_announce_requires_and_propagates_fields _
+
+self = <wfb_ng.tests.test_fl_job_contract_stage3.TestStage3JobContractAndTerminalConsistency testMethod=test_client_daemon_task_announce_requires_and_propagates_fields>
+
+    def test_client_daemon_task_announce_requires_and_propagates_fields(self):
+        config = ClientDaemonConfig(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            channel=157,
+            work_dir=self.temp_dir,
+            enable_control_plane=False,
+            enable_link_process=False,
+        )
+        daemon = ClientDaemon(config, network_adapter=self.adapter)
+        daemon.current_interface = "wlan0"
+    
+        # Trap triggered job config
+        triggered_job: List[ClientJobConfig] = []
+        daemon.trigger_job = lambda job_cfg: triggered_job.append(job_cfg)  # type: ignore
+    
+        base_announce = {
+            "type": "TASK_ANNOUNCE",
+            "run_id": "run_test_42",
+            "job_id": "job_42",
+            "target_nodes": [1],
+            "rounds": 2,
+            "algorithm": "wfb_ng.fl.issue41_algorithm:client_main",
+            "algorithm_config": {},
+            "server_http_host": "10.80.0.1",
+            "server_http_port": 8080,
+            "uftp_port": 1044,
+            "link_id": 7669206,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
+        }
+    
+        # 1. Missing run_id in announce -> rejected
+        msg_bad_run = dict(base_announce)
+        del msg_bad_run["run_id"]
+        daemon._handle_task_announce(msg_bad_run)
+        self.assertEqual(len(triggered_job), 0)
+    
+        # 2. Missing io_timeout_seconds -> rejected
+        msg_bad_io = dict(base_announce)
+        del msg_bad_io["io_timeout_seconds"]
+        daemon._handle_task_announce(msg_bad_io)
+        self.assertEqual(len(triggered_job), 0)
+    
+        # 3. Missing live_observation -> rejected
+        msg_bad_obs = dict(base_announce)
+        del msg_bad_obs["live_observation"]
+        daemon._handle_task_announce(msg_bad_obs)
+        self.assertEqual(len(triggered_job), 0)
+    
+        # 4. Injected observation_path from server -> strictly ignored and sandboxed
+        msg_injected_path = dict(base_announce, observation_path="/etc/passwd")
+        daemon._handle_task_announce(msg_injected_path)
+>       self.assertEqual(len(triggered_job), 1)
+E       AssertionError: 0 != 1
+
+wfb_ng/tests/test_fl_job_contract_stage3.py:316: AssertionError
+----------------------------- Captured stderr call -----------------------------
+TASK_ANNOUNCE 标识非法: run_id 必须为非空字符串
+TASK_ANNOUNCE 缺失或无效的 io_timeout_seconds 字段: None
+TASK_ANNOUNCE 缺失或无效的 live_observation 字段: None
+TASK_ANNOUNCE 轮数或准备期限无效
+_ TestStage3JobContractAndTerminalConsistency.test_server_daemon_abort_handles_link_reset_failure_without_masking _
+
+self = <wfb_ng.tests.test_fl_job_contract_stage3.TestStage3JobContractAndTerminalConsistency testMethod=test_server_daemon_abort_handles_link_reset_failure_without_masking>
+
+    def test_server_daemon_abort_handles_link_reset_failure_without_masking(self):
+        cfg = ServerDaemonConfig(
+            ipc_host="127.0.0.1",
+            ipc_port=0,
+            control_bind_port=self.control_bind_port,
+            control_broadcast_port=self.control_broadcast_port,
+            work_dir=self.temp_dir,
+            enable_link_process=True,
+        )
+        daemon = ServerDaemon(
+            config=cfg,
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.active_job = {"job_id": "job_fail_reset", "run_id": "run_fail_reset"}
+        daemon.server_state = ServerState.RUNNING
+    
+        broadcasted_messages: List[Dict[str, Any]] = []
+        daemon.control_plane.broadcast_downlink = lambda msg: broadcasted_messages.append(msg)
+    
+        with mock.patch.object(daemon, "_stop_link_process"), \
+             mock.patch.object(daemon, "_start_link_process", side_effect=OSError("Interface busy")):
+            # Must raise FLRuntimeError, fail closed, and not masquerade as IDLE
+>           with self.assertRaises(FLRuntimeError) as ctx:
+E           AssertionError: FLRuntimeError not raised
+
+wfb_ng/tests/test_fl_job_contract_stage3.py:495: AssertionError
+_ TestStage3JobContractAndTerminalConsistency.test_server_daemon_abort_job_resets_link_and_broadcasts_job_abort _
+
+self = <wfb_ng.tests.test_fl_job_contract_stage3.TestStage3JobContractAndTerminalConsistency testMethod=test_server_daemon_abort_job_resets_link_and_broadcasts_job_abort>
+
+    def test_server_daemon_abort_job_resets_link_and_broadcasts_job_abort(self):
+        cfg = ServerDaemonConfig(
+            ipc_host="127.0.0.1",
+            ipc_port=0,
+            control_bind_port=self.control_bind_port,
+            control_broadcast_port=self.control_broadcast_port,
+            work_dir=self.temp_dir,
+            enable_link_process=True,
+        )
+        daemon = ServerDaemon(
+            config=cfg,
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.current_interface = "wlan0"
+    
+        # Mock coordinator, role, and link reset methods
+        mock_coord = mock.Mock()
+        mock_role = mock.Mock()
+        daemon.coordinator = mock_coord
+        daemon.server_role = mock_role
+        daemon.active_job = {"job_id": "job_term_abort", "run_id": "run_term_abort"}
+        daemon.server_state = ServerState.RUNNING
+    
+        broadcasted_messages: List[Dict[str, Any]] = []
+        daemon.control_plane.broadcast_downlink = lambda msg: broadcasted_messages.append(msg)
+    
+        with mock.patch.object(daemon, "_stop_link_process") as mock_stop_link, \
+             mock.patch.object(daemon, "_start_link_process") as mock_start_link, \
+             self.assertLogs("wfb_fl_server_daemon", level="INFO") as logs:
+            res = daemon.abort_job(reason="operator_abort")
+    
+        self.assertIn(
+            "作业终态广播成功 type=JOB_ABORT job_id=job_term_abort",
+            "\n".join(logs.output),
+        )
+        self.assertEqual(res["status"], "aborted")
+        self.assertEqual(res["job_id"], "job_term_abort")
+        self.assertEqual(daemon.server_state, ServerState.IDLE)
+        self.assertIsNone(daemon.active_job)
+        self.assertIsNone(daemon.coordinator)
+        self.assertIsNone(daemon.server_role)
+    
+        # Coordinator and ServerRole properly stopped
+        mock_coord.abort.assert_called_once_with(reason="operator_abort")
+        mock_role.close.assert_called_once()
+    
+        # Link reset strictly performed
+>       mock_stop_link.assert_called_once()
+
+wfb_ng/tests/test_fl_job_contract_stage3.py:405: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MagicMock name='_stop_link_process' id='281470810625632'>
+
+    def assert_called_once(self):
+        """assert that the mock was called only once.
+        """
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to have been called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected '_stop_link_process' to have been called once. Called 0 times.
+
+/usr/lib/python3.10/unittest/mock.py:908: AssertionError
+_ TestStage3JobContractAndTerminalConsistency.test_server_role_constructs_with_explicit_io_timeout_and_live_observation _
+
+model_path = '/tmp/wfb_test_stage3_job_mb9xifgr/job_job_stage3_001/artifacts/initial.pt'
+
+    def load_model(model_path: ModelPath) -> ModelArtifact:
+        """返回可独立修改的 CPU 模型及实际读取内容的 SHA-256，不改写源文件。"""
+        stream, _ = preflight_artifact(model_path, MAX_MODEL_BYTES)
+        try:
+            data = stream.read(MAX_MODEL_BYTES + 1)
+        finally:
+            stream.close()
+        if len(data) > MAX_MODEL_BYTES:
+            raise FLRuntimeError('invalid_reference_model', '参考模型文件超过 1 MiB')
+        try:
+>           value = torch.load(io.BytesIO(data), map_location=_cpu_storage, weights_only=True)
+
+wfb_ng/fl/reference_model.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+f = <_io.BytesIO object at 0xffff07b362f0>
+map_location = <function _cpu_storage at 0xffff08d6f250>, pickle_module = None
+weights_only = True, mmap = False, pickle_load_args = {'encoding': 'utf-8'}
+_get_wo_message = <function load.<locals>._get_wo_message at 0xffff07b2c160>
+warn_weights_only = False, opened_file = <_io.BytesIO object at 0xffff07b362f0>
+
+    def load(
+        f: FILE_LIKE,
+        map_location: MAP_LOCATION = None,
+        pickle_module: Any = None,
+        *,
+        weights_only: Optional[bool] = None,
+        mmap: Optional[bool] = None,
+        **pickle_load_args: Any,
+    ) -> Any:
+        # Reference: https://github.com/pytorch/pytorch/issues/54354
+        # The first line of this docstring overrides the one Sphinx generates for the
+        # documentation. We need it so that Sphinx doesn't leak `pickle`s path from
+        # the build environment (e.g. `<module 'pickle' from '/leaked/path').
+    
+        """load(f, map_location=None, pickle_module=pickle, *, weights_only=False, mmap=None, **pickle_load_args)
+    
+        Loads an object saved with :func:`torch.save` from a file.
+    
+        :func:`torch.load` uses Python's unpickling facilities but treats storages,
+        which underlie tensors, specially. They are first deserialized on the
+        CPU and are then moved to the device they were saved from. If this fails
+        (e.g. because the run time system doesn't have certain devices), an exception
+        is raised. However, storages can be dynamically remapped to an alternative
+        set of devices using the :attr:`map_location` argument.
+    
+        If :attr:`map_location` is a callable, it will be called once for each serialized
+        storage with two arguments: storage and location. The storage argument
+        will be the initial deserialization of the storage, residing on the CPU.
+        Each serialized storage has a location tag associated with it which
+        identifies the device it was saved from, and this tag is the second
+        argument passed to :attr:`map_location`. The builtin location tags are ``'cpu'``
+        for CPU tensors and ``'cuda:device_id'`` (e.g. ``'cuda:2'``) for CUDA tensors.
+        :attr:`map_location` should return either ``None`` or a storage. If
+        :attr:`map_location` returns a storage, it will be used as the final deserialized
+        object, already moved to the right device. Otherwise, :func:`torch.load` will
+        fall back to the default behavior, as if :attr:`map_location` wasn't specified.
+    
+        If :attr:`map_location` is a :class:`torch.device` object or a string containing
+        a device tag, it indicates the location where all tensors should be loaded.
+    
+        Otherwise, if :attr:`map_location` is a dict, it will be used to remap location tags
+        appearing in the file (keys), to ones that specify where to put the
+        storages (values).
+    
+        User extensions can register their own location tags and tagging and
+        deserialization methods using :func:`torch.serialization.register_package`.
+    
+        Args:
+            f: a file-like object (has to implement :meth:`read`, :meth:`readline`, :meth:`tell`, and :meth:`seek`),
+                or a string or os.PathLike object containing a file name
+            map_location: a function, :class:`torch.device`, string or a dict specifying how to remap storage
+                locations
+            pickle_module: module used for unpickling metadata and objects (has to
+                match the :attr:`pickle_module` used to serialize file)
+            weights_only: Indicates whether unpickler should be restricted to
+                loading only tensors, primitive types, dictionaries
+                and any types added via :func:`torch.serialization.add_safe_globals`.
+            mmap: Indicates whether the file should be mmaped rather than loading all the storages into memory.
+                Typically, tensor storages in the file will first be moved from disk to CPU memory, after which they
+                are moved to the location that they were tagged with when saving, or specified by ``map_location``. This
+                second step is a no-op if the final location is CPU. When the ``mmap`` flag is set, instead of copying the
+                tensor storages from disk to CPU memory in the first step, ``f`` is mmaped.
+            pickle_load_args: (Python 3 only) optional keyword arguments passed over to
+                :func:`pickle_module.load` and :func:`pickle_module.Unpickler`, e.g.,
+                :attr:`errors=...`.
+    
+        .. warning::
+            :func:`torch.load()` unless `weights_only` parameter is set to `True`,
+            uses ``pickle`` module implicitly, which is known to be insecure.
+            It is possible to construct malicious pickle data which will execute arbitrary code
+            during unpickling. Never load data that could have come from an untrusted
+            source in an unsafe mode, or that could have been tampered with. **Only load data you trust**.
+    
+        .. note::
+            When you call :func:`torch.load()` on a file which contains GPU tensors, those tensors
+            will be loaded to GPU by default. You can call ``torch.load(.., map_location='cpu')``
+            and then :meth:`load_state_dict` to avoid GPU RAM surge when loading a model checkpoint.
+    
+        .. note::
+            By default, we decode byte strings as ``utf-8``.  This is to avoid a common error
+            case ``UnicodeDecodeError: 'ascii' codec can't decode byte 0x...``
+            when loading files saved by Python 2 in Python 3.  If this default
+            is incorrect, you may use an extra :attr:`encoding` keyword argument to specify how
+            these objects should be loaded, e.g., :attr:`encoding='latin1'` decodes them
+            to strings using ``latin1`` encoding, and :attr:`encoding='bytes'` keeps them
+            as byte arrays which can be decoded later with ``byte_array.decode(...)``.
+    
+        Example:
+            >>> # xdoctest: +SKIP("undefined filepaths")
+            >>> torch.load('tensors.pt', weights_only=True)
+            # Load all tensors onto the CPU
+            >>> torch.load('tensors.pt', map_location=torch.device('cpu'), weights_only=True)
+            # Load all tensors onto the CPU, using a function
+            >>> torch.load('tensors.pt', map_location=lambda storage, loc: storage, weights_only=True)
+            # Load all tensors onto GPU 1
+            >>> torch.load('tensors.pt', map_location=lambda storage, loc: storage.cuda(1), weights_only=True)  # type: ignore[attr-defined]
+            # Map tensors from GPU 1 to GPU 0
+            >>> torch.load('tensors.pt', map_location={'cuda:1': 'cuda:0'}, weights_only=True)
+            # Load tensor from io.BytesIO object
+            # Loading from a buffer setting weights_only=False, warning this can be unsafe
+            >>> with open('tensor.pt', 'rb') as f:
+            ...     buffer = io.BytesIO(f.read())
+            >>> torch.load(buffer, weights_only=False)
+            # Load a module with 'ascii' encoding for unpickling
+            # Loading from a module setting weights_only=False, warning this can be unsafe
+            >>> torch.load('module.pt', encoding='ascii', weights_only=False)
+        """
+        torch._C._log_api_usage_once("torch.load")
+        UNSAFE_MESSAGE = (
+            "Re-running `torch.load` with `weights_only` set to `False` will likely succeed, "
+            "but it can result in arbitrary code execution. Do it only if you got the file from a "
+            "trusted source."
+        )
+        DOCS_MESSAGE = (
+            "\n\nCheck the documentation of torch.load to learn more about types accepted by default with "
+            "weights_only https://pytorch.org/docs/stable/generated/torch.load.html."
+        )
+    
+        def _get_wo_message(message: str) -> str:
+            pattern = r"GLOBAL (\S+) was not an allowed global by default."
+            has_unsafe_global = re.search(pattern, message) is not None
+            if has_unsafe_global:
+                updated_message = (
+                    "Weights only load failed. This file can still be loaded, to do so you have two options "
+                    f"\n\t(1) {UNSAFE_MESSAGE}\n\t(2) Alternatively, to load with `weights_only=True` please check "
+                    "the recommended steps in the following error message.\n\tWeightsUnpickler error: "
+                    + message
+                )
+            else:
+                updated_message = (
+                    f"Weights only load failed. {UNSAFE_MESSAGE}\n Please file an issue with the following "
+                    "so that we can make `weights_only=True` compatible with your use case: WeightsUnpickler "
+                    "error: " + message
+                )
+            return updated_message + DOCS_MESSAGE
+    
+        if weights_only is None:
+            weights_only, warn_weights_only = False, True
+        else:
+            warn_weights_only = False
+    
+        # Add ability to force safe only weight loads via environment variable
+        if os.getenv("TORCH_FORCE_WEIGHTS_ONLY_LOAD", "0").lower() in [
+            "1",
+            "y",
+            "yes",
+            "true",
+        ]:
+            weights_only = True
+    
+        if weights_only:
+            if pickle_module is not None:
+                raise RuntimeError(
+                    "Can not safely load weights when explicit pickle_module is specified"
+                )
+        else:
+            if pickle_module is None:
+                if warn_weights_only:
+                    warnings.warn(
+                        "You are using `torch.load` with `weights_only=False` (the current default value), which uses "
+                        "the default pickle module implicitly. It is possible to construct malicious pickle data "
+                        "which will execute arbitrary code during unpickling (See "
+                        "https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). "
+                        "In a future release, the default value for `weights_only` will be flipped to `True`. This "
+                        "limits the functions that could be executed during unpickling. Arbitrary objects will no "
+                        "longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the "
+                        "user via `torch.serialization.add_safe_globals`. We recommend you start setting "
+                        "`weights_only=True` for any use case where you don't have full control of the loaded file. "
+                        "Please open an issue on GitHub for any issues related to this experimental feature.",
+                        FutureWarning,
+                        stacklevel=2,
+                    )
+                pickle_module = pickle
+    
+        # make flipping default BC-compatible
+        if mmap is None:
+            mmap = False
+    
+        _check_dill_version(pickle_module)
+    
+        if "encoding" not in pickle_load_args.keys():
+            pickle_load_args["encoding"] = "utf-8"
+    
+        with _open_file_like(f, "rb") as opened_file:
+            if _is_zipfile(opened_file):
+                # The zipfile reader is going to advance the current file position.
+                # If we want to actually tail call to torch.jit.load, we need to
+                # reset back to the original position.
+                orig_position = opened_file.tell()
+                overall_storage = None
+                with _open_zipfile_reader(opened_file) as opened_zipfile:
+                    if _is_torchscript_zip(opened_zipfile):
+                        warnings.warn(
+                            "'torch.load' received a zip file that looks like a TorchScript archive"
+                            " dispatching to 'torch.jit.load' (call 'torch.jit.load' directly to"
+                            " silence this warning)",
+                            UserWarning,
+                        )
+                        opened_file.seek(orig_position)
+                        return torch.jit.load(opened_file, map_location=map_location)
+                    if mmap:
+                        if not _is_path(f):
+                            raise ValueError(
+                                "f must be a file path in order to use the mmap argument"
+                            )
+                        size = os.path.getsize(f)
+                        if not IS_WINDOWS:
+                            shared = get_default_mmap_options() == MAP_SHARED
+                        else:
+                            shared = False
+                        overall_storage = torch.UntypedStorage.from_file(
+                            os.fspath(f), shared, size
+                        )
+                    if weights_only:
+                        try:
+                            return _load(
+                                opened_zipfile,
+                                map_location,
+                                _weights_only_unpickler,
+                                overall_storage=overall_storage,
+                                **pickle_load_args,
+                            )
+                        except RuntimeError as e:
+                            raise pickle.UnpicklingError(_get_wo_message(str(e))) from None
+                    return _load(
+                        opened_zipfile,
+                        map_location,
+                        pickle_module,
+                        overall_storage=overall_storage,
+                        **pickle_load_args,
+                    )
+            if mmap:
+                f_name = "" if not isinstance(f, str) else f"{f}, "
+                raise RuntimeError(
+                    "mmap can only be used with files saved with "
+                    f"`torch.save({f_name}_use_new_zipfile_serialization=True), "
+                    "please torch.save your checkpoint with this option in order to use mmap."
+                )
+            if weights_only:
+                try:
+>                   return _legacy_load(
+                        opened_file,
+                        map_location,
+                        _weights_only_unpickler,
+                        **pickle_load_args,
+                    )
+
+/usr/local/lib/python3.10/dist-packages/torch/serialization.py:1242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+f = <_io.BytesIO object at 0xffff07b362f0>
+map_location = <function _cpu_storage at 0xffff08d6f250>
+pickle_module = <module 'torch._weights_only_unpickler' from '/usr/local/lib/python3.10/dist-packages/torch/_weights_only_unpickler.py'>
+pickle_load_args = {'encoding': 'utf-8'}
+legacy_load = <function _legacy_load.<locals>.legacy_load at 0xffff07b2edd0>
+persistent_load = <function _legacy_load.<locals>.persistent_load at 0xffff07b2ee60>
+f_should_read_directly = False
+
+    def _legacy_load(f, map_location, pickle_module, **pickle_load_args):
+        deserialized_objects: Dict[int, Any] = {}
+    
+        restore_location = _get_restore_location(map_location)
+    
+        class UnpicklerWrapper(pickle_module.Unpickler):  # type: ignore[name-defined]
+            def find_class(self, mod_name, name):
+                if type(name) is str and "Storage" in name:
+                    try:
+                        return StorageType(name)
+                    except KeyError:
+                        pass
+                return super().find_class(mod_name, name)
+    
+        def _check_container_source(container_type, source_file, original_source):
+            try:
+                current_source = "".join(get_source_lines_and_file(container_type)[0])
+            except Exception:  # saving the source is optional, so we can ignore any errors
+                warnings.warn(
+                    "Couldn't retrieve source code for container of "
+                    "type " + container_type.__name__ + ". It won't be checked "
+                    "for correctness upon loading."
+                )
+                return
+            if original_source != current_source:
+                if container_type.dump_patches:
+                    file_name = container_type.__name__ + ".patch"
+                    diff = difflib.unified_diff(
+                        current_source.split("\n"),
+                        original_source.split("\n"),
+                        source_file,
+                        source_file,
+                        lineterm="",
+                    )
+                    lines = "\n".join(diff)
+                    try:
+                        with open(file_name, "a+") as f:
+                            file_size = f.seek(0, 2)
+                            f.seek(0)
+                            if file_size == 0:
+                                f.write(lines)
+                            elif file_size != len(lines) or f.read() != lines:
+                                raise OSError
+                        msg = (
+                            "Saved a reverse patch to " + file_name + ". "
+                            "Run `patch -p0 < " + file_name + "` to revert your "
+                            "changes."
+                        )
+                    except OSError:
+                        msg = (
+                            "Tried to save a patch, but couldn't create a "
+                            "writable file " + file_name + ". Make sure it "
+                            "doesn't exist and your working directory is "
+                            "writable."
+                        )
+                else:
+                    msg = (
+                        "you can retrieve the original source code by "
+                        "accessing the object's source attribute or set "
+                        "`torch.nn.Module.dump_patches = True` and use the "
+                        "patch tool to revert the changes."
+                    )
+                msg = f"source code of class '{torch.typename(container_type)}' has changed. {msg}"
+                warnings.warn(msg, SourceChangeWarning)
+    
+        def legacy_load(f):
+            deserialized_objects: Dict[int, Any] = {}
+    
+            def persistent_load(saved_id):
+                if isinstance(saved_id, tuple):
+                    # Ignore containers that don't have any sources saved
+                    if all(saved_id[1:]):
+                        _check_container_source(*saved_id)
+                    return saved_id[0]
+                return deserialized_objects[int(saved_id)]
+    
+            with closing(
+                tarfile.open(fileobj=f, mode="r:", format=tarfile.PAX_FORMAT)
+            ) as tar, mkdtemp() as tmpdir:
+                tar.extract("storages", path=tmpdir)
+                with open(os.path.join(tmpdir, "storages"), "rb", 0) as f:
+                    num_storages = pickle_module.load(f, **pickle_load_args)
+                    for i in range(num_storages):
+                        args = pickle_module.load(f, **pickle_load_args)
+                        key, location, storage_type = args
+                        dtype = storage_type._dtype
+                        obj = cast(Storage, torch.UntypedStorage)._new_with_file(
+                            f, torch._utils._element_size(dtype)
+                        )
+                        obj = restore_location(obj, location)
+                        # TODO: Once we decide to break serialization FC, we can
+                        # stop wrapping with TypedStorage
+                        deserialized_objects[key] = torch.storage.TypedStorage(
+                            wrap_storage=obj, dtype=dtype, _internal=True
+                        )
+    
+                    storage_views = pickle_module.load(f, **pickle_load_args)
+                    for target_cdata, root_cdata, offset, numel in storage_views:
+                        root = deserialized_objects[root_cdata]
+                        element_size = torch._utils._element_size(root.dtype)
+                        offset_bytes = offset * element_size
+                        # TODO: Once we decide to break serialization FC, we can
+                        # stop wrapping with TypedStorage
+                        deserialized_objects[target_cdata] = torch.storage.TypedStorage(
+                            wrap_storage=root._untyped_storage[
+                                offset_bytes : offset_bytes + numel * element_size
+                            ],
+                            dtype=root.dtype,
+                            _internal=True,
+                        )
+    
+                tar.extract("tensors", path=tmpdir)
+                with open(os.path.join(tmpdir, "tensors"), "rb", 0) as f:
+                    num_tensors = pickle_module.load(f, **pickle_load_args)
+                    for _ in range(num_tensors):
+                        args = pickle_module.load(f, **pickle_load_args)
+                        key, storage_id, original_tensor_type = args
+                        storage = deserialized_objects[storage_id]
+                        (ndim,) = struct.unpack("<i", f.read(4))
+                        # skip next 4 bytes; legacy encoding treated ndim as 8 bytes
+                        f.read(4)
+                        numel = struct.unpack(f"<{ndim}q", f.read(8 * ndim))
+                        stride = struct.unpack(f"<{ndim}q", f.read(8 * ndim))
+                        (storage_offset,) = struct.unpack("<q", f.read(8))
+                        tensor = torch.empty((0,), dtype=storage.dtype).set_(
+                            storage._untyped_storage, storage_offset, numel, stride
+                        )
+                        deserialized_objects[key] = tensor
+    
+                pickle_file = tar.extractfile("pickle")
+                unpickler = UnpicklerWrapper(pickle_file, **pickle_load_args)
+                unpickler.persistent_load = persistent_load
+                result = unpickler.load()
+                return result
+    
+        deserialized_objects = {}
+    
+        def persistent_load(saved_id):
+            assert isinstance(saved_id, tuple)
+            typename = _maybe_decode_ascii(saved_id[0])
+            data = saved_id[1:]
+    
+            if typename == "module":
+                # Ignore containers that don't have any sources saved
+                if all(data[1:]):
+                    _check_container_source(*data)
+                return data[0]
+            elif typename == "storage":
+                storage_type, root_key, location, numel, view_metadata = data
+                location = _maybe_decode_ascii(location)
+                dtype = storage_type.dtype
+    
+                nbytes = numel * torch._utils._element_size(dtype)
+    
+                if root_key not in deserialized_objects:
+                    if torch._guards.active_fake_mode() is not None:
+                        obj = cast(Storage, torch.UntypedStorage(nbytes, device="meta"))
+                    else:
+                        obj = cast(Storage, torch.UntypedStorage(nbytes))
+                        obj._torch_load_uninitialized = True
+                        obj = restore_location(obj, location)
+                    # TODO: Once we decide to break serialization FC, we can
+                    # stop wrapping with TypedStorage
+                    typed_storage = torch.storage.TypedStorage(
+                        wrap_storage=obj, dtype=dtype, _internal=True
+                    )
+                    deserialized_objects[root_key] = typed_storage
+                else:
+                    typed_storage = deserialized_objects[root_key]
+                    if typed_storage._data_ptr() == 0:
+                        typed_storage = torch.storage.TypedStorage(
+                            device=typed_storage._untyped_storage.device,
+                            dtype=dtype,
+                            _internal=True,
+                        )
+    
+                if view_metadata is not None:
+                    view_key, offset, view_size = view_metadata
+                    offset_bytes = offset * torch._utils._element_size(dtype)
+                    view_size_bytes = view_size * torch._utils._element_size(dtype)
+                    if view_key not in deserialized_objects:
+                        # TODO: Once we decide to break serialization FC, we can
+                        # stop wrapping with TypedStorage
+                        deserialized_objects[view_key] = torch.storage.TypedStorage(
+                            wrap_storage=typed_storage._untyped_storage[
+                                offset_bytes : offset_bytes + view_size_bytes
+                            ],
+                            dtype=dtype,
+                            _internal=True,
+                        )
+                    res = deserialized_objects[view_key]
+    
+                else:
+                    res = typed_storage
+                return res
+            else:
+                raise RuntimeError(f"Unknown saved id type: {saved_id[0]}")
+    
+        _check_seekable(f)
+        f_should_read_directly = _should_read_directly(f)
+    
+        if f_should_read_directly and f.tell() == 0:
+            # legacy_load requires that f has fileno()
+            # only if offset is zero we can attempt the legacy tar file loader
+            try:
+                return legacy_load(f)
+            except tarfile.TarError:
+                if _is_zipfile(f):
+                    # .zip is used for torch.jit.save and will throw an un-pickling error here
+                    raise RuntimeError(
+                        f"{f.name} is a zip archive (did you mean to use torch.jit.load()?)"
+                    ) from None
+                # if not a tarfile, reset file offset and proceed
+                f.seek(0)
+    
+        if not hasattr(f, "readinto") and (3, 8, 0) <= sys.version_info < (3, 8, 2):
+            raise RuntimeError(
+                "torch.load does not work with file-like objects that do not implement readinto on Python 3.8.0 and 3.8.1. "
+                f'Received object of type "{type(f)}". Please update to Python 3.8.2 or newer to restore this '
+                "functionality."
+            )
+    
+>       magic_number = pickle_module.load(f, **pickle_load_args)
+
+/usr/local/lib/python3.10/dist-packages/torch/serialization.py:1494: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+file = <_io.BytesIO object at 0xffff07b362f0>
+
+    def load(file, *, encoding: str = "ASCII"):
+>       return Unpickler(file, encoding=encoding).load()
+
+/usr/local/lib/python3.10/dist-packages/torch/_weights_only_unpickler.py:383: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <torch._weights_only_unpickler.Unpickler object at 0xffff07b1dfc0>
+
+    def load(self):
+        """Read a pickled object representation from the open file.
+    
+        Return the reconstituted object hierarchy specified in the file.
+        """
+        self.metastack = []
+        self.stack: List[Any] = []
+        self.append = self.stack.append
+        read = self.read
+        readline = self.readline
+        while True:
+            key = read(1)
+            if not key:
+                raise EOFError
+            assert isinstance(key, bytes_types)
+            # Risky operators
+            if key[0] == GLOBAL[0]:
+                module = readline()[:-1].decode("utf-8")
+                name = readline()[:-1].decode("utf-8")
+                # Patch since torch.save default protocol is 2
+                # users will be running this code in python > 3
+                if self.proto == 2:
+                    if (module, name) in NAME_MAPPING:
+                        module, name = NAME_MAPPING[(module, name)]
+                    elif module in IMPORT_MAPPING:
+                        module = IMPORT_MAPPING[module]
+                full_path = f"{module}.{name}"
+                if full_path in _get_allowed_globals():
+                    self.append(_get_allowed_globals()[full_path])
+                elif full_path in _get_user_allowed_globals():
+                    self.append(_get_user_allowed_globals()[full_path])
+                else:
+                    raise RuntimeError(
+                        f"Unsupported global: GLOBAL {full_path} was not an allowed global by default. "
+                        f"Please use `torch.serialization.add_safe_globals([{name}])` to allowlist "
+                        "this global if you trust this class/function."
+                    )
+            elif key[0] == NEWOBJ[0]:
+                args = self.stack.pop()
+                cls = self.stack.pop()
+                if cls is torch.nn.Parameter:
+                    self.append(torch.nn.Parameter(*args))
+                elif cls in _get_user_allowed_globals().values():
+                    self.append(cls.__new__(cls, *args))
+                else:
+                    raise RuntimeError(f"Trying to instantiate unsupported class {cls}")
+            elif key[0] == REDUCE[0]:
+                args = self.stack.pop()
+                func = self.stack[-1]
+                if (
+                    func not in _get_allowed_globals().values()
+                    and func not in _get_user_allowed_globals().values()
+                ):
+                    raise RuntimeError(
+                        f"Trying to call reduce for unrecognized function {func}"
+                    )
+                self.stack[-1] = func(*args)
+            elif key[0] == BUILD[0]:
+                state = self.stack.pop()
+                inst = self.stack[-1]
+                if type(inst) is torch.Tensor:
+                    # Legacy unpickling
+                    inst.set_(*state)
+                elif type(inst) is torch.nn.Parameter:
+                    inst.__setstate__(state)
+                elif type(inst) is OrderedDict:
+                    inst.__dict__.update(state)
+                elif type(inst) in _get_user_allowed_globals().values():
+                    if hasattr(inst, "__setstate__"):
+                        inst.__setstate__(state)
+                    else:
+                        inst.__dict__.update(state)
+                else:
+                    raise RuntimeError(
+                        f"Can only build Tensor, parameter or OrderedDict objects, but got {type(inst)}"
+                    )
+            # Stack manipulation
+            elif key[0] == APPEND[0]:
+                item = self.stack.pop()
+                list_obj = self.stack[-1]
+                if type(list_obj) is not list:
+                    raise RuntimeError(
+                        f"Can only append to lists, but got {type(list_obj)}"
+                    )
+                list_obj.append(item)
+            elif key[0] == APPENDS[0]:
+                items = self.pop_mark()
+                list_obj = self.stack[-1]
+                if type(list_obj) is not list:
+                    raise RuntimeError(
+                        f"Can only extend lists, but got {type(list_obj)}"
+                    )
+                list_obj.extend(items)
+            elif key[0] == SETITEM[0]:
+                (v, k) = (self.stack.pop(), self.stack.pop())
+                self.stack[-1][k] = v
+            elif key[0] == SETITEMS[0]:
+                items = self.pop_mark()
+                for i in range(0, len(items), 2):
+                    self.stack[-1][items[i]] = items[i + 1]
+            elif key[0] == MARK[0]:
+                self.metastack.append(self.stack)
+                self.stack = []
+                self.append = self.stack.append
+            elif key[0] == TUPLE[0]:
+                items = self.pop_mark()
+                self.append(tuple(items))
+            elif key[0] == TUPLE1[0]:
+                self.stack[-1] = (self.stack[-1],)
+            elif key[0] == TUPLE2[0]:
+                self.stack[-2:] = [(self.stack[-2], self.stack[-1])]
+            elif key[0] == TUPLE3[0]:
+                self.stack[-3:] = [(self.stack[-3], self.stack[-2], self.stack[-1])]
+            # Basic types construction
+            elif key[0] == NONE[0]:
+                self.append(None)
+            elif key[0] == NEWFALSE[0]:
+                self.append(False)
+            elif key[0] == NEWTRUE[0]:
+                self.append(True)
+            elif key[0] == EMPTY_TUPLE[0]:
+                self.append(())
+            elif key[0] == EMPTY_LIST[0]:
+                self.append([])
+            elif key[0] == EMPTY_DICT[0]:
+                self.append({})
+            elif key[0] == EMPTY_SET[0]:
+                self.append(set())
+            elif key[0] == BININT[0]:
+                self.append(unpack("<i", read(4))[0])
+            elif key[0] == BININT1[0]:
+                self.append(self.read(1)[0])
+            elif key[0] == BININT2[0]:
+>               self.append(unpack("<H", read(2))[0])
+E               struct.error: unpack requires a buffer of 2 bytes
+
+/usr/local/lib/python3.10/dist-packages/torch/_weights_only_unpickler.py:312: error
+
+The above exception was the direct cause of the following exception:
+
+self = <wfb_ng.tests.test_fl_job_contract_stage3.TestStage3JobContractAndTerminalConsistency testMethod=test_server_role_constructs_with_explicit_io_timeout_and_live_observation>
+
+    def test_server_role_constructs_with_explicit_io_timeout_and_live_observation(self):
+        role_dir = os.path.join(self.temp_dir, "server_role_test")
+        obs_file = os.path.join(role_dir, "obs.jsonl")
+        role = ServerRole(
+            work_dir=role_dir,
+            participant_node_id=(1, 2),
+            participant_uftp_uid=(1, 2),
+            server_uftp_uid=100,
+            uftp_port=1044,
+            http_port=8080,
+            max_update_size_bytes=1024,
+            live_observation=True,
+            observation_path=obs_file,
+            io_timeout=120,
+        )
+        try:
+            self.assertEqual(role.transport.io_timeout, 120)
+            self.assertTrue(role.transport.live_observation)
+            self.assertEqual(role.transport.observation_path, obs_file)
+        finally:
+            role.close()
+    
+        # Readback verification of generated configuration dictionary
+        from wfb_ng.fl.service import _read_config
+        server_cfg = {
+            "schema_version": 1,
+            "role": "server",
+            "node_id": 100,
+            "work_dir": role_dir,
+            "channel": 157,
+            "channel_width": "HT40+",
+            "link_args": ["--tun-name", "fl-s"],
+            "participant_node_ids": [1, 2],
+            "participant_uftp_uids": [1, 2],
+            "server_uftp_uid": 100,
+            "uftp_port": 1044,
+            "http_host": "10.80.0.1",
+            "http_port": 8080,
+            "uftp_bind_host": "10.80.0.1",
+            "uftp_multicast_host": "239.80.41.1",
+            "uftp_private_multicast_host": "239.80.41.2",
+            "uftp_rate_kbps": 12000,
+            "max_update_size_bytes": 1024,
+            "live_observation": True,
+            "observation_path": obs_file,
+            "io_timeout_seconds": 120,
+        }
+        cfg_file = os.path.join(role_dir, "server_role.json")
+        with open(cfg_file, "w", encoding="utf-8") as f:
+            json.dump(server_cfg, f)
+        parsed = _read_config(cfg_file)
+        self.assertEqual(parsed["io_timeout_seconds"], 120)
+        self.assertTrue(parsed["live_observation"])
+        self.assertEqual(parsed["observation_path"], obs_file)
+    
+        # Verification that ServerDaemon.start_job passes these exact parameters into ServerRole
+        daemon_cfg = ServerDaemonConfig(
+            ipc_host="127.0.0.1",
+            ipc_port=0,
+            control_bind_port=self.control_bind_port,
+            control_broadcast_port=self.control_broadcast_port,
+            work_dir=self.temp_dir,
+            enable_link_process=True,
+        )
+        srv_daemon = ServerDaemon(
+            config=daemon_cfg,
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        srv_daemon.current_interface = "wlan0"
+        srv_daemon.server_state = ServerState.IDLE
+    
+        from wfb_ng.fl.control import NodeRecord, NodeReadiness
+        srv_daemon.control_plane.registry._nodes[1] = NodeRecord(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            reported_state="IDLE",
+            readiness=NodeReadiness.READY,
+            elapsed_ms=0,
+            current_channel=157,
+            txpower_dbm=12,
+            uplink_mcs=6,
+            last_heartbeat_time=time.monotonic(),
+        )
+    
+        with mock.patch("wfb_ng.fl.role.ServerRole.start"), \
+             mock.patch.object(srv_daemon.control_plane, "wait_for_task_readiness", return_value=True), \
+             mock.patch.object(srv_daemon.control_plane, "broadcast_downlink"), \
+             mock.patch.object(srv_daemon, "_stop_link_process"), \
+             mock.patch.object(srv_daemon, "_start_link_process"):
+>           res = srv_daemon.start_job(self.valid_job_payload)
+
+wfb_ng/tests/test_fl_job_contract_stage3.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/server_daemon.py:1253: in start_job
+    raise model_error
+wfb_ng/fl/server_daemon.py:1242: in start_job
+    actual_file_size, computed_sha256 = model_preparation.result()
+wfb_ng/fl/server_daemon.py:614: in result
+    raise self._error
+wfb_ng/fl/server_daemon.py:595: in _run
+    self._result = work()
+wfb_ng/fl/server_daemon.py:1212: in prepare_model
+    evaluate_fn(job.model_path, freeze_algorithm_config(algorithm_config), algorithm_context))
+wfb_ng/fl/mnist.py:175: in evaluate_entry
+    artifact = load_model(model_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_path = '/tmp/wfb_test_stage3_job_mb9xifgr/job_job_stage3_001/artifacts/initial.pt'
+
+    def load_model(model_path: ModelPath) -> ModelArtifact:
+        """返回可独立修改的 CPU 模型及实际读取内容的 SHA-256，不改写源文件。"""
+        stream, _ = preflight_artifact(model_path, MAX_MODEL_BYTES)
+        try:
+            data = stream.read(MAX_MODEL_BYTES + 1)
+        finally:
+            stream.close()
+        if len(data) > MAX_MODEL_BYTES:
+            raise FLRuntimeError('invalid_reference_model', '参考模型文件超过 1 MiB')
+        try:
+            value = torch.load(io.BytesIO(data), map_location=_cpu_storage, weights_only=True)
+            with torch.random.fork_rng(devices=[]):
+                model = MNISTReferenceModel()
+            seed = _validate_payload(value, model)
+            model.load_state_dict(value['state_dict'], strict=True)
+            return ModelArtifact(model, seed, hashlib.sha256(data).hexdigest())
+        except FLRuntimeError:
+            raise
+        except Exception as exc:
+>           raise FLRuntimeError('invalid_reference_model', '参考模型格式或参数无效') from exc
+E           wfb_ng.fl.errors.FLRuntimeError: 参考模型格式或参数无效
+
+wfb_ng/fl/reference_model.py:166: FLRuntimeError
+_ TestStage3JobContractAndTerminalConsistency.test_terminal_paths_fail_closed_on_unavailable_broadcast _
+
+self = <wfb_ng.tests.test_fl_job_contract_stage3.TestStage3JobContractAndTerminalConsistency testMethod=test_terminal_paths_fail_closed_on_unavailable_broadcast>
+
+    def test_terminal_paths_fail_closed_on_unavailable_broadcast(self):
+        for outcome in ("completed", "failed", "aborted"):
+            for missing_control_plane in (False, True):
+                with self.subTest(outcome=outcome, missing_control_plane=missing_control_plane):
+                    daemon = ServerDaemon(
+                        config=ServerDaemonConfig(work_dir=self.temp_dir, enable_link_process=False),
+                        network_adapter=self.adapter,
+                        survey_backend=self.survey_backend,
+                    )
+                    job_id = f"job_terminal_{outcome}"
+                    daemon.active_job = {"job_id": job_id}
+                    daemon.server_state = ServerState.RUNNING
+                    events = daemon.event_bus.subscribe()
+                    if missing_control_plane:
+                        daemon.control_plane = None
+                    else:
+                        daemon.control_plane.broadcast_downlink = mock.Mock(
+                            side_effect=OSError("network unavailable")
+                        )
+    
+                    with self.assertLogs("wfb_fl_server_daemon", level="INFO") as logs:
+                        with self.assertRaises(FLRuntimeError) as ctx:
+                            if outcome == "completed":
+>                               daemon._on_job_completed(job_id, {})
+
+wfb_ng/tests/test_fl_job_contract_stage3.py:459: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/server_daemon.py:1686: in _on_job_completed
+    self._finalize_job(outcome="completed", job_id=job_id, summary=summary)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _finalize_job(
+        self,
+        outcome: str,
+        job_id: Optional[str] = None,
+        reason: str = "completed",
+        summary: Optional[Dict[str, Any]] = None,
+        error: str = "",
+    ) -> Dict[str, Any]:
+        """
+        Unified terminal helper for all job termination paths (completed, failed, aborted).
+        Closes coordinator/role, broadcasts terminal downlink with job_id, preserves persistent link,
+        and restores IDLE state. Fails closed if link reset or terminal broadcast fails.
+        """
+        target_job_id = job_id
+        coord = None
+        role_to_close = None
+    
+        with self._lock:
+            if self.server_state == ServerState.STOPPED:
+                logger.warning("服务已处于 STOPPED 状态，忽略终态收口 (job=%s)", target_job_id)
+                return {"status": "ignored", "job_id": target_job_id}
+    
+            if self.active_job is None or (target_job_id is not None and self.active_job.get("job_id") != target_job_id):
+                logger.warning(
+                    "忽略针对已失活作业 %s 的终态收口 (当前活跃: %s)",
+                    target_job_id,
+                    self.active_job.get("job_id") if self.active_job else None,
+                )
+                return {"status": "ignored", "job_id": target_job_id}
+    
+            if target_job_id is None:
+                target_job_id = self.active_job.get("job_id")
+    
+            self._recent_job = deepcopy(self.active_job)
+            terminal_summary = summary or self._recent_job.get('summary') or {}
+            if terminal_summary:
+                # 在清空 active_job 前保存权威终态，不能依赖稍后的终态事件回填。
+                self._recent_job['summary'] = deepcopy(terminal_summary)
+                self._recent_job['rounds_completed'] = terminal_summary.get(
+                    'rounds_completed', self._recent_job.get('rounds_completed', 0))
+                if 'effect_result' in terminal_summary:
+                    self._recent_job['effect_result'] = deepcopy(terminal_summary['effect_result'])
+            self._recent_job.update(
+                execution_result=terminal_summary.get(
+                    'execution_result',
+                    {"completed": "succeeded", "failed": "failed", "aborted": "aborted"}[outcome]),
+                recovery_state="recovering", server_phase="recovering", reason=reason, error=error,
+                phase_started_at=time.time(),
+            )
+            self.console.record_event({"type": "RECOVERY_STARTED", "job_id": target_job_id})
+    
+            if outcome == "aborted":
+                self.server_state = ServerState.ABORTING
+    
+            coord = self.coordinator
+            role_to_close = self.server_role
+            self.coordinator = None
+            self.active_job = None
+            self.server_role = None
+>           self.control_plane.cancel_task_readiness()
+E           AttributeError: 'NoneType' object has no attribute 'cancel_task_readiness'
+
+wfb_ng/fl/server_daemon.py:1587: AttributeError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_contract_stage3.py::TestStage3JobContractAndTerminalConsistency::test_client_daemon_task_announce_requires_and_propagates_fields
+FAILED wfb_ng/tests/test_fl_job_contract_stage3.py::TestStage3JobContractAndTerminalConsistency::test_server_daemon_abort_handles_link_reset_failure_without_masking
+FAILED wfb_ng/tests/test_fl_job_contract_stage3.py::TestStage3JobContractAndTerminalConsistency::test_server_daemon_abort_job_resets_link_and_broadcasts_job_abort
+FAILED wfb_ng/tests/test_fl_job_contract_stage3.py::TestStage3JobContractAndTerminalConsistency::test_server_role_constructs_with_explicit_io_timeout_and_live_observation
+FAILED wfb_ng/tests/test_fl_job_contract_stage3.py::TestStage3JobContractAndTerminalConsistency::test_terminal_paths_fail_closed_on_unavailable_broadcast
+5 failed, 222 passed, 3 skipped, 2 warnings in 65.32s (0:01:05)

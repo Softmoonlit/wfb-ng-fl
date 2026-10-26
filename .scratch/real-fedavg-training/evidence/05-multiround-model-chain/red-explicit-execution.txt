@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestServerDaemonRestIPCAndPreflight.test_completed_terminal_requires_explicit_execution_summary _
+
+self = <wfb_ng.tests.test_fl_server_daemon.TestServerDaemonRestIPCAndPreflight testMethod=test_completed_terminal_requires_explicit_execution_summary>
+
+    def test_completed_terminal_requires_explicit_execution_summary(self):
+        self.daemon.active_job = {'job_id': 'missing-summary'}
+        self.daemon.server_state = ServerState.RUNNING
+        for summary in (None, {}, {'rounds_completed': 5}):
+>           with self.subTest(summary=summary), self.assertRaises(FLRuntimeError) as raised:
+E           AssertionError: FLRuntimeError not raised
+
+wfb_ng/tests/test_fl_server_daemon.py:356: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_completed_terminal_requires_explicit_execution_summary
+1 failed, 23 deselected, 2 warnings in 1.33s

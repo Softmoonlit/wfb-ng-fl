@@ -66,7 +66,8 @@ def test_job_context_uses_local_dataset_and_keeps_algorithm_config_unchanged(tmp
         sandbox.abort(timeout=0.05)
 
 
-def test_sandbox_ack_follows_server_acceptance_and_monitors_final_round(tmp_path, monkeypatch):
+@pytest.mark.parametrize('rounds', [1, 5])
+def test_sandbox_ack_follows_server_acceptance_and_monitors_final_round(tmp_path, monkeypatch, rounds):
     import os
     import subprocess
     import sys
@@ -78,14 +79,23 @@ import os, threading
 from wfb_ng.fl.service import AlgorithmNotifications
 n = AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job1', threading.Event(), timeout=3)
 n.prepared({'sample_count': 60000})
-n.round_complete(1)
+for index in range(1, ROUND_COUNT + 1):
+    n.round_complete(index)
 '''
-    monkeypatch.setattr(subprocess, 'Popen', lambda command, **kw: real_popen([sys.executable, '-c', program], **kw))
+    program = program.replace('ROUND_COUNT', str(rounds))
+    processes = []
+
+    def spawn(command, **kwargs):
+        process = real_popen([sys.executable, '-c', program], **kwargs)
+        processes.append(process)
+        return process
+
+    monkeypatch.setattr(subprocess, 'Popen', spawn)
     sandbox = JobSandbox(str(tmp_path), MockNetworkAdapter(), evidence_dir=str(tmp_path / 'evidence'))
     job = ClientJobConfig(job_id='job1', run_id='run1', node_id=1,
                           tun_name='fl-c1', tun_ip='10.80.0.11',
                           io_timeout_seconds=20, live_observation=False,
-                          preparation_timeout_seconds=3, target_nodes=(1,), rounds=1)
+                          preparation_timeout_seconds=3, target_nodes=(1,), rounds=rounds)
     seen = []
     prepared = threading.Event()
     release = threading.Event()
@@ -114,7 +124,8 @@ n.round_complete(1)
         worker.join(4)
         assert not worker.is_alive()
         assert not errors
-        assert seen == ['prepared', 'round_complete']
+        assert seen == ['prepared'] + ['round_complete'] * rounds
+        assert len(processes) == 1, '多轮通知和等待复用同一任务角色进程'
     finally:
         release.set()
         sandbox.abort(timeout=0.05)
@@ -520,3 +531,72 @@ def test_service_passes_recursively_readonly_config_to_client_entry(tmp_path, mo
     finally:
         daemon.close()
         worker.join(2)
+
+@pytest.mark.parametrize('terminal', ['JOB_COMPLETED', 'JOB_ABORT', 'natural'])
+def test_finished_job_cannot_be_restarted_by_delayed_announce(tmp_path, monkeypatch, terminal):
+    """带内终态和自然返回后，迟到的启动重试不得重新执行同一作业。"""
+    import subprocess
+    import sys
+    from unittest import mock
+    from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
+    from wfb_ng.fl.control import ControlPlaneClient
+    from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+
+    daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+        work_dir=str(tmp_path), enable_link_process=False),
+        network_adapter=MockNetworkAdapter(['wlan0']))
+    daemon.poll_hardware_once()
+    with mock.patch.object(ControlPlaneClient, 'start'):
+        daemon.start_control_plane()
+    real_popen = subprocess.Popen
+    processes = []
+    contexts = []
+    daemon.sandbox.evidence_dir = str(tmp_path / 'evidence')
+    program = '''
+import os, threading, time
+from wfb_ng.fl.service import AlgorithmNotifications
+n = AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job1', threading.Event(), timeout=4)
+n.prepared({'ready': True})
+n.round_complete(1)
+'''
+    if terminal != 'natural':
+        program += 'time.sleep(30)\n'
+
+    def spawn(cmd, **kwargs):
+        from pathlib import Path
+        context = json.loads(Path(cmd[cmd.index('--job-context') + 1]).read_text())
+        contexts.append(context)
+        proc = real_popen([sys.executable, '-c', program.replace("'job1'", repr(context['job_id']))], **kwargs)
+        processes.append(proc)
+        return proc
+
+    monkeypatch.setattr(subprocess, 'Popen', spawn)
+    completed = threading.Event()
+    monkeypatch.setattr(daemon.control_plane, 'notify_task_ready', lambda *a, **kw: None)
+    monkeypatch.setattr(daemon.control_plane, 'notify_round_complete', lambda *a, **kw: completed.set())
+    announce = dict(type='TASK_ANNOUNCE', job_id='job1', run_id='run1', target_nodes=[1],
+        rounds=1, preparation_timeout_seconds=10, algorithm='wfb_ng.fl.mnist:client_entry',
+        algorithm_config={}, io_timeout_seconds=10, live_observation=False,
+        server_http_host='10.80.0.1', server_http_port=8080, uftp_port=1044, link_id=7669206)
+    try:
+        daemon.control_plane.handle_broadcast(announce)
+        assert completed.wait(3)
+        if terminal != 'natural':
+            daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job1'))
+        daemon._startup_thread.join(3)
+        assert not daemon.sandbox.is_running
+        daemon.control_plane.handle_broadcast(dict(type='JOB_COMPLETED', job_id='job1'))
+        daemon.control_plane.handle_broadcast(announce)
+        daemon._startup_thread.join(3)
+        assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
+        completed.clear()
+        daemon.control_plane.handle_broadcast({**announce, 'job_id': 'job2'})
+        assert completed.wait(3), '新的作业身份应创建新的执行上下文'
+        if terminal != 'natural':
+            daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job2'))
+        daemon._startup_thread.join(3)
+        assert len(processes) == 2
+        assert [context['job_id'] for context in contexts] == ['job1', 'job2']
+        assert contexts[0]['artifact_dir'] != contexts[1]['artifact_dir']
+    finally:
+        daemon.stop()
