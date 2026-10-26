@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .coordinator import CoordinatorState, FLCoordinator, JobConfig, aggregate_models
+from .coordinator import CoordinatorState, FLCoordinator, JobConfig
 from .errors import FLRuntimeError
 from .role import ClientRole, ServerRole
 from .runtime import ClientRuntime, ServerRuntime
@@ -15,5 +15,4 @@ __all__ = (
     'JobConfig',
     'ServerRole',
     'ServerRuntime',
-    'aggregate_models',
 )

@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -41,6 +42,7 @@ class TestClientEvidence(unittest.TestCase):
 
     def test_completed_job_archives_small_evidence_before_removing_sandbox(self):
         sandbox = self.sandbox()
+        sandbox.local_config = {'mnist_data_dir': '/local/mnist'}
         sandbox.start(_make_client_job(), 'wlx001')
         work = self.root / 'work' / 'job_job_001'
         (work / 'unknown.json').write_text('secret')
@@ -54,7 +56,9 @@ class TestClientEvidence(unittest.TestCase):
         self.assertEqual(manifest['node_id'], 1)
         self.assertEqual(manifest['runtime_commit'], 'a' * 40)
         self.assertEqual(manifest['build_identity_sha256'], hashlib.sha256(self.identity.read_bytes()).hexdigest())
-        self.assertEqual(set(manifest['files']), {'build_identity.json', 'client_role.json', 'role_service.log'})
+        self.assertEqual(set(manifest['files']), {'build_identity.json', 'client_role.json', 'job_context.json', 'role_service.log'})
+        self.assertEqual(json.loads((target / 'job_context.json').read_text())['local_config'],
+                         {'mnist_data_dir': '/local/mnist'})
         self.assertFalse(work.exists())
         for name, info in manifest['files'].items():
             content = (target / name).read_bytes()
@@ -222,18 +226,21 @@ class TestClientEvidence(unittest.TestCase):
         self.assertEqual(list((self.root / 'evidence' / 'job_001').iterdir()), [])
         self.assertTrue((self.root / 'work' / 'job_job_001').exists())
 
-    def test_failed_start_preserves_actual_child_exit_code(self):
+    def test_preparation_exit_preserves_actual_child_exit_code(self):
         sandbox = JobSandbox(str(self.root / 'work'), self.adapter,
                              evidence_dir=str(self.root / 'evidence'))
-        # 使用真实就绪 socket，子进程在 READY 前退出。
+        # spawn 返回后由宿主监管准备期退出；进程组回收仍保存实际退出码。
         real_popen = subprocess.Popen
         def exiting_child(cmd, **kwargs):
             return real_popen([sys.executable, '-c', 'raise SystemExit(42)'], **kwargs)
         with mock.patch('wfb_ng.fl.client_daemon.subprocess.Popen', side_effect=exiting_child):
-            with self.assertRaises(FLRuntimeError):
-                sandbox.start(_make_client_job(), 'wlx001')
+            sandbox.start(_make_client_job(), 'wlx001')
+            with self.assertRaises(FLRuntimeError) as error:
+                sandbox.monitor(lambda event: self.fail('角色未报告准备'), threading.Event())
+            self.assertEqual(error.exception.error_code, 'algorithm_incomplete')
+            sandbox.abort(outcome='failed')
         _, manifest = self.manifest()
-        self.assertEqual(manifest['lifecycle_outcome'], 'start_failed')
+        self.assertEqual(manifest['lifecycle_outcome'], 'failed')
         self.assertEqual(manifest['returncode'], 42)
 
     def test_tun_cleanup_failure_stops_sandbox_accepting_jobs(self):
@@ -334,7 +341,7 @@ class TestClientEvidence(unittest.TestCase):
         self.assertEqual(manifest['lifecycle_outcome'], 'succeeded')
         self.assertEqual(manifest['returncode'], 0)
         self.assertEqual(set(manifest['files']), set(expected) | {
-            'build_identity.json', 'client_role.json', 'role_service.log',
+            'build_identity.json', 'client_role.json', 'job_context.json', 'role_service.log',
         })
         for name, value in expected.items():
             self.assertEqual(json.loads((target / name).read_text()), value)

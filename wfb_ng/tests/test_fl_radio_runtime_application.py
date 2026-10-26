@@ -1,5 +1,6 @@
 """射频配置必须进入真实进程命令和后续数据面参数。"""
 from contextlib import contextmanager
+from pathlib import Path
 from unittest.mock import patch
 import threading
 import subprocess
@@ -36,7 +37,7 @@ def tun_snapshot(daemon):
 
 
 @contextmanager
-def running_server(tmp_path, reject_updates=(), **config):
+def running_server(tmp_path, reject_updates=(), sender_finished=None, **config):
     # 模拟 v6 的本机 UDP 端点，生产 updater 原样参与测试。
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp.bind(('127.0.0.1', 0))
@@ -65,9 +66,9 @@ def running_server(tmp_path, reject_updates=(), **config):
     commands = []
     uftp_started = threading.Event()
     class Process:
-        def __init__(self, pid):
+        def __init__(self, pid, exited=None):
             self.pid = pid
-            self.exited = threading.Event()
+            self.exited = threading.Event() if exited is None else exited
         def poll(self):
             return 0 if self.exited.is_set() else None
         def terminate(self):
@@ -83,7 +84,7 @@ def running_server(tmp_path, reject_updates=(), **config):
             uftp_started.set()
         else:
             daemon.adapter.setup_tun(daemon.config.tun_name, daemon.config.tun_cidr)
-        return Process(len(commands))
+        return Process(len(commands), sender_finished if '-R' in command else None)
     with patch('wfb_ng.fl.server_daemon.shutil.which', return_value='/test/wfb_v6_uplink'), patch(
             'wfb_ng.fl.server_daemon.subprocess.Popen', side_effect=spawn):
         daemon.start()
@@ -192,12 +193,49 @@ def test_controlled_ht20_calibration_updates_hardware_and_link_without_restart(t
         assert tun_snapshot(daemon) == initial_tun
 
 
+def _rate_client_entry(runtime, config, context):
+    """仅供服务端装配检查，速率测试不执行客户端计算。"""
+    raise AssertionError('server must not execute the deployed client entry')
+
+
+def _rate_aggregate_entry(current_model, updates, output_model, config, context):
+    """本用例在发布命令启动后停止，不应进入无 update 的聚合阶段。"""
+    raise AssertionError('aggregation must not run before client updates arrive')
+
+
+def _rate_evaluate_entry(model_path, config, context):
+    """检查本用例自己的有限模型格式，返回合法的初始评估信封。"""
+    context.check_stop()
+    assert json.loads(Path(model_path).read_text()) == dict(config)
+    return {'metrics': {'fixture_score': 0.0},
+            'preparation': {'model_format': config['model_format'], 'ready': True},
+            'verdict': None, 'reason': None}
+
+
+def _ready_taskpeer(daemon, message):
+    """经公开控制面提交带稳定报告身份的有限准备事实，并核对确认。"""
+    for node in message['target_nodes']:
+        replies = daemon.control_plane.handle_datagram(json.dumps({
+            'type': 'TASK_READY', 'node_id': node, 'job_id': message['job_id'],
+            'report_id': f"prepared-{message['job_id']}-{node}",
+            'report': {'ready': True, 'model_format': 'radio-rate-test'},
+        }).encode(), ('127.0.0.1', 10000 + node))
+        assert replies
+        ack = json.loads(replies[0])
+        assert ack['type'] == 'TASK_READY_ACK' and ack['ok'] is True, ack
+
+
 @pytest.mark.parametrize('fail_at,status,expected_rate', [
     (None, 'finalized', '17000'),
     ('RADIO_SWITCH_FINALIZED', 'rolled_back', '15000'),
 ])
 def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fail_at, status, expected_rate):
-    with running_server(tmp_path, tun_ip='127.0.0.1') as (daemon, commands, uftp_started, updates):
+    sender_finished = threading.Event()
+    with running_server(tmp_path, tun_ip='127.0.0.1', sender_finished=sender_finished,
+                        client_entry=f'{__name__}:_rate_client_entry',
+                        aggregate_entry=f'{__name__}:_rate_aggregate_entry',
+                        evaluate_entry=f'{__name__}:_rate_evaluate_entry',
+                        algorithm_config={'model_format': 'radio-rate-test'}) as (daemon, commands, uftp_started, updates):
         peer = radio_rest.TestRadioReconfigureREST()
         peer.daemon = daemon
         initial_link = daemon.console.snapshot()['server']['link_process'].copy()
@@ -207,8 +245,7 @@ def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fai
             if message['type'] == fail_at:
                 raise OSError('最终屏障广播失败')
             if message['type'] == 'TASK_ANNOUNCE':
-                daemon.control_plane.handle_datagram(json.dumps({
-                    'type':'TASK_READY', 'node_id':1, 'job_id':message['job_id']}).encode(), ('127.0.0.1',10001))
+                _ready_taskpeer(daemon, message)
             else:
                 peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
@@ -219,13 +256,17 @@ def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fai
             assert tun_snapshot(daemon) == initial_tun
             assert len(commands) == 1
             model = tmp_path / 'model.bin'
-            model.write_bytes(b'ordinary model')
+            model.write_text(json.dumps({'model_format': 'radio-rate-test'}))
             daemon.start_job({'job_id':'rate-job', 'run_id':'rate-run', 'target_nodes':[1],
-                              'model_path':str(model), 'model_size_bytes':14, 'rounds':1,
+                              'model_path':str(model), 'model_size_bytes':model.stat().st_size, 'rounds':1,
                               'server_http_port':0, 'io_timeout_seconds':5, 'live_observation':False})
-            assert uftp_started.wait(3)
-            send = next(command for command in commands if '-R' in command)
-            assert send[send.index('-R')+1] == expected_rate
+            try:
+                assert uftp_started.wait(3)
+                send = next(command for command in commands if '-R' in command)
+                assert send[send.index('-R')+1] == expected_rate
+            finally:
+                # 命令检查结束后释放假 sender，断言失败也能正常回收。
+                sender_finished.set()
             daemon.abort_job()
 
 

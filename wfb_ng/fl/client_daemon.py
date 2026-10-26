@@ -17,6 +17,7 @@ import argparse
 import ipaddress
 import json
 import logging
+import math
 import os
 import shutil
 import signal
@@ -31,6 +32,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence
 
 from pyroute2 import IPRoute, NetlinkError
 
+from .algorithm import validate_algorithm_config
 from .artifacts import validate_path_safe_identifier, write_json_atomic
 from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
@@ -419,6 +421,7 @@ class ClientDaemonConfig:
     enable_control_plane: bool = True
     enable_link_process: bool = True
     radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT
+    mnist_data_dir: Optional[str] = None
 
     def __post_init__(self):
         if not self.tun_cidr:
@@ -460,8 +463,20 @@ class ClientJobConfig:
     max_update_size_bytes: int = 1073741824
     algorithm: Optional[str] = None
     algorithm_config: Optional[Dict[str, Any]] = None
+    target_nodes: Sequence[int] = ()
+    rounds: int = 1
+    preparation_timeout_seconds: float = 30.0
 
     def __post_init__(self):
+        if (type(self.rounds) is not int or self.rounds <= 0 or
+                isinstance(self.preparation_timeout_seconds, bool) or
+                not isinstance(self.preparation_timeout_seconds, (int, float)) or
+                not math.isfinite(self.preparation_timeout_seconds) or self.preparation_timeout_seconds <= 0):
+            raise FLRuntimeError('invalid_job_config', '轮数与准备期限必须为正数')
+        if self.target_nodes and (self.node_id not in self.target_nodes or
+                any(type(node) is not int or not 1 <= node <= 255 for node in self.target_nodes) or
+                len(set(self.target_nodes)) != len(self.target_nodes)):
+            raise FLRuntimeError('invalid_job_config', '参与节点无效')
         validate_path_safe_identifier(self.run_id, "run_id")
         validate_path_safe_identifier(self.job_id, "job_id")
         if type(self.io_timeout_seconds) is not int or self.io_timeout_seconds <= 0:
@@ -499,7 +514,15 @@ class JobSandbox:
         _command_prefix: Optional[Sequence[str]] = None,
         _require_ready_notification: bool = True,
         evidence_dir: Optional[str] = None,
+        local_config: Optional[Dict[str, Any]] = None,
     ):
+        self.local_config = dict(local_config or {})
+        self._notify_socket: Optional[socket.socket] = None
+        self._notify_path: Optional[str] = None
+        self._preparation_deadline: Optional[float] = None
+        self.supervised = False
+        self._prepared = False
+        self._completed_round = 0
         self.evidence_dir = evidence_dir if evidence_dir is not None else DEFAULT_EVIDENCE_DIR
         self.last_evidence_error: Optional[str] = None
         self.retained_sandbox_dir: Optional[str] = None
@@ -522,6 +545,8 @@ class JobSandbox:
                 return False
             ret = self._process.poll()
             if ret is not None:
+                if self.supervised:
+                    return True  # 监管线程先核对完成事实，再释放资源。
                 self._finalize(ret)
                 return False
             return True
@@ -540,13 +565,14 @@ class JobSandbox:
                 self._finalize(returncode)
 
             self.state = DaemonState.PREPARING
+            self._preparation_deadline = time.monotonic() + job.preparation_timeout_seconds
             self.last_evidence_error = None
             self._active_job = job
             job_work_dir = os.path.join(self.work_dir, f"job_{job.job_id}")
             self._job_work_dir = None
 
             try:
-                os.makedirs(job_work_dir, exist_ok=False)
+                os.makedirs(job_work_dir, mode=0o700, exist_ok=False)
                 self._job_work_dir = job_work_dir
 
                 # Ensure any leftover TUN from a previous crashed run is cleaned up
@@ -615,6 +641,14 @@ class JobSandbox:
                     with open(algorithm_config_path, "w", encoding="utf-8") as f:
                         json.dump(job.algorithm_config, f, indent=2)
 
+                context_path = os.path.join(self._job_work_dir, "job_context.json")
+                with open(context_path, "w", encoding="utf-8") as f:
+                    json.dump(dict(job_id=job.job_id, node_id=job.node_id,
+                                   target_nodes=list(job.target_nodes or (job.node_id,)),
+                                   rounds=job.rounds, artifact_dir=os.path.join(self._job_work_dir, 'algorithm'),
+                                   local_config=self.local_config,
+                                   preparation_timeout_seconds=job.preparation_timeout_seconds), f)
+
                 # Build command line
                 if self._command_prefix:
                     cmd = list(self._command_prefix)
@@ -625,6 +659,7 @@ class JobSandbox:
                         "wfb_ng.fl.service",
                         "--config",
                         client_config_path,
+                        "--job-context", context_path,
                     ]
                     if job.algorithm:
                         cmd += ["--algorithm", job.algorithm]
@@ -635,6 +670,8 @@ class JobSandbox:
                 log_path = os.path.join(self._job_work_dir, "role_service.log")
                 self._log_file = open(log_path, "w", encoding="utf-8")
                 notify_socket = None
+                self._prepared = False
+                self._completed_round = 0
                 notify_path = os.path.join(self._job_work_dir, "notify.sock")
                 child_env = None
                 if self._command_prefix is None and self._require_ready_notification:
@@ -642,7 +679,9 @@ class JobSandbox:
                     notify_socket.bind(notify_path)
                     notify_socket.settimeout(0.1)
                     child_env = os.environ.copy()
-                    child_env["NOTIFY_SOCKET"] = notify_path
+                    child_env["WFB_FL_NOTIFY_SOCKET"] = notify_path
+                    self._notify_socket = notify_socket
+                    self._notify_path = notify_path
                 # Use start_new_session=True to place child in a new process group
                 # Redirect stdout/stderr to log file to avoid pipe buffer deadlock
                 self._process = subprocess.Popen(
@@ -657,40 +696,86 @@ class JobSandbox:
                     self._pgid = os.getpgid(self._process.pid)
                 except OSError:
                     self._pgid = None
-                if notify_socket is not None:
-                    try:
-                        deadline = time.monotonic() + 5.0
-                        while time.monotonic() < deadline:
-                            returncode = self._process.poll()
-                            if returncode is not None:
-                                raise FLRuntimeError(
-                                    "sandbox_start_failed",
-                                    f"角色服务就绪前退出，退出码: {returncode}",
-                                )
-                            try:
-                                notification = notify_socket.recv(1024)
-                            except socket.timeout:
-                                continue
-                            if b"READY=1" in notification.splitlines():
-                                break
-                        else:
-                            raise FLRuntimeError(
-                                "sandbox_start_timeout",
-                                "角色服务未在 5 秒内报告就绪",
-                            )
-                    finally:
-                        notify_socket.close()
-                        try:
-                            os.unlink(notify_path)
-                        except FileNotFoundError:
-                            pass
-                self.state = DaemonState.RUNNING
+                if notify_socket is None:
+                    self.state = DaemonState.RUNNING
                 return self._process
             except Exception as exc:
                 self._cleanup_failed_start()
                 raise FLRuntimeError(
                     "sandbox_start_failed", f"启动角色服务子进程失败: {exc}"
                 ) from exc
+
+    def monitor(self, on_event, stop_event):
+        """监管准备期限、有限算法报告与角色退出。"""
+        with self._lock:
+            job, proc, notify = self._active_job, self._process, self._notify_socket
+            preparation_deadline = self._preparation_deadline
+        if job is None or proc is None:
+            return
+        if preparation_deadline is None:
+            raise FLRuntimeError('sandbox_start_failed', '任务沙箱缺少准备期限')
+        while not stop_event.is_set():
+            # 先处理排队报告，再检查退出，避免遗漏最后的错误事实。
+            if notify is not None:
+                try:
+                    payload, sender = notify.recvfrom(4097)
+                except socket.timeout:
+                    payload = None
+                except OSError:
+                    return
+                if payload is not None:
+                    accepted = False
+                    try:
+                        if len(payload) > 4096:
+                            raise FLRuntimeError('control_message_too_large', '本机算法报告超过 4096 字节')
+                        event = json.loads(payload)
+                        if not isinstance(event, dict) or event.get('job_id') != job.job_id:
+                            raise FLRuntimeError('invalid_algorithm_report', '算法报告作业身份不匹配')
+                        kind = event.get('event')
+                        if kind == 'prepared':
+                            if self._prepared or set(event) != {'job_id', 'event', 'report'} or not isinstance(event['report'], dict):
+                                raise FLRuntimeError('invalid_algorithm_report', '准备报告无效')
+                        elif kind == 'round_complete':
+                            index = event.get('round_index')
+                            if (set(event) != {'job_id', 'event', 'round_index'} or not self._prepared or
+                                    type(index) is not int or index != self._completed_round + 1 or index > job.rounds):
+                                raise FLRuntimeError('invalid_algorithm_report', '算法完成轮序无效')
+                        elif kind == 'error':
+                            if (set(event) != {'job_id', 'event', 'phase', 'code', 'reason', 'round_index'} or
+                                    any(not isinstance(event.get(key), str) or not event[key] for key in ('phase', 'code', 'reason')) or
+                                    (event['round_index'] is not None and (type(event['round_index']) is not int or event['round_index'] < 1))):
+                                raise FLRuntimeError('invalid_algorithm_report', '算法错误报告无效')
+                        else:
+                            raise FLRuntimeError('invalid_algorithm_report', '未知算法报告')
+                        on_event(event)
+                        with self._lock:
+                            if stop_event.is_set() or self._process is not proc:
+                                return
+                            if kind == 'prepared':
+                                self._prepared = True
+                                self.state = DaemonState.RUNNING
+                            elif kind == 'round_complete':
+                                self._completed_round = event['round_index']
+                            accepted = True
+                    except Exception as exc:
+                        logger.warning('算法报告未获确认: %s', exc)
+                    try:
+                        notify.sendto(json.dumps({'accepted': accepted}).encode('utf-8'), sender)
+                    except OSError:
+                        return
+                    if not accepted:
+                        raise FLRuntimeError('algorithm_report_rejected', '本机算法报告无效或控制面未确认')
+                    if event['event'] == 'error':
+                        return
+            elif stop_event.wait(0.05):
+                return
+            if not self._prepared and time.monotonic() >= preparation_deadline:
+                raise FLRuntimeError('preparation_timeout', '客户端训练准备期限已到达')
+            returncode = proc.poll()
+            if returncode is not None:
+                if returncode != 0 or not self._prepared or self._completed_round != job.rounds:
+                    raise FLRuntimeError('algorithm_incomplete', '角色退出或算法完成轮数不足')
+                return
 
     def _cleanup_failed_start(self) -> None:
         proc = self._process
@@ -714,7 +799,7 @@ class JobSandbox:
             if self._process is None:
                 return None
             ret = self._process.poll()
-            if ret is not None:
+            if ret is not None and not self.supervised:
                 self._finalize(ret)
             return ret
 
@@ -743,7 +828,7 @@ class JobSandbox:
             if proc is not None:
                 completed_returncode = proc.poll()
                 if completed_returncode is not None:
-                    self._finalize(completed_returncode)
+                    self._finalize(completed_returncode, outcome=outcome)
                     return
                 pid = proc.pid
                 pgid = None
@@ -768,6 +853,7 @@ class JobSandbox:
                 # 2. Wait for process group / child to exit within timeout
                 deadline = time.monotonic() + timeout
                 while time.monotonic() < deadline:
+                    proc.poll()  # 先回收直接子进程，再判断是否仍有存活后代。
                     pg_alive = False
                     if pgid is not None:
                         try:
@@ -802,6 +888,15 @@ class JobSandbox:
 
     def _finalize(self, returncode: int, outcome: Optional[str] = None) -> None:
         """Clean up process log file, process group, TUN, temporary workspace, and reset state."""
+        if self._notify_socket is not None:
+            self._notify_socket.close()
+            self._notify_socket = None
+        if self._notify_path is not None:
+            try:
+                os.unlink(self._notify_path)
+            except FileNotFoundError:
+                pass
+            self._notify_path = None
         # Always terminate any lingering descendant processes in the process group
         pgid = self._pgid
         if pgid is not None:
@@ -859,6 +954,7 @@ class JobSandbox:
             self.retained_sandbox_dir = self._job_work_dir
 
         self._process = None
+        self.supervised = False
         self._active_job = None
         self._job_work_dir = None
         self.state = DaemonState.STOPPED if cleanup_error is not None else DaemonState.IDLE
@@ -888,6 +984,7 @@ class ClientDaemon:
         self.sandbox = JobSandbox(
             work_dir=config.work_dir,
             network_adapter=self.network_adapter,
+            local_config={"mnist_data_dir": config.mnist_data_dir},
         )
         self.current_interface: Optional[str] = None
         self._last_locked_channel: int = self._load_cached_channel()
@@ -897,6 +994,8 @@ class ClientDaemon:
         self._link_log_file: Optional[Any] = None
         self._current_job_id: Optional[str] = None
         self._stop_event = threading.Event()
+        self._job_stop_event = threading.Event()
+        self._startup_thread: Optional[threading.Thread] = None
         self._lock = threading.RLock()
 
     def _load_cached_channel(self) -> int:
@@ -1092,7 +1191,7 @@ class ClientDaemon:
             self.network_adapter.teardown_tun(self.config.tun_name)
 
     def _ensure_idle_transport(self) -> None:
-        if self.current_interface is None or self.sandbox.state == DaemonState.STOPPED or self.sandbox.is_running:
+        if self.current_interface is None or self.sandbox.state in (DaemonState.STOPPED, DaemonState.PREPARING) or self.sandbox.is_running:
             return
         if self.config.enable_link_process and self.config.enable_control_plane:
             self.start_idle_link()
@@ -1101,6 +1200,7 @@ class ClientDaemon:
 
     def _on_interface_lost(self) -> None:
         """Safely handle interface unplugging while running."""
+        self._job_stop_event.set()
         if self.sandbox.is_running:
             logger.warning("网卡丢失，紧急中止正在运行的作业沙箱...")
             self.sandbox.abort()
@@ -1130,6 +1230,8 @@ class ClientDaemon:
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
         """Start a job in the sandbox using the active wireless interface."""
         with self._lock:
+            if threading.current_thread() is self._startup_thread and (self._job_stop_event.is_set() or self._stop_event.is_set()):
+                raise FLRuntimeError('job_stopped', '启动前作业已停止')
             if self.control_plane is not None and self.control_plane.radio_switch_pending:
                 raise FLRuntimeError('radio_switch_pending', '射频切换未完成，拒绝启动作业')
             if self.state == DaemonState.STOPPED:
@@ -1171,9 +1273,6 @@ class ClientDaemon:
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
                 self._current_job_id = job_config.job_id
-                if self.control_plane is not None:
-                    self.control_plane.notify_task_ready(job_config.job_id)
-                    self.control_plane.notify_state_change(ClientNodeState.RUNNING)
                 return proc
             except Exception:
                 self._current_job_id = None
@@ -1187,6 +1286,7 @@ class ClientDaemon:
                 return
             logger.info("收到作业终态 type=%s job_id=%s node_id=%s",
                         "JOB_ABORT" if aborted else "JOB_COMPLETED", job_id, self.config.node_id)
+            self._job_stop_event.set()
             self.sandbox.abort(outcome='aborted' if aborted else 'succeeded')
             self._ensure_idle_transport()
             self._current_job_id = None
@@ -1197,6 +1297,7 @@ class ClientDaemon:
 
     def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
         with self._lock:
+            self._job_stop_event.set()
             self.sandbox.abort(outcome='aborted' if intermediate_state is not None else 'succeeded')
             self._ensure_idle_transport()
             if self.control_plane is not None:
@@ -1222,12 +1323,14 @@ class ClientDaemon:
         """Handle incoming TASK_ANNOUNCE broadcast from server coordinator."""
         with self._lock:
             target_nodes = msg.get("target_nodes")
-            if target_nodes and self.config.node_id not in target_nodes:
+            if (not isinstance(target_nodes, (list, tuple)) or not target_nodes or
+                    any(type(node) is not int or not 1 <= node <= 255 for node in target_nodes) or
+                    len(set(target_nodes)) != len(target_nodes) or self.config.node_id not in target_nodes):
                 return
             if self.control_plane is not None and self.control_plane.radio_switch_pending:
                 logger.warning("射频切换未完成，忽略 TASK_ANNOUNCE")
                 return
-            if self.state != DaemonState.IDLE:
+            if self.state != DaemonState.IDLE or (self._startup_thread is not None and self._startup_thread.is_alive()):
                 logger.warning("收到 TASK_ANNOUNCE 但节点非 IDLE (当前: %s)，忽略", self.state)
                 return
             if self.control_plane is not None:
@@ -1235,8 +1338,29 @@ class ClientDaemon:
 
             def _reject(reason: str) -> None:
                 logger.error(reason)
-                if self.control_plane is not None:
-                    self.control_plane.notify_state_change(ClientNodeState.IDLE)
+                control = self.control_plane
+                if control is None:
+                    return
+                try:
+                    rejected_job_id = validate_path_safe_identifier(msg.get('job_id'), 'job_id')
+                except FLRuntimeError:
+                    control.notify_state_change(ClientNodeState.IDLE)
+                    return
+
+                def report_rejection():
+                    try:
+                        control.notify_task_error(rejected_job_id, 'prepare', 'invalid_job_config',
+                                                  reason, timeout=8.0)
+                    except Exception:
+                        logger.exception('配置拒绝报告未获确认')
+                    finally:
+                        with self._lock:
+                            if self.control_plane is control:
+                                control.notify_state_change(ClientNodeState.IDLE)
+
+                self._startup_thread = threading.Thread(target=report_rejection,
+                                                        name='fl-client-rejection', daemon=True)
+                self._startup_thread.start()
 
             try:
                 run_id = validate_path_safe_identifier(msg.get("run_id"), "run_id")
@@ -1255,7 +1379,7 @@ class ClientDaemon:
             live_observation = raw_live_obs
 
             algorithm = msg.get("algorithm")
-            if not algorithm:
+            if not isinstance(algorithm, str) or not algorithm:
                 return _reject("TASK_ANNOUNCE 缺失 algorithm 字段，拒绝启动")
 
             raw_algo_config = msg.get("algorithm_config")
@@ -1265,29 +1389,31 @@ class ClientDaemon:
             if "rounds" not in msg:
                 return _reject("TASK_ANNOUNCE 缺失 rounds 字段，拒绝启动")
 
-            rounds = int(msg["rounds"])
-            algo_config = dict(raw_algo_config)
-            algo_config["rounds"] = rounds
-            algo_config["node_id"] = self.config.node_id
-            model_size = msg.get("model_size_bytes")
-            if model_size is not None:
-                algo_config["required_artifact_size_bytes"] = model_size
-
-            tpl = algo_config.get("update_template_path")
-            if tpl and "{node_id}" in tpl:
-                algo_config["update_template_path"] = tpl.format(node_id=self.config.node_id)
-            elif not tpl:
-                algo_config["update_template_path"] = os.path.join(
-                    self.config.work_dir,
-                    f"update-client{self.config.node_id}-template.bin",
-                )
+            rounds = msg['rounds']
+            preparation_timeout = msg.get('preparation_timeout_seconds')
+            if (type(rounds) is not int or rounds <= 0 or
+                    isinstance(preparation_timeout, bool) or
+                    not isinstance(preparation_timeout, (int, float)) or
+                    not math.isfinite(preparation_timeout) or preparation_timeout <= 0):
+                return _reject('TASK_ANNOUNCE 轮数或准备期限无效')
+            if any(key in msg for key in ('mnist_data_dir', 'local_config')):
+                return _reject('TASK_ANNOUNCE 不得提供本机数据路径')
+            try:
+                algo_config = validate_algorithm_config(raw_algo_config)
+            except FLRuntimeError as exc:
+                return _reject(exc.error_message)
 
             if "server_http_host" not in msg or "server_http_port" not in msg or "uftp_port" not in msg or "link_id" not in msg:
                 return _reject("TASK_ANNOUNCE 缺失网络配置字段，拒绝启动")
 
-            server_http_host = str(msg["server_http_host"])
-            server_http_port = int(msg["server_http_port"])
-            uftp_port = int(msg["uftp_port"])
+            if (not isinstance(msg['server_http_host'], str) or not msg['server_http_host'] or
+                    any(type(msg[key]) is not int or not 1 <= msg[key] <= 65535
+                        for key in ('server_http_port', 'uftp_port')) or
+                    type(msg['link_id']) is not int or msg['link_id'] <= 0):
+                return _reject('TASK_ANNOUNCE 网络配置无效')
+            server_http_host = msg['server_http_host']
+            server_http_port = msg['server_http_port']
+            uftp_port = msg['uftp_port']
             if uftp_port in (self.config.broadcast_port, self.config.server_control_port):
                 return _reject("TASK_ANNOUNCE 的 UFTP 数据端口与控制面端口冲突")
             link_id = int(msg["link_id"])
@@ -1304,10 +1430,75 @@ class ClientDaemon:
                 link_id=link_id,
                 algorithm=algorithm,
                 algorithm_config=algo_config,
+                target_nodes=tuple(target_nodes or ()),
+                rounds=rounds,
+                preparation_timeout_seconds=preparation_timeout,
                 io_timeout_seconds=io_timeout_seconds,
                 live_observation=live_observation,
             )
-            self.trigger_job(job_config)
+            self._current_job_id = job_id
+            self._job_stop_event = threading.Event()
+            self.sandbox.state = DaemonState.PREPARING
+            self.sandbox.supervised = True
+            self._startup_thread = threading.Thread(
+                target=self._run_job, args=(job_config, self._job_stop_event),
+                name='fl-client-job-' + job_id, daemon=True)
+            self._startup_thread.start()
+
+    def _run_job(self, job, stop_event):
+        outcome = 'failed'
+        try:
+            if stop_event.is_set() or self._stop_event.is_set():
+                return
+            self.trigger_job(job)
+            if stop_event.is_set() or self._stop_event.is_set():
+                return
+
+            preparation_deadline = self.sandbox._preparation_deadline
+            if preparation_deadline is None:
+                raise FLRuntimeError('sandbox_start_failed', '任务沙箱缺少准备期限')
+
+            def forward(event):
+                control = self.control_plane
+                if control is None or stop_event.is_set():
+                    raise FLRuntimeError('job_stopped', '作业停止或控制面不可用')
+                timeout = min(8.0, max(0.001, preparation_deadline - time.monotonic())
+                              if event['event'] == 'prepared' else job.io_timeout_seconds)
+                if event['event'] == 'prepared':
+                    control.notify_task_ready(job.job_id, event['report'], timeout=timeout)
+                    with self._lock:
+                        if not stop_event.is_set() and self.control_plane is control:
+                            control.notify_state_change(ClientNodeState.RUNNING)
+                elif event['event'] == 'round_complete':
+                    control.notify_round_complete(job.job_id, event['round_index'], timeout=timeout)
+                else:
+                    control.notify_task_error(job.job_id, event['phase'], event['code'], event['reason'],
+                                              round_index=event.get('round_index'), timeout=timeout)
+
+            self.sandbox.monitor(forward, stop_event)
+            outcome = 'succeeded' if self.sandbox._completed_round == job.rounds else 'failed'
+        except Exception as exc:
+            logger.exception('客户端作业 %s 失败', job.job_id)
+            if not stop_event.is_set() and self.control_plane is not None:
+                try:
+                    self.control_plane.notify_task_error(
+                        job.job_id, 'prepare' if not self.sandbox._prepared else 'round',
+                        getattr(exc, 'error_code', 'client_job_failed'),
+                        getattr(exc, 'error_message', '客户端作业执行失败'),
+                        round_index=self.sandbox._completed_round + 1 if self.sandbox._prepared else None,
+                        timeout=min(job.io_timeout_seconds, 8.0))
+                except Exception:
+                    logger.exception('客户端作业失败报告未获确认')
+        finally:
+            with self._lock:
+                if self._current_job_id == job.job_id:
+                    self.sandbox.supervised = False
+                    self.sandbox.abort(outcome='aborted' if stop_event.is_set() else outcome)
+                    self._current_job_id = None
+                    if not self._stop_event.is_set():
+                        self._ensure_idle_transport()
+                        if self.control_plane is not None:
+                            self.control_plane.notify_state_change(ClientNodeState.IDLE)
 
     def start_control_plane(self) -> None:
         """Start client UDP control plane if network interface is available."""
@@ -1437,9 +1628,21 @@ class ClientDaemon:
     def stop(self) -> None:
         """Stop the daemon and release all resources."""
         self._stop_event.set()
+        self._job_stop_event.set()
         self._cleanup()
 
     def _cleanup(self) -> None:
+        self._job_stop_event.set()
+        cleanup_error = None
+        with self._lock:
+            if self.sandbox.is_running:
+                try:
+                    self.sandbox.abort()
+                except Exception as exc:
+                    cleanup_error = exc
+        worker = self._startup_thread
+        if worker is not None and worker is not threading.current_thread():
+            worker.join()
         with self._lock:
             if self.control_plane is not None:
                 self.control_plane.stop()
@@ -1450,6 +1653,8 @@ class ClientDaemon:
             if self.current_interface is not None:
                 self.network_adapter.teardown_tun(self.config.tun_name)
             logger.info("wfb-fl-client-daemon 已安全停止")
+        if cleanup_error is not None:
+            raise cleanup_error
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -1483,6 +1688,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     parser.add_argument("--bandwidth-mhz", type=int, choices=(20, 40), default=DEFAULT_BANDWIDTH_MHZ)
     parser.add_argument("--radio-control-port", type=int, default=DEFAULT_RADIO_CONTROL_PORT)
+    parser.add_argument("--mnist-data-dir", help="本机预置 MNIST IDX 数据目录")
     parser.add_argument(
         "--link-id",
         type=int,
@@ -1536,6 +1742,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         uplink_mcs=args.uplink_mcs,
         bandwidth_mhz=args.bandwidth_mhz,
         radio_control_port=args.radio_control_port,
+        mnist_data_dir=args.mnist_data_dir,
         link_id=args.link_id,
         work_dir=args.work_dir,
         poll_interval_seconds=args.poll_interval,

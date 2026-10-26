@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import importlib
 import ipaddress
 import json
 import os
@@ -13,7 +12,10 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
+from typing import List, Union
 
+from .algorithm import freeze_algorithm_config
 from .errors import FLRuntimeError
 from .role import ClientRole, ServerRole
 
@@ -246,6 +248,7 @@ def load_role_service(path, expected_role=None):
         '--role', role_name,
         '--node-id', str(config['node_id']),
     ] + link_args, readiness_probe=lambda: _is_tun_ready(tun_path))
+    role: Union[ClientRole, ServerRole]
     try:
         if role_name == 'server':
             role = ServerRole(
@@ -380,14 +383,22 @@ def _parse_known_client_node_ids(value):
     return set(node_ids)
 
 
-def _run_algorithm(algorithm, runtime, config, errors, stop_event):
+def _run_algorithm(algorithm, runtime, config, context, notifications, errors, stop_event):
     try:
-        algorithm(runtime, config)
-    except FLRuntimeError as exc:
-        errors.append(exc)
-    except Exception:
-        errors.append(FLRuntimeError(
-            'algorithm_failed', '算法入口执行失败'))
+        algorithm(runtime, freeze_algorithm_config(config), context)
+        if not notifications.prepared_reported or notifications.completed_round != context.rounds:
+            raise FLRuntimeError('algorithm_incomplete', '客户端算法提前返回或完成轮数不足')
+    except Exception as exc:
+        error = exc if isinstance(exc, FLRuntimeError) else FLRuntimeError(
+            'algorithm_failed', '算法入口执行失败')
+        errors.append(error)
+        if not stop_event.is_set():
+            try:
+                notifications.error('prepare' if not notifications.prepared_reported else 'round',
+                                    error.error_code, error.error_message,
+                                    notifications.completed_round + 1 if notifications.prepared_reported else None)
+            except Exception:
+                pass
     finally:
         stop_event.set()
 
@@ -406,40 +417,57 @@ def _read_algorithm_config(path):
     return config
 
 
-def _load_algorithm(spec):
-    if spec is None:
-        return None
-    if ':' not in spec:
-        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
-    module_name, callable_name = spec.split(':', 1)
-    if not module_name or not callable_name:
-        raise FLRuntimeError('invalid_configuration', '算法入口格式无效')
-    try:
-        module = importlib.import_module(module_name)
-        target = module
-        for part in callable_name.split('.'):
-            if not part:
-                raise AttributeError(part)
-            target = getattr(target, part)
-    except (ImportError, AttributeError) as exc:
-        raise FLRuntimeError('invalid_configuration', '算法入口无法导入') from exc
-    if not callable(target):
-        raise FLRuntimeError('invalid_configuration', '算法入口不可调用')
-    return target
+class AlgorithmNotifications:
+    """通过沙箱私有 UNIX socket 同步报告算法事实。"""
 
+    def __init__(self, address, job_id, stop_event, timeout=30):
+        self.address = address
+        self.job_id = job_id
+        self.stop_event = stop_event
+        self.timeout = timeout
+        self.prepared_reported = False
+        self.completed_round = 0
 
-def _notify_ready():
-    address = os.environ.get('NOTIFY_SOCKET')
-    if not address:
-        return
-    if address.startswith('@'):
-        address = '\0' + address[1:]
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-    try:
-        sock.connect(address)
-        sock.sendall(b'READY=1')
-    finally:
-        sock.close()
+    def send(self, event, **fields):
+        payload = json.dumps(dict(job_id=self.job_id, event=event, **fields),
+                             allow_nan=False, separators=(',', ':')).encode('utf-8')
+        if len(payload) > 4096:
+            raise FLRuntimeError('control_message_too_large', '本机算法报告超过 4096 字节')
+        if not self.address:
+            raise FLRuntimeError('notification_unavailable', '缺少本机算法通知通路')
+        with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as sock:
+            sock.bind('\0wfb-fl-' + uuid.uuid4().hex)
+            sock.connect(self.address)
+            sock.settimeout(0.1)
+            sock.send(payload)
+            deadline = time.monotonic() + self.timeout
+            while time.monotonic() < deadline:
+                if self.stop_event.is_set():
+                    raise FLRuntimeError('job_stopped', '作业已经停止')
+                try:
+                    reply = sock.recv(4097)
+                except socket.timeout:
+                    continue
+                try:
+                    result = json.loads(reply)
+                except (ValueError, UnicodeError) as exc:
+                    raise FLRuntimeError('notification_rejected', '本机通知确认无效') from exc
+                if len(reply) > 4096 or not isinstance(result, dict) or result.get('accepted') is not True:
+                    raise FLRuntimeError('notification_rejected', '本机 Daemon 拒绝算法报告')
+                return
+        raise FLRuntimeError('notification_timeout', '等待本机算法报告确认超时')
+
+    def prepared(self, report):
+        self.send('prepared', report=report)
+        self.prepared_reported = True
+
+    def round_complete(self, index):
+        self.send('round_complete', round_index=index)
+        self.completed_round = index
+
+    def error(self, phase, code, reason, round_index=None):
+        return self.send('error', phase=phase, code=code, reason=reason,
+                         round_index=round_index)
 
 
 def main(role=None):
@@ -447,12 +475,15 @@ def main(role=None):
     parser.add_argument('--config', required=True, help='角色服务 JSON 配置')
     parser.add_argument('--algorithm', help='算法入口，格式为 package.module:callable')
     parser.add_argument('--algorithm-config', help='算法 JSON object 配置')
+    parser.add_argument('--job-context', help='Daemon 生成的本机作业上下文 JSON')
     args = parser.parse_args()
     service = None
     algorithm_thread = None
-    algorithm_error = []
+    algorithm_error: List[FLRuntimeError] = []
     stop_event = threading.Event()
     signal_received = threading.Event()
+    notifications = None
+    context = None
 
     def stop(signum, frame):
         signal_received.set()
@@ -463,15 +494,31 @@ def main(role=None):
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     try:
-        algorithm = _load_algorithm(args.algorithm)
+        from .algorithm import AlgorithmContext, load_algorithm
+        role_config = _read_config(args.config)
+        role_name = role or role_config['role']
+        if role_name == 'client' and (not args.algorithm or not args.algorithm_config or not args.job_context):
+            raise FLRuntimeError('invalid_configuration', '客户端必须显式指定算法、配置及作业上下文')
+        if role_name == 'client':
+            host = _read_algorithm_config(args.job_context)
+            notifications = AlgorithmNotifications(os.environ.get('WFB_FL_NOTIFY_SOCKET'),
+                                                  host['job_id'], stop_event,
+                                                  timeout=host['preparation_timeout_seconds'])
+            os.makedirs(host['artifact_dir'], exist_ok=True)
+            context = AlgorithmContext(
+                job_id=host['job_id'], node_id=host['node_id'],
+                target_nodes=tuple(host['target_nodes']), rounds=host['rounds'],
+                artifact_dir=host['artifact_dir'], local_config=host['local_config'],
+                stop_event=stop_event, prepared_callback=notifications.prepared,
+                round_callback=notifications.round_complete)
+        algorithm = load_algorithm(args.algorithm, arity=3) if args.algorithm else None
         algorithm_config = _read_algorithm_config(args.algorithm_config)
         service = load_role_service(args.config, expected_role=role)
         runtime = service.start()
-        _notify_ready()
         if algorithm is not None:
             algorithm_thread = threading.Thread(
                 target=_run_algorithm,
-                args=(algorithm, runtime, algorithm_config, algorithm_error, stop_event),
+                args=(algorithm, runtime, algorithm_config, context, notifications, algorithm_error, stop_event),
                 name='fl-algorithm', daemon=True)
             algorithm_thread.start()
         while not stop_event.is_set():
@@ -486,13 +533,23 @@ def main(role=None):
     except FLRuntimeError as exc:
         if signal_received.is_set():
             return 0
+        if notifications is not None and not algorithm_error:
+            try:
+                notifications.error('round' if notifications.prepared_reported else 'prepare',
+                                    exc.error_code, exc.error_message,
+                                    notifications.completed_round + 1 if notifications.prepared_reported else None)
+            except Exception:
+                pass
         print('%s: %s' % (exc.error_code, exc.error_message), file=sys.stderr)
         return 1
     finally:
         signal.signal(signal.SIGTERM, previous_sigterm)
         signal.signal(signal.SIGINT, previous_sigint)
+        stop_event.set()
         if service is not None:
             service.close()
+        if algorithm_thread is not None:
+            algorithm_thread.join()
     return 0
 
 

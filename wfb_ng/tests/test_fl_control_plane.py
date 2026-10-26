@@ -451,19 +451,25 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.server.prepare_task_readiness("job-ready", [1, 2])
 
         wrong_job = json.dumps({
-            "type": "TASK_READY", "job_id": "other", "node_id": 1
+            "type": "TASK_READY", "report_id": "wrong-job-1",
+            "job_id": "other", "node_id": 1,
+            "report": {"format": "reference"},
         }).encode()
         self.assertIsNotNone(self.server.handle_datagram(wrong_job, ("127.0.0.1", 1)))
         self.assertFalse(self.server.wait_for_task_readiness(0))
 
         node1 = json.dumps({
-            "type": "TASK_READY", "job_id": "job-ready", "node_id": 1
+            "type": "TASK_READY", "report_id": "ready-1",
+            "job_id": "job-ready", "node_id": 1,
+            "report": {"format": "reference"},
         }).encode()
         self.assertIsNotNone(self.server.handle_datagram(node1, ("127.0.0.1", 1)))
         self.assertFalse(self.server.wait_for_task_readiness(0))
 
         node2 = json.dumps({
-            "type": "TASK_READY", "job_id": "job-ready", "node_id": 2
+            "type": "TASK_READY", "report_id": "ready-2",
+            "job_id": "job-ready", "node_id": 2,
+            "report": {"format": "reference"},
         }).encode()
         self.assertIsNotNone(self.server.handle_datagram(node2, ("127.0.0.1", 2)))
         self.assertTrue(self.server.wait_for_task_readiness(0))
@@ -574,11 +580,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         client.stop()
 
-    def test_full_pool_sweep_under_two_seconds(self):
-        """
-        When server is unreachable, all 4 channels in the pool must be swept in < 2 seconds.
-        Verify production default parameters strictly satisfy the 2-second constraint.
-        """
+    def test_compatible_channel_pool_sweep_under_two_seconds(self):
+        """未找到服务器时，两秒内扫完当前HT40允许的信道，跳过不兼容的165。"""
         from wfb_ng.fl.control import HUNTING_ATTEMPT_TIMEOUT_SECONDS
         self.assertEqual(HUNTING_ATTEMPT_TIMEOUT_SECONDS, 0.23)
 
@@ -605,10 +608,10 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         elapsed = time.monotonic() - t0
 
         self.assertFalse(found)
-        self.assertEqual(adapter.channel_history, [157, 149, 153, 165])
-        # Must sweep all 4 channels within 2 seconds
+        self.assertEqual(adapter.channel_history, [157, 149, 153])
+        # 当前带宽不能在165工作，只检查实际可用集合的有界寻频。
         self.assertLess(elapsed, 2.0)
-        self.assertGreaterEqual(elapsed, 1.5)
+        self.assertGreaterEqual(elapsed, 3 * HUNTING_ATTEMPT_TIMEOUT_SECONDS)
 
         client.stop()
 
@@ -872,6 +875,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         - JOB_ABORT broadcasts abort and restores IDLE.
         """
         import sys
+        import subprocess
+        from unittest.mock import patch
         work = tempfile.TemporaryDirectory()
         self.addCleanup(work.cleanup)
         adapter = MockNetworkAdapter(["wlan0"])
@@ -889,8 +894,20 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         )
         daemon = ClientDaemon(config, network_adapter=adapter)
         daemon.sandbox.evidence_dir = work.name + '/evidence'
-        stub_script = "import time; time.sleep(10)"
-        daemon.sandbox._command_prefix = [sys.executable, "-c", stub_script]
+        stub_script = (
+            "import os, threading\n"
+            "from wfb_ng.fl.service import AlgorithmNotifications\n"
+            "AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job_fl_001', "
+            "threading.Event(), timeout=3).prepared({'sample_count': 60000})\n"
+            "threading.Event().wait(10)\n"
+        )
+        real_popen = subprocess.Popen
+        process_patch = patch('wfb_ng.fl.client_daemon.subprocess.Popen',
+                              side_effect=lambda cmd, **kwargs: real_popen(
+                                  [sys.executable, '-c', stub_script], **kwargs))
+        process_patch.start()
+        self.addCleanup(process_patch.stop)
+        self.addCleanup(daemon.stop)
 
         daemon_thread = threading.Thread(target=daemon.run, daemon=True)
         daemon_thread.start()
@@ -904,15 +921,18 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         self.assertEqual(daemon.state, DaemonState.IDLE)
 
+        # 使用真实 prepared 报告及相关确认，心跳回执不能代替准备确认。
+        self.server.prepare_task_readiness("job_fl_001", [1])
         # Broadcast TASK_ANNOUNCE targeted to node 1
         self.server.broadcast_downlink({
             "type": "TASK_ANNOUNCE",
             "run_id": "run_fl_001",
             "job_id": "job_fl_001",
-            "target_nodes": [1, 2],
+            "target_nodes": [1],
             "rounds": 1,
-            "algorithm": "wfb_ng.fl.issue41_algorithm:client_main",
-            "algorithm_config": {},
+            "preparation_timeout_seconds": 3,
+            "algorithm": "wfb_ng.fl.mnist:client_entry",
+            "algorithm_config": {"data_seed": 2026},
             "server_http_host": "10.80.0.1",
             "server_http_port": 8080,
             "uftp_port": 1044,
@@ -920,6 +940,10 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             "io_timeout_seconds": 120,
             "live_observation": True,
         })
+
+        self.assertTrue(self.server.wait_for_task_readiness(2))
+        self.assertEqual(self.server.get_task_preparation_reports("job_fl_001")[1]["report"],
+                         {"sample_count": 60000})
 
         # Wait for job to start
         start_t = time.monotonic()

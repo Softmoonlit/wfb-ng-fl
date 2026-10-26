@@ -1,0 +1,14 @@
+{
+  "captured_at": "2026-10-27T01:56:13.037516+08:00",
+  "hostname": "fl00",
+  "architecture": "aarch64",
+  "kernel": "5.15.148-tegra",
+  "python": "3.10.12",
+  "torch": "2.5.0a0+872d972e41.nv24.08",
+  "cuda": "12.6",
+  "cudnn": 90300,
+  "gpu_available": true,
+  "gpu_name": "Orin",
+  "base_commit": "99865efe224a9ad35fefd13ae1340721f374b521",
+  "scope": "仅fl00本机受控IDX真实GPU计算；不声明三客户端环境、官方数据或四板无线训练通过"
+}

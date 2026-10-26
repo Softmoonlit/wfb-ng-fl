@@ -22,6 +22,7 @@ BUILD_IDENTITY_PATH = Path(__file__).with_name('build_identity.json')
 MAX_EVIDENCE_FILE_BYTES = 16 * 1024 * 1024
 ROOT_FILES = (
     'role_service.log', 'uftpd.log', 'client_role.json', 'algorithm_config.json',
+    'job_context.json',
     'issue41-client-result.json', 'observation.jsonl', 'current-round.json',
 )
 ROUND_FILES = ('round-state.json', 'model.manifest.json', 'update.manifest.json')

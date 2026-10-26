@@ -11,6 +11,8 @@ import json
 import threading
 import time
 from unittest.mock import Mock, patch
+from typing import Any, Dict
+from pathlib import Path
 
 import pytest
 
@@ -21,15 +23,70 @@ from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig, ServerState, load_server_config
 
 
+def selection_client(runtime, config, context):
+    """部署入口只参与装配，本文件不执行客户端计算。"""
+    raise AssertionError('server must not execute client entry')
+
+
+def selection_aggregate(current, updates, output, config, context):
+    """选择测试停止在发布等待，不应进入聚合。"""
+    raise AssertionError('selection test must not aggregate updates')
+
+
+def selection_evaluate(model_path, config, context):
+    """按选择夹具自己的格式检查模型，提供有限准备事实。"""
+    context.check_stop()
+    assert Path(model_path).read_bytes() == b'model'
+    return {'metrics': {'selection_fixture': 1.0}, 'preparation': {'ready': True},
+            'verdict': None, 'reason': None}
+
+
+class SelectionRuntime:
+    """保留活动作业供快照观察，停止时显式唤醒发布等待。"""
+    def __init__(self):
+        self.cancelled = threading.Event()
+
+    def publish_model(self, model_path):
+        if not self.cancelled.wait(5):
+            raise FLRuntimeError('fixture_timeout', '测试没有停止活动作业')
+        raise FLRuntimeError('aborted', '选择测试作业已停止')
+
+    def wait_for_updates(self):
+        raise AssertionError('selection test must not collect updates')
+
+    def abort(self, reason='aborted'):
+        self.cancelled.set()
+
+    def close(self):
+        self.cancelled.set()
+
+
+def ready_taskpeer(daemon, message):
+    """通过正式报告和相关确认释放所选完整节点集合的准备门禁。"""
+    if message['type'] != 'TASK_ANNOUNCE':
+        return
+    for node in message['target_nodes']:
+        replies = daemon.control_plane.handle_datagram(json.dumps({
+            'type': 'TASK_READY', 'node_id': node, 'job_id': message['job_id'],
+            'report_id': f"prepared-{message['job_id']}-{node}", 'report': {'ready': True},
+        }).encode(), (f'10.80.0.{10 + node}', 9001))
+        assert replies and json.loads(replies[0])['ok'] is True
+
+
 @pytest.fixture
 def daemon(tmp_path):
     adapter = Mock(spec=NetworkAdapter)
     adapter.is_tun_active.return_value = True
     result = ServerDaemon(ServerDaemonConfig(
         enable_link_process=False, enable_control_plane=False,
-        model_library_dir=str(tmp_path / 'models'), work_dir=str(tmp_path)), adapter)
+        client_entry=f'{__name__}:selection_client',
+        aggregate_entry=f'{__name__}:selection_aggregate',
+        evaluate_entry=f'{__name__}:selection_evaluate', algorithm_config={'fixture': 'selection'},
+        model_library_dir=str(tmp_path / 'models'), work_dir=str(tmp_path)), adapter,
+        runtime_factory=lambda job, payload: SelectionRuntime())
     result.server_state = ServerState.IDLE
-    return result
+    yield result
+    result.stop()
 
 
 def heartbeat(daemon, node_id, state='IDLE', error=None):
@@ -61,7 +118,8 @@ def http_server(daemon):
     worker.start()
 
     def request(method, path, data=None, key='selection-request'):
-        conn = http.client.HTTPConnection(*server.server_address, timeout=5)
+        host, port = server.server_address[:2]
+        conn = http.client.HTTPConnection(str(host), int(port), timeout=5)
         conn.request(method, path, body=json.dumps(data) if data is not None else None,
                      headers={'Content-Type': 'application/json', 'Idempotency-Key': key})
         response = conn.getresponse()
@@ -78,7 +136,8 @@ def http_server(daemon):
 
 
 def test_preparation_timeout_is_positive_and_frozen():
-    config = ServerDaemonConfig(preparation_timeout_seconds='12')
+    raw_timeout: Any = '12'
+    config = ServerDaemonConfig(preparation_timeout_seconds=raw_timeout)
     assert config.preparation_timeout_seconds == 12.0
     with pytest.raises(FLRuntimeError) as caught:
         ServerDaemonConfig(preparation_timeout_seconds=0)
@@ -156,7 +215,7 @@ def test_disconnection_events_stay_with_the_job_that_observed_them(daemon):
     heartbeat(daemon, 1)
     daemon.console.snapshot()
     first = payload(daemon, [1])
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
+    with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda msg: ready_taskpeer(daemon, msg)):
         daemon.start_job(first)
     with patch('wfb_ng.fl.control.time.monotonic', return_value=time.monotonic() + 31):
         offline = daemon.console.snapshot()['current_job']['participants'][0]
@@ -167,7 +226,7 @@ def test_disconnection_events_stay_with_the_job_that_observed_them(daemon):
     heartbeat(daemon, 1)
     second = payload(daemon, [1])
     second['job_id'] = 'second-selection-job'
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
+    with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda msg: ready_taskpeer(daemon, msg)):
         daemon.start_job(second)
     participant = daemon.console.snapshot()['current_job']['participants'][0]
     assert participant['disconnection_events'] == []
@@ -195,7 +254,7 @@ def test_daemon_admits_the_exact_set_using_registry_heartbeat_threshold(daemon):
     with patch('wfb_ng.fl.control.time.monotonic', return_value=now - 20):
         heartbeat(daemon, 3)
         heartbeat(daemon, 1)
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
+    with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda msg: ready_taskpeer(daemon, msg)):
         accepted = daemon.start_job(payload(daemon, [3, 1]))
     assert accepted['status'] == 'accepted'
     assert accepted['target_nodes'] == [3, 1]
@@ -210,10 +269,11 @@ def test_daemon_admits_the_exact_set_using_registry_heartbeat_threshold(daemon):
 
 def test_role_preparation_timeout_requests_resource_close(daemon):
     daemon.config = replace(daemon.config, enable_link_process=True, preparation_timeout_seconds=0.05)
+    daemon.runtime_factory = None
     heartbeat(daemon, 1)
     release_role = threading.Event()
     role = Mock()
-    role.runtime = None
+    role.runtime = SelectionRuntime()
     role.start.side_effect = lambda: release_role.wait(2)
     role.close.side_effect = lambda: release_role.set()
 
@@ -228,14 +288,15 @@ def test_role_preparation_timeout_requests_resource_close(daemon):
 
 def test_role_start_does_not_hold_daemon_lock_against_stop(daemon):
     daemon.config = replace(daemon.config, enable_link_process=True, preparation_timeout_seconds=30.0)
+    daemon.runtime_factory = None
     heartbeat(daemon, 1)
     role_started = threading.Event()
     release_role = threading.Event()
     listener_open = False
-    result = {}
+    result: Dict[str, Any] = {}
 
     role = Mock()
-    role.runtime = None
+    role.runtime = SelectionRuntime()
     def start_role():
         nonlocal listener_open
         role_started.set()
@@ -283,21 +344,19 @@ def test_daemon_rejects_new_job_while_recovery_is_blocked(daemon):
 
 def test_readiness_wait_releases_daemon_lock_for_abort(daemon):
     daemon.config = replace(daemon.config, enable_link_process=True)
+    daemon.runtime_factory = None
     heartbeat(daemon, 1)
     wait_started = threading.Event()
-    release_wait = threading.Event()
-    result = {}
+    result: Dict[str, Any] = {}
 
-    def wait_for_readiness(_timeout):
-        wait_started.set()
-        release_wait.wait(2)
-        return False
+    def observe_announcement(message):
+        if message['type'] == 'TASK_ANNOUNCE':
+            wait_started.set()
 
     role = Mock()
-    role.runtime = None
+    role.runtime = SelectionRuntime()
     with patch('wfb_ng.fl.role.ServerRole', return_value=role), \
-            patch.object(daemon.control_plane, 'broadcast_downlink'), \
-            patch.object(daemon.control_plane, 'wait_for_task_readiness', side_effect=wait_for_readiness), \
+            patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=observe_announcement), \
             patch.object(daemon, '_stop_link_process'), \
             patch.object(daemon, '_start_link_process'):
         request_body = body(daemon, [1])
@@ -310,7 +369,6 @@ def test_readiness_wait_releases_daemon_lock_for_abort(daemon):
         aborter.start()
         aborter.join(1)
         assert not aborter.is_alive()
-        release_wait.set()
         starter.join(2)
 
     assert not starter.is_alive()
@@ -334,13 +392,13 @@ def test_http_submission_race_rejects_whole_set_and_reports_each_node(daemon):
 
 @pytest.mark.parametrize('recovery_fails', [False, True])
 def test_http_accepted_startup_timeout_is_a_recent_failed_job(daemon, recovery_fails):
+    daemon.runtime_factory = None
     heartbeat(daemon, 1)
     request_body = body(daemon, [1])
-    daemon.config = replace(daemon.config, enable_link_process=True)
+    daemon.config = replace(daemon.config, enable_link_process=True, preparation_timeout_seconds=0.15)
     role = Mock()
-    role.runtime = None
+    role.runtime = SelectionRuntime()
     with patch('wfb_ng.fl.role.ServerRole', return_value=role), \
-            patch.object(daemon.control_plane, 'wait_for_task_readiness', return_value=False), \
             patch.object(daemon.control_plane, 'broadcast_downlink'), \
             patch.object(daemon, '_stop_link_process'), \
             patch.object(daemon, '_start_link_process', side_effect=RuntimeError('reset failed') if recovery_fails else None), \

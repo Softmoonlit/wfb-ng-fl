@@ -6,6 +6,7 @@ import socket
 import struct
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import threading
 import time
@@ -220,25 +221,25 @@ class TestClientRadioApplication(unittest.TestCase):
             _command_prefix=[sys.executable, '-c', 'import time; time.sleep(30)'],
             evidence_dir=os.path.join(self.daemon.config.work_dir, 'evidence'),
         )
-        udp = mock.Mock()
-        blocking = [True]
-        udp.setblocking.side_effect = lambda value: blocking.__setitem__(0, value)
+        self.control._uplink_sock.recvfrom.side_effect = BlockingIOError
+        spawned = threading.Event()
+        real_popen = subprocess.Popen
 
-        def recv(*args):
-            if not blocking[0]:
-                raise BlockingIOError()
-            return b'{"ack": true}', ('10.80.0.1', 9001)
+        def spawn(*args, **kwargs):
+            process = real_popen(*args, **kwargs)
+            spawned.set()
+            return process
 
-        udp.recvfrom.side_effect = recv
-        self.control._uplink_sock = udp
-        with mock.patch('wfb_ng.fl.control.socket.socket', return_value=udp):
+        with mock.patch('wfb_ng.fl.client_daemon.subprocess.Popen', side_effect=spawn):
             self.control.handle_broadcast({
                 'type': 'TASK_ANNOUNCE', 'run_id': 'run-1', 'job_id': 'job-1',
-                'rounds': 1, 'algorithm': 'wfb_ng.fl.issue41_algorithm:client_main',
+                'rounds': 1, 'target_nodes': [1], 'preparation_timeout_seconds': 120,
+                'algorithm': 'wfb_ng.fl.mnist:client_entry',
                 'algorithm_config': {}, 'server_http_host': '10.80.0.1',
                 'server_http_port': 8080, 'uftp_port': 1044, 'link_id': 7669206,
                 'io_timeout_seconds': 120, 'live_observation': False,
             })
+            self.assertTrue(spawned.wait(2), 'task role must start in the background')
         path = os.path.join(self.daemon.config.work_dir, 'job_job-1', 'client_role.json')
         with open(path, encoding='utf-8') as stream:
             role = json.load(stream)

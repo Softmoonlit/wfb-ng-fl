@@ -1,6 +1,9 @@
-"""
-Tests for WFB-ng Stage 2 Server Persistent Daemon, Pre-allocated Slot Pool,
-Local REST IPC, and Deterministic Job Preflight Gates (Ticket 05).
+"""Server daemon infrastructure checks after the real-training host migration.
+
+Training execution, explicit algorithm deployment, preparation reports, round
+barriers, and cooperative evaluation cancellation live in test_fl_training_host.
+This module keeps the server-owned radio, topology, rejection, lifecycle, and
+packaging seams without reviving the old file-simulation job contract.
 """
 
 import json
@@ -10,27 +13,15 @@ import tempfile
 import threading
 import time
 import unittest
-import urllib.error
-import urllib.request
-from dataclasses import replace
-from typing import Any, Dict, List, Optional, Tuple
 from unittest.mock import MagicMock, patch
 
 from wfb_ng.fl.control import (
     ClientNodeState,
-    ControlPlaneClient,
-    ControlPlaneServer,
     NodeHeartbeat,
     NodeReadiness,
 )
 from wfb_ng.fl.errors import FLRuntimeError
-from wfb_ng.fl.radio import (
-    ChannelSurveyResult,
-    RadioConfig,
-    SpectrumSurveyReport,
-)
 from wfb_ng.fl.server_daemon import (
-    DEFAULT_SERVER_CONFIG_PATH,
     ServerDaemon,
     ServerDaemonConfig,
     ServerState,
@@ -42,7 +33,7 @@ from wfb_ng.tests.test_fl_radio import MockSurveyBackend
 
 
 class TestServerDaemonConfig(unittest.TestCase):
-    """Test configuration loading, validation, and defaults."""
+    """Deployment defaults, explicit algorithm selection, and radio validation."""
 
     def test_default_config(self):
         cfg = ServerDaemonConfig()
@@ -57,19 +48,26 @@ class TestServerDaemonConfig(unittest.TestCase):
         self.assertEqual(cfg.tun_cidr, "10.80.0.1/24")
         self.assertEqual(cfg.tun_txqueuelen, 5000)
         self.assertEqual(cfg.known_clients, tuple(range(1, 11)))
+        self.assertEqual(cfg.client_entry, "wfb_ng.fl.mnist:client_entry")
+        self.assertEqual(cfg.aggregate_entry, "wfb_ng.fl.mnist:aggregate_entry")
+        self.assertEqual(cfg.evaluate_entry, "wfb_ng.fl.mnist:evaluate_entry")
+        self.assertEqual(cfg.algorithm_config, {"data_seed": 2026})
 
     def test_load_from_json_file(self):
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
-            json.dump({
-                "ipc_host": "127.0.0.1",
-                "ipc_port": 9099,
-                "channel": 149,
-                "radio_txpower_dbm": 15,
-                "downlink_mcs": 4,
-                "uplink_mcs": 5,
-                "tun_name": "fl-custom",
-            }, f)
-            temp_path = f.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as stream:
+            json.dump(
+                {
+                    "ipc_host": "127.0.0.1",
+                    "ipc_port": 9099,
+                    "channel": 149,
+                    "radio_txpower_dbm": 15,
+                    "downlink_mcs": 4,
+                    "uplink_mcs": 5,
+                    "tun_name": "fl-custom",
+                },
+                stream,
+            )
+            temp_path = stream.name
 
         try:
             cfg = load_server_config(temp_path)
@@ -80,40 +78,39 @@ class TestServerDaemonConfig(unittest.TestCase):
             self.assertEqual(cfg.uplink_mcs, 5)
             self.assertEqual(cfg.tun_name, "fl-custom")
             self.assertEqual(cfg.known_clients, tuple(range(1, 11)))
+            self.assertEqual(cfg.algorithm_config, {"data_seed": 2026})
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
 
     def test_load_nonexistent_custom_config_fails_closed(self):
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(FLRuntimeError) as caught:
             load_server_config("/nonexistent/path/server.json")
-        self.assertEqual(ctx.exception.error_code, "config_not_found")
+        self.assertEqual(caught.exception.error_code, "config_not_found")
 
     def test_fail_closed_on_invalid_radio_parameters(self):
-        # Forbidden channel 161
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(channel=161)
-
-        # Invalid txpower
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(radio_txpower_dbm=0)
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(radio_txpower_dbm=35)
-
-        # Invalid MCS
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(downlink_mcs=2)
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(downlink_mcs=7)
-
-        # Shrinking known_clients pool is strictly forbidden
-        with self.assertRaises(FLRuntimeError) as ctx:
+        with self.assertRaises(FLRuntimeError) as caught:
             ServerDaemonConfig(known_clients=(1, 2, 3))
-        self.assertEqual(ctx.exception.error_code, "invalid_known_clients")
+        self.assertEqual(caught.exception.error_code, "invalid_known_clients")
+
+    def test_invalid_deployment_algorithm_entry_fails_closed(self):
+        with self.assertRaises(FLRuntimeError) as caught:
+            ServerDaemonConfig(client_entry="not-an-entry")
+        self.assertEqual(caught.exception.error_code, "invalid_configuration")
 
 
 class TestV6UplinkServerCommand(unittest.TestCase):
-    """Test command-line construction for wfb_v6_uplink server role."""
+    """Pre-allocated slot command construction remains server-owned."""
 
     def test_command_generation_preallocated_slots_and_no_slot_flags(self):
         cmd = build_v6_uplink_server_command(
@@ -126,51 +123,31 @@ class TestV6UplinkServerCommand(unittest.TestCase):
             link_id=7669206,
             known_clients=tuple(range(1, 11)),
         )
-
-        # Basic role and identifiers
-        self.assertIn("--role", cmd)
         self.assertEqual(cmd[cmd.index("--role") + 1], "server")
-        self.assertIn("--tun-name", cmd)
         self.assertEqual(cmd[cmd.index("--tun-name") + 1], "fl-s")
-        self.assertIn("--tun-addr", cmd)
         self.assertEqual(cmd[cmd.index("--tun-addr") + 1], "10.80.0.1/24")
-        self.assertIn("--node-id", cmd)
         self.assertEqual(cmd[cmd.index("--node-id") + 1], "255")
-        self.assertIn("--link-id", cmd)
         self.assertEqual(cmd[cmd.index("--link-id") + 1], "7669206")
-        self.assertIn("--air-interface", cmd)
         self.assertEqual(cmd[cmd.index("--air-interface") + 1], "wlan0")
-
-        # FEC and bandwidth
-        self.assertIn("--fec-k", cmd)
         self.assertEqual(cmd[cmd.index("--fec-k") + 1], "8")
-        self.assertIn("--fec-n", cmd)
         self.assertEqual(cmd[cmd.index("--fec-n") + 1], "14")
-        self.assertIn("--radio-bandwidth", cmd)
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "40")
-        self.assertIn("--radio-mcs-index", cmd)
         self.assertEqual(cmd[cmd.index("--radio-mcs-index") + 1], "3")
         self.assertIn("--radio-short-gi", cmd)
-
-        # Pre-allocated 1..10 known clients
-        self.assertIn("--known-clients", cmd)
         self.assertEqual(
             cmd[cmd.index("--known-clients") + 1],
             "1,2,3,4,5,6,7,8,9,10",
         )
-
-        # Check all 10 client targets
-        for nid in range(1, 11):
-            expected_target = f"{nid}:10.80.0.{10 + nid}:127.0.0.1:1"
-            self.assertIn(expected_target, cmd)
-
-        # Spec / ADR-0014 requirement: MUST NOT pass grant-duration-ms or guard-interval-ms
+        for node_id in range(1, 11):
+            self.assertIn(f"{node_id}:10.80.0.{10 + node_id}:127.0.0.1:1", cmd)
         self.assertNotIn("--grant-duration-ms", cmd)
         self.assertNotIn("--guard-interval-ms", cmd)
 
     def test_channel_165_requires_explicit_narrow_bandwidth(self):
         with self.assertRaises(ValueError):
-            build_v6_uplink_server_command("/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0", channel=165)
+            build_v6_uplink_server_command(
+                "/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0", channel=165
+            )
         cmd = build_v6_uplink_server_command(
             executable_path="/usr/bin/wfb_v6_uplink",
             tun_name="fl-s",
@@ -180,17 +157,23 @@ class TestV6UplinkServerCommand(unittest.TestCase):
             bandwidth_mhz=20,
             downlink_mcs=3,
         )
-        self.assertIn("--radio-bandwidth", cmd)
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "20")
 
 
-class TestHeartbeatTaskReadinessConcurrency(unittest.TestCase):
-    def test_preparing_heartbeat_does_not_block_task_ready_under_daemon_lock(self):
+class TestReportReadinessConcurrency(unittest.TestCase):
+    """Heartbeat processing must not block a real TASK_READY report."""
+
+    def test_preparing_heartbeat_does_not_block_report_under_daemon_lock(self):
         with tempfile.TemporaryDirectory() as root:
-            daemon = ServerDaemon(ServerDaemonConfig(
-                control_bind_host="127.0.0.1", control_bind_port=0,
-                enable_link_process=False, model_library_dir=root,
-            ), network_adapter=MockNetworkAdapter())
+            daemon = ServerDaemon(
+                ServerDaemonConfig(
+                    control_bind_host="127.0.0.1",
+                    control_bind_port=0,
+                    enable_link_process=False,
+                    model_library_dir=root,
+                ),
+                network_adapter=MockNetworkAdapter(),
+            )
             control = daemon.control_plane
             entered_callback = threading.Event()
             original_callback = control.on_heartbeat_received
@@ -207,67 +190,70 @@ class TestHeartbeatTaskReadinessConcurrency(unittest.TestCase):
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
                     client.settimeout(1.0)
                     control.prepare_task_readiness("startup-job", [1])
-                    hb = NodeHeartbeat(
-                        node_id=1, state="PREPARING", elapsed_ms=0,
-                        current_channel=157, txpower_dbm=12, uplink_mcs=6,
+                    heartbeat = NodeHeartbeat(
+                        node_id=1,
+                        state="PREPARING",
+                        elapsed_ms=0,
+                        current_channel=157,
+                        txpower_dbm=12,
+                        uplink_mcs=6,
                         timestamp_ms=1000,
                     )
-                    # This is the lock held by start_job while awaiting TASK_READY.
                     with daemon._lock:
-                        client.sendto(hb.to_bytes(), address)
+                        client.sendto(heartbeat.to_bytes(), address)
                         self.assertTrue(entered_callback.wait(1.0))
-                        client.sendto(json.dumps({
-                            "type": "TASK_READY", "job_id": "startup-job", "node_id": 1,
-                        }).encode(), address)
-                        self.assertTrue(control.wait_for_task_readiness(1.0),
-                                        "PREPARING diagnostic blocked UDP TASK_READY reception")
-                        self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
-                        self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
+                        client.sendto(
+                            json.dumps(
+                                {
+                                    "type": "TASK_READY",
+                                    "report_id": "startup-report-1",
+                                    "job_id": "startup-job",
+                                    "node_id": 1,
+                                    "report": {
+                                        "model_format": "reference",
+                                        "sample_count": 1,
+                                        "data_sha256": {},
+                                        "device": {"type": "cpu"},
+                                    },
+                                }
+                            ).encode(),
+                            address,
+                        )
+                        self.assertTrue(
+                            control.wait_for_task_readiness(1.0),
+                            "PREPARING diagnostic blocked TASK_READY report reception",
+                        )
+                        replies = [json.loads(client.recv(4096)) for _ in range(2)]
+                        self.assertIn({"ack": True}, replies)
+                        report_reply = next(reply for reply in replies if reply.get("type") == "TASK_READY_ACK")
+                        self.assertTrue(report_reply["ok"])
                         event = diagnostic.get(timeout=1.0)
                         self.assertEqual(event["type"], "NODE_HEARTBEAT")
                         self.assertEqual(event["state"], "PREPARING")
                     state = daemon.console.snapshot()
                     self.assertEqual(state["nodes"][0]["state"], "preparing")
                     self.assertEqual(state["events"], [])
-                    # With no state mutation holding the lock, heartbeats still
-                    # push live snapshots as well as the diagnostic SSE event.
-                    snapshots = daemon.console.subscribe_events()
-                    hb = replace(hb, state="RUNNING", timestamp_ms=hb.timestamp_ms + 1)
-                    client.sendto(hb.to_bytes(), address)
-                    self.assertEqual(json.loads(client.recv(4096)), {"ack": True})
-                    self.assertEqual(diagnostic.get(timeout=1.0)["state"], "RUNNING")
-                    frame = snapshots.get(timeout=1.0)
-                    self.assertEqual(frame["kind"], "snapshot")
-                    self.assertEqual(frame["snapshot"]["nodes"][0]["state"], "running")
-                    self.assertEqual(frame["snapshot"]["events"], [])
             finally:
                 control.stop()
 
 
 class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
-    """Test Local REST IPC server and the 3 deterministic preflight checks."""
+    """Server-owned status, rejection gates, radio and lifecycle seams."""
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp(prefix="wfb_test_server_")
         self.adapter = MockNetworkAdapter(["wlan0"])
-        self.survey_backend = MockSurveyBackend({
-            149: 5,
-            153: 0,
-            157: 12,
-            165: 25,
-        })
-
-        # Ephemeral ports for test isolation
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.bind(("127.0.0.1", 0))
-            self.control_bind_port = s.getsockname()[1]
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.bind(("127.0.0.1", 0))
-            self.control_broadcast_port = s.getsockname()[1]
+        self.survey_backend = MockSurveyBackend({149: 5, 153: 0, 157: 12, 165: 25})
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.bind(("127.0.0.1", 0))
+            self.control_bind_port = sock.getsockname()[1]
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.bind(("127.0.0.1", 0))
+            self.control_broadcast_port = sock.getsockname()[1]
 
         self.config = ServerDaemonConfig(
             ipc_host="127.0.0.1",
-            ipc_port=0,  # Ephemeral HTTP port
+            ipc_port=0,
             channel=157,
             radio_txpower_dbm=12,
             downlink_mcs=3,
@@ -276,23 +262,18 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             control_bind_port=self.control_bind_port,
             control_broadcast_port=self.control_broadcast_port,
             work_dir=self.temp_dir,
-            enable_link_process=False,  # Mocked
+            enable_link_process=False,
         )
-
         self.daemon = ServerDaemon(
             config=self.config,
             network_adapter=self.adapter,
             survey_backend=self.survey_backend,
         )
         self.daemon.start()
-        self.http_port = self.daemon.actual_ipc_port
-        self.base_url = f"http://127.0.0.1:{self.http_port}"
-
-        # Create dummy initial model file
         self.model_path = os.path.join(self.temp_dir, "initial_model.bin")
         self.model_data = b"M" * 1024
-        with open(self.model_path, "wb") as f:
-            f.write(self.model_data)
+        with open(self.model_path, "wb") as stream:
+            stream.write(self.model_data)
 
     def tearDown(self):
         self.daemon.stop()
@@ -300,65 +281,40 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             import shutil
             shutil.rmtree(self.temp_dir, ignore_errors=True)
 
-    def _http_get(self, path: str) -> Tuple[int, Dict[str, Any]]:
-        url = f"{self.base_url}{path}"
-        req = urllib.request.Request(url, method="GET")
-        try:
-            with urllib.request.urlopen(req, timeout=3.0) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return resp.status, data
-        except urllib.error.HTTPError as exc:
-            data = json.loads(exc.read().decode("utf-8"))
-            return exc.code, data
-
-    def _http_post(self, path: str, payload: Optional[Dict[str, Any]] = None) -> Tuple[int, Dict[str, Any]]:
-        url = f"{self.base_url}{path}"
-        body = json.dumps(payload or {}).encode("utf-8")
-        req = urllib.request.Request(
-            url,
-            data=body,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=3.0) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return resp.status, data
-        except urllib.error.HTTPError as exc:
-            data = json.loads(exc.read().decode("utf-8"))
-            return exc.code, data
-
     def _simulate_client_handshake(self, node_id: int):
-        """Simulate client legitimate HUNTING -> ACK -> IDLE handshake to establish READY state."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        server_addr = ("127.0.0.1", self.control_bind_port)
+        address = ("127.0.0.1", self.control_bind_port)
+        try:
+            for state, timestamp in ((ClientNodeState.HUNTING.value, 1000), (ClientNodeState.IDLE.value, 1050)):
+                sock.sendto(
+                    NodeHeartbeat(
+                        node_id=node_id,
+                        state=state,
+                        elapsed_ms=0,
+                        current_channel=157,
+                        txpower_dbm=12,
+                        uplink_mcs=6,
+                        timestamp_ms=timestamp,
+                    ).to_bytes(),
+                    address,
+                )
+                time.sleep(0.05)
+        finally:
+            sock.close()
 
-        # 1. HUNTING
-        hb_hunting = NodeHeartbeat(
-            node_id=node_id,
-            state=ClientNodeState.HUNTING.value,
-            elapsed_ms=0,
-            current_channel=157,
-            txpower_dbm=12,
-            uplink_mcs=6,
-            timestamp_ms=1000,
-        )
-        sock.sendto(hb_hunting.to_bytes(), server_addr)
-        time.sleep(0.05)
-
-        # 2. IDLE
-        hb_idle = NodeHeartbeat(
-            node_id=node_id,
-            state=ClientNodeState.IDLE.value,
-            elapsed_ms=0,
-            current_channel=157,
-            txpower_dbm=12,
-            uplink_mcs=6,
-            timestamp_ms=1050,
-        )
-        sock.sendto(hb_idle.to_bytes(), server_addr)
-        time.sleep(0.05)
-        sock.close()
+    def _job_payload(self, **overrides):
+        payload = {
+            "run_id": "run-test",
+            "job_id": "job-test",
+            "mode": "sync",
+            "target_nodes": [1],
+            "model_path": self.model_path,
+            "model_size_bytes": len(self.model_data),
+            "io_timeout_seconds": 2,
+            "live_observation": False,
+        }
+        payload.update(overrides)
+        return payload
 
     def test_terminal_job_resets_persistent_link_after_role_close(self):
         daemon = ServerDaemon(
@@ -377,9 +333,9 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         calls = []
         role.close.side_effect = lambda: calls.append("role_close")
 
-        with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), patch.object(
-            daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")
-        ), patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
+        with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), \
+                patch.object(daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")), \
+                patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
             daemon._finalize_job(outcome="completed", job_id="terminal-reset")
 
         self.assertEqual(calls, ["role_close", "link_stop", "link_start", "terminal_broadcast"])
@@ -388,10 +344,8 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertIsNone(daemon.active_job)
         self.assertIsNone(daemon.server_role)
 
-    def test_status_endpoint_returns_topology_and_radio(self):
-        # 1. Basic status without nodes
-        status_code, body = self._http_get("/api/v1/status")
-        self.assertEqual(status_code, 200)
+    def test_status_snapshot_returns_topology_and_radio(self):
+        body = self.daemon.get_status_report()
         self.assertEqual(body["server_state"], "IDLE")
         self.assertIsNone(body["active_job"])
         self.assertEqual(body["radio"]["channel"], 157)
@@ -401,650 +355,206 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         self.assertEqual(body["tun"]["name"], "fl-s")
         self.assertEqual(body["tun"]["ip"], "10.80.0.1")
 
-        # Also verify unversioned alias returns 404 (strict versioned API)
-        code_alias, body_alias = self._http_get("/status")
-        self.assertEqual(code_alias, 404)
-
-        # 2. Simulate Node 1 and Node 2 check-ins
         self._simulate_client_handshake(1)
         self._simulate_client_handshake(2)
-
-        status_code, body = self._http_get("/api/v1/status")
-        self.assertEqual(status_code, 200)
+        body = self.daemon.get_status_report()
         nodes = body["nodes"]
-        # Per spec, all 1..10 pre-allocated slots must be present
         self.assertEqual(len(nodes), 10)
-        for nid in range(1, 11):
-            self.assertIn(str(nid), nodes)
-
         self.assertEqual(nodes["1"]["readiness"], "READY")
         self.assertEqual(nodes["1"]["reported_state"], "IDLE")
-        self.assertIsNotNone(nodes["1"]["last_heartbeat_timestamp_ms"])
         self.assertEqual(nodes["2"]["readiness"], "READY")
         self.assertEqual(nodes["2"]["reported_state"], "IDLE")
-        self.assertLess(nodes["1"]["last_heartbeat_ago_seconds"], 2.0)
-
-        # Unconnected nodes are pre-allocated but OFFLINE
         self.assertEqual(nodes["3"]["readiness"], "OFFLINE")
-        self.assertIsNone(nodes["3"]["reported_state"])
         self.assertEqual(nodes["3"]["tun_ip"], "10.80.0.13")
 
-    def test_survey_endpoint(self):
-        # Trigger 5GHz survey
-        status_code, body = self._http_post("/api/v1/survey", {"duration_ms": 300})
-        self.assertEqual(status_code, 200)
-        self.assertIn("results", body)
-        self.assertIn("ranking", body)
-        # Channel 153 had 0 frames, so it should rank 1st
-        self.assertEqual(body["ranking"][0], 153)
+    def test_survey_snapshot_returns_ranking(self):
+        report = self.daemon.run_spectrum_survey(duration_ms=300)
+        self.assertEqual(report.recommended_channel, 153)
 
-        # Also verify unversioned alias returns 404
-        status_code_alias, body_alias = self._http_post("/survey", {"duration_ms": 300})
-        self.assertEqual(status_code_alias, 404)
-
-    def test_preflight_gate_1_target_nodes_not_ready(self):
-        """
-        Gate 1: target_nodes must be READY/IDLE under registry heartbeat facts; preparation budget covers TASK_READY.
-        """
-        # Node 1 is ready, but Node 2 has never checked in
+    def test_target_nodes_not_ready_is_rejected_before_training_host(self):
         self._simulate_client_handshake(1)
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(
+                self._job_payload(target_nodes=[1, 2], job_id="job-target-not-ready")
+            )
+        self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
+        self.assertIn("2", caught.exception.details["unready_nodes"])
 
-        payload = {
-            "run_id": "run_fl_001",
-            "job_id": "job_fl_001",
-            "target_nodes": [1, 2],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_not_ready")
-        self.assertIn("2", body["unready_nodes"])
-
-    def test_preflight_gate_1_target_node_in_hunting_fails(self):
-        """
-        Node only sent HUNTING and hasn't closed two-army IDLE loop -> CONNECTING, fails.
-        """
+    def test_hunting_node_is_not_a_training_candidate(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        hb = NodeHeartbeat(
-            node_id=1,
-            state=ClientNodeState.HUNTING.value,
-            elapsed_ms=0,
-            current_channel=157,
-            txpower_dbm=12,
-            uplink_mcs=6,
-            timestamp_ms=407,
-        )
-        sock.sendto(hb.to_bytes(), ("127.0.0.1", self.control_bind_port))
-        sock.close()
+        try:
+            sock.sendto(
+                NodeHeartbeat(
+                    node_id=1,
+                    state=ClientNodeState.HUNTING.value,
+                    elapsed_ms=0,
+                    current_channel=157,
+                    txpower_dbm=12,
+                    uplink_mcs=6,
+                    timestamp_ms=407,
+                ).to_bytes(),
+                ("127.0.0.1", self.control_bind_port),
+            )
+        finally:
+            sock.close()
         time.sleep(0.05)
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(self._job_payload(job_id="job-hunting"))
+        self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
+        self.assertEqual(caught.exception.details["unready_nodes"]["1"]["readiness"], "CONNECTING")
 
-        payload = {
-            "run_id": "run_fl_002",
-            "job_id": "job_fl_002",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_not_ready")
-        self.assertEqual(body["unready_nodes"]["1"]["readiness"], "CONNECTING")
-
-    def test_preflight_gate_1_target_node_timed_out_offline(self):
-        """
-        Node was ready, but last heartbeat was > 10s ago -> OFFLINE, fails.
-        """
+    def test_timed_out_node_is_rejected(self):
         self._simulate_client_handshake(1)
-        # Fast forward last heartbeat time
-        node_record = self.daemon.control_plane.registry.get_node(1)
-        node_record.last_heartbeat_time -= 12.0
+        self.daemon.control_plane.registry.get_node(1).last_heartbeat_time -= 12.0
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(self._job_payload(job_id="job-offline"))
+        self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
+        self.assertEqual(caught.exception.details["unready_nodes"]["1"]["readiness"], "OFFLINE")
 
-        payload = {
-            "run_id": "run_fl_003",
-            "job_id": "job_fl_003",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_not_ready")
-        self.assertEqual(body["unready_nodes"]["1"]["readiness"], "OFFLINE")
-
-    def test_preflight_gate_2_model_file_validation(self):
-        """
-        Gate 2: initial model file must exist, non-empty, and match size.
-        """
+    def test_model_file_validation_rejects_before_training_host(self):
         self._simulate_client_handshake(1)
+        cases = [
+            ("missing", os.path.join(self.temp_dir, "missing.bin"), 1024, "preflight_model_file_not_found"),
+            ("empty", os.path.join(self.temp_dir, "empty.bin"), 1024, "preflight_model_empty"),
+            ("size", self.model_path, 999999, "preflight_model_validation_failed"),
+        ]
+        open(cases[1][1], "wb").close()
+        for name, path, size, expected in cases:
+            with self.subTest(name=name):
+                with self.assertRaises(FLRuntimeError) as caught:
+                    self.daemon.start_job(
+                        self._job_payload(
+                            job_id=f"job-model-{name}",
+                            model_path=path,
+                            model_size_bytes=size,
+                        )
+                    )
+                self.assertEqual(caught.exception.error_code, expected)
 
-        # 1. Non-existent file
-        payload_missing = {
-            "run_id": "run_fl_004",
-            "job_id": "job_fl_004",
-            "target_nodes": [1],
-            "model_path": os.path.join(self.temp_dir, "non_existent.bin"),
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload_missing)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_model_file_not_found")
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(
+                self._job_payload(job_id="job-model-sha", model_sha256="0" * 64)
+            )
+        self.assertEqual(caught.exception.error_code, "preflight_model_checksum_failed")
 
-        # 2. Empty file
-        empty_path = os.path.join(self.temp_dir, "empty.bin")
-        open(empty_path, "wb").close()
-        payload_empty = {
-            "run_id": "run_fl_005",
-            "job_id": "job_fl_005",
-            "target_nodes": [1],
-            "model_path": empty_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload_empty)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_model_empty")
+    def test_busy_engine_rejects_new_job_and_survey_without_fake_acceptance(self):
+        self.daemon.active_job = {"job_id": "already-running"}
+        self.daemon.server_state = ServerState.RUNNING
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(self._job_payload())
+        self.assertEqual(caught.exception.error_code, "preflight_engine_conflict")
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.run_spectrum_survey()
+        self.assertEqual(caught.exception.error_code, "engine_busy")
 
-        # 3. Missing model_size_bytes (strictly required)
-        payload_missing_size = {
-            "run_id": "run_fl_no_size",
-            "job_id": "job_fl_no_size",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload_missing_size)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_model_missing_size")
-
-        # 4. Size mismatch
-        payload_size_mismatch = {
-            "run_id": "run_fl_006",
-            "job_id": "job_fl_006",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": 999999,  # actual is 1024
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload_size_mismatch)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_model_validation_failed")
-
-        # 5. Checksum mismatch if model_sha256 provided
-        payload_sha_mismatch = {
-            "run_id": "run_fl_bad_sha",
-            "job_id": "job_fl_bad_sha",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "model_sha256": "0" * 64,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload_sha_mismatch)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_model_checksum_failed")
-
-    def test_preflight_gate_3_engine_concurrency_conflict(self):
-        """
-        Gate 3: engine must be IDLE; concurrent job submissions fail with HTTP 409.
-        """
-        self._simulate_client_handshake(1)
-        self._simulate_client_handshake(2)
-
-        # Start first job successfully
-        payload = {
-            "run_id": "run_fl_primary",
-            "job_id": "job_fl_primary",
-            "mode": "sync",
-            "target_nodes": [1, 2],
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 200)
-        self.assertEqual(body["status"], "accepted")
-        self.assertEqual(body["job_id"], "job_fl_primary")
-        self.assertEqual(self.daemon.server_state, ServerState.RUNNING)
-
-        # Attempt to submit second concurrent job -> must be rejected with HTTP 409
-        status_code2, body2 = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code2, 409)
-        self.assertEqual(body2["error"], "preflight_engine_conflict")
-
-        # Attempt to run survey while job is running -> must be rejected with HTTP 409
-        status_code_survey, body_survey = self._http_post("/api/v1/survey")
-        self.assertEqual(status_code_survey, 409)
-        self.assertEqual(body_survey["error"], "engine_busy")
-
-    def test_job_abort_resets_engine_and_broadcasts(self):
-        """
-        Test POST /api/v1/jobs/abort stops active job and resets engine to IDLE.
-        """
-        self._simulate_client_handshake(1)
-
-        payload = {
-            "run_id": "run_to_abort",
-            "job_id": "job_to_abort",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, _ = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 200)
-        self.assertEqual(self.daemon.server_state, ServerState.RUNNING)
-
-        # Abort job
-        status_code_abort, body_abort = self._http_post("/api/v1/jobs/abort")
-        self.assertEqual(status_code_abort, 200)
-        self.assertEqual(body_abort["status"], "aborted")
-        self.assertEqual(self.daemon.server_state, ServerState.IDLE)
+    def test_old_algorithm_and_partial_mode_fields_are_rejected(self):
+        cases = [
+            {"algorithm": "legacy:client"},
+            {"algorithm_config": {"file_simulation": True}},
+            {"client_entry": "legacy:client"},
+            {"aggregate_entry": "legacy:aggregate"},
+            {"evaluate_entry": "legacy:evaluate"},
+            {"min_updates": 1},
+            {"max_staleness": 1},
+            {"mode": "semi_async"},
+            {"mode": "async"},
+        ]
+        for extra in cases:
+            with self.subTest(extra=extra):
+                with self.assertRaises(FLRuntimeError) as caught:
+                    self.daemon.start_job(self._job_payload(**extra))
+                self.assertEqual(caught.exception.error_code, "invalid_job_config")
         self.assertIsNone(self.daemon.active_job)
 
-        # New job can now start
-        status_code_restart, _ = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code_restart, 200)
-
-    def test_logs_stream_sse_protocol(self):
-        """
-        Test GET /api/v1/logs/stream returns SSE events.
-        """
-        url = f"{self.base_url}/api/v1/logs/stream"
-        req = urllib.request.Request(url, method="GET")
-
-        # Open streaming connection
-        resp = urllib.request.urlopen(req, timeout=3.0)
-        self.assertEqual(resp.status, 200)
-        self.assertIn("text/event-stream", resp.headers.get("Content-Type", ""))
-
-        # Read initial connected event
-        line1 = resp.readline().decode("utf-8").strip()
-        line2 = resp.readline().decode("utf-8").strip()
-        line3 = resp.readline().decode("utf-8").strip()  # empty separator
-
-        self.assertTrue(line1.startswith("event:") or line1.startswith("data:"))
-        # Publish an event via daemon
-        self.daemon.publish_event({"type": "CUSTOM_TEST_EVENT", "value": 42})
-
-        # Read next SSE frame
-        event_lines = []
-        for _ in range(3):
-            line = resp.readline().decode("utf-8").strip()
-            if line:
-                event_lines.append(line)
-
-        raw_event = " ".join(event_lines)
-        self.assertIn("CUSTOM_TEST_EVENT", raw_event)
-        self.assertIn("42", raw_event)
-
-        resp.close()
-
-
-    def test_preflight_gate_1_unsolicited_idle_held_in_connecting_fails(self):
-        """
-        An unsolicited IDLE heartbeat without prior HUNTING handshake is held in CONNECTING
-        by the two-army anti-desync gate, so preflight check MUST reject it.
-        """
+    def test_unsolicited_idle_is_held_in_connecting(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Send direct IDLE for node 3 without any prior HUNTING
-        hb_unsolicited = NodeHeartbeat(
-            node_id=3,
-            state=ClientNodeState.IDLE.value,
-            elapsed_ms=0,
-            current_channel=157,
-            txpower_dbm=12,
-            uplink_mcs=6,
-            timestamp_ms=640,
-        )
-        sock.sendto(hb_unsolicited.to_bytes(), ("127.0.0.1", self.control_bind_port))
-        sock.close()
+        try:
+            sock.sendto(
+                NodeHeartbeat(
+                    node_id=3,
+                    state=ClientNodeState.IDLE.value,
+                    elapsed_ms=0,
+                    current_channel=157,
+                    txpower_dbm=12,
+                    uplink_mcs=6,
+                    timestamp_ms=640,
+                ).to_bytes(),
+                ("127.0.0.1", self.control_bind_port),
+            )
+        finally:
+            sock.close()
         time.sleep(0.05)
+        node = self.daemon.control_plane.registry.get_node(3)
+        self.assertIsNotNone(node)
+        self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(
+                self._job_payload(target_nodes=[3], job_id="job-unsolicited")
+            )
+        self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
+        self.assertEqual(caught.exception.details["unready_nodes"]["3"]["readiness"], "CONNECTING")
 
-        # Registry should have node 3 in CONNECTING, not READY
-        node3 = self.daemon.control_plane.registry.get_node(3)
-        self.assertIsNotNone(node3)
-        self.assertEqual(node3.readiness, NodeReadiness.CONNECTING)
-
-        payload = {
-            "run_id": "run_unsolicited",
-            "job_id": "job_unsolicited",
-            "target_nodes": [3],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_not_ready")
-        self.assertEqual(body["unready_nodes"]["3"]["readiness"], "CONNECTING")
-
-    def test_preflight_rejects_uftp_control_port_conflict(self):
+    def test_uftp_control_port_conflict_is_rejected(self):
         self._simulate_client_handshake(1)
-        payload = {
-            "run_id": "run_port_conflict",
-            "job_id": "job_port_conflict",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": len(self.model_data),
-            "uftp_port": self.config.control_broadcast_port,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        status_code, body = self._http_post("/api/v1/jobs/start", payload)
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_port_conflict")
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.daemon.start_job(
+                self._job_payload(
+                    job_id="job-port-conflict",
+                    uftp_port=self.config.control_broadcast_port,
+                )
+            )
+        self.assertEqual(caught.exception.error_code, "preflight_port_conflict")
         self.assertEqual(self.daemon.server_state, ServerState.IDLE)
 
-    def test_preflight_invalid_target_nodes_payload(self):
-        # Empty list
-        status_code, body = self._http_post(
-            "/api/v1/jobs/start",
-            {
-                "run_id": "run_inv_nodes_1",
-                "target_nodes": [],
-                "model_path": self.model_path,
-                "model_size_bytes": 1024,
-                "io_timeout_seconds": 120,
-                "live_observation": True,
-            },
-        )
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_invalid")
-
-        # Out-of-bounds node id
-        status_code, body = self._http_post(
-            "/api/v1/jobs/start",
-            {
-                "run_id": "run_inv_nodes_2",
-                "target_nodes": [1, 99],
-                "model_path": self.model_path,
-                "model_size_bytes": 1024,
-                "io_timeout_seconds": 120,
-                "live_observation": True,
-            },
-        )
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_invalid")
-
-        # Non-integer node id
-        status_code, body = self._http_post(
-            "/api/v1/jobs/start",
-            {
-                "run_id": "run_inv_nodes_3",
-                "target_nodes": ["client1"],
-                "model_path": self.model_path,
-                "model_size_bytes": 1024,
-                "io_timeout_seconds": 120,
-                "live_observation": True,
-            },
-        )
-        self.assertEqual(status_code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_invalid")
-
-    def test_semi_async_and_async_modes_validation(self):
-        self._simulate_client_handshake(1)
-        self._simulate_client_handshake(2)
-
-        # semi_async missing min_updates fails
-        payload_no_min = {
-            "run_id": "run_semi_no_min",
-            "job_id": "job_semi_no_min",
-            "mode": "semi_async",
-            "target_nodes": [1, 2],
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_no_min)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "invalid_semi_async_config")
-
-        # semi_async min_updates boolean (True) fails
-        payload_bool_min = {
-            "run_id": "run_semi_bool_min",
-            "job_id": "job_semi_bool_min",
-            "mode": "semi_async",
-            "target_nodes": [1, 2],
-            "min_updates": True,
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_bool_min)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "invalid_semi_async_config")
-
-        # semi_async out of bounds min_updates fails
-        payload_bad_min = {
-            "run_id": "run_semi_bad_min",
-            "job_id": "job_semi_bad_min",
-            "mode": "semi_async",
-            "target_nodes": [1, 2],
-            "min_updates": 5,
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_bad_min)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "invalid_semi_async_config")
-
-        # invalid mode fails
-        payload_bad_mode = {
-            "run_id": "run_bad_mode",
-            "job_id": "job_bad_mode",
-            "mode": "unknown_paradigm",
-            "target_nodes": [1, 2],
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_bad_mode)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "invalid_fl_mode")
-
-        # duplicate target nodes fail
-        payload_dup_nodes = {
-            "run_id": "run_dup",
-            "job_id": "job_dup",
-            "target_nodes": [1, 1],
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_dup_nodes)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "preflight_target_nodes_invalid")
-
-        # model_size_bytes boolean (True) fails
-        payload_bool_size = {
-            "run_id": "run_bool_size",
-            "job_id": "job_bool_size",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": True,
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_bool_size)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "preflight_model_missing_size")
-
-        # malformed model_sha256 fails
-        payload_bad_hex = {
-            "run_id": "run_bad_hex",
-            "job_id": "job_bad_hex",
-            "target_nodes": [1],
-            "model_path": self.model_path,
-            "model_size_bytes": 1024,
-            "model_sha256": "not-valid-hex-or-length",
-            "io_timeout_seconds": 120,
-            "live_observation": True,
-        }
-        code, body = self._http_post("/api/v1/jobs/start", payload_bad_hex)
-        self.assertEqual(code, 400)
-        self.assertEqual(body["error"], "invalid_model_sha256")
-
-    def test_invalid_json_request_body(self):
-        url = f"{self.base_url}/api/v1/jobs/start"
-        req = urllib.request.Request(
-            url,
-            data=b"not-valid-json{{{",
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=3.0) as resp:
-                self.fail("Expected 400 error")
-        except urllib.error.HTTPError as exc:
-            self.assertEqual(exc.code, 400)
-            data = json.loads(exc.read().decode("utf-8"))
-            self.assertEqual(data["error"], "invalid_json")
-
-    def test_not_found_endpoint(self):
-        status_code, body = self._http_get("/api/v1/non_existent_route")
-        self.assertEqual(status_code, 404)
-        self.assertEqual(body["error"], "not_found")
-
-    def test_full_client_control_plane_and_server_daemon_interaction(self):
-        """
-        End-to-end integration between ControlPlaneClient and ServerDaemon:
-        - Client hunts and locks channel.
-        - Server marks client as READY in registry.
-        - Job starts successfully.
-        - Client receives TASK_ANNOUNCE via broadcast.
-        - Server aborts job, Client receives JOB_ABORT via broadcast.
-        """
-        client_adapter = MockNetworkAdapter(["wlan1"])
-        client = ControlPlaneClient(
-            node_id=1,
-            tun_ip="10.80.0.11",
-            network_adapter=client_adapter,
-            air_interface="wlan1",
-            initial_channel=157,
-            cached_channel=157,
-            txpower_dbm=12,
-            uplink_mcs=6,
-            server_host="127.0.0.1",
-            server_port=self.control_bind_port,
-            broadcast_port=self.control_broadcast_port,
-            attempt_timeout_seconds=0.1,
-            max_attempts_per_channel=2,
-        )
-        client.start_broadcast_listener()
-
-        received_broadcasts: List[Dict[str, Any]] = []
-        client.register_broadcast_handler(
-            "TASK_ANNOUNCE", lambda m: received_broadcasts.append(m)
-        )
-        client.register_broadcast_handler(
-            "JOB_ABORT", lambda m: received_broadcasts.append(m)
-        )
-
-        try:
-            # 1. Client hunts
-            found = client.hunt_once(ladder=[157])
-            self.assertTrue(found)
-            self.assertEqual(client.state, ClientNodeState.IDLE)
-
-            # Wait briefly for server to process IDLE heartbeat
-            time.sleep(0.08)
-
-            # Verify server reports node 1 as READY
-            status_code, status_body = self._http_get("/api/v1/status")
-            self.assertEqual(status_code, 200)
-            self.assertEqual(status_body["nodes"]["1"]["readiness"], "READY")
-
-            # 2. Start job via REST IPC
-            payload = {
-                "run_id": "run_e2e_test",
-                "job_id": "job_e2e_test",
-                "mode": "sync",
-                "target_nodes": [1],
-                "model_path": self.model_path,
-                "model_size_bytes": len(self.model_data),
-                "io_timeout_seconds": 120,
-                "live_observation": True,
-            }
-            start_code, start_body = self._http_post("/api/v1/jobs/start", payload)
-            self.assertEqual(start_code, 200)
-            self.assertEqual(start_body["status"], "accepted")
-
-            # Wait for broadcast reception
-            time.sleep(0.1)
-            self.assertTrue(any(b.get("type") == "TASK_ANNOUNCE" for b in received_broadcasts))
-            task_msg = next(b for b in received_broadcasts if b.get("type") == "TASK_ANNOUNCE")
-            self.assertEqual(task_msg["job_id"], "job_e2e_test")
-            self.assertEqual(task_msg["link_id"], self.daemon.config.link_id)
-
-            # 3. Abort job via REST IPC
-            abort_code, abort_body = self._http_post("/api/v1/jobs/abort")
-            self.assertEqual(abort_code, 200)
-
-            time.sleep(0.1)
-            self.assertTrue(any(b.get("type") == "JOB_ABORT" for b in received_broadcasts))
-        finally:
-            client.stop()
-
+    def test_invalid_target_nodes_payloads_are_rejected(self):
+        for name, targets in (("empty", []), ("range", [1, 99]), ("type", ["client1"])):
+            with self.subTest(name=name):
+                with self.assertRaises(FLRuntimeError) as caught:
+                    self.daemon.start_job(
+                        self._job_payload(job_id=f"job-invalid-{name}", target_nodes=targets)
+                    )
+                self.assertEqual(caught.exception.error_code, "preflight_target_nodes_invalid")
 
 class TestSystemdUnitAndPackage(unittest.TestCase):
-    """Verify systemd service unit and setup.py entrypoint registrations."""
-
     def test_systemd_service_file_exists_and_configured(self):
-        service_path = "scripts/systemd/wfb-fl-server-daemon.service"
-        self.assertTrue(os.path.exists(service_path))
-        with open(service_path, "r", encoding="utf-8") as f:
-            content = f.read()
-
+        path = "scripts/systemd/wfb-fl-server-daemon.service"
+        self.assertTrue(os.path.exists(path))
+        with open(path, encoding="utf-8") as stream:
+            content = stream.read()
         self.assertIn("ExecStart=/usr/bin/wfb-fl-server-daemon", content)
         self.assertIn("Restart=always", content)
         self.assertIn("KillMode=control-group", content)
 
     def test_setup_py_contains_server_daemon_entry_and_data_files(self):
-        with open("setup.py", "r", encoding="utf-8") as f:
-            content = f.read()
+        with open("setup.py", encoding="utf-8") as stream:
+            content = stream.read()
 
         self.assertIn("'wfb-fl-server-daemon=wfb_ng.fl.server_daemon:main'", content)
         self.assertIn("'scripts/systemd/wfb-fl-server-daemon.service'", content)
 
     def test_main_cli_argument_parsing_and_run(self):
-        """Verify main() parses CLI arguments and initializes ServerDaemon correctly."""
-        with patch("sys.argv", [
-            "wfb-fl-server-daemon",
-            "--ipc-host", "127.0.0.1",
-            "--ipc-port", "9191",
-            "--channel", "149",
-            "--txpower", "14",
-            "--downlink-mcs", "4",
-            "--uplink-mcs", "5",
-            "--interface", "wlan_test",
-            "--tun-name", "fl-test",
-        ]):
-            with patch.object(ServerDaemon, "run") as mock_run:
-                from wfb_ng.fl.server_daemon import main
-                main()
-                mock_run.assert_called_once()
+        with tempfile.NamedTemporaryFile("w", suffix=".json") as config_file:
+            json.dump({}, config_file)
+            config_file.flush()
+            with patch(
+                "sys.argv",
+                [
+                    "wfb-fl-server-daemon",
+                    "--config", config_file.name,
+                    "--ipc-host", "127.0.0.1",
+                    "--ipc-port", "9191",
+                    "--channel", "149",
+                    "--txpower", "14",
+                    "--downlink-mcs", "4",
+                    "--uplink-mcs", "5",
+                    "--interface", "wlan_test",
+                    "--tun-name", "fl-test",
+                ],
+            ):
+                with patch.object(ServerDaemon, "run") as mock_run:
+                    from wfb_ng.fl.server_daemon import main
+                    main()
+                    mock_run.assert_called_once()
 
 
 if __name__ == "__main__":

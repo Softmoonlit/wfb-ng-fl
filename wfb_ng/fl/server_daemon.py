@@ -37,21 +37,22 @@ import sys
 import threading
 import time
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from urllib.parse import parse_qs, urlparse
 
-from .artifacts import write_json_atomic
+from .artifacts import archive_file, write_json_atomic
+from .algorithm import (AlgorithmContext, freeze_algorithm_config, load_algorithm,
+                        validate_algorithm_config, validate_evaluation_result)
 from .client_daemon import (
     LinuxNetworkAdapter,
     NetworkAdapter,
 )
 from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio
 from .coordinator import FLCoordinator, JobConfig, VALID_FL_MODES
-from .issue41_algorithm import copy_model
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
     DEFAULT_UFTP_MULTICAST_HOST,
@@ -108,7 +109,7 @@ DEFAULT_LINK_ID = 7669206
 DEFAULT_DOWNLINK_MCS = 3
 DEFAULT_UPLINK_MCS = 6
 ALL_KNOWN_CLIENT_IDS = tuple(range(1, 11))
-VALID_FL_MODES = ("sync", "semi_async", "async")
+VALID_FL_MODES = ("sync",)
 
 
 class ServerState(str, Enum):
@@ -167,8 +168,20 @@ class ServerDaemonConfig:
     enable_link_process: bool = True
     enable_control_plane: bool = True
     preparation_timeout_seconds: float = 30.0
+    mnist_data_dir: Optional[str] = None
+    client_entry: str = 'wfb_ng.fl.mnist:client_entry'
+    aggregate_entry: str = 'wfb_ng.fl.mnist:aggregate_entry'
+    evaluate_entry: str = 'wfb_ng.fl.mnist:evaluate_entry'
+    algorithm_config: Dict[str, Any] = field(default_factory=lambda: {'data_seed': 2026})
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, 'algorithm_config', validate_algorithm_config(self.algorithm_config))
+        for entry in (self.client_entry, self.aggregate_entry, self.evaluate_entry):
+            if not isinstance(entry, str) or entry.count(':') != 1 or not all(entry.split(':')):
+                raise FLRuntimeError('invalid_configuration', '部署算法入口格式须为 module:callable')
+        if self.mnist_data_dir is not None and (not isinstance(self.mnist_data_dir, str)
+                                                or not os.path.isabs(self.mnist_data_dir)):
+            raise FLRuntimeError('invalid_configuration', 'mnist_data_dir须为本机绝对目录')
         # Validate radio parameters fail-closed per ADR-0014
         try:
             radio = validate_radio_config({
@@ -274,6 +287,11 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         enable_link_process=bool(data.get("enable_link_process", True)),
         enable_control_plane=bool(data.get("enable_control_plane", True)),
         preparation_timeout_seconds=data.get("preparation_timeout_seconds", 30.0),
+        mnist_data_dir=data.get('mnist_data_dir'),
+        client_entry=data.get('client_entry', 'wfb_ng.fl.mnist:client_entry'),
+        aggregate_entry=data.get('aggregate_entry', 'wfb_ng.fl.mnist:aggregate_entry'),
+        evaluate_entry=data.get('evaluate_entry', 'wfb_ng.fl.mnist:evaluate_entry'),
+        algorithm_config=data.get('algorithm_config', {'data_seed': 2026}),
     )
 
 
@@ -699,6 +717,9 @@ class ServerDaemon:
             on_radio_applied=self._apply_radio_runtime,
         )
 
+        self.control_plane.register_task_error_handler(self._on_task_report_error)
+        self._job_error_thread: Optional[threading.Thread] = None
+
         # HTTP REST IPC Server
         self._httpd: Optional[ThreadingHTTPServer] = None
         self._http_thread: Optional[threading.Thread] = None
@@ -714,7 +735,7 @@ class ServerDaemon:
         )
 
     def _start_console_job(self, request: Dict[str, Any], idempotency_key: str) -> Dict[str, Any]:
-        """Translate the narrow Web file-job contract into the daemon job contract."""
+        """将Web窄接口映射到已部署的真实算法，不接受浏览器算法路径。"""
         with self._lock:
             payload = dict(request)
             payload.update({
@@ -723,8 +744,6 @@ class ServerDaemon:
                 'mode': 'sync',
                 'io_timeout_seconds': 120,
                 'live_observation': False,
-                'algorithm': 'wfb_ng.fl.issue41_algorithm:client_main',
-                'algorithm_config': {'file_simulation': True},
             })
         result = self.start_job(payload)
         result['idempotency_key'] = idempotency_key
@@ -795,10 +814,17 @@ class ServerDaemon:
                 elif event_type == 'WAIT_FOR_UPDATES_START':
                     self.active_job['server_phase'] = 'waiting_updates'
                     self.active_job['phase_started_at'] = time.time()
+                elif event_type == 'EVALUATION_COMPLETED':
+                    if event.get('round_index') == self.active_job['rounds']:
+                        self.active_job['effect_result'] = {
+                            key: deepcopy(event.get(key)) for key in ('round_index', 'metrics', 'verdict', 'reason')}
                 elif event_type == 'ROUND_COMPLETED':
                     self.active_job['rounds_completed'] = event.get('round_index', 0)
+                    self.active_job.setdefault('round_results', []).append(deepcopy(event.get('summary', {})))
                     self.active_job['server_phase'] = 'preparing'
                     self.active_job['phase_started_at'] = time.time()
+                elif event_type in ('JOB_COMPLETED', 'JOB_FAILED') and isinstance(event.get('summary'), dict):
+                    self.active_job['summary'] = deepcopy(event['summary'])
             self.console.record_event(event)
             self._best_effort_console_refresh()
         self.event_bus.publish(event)
@@ -1070,11 +1096,32 @@ class ServerDaemon:
                 if self.server_state == ServerState.SURVEYING:
                     self.server_state = ServerState.IDLE
 
+    def _on_task_report_error(self, report: Dict[str, Any]) -> None:
+        """接收线程只记录事实并调度收尾，不能在发送报告ACK前等待计算退出。"""
+        with self._lock:
+            job_id = report['job_id']
+            if self.active_job is None or self.active_job['job_id'] != job_id:
+                return
+            if self._job_error_thread is not None and self._job_error_thread.is_alive():
+                return
+            self.active_job['client_error'] = deepcopy(report)
+            exc = FLRuntimeError(report['error_code'], report['reason'], details=deepcopy(report))
+            self._job_error_thread = threading.Thread(
+                target=self._on_job_failed, args=(job_id, exc),
+                name=f'fl-client-error-{job_id}', daemon=True)
+            self._job_error_thread.start()
+
     def start_job(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Execute 3 deterministic preflight checks and transition to active job execution.
-        """
+        """冻结已部署算法，先完成初始评估与全员准备，再启动真实轮次。"""
+        if any(key in payload for key in ('algorithm', 'algorithm_config', 'client_entry',
+                                          'aggregate_entry', 'evaluate_entry')):
+            raise FLRuntimeError('invalid_job_config', '算法入口和参数只从服务器部署配置选择')
         job = JobConfig.from_dict(payload)
+        algorithm_config = validate_algorithm_config(self.config.algorithm_config)
+        algorithm_context: Optional[AlgorithmContext] = None
+        aggregate_fn: Optional[Callable[..., Any]] = None
+        evaluate_fn: Optional[Callable[..., Any]] = None
+        initial_result: Dict[str, Any] = {}
         preparation_started_at = time.monotonic()
 
         with self._lock:
@@ -1117,6 +1164,7 @@ class ServerDaemon:
             self._preparation = model_preparation
 
             def prepare_model() -> Tuple[Any, Optional[Any]]:
+                nonlocal aggregate_fn, evaluate_fn, algorithm_context, initial_result, job
                 if model_preparation.cancelled:
                     raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
                 if not os.path.isfile(job.model_path):
@@ -1141,6 +1189,39 @@ class ServerDaemon:
                         "preflight_model_checksum_failed",
                         f"模型 SHA-256 校验不一致: 期望 {job.model_sha256}，实际 {digest}",
                     )
+                frozen_model = os.path.join(self.config.work_dir, f'job_{job.job_id}', 'artifacts', 'initial.pt')
+                if model_preparation.cancelled:
+                    raise FLRuntimeError('job_preparation_cancelled', '作业准备被停止')
+                frozen_size, frozen_digest = archive_file(job.model_path, frozen_model, actual_size)
+                if frozen_size != actual_size or frozen_digest != digest:
+                    raise FLRuntimeError('preflight_model_checksum_failed', '初始模型冻结期间内容发生变化')
+                job = replace(job, model_path=frozen_model, model_sha256=digest)
+                if model_preparation.cancelled:
+                    raise FLRuntimeError('job_preparation_cancelled', '作业准备被停止')
+                load_algorithm(self.config.client_entry, arity=3)
+                aggregate_fn = load_algorithm(self.config.aggregate_entry, arity=5)
+                evaluate_fn = load_algorithm(self.config.evaluate_entry, arity=3)
+                algorithm_context = AlgorithmContext(
+                    job_id=job.job_id, node_id=255, target_nodes=tuple(job.target_nodes),
+                    rounds=job.rounds,
+                    artifact_dir=os.path.join(self.config.work_dir, f'job_{job.job_id}', 'artifacts'),
+                    local_config={'mnist_data_dir': self.config.mnist_data_dir},
+                    stop_event=model_preparation.cancellation_event,
+                    phase='preparing', round_index=0)
+                initial_result = validate_evaluation_result(
+                    evaluate_fn(job.model_path, freeze_algorithm_config(algorithm_config), algorithm_context))
+                if (not initial_result['preparation'] or initial_result['verdict'] is not None
+                        or initial_result['reason'] is not None):
+                    raise FLRuntimeError('invalid_initial_metrics', '初始评估须返回非空准备事实且不判定最终效果')
+                if self.config.evaluate_entry == 'wfb_ng.fl.mnist:evaluate_entry':
+                    from .mnist import validate_preparation_report
+                    validate_preparation_report(initial_result['preparation'], expected_samples=10000,
+                                                require_gpu=False, expected_seed=algorithm_config.get('data_seed'))
+                algorithm_context.check_stop()
+                os.makedirs(algorithm_context.artifact_dir, exist_ok=True)
+                write_json_atomic(Path(algorithm_context.artifact_dir) / 'initial_evaluation.json', initial_result)
+                if calculate_file_sha256(job.model_path, model_preparation.cancellation_event) != digest:
+                    raise FLRuntimeError('preflight_model_checksum_failed', '初始评估期间模型被修改')
                 return actual_size, digest
 
             model_preparation.start(prepare_model)
@@ -1179,6 +1260,14 @@ class ServerDaemon:
             job_dict["started_at"] = time.time()
             job_dict["preparation_timeout_seconds"] = preparation_timeout_seconds
 
+            assert algorithm_context is not None and aggregate_fn is not None and evaluate_fn is not None
+            job_dict['algorithm'] = {'client_entry': self.config.client_entry,
+                                     'aggregate_entry': self.config.aggregate_entry,
+                                     'evaluate_entry': self.config.evaluate_entry,
+                                     'config': deepcopy(algorithm_config)}
+            job_dict['initial_metrics'] = deepcopy(initial_result['metrics'])
+            job_dict['server_preparation'] = deepcopy(initial_result['preparation'])
+
             # Instantiate runtime and coordinator
             runtime = None
             server_role = None
@@ -1191,18 +1280,17 @@ class ServerDaemon:
                     raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
                 if self.runtime_factory is not None:
                     prepared_runtime = self.runtime_factory(job, payload)
-                    if prepared_runtime is not None:
-                        preparation.register_resource(prepared_runtime)
+                    if prepared_runtime is None:
+                        raise FLRuntimeError('runtime_unavailable', 'Runtime工厂没有返回可用任务上下文')
+                    preparation.register_resource(prepared_runtime)
                     if preparation.cancelled:
                         raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
-                    if payload.get('algorithm_config', {}).get('file_simulation') is True and prepared_runtime is not None:
-                        prepared_runtime.require_update_model_match = True
                     if preparation.cancelled:
                         preparation.close_registered_resource(prepared_runtime)
                         raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
                     return prepared_runtime, None
                 if not self.config.enable_link_process:
-                    return None, None
+                    raise FLRuntimeError('runtime_unavailable', '未启用任务Runtime且未提供宿主Runtime工厂')
 
                 from .role import ServerRole
                 role_work_dir = os.path.join(self.config.work_dir, f"job_{job.job_id}_role")
@@ -1229,8 +1317,6 @@ class ServerDaemon:
                     raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
                 prepared_role.start()
                 prepared_runtime = prepared_role.runtime
-                if payload.get('algorithm_config', {}).get('file_simulation') is True and prepared_runtime is not None:
-                    prepared_runtime.require_update_model_match = True
                 if preparation.cancelled:
                     preparation.close_registered_resource(prepared_role)
                     raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
@@ -1308,7 +1394,6 @@ class ServerDaemon:
                 "mode": job.mode,
                 "rounds": job.rounds,
                 "target_nodes": list(job.target_nodes),
-                "min_updates": job.min_updates,
                 "model_size_bytes": actual_file_size,
                 "model_sha256": computed_sha256,
                 "preparation_timeout_seconds": preparation_timeout_seconds,
@@ -1344,8 +1429,6 @@ class ServerDaemon:
                     "mode": job.mode,
                     "rounds": job.rounds,
                     "target_nodes": list(job.target_nodes),
-                    "min_updates": job.min_updates,
-                    "max_staleness": job.max_staleness,
                     "round_timeout_seconds": job.round_timeout_seconds,
                     "io_timeout_seconds": job.io_timeout_seconds,
                     "live_observation": job.live_observation,
@@ -1356,31 +1439,57 @@ class ServerDaemon:
                     "server_http_port": int(payload.get("server_http_port", 8080)),
                     "uftp_port": uftp_port,
                     "link_id": self.config.link_id,
-                    "algorithm": payload.get("algorithm", "wfb_ng.fl.issue41_algorithm:client_main"),
-                    "algorithm_config": payload.get("algorithm_config", {}),
+                    "algorithm": self.config.client_entry,
+                    "algorithm_config": deepcopy(algorithm_config),
+
                     "timestamp_ms": int(time.time() * 1000),
                 }
-                self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes)
-                self.control_plane.broadcast_downlink(announce_msg)
+                preparation_reference: Dict[str, Any] = {}
 
-                if self.config.enable_link_process:
-                    remaining_preparation_timeout = max(
-                        0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
-                    self._lock.release()
-                    try:
-                        task_ready = self.control_plane.wait_for_task_readiness(
-                            remaining_preparation_timeout)
-                    finally:
-                        self._lock.acquire()
-                    if self.active_job is None or self.active_job.get("job_id") != job.job_id:
-                        self.control_plane.clear_task_readiness(job.job_id)
-                        return accepted
-                    if not task_ready:
-                        return finalize_accepted_failure(
-                            "client_startup_timeout",
-                            "目标客户端未在配置的准备期限内完成 RoleService 就绪",
-                        )
-                self.control_plane.clear_task_readiness(job.job_id)
+                def validate_task_report(message: Dict[str, Any], source: Tuple[str, int]) -> None:
+                    if self.config.client_entry == 'wfb_ng.fl.mnist:client_entry':
+                        from .mnist import validate_preparation_report
+                        report = message['report']
+                        validate_preparation_report(report, expected_samples=60000, require_gpu=True,
+                                                    expected_seed=algorithm_config.get('data_seed'))
+                        comparable = {key: report[key] for key in
+                                      ('model_format', 'sample_count', 'data_sha256', 'data_seed')}
+                        if preparation_reference and comparable != preparation_reference:
+                            raise FLRuntimeError('client_preparation_mismatch', '客户端训练数据或算法准备事实不一致')
+                        preparation_reference.update(deepcopy(comparable))
+
+                self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes, validate_task_report)
+                self.control_plane.broadcast_downlink(announce_msg)
+                remaining_preparation_timeout = max(
+                    0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
+                self._lock.release()
+                try:
+                    task_ready = self.control_plane.wait_for_task_readiness(remaining_preparation_timeout)
+                finally:
+                    self._lock.acquire()
+                if self.active_job is None or self.active_job.get('job_id') != job.job_id:
+                    return accepted
+                if not task_ready:
+                    return finalize_accepted_failure(
+                        'client_startup_timeout', '目标客户端未在准备期限内提交有效训练准备报告')
+                reports = {node: entry['report'] for node, entry in
+                           self.control_plane.get_task_preparation_reports(job.job_id).items()}
+                self.active_job['client_preparation_reports'] = deepcopy(reports)
+                algorithm_context = replace(
+                    algorithm_context,
+                    local_config={**algorithm_context.local_config, 'client_preparation_reports': reports},
+                    initial_metrics=initial_result['metrics'])
+                round_deadline = 0.0
+
+                def prepare_round(index: int) -> None:
+                    nonlocal round_deadline
+                    round_deadline = time.monotonic() + job.round_timeout_seconds
+                    self.control_plane.prepare_round_completion(job.job_id, index)
+
+                def complete_round(index: int) -> None:
+                    remaining = max(0.0, round_deadline - time.monotonic())
+                    if not self.control_plane.wait_for_round_completion(job.job_id, index, remaining):
+                        raise FLRuntimeError('round_report_timeout', '未在本轮期限内收齐提交完成报告')
 
                 # Broadcast SSE event
                 self.publish_event({
@@ -1397,7 +1506,10 @@ class ServerDaemon:
                         on_event=self.publish_event,
                         on_completed=lambda summary: self._on_job_completed(job.job_id, summary),
                         on_failed=lambda exc: self._on_job_failed(job.job_id, exc),
-                        aggregation_fn=(copy_model if payload.get('algorithm_config', {}).get('file_simulation') is True else None),
+                        aggregate_fn=aggregate_fn, evaluate_fn=evaluate_fn,
+                        algorithm_config=algorithm_config, context=algorithm_context,
+                        initial_metrics=initial_result['metrics'],
+                        prepare_round=prepare_round, round_completion=complete_round,
                     )
                     self.coordinator.start()
 
@@ -1464,14 +1576,16 @@ class ServerDaemon:
             self.server_role = None
             self.control_plane.cancel_task_readiness()
         recovery_error = None
-        # 1. Stop coordinator if aborting from outside
-        if coord is not None and outcome == "aborted":
+        # 先等待计算退出，才能关闭仍可能被计算使用的任务资源。
+        if coord is not None and outcome in ('aborted', 'failed'):
             try:
                 coord.abort(reason=reason)
-                coord.wait(timeout=3.0)
+                coord.wait(timeout=None)
             except Exception as exc:
                 logger.warning("中止 coordinator 失败: %s", exc)
                 recovery_error = "COORDINATOR_STOP_FAILED"
+
+        self.control_plane.clear_task_readiness(target_job_id)
 
         # 2. Close server role
         if role_to_close is not None:
@@ -1823,7 +1937,7 @@ class ServerDaemon:
         if coord is not None:
             try:
                 coord.abort(reason="daemon_stopped")
-                coord.wait(timeout=2.0)
+                coord.wait(timeout=None)
             except Exception as exc:
                 logger.warning("停止 coordinator 失败: %s", exc)
 

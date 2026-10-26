@@ -4,6 +4,7 @@ and NodeHorizon registry for WFB-ng Stage 2 (ADR-0012, ADR-0014, Ticket 03).
 """
 
 from contextlib import contextmanager
+from copy import deepcopy
 import json
 import logging
 import os
@@ -57,6 +58,11 @@ COMMIT_DELAY_DEFAULT_SECONDS: float = 2.0
 COMMIT_TIMEOUT_DEFAULT_SECONDS: float = 10.0
 LEASE_TIMEOUT_DEFAULT_SECONDS: float = 15.0
 NEW_CHANNEL_PING_INTERVAL_SECONDS: float = 1.0
+
+# 任务报告传输限制。报告使用调用方总截止时间，不采用固定尝试次数，
+# 由重试间隔限制 UDP 重试频率。
+MAX_CONTROL_DATAGRAM_BYTES: int = 4096
+REPORT_RETRY_INTERVAL_SECONDS: float = 0.25
 
 
 class ClientNodeState(str, Enum):
@@ -711,11 +717,39 @@ class ControlPlaneServer:
         self._rollback_acks: Set[int] = set()
         self._barrier_event = threading.Event()
 
-        # Job-scoped client RoleService readiness synchronization
+        # 客户端角色服务作业就绪同步。任务报告与私有 systemd READY
+        # 通知相互独立。
         self._task_ready_job_id: Optional[str] = None
         self._task_ready_expected_nodes: Set[int] = set()
         self._task_ready_nodes: Set[int] = set()
+        self._task_ready_reports: Dict[int, Dict[str, Any]] = {}
+        self._task_ready_seen: Dict[int, Dict[str, Any]] = {}
+        self._task_ready_report_validator: Optional[Callable[
+            [Dict[str, Any], Tuple[str, int]], Any]] = None
+        self._task_ready_completed = False
+        self._task_ready_active = False
+        self._task_ready_cancelled = False
+        self._task_ready_error: Optional[Dict[str, Any]] = None
         self._task_ready_event = threading.Event()
+
+        # 轮次完成屏障。参与节点取自任务准备屏障，因此不需要新增 Runtime 接口。
+        self._round_job_id: Optional[str] = None
+        self._round_index: Optional[int] = None
+        self._round_expected_nodes: Set[int] = set()
+        self._round_reports: Dict[int, Dict[str, Any]] = {}
+        self._round_seen: Dict[int, Dict[str, Any]] = {}
+        self._round_error: Optional[Dict[str, Any]] = None
+        self._round_active = False
+        self._round_event = threading.Event()
+        self._task_error_handlers: List[Callable[[Dict[str, Any]], None]] = []
+
+        # 只保留最近结束任务的有限报告 receipt，不形成历史数据库。
+        self._recent_report_job_id: Optional[str] = None
+        self._recent_report_receipts: Dict[str, List[Dict[str, Any]]] = {
+            "preparation": [],
+            "round": [],
+            "error": [],
+        }
 
     def start(self) -> None:
         """Bind sockets and start receiving client heartbeats."""
@@ -785,46 +819,585 @@ class ControlPlaneServer:
         with self._lock:
             self.active_radio_config = config
 
-    def prepare_task_readiness(self, job_id: str, target_nodes: Sequence[int]) -> None:
+    def prepare_task_readiness(
+        self,
+        job_id: str,
+        target_nodes: Sequence[int],
+        report_validator: Optional[Callable[[Dict[str, Any], Tuple[str, int]], Any]] = None,
+    ) -> None:
+        """为已校验的客户端报告开启任务准备屏障。"""
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError('invalid_task_readiness', 'job_id 无效')
+        try:
+            expected_nodes = set(target_nodes)
+        except TypeError as exc:
+            raise FLRuntimeError('invalid_task_readiness', 'target_nodes 无效') from exc
+        if (not expected_nodes or
+                any(type(node_id) is not int or not 1 <= node_id <= 10
+                    for node_id in expected_nodes)):
+            raise FLRuntimeError('invalid_task_readiness', 'target_nodes 无效')
+        if report_validator is not None and not callable(report_validator):
+            raise FLRuntimeError('invalid_task_readiness', 'report_validator 不可调用')
+
         with self._lock:
+            # 新任务替换最近结束任务的 receipt，避免旧作业报告进入新屏障。
+            self._recent_report_job_id = None
+            self._recent_report_receipts = {
+                "preparation": [],
+                "round": [],
+                "error": [],
+            }
             self._task_ready_job_id = job_id
-            self._task_ready_expected_nodes = set(target_nodes)
+            self._task_ready_expected_nodes = expected_nodes
             self._task_ready_nodes.clear()
+            self._task_ready_reports.clear()
+            self._task_ready_seen.clear()
+            self._task_ready_report_validator = report_validator
+            self._task_ready_completed = False
+            self._task_ready_active = True
+            self._task_ready_cancelled = False
+            self._task_ready_error = None
             self._task_ready_event.clear()
+            self._round_job_id = None
+            self._round_index = None
+            self._round_expected_nodes.clear()
+            self._round_reports.clear()
+            self._round_seen.clear()
+            self._round_error = None
+            self._round_active = False
+            self._round_event.clear()
 
     def wait_for_task_readiness(self, timeout: float) -> bool:
-        return self._task_ready_event.wait(timeout)
+        """等待全部准备报告；收到客户端错误时抛出异常。"""
+        deadline = self._wait_deadline(timeout)
+        while True:
+            with self._lock:
+                if self._task_ready_error is not None:
+                    raise self._report_error(self._task_ready_error)
+                if (self._task_ready_active and
+                        self._task_ready_expected_nodes.issubset(self._task_ready_nodes)):
+                    self._task_ready_completed = True
+                    return True
+                if self._task_ready_cancelled or not self._task_ready_active:
+                    return False
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            self._task_ready_event.wait(remaining)
+
+    def get_task_preparation_reports(self, job_id: str) -> Dict[int, Dict[str, Any]]:
+        """返回已接受准备报告的独立 envelope 快照，实际报告位于 entry['report']。"""
+        with self._lock:
+            if job_id != self._task_ready_job_id:
+                return {}
+            return deepcopy(self._task_ready_reports)
+
+    def prepare_round_completion(self, job_id: str, round_index: int) -> None:
+        """使用任务参与者快照开启轮次完成屏障。"""
+        if type(round_index) is not int or round_index <= 0:
+            raise FLRuntimeError('invalid_round_report', 'round_index 无效')
+        with self._lock:
+            if job_id != self._task_ready_job_id:
+                raise FLRuntimeError('round_not_prepared', 'job_id 没有对应的任务准备上下文')
+            if not self._task_ready_completed:
+                raise FLRuntimeError('task_not_ready', '任务准备屏障尚未完成')
+            if (self._round_active and self._round_job_id == job_id and
+                    self._round_index != round_index and
+                    self._round_error is None and
+                    not self._round_expected_nodes.issubset(self._round_reports)):
+                raise FLRuntimeError('round_in_progress', '上一轮完成屏障仍在等待')
+            self._round_job_id = job_id
+            self._round_index = round_index
+            self._round_expected_nodes = set(self._task_ready_expected_nodes)
+            self._round_reports.clear()
+            self._round_seen.clear()
+            self._round_error = None
+            self._round_active = True
+            self._round_event.clear()
+
+    def wait_for_round_completion(
+        self, job_id: str, round_index: int, timeout: float
+    ) -> bool:
+        """等待全部轮次报告；收到客户端错误时抛出异常。"""
+        if type(round_index) is not int or round_index <= 0:
+            raise FLRuntimeError('invalid_round_report', 'round_index 无效')
+        deadline = self._wait_deadline(timeout)
+        while True:
+            with self._lock:
+                if (not self._round_active or self._round_job_id != job_id or
+                        self._round_index != round_index):
+                    raise FLRuntimeError('round_not_prepared', '轮次完成屏障未准备')
+                if self._round_error is not None:
+                    raise self._report_error(self._round_error)
+                if self._round_expected_nodes.issubset(self._round_reports):
+                    return True
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            self._round_event.wait(remaining)
 
     def cancel_task_readiness(self) -> None:
         """唤醒等待中的作业准备屏障，由停止或急停路径调用。"""
-        self._task_ready_event.set()
+        with self._lock:
+            self._task_ready_cancelled = True
+            self._task_ready_event.set()
 
     def clear_task_readiness(self, job_id: Optional[str] = None) -> None:
+        """清除当前准备和轮次状态，并保留任务参与者快照供轮次屏障使用。"""
         with self._lock:
-            if job_id is not None and self._task_ready_job_id != job_id:
+            if job_id is not None and job_id != self._task_ready_job_id:
                 return
-            self._task_ready_job_id = None
-            self._task_ready_expected_nodes.clear()
+            self._archive_report_receipts_locked()
+            self._task_ready_active = False
+            self._task_ready_cancelled = False
             self._task_ready_nodes.clear()
+            self._task_ready_reports.clear()
+            self._task_ready_seen.clear()
+            self._task_ready_report_validator = None
+            self._task_ready_error = None
             self._task_ready_event.clear()
+            self._round_job_id = None
+            self._round_index = None
+            self._round_expected_nodes.clear()
+            self._round_reports.clear()
+            self._round_seen.clear()
+            self._round_error = None
+            self._round_active = False
+            self._round_event.clear()
+
+    @staticmethod
+    def _wait_deadline(timeout: float) -> float:
+        if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or timeout < 0:
+            raise FLRuntimeError('invalid_wait_timeout', '等待超时参数无效')
+        return time.monotonic() + float(timeout)
+
+    @staticmethod
+    def _report_error(report: Dict[str, Any]) -> FLRuntimeError:
+        return FLRuntimeError(
+            report.get('error_code', 'task_error'),
+            report.get('reason', '客户端报告作业错误'),
+            node_id=report.get('node_id'),
+            details={
+                'job_id': report.get('job_id'),
+                'phase': report.get('phase'),
+                'round_index': report.get('round_index'),
+                'report_id': report.get('report_id'),
+            },
+        )
+
+    def register_task_error_handler(
+        self, handler: Callable[[Dict[str, Any]], None]
+    ) -> None:
+        """注册轻量错误观察器；异步投递和处理由守护进程负责。"""
+        if not callable(handler):
+            raise TypeError('task error handler must be callable')
+        with self._lock:
+            self._task_error_handlers.append(handler)
 
     def broadcast_downlink(self, message: Dict[str, Any]) -> None:
-        """Broadcast control message to 255.255.255.255:9000."""
+        """向 255.255.255.255:9000 广播控制消息，并校验 UTF-8 字节上限。"""
         with self._lock:
             if self._broadcast_sock is None:
                 raise RuntimeError("Server broadcast socket is not initialized")
-            data = json.dumps(message).encode("utf-8")
+            try:
+                data = json.dumps(
+                    message, ensure_ascii=False, allow_nan=False
+                ).encode("utf-8")
+            except (TypeError, ValueError) as exc:
+                raise FLRuntimeError(
+                    "invalid_control_message", "控制广播消息不可编码"
+                ) from exc
+            if len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+                raise FLRuntimeError(
+                    "control_message_too_large", "控制广播消息超过 4096 字节"
+                )
             self._broadcast_sock.sendto(data, (self.broadcast_addr, self.broadcast_port))
+
+    @staticmethod
+    def _report_fingerprint(payload: Dict[str, Any]) -> str:
+        return json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+        )
+
+    @staticmethod
+    def _report_source_host(client_addr: Tuple[str, int]) -> Optional[str]:
+        return client_addr[0] if isinstance(client_addr, tuple) and client_addr else None
+
+    @staticmethod
+    def _receipt_category(report_type: Any) -> Optional[str]:
+        if report_type == "TASK_READY":
+            return "preparation"
+        if report_type == "ROUND_READY":
+            return "round"
+        if report_type == "TASK_ERROR":
+            return "error"
+        return None
+
+    def _recent_report_status_locked(
+        self,
+        payload: Dict[str, Any],
+        report_type: str,
+        client_addr: Tuple[str, int],
+    ) -> Optional[str]:
+        """检查最近结束任务的 receipt；调用时必须持有控制锁。"""
+        if self._recent_report_job_id != payload.get("job_id"):
+            return None
+        category = self._receipt_category(report_type)
+        if category is None:
+            return None
+        for receipt in self._recent_report_receipts[category]:
+            stored = receipt.get("payload")
+            if (not isinstance(stored, dict)
+                    or stored.get("type") != report_type
+                    or stored.get("node_id") != payload.get("node_id")):
+                continue
+            if receipt.get("report_id") != payload.get("report_id"):
+                return "conflict"
+            if (receipt.get("fingerprint") == self._report_fingerprint(payload)
+                    and receipt.get("source_host") == self._report_source_host(client_addr)):
+                return "idempotent"
+            return "conflict"
+        return None
+
+    def _archive_report_receipts_locked(self) -> None:
+        """只保存最近任务的每节点准备、末轮报告及首个错误，大小受冻结参与集合约束。"""
+        job_id = self._task_ready_job_id
+        if job_id is None:
+            return
+        receipts: Dict[str, List[Dict[str, Any]]] = {
+            "preparation": [],
+            "round": [],
+            "error": [],
+        }
+
+        def append_seen(seen: Dict[str, Any]) -> None:
+            payload = seen.get("payload")
+            if not isinstance(payload, dict) or payload.get("job_id") != job_id:
+                return
+            category = self._receipt_category(payload.get("type"))
+            if category is None:
+                return
+            if category == "error" and receipts[category]:
+                return
+            receipts[category].append({
+                "report_id": seen.get("report_id"),
+                "fingerprint": seen.get("fingerprint"),
+                "source_host": seen.get("source_host"),
+                "payload": deepcopy(payload),
+            })
+
+        for seen in self._task_ready_seen.values():
+            append_seen(seen)
+        for seen in self._round_seen.values():
+            append_seen(seen)
+        self._recent_report_job_id = job_id
+        self._recent_report_receipts = receipts
+
+    @classmethod
+    def _report_ack(
+        cls,
+        report_type: str,
+        payload: Dict[str, Any],
+        ok: bool,
+        reason: Optional[str] = None,
+        error_code: Optional[str] = None,
+    ) -> List[bytes]:
+        ack: Dict[str, Any] = {
+            "type": f"{report_type}_ACK",
+            "report_id": payload.get("report_id"),
+            "job_id": payload.get("job_id"),
+            "node_id": payload.get("node_id"),
+            "ok": ok,
+        }
+        if reason is not None:
+            # 拒绝 ACK 也必须有界，避免校验器抛出超长错误信息。
+            ack["reason"] = str(reason)[:512]
+        if error_code is not None:
+            ack["error_code"] = str(error_code)[:128]
+        data = json.dumps(ack, separators=(",", ":")).encode("utf-8")
+        if len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+            ack["reason"] = "REPORT_REJECTED"
+            ack.pop("error_code", None)
+            data = json.dumps(ack, separators=(",", ":")).encode("utf-8")
+        return [data]
+
+    @staticmethod
+    def _report_envelope_error(
+        payload: Any, report_type: str
+    ) -> Optional[str]:
+        if not isinstance(payload, dict):
+            return "INVALID_REPORT"
+        if payload.get("type") != report_type:
+            return "INVALID_REPORT_TYPE"
+        report_id = payload.get("report_id")
+        if not isinstance(report_id, str) or not report_id:
+            return "INVALID_REPORT_ID"
+        job_id = payload.get("job_id")
+        if not isinstance(job_id, str) or not job_id:
+            return "INVALID_JOB_ID"
+        node_id = payload.get("node_id")
+        if type(node_id) is not int or not 1 <= node_id <= 10:
+            return "INVALID_NODE_ID"
+        if report_type == "TASK_READY":
+            report = payload.get("report")
+            if not isinstance(report, dict) or not report:
+                return "TASK_READY_REPORT_REQUIRED"
+        elif report_type == "ROUND_READY":
+            round_index = payload.get("round_index")
+            if type(round_index) is not int or round_index <= 0:
+                return "INVALID_ROUND_INDEX"
+        elif report_type == "TASK_ERROR":
+            phase = payload.get("phase")
+            if phase not in ("prepare", "round"):
+                return "INVALID_PHASE"
+            error_code = payload.get("error_code")
+            reason = payload.get("reason")
+            if not isinstance(error_code, str) or not error_code:
+                return "INVALID_ERROR_CODE"
+            if not isinstance(reason, str) or not reason:
+                return "INVALID_ERROR_REASON"
+            round_index = payload.get("round_index")
+            if phase == "prepare":
+                if round_index is not None:
+                    return "PREPARE_ROUND_INDEX_FORBIDDEN"
+            elif type(round_index) is not int or round_index <= 0:
+                return "ROUND_INDEX_REQUIRED"
+        return None
+
+    @classmethod
+    def _seen_status(
+        cls,
+        seen: Optional[Dict[str, Any]],
+        payload: Dict[str, Any],
+        client_addr: Tuple[str, int],
+    ) -> Optional[str]:
+        if seen is None:
+            return None
+        same_content = (
+            seen.get("report_id") == payload.get("report_id")
+            and seen.get("fingerprint") == cls._report_fingerprint(payload)
+            and seen.get("source_host") == cls._report_source_host(client_addr)
+        )
+        return "idempotent" if same_content else "conflict"
+
+    @staticmethod
+    def _validator_failure(exc: BaseException) -> Tuple[str, Optional[str]]:
+        if isinstance(exc, FLRuntimeError):
+            return exc.error_message or exc.error_code, exc.error_code
+        return str(exc) or "报告校验失败", None
+
+    def _validate_task_report(
+        self, payload: Dict[str, Any], client_addr: Tuple[str, int]
+    ) -> Optional[List[bytes]]:
+        envelope_error = self._report_envelope_error(payload, "TASK_READY")
+        if envelope_error is not None:
+            return self._report_ack("TASK_READY", payload, False, envelope_error)
+
+        with self._lock:
+            recent_status = self._recent_report_status_locked(
+                payload, "TASK_READY", client_addr
+            )
+            if recent_status == "idempotent":
+                return self._report_ack("TASK_READY", payload, True)
+            if recent_status == "conflict":
+                return self._report_ack("TASK_READY", payload, False, "REPORT_ID_CONFLICT")
+            if not self._task_ready_active or payload["job_id"] != self._task_ready_job_id:
+                return self._report_ack("TASK_READY", payload, False, "TASK_NOT_PREPARED")
+            if payload["node_id"] not in self._task_ready_expected_nodes:
+                return self._report_ack("TASK_READY", payload, False, "REPORT_NOT_PARTICIPANT")
+            seen = self._task_ready_seen.get(payload["node_id"])
+            status = self._seen_status(seen, payload, client_addr)
+            if status == "idempotent":
+                return self._report_ack("TASK_READY", payload, True)
+            if status == "conflict":
+                return self._report_ack("TASK_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._task_ready_error is not None:
+                return self._report_ack("TASK_READY", payload, False, "BARRIER_FAILED")
+            if self._task_ready_completed:
+                return self._report_ack("TASK_READY", payload, False, "BARRIER_COMPLETE")
+            validator = self._task_ready_report_validator
+
+        if validator is not None:
+            try:
+                result = validator(deepcopy(payload), client_addr)
+                if result is False:
+                    return self._report_ack("TASK_READY", payload, False, "REPORT_VALIDATION_FAILED")
+            except Exception as exc:
+                reason, error_code = self._validator_failure(exc)
+                return self._report_ack("TASK_READY", payload, False, reason, error_code)
+
+        with self._lock:
+            # 即使校验器执行在锁外，也要在提交前重新检查屏障状态。
+            if not self._task_ready_active or payload["job_id"] != self._task_ready_job_id:
+                return self._report_ack("TASK_READY", payload, False, "TASK_NOT_PREPARED")
+            if payload["node_id"] not in self._task_ready_expected_nodes:
+                return self._report_ack("TASK_READY", payload, False, "REPORT_NOT_PARTICIPANT")
+            seen = self._task_ready_seen.get(payload["node_id"])
+            status = self._seen_status(seen, payload, client_addr)
+            if status == "idempotent":
+                return self._report_ack("TASK_READY", payload, True)
+            if status == "conflict":
+                return self._report_ack("TASK_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._task_ready_error is not None:
+                return self._report_ack("TASK_READY", payload, False, "BARRIER_FAILED")
+            record = {
+                "report_id": payload["report_id"],
+                "job_id": payload["job_id"],
+                "node_id": payload["node_id"],
+                "report": deepcopy(payload["report"]),
+                "source": client_addr,
+            }
+            self._task_ready_seen[payload["node_id"]] = {
+                "type": "TASK_READY",
+                "payload": deepcopy(payload),
+                "report_id": payload["report_id"],
+                "fingerprint": self._report_fingerprint(payload),
+                "source_host": self._report_source_host(client_addr),
+            }
+            self._task_ready_reports[payload["node_id"]] = record
+            self._task_ready_nodes.add(payload["node_id"])
+            if self._task_ready_expected_nodes.issubset(self._task_ready_nodes):
+                self._task_ready_completed = True
+                self._task_ready_event.set()
+        return self._report_ack("TASK_READY", payload, True)
+
+    def _validate_round_report(
+        self, payload: Dict[str, Any], client_addr: Tuple[str, int]
+    ) -> Optional[List[bytes]]:
+        envelope_error = self._report_envelope_error(payload, "ROUND_READY")
+        if envelope_error is not None:
+            return self._report_ack("ROUND_READY", payload, False, envelope_error)
+        with self._lock:
+            recent_status = self._recent_report_status_locked(
+                payload, "ROUND_READY", client_addr
+            )
+            if recent_status == "idempotent":
+                return self._report_ack("ROUND_READY", payload, True)
+            if recent_status == "conflict":
+                return self._report_ack("ROUND_READY", payload, False, "REPORT_ID_CONFLICT")
+            if (not self._round_active or payload["job_id"] != self._round_job_id or
+                    payload["round_index"] != self._round_index):
+                return self._report_ack("ROUND_READY", payload, False, "ROUND_NOT_PREPARED")
+            if payload["node_id"] not in self._round_expected_nodes:
+                return self._report_ack("ROUND_READY", payload, False, "REPORT_NOT_PARTICIPANT")
+            seen = self._round_seen.get(payload["node_id"])
+            status = self._seen_status(seen, payload, client_addr)
+            if status == "idempotent":
+                return self._report_ack("ROUND_READY", payload, True)
+            if status == "conflict":
+                return self._report_ack("ROUND_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._round_error is not None:
+                return self._report_ack("ROUND_READY", payload, False, "BARRIER_FAILED")
+            if self._round_expected_nodes.issubset(self._round_reports):
+                return self._report_ack("ROUND_READY", payload, False, "BARRIER_COMPLETE")
+            self._round_seen[payload["node_id"]] = {
+                "type": "ROUND_READY",
+                "payload": deepcopy(payload),
+                "report_id": payload["report_id"],
+                "fingerprint": self._report_fingerprint(payload),
+                "source_host": self._report_source_host(client_addr),
+            }
+            self._round_reports[payload["node_id"]] = {
+                "report_id": payload["report_id"],
+                "job_id": payload["job_id"],
+                "node_id": payload["node_id"],
+                "round_index": payload["round_index"],
+                "source": client_addr,
+            }
+            if self._round_expected_nodes.issubset(self._round_reports):
+                self._round_event.set()
+        return self._report_ack("ROUND_READY", payload, True)
+
+    def _validate_error_report(
+        self, payload: Dict[str, Any], client_addr: Tuple[str, int]
+    ) -> Optional[List[bytes]]:
+        envelope_error = self._report_envelope_error(payload, "TASK_ERROR")
+        if envelope_error is not None:
+            return self._report_ack("TASK_ERROR", payload, False, envelope_error)
+
+        handlers: List[Callable[[Dict[str, Any]], None]] = []
+        with self._lock:
+            recent_status = self._recent_report_status_locked(
+                payload, "TASK_ERROR", client_addr
+            )
+            if recent_status == "idempotent":
+                return self._report_ack("TASK_ERROR", payload, True)
+            if recent_status == "conflict":
+                return self._report_ack("TASK_ERROR", payload, False, "REPORT_ID_CONFLICT")
+            phase = payload["phase"]
+            if phase == "prepare":
+                active = (
+                    self._task_ready_active and
+                    payload["job_id"] == self._task_ready_job_id
+                )
+                expected_nodes = self._task_ready_expected_nodes
+                seen_map = self._task_ready_seen
+                current_error = self._task_ready_error
+            else:
+                active = (
+                    self._round_active and
+                    payload["job_id"] == self._round_job_id and
+                    payload["round_index"] == self._round_index
+                )
+                expected_nodes = self._round_expected_nodes
+                seen_map = self._round_seen
+                current_error = self._round_error
+            if not active:
+                return self._report_ack("TASK_ERROR", payload, False, "PHASE_NOT_ACTIVE")
+            if payload["node_id"] not in expected_nodes:
+                return self._report_ack("TASK_ERROR", payload, False, "REPORT_NOT_PARTICIPANT")
+            seen = seen_map.get(payload["node_id"])
+            status = self._seen_status(seen, payload, client_addr)
+            if status == "idempotent":
+                return self._report_ack("TASK_ERROR", payload, True)
+            if status == "conflict":
+                return self._report_ack("TASK_ERROR", payload, False, "REPORT_ID_CONFLICT")
+            if current_error is not None:
+                return self._report_ack("TASK_ERROR", payload, False, "BARRIER_FAILED")
+            record = {
+                "report_id": payload["report_id"],
+                "job_id": payload["job_id"],
+                "node_id": payload["node_id"],
+                "phase": payload["phase"],
+                "round_index": payload.get("round_index"),
+                "error_code": payload["error_code"],
+                "reason": payload["reason"],
+                "source": client_addr,
+            }
+            seen_map[payload["node_id"]] = {
+                "type": "TASK_ERROR",
+                "payload": deepcopy(payload),
+                "report_id": payload["report_id"],
+                "fingerprint": self._report_fingerprint(payload),
+                "source_host": self._report_source_host(client_addr),
+            }
+            if phase == "prepare":
+                self._task_ready_error = record
+                self._task_ready_event.set()
+            else:
+                self._round_error = record
+                self._round_event.set()
+            handlers = list(self._task_error_handlers)
+
+        # 守护进程错误处理器负责排队；控制面不会在自身锁内调用它。
+        for handler in handlers:
+            try:
+                handler(deepcopy(record))
+            except Exception as exc:
+                logger.warning("任务错误 handler 执行异常: %s", exc)
+        return self._report_ack("TASK_ERROR", payload, True)
 
     def handle_datagram(
         self, data: bytes, client_addr: Tuple[str, int]
     ) -> Optional[List[bytes]]:
         """
-        Process incoming datagram and produce outbound replies.
-        Handles PREPARE_ACK, COMMIT_SUCCESS, and standard NODE_HEARTBEAT.
+        处理控制面数据报并生成响应。
+        处理任务报告、射频确认和普通心跳。
         """
+        if not isinstance(data, (bytes, bytearray)) or len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+            return None
         try:
-            payload = json.loads(data.decode("utf-8"))
+            payload = json.loads(bytes(data).decode("utf-8"))
         except Exception as exc:
             logger.debug("无法解析 JSON 数据报: %s", exc)
             return None
@@ -832,6 +1405,13 @@ class ControlPlaneServer:
         if not isinstance(payload, dict):
             return None
         msg_type = payload.get("type")
+        if msg_type == "TASK_READY":
+            return self._validate_task_report(payload, client_addr)
+        if msg_type == "ROUND_READY":
+            return self._validate_round_report(payload, client_addr)
+        if msg_type == "TASK_ERROR":
+            return self._validate_error_report(payload, client_addr)
+
         if msg_type in ("RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK",
                         "RADIO_SWITCH_ROLLBACK_ACK"):
             phase = {"RADIO_SWITCH_FINALIZED_ACK": "FINALIZED",
@@ -857,25 +1437,6 @@ class ControlPlaneServer:
                     if self._expected_target_nodes.issubset(acks):
                         self._barrier_event.set()
             return None
-
-        if msg_type == "TASK_READY":
-            job_id = payload.get("job_id")
-            node_id = payload.get("node_id")
-            if not isinstance(job_id, str) or type(node_id) is not int:
-                return None
-            with self._lock:
-                if (
-                    job_id == self._task_ready_job_id
-                    and node_id in self._task_ready_expected_nodes
-                ):
-                    first_ready = node_id not in self._task_ready_nodes
-                    self._task_ready_nodes.add(node_id)
-                    if first_ready:
-                        logger.info("TASK_READY job_id=%s node_id=%s source=%s:%s", job_id, node_id,
-                                    client_addr[0], client_addr[1])
-                    if self._task_ready_expected_nodes.issubset(self._task_ready_nodes):
-                        self._task_ready_event.set()
-            return [HeartbeatAck(ack=True).to_bytes()]
 
         if msg_type == "PREPARE_ACK":
             ack = PrepareAck.from_dict(payload)
@@ -1221,11 +1782,13 @@ class ControlPlaneServer:
             if self._server_sock is None:
                 break
             try:
-                data, client_addr = self._server_sock.recvfrom(4096)
+                data, client_addr = self._server_sock.recvfrom(MAX_CONTROL_DATAGRAM_BYTES + 1)
             except (socket.timeout, BlockingIOError):
                 continue
             except OSError:
                 break
+            if len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+                continue
 
             try:
                 replies = self.handle_datagram(data, client_addr)
@@ -1637,32 +2200,151 @@ class ControlPlaneClient:
             self._send_heartbeat(new_state.value, elapsed_ms=0)
             self._wake_event.set()
 
-    def notify_task_ready(self, job_id: str, timeout: float = 8.0) -> None:
-        message = json.dumps({
-            "type": "TASK_READY",
-            "job_id": job_id,
-            "node_id": self.node_id,
-            "timestamp_ms": self._next_timestamp_ms(),
-        }).encode("utf-8")
-        deadline = time.monotonic() + timeout
+    def _notify_report(
+        self,
+        payload: Dict[str, Any],
+        ack_type: str,
+        timeout: float,
+        timeout_code: str,
+        timeout_message: str,
+    ) -> None:
+        if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or timeout <= 0:
+            raise FLRuntimeError('invalid_report_timeout', '报告 ACK 超时参数无效')
+        try:
+            message = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+        except (TypeError, ValueError) as exc:
+            raise FLRuntimeError('invalid_task_report', '报告内容不可序列化') from exc
+        if len(message) > MAX_CONTROL_DATAGRAM_BYTES:
+            raise FLRuntimeError('control_report_too_large', '控制报告超过 4096 字节')
+
+        deadline = time.monotonic() + float(timeout)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(min(0.25, timeout))
         try:
             while time.monotonic() < deadline:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
                 try:
                     sock.sendto(message, (self.server_host, self.server_port))
-                    data, _ = sock.recvfrom(4096)
-                    if HeartbeatAck.from_bytes(data).ack:
-                        logger.info("TASK_READY_ACK job_id=%s node_id=%s server=%s:%s",
-                                    job_id, self.node_id, self.server_host, self.server_port)
-                        return
-                except (socket.timeout, BlockingIOError, ValueError, OSError):
+                except OSError:
+                    time.sleep(min(REPORT_RETRY_INTERVAL_SECONDS, remaining))
                     continue
+
+                # 一次重试间隔同时作为单次 ACK 等待窗口。无关的心跳 ACK
+                # 会被忽略，不能确认当前报告。
+                attempt_deadline = min(
+                    deadline, time.monotonic() + REPORT_RETRY_INTERVAL_SECONDS
+                )
+                while time.monotonic() < attempt_deadline:
+                    try:
+                        sock.settimeout(max(0.001, attempt_deadline - time.monotonic()))
+                        data, _ = sock.recvfrom(MAX_CONTROL_DATAGRAM_BYTES + 1)
+                    except (socket.timeout, BlockingIOError, OSError):
+                        break
+                    if len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+                        continue
+                    try:
+                        ack = json.loads(data.decode("utf-8"))
+                    except (UnicodeError, ValueError):
+                        continue
+                    if not isinstance(ack, dict):
+                        continue
+                    if (ack.get("type") != ack_type
+                            or ack.get("report_id") != payload["report_id"]
+                            or ack.get("job_id") != payload["job_id"]
+                            or ack.get("node_id") != self.node_id
+                            or type(ack.get("ok")) is not bool):
+                        continue
+                    if not ack["ok"]:
+                        raise FLRuntimeError(
+                            "task_report_rejected",
+                            str(ack.get("reason") or "服务端拒绝任务报告"),
+                            node_id=self.node_id,
+                            details={"report_id": payload["report_id"], "ack": ack},
+                        )
+                    logger.info(
+                        "%s report_id=%s job_id=%s node_id=%s server=%s:%s",
+                        ack_type, payload["report_id"], payload["job_id"],
+                        self.node_id, self.server_host, self.server_port,
+                    )
+                    return
         finally:
             sock.close()
-        raise FLRuntimeError(
-            "task_ready_timeout",
+        raise FLRuntimeError(timeout_code, timeout_message, node_id=self.node_id)
+
+    def notify_task_ready(
+        self, job_id: str, report: Dict[str, Any], timeout: float = 8.0
+    ) -> None:
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError('invalid_task_report', 'job_id 无效')
+        if not isinstance(report, dict) or not report:
+            raise FLRuntimeError('invalid_task_report', 'TASK_READY.report 必须为非空 object')
+        payload = {
+            "type": "TASK_READY",
+            "report_id": uuid.uuid4().hex,
+            "job_id": job_id,
+            "node_id": self.node_id,
+            "report": deepcopy(report),
+        }
+        self._notify_report(
+            payload, "TASK_READY_ACK", timeout, "task_ready_timeout",
             f"作业 {job_id} 的 TASK_READY 未在 {timeout:g} 秒内获得服务端确认",
+        )
+
+    def notify_round_complete(
+        self, job_id: str, round_index: int, timeout: float = 8.0
+    ) -> None:
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError('invalid_round_report', 'job_id 无效')
+        if type(round_index) is not int or round_index <= 0:
+            raise FLRuntimeError('invalid_round_report', 'round_index 无效')
+        payload = {
+            "type": "ROUND_READY",
+            "report_id": uuid.uuid4().hex,
+            "job_id": job_id,
+            "node_id": self.node_id,
+            "round_index": round_index,
+        }
+        self._notify_report(
+            payload, "ROUND_READY_ACK", timeout, "round_ready_timeout",
+            f"作业 {job_id} 第 {round_index} 轮未在 {timeout:g} 秒内获得服务端确认",
+        )
+
+    def notify_task_error(
+        self,
+        job_id: str,
+        phase: str,
+        error_code: str,
+        reason: str,
+        round_index: Optional[int] = None,
+        timeout: float = 8.0,
+    ) -> None:
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError('invalid_task_report', 'job_id 无效')
+        if phase not in ("prepare", "round"):
+            raise FLRuntimeError('invalid_task_report', 'phase 无效')
+        if not isinstance(error_code, str) or not error_code:
+            raise FLRuntimeError('invalid_task_report', 'error_code 无效')
+        if not isinstance(reason, str) or not reason:
+            raise FLRuntimeError('invalid_task_report', 'reason 无效')
+        if phase == "prepare" and round_index is not None:
+            raise FLRuntimeError('invalid_task_report', 'prepare 错误不能带 round_index')
+        if phase == "round" and (type(round_index) is not int or round_index <= 0):
+            raise FLRuntimeError('invalid_task_report', 'round 错误必须带有效 round_index')
+        payload: Dict[str, Any] = {
+            "type": "TASK_ERROR",
+            "report_id": uuid.uuid4().hex,
+            "job_id": job_id,
+            "node_id": self.node_id,
+            "phase": phase,
+            "error_code": error_code,
+            "reason": reason,
+        }
+        if round_index is not None:
+            payload["round_index"] = round_index
+        self._notify_report(
+            payload, "TASK_ERROR_ACK", timeout, "task_error_timeout",
+            f"作业 {job_id} 的 TASK_ERROR 未在 {timeout:g} 秒内获得服务端确认",
         )
 
     def _send_unicast_datagram(self, data: bytes) -> None:
@@ -1974,7 +2656,9 @@ class ControlPlaneClient:
             if self._broadcast_listener_sock is None:
                 break
             try:
-                data, _ = self._broadcast_listener_sock.recvfrom(4096)
+                data, _ = self._broadcast_listener_sock.recvfrom(MAX_CONTROL_DATAGRAM_BYTES + 1)
+                if len(data) > MAX_CONTROL_DATAGRAM_BYTES:
+                    continue
                 msg = json.loads(data.decode("utf-8"))
             except (socket.timeout, BlockingIOError):
                 continue

@@ -64,9 +64,16 @@ def initialize_model(output_path: ModelPath, seed: int) -> str:
             nn.init.xavier_uniform_(layer.weight, generator=generator)
             assert layer.bias is not None
             nn.init.zeros_(layer.bias)
+    return write_model_atomic(output_path, dict(model.state_dict()), seed)
+
+
+def write_model_atomic(output_path: ModelPath, state_dict: dict, initialization_seed: int) -> str:
+    """严格校验 CPU 完整参数，以 01 格式原子发布新文件且不覆盖已有文件。"""
+    seed = _seed(initialization_seed)
+    validate_state_dict(state_dict)
     value = {
         'model_format': MODEL_FORMAT,
-        'state_dict': dict(model.state_dict()),
+        'state_dict': state_dict,
         'initialization': {'source': INITIALIZATION_SOURCE, 'seed': seed},
     }
     output = Path(output_path).absolute()
@@ -119,8 +126,14 @@ def _validate_payload(value: Any, model: MNISTReferenceModel) -> int:
             or initialization['source'] != INITIALIZATION_SOURCE):
         raise FLRuntimeError('invalid_reference_model', '参考模型初始化来源不匹配')
     seed = _seed(initialization['seed'])
-    state = value['state_dict']
-    expected = model.state_dict()
+    validate_state_dict(value['state_dict'])
+    return seed
+
+
+def validate_state_dict(state: Any) -> None:
+    """验证固定 9098 参数结构及 CPU／FP32／有限数值，不接受兼容格式。"""
+    with torch.random.fork_rng(devices=[]):
+        expected = MNISTReferenceModel().state_dict()
     if type(state) is not dict or set(state) != set(expected):
         raise FLRuntimeError('invalid_reference_model', '参考模型参数键不匹配')
     for name, tensor in state.items():
@@ -129,7 +142,6 @@ def _validate_payload(value: Any, model: MNISTReferenceModel) -> int:
                 or tensor.shape != expected[name].shape
                 or not torch.isfinite(tensor).all().item()):
             raise FLRuntimeError('invalid_reference_model', f'参数 {name} 的形状、类型或数值无效')
-    return seed
 
 
 def load_model(model_path: ModelPath) -> ModelArtifact:
