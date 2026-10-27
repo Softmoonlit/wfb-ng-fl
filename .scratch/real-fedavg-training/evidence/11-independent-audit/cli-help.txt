@@ -1,0 +1,11 @@
+usage: fp64_audit.py [-h] --job-root JOB_ROOT --out OUT [--summary SUMMARY]
+
+Independently audit persisted MNIST FedAvg rounds with CPU FP64.
+
+options:
+  -h, --help           show this help message and exit
+  --job-root JOB_ROOT  Coordinator job root containing
+                       coordinator_summary.json
+  --out OUT            New operator-selected persistent evidence directory
+  --summary SUMMARY    Summary path; defaults to <job-
+                       root>/coordinator_summary.json
