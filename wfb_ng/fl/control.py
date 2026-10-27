@@ -3006,8 +3006,7 @@ class ControlPlaneClient:
     def _matches_pending_switch(self, msg: Dict[str, Any]) -> bool:
         """当前事务必须同时匹配 session、job 身份和冻结目标节点。"""
         try:
-            target_nodes = self._canonical_target_nodes(
-                msg.get("target_nodes", [self.node_id]))
+            target_nodes = self._canonical_target_nodes(msg.get("target_nodes"))
         except ValueError:
             return False
         return (
@@ -3032,14 +3031,12 @@ class ControlPlaneClient:
     def _handle_radio_prepare(self, msg: Dict[str, Any]) -> None:
         session_id = msg.get("session_id")
         job_id = msg.get("job_id")
-        raw_targets = msg.get("target_nodes", [self.node_id])
         if not isinstance(session_id, str) or not session_id:
             return
         if job_id is not None and (not isinstance(job_id, str) or not job_id):
             return
         try:
-            target_nodes = self._canonical_target_nodes(
-                msg.get("target_nodes", [self.node_id]))
+            target_nodes = self._canonical_target_nodes(msg.get("target_nodes"))
         except ValueError:
             return
         if self.node_id not in target_nodes:
@@ -3197,8 +3194,7 @@ class ControlPlaneClient:
             if not isinstance(session_id, str) or not session_id:
                 return
             try:
-                target_nodes = self._canonical_target_nodes(
-                    msg.get("target_nodes", [self.node_id]))
+                target_nodes = self._canonical_target_nodes(msg.get("target_nodes"))
             except ValueError:
                 return
             if (self.node_id not in target_nodes
@@ -3327,8 +3323,7 @@ class ControlPlaneClient:
     def _handle_radio_abort(self, msg: Dict[str, Any]) -> None:
         with self._lock:
             try:
-                target_nodes = self._canonical_target_nodes(
-                    msg.get("target_nodes", [self.node_id]))
+                target_nodes = self._canonical_target_nodes(msg.get("target_nodes"))
             except ValueError:
                 return
             if (self._rolled_back_switch_session is not None and

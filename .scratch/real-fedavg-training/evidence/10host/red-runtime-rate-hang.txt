@@ -1,0 +1,81 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 12 items / 10 deselected / 2 selected
+
+wfb_ng/tests/test_fl_radio_runtime_application.py::test_next_job_uses_final_effective_uftp_rate_in_sender_command[None-finalized-17000] Timeout (0:00:15)!
+Thread 0x0000fffeb6fdf120 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 324 in wait
+  File "/usr/lib/python3.10/threading.py", line 607 in wait
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 1107 in wait_for_job_recovery
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1923 in deliver_terminal
+  File "/usr/lib/python3.10/threading.py", line 953 in run
+  File "/usr/lib/python3.10/threading.py", line 1016 in _bootstrap_inner
+  File "/usr/lib/python3.10/threading.py", line 973 in _bootstrap
+
+Thread 0x0000fffed66ef120 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 320 in wait
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 1303 in _liveness_loop
+  File "/usr/lib/python3.10/threading.py", line 953 in run
+  File "/usr/lib/python3.10/threading.py", line 1016 in _bootstrap_inner
+  File "/usr/lib/python3.10/threading.py", line 973 in _bootstrap
+
+Thread 0x0000fffed6eff120 (most recent call first):
+  File "/usr/lib/python3.10/selectors.py", line 416 in select
+  File "/usr/lib/python3.10/socketserver.py", line 232 in serve_forever
+  File "/usr/lib/python3.10/threading.py", line 953 in run
+  File "/usr/lib/python3.10/threading.py", line 1016 in _bootstrap_inner
+  File "/usr/lib/python3.10/threading.py", line 973 in _bootstrap
+
+Thread 0x0000fffed780f120 (most recent call first):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_radio_runtime_application.py", line 52 in serve
+  File "/usr/lib/python3.10/threading.py", line 953 in run
+  File "/usr/lib/python3.10/threading.py", line 1016 in _bootstrap_inner
+  File "/usr/lib/python3.10/threading.py", line 973 in _bootstrap
+
+Thread 0x0000ffff8eace860 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 1116 in _wait_for_tstate_lock
+  File "/usr/lib/python3.10/threading.py", line 1096 in join
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1982 in _finalize_job
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 2039 in abort_job
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_radio_runtime_application.py", line 278 in test_next_job_uses_final_effective_uftp_rate_in_sender_command
+  File "/usr/lib/python3/dist-packages/_pytest/python.py", line 183 in pytest_pyfunc_call
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/python.py", line 1641 in runtest
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 162 in pytest_runtest_call
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 255 in <lambda>
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 311 in from_call
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 254 in call_runtest_hook
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 215 in call_and_report
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 126 in runtestprotocol
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 109 in pytest_runtest_protocol
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 348 in pytest_runtestloop
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 323 in _main
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 269 in wrap_session
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 316 in pytest_cmdline_main
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 162 in main
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 185 in console_main
+  File "/usr/lib/python3/dist-packages/pytest/__main__.py", line 5 in <module>
+  File "/usr/lib/python3.10/runpy.py", line 86 in _run_code
+  File "/usr/lib/python3.10/runpy.py", line 196 in _run_module_as_main

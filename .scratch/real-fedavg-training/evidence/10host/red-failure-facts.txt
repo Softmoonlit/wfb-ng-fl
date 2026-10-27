@@ -1,0 +1,120 @@
+F.F..                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-0] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffeec377d90>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffeec3852d0>
+phase = 0, unknown = False
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+            assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+            recent = host.daemon.get_status_report()['recent_job']
+        assert caught == ['radio_transaction_failed']
+>       assert recent and recent['execution_result'] == 'failed'
+E       assert (None)
+
+wfb_ng/tests/test_fl_job_radio_policy.py:203: AssertionError
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-0] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffeec3a9900>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffeec40a4d0>
+phase = 0, unknown = True
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+            assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+            recent = host.daemon.get_status_report()['recent_job']
+        assert caught == ['radio_transaction_failed']
+>       assert recent and recent['execution_result'] == 'failed'
+E       assert (None)
+
+wfb_ng/tests/test_fl_job_radio_policy.py:203: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-0]
+2 failed, 3 passed, 4 deselected, 2 warnings in 5.52s

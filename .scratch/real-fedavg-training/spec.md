@@ -312,7 +312,7 @@ Web 保留初始模型、目标客户端、轮数三个启动输入，目标改�
 
 ## Further Notes
 
-- 本规格依据用户对已结单规划的最新授权，在新的特性目录独立发布，分流状态为 `ready-for-agent`。原地图在收尾时暂缓生成规格的决定保留为历史，地图不重开。实施任务已拆为本目录 `issues/01`～`13`，其中01、02、03、04、05、06、07已完成；本次按用户明确指定更新四板测试前提，不将通信预检或文档更新记为其余产品和训练验收通过。
+- 本规格依据用户对已结单规划的最新授权，在新的特性目录独立发布，分流状态为 `ready-for-agent`。原地图在收尾时暂缓生成规格的决定保留为历史，地图不重开。实施任务已拆为本目录 `issues/01`～`13`，其中01、02、03、04、05、06、07、10、11已完成软件交付；08、09、12、13仍待实机验证闭合；本次按用户明确指定更新四板测试前提，不将通信预检或文档更新记为其余产品和训练验收通过。
 - 本规格是该特性的实施范围和验收依据，继承未改变的层内契约。后续实际证据若要求改变参考参数或边界，应显式修订并保持设计一致，不能事后改写某次运行的通过条件。
 - 决策总索引见[真实 FedAvg 训练规划](../fedavg-training-extension/map.md)。各项依据分别为[参考任务与效果判据](../fedavg-training-extension/issues/01-fedavg-reference-task.md#answer)、[MNIST 最小本地接入](../fedavg-training-extension/issues/02-client-dataset-library.md#answer)、[无线配置边界](../fedavg-training-extension/issues/04-algorithm-radio-configuration.md#answer)、[在线节点与失联呈现](../fedavg-training-extension/issues/05-online-client-view.md#answer)、[训练作业契约](../fedavg-training-extension/issues/06-fedavg-job-contract.md#answer)及[端到端验收与实施顺序](../fedavg-training-extension/issues/07-acceptance-and-handoff.md#answer)。
 - 环境与标定责任见[Jetson 环境前提](../fedavg-training-extension/issues/08-jetson-training-environment.md#answer)和[20 MHz 组合速率标定](../fedavg-training-extension/issues/09-20mhz-uftp-rate-calibration.md#answer)。这些规划是历史决策依据；实际测试规模与已知通信证据以本规格四板记录为准。逐端训练依赖、真实训练耗时及 20 MHz 标定数字仍是对应执行票与最终验收的条件，不能引用历史“未取得设备”作为当前阻塞。

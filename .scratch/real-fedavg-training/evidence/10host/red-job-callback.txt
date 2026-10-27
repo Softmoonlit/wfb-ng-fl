@@ -1,0 +1,81 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk _
+
+policy_host = <function policy_host.<locals>.make at 0xfffeee00ef80>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffeee187a30>
+
+    def test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk(
+            policy_host, monkeypatch):
+        from wfb_ng.fl.radio import validate_radio_patch
+        calls = []
+        reports = []
+    
+        def policy(config, context):
+            reports.append(context.configure_radio({'radio_txpower_dbm': 13 + context.round_index}))
+    
+        host = policy_host(policy)
+        add_online_node(host, 3)
+        startup = host.daemon.config
+        startup_path = Path(host.daemon.config.work_dir) / 'startup.json'
+        startup_path.parent.mkdir(parents=True, exist_ok=True)
+        startup_path.write_text('unchanged deployment')
+        host.daemon.config = replace(startup, startup_config_path=str(startup_path))
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            assert job_id == host.payload['job_id']
+            assert stop_event.is_set() is False
+            before = host.daemon.control_plane.active_radio_config
+            calls.append((list(target_nodes), host.daemon.server_state))
+            assert list(target_nodes) == [1, 2, 3]
+            add_online_node(host, 4)
+            assert list(target_nodes) == [1, 2, 3], '已受理事务不加入后到节点'
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id=f'fixture-{len(calls)}',
+                target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        # 第二次事务的在线union应包含首次事务后上线的4号节点。
+        def controlled_transaction(patch, target_nodes, **kwargs):
+            if calls:
+                assert list(target_nodes) == [1, 2, 3, 4]
+                before = host.daemon.control_plane.active_radio_config
+                updated = validate_radio_patch(patch, before)
+                calls.append((list(target_nodes), host.daemon.server_state))
+                host.daemon.control_plane.active_radio_config = updated
+                return RadioSwitchResult(success=True, session_id='fixture-2',
+                    target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                    effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                    confirmed_nodes=list(target_nodes), job_id=kwargs['job_id'])
+            return transaction(patch, target_nodes, **kwargs)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', controlled_transaction)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffeee030520>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError('宿主未提供作业绑定的无线配置通路')]
+E       assert not [FLRuntimeError('宿主未提供作业绑定的无线配置通路')]
+E        +  where [FLRuntimeError('宿主未提供作业绑定的无线配置通路')] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffeee030520>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk
+1 failed, 3 deselected, 2 warnings in 3.52s

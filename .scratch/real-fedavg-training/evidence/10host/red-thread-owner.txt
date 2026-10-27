@@ -1,0 +1,162 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_policy_spawned_thread_cannot_escape_synchronous_radio_window[0] _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffee7d52830>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffee7d57dc0>
+phase = 0
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_policy_spawned_thread_cannot_escape_synchronous_radio_window(
+            policy_host, monkeypatch, phase):
+        attempted = threading.Event()
+        transaction_entered = threading.Event()
+        release_transaction = threading.Event()
+        children = []
+        rejected = []
+        saved_contexts = []
+    
+        def policy(config, context):
+            if context.round_index != phase:
+                return
+            saved_contexts.append(context)
+    
+            def spawned_configure():
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    rejected.append(exc.error_code)
+                    attempted.set()
+    
+            child = threading.Thread(target=spawned_configure, name='fixture-escaped-radio')
+            children.append(child)
+            child.start()
+            # 在策略返回前确认子线程已进入事务，或已在公开上下文入口遭拒。
+            assert attempted.wait(2)
+    
+        host = policy_host(policy)
+        host.hold_final_reports = True
+    
+        def blocking_transaction(patch, target_nodes, *, job_id, stop_event):
+            transaction_entered.set()
+            attempted.set()
+            release_transaction.wait()
+            before = host.daemon.control_plane.active_radio_config
+            return RadioSwitchResult(success=True, session_id='must-not-escape',
+                target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocking_transaction)
+        try:
+            host.launch()
+            assert host.final_evaluated.wait(2), f'公开start未推进到末轮: {host.errors}'
+>           assert rejected == ['radio_policy_phase_required'], '异线程必须在策略返回前被拒绝'
+E           AssertionError: 异线程必须在策略返回前被拒绝
+E           assert [] == ['radio_polic...ase_required']
+E             Right contains one more item: 'radio_policy_phase_required'
+E             Full diff:
+E             - ['radio_policy_phase_required']
+E             + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:627: AssertionError
+--------------------------- Captured stderr teardown ---------------------------
+FLCoordinator execution failed for job training-host-job
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 633, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 922, in run
+    raise failure_exc
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 896, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 1151, in _run_synchronous_loop
+    self.round_completion(round_index)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1711, in complete_round
+    raise FLRuntimeError('round_report_timeout', '未在本轮期限内收齐提交完成报告')
+wfb_ng.fl.errors.FLRuntimeError: 未在本轮期限内收齐提交完成报告
+_____ test_policy_spawned_thread_cannot_escape_synchronous_radio_window[1] _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffee7d52950>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffee7d92770>
+phase = 1
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_policy_spawned_thread_cannot_escape_synchronous_radio_window(
+            policy_host, monkeypatch, phase):
+        attempted = threading.Event()
+        transaction_entered = threading.Event()
+        release_transaction = threading.Event()
+        children = []
+        rejected = []
+        saved_contexts = []
+    
+        def policy(config, context):
+            if context.round_index != phase:
+                return
+            saved_contexts.append(context)
+    
+            def spawned_configure():
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    rejected.append(exc.error_code)
+                    attempted.set()
+    
+            child = threading.Thread(target=spawned_configure, name='fixture-escaped-radio')
+            children.append(child)
+            child.start()
+            # 在策略返回前确认子线程已进入事务，或已在公开上下文入口遭拒。
+            assert attempted.wait(2)
+    
+        host = policy_host(policy)
+        host.hold_final_reports = True
+    
+        def blocking_transaction(patch, target_nodes, *, job_id, stop_event):
+            transaction_entered.set()
+            attempted.set()
+            release_transaction.wait()
+            before = host.daemon.control_plane.active_radio_config
+            return RadioSwitchResult(success=True, session_id='must-not-escape',
+                target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocking_transaction)
+        try:
+            host.launch()
+            assert host.final_evaluated.wait(2), f'公开start未推进到末轮: {host.errors}'
+>           assert rejected == ['radio_policy_phase_required'], '异线程必须在策略返回前被拒绝'
+E           AssertionError: 异线程必须在策略返回前被拒绝
+E           assert [] == ['radio_polic...ase_required']
+E             Right contains one more item: 'radio_policy_phase_required'
+E             Full diff:
+E             - ['radio_policy_phase_required']
+E             + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:627: AssertionError
+--------------------------- Captured stderr teardown ---------------------------
+FLCoordinator execution failed for job training-host-job
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 633, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 922, in run
+    raise failure_exc
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 896, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 1151, in _run_synchronous_loop
+    self.round_completion(round_index)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1711, in complete_round
+    raise FLRuntimeError('round_report_timeout', '未在本轮期限内收齐提交完成报告')
+wfb_ng.fl.errors.FLRuntimeError: 未在本轮期限内收齐提交完成报告
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_spawned_thread_cannot_escape_synchronous_radio_window[0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_spawned_thread_cannot_escape_synchronous_radio_window[1]
+2 failed, 19 deselected, 2 warnings in 4.22s

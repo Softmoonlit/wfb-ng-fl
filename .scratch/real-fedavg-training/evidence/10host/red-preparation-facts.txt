@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_initial_confirmed_change_is_retained_when_role_preparation_fails _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffef9a49b40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffef9a52560>
+
+    def test_initial_confirmed_change_is_retained_when_role_preparation_fails(policy_host, monkeypatch):
+        from wfb_ng.fl.radio import validate_radio_patch
+    
+        def policy(config, context):
+            context.configure_radio({'radio_txpower_dbm': 13})
+    
+        host = policy_host(policy, rounds=1)
+        host.daemon.runtime_factory = lambda job, payload: None
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id='before-role-failure',
+                target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.launch()
+        assert host.start_done.wait(2)
+        assert host.errors[0].error_code == 'runtime_unavailable'
+        assert not host.announced.is_set()
+        recent = host.daemon.get_status_report()['recent_job']
+>       assert recent['execution_result'] == 'failed'
+E       TypeError: 'NoneType' object is not subscriptable
+
+wfb_ng/tests/test_fl_job_radio_policy.py:518: TypeError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_initial_confirmed_change_is_retained_when_role_preparation_fails
+1 failed, 16 deselected, 2 warnings in 3.64s

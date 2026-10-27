@@ -1,6 +1,6 @@
 # 票10服务端作业无线策略接线
 
-基于HEAD `69a94d8`（07 `145ea88`，06 `e53de00`）。仅修改server_daemon.py、新增test_fl_job_radio_policy.py及本目录证据。未commit、未部署、未访问四板、未修改service/client/control/algorithm/coordinator/transport/runtime/Console/工单状态。
+本目录最初记录以 `69a94d8` 为基线的宿主分片；该分片已随票10提交并完成双轴复核。以下分片检查记录保留原范围，最终收尾补充见末节。
 
 ## 生产接线
 
@@ -28,4 +28,13 @@
 
 ## 主线接线点
 
-Console需后续透传job.radio_results的有限字段；本worker未改Console。精确接口与进展见interface-notes.md。当前可用工具无send_message，跨owner信息通过共享证据文件传递。
+Console 已接入 `job.radio_results` 的有限字段投影。精确接口与分片进展见 `interface-notes.md`。
+
+## 最终合并复验
+
+- `strict-targets-full.txt`：控制事务、无线切换和客户端作业无线门禁共 **76 passed**。缺失目标集合不再隐式补成本节点，所有阶段严格匹配显式冻结集合。
+- `runtime-application-full.txt`：运行时射频应用完整文件 **12 passed**。旧夹具遗漏 `JOB_RECOVERY`，曾触发等待部署恢复预算；现使用真实报告及 ACK，额外验证 sender 已 reap、Coordinator 已退出、Transport 已关闭和服务端恢复完成。没有修改生产期限或使用固定等待规避。
+- `console-complete.txt`：完整 Console 文件 **35 passed**。
+- 先前拼组因 60 秒工具时限终止，以及只输出 7 个点的等待记录，均不算通过；最终以各完整文件的独立结果为准。
+
+以上均为隔离软件检查，未改变四板现场，不代表票08、09、12、13的实机验收通过。

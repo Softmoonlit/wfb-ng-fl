@@ -270,6 +270,36 @@ class TestRadioTransaction(unittest.TestCase):
             client.clear_job_context("job-a")
             client.stop()
 
+    def test_missing_target_nodes_rejects_every_radio_phase_without_ack_or_mutation(self):
+        client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
+        sent = []
+        client._send_unicast_datagram = lambda data: sent.append(json.loads(data))
+        base = {
+            "session_id": "strict-targets",
+            "job_id": None,
+            "patch": {"uplink_mcs": 5},
+            "channel": 157,
+            "config": RadioConfig(channel=157, uplink_mcs=5).to_dict(),
+            "calibration": False,
+        }
+        try:
+            client.handle_broadcast(dict(base, type="CONFIG_RADIO_PREPARE"))
+            self.assertEqual(sent, [])
+            client.handle_broadcast(dict(base, type="CONFIG_RADIO_PREPARE", target_nodes=[1]))
+            self.assertEqual(sent[-1]["type"], "PREPARE_ACK")
+            before = (client.current_channel, client.state, len(sent))
+            for kind in (
+                "CONFIG_RADIO_COMMIT", "NEW_CHANNEL_PING",
+                "RADIO_SWITCH_FINALIZED", "RADIO_SWITCH_CONFIRMED", "CONFIG_RADIO_ABORT",
+            ):
+                client.handle_broadcast(dict(base, type=kind))
+            self.assertEqual(
+                (client.current_channel, client.state, len(sent)), before
+            )
+            self.assertTrue(client.radio_switch_pending)
+        finally:
+            client.stop()
+
     def test_unbound_idle_client_accepts_job_bound_prepare(self):
         client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
         sent = []

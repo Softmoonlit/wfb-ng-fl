@@ -18,3 +18,7 @@ HEAD69a94d8，07为145ea88。仅server_daemon.py+test_fl_job_radio_policy.py。
 初始已成功无线事务、但后续role准备失败也保留recent.radio_results和已确认current config。恢复未知时recent.recovery_error=RADIO_CONFIGURATION_UNKNOWN，不用task/clientready冒充无线恢复。纯policy无新预算、初始归prep、真实control事务实际session lease沿owner实现。
 
 迁移 test_fl_radio_runtime_application：CONFIRMED 后缺确认现在明确断言 daemon.get_status_report()['radio'] is None、result.effective_config is None；单独 result.local_committed_config 保留本机已提交 downlink_mcs=4。rolled_back仍断言旧配置，finalized断言有效新配置。为避开当前并行Console缺常量的无关错误，测试使用daemon.radio_config构造patch与公开daemon.reconfigure_radio，running_server为127.0.0.1临时UDP。迁移3pass，server mypy成功，compile/diff check通过。未改control/console。
+
+完整runtime_application hang收口：确认并终止纯本机pytest PID232620（原命令仅test_fl_radio_runtime_application+test_fl_console），未碰实机服务。旧拼组只输出7 dots，之前60秒终止及此次>90秒运行均未通过，不能记成功。复现使用-o faulthandler_timeout=15并在25秒外部终止：red-runtime-rate-hang.txt显示主线程abort_job->_finalize_job->join(delivery_thread)，delivery等待JOB_RECOVERY，不是算法或sender未退出。fixture只回TASK_READY，无JOB_RECOVERY；payload io=5被部署默认120冻结覆盖。
+仅修改test_fl_radio_runtime_application.py：显式loopback control/IPC和临时端口，导入autouse socket出站guard；rate用例配置部署io=5而不是依赖payload覆盖。terminal出站内存peer提交同job/source/report身份的JOB_RECOVERY ready并核对ACK；fake sender wait返回后置sender_reaped，abort后验证该退出证明、Coordinator.wait成功、role.transport.ready=False、server_recovery_complete、missing_nodes=[]。无sleep，无生产deadline更改，无prodcore改动。
+runtime-rate-recovery.txt：2参数passed，9.05秒；runtime-application-full.txt：完整12passed，28.44秒，-o faulthandler_timeout=15未触发；compileall/diff check通过。未运行其他owner Console检查，父端可重新拼组。

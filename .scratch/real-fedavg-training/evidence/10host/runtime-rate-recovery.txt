@@ -1,0 +1,19 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 12 items / 10 deselected / 2 selected
+
+wfb_ng/tests/test_fl_radio_runtime_application.py::test_next_job_uses_final_effective_uftp_rate_in_sender_command[None-finalized-17000] PASSED [ 50%]
+wfb_ng/tests/test_fl_radio_runtime_application.py::test_next_job_uses_final_effective_uftp_rate_in_sender_command[RADIO_SWITCH_FINALIZED-rolled_back-15000] PASSED [100%]
+
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+================= 2 passed, 10 deselected, 2 warnings in 9.05s =================

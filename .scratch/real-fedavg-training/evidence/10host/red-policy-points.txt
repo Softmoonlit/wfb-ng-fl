@@ -1,0 +1,46 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds __
+
+policy_host = <function policy_host.<locals>.make at 0xfffee7846830>
+
+    def test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds(policy_host):
+        calls = []
+    
+        def policy(config, context):
+            calls.append(context.round_index)
+            assert context.phase == 'radio_policy'
+            assert context.job_id == host.payload['job_id']
+            assert context.target_nodes == (1, 2)
+            if context.round_index == 0:
+                assert host.evaluation_exited.is_set()
+                assert host.daemon.active_job is None
+                assert not host.announced.is_set()
+                assert host.daemon.server_state == ServerState.PREPARING
+            else:
+                assert host.runtime.wait_calls == 1
+                assert len(host.runtime.models) == 1
+                assert host.daemon.server_state == ServerState.RUNNING
+    
+        host = policy_host(policy)
+        host.launch()
+        recent = host.assert_succeeded()
+>       assert calls == [0, 1]
+E       assert [] == [0, 1]
+E         Right contains 2 more items, first extra item: 0
+E         Full diff:
+E         - [0, 1]
+E         + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:71: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds
+1 failed, 2 deselected, 2 warnings in 3.63s

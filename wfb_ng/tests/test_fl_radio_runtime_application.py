@@ -15,6 +15,7 @@ from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 from wfb_ng.tests.test_fl_console import register_idle
 from wfb_ng.tests import test_fl_radio_rest as radio_rest
+from wfb_ng.tests.test_fl_training_host import isolated_socket_boundary
 
 
 class ObservedNetworkAdapter(MockNetworkAdapter):
@@ -37,7 +38,7 @@ def tun_snapshot(daemon):
 
 
 @contextmanager
-def running_server(tmp_path, reject_updates=(), sender_finished=None, **config):
+def running_server(tmp_path, reject_updates=(), sender_finished=None, sender_reaped=None, **config):
     # 模拟 v6 的本机 UDP 端点，生产 updater 原样参与测试。
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp.bind(('127.0.0.1', 0))
@@ -58,7 +59,10 @@ def running_server(tmp_path, reject_updates=(), sender_finished=None, **config):
 
     worker = threading.Thread(target=serve, daemon=True)
     worker.start()
-    daemon = ServerDaemon(ServerDaemonConfig(ipc_port=0, enable_control_plane=False,
+    daemon = ServerDaemon(ServerDaemonConfig(ipc_host='127.0.0.1', ipc_port=0,
+                         control_bind_host='127.0.0.1', control_bind_port=0,
+                         control_broadcast_addr='127.0.0.1', control_broadcast_port=udp.getsockname()[1],
+                         enable_control_plane=False,
                          enable_link_process=True, air_interface='wlx-test',
                          radio_control_port=udp.getsockname()[1],
                          model_library_dir=str(tmp_path / 'models'), work_dir=str(tmp_path), **config),
@@ -77,6 +81,8 @@ def running_server(tmp_path, reject_updates=(), sender_finished=None, **config):
         def wait(self, timeout=None):
             if not self.exited.wait(timeout):
                 raise subprocess.TimeoutExpired('test-process', timeout)
+            if self.exited is sender_finished and sender_reaped is not None:
+                sender_reaped.set()
             return 0
     def spawn(command, **kwargs):
         commands.append(command)
@@ -235,7 +241,10 @@ def _ready_taskpeer(daemon, message):
 ])
 def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fail_at, status, expected_rate):
     sender_finished = threading.Event()
+    sender_reaped = threading.Event()
+    recovery_acks = []
     with running_server(tmp_path, tun_ip='127.0.0.1', sender_finished=sender_finished,
+                        sender_reaped=sender_reaped, io_timeout_seconds=5,
                         client_entry=f'{__name__}:_rate_client_entry',
                         aggregate_entry=f'{__name__}:_rate_aggregate_entry',
                         evaluate_entry=f'{__name__}:_rate_evaluate_entry',
@@ -249,7 +258,20 @@ def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fai
             if message['type'] == fail_at:
                 raise OSError('最终屏障广播失败')
             if message['type'] == 'TASK_ANNOUNCE':
+                assert message['io_timeout_seconds'] == 5
                 _ready_taskpeer(daemon, message)
+            elif message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+                # 模拟客户端收到终态后完成本地退出；服务端退出证明在abort返回后单独核对。
+                for node in (1,):
+                    replies = daemon.control_plane.handle_datagram(json.dumps({
+                        'type': 'JOB_RECOVERY', 'node_id': node, 'job_id': message['job_id'],
+                        'report_id': f"recovered-{message['job_id']}-{node}",
+                        'report': {'recovery_epoch': 1, 'recovery_state': 'ready'},
+                    }).encode(), ('127.0.0.1', 10000 + node))
+                    assert replies
+                    ack = json.loads(replies[0])
+                    assert ack['type'] == 'JOB_RECOVERY_ACK' and ack['ok'] is True, ack
+                    recovery_acks.append(ack)
             else:
                 peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
@@ -264,6 +286,8 @@ def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fai
             daemon.start_job({'job_id':'rate-job', 'run_id':'rate-run', 'target_nodes':[1],
                               'model_path':str(model), 'model_size_bytes':model.stat().st_size, 'rounds':1,
                               'server_http_port':0, 'io_timeout_seconds':5, 'live_observation':False})
+            coordinator = daemon.coordinator
+            role = daemon.server_role
             try:
                 assert uftp_started.wait(3)
                 send = next(command for command in commands if '-R' in command)
@@ -272,6 +296,15 @@ def test_next_job_uses_final_effective_uftp_rate_in_sender_command(tmp_path, fai
                 # 命令检查结束后释放假 sender，断言失败也能正常回收。
                 sender_finished.set()
             daemon.abort_job()
+            assert coordinator is not None
+            coordinator.wait(timeout=1)
+            assert sender_reaped.is_set(), '假sender必须已被实际wait回收'
+            assert role is not None and role.transport.ready is False
+            recent = daemon.get_status_report()['recent_job']
+            assert recent['recovery_state'] == 'ready'
+            assert recent['server_recovery_complete'] is True
+            assert recent['recovery_missing_nodes'] == []
+            assert recovery_acks
 
 
 def test_mcs_update_is_acknowledged_before_new_channel_ping(tmp_path):
