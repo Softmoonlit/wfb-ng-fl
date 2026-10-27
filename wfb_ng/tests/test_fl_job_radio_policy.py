@@ -577,3 +577,65 @@ def test_initial_target_snapshot_keeps_fixed_nodes_even_when_they_become_offline
     assert seen == [[1, 2]]
     assert host.errors[0].error_code == 'radio_transaction_failed'
     assert host.daemon.get_status_report()['recent_job']['radio_results'][0]['target_nodes'] == [1, 2]
+
+
+@pytest.mark.parametrize('phase', [0, 1])
+def test_policy_spawned_thread_cannot_escape_synchronous_radio_window(
+        policy_host, monkeypatch, phase):
+    attempted = threading.Event()
+    transaction_entered = threading.Event()
+    release_transaction = threading.Event()
+    children = []
+    rejected = []
+    saved_contexts = []
+
+    def policy(config, context):
+        if context.round_index != phase:
+            return
+        saved_contexts.append(context)
+
+        def spawned_configure():
+            try:
+                context.configure_radio({'radio_txpower_dbm': 13})
+            except FLRuntimeError as exc:
+                rejected.append(exc.error_code)
+                attempted.set()
+
+        child = threading.Thread(target=spawned_configure, name='fixture-escaped-radio')
+        children.append(child)
+        child.start()
+        # 在策略返回前确认子线程已进入事务，或已在公开上下文入口遭拒。
+        assert attempted.wait(2)
+
+    host = policy_host(policy)
+    host.hold_final_reports = True
+
+    def blocking_transaction(patch, target_nodes, *, job_id, stop_event):
+        transaction_entered.set()
+        attempted.set()
+        release_transaction.wait()
+        before = host.daemon.control_plane.active_radio_config
+        return RadioSwitchResult(success=True, session_id='must-not-escape',
+            target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+            effective_config=before, before_config=before, target_nodes=list(target_nodes),
+            confirmed_nodes=list(target_nodes), job_id=job_id)
+
+    monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocking_transaction)
+    try:
+        host.launch()
+        assert host.final_evaluated.wait(2), f'公开start未推进到末轮: {host.errors}'
+        assert rejected == ['radio_policy_phase_required'], '异线程必须在策略返回前被拒绝'
+        assert not transaction_entered.is_set(), '子线程不能持有跨越announce/nextpublish的事务'
+        assert len(host.runtime.models) == 2
+        with pytest.raises(FLRuntimeError) as caught:
+            saved_contexts[0].configure_radio({'radio_txpower_dbm': 13})
+        assert caught.value.error_code == 'radio_policy_phase_required'
+        assert host.round_ready(1)['ok'] is True
+        assert host.round_ready(2)['ok'] is True
+        recent = host.assert_succeeded()
+        assert recent['radio_results'] == []
+    finally:
+        release_transaction.set()
+        for child in children:
+            child.join(2)
+            assert not child.is_alive()

@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_radio_policy_entry_is_optional_deployment_config_and_json ________
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-332/test_radio_policy_entry_is_opt0')
+
+    def test_radio_policy_entry_is_optional_deployment_config_and_json(tmp_path):
+>       assert ServerDaemonConfig().radio_policy_entry is None
+E       AttributeError: 'ServerDaemonConfig' object has no attribute 'radio_policy_entry'
+
+wfb_ng/tests/test_fl_job_radio_policy.py:20: AttributeError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_radio_policy_entry_is_optional_deployment_config_and_json
+1 failed, 2 warnings in 3.03s

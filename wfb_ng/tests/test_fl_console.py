@@ -433,6 +433,83 @@ def test_web_config_rejects_forbidden_addresses(host):
         ServerDaemonConfig(web_host=host)
 
 
+def test_console_snapshot_projects_radio_transaction_facts_with_unknown_effective_config():
+    daemon = make_daemon()
+    daemon.server_state = ServerState.RUNNING
+    daemon.active_job = {
+        'job_id': 'job-radio-console', 'target_nodes': [1, 2], 'rounds': 2,
+        'radio_results': [
+            {
+                'request_id': 'radio-request-1', 'job_id': 'job-radio-console', 'round_index': 0,
+                'phase': 'CONFIRMED', 'transaction_state': 'confirmed',
+                'before_config': {'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14,
+                                  'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000,
+                                  'channel_width': 'HT40+', 'secret': '/private/before'},
+                'requested_patch': {'bandwidth_mhz': 20, 'downlink_mcs': 0, 'uftp_rate_kbps': 9000,
+                                    'dataset_root': '/private/data'},
+                'target_config': {'channel': 157, 'bandwidth_mhz': 20, 'radio_txpower_dbm': 14,
+                                  'downlink_mcs': 0, 'uplink_mcs': 4, 'uftp_rate_kbps': 9000,
+                                  'checkpoint': '/private/target'},
+                'target_nodes': [2, 1, 2], 'confirmed_nodes': [1, 2], 'unconfirmed_nodes': [],
+                'effective_config': {'channel': 157, 'bandwidth_mhz': 20, 'downlink_mcs': 0,
+                                     'uftp_rate_kbps': 9000,
+                                     'path': '/private/effective'},
+                'recovery_state': 'ready', 'error_code': None, 'reason': None,
+                'secret': {'path': '/private/secret'},
+            },
+            {
+                'request_id': 'radio-request-2', 'job_id': 'job-radio-console', 'round_index': 1,
+                'phase': 'unknown', 'transaction_state': 'radio_error',
+                'before_config': {'channel': 157, 'bandwidth_mhz': 20},
+                'requested_patch': {'uplink_mcs': 5}, 'target_config': {'uplink_mcs': 5},
+                'target_nodes': [1, 2], 'confirmed_nodes': [1], 'unconfirmed_nodes': [2],
+                'effective_config': None, 'recovery_state': 'blocked',
+                'error_code': 'radio_transaction_failed', 'reason': '确认未知',
+            },
+            {
+                'request_id': 'radio-request-bad', 'job_id': 'job-radio-console',
+                'round_index': 2,
+                'phase': 'phase-' + ('x' * 200), 'transaction_state': True,
+                'before_config': {'downlink_mcs': 10 ** 400, 'uplink_mcs': 0},
+                'requested_patch': {'radio_txpower_dbm': float('nan'), 'uplink_mcs': 0},
+                'target_config': {'uftp_rate_kbps': 10 ** 400},
+                'target_nodes': [1, 10 ** 400, True], 'confirmed_nodes': [1],
+                'unconfirmed_nodes': [10 ** 400], 'effective_config': {'uplink_mcs': 0},
+                'recovery_state': 'recovering', 'error_code': 'e' * 200,
+                'reason': 'r' * (1024 * 1024),
+            },
+            {'request_id': 'missing-round', 'job_id': 'job-radio-console'},
+        ],
+    }
+
+    state = daemon.console.snapshot()
+    results = state['current_job']['radio_results']
+    assert len(results) == 3
+    assert results[0]['request_id'] == 'radio-request-1'
+    assert results[0]['job_id'] == 'job-radio-console'
+    assert results[0]['round_index'] == 0
+    assert results[0]['target_nodes'] == [1, 2]
+    assert results[0]['confirmed_nodes'] == [1, 2]
+    assert results[0]['effective_config'] == {
+        'channel': 157, 'bandwidth_mhz': 20, 'downlink_mcs': 0, 'uftp_rate_kbps': 9000}
+    assert results[1]['effective_config'] is None
+    assert results[1]['unconfirmed_nodes'] == [2]
+    assert results[1]['recovery_state'] == 'blocked'
+    bad = results[2]
+    assert bad['before_config'] is None
+    assert bad['requested_patch'] is None
+    assert bad['target_config'] is None
+    assert bad['effective_config'] == {'uplink_mcs': 0}
+    assert bad['phase'] is None
+    assert bad['transaction_state'] is None
+    assert bad['error_code'] is None
+    assert bad['reason'] is None
+    serialized = json.dumps(results, ensure_ascii=False)
+    assert '/private/' not in serialized
+    assert 'secret' not in serialized
+    assert 'dataset_root' not in serialized
+
+
 def test_web_port_is_fixed_even_without_host():
     from wfb_ng.fl.errors import FLRuntimeError
     with pytest.raises(FLRuntimeError):

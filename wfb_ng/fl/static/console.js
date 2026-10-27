@@ -231,6 +231,28 @@
     facts.textContent = messages.join(' · ');
   }
 
+  function radioConfigText(config) {
+    if (!config) return '未知';
+    const values = [];
+    for (const key of ['bandwidth_mhz', 'radio_txpower_dbm', 'downlink_mcs', 'uplink_mcs', 'uftp_rate_kbps']) {
+      if (config[key] !== undefined) values.push(`${key} ${config[key]}`);
+    }
+    return values.length ? values.join(' · ') : '已取得';
+  }
+
+  function renderRadioResults(job) {
+    const rows = byId('job-radio-rows');
+    const note = byId('job-radio-note');
+    const results = (job && job.radio_results) || [];
+    rows.replaceChildren(...results.map(result => tableRow([
+      String(result.round_index), result.phase || '未知', result.transaction_state || '未知',
+      `${(result.target_nodes || []).join(',') || '—'} / ${(result.confirmed_nodes || []).join(',') || '—'}${result.unconfirmed_nodes && result.unconfirmed_nodes.length ? ` · 未确认 ${(result.unconfirmed_nodes || []).join(',')}` : ''}`,
+      radioConfigText(result.effective_config),
+      [result.recovery_state, result.error_code, result.reason].filter(Boolean).join(' · ') || '—'
+    ])));
+    note.textContent = results.length ? `${results.length} 条作业无线事务` : '暂无作业无线事务';
+  }
+
   function updateTimers() {
     if ((!sseConnected && !httpConnected) || !lastState) return;
     const job = lastState.current_job || (lastState.job && lastState.job.execution_result === 'running' ? lastState.job : null);
@@ -321,6 +343,7 @@
     }).join('；') : '—';
     renderTrainingResults(job);
     renderParticipantResults(job);
+    renderRadioResults(job);
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';
 
     const abortButton = byId('abort-job');

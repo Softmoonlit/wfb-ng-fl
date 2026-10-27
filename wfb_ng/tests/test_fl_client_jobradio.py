@@ -336,14 +336,26 @@ def test_wire_busy_prepare_rejected_before_ack_and_physical_change(radio_wire, s
     assert not (work / 'v6-update.json').exists()
 
 
-def test_wire_different_job_ignored_before_physical_change(radio_wire):
+def test_wire_different_job_rejected_before_physical_change(radio_wire):
     daemon, adapter, work, exchange, messages = radio_wire
-    before = len(messages)
     base = dict(job_id='another-job', session_id='wrong-job', target_nodes=[1],
                 patch={'uplink_mcs': 5, 'radio_txpower_dbm': 14})
-    exchange(dict(base, type='CONFIG_RADIO_PREPARE'))
+    before_effective = daemon._effective_radio
+    before_channels = list(adapter.channel_history)
+    before_wire = len(messages)
+    ack = exchange(dict(base, type='CONFIG_RADIO_PREPARE'), 'PREPARE_ACK')
+    assert ack['ok'] is False
+    assert ack['job_id'] == 'another-job'
+    assert ack['session_id'] == 'wrong-job'
+    assert len(messages) >= before_wire + 1
+    assert daemon._effective_radio == before_effective
+    assert list(adapter.channel_history) == before_channels
+    assert not daemon.control_plane.radio_switch_pending
+    assert not (work / 'v6-update.json').exists()
+    # COMMIT for a rejected PREPARE has no pending transaction and cannot alter the link.
     exchange(dict(base, type='CONFIG_RADIO_COMMIT', delay_ms=0))
-    assert len(messages) == before
+    assert daemon._effective_radio == before_effective
+    assert list(adapter.channel_history) == before_channels
     assert not daemon.control_plane.radio_switch_pending
     assert not (work / 'v6-update.json').exists()
 

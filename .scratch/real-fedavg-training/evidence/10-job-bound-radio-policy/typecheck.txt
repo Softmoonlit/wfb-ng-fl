@@ -1,0 +1,9 @@
+Type and syntax verification for the Ticket 10 algorithm/coordinator slice.
+
+Commands:
+python -m py_compile wfb_ng/fl/algorithm.py wfb_ng/fl/coordinator.py wfb_ng/tests/test_fl_algorithm_context.py wfb_ng/tests/test_fl_coordinator.py
+git diff --check -- wfb_ng/fl/algorithm.py wfb_ng/fl/coordinator.py wfb_ng/tests/test_fl_algorithm_context.py wfb_ng/tests/test_fl_coordinator.py
+python -m mypy wfb_ng/fl/algorithm.py wfb_ng/fl/coordinator.py
+
+Result:
+All commands passed. Mypy reported no issues in the two source files; unrelated existing annotation notes from wfb_ng/fl/transport.py are emitted by the repository configuration.

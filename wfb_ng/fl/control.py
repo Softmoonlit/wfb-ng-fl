@@ -365,6 +365,7 @@ class RadioSwitchResult:
     error_message: Optional[str] = None
     failed_phase: Optional[str] = None
     unresponsive_nodes: List[int] = field(default_factory=list)
+    unconfirmed_nodes: List[int] = field(default_factory=list)
     job_id: Optional[str] = None
     before_config: Optional[RadioConfig] = None
     target_nodes: List[int] = field(default_factory=list)
@@ -2044,6 +2045,21 @@ class ControlPlaneServer:
                     before_config=previous, target_nodes=sorted(targets),
                 )
             session_id = f"switch_{uuid.uuid4().hex}"
+            liveness_lease_started = False
+            if job_id is not None:
+                with self._lock:
+                    watch_exists = job_id in self._liveness_watches
+                if watch_exists:
+                    # 覆盖准备、三段可逆/不可逆屏障以及最坏回退等待。
+                    transaction_budget = (
+                        prepare_timeout_seconds
+                        + 3 * commit_timeout_seconds
+                        + lease_timeout_seconds
+                        + 2 * commit_delay_seconds
+                    )
+                    self.begin_job_liveness_lease(
+                        job_id, session_id, transaction_budget)
+                    liveness_lease_started = True
             committed = False
             commit_sent = False
             phase = "PREPARE"
@@ -2280,11 +2296,14 @@ class ControlPlaneServer:
                     target_channel=updated.channel, applied_patch=norm_patch,
                     effective_config=effective, error_message=error,
                     failed_phase=phase, unresponsive_nodes=missing,
+                    unconfirmed_nodes=missing,
                     job_id=job_id, before_config=previous,
                     target_nodes=sorted(targets),
                     confirmed_nodes=sorted(set(targets) - set(missing)),
                 )
             finally:
+                if liveness_lease_started and job_id is not None:
+                    self.end_job_liveness_lease(job_id, session_id)
                 with self._lock:
                     self._active_switch_session = None
                     self._target_switch_job_id = None
@@ -2434,6 +2453,9 @@ class ControlPlaneClient:
         self.on_radio_finalized: Optional[Callable[[RadioConfig], None]] = None
         self._pending_switch_session_id: Optional[str] = None
         self._pending_switch_job_id: Optional[str] = None
+        self._pending_switch_target_nodes: Tuple[int, ...] = ()
+        self._pending_switch_state: Optional[ClientNodeState] = None
+        self._pending_switch_locked_channel: Optional[int] = None
         self._pending_switch_patch: Optional[Dict[str, Any]] = None
         self._pre_switch_config: Optional[RadioConfig] = None
         self._switch_applied = False
@@ -2441,8 +2463,10 @@ class ControlPlaneClient:
         self._confirmed_switch_session: Optional[str] = None
         self._confirmed_switch_channel: Optional[int] = None
         self._confirmed_switch_job_id: Optional[str] = None
+        self._confirmed_switch_target_nodes: Tuple[int, ...] = ()
         self._rolled_back_switch_session: Optional[str] = None
         self._rolled_back_switch_job_id: Optional[str] = None
+        self._rolled_back_switch_target_nodes: Tuple[int, ...] = ()
 
         # Register radio switch broadcast handlers
         self.register_broadcast_handler(
@@ -2969,18 +2993,37 @@ class ControlPlaneClient:
         except Exception as exc:
             logger.debug("发送单播控制报文失败: %s", exc)
 
+    @staticmethod
+    def _canonical_target_nodes(value: Any) -> Tuple[int, ...]:
+        if (not isinstance(value, (list, tuple)) or not value or
+                any(type(node_id) is not int or not 1 <= node_id <= 10
+                    for node_id in value)):
+            raise ValueError("target_nodes 无效")
+        if len(set(value)) != len(value):
+            raise ValueError("target_nodes 不能重复")
+        return tuple(sorted(value))
+
     def _matches_pending_switch(self, msg: Dict[str, Any]) -> bool:
         """当前事务必须同时匹配 session、job 身份和冻结目标节点。"""
+        try:
+            target_nodes = self._canonical_target_nodes(
+                msg.get("target_nodes", [self.node_id]))
+        except ValueError:
+            return False
         return (
             self._pending_switch_session_id is not None
             and msg.get("session_id") == self._pending_switch_session_id
             and msg.get("job_id") == self._pending_switch_job_id
-            and self.node_id in msg.get("target_nodes", [self.node_id])
+            and target_nodes == self._pending_switch_target_nodes
+            and self.node_id in target_nodes
         )
 
     def _clear_pending_switch(self) -> None:
         self._pending_switch_session_id = None
         self._pending_switch_job_id = None
+        self._pending_switch_target_nodes = ()
+        self._pending_switch_state = None
+        self._pending_switch_locked_channel = None
         self._pending_switch_patch = None
         self._pre_switch_config = None
         self._switch_applied = False
@@ -2989,17 +3032,38 @@ class ControlPlaneClient:
     def _handle_radio_prepare(self, msg: Dict[str, Any]) -> None:
         session_id = msg.get("session_id")
         job_id = msg.get("job_id")
+        raw_targets = msg.get("target_nodes", [self.node_id])
         if not isinstance(session_id, str) or not session_id:
             return
         if job_id is not None and (not isinstance(job_id, str) or not job_id):
             return
-        if self.node_id not in msg.get("target_nodes", [self.node_id]):
+        try:
+            target_nodes = self._canonical_target_nodes(
+                msg.get("target_nodes", [self.node_id]))
+        except ValueError:
+            return
+        if self.node_id not in target_nodes:
             return
         with self._lock:
-            # 未绑定节点可接受初始 job-bound 策略；绑定任务后只接受同一 job。
-            if not self._accepts_job_transaction(job_id):
-                return
-            if self._pre_switch_config is not None:
+            # PREPARE itself reserves the owner. Only the exact same proposal
+            # may be acknowledged again before COMMIT; another owner is ignored.
+            if self._pending_switch_session_id is not None:
+                try:
+                    norm_patch = normalize_radio_patch(msg.get("patch", {}))
+                    calibration = msg.get("calibration", False)
+                    same_proposal = (
+                        session_id == self._pending_switch_session_id
+                        and job_id == self._pending_switch_job_id
+                        and target_nodes == self._pending_switch_target_nodes
+                        and norm_patch == self._pending_switch_patch
+                        and calibration is self._pending_switch_calibration
+                    )
+                except (TypeError, ValueError):
+                    same_proposal = False
+                if same_proposal:
+                    self._send_unicast_datagram(PrepareAck(
+                        self.node_id, session_id, ok=True, job_id=job_id,
+                        timestamp_ms=self._next_timestamp_ms()).to_bytes())
                 return
             try:
                 norm_patch = normalize_radio_patch(msg.get("patch", {}))
@@ -3011,8 +3075,12 @@ class ControlPlaneClient:
                 if self.on_radio_prepare is not None:
                     self.on_radio_prepare(job_id, updated)
                 self._rolled_back_switch_session = None
+                self._rolled_back_switch_target_nodes = ()
                 self._pending_switch_session_id = session_id
                 self._pending_switch_job_id = job_id
+                self._pending_switch_target_nodes = target_nodes
+                self._pending_switch_state = self.state
+                self._pending_switch_locked_channel = self.locked_channel
                 self._pending_switch_patch = norm_patch
                 self._pending_switch_calibration = calibration
                 self._finalized_proposal_session = None
@@ -3020,6 +3088,7 @@ class ControlPlaneClient:
                 self._confirmed_switch_session = None
                 self._confirmed_switch_channel = None
                 self._confirmed_switch_job_id = None
+                self._confirmed_switch_target_nodes = ()
                 ack = PrepareAck(
                     self.node_id, session_id, ok=True,
                     job_id=job_id, timestamp_ms=self._next_timestamp_ms())
@@ -3127,11 +3196,17 @@ class ControlPlaneClient:
             session_id = msg.get("session_id")
             if not isinstance(session_id, str) or not session_id:
                 return
-            if (self.node_id not in msg.get("target_nodes", [self.node_id])
+            try:
+                target_nodes = self._canonical_target_nodes(
+                    msg.get("target_nodes", [self.node_id]))
+            except ValueError:
+                return
+            if (self.node_id not in target_nodes
                 or not self._matches_current_radio(msg)):
                 return
             if (session_id == self._confirmed_switch_session
                 and msg.get("job_id") == self._confirmed_switch_job_id
+                and target_nodes == self._confirmed_switch_target_nodes
                 and self.current_channel == self._confirmed_switch_channel):
                 self._send_final_barrier_ack(
                     "RADIO_SWITCH_CONFIRMED_ACK", session_id,
@@ -3144,11 +3219,28 @@ class ControlPlaneClient:
             self.locked_channel = self.current_channel
             self.cached_channel = self.current_channel
             confirmed_job_id = self._pending_switch_job_id
+            confirmed_target_nodes = self._pending_switch_target_nodes
+            task_owned = (
+                confirmed_job_id is not None
+                and self._bound_job_id == confirmed_job_id
+            )
+            previous_state = self._pending_switch_state or ClientNodeState.IDLE
+            previous_locked_channel = self._pending_switch_locked_channel
             self._confirmed_switch_session = session_id
             self._confirmed_switch_channel = self.current_channel
             self._confirmed_switch_job_id = confirmed_job_id
+            self._confirmed_switch_target_nodes = confirmed_target_nodes
             self._clear_pending_switch()
-            self.state = ClientNodeState.IDLE
+            if task_owned:
+                self.state = previous_state
+                self.locked_channel = (
+                    previous_locked_channel
+                    if previous_locked_channel is not None
+                    else (self.current_channel if previous_state == ClientNodeState.IDLE else None)
+                )
+            else:
+                self.state = ClientNodeState.IDLE
+                self.locked_channel = self.current_channel
             self._state_enter_time = time.monotonic()
             new_config = self._current_radio_config()
             self._send_final_barrier_ack(
@@ -3195,6 +3287,13 @@ class ControlPlaneClient:
         self._finalized_proposal_session = None
         session_id = self._pending_switch_session_id
         rollback_job_id = self._pending_switch_job_id
+        rollback_target_nodes = self._pending_switch_target_nodes
+        task_owned = (
+            rollback_job_id is not None
+            and self._bound_job_id == rollback_job_id
+        )
+        previous_state = self._pending_switch_state or ClientNodeState.HUNTING
+        previous_locked_channel = self._pending_switch_locked_channel
         previous = self._pre_switch_config or self._current_radio_config()
         previous_calibration = (
             self._pre_switch_calibration if self._pre_switch_config is not None
@@ -3206,22 +3305,38 @@ class ControlPlaneClient:
         self.calibration = previous_calibration
         self._notify_radio_applied()
         self._clear_pending_switch()
-        self.locked_channel = None
-        self.state = ClientNodeState.HUNTING
+        if task_owned:
+            self.locked_channel = (
+                previous_locked_channel
+                if previous_locked_channel is not None
+                else (self.current_channel if previous_state == ClientNodeState.IDLE else None)
+            )
+            self.state = previous_state
+        else:
+            self.locked_channel = None
+            self.state = ClientNodeState.HUNTING
         self._state_enter_time = time.monotonic()
         self._wake_event.set()
         self._rolled_back_switch_session = session_id
         self._rolled_back_switch_job_id = rollback_job_id
+        self._rolled_back_switch_target_nodes = rollback_target_nodes
         if session_id is not None:
             self._send_final_barrier_ack(
                 "RADIO_SWITCH_ROLLBACK_ACK", session_id, rollback_job_id)
 
     def _handle_radio_abort(self, msg: Dict[str, Any]) -> None:
         with self._lock:
+            try:
+                target_nodes = self._canonical_target_nodes(
+                    msg.get("target_nodes", [self.node_id]))
+            except ValueError:
+                return
+            if (self._rolled_back_switch_session is not None and
+                    target_nodes != self._rolled_back_switch_target_nodes):
+                return
             if (self._rolled_back_switch_session is not None
                 and msg.get("session_id") == self._rolled_back_switch_session
                 and msg.get("job_id") == self._rolled_back_switch_job_id
-                and self.node_id in msg.get("target_nodes", [self.node_id])
                 and self._matches_current_radio(msg)):
                 self._send_final_barrier_ack(
                     "RADIO_SWITCH_ROLLBACK_ACK", self._rolled_back_switch_session,
@@ -3242,8 +3357,13 @@ class ControlPlaneClient:
             # 排队中的到期回调不得撤销新租约或已通过原子截止时间检查的确认。
             if not self.lease_watchdog.is_expired or self._pending_switch_session_id is None:
                 return
+            previous_channel = (
+                self._pre_switch_config.channel
+                if self._pre_switch_config is not None
+                else self.current_channel
+            )
             logger.warning("节点 %d: 射频租约耗尽 session=%s，回退至 Channel %d", self.node_id,
-                           self._pending_switch_session_id, DEFAULT_BENCHMARK_CHANNEL)
+                           self._pending_switch_session_id, previous_channel)
             # 即使首次恢复抛出异常，也唤醒现有监督循环以便重试。
             self._wake_event.set()
             self._rollback_switch()

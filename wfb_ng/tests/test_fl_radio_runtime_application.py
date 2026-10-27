@@ -110,10 +110,7 @@ def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_
         peer.daemon = daemon
         initial_link = daemon.console.snapshot()['server']['link_process'].copy()
         initial_tun = tun_snapshot(daemon)
-        current = daemon.console.radio_configuration()['config']
-        config = {key:current[key] for key in ('channel','bandwidth_mhz','radio_txpower_dbm','downlink_mcs','uplink_mcs','uftp_rate_kbps')}
-        config.update(downlink_mcs=4, uftp_rate_kbps=22000)
-        checked = daemon.console.validate_radio_configuration({'config':config})
+        current = daemon.radio_config.to_dict()
         def respond(message):
             if message['type'] == fail_at:
                 raise OSError('最终屏障广播失败')
@@ -121,8 +118,10 @@ def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_
                 assert updates[-1] == (2, 0, 0, 1, 40, 4, 0, 1)
             peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
-            result = daemon.console.apply_radio_configuration({
-                'confirmation_token':checked['confirmation']['token'], 'confirm_risk':False})
+            result = daemon.reconfigure_radio({
+                'confirmed': True,
+                'patch': {'downlink_mcs': 4, 'uftp_rate_kbps': 22000},
+                'target_nodes': [1]})
         assert result['status'] == expected_status
         assert [update[5] for update in updates] == expected_mcs
         assert len(commands) == 1
@@ -131,9 +130,14 @@ def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_
         assert daemon.console.snapshot()['server']['link_process']['running']
         expected_phase = {'RADIO_SWITCH_FINALIZED':'FINALIZED', 'RADIO_SWITCH_CONFIRMED':'CONFIRMED'}.get(fail_at)
         assert result['failed_phase'] == expected_phase
-        state = daemon.console.snapshot()['server']
-        assert state['radio']['downlink_mcs'] == (3 if expected_status == 'rolled_back' else 4)
-        assert state['state'] == ('radio_error' if expected_status == 'radio_error' else 'idle')
+        state = daemon.get_status_report()
+        if expected_status == 'radio_error':
+            assert state['radio'] is None
+            assert result['effective_config'] is None
+            assert result['local_committed_config']['downlink_mcs'] == 4
+        else:
+            assert state['radio']['downlink_mcs'] == (4 if expected_status == 'finalized' else 3)
+        assert state['server_state'] == ('RADIO_ERROR' if expected_status == 'radio_error' else 'IDLE')
 
 
 @pytest.mark.parametrize('reject_updates,status', [((1,), 'rolled_back'), ((1,2), 'radio_error')])

@@ -11,7 +11,9 @@ from typing import Any, BinaryIO, Callable, Dict, Optional
 
 from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
-from .radio import ALLOWED_BANDWIDTH_MHZ, ALLOWED_PATCH_KEYS, ALLOWED_MCS_VALUES, get_downlink_rate_bounds, validate_radio_config
+from .radio import (ALLOWED_5GHZ_CHANNELS, ALLOWED_BANDWIDTH_MHZ, ALLOWED_MCS_VALUES,
+                    ALLOWED_PATCH_KEYS, FIXED_FEC_K, FIXED_FEC_N, TXPOWER_MAX_DBM, TXPOWER_MIN_DBM,
+                    get_downlink_rate_bounds, validate_radio_config)
 
 
 class RadioPreparationError(Exception):
@@ -73,6 +75,123 @@ def _positive_int(value: Any) -> Optional[int]:
     if type(value) is not int or value <= 0:
         return None
     return value
+
+
+_RADIO_RESULT_CONFIG_FIELDS = {
+    'channel', 'bandwidth_mhz', 'radio_txpower_dbm', 'downlink_mcs',
+    'uplink_mcs', 'uftp_rate_kbps', 'fec_k', 'fec_n',
+    'channel_width', 'guard_interval',
+}
+_RADIO_RESULT_CHANNEL_WIDTHS = {'HT20', 'HT40+', 'HT40-'}
+_RADIO_RESULT_GUARD_INTERVALS = {'short'}
+_RADIO_RESULT_JS_SAFE_MAX = 2 ** 53 - 1
+_RADIO_RESULT_TEXT_MAX = 128
+_RADIO_RESULT_REASON_MAX_BYTES = 512
+
+
+def _bounded_utf8(value: Any, max_bytes: int) -> Optional[str]:
+    if not isinstance(value, str) or not value or len(value.encode('utf-8')) > max_bytes:
+        return None
+    return value
+
+
+def _radio_safe_int(value: Any, minimum: int, maximum: int) -> Optional[int]:
+    if (type(value) is not int or not -_RADIO_RESULT_JS_SAFE_MAX <= value <= _RADIO_RESULT_JS_SAFE_MAX
+            or value < minimum or value > maximum):
+        return None
+    return value
+
+
+def _project_radio_config(value: Any) -> Optional[Dict[str, Any]]:
+    """只投影已知射频配置键，不把事务内部任意字典送入 Web。"""
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    for key in _RADIO_RESULT_CONFIG_FIELDS:
+        if key not in value:
+            continue
+        item = value[key]
+        projected: Any = None
+        if key == 'channel':
+            projected = item if type(item) is int and item in ALLOWED_5GHZ_CHANNELS else None
+        elif key == 'bandwidth_mhz':
+            projected = item if type(item) is int and item in ALLOWED_BANDWIDTH_MHZ else None
+        elif key == 'radio_txpower_dbm':
+            projected = _radio_safe_int(item, TXPOWER_MIN_DBM, TXPOWER_MAX_DBM)
+        elif key in ('downlink_mcs', 'uplink_mcs'):
+            # 10 的结果允许 MCS 0；生产入口的组合校验仍由 radio.py 负责。
+            projected = _radio_safe_int(item, 0, 6)
+        elif key == 'uftp_rate_kbps':
+            projected = _radio_safe_int(item, 1, _RADIO_RESULT_JS_SAFE_MAX)
+        elif key == 'fec_k':
+            projected = item if type(item) is int and item == FIXED_FEC_K else None
+        elif key == 'fec_n':
+            projected = item if type(item) is int and item == FIXED_FEC_N else None
+        elif key == 'channel_width':
+            projected = item if isinstance(item, str) and item in _RADIO_RESULT_CHANNEL_WIDTHS else None
+        elif key == 'guard_interval':
+            projected = item if isinstance(item, str) and item in _RADIO_RESULT_GUARD_INTERVALS else None
+        else:
+            projected = None
+        if projected is None:
+            return None
+        result[key] = projected
+    return result or None
+
+
+def _project_node_list(value: Any) -> list:
+    if not isinstance(value, list):
+        return []
+    return sorted({item for item in value
+                   if type(item) is int and 1 <= item <= 255
+                   and item <= _RADIO_RESULT_JS_SAFE_MAX})
+
+
+def _project_radio_result(value: Any, job_id: Any) -> Optional[Dict[str, Any]]:
+    """投影 10 的有限事务事实；effective_config=None 表示未知，不能替换。"""
+    if not isinstance(value, dict) or not isinstance(job_id, str) or value.get('job_id') != job_id:
+        return None
+    request_id = _bounded_utf8(value.get('request_id'), _RADIO_RESULT_TEXT_MAX)
+    if request_id is None:
+        return None
+    round_index = _radio_safe_int(value.get('round_index'), 0, _RADIO_RESULT_JS_SAFE_MAX)
+    if round_index is None:
+        return None
+    phase = _bounded_utf8(value.get('phase'), _RADIO_RESULT_TEXT_MAX)
+    transaction_state = _bounded_utf8(value.get('transaction_state'), _RADIO_RESULT_TEXT_MAX)
+    recovery_state = _bounded_utf8(value.get('recovery_state'), _RADIO_RESULT_TEXT_MAX)
+    error_code = _bounded_utf8(value.get('error_code'), _RADIO_RESULT_TEXT_MAX)
+    reason = _bounded_utf8(value.get('reason'), _RADIO_RESULT_REASON_MAX_BYTES)
+    result: Dict[str, Any] = {
+        'request_id': request_id,
+        'job_id': job_id,
+        'round_index': round_index,
+        'phase': phase,
+        'transaction_state': transaction_state,
+        'before_config': _project_radio_config(value.get('before_config')),
+        'requested_patch': _project_radio_config(value.get('requested_patch')),
+        'target_config': _project_radio_config(value.get('target_config')),
+        'target_nodes': _project_node_list(value.get('target_nodes')),
+        'confirmed_nodes': _project_node_list(value.get('confirmed_nodes')),
+        'unconfirmed_nodes': _project_node_list(value.get('unconfirmed_nodes')),
+        'effective_config': (_project_radio_config(value.get('effective_config'))
+                             if value.get('effective_config') is not None else None),
+        'recovery_state': recovery_state,
+        'error_code': error_code,
+        'reason': reason,
+    }
+    return result
+
+
+def _project_radio_results(value: Any, job_id: Any) -> list:
+    if not isinstance(value, list):
+        return []
+    result = []
+    for item in value:
+        projected = _project_radio_result(item, job_id)
+        if projected is not None:
+            result.append(projected)
+    return result
 
 
 def _project_device(value: Any) -> Optional[Dict[str, str]]:
@@ -354,6 +473,7 @@ def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
         'final_model_sha256': final_model_sha256,
         'final_model_size_bytes': final_model_size,
     }
+    view['radio_results'] = _project_radio_results(job.get('radio_results'), job.get('job_id'))
     prep_reports = job.get('client_preparation_reports')
     preparation_by_node: Dict[int, Any] = {}
     if isinstance(prep_reports, dict):

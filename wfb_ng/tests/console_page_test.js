@@ -22,7 +22,11 @@ const snapshot = {
     evaluation:{initial_metrics:{loss:2, accuracy:0}, rounds:[{round_index:1, output_model_sha256:'b'.repeat(64),
       metrics:{loss:0, accuracy:0}, verdict:null, client_submission_returns_received:false, training:[]}],
       effect_result:{verdict:null}, final_model_sha256:'b'.repeat(64)},
-    participants:[{node_id:1, online:false, state:'offline', readiness:'OFFLINE', reported_state:null,
+    radio_results:[{request_id:'radio-1',job_id:'job-1',round_index:0,phase:'CONFIRMED',transaction_state:'confirmed',
+      target_nodes:[1],confirmed_nodes:[1],unconfirmed_nodes:[],effective_config:{bandwidth_mhz:20},recovery_state:'ready'},
+      {request_id:'radio-2',job_id:'job-1',round_index:1,phase:'unknown',transaction_state:'radio_error',
+       target_nodes:[1],confirmed_nodes:[],unconfirmed_nodes:[1],effective_config:null,recovery_state:'blocked',
+       error_code:'radio_transaction_failed',reason:'确认未知'}],    participants:[{node_id:1, online:false, state:'offline', readiness:'OFFLINE', reported_state:null,
       error_code:null, can_select:false, selection_blockers:[{code:'NODE_OFFLINE', message:'节点未上线或心跳已超时'}],
       preparation:{sample_count:60000, device:{type:'cuda', name:'GPU 1'}},
       training:[{round_index:1, sample_count:60000, optimizer_steps:938, train_loss:0, device:{type:'cuda'}}]}],
@@ -73,6 +77,10 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   assert.match(text(page.elements['job-participant-rows'].children[0]), /938/);
   assert.match(page.elements['job-recovery-facts'].textContent, /Server 资源恢复尚未完成/);
   assert.match(page.elements['job-recovery-facts'].textContent, /未确认恢复节点：1/);
+  assert.equal(page.elements['job-radio-rows'].children.length, 2);
+  assert.match(text(page.elements['job-radio-rows'].children[0]), /20/);
+  assert.match(text(page.elements['job-radio-rows'].children[1]), /未知/);
+  assert.match(text(page.elements['job-radio-rows'].children[1]), /radio_transaction_failed/);
   const aborted = JSON.parse(JSON.stringify(snapshot));
   aborted.state_version = 5;
   aborted.job.execution_result = 'aborted';

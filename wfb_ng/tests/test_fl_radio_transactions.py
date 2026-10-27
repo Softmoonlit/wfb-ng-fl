@@ -11,7 +11,7 @@ import unittest
 import threading
 from unittest.mock import Mock, patch
 
-from wfb_ng.fl.control import ControlPlaneClient, ControlPlaneServer
+from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, ControlPlaneServer
 from wfb_ng.fl.radio import RadioConfig
 from wfb_ng.fl.errors import FLRuntimeError
 
@@ -140,7 +140,7 @@ class TestRadioTransaction(unittest.TestCase):
         self.assertIsNone(result.effective_config)
 
     def test_barrier_ack_requires_matching_session_node_channel_and_phase(self):
-        mutations = [{"session_id": "stale"}, {"node_id": 2}, {"channel": 153},
+        mutations = [{"session_id": "stale"}, {"job_id": "stale"}, {"node_id": 2}, {"channel": 153},
                      {"type": "RADIO_SWITCH_CONFIRMED_ACK"}]
         for mutation in mutations:
             with self.subTest(mutation=mutation):
@@ -242,6 +242,21 @@ class TestRadioTransaction(unittest.TestCase):
             self.assertFalse(observed[0][2], "prepare callback must precede local pending state")
             self.assertEqual(sent[-1]["type"], "PREPARE_ACK")
             self.assertEqual(sent[-1]["job_id"], "job-a")
+            sent_before = len(sent)
+            client.handle_broadcast(message)
+            self.assertEqual(len(sent), sent_before + 1)
+            self.assertEqual(observed[0][0], "job-a")
+            self.assertEqual(len(observed), 1, "idempotent PREPARE must not re-run owner callback")
+
+            sent_before = len(sent)
+            client.handle_broadcast(dict(message, target_nodes=[1, 2]))
+            self.assertEqual(len(sent), sent_before)
+            client.handle_broadcast(dict(
+                message, type="CONFIG_RADIO_COMMIT", target_nodes=[1, 2],
+                delay_ms=0, lease_timeout_seconds=.5,
+            ))
+            self.assertEqual(len(sent), sent_before)
+            self.assertTrue(client.radio_switch_pending)
 
             sent_before = len(sent)
             client.handle_broadcast(dict(message, session_id="session-b", job_id="job-b"))
@@ -268,6 +283,110 @@ class TestRadioTransaction(unittest.TestCase):
             self.assertEqual(sent[-1]["job_id"], "job-a")
         finally:
             client.stop()
+
+    def test_job_bound_confirmed_and_rollback_preserve_task_state_and_channel_owner(self):
+        client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
+        sent = []
+        commit_seen = threading.Event()
+        client._send_unicast_datagram = lambda data: (
+            sent.append(json.loads(data)),
+            commit_seen.set() if json.loads(data).get("type") == "COMMIT_SUCCESS" else None,
+        )
+        client.bind_job_context("job-task")
+        client.state = ClientNodeState.RUNNING
+        client.locked_channel = 157
+        base = {
+            "job_id": "job-task", "target_nodes": [1],
+            "config": RadioConfig(channel=157, uplink_mcs=5).to_dict(),
+            "calibration": False,
+        }
+        try:
+            client.handle_broadcast(dict(base, type="CONFIG_RADIO_PREPARE",
+                                         session_id="job-session", patch={"uplink_mcs": 5}))
+            client.handle_broadcast(dict(base, type="CONFIG_RADIO_COMMIT",
+                                         session_id="job-session", patch={"uplink_mcs": 5},
+                                         delay_ms=0, lease_timeout_seconds=.5))
+            client.handle_broadcast(dict(base, type="NEW_CHANNEL_PING",
+                                         session_id="job-session", channel=157))
+            self.assertTrue(commit_seen.wait(1))
+            client.handle_broadcast(dict(base, type="RADIO_SWITCH_FINALIZED",
+                                         session_id="job-session", channel=157, patch={"uplink_mcs": 5}))
+            client.handle_broadcast(dict(base, type="RADIO_SWITCH_CONFIRMED",
+                                         session_id="job-session", channel=157, patch={"uplink_mcs": 5}))
+            self.assertEqual(client.state, ClientNodeState.RUNNING)
+            self.assertEqual(client.locked_channel, 157)
+        finally:
+            client.stop()
+
+        rollback_client = ControlPlaneClient(1, "10.80.0.11", initial_channel=153)
+        rollback_client.bind_job_context("job-task")
+        rollback_client.state = ClientNodeState.RUNNING
+        rollback_client.locked_channel = 153
+        rollback_client._send_unicast_datagram = lambda data: None
+        try:
+            rollback_client.handle_broadcast({
+                "type": "CONFIG_RADIO_PREPARE", "session_id": "rollback-session",
+                "job_id": "job-task", "target_nodes": [1],
+                "patch": {"uplink_mcs": 5},
+            })
+            rollback_client.handle_broadcast({
+                "type": "CONFIG_RADIO_ABORT", "session_id": "rollback-session",
+                "job_id": "job-task", "target_nodes": [1], "channel": 153,
+                "config": rollback_client._current_radio_config().to_dict(),
+                "calibration": False,
+            })
+            self.assertEqual(rollback_client.state, ClientNodeState.RUNNING)
+            self.assertEqual(rollback_client.locked_channel, 153)
+        finally:
+            rollback_client.stop()
+
+    def test_job_transaction_starts_and_ends_liveness_lease(self):
+        server = ControlPlaneServer(RadioConfig(channel=157, radio_txpower_dbm=12))
+        server.watch_job_liveness("job-lease", [1], lambda event: None)
+        begin_calls = []
+        end_calls = []
+        original_begin = server.begin_job_liveness_lease
+        original_end = server.end_job_liveness_lease
+        server.begin_job_liveness_lease = lambda job, transaction, timeout: (
+            begin_calls.append((job, transaction, timeout)),
+            original_begin(job, transaction, timeout),
+        )[1]
+        server.end_job_liveness_lease = lambda job, transaction: (
+            end_calls.append((job, transaction)),
+            original_end(job, transaction),
+        )[1]
+
+        def broadcast(message):
+            replies = {
+                "CONFIG_RADIO_PREPARE": "PREPARE_ACK",
+                "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
+                "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
+                "RADIO_SWITCH_CONFIRMED": "RADIO_SWITCH_CONFIRMED_ACK",
+            }
+            reply_type = replies.get(message["type"])
+            if reply_type is None:
+                return
+            payload = {
+                "type": reply_type, "node_id": 1,
+                "session_id": message["session_id"], "job_id": message["job_id"],
+                "current_channel": message.get("channel", 149),
+                "channel": message.get("channel", 149), "ok": True,
+                "config": message["config"], "calibration": message["calibration"],
+            }
+            server.handle_datagram(json.dumps(payload).encode(), ("127.0.0.1", 12003))
+
+        server.broadcast_downlink = broadcast
+        try:
+            result = server.reconfigure_radio(
+                {"channel": 149}, [1], commit_delay_seconds=0,
+                commit_timeout_seconds=.05, ping_interval_seconds=.005,
+                job_id="job-lease",
+            )
+            self.assertEqual(result.status, "finalized")
+            self.assertEqual(begin_calls[0][0], "job-lease")
+            self.assertEqual(end_calls, [("job-lease", begin_calls[0][1])])
+        finally:
+            server.unwatch_job_liveness("job-lease")
 
     def test_stop_before_commit_restores_full_previous_config(self):
         server = ControlPlaneServer(RadioConfig(
@@ -343,6 +462,7 @@ class TestRadioTransaction(unittest.TestCase):
         self.assertEqual(result.status, "radio_error")
         self.assertIsNone(result.effective_config)
         self.assertTrue(server.radio_error)
+        self.assertEqual(result.unconfirmed_nodes, [1])
         self.assertEqual(server.active_radio_config.channel, 153)
 
     def setUp(self):

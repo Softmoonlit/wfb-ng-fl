@@ -107,6 +107,19 @@ def main() -> None:
                 1: {'sample_count': 60000, 'device': {'type': 'cuda', 'name': 'GPU 1'}},
                 2: {'sample_count': 60000, 'device': {'type': 'cuda', 'name': 'GPU 2'}},
             },
+            'radio_results': [{
+                'request_id': 'radio-1', 'job_id': 'job-07-browser', 'round_index': 1,
+                'phase': 'CONFIRMED', 'transaction_state': 'confirmed',
+                'target_nodes': [1, 2], 'confirmed_nodes': [1, 2], 'unconfirmed_nodes': [],
+                'effective_config': {'bandwidth_mhz': 20, 'uftp_rate_kbps': 9000},
+                'recovery_state': 'ready',
+            }, {
+                'request_id': 'radio-2', 'job_id': 'job-07-browser', 'round_index': 2,
+                'phase': 'unknown', 'transaction_state': 'radio_error',
+                'target_nodes': [1, 2], 'confirmed_nodes': [1], 'unconfirmed_nodes': [2],
+                'effective_config': None, 'recovery_state': 'blocked',
+                'error_code': 'radio_transaction_failed', 'reason': '确认未知',
+            }],
         }
         # controlled snapshot：不让宿主测试触发真实 recovery control 查询。
         daemon._refresh_job_recovery = lambda: None

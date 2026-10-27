@@ -1092,6 +1092,11 @@ class ServerDaemon:
                 "unresponsive_nodes": result.unresponsive_nodes,
                 "error_message": result.error_message,
                 "effective_config": self.radio_config.to_dict() if self._radio_config_confirmed else None,
+                "local_committed_config": (
+                    self.radio_config.to_dict()
+                    if result.status == "radio_error" and result.effective_config is None
+                    else None
+                ),
             }
 
     def _configure_job_radio(
@@ -1383,11 +1388,13 @@ class ServerDaemon:
 
                     def invoke_policy(config: Any, context: AlgorithmContext) -> None:
                         context.check_stop()
+                        policy_thread = threading.current_thread()
                         window_open = True
 
                         def configure(patch: Any) -> Dict[str, Any]:
-                            if not window_open:
-                                raise FLRuntimeError('radio_policy_phase_required', '无线策略调用窗口已结束')
+                            if threading.current_thread() is not policy_thread or not window_open:
+                                raise FLRuntimeError(
+                                    'radio_policy_phase_required', '无线配置仅允许在当前策略调用线程和窗口内执行')
                             return self._configure_job_radio(
                                 job, context.round_index, context.stop_event,
                                 model_preparation, radio_results, radio_failure, patch)
