@@ -13,7 +13,7 @@ from .artifacts import fsync_directory, preflight_artifact
 from .errors import FLRuntimeError
 from .mnist_data import load_mnist
 from .reference_model import (MODEL_FORMAT, MAX_MODEL_BYTES, load_model,
-                              MNISTReferenceModel, validate_state_dict, write_model_atomic)
+                              MNISTReferenceModel, ModelPath, validate_state_dict, write_model_atomic)
 
 
 UPDATE_FIELDS = {'model_format', 'state_dict', 'base_model_sha256', 'node_id',
@@ -100,6 +100,29 @@ def _validate_update(value, node, round_index, base_sha):
             or any(type(item) is not str or not 0 < len(item) <= 128 for item in device.values())):
         raise FLRuntimeError('invalid_mnist_update', 'update 训练设备必须为有限 GPU 描述')
     validate_state_dict(value['state_dict'])
+
+
+def read_update_metadata(path: ModelPath, *, node_id: int, round_index: int,
+                         base_model_sha256: str, expected_sample_count: int) -> dict:
+    """严格读取参考 update 的有限事实，不返回参数，也不推断训练或作业成功。"""
+    if (type(node_id) is not int or not 1 <= node_id <= 10
+            or type(round_index) is not int or not 0 < round_index < 2**63
+            or type(base_model_sha256) is not str
+            or re.fullmatch(r'[0-9a-f]{64}', base_model_sha256) is None
+            or type(expected_sample_count) is not int or not 0 < expected_sample_count <= 60000):
+        raise FLRuntimeError('invalid_mnist_update', 'update 元数据预期身份、摘要或样本约束无效')
+    value = _load_update(path)
+    try:
+        _validate_update(value, node_id, round_index, base_model_sha256)
+    except (TypeError, ValueError, OverflowError, RuntimeError) as exc:
+        raise FLRuntimeError('invalid_mnist_update', 'update 元数据或参数格式无效') from exc
+    if value['sample_count'] != expected_sample_count:
+        raise FLRuntimeError('invalid_mnist_update', 'update 实际样本数与预期样本数不一致')
+    return {'model_format': value['model_format'],
+            'base_model_sha256': value['base_model_sha256'],
+            'node_id': value['node_id'], 'round_index': value['round_index'],
+            'sample_count': value['sample_count'], 'optimizer_steps': value['optimizer_steps'],
+            'train_loss': float(value['train_loss']), 'device': dict(value['device'])}
 
 
 def aggregate_entry(current_model_path, updates_by_node, output_model_path, config, context):

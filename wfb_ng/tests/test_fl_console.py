@@ -85,34 +85,43 @@ def test_snapshot_recovery_observes_existing_terminal_steps_without_client_barri
     from unittest.mock import Mock
     daemon = make_daemon()
     daemon.server_state = ServerState.RUNNING
-    daemon.active_job = {'job_id': 'test-job', 'target_nodes': [1]}
+    daemon.active_job = {'job_id': 'test-job', 'target_nodes': [1], 'io_timeout_seconds': 1}
     role = Mock()
     observed = []
     role.close.side_effect = lambda: observed.append(daemon.console.snapshot())
     daemon.server_role = role
     diagnostic = daemon.event_bus.subscribe()
     with patch.object(daemon.control_plane, 'broadcast_downlink',
-                      side_effect=lambda message: observed.append(daemon.console.snapshot())):
+                      side_effect=lambda message: observed.append(daemon.console.snapshot())), \
+            patch.object(daemon.control_plane, 'prepare_job_recovery'), \
+            patch.object(daemon.control_plane, 'wait_for_job_recovery', return_value=True), \
+            patch.object(daemon.control_plane, 'get_job_recovery_reports', return_value={
+                1: {'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}}):
         daemon.abort_job()
     assert all(state['recent_job']['execution_result'] == 'aborted' for state in observed)
     assert all(state['recent_job']['recovery_state'] == 'recovering' for state in observed)
     assert all(not state['server']['can_start_job'] for state in observed)
-    final = daemon.console.snapshot()
+    with patch.object(daemon.control_plane, 'get_job_recovery_reports', return_value={
+            1: {'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}}):
+        final = daemon.console.snapshot()
     assert final['recent_job']['recovery_state'] == 'ready'
     assert daemon.server_state == ServerState.IDLE
     # Recovery.ready describes existing local cleanup, not a Client release barrier.
     assert not final['server']['can_start_job']  # no ready nodes
     assert diagnostic.get_nowait()['type'] == 'JOB_ABORTED'
-    assert diagnostic.empty()
-    daemon.active_job = {'job_id': 'fail-job', 'target_nodes': [1]}
+    daemon.active_job = {'job_id': 'fail-job', 'target_nodes': [1], 'io_timeout_seconds': 1}
     daemon.server_state = ServerState.RUNNING
-    with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=OSError('wireless gone')):
-        with pytest.raises(Exception):
-            daemon.abort_job()
+    with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=OSError('wireless gone')), \
+            patch.object(daemon.control_plane, 'prepare_job_recovery'), \
+            patch.object(daemon.control_plane, 'wait_for_job_recovery', return_value=True), \
+            patch.object(daemon.control_plane, 'get_job_recovery_reports', return_value={
+                1: {'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}}):
+        daemon.abort_job()
     blocked = daemon.console.snapshot()
     assert blocked['recent_job']['execution_result'] == 'aborted'
     assert blocked['recent_job']['recovery_state'] == 'blocked'
     assert not blocked['server']['can_start_job']
+    assert diagnostic.get_nowait()['type'] == 'JOB_ABORTED'
     assert diagnostic.empty()
 
 
@@ -140,9 +149,9 @@ def register_idle(daemon):
     hb = _heartbeat()
     from dataclasses import replace
     hb = replace(hb, state='HUNTING')
-    daemon.control_plane.registry.update_heartbeat(hb, ('10.80.0.11', 9001), daemon.radio_config)
+    daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
     hb = replace(hb, state='IDLE')
-    daemon.control_plane.registry.update_heartbeat(hb, ('10.80.0.11', 9001), daemon.radio_config)
+    daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
 
 
 def test_lifecycle_changes_advance_version_even_between_reads():
@@ -241,20 +250,47 @@ def test_packaged_page_renders_errors_retry_and_refresh_with_existing_node():
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_real_chromium_renders_training_facts_and_reload():
+    import os
+    import shutil
+    import subprocess
+    import sys
+    from pathlib import Path
+    chromium = Path('/snap/bin/chromium')
+    node = shutil.which('node')
+    if not chromium.is_file() or not node:
+        pytest.skip('Chromium snap and Node are required for the real page check')
+    root = Path(__file__).resolve().parents[2]
+    env = os.environ.copy()
+    env['PYTHONDONTWRITEBYTECODE'] = '1'
+    env['PYTHONPATH'] = str(root) + (os.pathsep + env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).with_name('console_training_browser_check.py'))],
+        cwd=root, env=env, text=True, capture_output=True, timeout=120)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert '评估表、固定参与者摘要、未判定事实与重载快照恢复通过' in result.stdout
+
+
 def test_local_recovery_failure_does_not_overwrite_execution_error_or_core_idle():
     from unittest.mock import Mock
     daemon = make_daemon()
     daemon.server_state = ServerState.RUNNING
-    daemon.active_job = {'job_id': 'failed-execution', 'target_nodes': [1]}
+    daemon.active_job = {'job_id': 'failed-execution', 'target_nodes': [1], 'io_timeout_seconds': 1}
     daemon.server_role = Mock()
     daemon.server_role.close.side_effect = OSError('cleanup failure')
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
-        daemon._on_job_failed('failed-execution', RuntimeError('original execution failure'))
+    with patch.object(daemon.control_plane, 'broadcast_downlink'), \
+            patch.object(daemon.control_plane, 'prepare_job_recovery'), \
+            patch.object(daemon.control_plane, 'wait_for_job_recovery', return_value=True), \
+            patch.object(daemon.control_plane, 'get_job_recovery_reports', return_value={
+                1: {'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}}):
+        daemon._finalize_job(
+            outcome='failed', job_id='failed-execution',
+            reason='original_execution_failure', error='original execution failure')
     job = daemon.console.snapshot()['recent_job']
     assert job['execution_result'] == 'failed'
     assert job['recovery_state'] == 'blocked'
     assert job['error'] == 'original execution failure'
-    assert job['recovery_error'] == 'ROLE_CLOSE_FAILED'
+    assert job['recovery_error'] == 'RESOURCE_RECOVERY_FAILED'
     assert daemon.server_state == ServerState.IDLE
 
 
@@ -272,14 +308,123 @@ def test_offline_transition_advances_version_and_records_one_key_event():
     assert offline['nodes'][0]['online'] is False
 
 
-def test_console_job_excludes_local_runtime_paths_and_snapshots_are_independent():
+def test_console_snapshot_projects_controlled_training_and_recovery_facts_without_paths():
     daemon = make_daemon()
-    daemon.active_job = {'job_id': 'job', 'model_path': '/private/model.bin', 'target_nodes': [1], 'rounds': 3}
-    first = daemon.console.snapshot()
-    assert 'model_path' not in first['job']
-    first['job']['target_nodes'].append(2)
-    assert daemon.console.snapshot()['job']['target_nodes'] == [1]
+    daemon.server_state = ServerState.RUNNING
+    daemon.active_job = {
+        'job_id': 'job-07-controlled', 'run_id': 'run-07-controlled',
+        'model_sha256': 'a' * 64, 'model_size_bytes': 10,
+        'target_nodes': [1, 2], 'rounds': 1, 'current_round': 1,
+        'rounds_completed': 1, 'server_phase': 'preparing',
+        'algorithm': {
+            'client_entry': 'wfb_ng.fl.mnist:client_entry',
+            'aggregate_entry': 'wfb_ng.fl.mnist:aggregate_entry',
+            'evaluate_entry': 'wfb_ng.fl.mnist:evaluate_entry',
+            'config': {'data_seed': 1, 'local_data_dir': '/private/not-web'},
+        },
+        'initial_metrics': {'loss': 2.0, 'accuracy': 0.0},
+        'server_preparation': {
+            'sample_count': 10000,
+            'device': {'type': 'cpu', 'name': 'CPU', 'torch_version': 'test', 'cuda_version': 'unavailable'},
+        },
+        'client_preparation_reports': {
+            1: {'model_format': 'mnist-two-conv-fp32-v1', 'sample_count': 60000,
+                'device': {'type': 'cuda', 'name': 'GPU 1', 'torch_version': 'test', 'cuda_version': '12'}},
+            2: {'model_format': 'mnist-two-conv-fp32-v1', 'sample_count': 60000,
+                'device': {'type': 'cuda', 'name': 'GPU 2', 'torch_version': 'test', 'cuda_version': '12'}},
+        },
+        'summary': {
+            'status': 'succeeded', 'execution_result': 'succeeded', 'rounds_completed': 1,
+            'initial_metrics': {'loss': 2.0, 'accuracy': 0.0},
+            'rounds': [{
+                'round_index': 1, 'input_model_sha256': 'a' * 64, 'output_model_sha256': 'b' * 64,
+                'metrics': {'loss': 0.0, 'accuracy': 0.0}, 'verdict': None, 'reason': None,
+                'committed_nodes': [1, 2], 'client_submission_returns_received': True,
+                'training': {
+                    1: {'node_id': 1, 'round_index': 1, 'model_format': 'mnist-two-conv-fp32-v1',
+                        'base_model_sha256': 'a' * 64,
+                        'sample_count': 60000, 'optimizer_steps': 938, 'train_loss': 0.0,
+                        'device': {'type': 'cuda', 'name': 'GPU 1'}, 'metadata_status': 'available'},
+                    2: {'node_id': 2, 'round_index': 1, 'model_format': 'mnist-two-conv-fp32-v1',
+                        'base_model_sha256': 'a' * 64,
+                        'sample_count': 60000, 'optimizer_steps': 938, 'train_loss': 0.0,
+                        'device': {'type': 'cuda', 'name': 'GPU 2'}, 'metadata_status': 'available'},
+                },
+                'updates': {1: {'path': '/private/update-1.pt', 'sha256': 'c' * 64,
+                                'size_bytes': 12, 'secret': 'must-not-project'}},
+                'secret': 'must-not-project',
+            }],
+            'effect_result': {'round_index': 1, 'metrics': {'loss': 0.0, 'accuracy': 0.0},
+                              'verdict': None, 'reason': None},
+            'final_model_sha256': 'b' * 64, 'final_model_size_bytes': 11,
+            'final_model_path': '/private/final.pt',
+        },
+        'recovery_state': 'unconfirmed',
+        'server_recovery_complete': False,
+        'recovery_missing_nodes': [2],
+        'recovery_reports': {
+            1: {'report_id': 'recovery-1', 'source': ('10.0.0.1', 1),
+                'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}},
+        },
+        'additional_errors': [{'phase': 'cleanup', 'error_code': 'LATE_ERROR', 'reason': '附加诊断'}],
+        'first_failure': {'phase': 'round', 'node_id': 2, 'error_code': 'GPU_TRAINING_FAILED', 'reason': '设备失败'},
+        'liveness_events': [{'node_id': 2, 'state': 'offline', 'message': '节点 2 失联'}],
+        'unknown_fact': 'must-not-project',
+    }
 
+    state = daemon.console.snapshot()
+    job = state['current_job']
+    assert job['evaluation']['initial_metrics'] == {'loss': 2.0, 'accuracy': 0.0}
+    assert job['evaluation']['rounds'][0]['metrics'] == {'loss': 0.0, 'accuracy': 0.0}
+    assert job['evaluation']['rounds'][0]['verdict'] is None
+    assert job['evaluation']['final_model_sha256'] == 'b' * 64
+    assert job['participants'][0]['preparation']['sample_count'] == 60000
+    assert job['participants'][0]['training'][0]['optimizer_steps'] == 938
+    assert job['participants'][0]['training'][0]['model_format'] == 'mnist-two-conv-fp32-v1'
+    assert job['participants'][1]['training'][0]['train_loss'] == 0.0
+    assert job['recovery']['state'] == 'unconfirmed'
+    assert job['recovery']['recovery_state'] == 'unconfirmed'
+    assert job['recovery']['missing_nodes'] == [2]
+    assert job['recovery_missing_nodes'] == [2]
+    assert job['server_recovery_complete'] is False
+    assert job['recovery_reports'] == [{'node_id': 1, 'report_id': 'recovery-1',
+                                        'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}]
+    assert job['first_failure']['error_code'] == 'GPU_TRAINING_FAILED'
+    assert job['liveness_events'][0]['state'] == 'offline'
+    serialized = json.dumps(job, ensure_ascii=False)
+    assert '/private/' not in serialized
+    assert 'must-not-project' not in serialized
+    assert 'source' not in serialized
+
+
+def test_snapshot_huge_numbers_and_unknown_algorithm_config_fail_closed():
+    daemon = make_daemon()
+    daemon.server_state = ServerState.RUNNING
+    daemon.active_job = {
+        'job_id': 'job-07-huge', 'target_nodes': [1], 'rounds': 1,
+        'model_sha256': 'a' * 64, 'model_size_bytes': 1,
+        'algorithm': {
+            'client_entry': 'custom.client:entry',
+            'config': {'data_seed': 10 ** 400, 'dataset_root': '/private/data', 'checkpoint': '/private/checkpoint'},
+        },
+        'initial_metrics': {'loss': 10 ** 400, 'accuracy': 0},
+        'client_preparation_reports': {1: {'sample_count': 60000, 'device': {'type': 'cuda', 'name': 'GPU'}}},
+        'round_results': [{
+            'round_index': 1,
+            'metrics': {'loss': 10 ** 400, 'accuracy': 0},
+            'verdict': False,
+            'client_submission_returns_received': False,
+            'training': {1: {'node_id': 1, 'round_index': 1, 'train_loss': 10 ** 400,
+                             'sample_count': 60000, 'optimizer_steps': 938,
+                             'device': {'type': 'cuda', 'name': 'GPU'}}},
+        }],
+    }
+    state = daemon.console.snapshot()
+    job = state['current_job']
+    assert job['evaluation']['initial_metrics'] is None
+    assert job['evaluation']['rounds'][0]['metrics'] is None
+    assert 'train_loss' not in job['participants'][0]['training'][0]
+    assert job['algorithm'] == {'client_entry': 'custom.client:entry'}
 
 @pytest.mark.parametrize('host', ['0.0.0.0', '127.0.0.1', '127.1.2.3', '10.80.0.1', 'not-an-address'])
 def test_web_config_rejects_forbidden_addresses(host):
@@ -421,17 +566,24 @@ def test_unassigned_management_address_is_retried_when_it_becomes_available():
 def test_role_close_failure_is_blocked_and_preserves_successful_execution():
     daemon = make_daemon()
     daemon.server_state = ServerState.RUNNING
-    daemon.active_job = {'job_id':'success-with-cleanup-error', 'target_nodes':[1]}
+    daemon.active_job = {'job_id':'success-with-cleanup-error', 'target_nodes':[1],
+                         'io_timeout_seconds': 1, 'rounds_completed': 0}
     from unittest.mock import Mock
     role = Mock()
     role.close.side_effect = OSError('role failed to close')
     daemon.server_role = role
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
-        daemon._on_job_completed('success-with-cleanup-error', {})
+    with patch.object(daemon.control_plane, 'broadcast_downlink'), \
+            patch.object(daemon.control_plane, 'prepare_job_recovery'), \
+            patch.object(daemon.control_plane, 'wait_for_job_recovery', return_value=True), \
+            patch.object(daemon.control_plane, 'get_job_recovery_reports', return_value={
+                1: {'report': {'recovery_epoch': 1, 'recovery_state': 'ready'}}}):
+        daemon._finalize_job(
+            outcome='completed', job_id='success-with-cleanup-error',
+            summary={'execution_result': 'succeeded', 'rounds_completed': 0})
     job = daemon.console.snapshot()['recent_job']
     assert job['execution_result'] == 'succeeded'
     assert job['recovery_state'] == 'blocked'
-    assert job['recovery_error'] == 'ROLE_CLOSE_FAILED'
+    assert job['recovery_error'] == 'RESOURCE_RECOVERY_FAILED'
 
 
 def test_daemon_stop_retains_aborted_job_and_blocks_unconfirmed_recovery():
@@ -454,53 +606,36 @@ def test_invalid_tun_and_web_configuration_maps_to_domain_error():
     assert error.value.error_code == 'invalid_tun_ip'
 
 
-def test_real_management_ipv4_validation_bind_and_http_service():
-    from pyroute2 import IPRoute
-    from wfb_ng.fl.console_http import validate_management_address
-    with IPRoute() as ip:
-        ip.get_timeout = 1.0
-        ip.get_timeout_exception = TimeoutError
-        ip.settimeout(1.0)
-        candidates = [address.get_attr('IFA_LOCAL') or address.get_attr('IFA_ADDRESS')
-                      for address in ip.get_addr(family=socket.AF_INET)]
-    host = None
-    for candidate in candidates:
-        try:
-            validate_management_address(candidate, 'fl-s', None)
-        except OSError:
-            continue
-        host = candidate
-        break
-    if host is None:
-        pytest.skip('No assigned non-wireless management IPv4 for real listener integration')
-    daemon = make_daemon(web_host=host)
-    daemon.start()
+def test_loopback_management_listener_serves_console_on_ephemeral_port():
+    from wfb_ng.fl.console_http import ManagementWebListener
+    ready = threading.Event()
+    daemon = make_daemon()
+    with socket.socket() as probe:
+        probe.bind(('127.0.0.1', 0))
+        port = probe.getsockname()[1]
+    statuses = []
+
+    def status(state, error):
+        statuses.append((state, error))
+        if state == 'ready':
+            ready.set()
+
+    listener = ManagementWebListener('127.0.0.1', port, daemon.console,
+                                     lambda host: None, status)
+    listener.start()
     try:
-        deadline = time.monotonic() + 4
-        while True:
-            ipc = http.client.HTTPConnection('127.0.0.1', daemon.actual_ipc_port, timeout=2)
-            ipc.request('GET', '/api/v1/state')
-            state = json.loads(ipc.getresponse().read())
-            ipc.close()
-            if state['server']['management_web']['status'] == 'ready':
-                break
-            assert time.monotonic() < deadline, state['server']['management_web']
-            threading.Event().wait(0.01)
+        assert ready.wait(3)
         for path in ('/', '/assets/console.js', '/api/v1/state'):
-            conn = http.client.HTTPConnection(host, 8080, timeout=2)
+            conn = http.client.HTTPConnection('127.0.0.1', port, timeout=2)
             conn.request('GET', path)
             response = conn.getresponse()
             body = response.read()
-            assert response.status == 200
-            if path == '/api/v1/state':
-                web_state = json.loads(body)['server']['management_web']
-                assert web_state == {'status':'ready', 'host':host, 'port':8080, 'error':None}
             conn.close()
+            assert response.status == 200
+            assert body
+        assert statuses[-1] == ('ready', None)
     finally:
-        daemon.stop()
-    with socket.socket() as probe:
-        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        probe.bind((host, 8080))
+        listener.stop()
 
 
 def test_web_stop_closes_listener_without_waiting_for_slow_snapshot_request():

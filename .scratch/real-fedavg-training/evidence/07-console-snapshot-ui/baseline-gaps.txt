@@ -1,0 +1,3 @@
+The mainline-provided full Console baseline is recorded at `/tmp/wfb07-console-resumed.txt`: 34 passed, 2 warnings. The host metadata helper/host-related check provided by mainline reports 37 passed.
+
+No 07 production code was changed to accommodate the former 06 lifecycle fixture failures. The current 06 baseline is `e53de00`; actual host `summary.rounds[].training` wiring remains the handoff item. 07 controlled facts and page checks are independent of that handoff.

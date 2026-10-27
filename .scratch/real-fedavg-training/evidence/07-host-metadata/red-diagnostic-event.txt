@@ -1,0 +1,71 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_publish_event_keeps_shared_diagnostic_original_and_enriches_console ___
+
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-313/test_publish_event_keeps_share0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff7c1410c0>
+
+    def test_publish_event_keeps_shared_diagnostic_original_and_enriches_console(tmp_path, monkeypatch):
+        from copy import deepcopy
+        import socket
+        from wfb_ng.fl.client_daemon import NetworkAdapter
+
+        def reject_network(*args, **kwargs):
+            raise AssertionError('07 宿主事件检查禁止网络出站')
+
+        monkeypatch.setattr(socket.socket, 'sendto', reject_network)
+        monkeypatch.setattr(socket.socket, 'connect', reject_network)
+        monkeypatch.setattr(socket.socket, 'connect_ex', reject_network)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sink:
+            sink.bind(('127.0.0.1', 0))
+            port = sink.getsockname()[1]
+            adapter = Mock(spec=NetworkAdapter)
+            adapter.is_tun_active.return_value = False
+            host = ServerDaemon(ServerDaemonConfig(
+                enable_control_plane=False, enable_link_process=False,
+                ipc_host='127.0.0.1', ipc_port=0,
+                control_bind_host='127.0.0.1', control_bind_port=0,
+                control_broadcast_addr='127.0.0.1', control_broadcast_port=port,
+                radio_control_port=port, work_dir=str(tmp_path),
+                model_library_dir=str(tmp_path / 'models'),
+            ), network_adapter=adapter)
+            host.active_job = {'job_id': 'snapshot-job', 'target_nodes': [1], 'rounds': 1}
+            training = {'node_id': 1, 'round_index': 1, 'sample_count': 60000,
+                        'optimizer_steps': 938, 'train_loss': 1.25}
+            host._job_training_by_round[1] = [training]
+            original = {'type': 'ROUND_COMPLETED', 'job_id': 'snapshot-job', 'round_index': 1,
+                        'summary': {'round_index': 1, 'metrics': {'loss': 1.0}}}
+            before = deepcopy(original)
+            subscriber = host.event_bus.subscribe()
+            # 观察 Console 公开入口，并继续执行真实 Console 投影。
+            recorded = Mock(wraps=host.console.record_event)
+            monkeypatch.setattr(host.console, 'record_event', recorded)
+            host.publish_event(original)
+            diagnostic = subscriber.get_nowait()
+            history = recorded.call_args.args[0]
+            assert history['summary']['training'] == [training]
+            assert host.console.snapshot()['current_job']['evaluation']['rounds'][0]['training'] == [training]
+>           assert diagnostic == before
+E           AssertionError: assert {'job_id': 's...ND_COMPLETED'} == {'job_id': 's...ND_COMPLETED'}
+E             Omitting 3 identical items, use -vv to show
+E             Differing items:
+E             {'summary': {'metrics': {'loss': 1.0}, 'round_index': 1, 'training': [{'node_id': 1, 'optimizer_steps': 938, 'round_index': 1, 'sample_count': 60000, ...}]}} != {'summary': {'metrics': {'loss': 1.0}, 'round_index': 1}}
+E             Full diff:
+E               {
+E                'job_id': 'snapshot-job',
+E                'round_index': 1,...
+E
+E             ...Full output truncated (12 lines hidden), use '-vv' to show
+
+wfb_ng/tests/test_fl_training_snapshot_host.py:146: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_training_snapshot_host.py::test_publish_event_keeps_shared_diagnostic_original_and_enriches_console
+1 failed, 4 deselected, 2 warnings in 0.63s

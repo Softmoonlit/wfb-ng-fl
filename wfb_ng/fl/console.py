@@ -1,6 +1,7 @@
 """Authoritative console state and operator history, independent of HTTP."""
 from copy import deepcopy
 from datetime import datetime, timezone
+import math
 import queue
 import threading
 import uuid
@@ -37,16 +38,337 @@ def _state_facts(value: Any) -> Any:
     return value
 
 
+def _finite_number(value: Any) -> bool:
+    return _finite_float(value) is not None
+
+
+def _finite_float(value: Any) -> Optional[float]:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return None
+    try:
+        number = float(value)
+    except (OverflowError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def _finite_metrics(value: Any) -> Optional[Dict[str, Any]]:
+    """只投影已验证的有限数值指标，保留合法的零值。"""
+    if not isinstance(value, dict) or not value:
+        return None
+    if any(not isinstance(key, str) or not _finite_number(item)
+           for key, item in value.items()):
+        return None
+    return deepcopy(value)
+
+
+def _sha256(value: Any) -> Optional[str]:
+    if (not isinstance(value, str) or len(value) != 64
+            or any(char not in '0123456789abcdefABCDEF' for char in value)):
+        return None
+    return value.lower()
+
+
+def _positive_int(value: Any) -> Optional[int]:
+    if type(value) is not int or value <= 0:
+        return None
+    return value
+
+
+def _project_device(value: Any) -> Optional[Dict[str, str]]:
+    if not isinstance(value, dict):
+        return None
+    result = {}
+    device_type = value.get('type')
+    device_name = value.get('name')
+    if (not isinstance(device_type, str) or device_type not in ('cpu', 'cuda')
+            or not isinstance(device_name, str) or not 0 < len(device_name) <= 128):
+        return None
+    result['type'] = device_type
+    result['name'] = device_name
+    for key in ('torch_version', 'cuda_version'):
+        item = value.get(key)
+        if isinstance(item, str) and 0 < len(item) <= 128:
+            result[key] = item
+    return result
+
+
+def _project_preparation(value: Any) -> Optional[Dict[str, Any]]:
+    """准备报告只保留页面需要的事实，不暴露本机路径或原始对象。"""
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    if isinstance(value.get('model_format'), str):
+        result['model_format'] = value['model_format']
+    sample_count = _positive_int(value.get('sample_count'))
+    if sample_count is not None:
+        result['sample_count'] = sample_count
+    data_seed = _positive_int(value.get('data_seed'))
+    if data_seed is not None:
+        result['data_seed'] = data_seed
+    if type(value.get('ready')) is bool:
+        result['ready'] = value['ready']
+    device = _project_device(value.get('device'))
+    if device is not None:
+        result['device'] = device
+    digests = value.get('data_sha256')
+    if isinstance(digests, dict):
+        projected = {key: digest for key, digest in digests.items()
+                     if isinstance(key, str) and _sha256(digest) is not None}
+        if projected:
+            result['data_sha256'] = projected
+    for key in ('error_code', 'reason', 'error'):
+        if isinstance(value.get(key), str) and value[key]:
+            result[key] = value[key]
+    return result or None
+
+
+def _project_training(value: Any, node_id: Optional[int] = None) -> Optional[Dict[str, Any]]:
+    """投影参考算法已由宿主验证的单节点训练 metadata。"""
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    actual_node = value.get('node_id', node_id)
+    if type(actual_node) is int and actual_node > 0:
+        result['node_id'] = actual_node
+    if isinstance(value.get('model_format'), str) and value['model_format']:
+        result['model_format'] = value['model_format']
+    round_index = _positive_int(value.get('round_index'))
+    if round_index is not None:
+        result['round_index'] = round_index
+    base_sha = _sha256(value.get('base_model_sha256'))
+    if base_sha is not None:
+        result['base_model_sha256'] = base_sha
+    update_sha = _sha256(value.get('update_sha256'))
+    if update_sha is not None:
+        result['update_sha256'] = update_sha
+    update_size = _positive_int(value.get('update_size_bytes'))
+    if update_size is not None:
+        result['update_size_bytes'] = update_size
+    for key in ('sample_count', 'optimizer_steps'):
+        number = _positive_int(value.get(key))
+        if number is not None:
+            result[key] = number
+    loss = value.get('train_loss')
+    loss_number = _finite_float(loss)
+    if loss_number is not None and loss_number >= 0:
+        result['train_loss'] = loss
+    device = _project_device(value.get('device'))
+    if device is not None:
+        result['device'] = device
+    if isinstance(value.get('metadata_status'), str):
+        result['metadata_status'] = value['metadata_status']
+    for key in ('error_code', 'reason', 'error'):
+        if isinstance(value.get(key), str) and value[key]:
+            result[key] = value[key]
+    return result or None
+
+
+def _project_training_entries(value: Any) -> list:
+    entries: list = []
+    if isinstance(value, dict):
+        source: Any = value.items()
+    elif isinstance(value, list):
+        source = ((item.get('node_id') if isinstance(item, dict) else None, item)
+                  for item in value)
+    else:
+        return entries
+    for raw_node, fact in source:
+        try:
+            node_id = int(raw_node)
+        except (TypeError, ValueError):
+            node_id = None
+        if node_id is None or node_id <= 0:
+            continue
+        projected = _project_training(fact, node_id)
+        if projected is not None:
+            projected['node_id'] = node_id
+            entries.append(projected)
+    return sorted(entries, key=lambda item: item['node_id'])
+
+
+def _project_effect(value: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    round_index = _positive_int(value.get('round_index'))
+    if round_index is not None:
+        result['round_index'] = round_index
+    metrics = _finite_metrics(value.get('metrics'))
+    if metrics is not None:
+        result['metrics'] = metrics
+    if type(value.get('verdict')) is bool:
+        result['verdict'] = value['verdict']
+    else:
+        result['verdict'] = None
+    if isinstance(value.get('reason'), str) and value['reason']:
+        result['reason'] = value['reason']
+    else:
+        result['reason'] = None
+    return result
+
+
+def _project_round(value: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    round_index = _positive_int(value.get('round_index'))
+    if round_index is None:
+        return None
+    result['round_index'] = round_index
+    for key in ('input_model_sha256', 'output_model_sha256'):
+        digest = _sha256(value.get(key))
+        if digest is not None:
+            result[key] = digest
+    for key in ('input_model_size_bytes', 'output_model_size_bytes'):
+        size = _positive_int(value.get(key))
+        if size is not None:
+            result[key] = size
+    metrics = _finite_metrics(value.get('metrics'))
+    result['metrics'] = metrics
+    if type(value.get('verdict')) is bool:
+        result['verdict'] = value['verdict']
+    else:
+        result['verdict'] = None
+    result['reason'] = value.get('reason') if isinstance(value.get('reason'), str) else None
+    for key in ('committed_nodes', 'dropped_out_nodes'):
+        values = value.get(key)
+        result[key] = sorted(item for item in values if type(item) is int and item > 0) if isinstance(values, list) else []
+    result['client_submission_returns_received'] = value.get('client_submission_returns_received') is True
+    result['training'] = _project_training_entries(value.get('training'))
+    return result
+
+
+def _project_rounds(job: Dict[str, Any], summary: Dict[str, Any]) -> list:
+    raw_rounds = summary.get('rounds') if isinstance(summary.get('rounds'), list) else job.get('round_results')
+    if not isinstance(raw_rounds, list):
+        return []
+    result: list = []
+    for raw_round in raw_rounds:
+        projected = _project_round(raw_round)
+        if projected is not None:
+            result.append(projected)
+    return sorted(result, key=lambda item: item['round_index'])
+
+
+def _project_recovery_report(value: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(value, dict):
+        return None
+    candidate = value.get('report')
+    report: Dict[str, Any] = candidate if isinstance(candidate, dict) else value
+    result: Dict[str, Any] = {}
+    epoch = _positive_int(report.get('recovery_epoch'))
+    if epoch is not None:
+        result['recovery_epoch'] = epoch
+    if isinstance(report.get('recovery_state'), str):
+        result['recovery_state'] = report['recovery_state']
+    for key in ('error_code', 'reason', 'error'):
+        if isinstance(report.get(key), str) and report[key]:
+            result[key] = report[key]
+    return result or None
+
+
+def _project_recovery_reports(value: Any) -> list:
+    if not isinstance(value, dict):
+        return []
+    result: list = []
+    for raw_node, envelope in value.items():
+        try:
+            node_id = int(raw_node)
+        except (TypeError, ValueError):
+            continue
+        if node_id <= 0:
+            continue
+        report = _project_recovery_report(envelope)
+        if report is None:
+            continue
+        item: Dict[str, Any] = {'node_id': node_id, 'report': report}
+        if isinstance(envelope, dict) and isinstance(envelope.get('report_id'), str):
+            item['report_id'] = envelope['report_id']
+        result.append(item)
+    return sorted(result, key=lambda item: item['node_id'])
+
+
+def _project_diagnostic(value: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    for key in ('node_id', 'round_index'):
+        number = value.get(key)
+        if type(number) is int and number > 0:
+            result[key] = number
+    for key in ('phase', 'error_code', 'reason', 'error', 'message', 'state'):
+        if isinstance(value.get(key), str) and value[key]:
+            result[key] = value[key]
+    return result or None
+
+
+def _project_algorithm(value: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(value, dict):
+        return None
+    result: Dict[str, Any] = {}
+    client_entry = value.get('client_entry')
+    for key in ('client_entry', 'aggregate_entry', 'evaluate_entry', 'radio_policy_entry'):
+        if isinstance(value.get(key), str) and value[key]:
+            result[key] = value[key]
+    # 参考 MNIST 只允许页面看到已冻结的无路径 data_seed；未知算法不暴露 config。
+    config = value.get('config')
+    if (client_entry == 'wfb_ng.fl.mnist:client_entry'
+            and isinstance(config, dict)
+            and type(config.get('data_seed')) is int
+            and 0 < config['data_seed'] < 2 ** 63):
+        result['config'] = {'data_seed': config['data_seed']}
+    return result or None
+
+
 def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
               disconnections: Dict[str, list]) -> Optional[Dict[str, Any]]:
     if job is None:
         return None
     fields = {"job_id", "run_id", "model_sha256", "model_size_bytes", "target_nodes", "rounds",
-              "started_at", "preparation_timeout_seconds", "execution_result", "recovery_state", "error", "reason", "recovery_error",
+              "started_at", "preparation_timeout_seconds", "round_timeout_seconds", "io_timeout_seconds",
+              "execution_result", "recovery_state", "error", "reason", "recovery_error",
               "current_round", "rounds_completed", "server_phase", "round_started_at", "phase_started_at"}
     view = {k: deepcopy(v) for k, v in job.items() if k in fields}
     target_nodes = view.get("target_nodes", [])
     view["target_nodes"] = target_nodes
+    summary_value = job.get('summary')
+    summary: Dict[str, Any] = summary_value if isinstance(summary_value, dict) else {}
+    initial_metrics = _finite_metrics(summary.get('initial_metrics'))
+    if initial_metrics is None:
+        initial_metrics = _finite_metrics(job.get('initial_metrics'))
+    rounds = _project_rounds(job, summary)
+    effect = _project_effect(summary.get('effect_result'))
+    if effect is None:
+        effect = _project_effect(job.get('effect_result'))
+    final_model_sha256 = _sha256(summary.get('final_model_sha256'))
+    final_model_size = _positive_int(summary.get('final_model_size_bytes'))
+    view['algorithm'] = _project_algorithm(job.get('algorithm'))
+    view['server_preparation'] = _project_preparation(job.get('server_preparation'))
+    view['initial_metrics'] = initial_metrics
+    view['effect_result'] = effect
+    view['evaluation'] = {
+        'initial_metrics': initial_metrics,
+        'rounds': rounds,
+        'effect_result': effect,
+        'final_model_sha256': final_model_sha256,
+        'final_model_size_bytes': final_model_size,
+    }
+    prep_reports = job.get('client_preparation_reports')
+    preparation_by_node: Dict[int, Any] = {}
+    if isinstance(prep_reports, dict):
+        for raw_node, report in prep_reports.items():
+            try:
+                node_id = int(raw_node)
+            except (TypeError, ValueError):
+                continue
+            if node_id > 0:
+                preparation_by_node[node_id] = _project_preparation(report)
+    training_by_node: Dict[int, list] = {}
+    for round_view in rounds:
+        for training in round_view['training']:
+            node_id = training['node_id']
+            training_by_node.setdefault(node_id, []).append(deepcopy(training))
     participant_fields = ("node_id", "online", "state", "readiness", "reported_state",
                           "error_code", "can_select", "selection_blockers")
     view["participants"] = []
@@ -59,7 +381,7 @@ def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
         ]
         node = nodes.get(node_id)
         if node is None:
-            view["participants"].append({
+            participant = {
                 "node_id": node_id,
                 "online": False,
                 "state": "offline",
@@ -69,11 +391,41 @@ def _job_view(job: Optional[Dict[str, Any]], nodes: Dict[int, Dict[str, Any]],
                 "can_select": False,
                 "selection_blockers": [{"code": "NODE_NOT_IN_SNAPSHOT", "message": "节点不在当前状态快照"}],
                 "disconnection_events": disconnection_events,
-            })
+            }
         else:
             participant = {key: deepcopy(node[key]) for key in participant_fields}
             participant["disconnection_events"] = disconnection_events
-            view["participants"].append(participant)
+        participant['preparation'] = deepcopy(preparation_by_node.get(node_id))
+        participant['training'] = deepcopy(training_by_node.get(node_id, []))
+        view["participants"].append(participant)
+    recovery_state = job.get('recovery_state') if isinstance(job.get('recovery_state'), str) else 'not_required'
+    recovery_missing_nodes = sorted(node for node in job.get('recovery_missing_nodes', [])
+                                    if type(node) is int and node > 0) if isinstance(job.get('recovery_missing_nodes'), list) else []
+    recovery_reports = _project_recovery_reports(job.get('recovery_reports'))
+    additional_errors = [_project_diagnostic(item) for item in job.get('additional_errors', [])
+                         if _project_diagnostic(item) is not None] if isinstance(job.get('additional_errors'), list) else []
+    first_failure = _project_diagnostic(job.get('first_failure'))
+    liveness_events = [_project_diagnostic(item) for item in job.get('liveness_events', [])
+                       if _project_diagnostic(item) is not None] if isinstance(job.get('liveness_events'), list) else []
+    server_recovery_complete = job.get('server_recovery_complete') if type(job.get('server_recovery_complete')) is bool else None
+    view['recovery_missing_nodes'] = recovery_missing_nodes
+    view['recovery_reports'] = recovery_reports
+    view['additional_errors'] = additional_errors
+    view['first_failure'] = first_failure
+    view['liveness_events'] = liveness_events
+    view['client_error'] = _project_diagnostic(job.get('client_error'))
+    view['recovery_wait_finished'] = job.get('recovery_wait_finished') if type(job.get('recovery_wait_finished')) is bool else None
+    view['server_recovery_complete'] = server_recovery_complete
+    view['recovery'] = {
+        'state': recovery_state,
+        'recovery_state': recovery_state,
+        'missing_nodes': recovery_missing_nodes,
+        'reports': recovery_reports,
+        'server_recovery_complete': server_recovery_complete,
+        'additional_errors': additional_errors,
+        'first_failure': first_failure,
+        'liveness_events': liveness_events,
+    }
     return view
 
 

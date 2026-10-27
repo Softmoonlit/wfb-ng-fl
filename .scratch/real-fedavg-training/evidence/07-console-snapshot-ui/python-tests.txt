@@ -1,0 +1,10 @@
+Command: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -m pytest -q wfb_ng/tests/test_fl_console.py -k 'snapshot_projects_controlled_training_and_recovery_facts_without_paths or snapshot_huge_numbers_and_unknown_algorithm_config_fail_closed or packaged_page_renders_errors_retry_and_refresh_with_existing_node or real_chromium_renders_training_facts_and_reload or loopback_management_listener_serves_console_on_ephemeral_port'
+Result: 5 passed, 29 deselected.
+
+Command: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -m pytest -q wfb_ng/tests/test_fl_console.py
+Result: 34 passed, 2 warnings (mainline-provided /tmp/wfb07-console-resumed.txt)
+
+Command: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -m pytest -q wfb_ng/tests/test_fl_sse_abort.py wfb_ng/tests/test_fl_online_target_selection.py
+Result: 20 passed, 2 warnings.
+
+Mainline host metadata helper/host checks: 37 passed.

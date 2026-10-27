@@ -31,7 +31,7 @@ def main():
             daemon.control_plane.registry.update_heartbeat(NodeHeartbeat(
                 node_id=node_id, state=state, elapsed_ms=0, current_channel=157,
                 txpower_dbm=12, uplink_mcs=6),
-                (f'10.80.0.{10 + node_id}', 9001), daemon.radio_config)
+                ('127.0.0.1', 0), daemon.radio_config)
 
         heartbeat(1, 'HUNTING')
         heartbeat(1, 'IDLE')

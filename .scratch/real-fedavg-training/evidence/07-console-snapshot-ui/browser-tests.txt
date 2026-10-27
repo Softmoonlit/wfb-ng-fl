@@ -1,0 +1,8 @@
+Command: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 wfb_ng/tests/online_target_browser_check.py
+Result: Chromium 真实页面：在线过滤、禁选、初始空选、明确勾选、刷新保留、HTTP 整体拒绝、重载清空通过
+
+Command: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 wfb_ng/tests/console_training_browser_check.py (repeated three times)
+Result: 3/3 pass
+Chromium 真实页面：评估表、固定参与者摘要、未判定事实与重载快照恢复通过
+
+The helper blocks `/api/v1/events`, waits with a monotonic 5-second deadline plus immediate CDP polling for `Page.loadEventFired` and DOM rows, rejects the old DOM sentinel, asserts snapshot `job.recovery.state/recovery_state=unconfirmed` and page `#job-recovery` exactly `恢复未确认`, exact M0/M1/M2 model SHA cells, zero/normal metrics, null/false effect results, final SHA, and zero `/api/v1/jobs` requests after reload.

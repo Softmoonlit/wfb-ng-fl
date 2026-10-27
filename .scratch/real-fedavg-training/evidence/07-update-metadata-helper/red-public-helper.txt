@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_read_update_metadata_returns_bounded_facts_without_parameters ______
+wfb_ng/tests/test_fl_mnist_update_metadata.py:38: in test_read_update_metadata_returns_bounded_facts_without_parameters
+    from wfb_ng.fl.mnist import read_update_metadata
+E   ImportError: cannot import name 'read_update_metadata' from 'wfb_ng.fl.mnist' (/home/fl/projects/wfb-ng-fl/wfb_ng/fl/mnist.py)
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_read_update_metadata_returns_bounded_facts_without_parameters
+1 failed in 2.76s

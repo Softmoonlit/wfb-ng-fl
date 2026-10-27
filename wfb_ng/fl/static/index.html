@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WFB 文件仿真控制台</title>
+  <title>WFB 联邦训练控制台</title>
   <link rel="stylesheet" href="/assets/console.css">
   <script defer src="/assets/console.js"></script>
 </head>
 <body>
 <header class="command-bar">
   <div class="brand-group">
-    <h1><a href="/" class="brand-link">WFB 文件仿真控制台</a></h1>
+    <h1><a href="/" class="brand-link">WFB 联邦训练控制台</a></h1>
     <nav class="main-nav" aria-label="控制台主导航">
       <a href="/" id="nav-monitor" aria-current="page">🎯 运行监控</a>
       <a href="/models" id="nav-models">📦 模型库</a>
@@ -36,7 +36,7 @@
     <div class="col-main">
       <section id="job-monitor-section" aria-labelledby="job-heading">
         <div class="section-header">
-          <h2 id="job-heading">🎯 同步文件仿真作业监控</h2>
+          <h2 id="job-heading">🎯 联邦训练作业监控</h2>
           <span id="job-result-badge" class="badge badge-gray">未执行</span>
         </div>
         <dl class="job-grid">
@@ -56,9 +56,31 @@
         <p id="job-error" role="status"></p>
       </section>
 
+      <section id="job-results-section" aria-labelledby="results-heading">
+        <div class="section-header">
+          <h2 id="results-heading">训练结果</h2>
+          <span id="job-effect-result" class="badge badge-gray">未判定</span>
+        </div>
+        <div class="result-table-wrap">
+          <table id="job-evaluation-table" aria-label="初始及逐轮评估结果">
+            <thead><tr><th>阶段</th><th>模型身份</th><th>损失</th><th>准确率</th><th>效果</th><th>完成</th></tr></thead>
+            <tbody id="job-evaluation-rows"></tbody>
+          </table>
+        </div>
+        <p id="job-evaluation-note" class="muted">暂无评估事实</p>
+        <h3>固定参与者摘要</h3>
+        <div class="result-table-wrap">
+          <table id="job-participant-table" aria-label="固定参与者准备与训练摘要">
+            <thead><tr><th>节点</th><th>当前事实</th><th>准备</th><th>训练摘要</th><th>失联/错误</th></tr></thead>
+            <tbody id="job-participant-rows"></tbody>
+          </table>
+        </div>
+        <p id="job-recovery-facts" class="muted"></p>
+      </section>
+
       <section id="job-start-section" aria-labelledby="start-job-heading">
-        <h2 id="start-job-heading">🚀 新建同步文件仿真作业</h2>
-        <p class="muted">选择不可变模型制品，固定目标 Client 节点与同步轮数。启动时将校验目标节点 TASK_READY 屏障。</p>
+        <h2 id="start-job-heading">🚀 新建联邦训练作业</h2>
+        <p class="muted">选择不可变模型制品，固定目标 Client 节点与同步轮数。数据、GPU 与依赖准备由服务端受理后核验。</p>
         <form id="job-form">
           <div class="form-grid">
             <div class="form-group full-width">

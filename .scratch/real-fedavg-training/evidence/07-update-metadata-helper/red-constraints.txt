@@ -1,0 +1,73 @@
+...................FFFFFFFFFFFFF.                                        [100%]
+=================================== FAILURES ===================================
+_______ test_metadata_rejects_invalid_update_contents[loss_huge_integer] _______
+wfb_ng/tests/test_fl_mnist_update_metadata.py:98: in test_metadata_rejects_invalid_update_contents
+    read_update_metadata(path, **expected)
+wfb_ng/fl/mnist.py:109: in read_update_metadata
+    _validate_update(value, node_id, round_index, base_model_sha256)
+wfb_ng/fl/mnist.py:95: in _validate_update
+    or type(loss) not in (int, float) or not math.isfinite(loss) or loss < 0):
+E   OverflowError: int too large to convert to float
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-True-1] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-2.0-2] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-0-0] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-11-11] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-True-1] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-3.0-3] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-0-0] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-9223372036854775808-9223372036854775808] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[base_model_sha256-not-a-sha-not-a-sha] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[base_model_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[expected_sample_count-60000.0-60000] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+_ test_metadata_rejects_invalid_expected_identity_and_sample_constraints[expected_sample_count-True-1] _
+wfb_ng/tests/test_fl_mnist_update_metadata.py:120: in test_metadata_rejects_invalid_expected_identity_and_sample_constraints
+    with pytest.raises(FLRuntimeError):
+E   Failed: DID NOT RAISE <class 'wfb_ng.fl.errors.FLRuntimeError'>
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_update_contents[loss_huge_integer]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-True-1]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-2.0-2]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-0-0]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[node_id-11-11]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-True-1]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-3.0-3]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-0-0]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[round_index-9223372036854775808-9223372036854775808]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[base_model_sha256-not-a-sha-not-a-sha]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[base_model_sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[expected_sample_count-60000.0-60000]
+FAILED wfb_ng/tests/test_fl_mnist_update_metadata.py::test_metadata_rejects_invalid_expected_identity_and_sample_constraints[expected_sample_count-True-1]
+13 failed, 20 passed in 3.64s

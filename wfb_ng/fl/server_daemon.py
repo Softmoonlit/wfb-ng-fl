@@ -692,6 +692,7 @@ class ServerDaemon:
         self.coordinator: Optional[Any] = None
         self.server_role: Optional[Any] = None
         self._job_runtime: Optional[Any] = None
+        self._job_training_by_round: Dict[int, List[Dict[str, Any]]] = {}
         self._preparation: Optional[_JobPreparation] = None
 
         self.event_bus = ServerEventBus()
@@ -811,10 +812,12 @@ class ServerDaemon:
                     self._lock.release()
             return
 
+        event_for_history = deepcopy(event)
         with self._lock:
             if (self.active_job is not None and
                     event.get('job_id', self.active_job['job_id']) == self.active_job['job_id']):
                 event_type = event.get('type')
+                event_for_history = self._on_training_round_event(event)
                 if event_type == 'ROUND_STARTED':
                     self.active_job['current_round'] = event.get('round_index')
                     self.active_job['server_phase'] = 'preparing'
@@ -832,12 +835,12 @@ class ServerDaemon:
                             key: deepcopy(event.get(key)) for key in ('round_index', 'metrics', 'verdict', 'reason')}
                 elif event_type == 'ROUND_COMPLETED':
                     self.active_job['rounds_completed'] = event.get('round_index', 0)
-                    self.active_job.setdefault('round_results', []).append(deepcopy(event.get('summary', {})))
+                    self.active_job.setdefault('round_results', []).append(deepcopy(event_for_history.get('summary', {})))
                     self.active_job['server_phase'] = 'preparing'
                     self.active_job['phase_started_at'] = time.time()
                 elif event_type in ('JOB_COMPLETED', 'JOB_FAILED') and isinstance(event.get('summary'), dict):
                     self.active_job['summary'] = deepcopy(event['summary'])
-            self.console.record_event(event)
+            self.console.record_event(event_for_history)
             self._best_effort_console_refresh()
         self.event_bus.publish(event)
 
@@ -1431,6 +1434,7 @@ class ServerDaemon:
                     job_dict['server_phase'] = 'preparing'
                     job_dict['phase_started_at'] = time.time()
                     self.active_job = job_dict
+                    self._job_training_by_round = {}
                     self.server_state = ServerState.RUNNING
                     self.server_role = server_role
                     self._job_runtime = runtime
@@ -1530,6 +1534,8 @@ class ServerDaemon:
                 reports = {node: entry['report'] for node, entry in
                            self.control_plane.get_task_preparation_reports(job.job_id).items()}
                 self.active_job['client_preparation_reports'] = deepcopy(reports)
+                aggregate_fn = self._wrap_mnist_aggregate(
+                    aggregate_fn, job, reports)
                 algorithm_context = replace(
                     algorithm_context,
                     local_config={**algorithm_context.local_config, 'client_preparation_reports': reports},
@@ -1589,21 +1595,83 @@ class ServerDaemon:
         reports = self.control_plane.get_job_recovery_reports(recent['job_id'])
         recent['recovery_reports'] = deepcopy(reports)
         for node, envelope in reports.items():
+            report = envelope.get('report', {}) if isinstance(envelope, dict) else {}
+            if not isinstance(report, dict) or 'recovery_epoch' not in report:
+                continue
             history = recent.setdefault('recovery_report_history', {}).setdefault(node, [])
-            epoch = envelope['report']['recovery_epoch']
-            if not any(entry['report']['recovery_epoch'] == epoch for entry in history):
+            epoch = report['recovery_epoch']
+            if not any(entry.get('report', {}).get('recovery_epoch') == epoch for entry in history):
                 history.append(deepcopy(envelope))
         missing = sorted(node for node in recent['target_nodes']
-                         if node not in reports or reports[node]['report']['recovery_state'] != 'ready')
+                         if node not in reports or not isinstance(reports[node], dict)
+                         or reports[node].get('report', {}).get('recovery_state') != 'ready')
         recent['recovery_missing_nodes'] = missing
         if not recent.get('recovery_wait_finished'):
             return
-        blocked = any(entry['report']['recovery_state'] == 'blocked' for entry in reports.values())
+        blocked = any(isinstance(entry, dict) and entry.get('report', {}).get('recovery_state') == 'blocked'
+                      for entry in reports.values())
         state = ('blocked' if recent.get('recovery_error') or blocked
                  or not recent.get('server_recovery_complete') else
                  'unconfirmed' if missing else 'ready')
         recent['recovery_state'] = state
         recent['server_phase'] = 'ready' if state == 'ready' else 'recovery_' + state
+
+    def _training_facts_for_summary(self, summary: Dict[str, Any]) -> Dict[str, Any]:
+        """复制 Coordinator 摘要后附加宿主读取的有限训练事实。"""
+        result = deepcopy(summary)
+        rounds = result.get('rounds')
+        if not isinstance(rounds, list):
+            return result
+        for row in rounds:
+            if not isinstance(row, dict) or type(row.get('round_index')) is not int:
+                continue
+            facts = self._job_training_by_round.get(row['round_index'])
+            if facts:
+                row['training'] = deepcopy(facts)
+        return result
+
+    def _on_training_round_event(self, event: Dict[str, Any]) -> Dict[str, Any]:
+        """把训练事实合入宿主快照；输入事件和 Coordinator 内部对象不被修改。"""
+        copied = deepcopy(event)
+        index = copied.get('round_index')
+        facts = self._job_training_by_round.get(index) if type(index) is int else None
+        if facts and copied.get('type') == 'ROUND_COMPLETED':
+            copied['summary'] = deepcopy(copied.get('summary', {}))
+            copied['summary']['training'] = deepcopy(facts)
+        return copied
+
+    def _wrap_mnist_aggregate(
+        self,
+        aggregate_fn: Callable[..., Any],
+        job: JobConfig,
+        preparation_reports: Dict[int, Any],
+    ) -> Callable[..., Any]:
+        """部署 MNIST 聚合成功后读取固定 update 的有限 metadata；generic 不解析。"""
+        if self.config.aggregate_entry != 'wfb_ng.fl.mnist:aggregate_entry':
+            return aggregate_fn
+
+        def aggregate_with_training_facts(current: str, updates: Any, output: str,
+                                          config: Any, context: Any) -> Any:
+            result = aggregate_fn(current, updates, output, config, context)
+            from .mnist import read_update_metadata
+            base_sha = calculate_file_sha256(current)
+            expected = {
+                node: report.get('sample_count') if isinstance(report, dict) else None
+                for node, report in preparation_reports.items()
+            }
+            facts: List[Dict[str, Any]] = []
+            self._job_training_by_round[context.round_index] = facts
+            for node in sorted(job.target_nodes):
+                expected_samples = expected.get(node)
+                if type(expected_samples) is not int:
+                    raise FLRuntimeError('invalid_mnist_preparation', '聚合缺少节点样本准备事实')
+                facts.append(read_update_metadata(
+                    updates[node], node_id=node, round_index=context.round_index,
+                    base_model_sha256=base_sha, expected_sample_count=expected_samples))
+            self._job_training_by_round[context.round_index] = deepcopy(facts)
+            return result
+
+        return aggregate_with_training_facts
 
     def _finalize_job(
         self,
@@ -1649,7 +1717,7 @@ class ServerDaemon:
                           server_recovery_complete=False,
                           recovery_missing_nodes=list(recent['target_nodes']))
             if terminal_summary:
-                recent['summary'] = deepcopy(terminal_summary)
+                recent['summary'] = self._training_facts_for_summary(terminal_summary)
                 recent['rounds_completed'] = terminal_summary.get('rounds_completed', recent['rounds_completed'])
                 if 'effect_result' in terminal_summary:
                     recent['effect_result'] = deepcopy(terminal_summary['effect_result'])
@@ -1721,8 +1789,8 @@ class ServerDaemon:
                 coord.wait(timeout=None)
                 coordinator_summary = coord.get_summary()
                 with self._lock:
-                    if coordinator_summary and not recent.get('summary'):
-                        recent['summary'] = coordinator_summary
+                    if coordinator_summary:
+                        recent['summary'] = self._training_facts_for_summary(coordinator_summary)
                         recent['rounds_completed'] = coordinator_summary.get('rounds_completed', recent['rounds_completed'])
             monitor = self._job_monitor_thread
             if monitor is not None and monitor is not threading.current_thread():
@@ -1780,6 +1848,8 @@ class ServerDaemon:
         self._schedule_job_terminal(outcome='failed', job_id=job_id, reason=cause, error=cause)
 
     def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
+        if isinstance(summary, dict):
+            summary = self._training_facts_for_summary(summary)
         self._schedule_job_terminal(outcome="completed", job_id=job_id, summary=summary)
 
     def _on_job_failed(self, job_id: str, exc: Exception) -> None:

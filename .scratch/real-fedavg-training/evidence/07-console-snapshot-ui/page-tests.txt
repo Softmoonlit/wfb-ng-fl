@@ -1,0 +1,5 @@
+Command: node wfb_ng/tests/console_page_test.js wfb_ng/fl/static/console.js
+Result: Packaged console JS: rendering, failure, retry and refresh passed
+
+Command: node wfb_ng/tests/online_target_page_check.js
+Result: online candidate, draft invalidation, management stale state, SSE/HTTP fallback, accepted-job recovery and fixed participant facts passed

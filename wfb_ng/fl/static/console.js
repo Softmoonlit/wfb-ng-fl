@@ -8,7 +8,7 @@
     management_web_unavailable: '管理 Web 不可用'
   };
   const results = {none: '未执行', running: '执行中', succeeded: '成功', failed: '失败', aborted: '已急停'};
-  const recovery = {not_required: '无需恢复', recovering: '正在恢复待命', ready: '已恢复待命', blocked: '恢复受阻'};
+  const recovery = {not_required: '无需恢复', recovering: '正在恢复待命', unconfirmed: '恢复未确认', ready: '已恢复待命', blocked: '恢复受阻'};
   const phases = {
     preparing: '准备任务', publishing_model: '下发模型', waiting_updates: '等待 update',
     recovering: '恢复待命', ready: '已待命', recovery_blocked: '恢复受阻'
@@ -77,6 +77,158 @@
     const m = Math.floor(total / 60);
     const s = total % 60;
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function metricText(metrics, key) {
+    if (!metrics || !Object.prototype.hasOwnProperty.call(metrics, key)
+        || metrics[key] === null || metrics[key] === undefined
+        || (typeof metrics[key] === 'number' && !Number.isFinite(metrics[key]))) {
+      return '未取得';
+    }
+    return String(metrics[key]);
+  }
+
+  function shortDigest(value) {
+    return typeof value === 'string' && value ? `${value.slice(0, 12)}…` : '未取得';
+  }
+
+  function effectText(verdict) {
+    if (verdict === true) return '达标';
+    if (verdict === false) return '未达标';
+    return '未判定';
+  }
+
+  function effectClass(verdict) {
+    if (verdict === true) return 'badge-green';
+    if (verdict === false) return 'badge-red';
+    return 'badge-gray';
+  }
+
+  function tableRow(values) {
+    const row = document.createElement('tr');
+    row.append(...values.map(value => item('td', value)));
+    return row;
+  }
+
+  function preparationText(preparation) {
+    if (!preparation) return '未取得';
+    const values = [];
+    if (preparation.ready === true) values.push('已准备');
+    if (preparation.ready === false) values.push('未准备');
+    if (preparation.sample_count !== undefined) values.push(`样本 ${preparation.sample_count}`);
+    if (preparation.device && preparation.device.type) {
+      values.push(`设备 ${preparation.device.type}${preparation.device.name ? ` · ${preparation.device.name}` : ''}`);
+    }
+    if (preparation.error_code) values.push(preparation.error_code);
+    return values.length ? values.join(' · ') : '已取得';
+  }
+
+  function trainingText(training) {
+    if (!training || !training.length) return '未取得';
+    const latest = training[training.length - 1];
+    const values = [`轮 ${latest.round_index || '未知'}`];
+    if (latest.sample_count !== undefined) values.push(`样本 ${latest.sample_count}`);
+    if (latest.optimizer_steps !== undefined) values.push(`步数 ${latest.optimizer_steps}`);
+    if (latest.train_loss !== undefined) values.push(`损失 ${latest.train_loss}`);
+    if (latest.device && latest.device.type) values.push(`设备 ${latest.device.type}`);
+    if (latest.metadata_status && latest.metadata_status !== 'available') values.push(latest.metadata_status);
+    if (latest.error_code) values.push(latest.error_code);
+    return values.join(' · ');
+  }
+
+  function completionText(job, round) {
+    if (round.client_submission_returns_received === true) return '已完成';
+    if (job && job.execution_result === 'running') return '等待报告';
+    return round.client_submission_returns_received === false ? '未确认' : '未取得';
+  }
+
+  function renderTrainingResults(job) {
+    const rows = byId('job-evaluation-rows');
+    const note = byId('job-evaluation-note');
+    const badge = byId('job-effect-result');
+    const evaluation = job && job.evaluation;
+    const rendered = [];
+    if (evaluation && evaluation.initial_metrics) {
+      rendered.push(tableRow([
+        'M0 初始', `M0 · ${shortDigest(job.model_sha256)}`,
+        metricText(evaluation.initial_metrics, 'loss'),
+        metricText(evaluation.initial_metrics, 'accuracy'), '未判定', '已取得'
+      ]));
+    }
+    for (const round of (evaluation && evaluation.rounds) || []) {
+      rendered.push(tableRow([
+        `M${round.round_index}`,
+        `M${round.round_index} · ${shortDigest(round.output_model_sha256)}`,
+        metricText(round.metrics, 'loss'),
+        metricText(round.metrics, 'accuracy'),
+        effectText(round.verdict),
+        completionText(job, round)
+      ]));
+    }
+    rows.replaceChildren(...rendered);
+    if (note) {
+      if (!evaluation || (!evaluation.initial_metrics && !((evaluation.rounds || []).length))) {
+        note.textContent = '暂无评估事实';
+      } else if (evaluation.final_model_sha256) {
+        note.textContent = `最终模型 ${shortDigest(evaluation.final_model_sha256)}`;
+      } else {
+        note.textContent = '最终模型身份未取得';
+      }
+    }
+    const effect = evaluation && evaluation.effect_result;
+    badge.textContent = effectText(effect && effect.verdict);
+    badge.className = `badge ${effectClass(effect && effect.verdict)}`;
+  }
+
+  function renderParticipantResults(job) {
+    const rows = byId('job-participant-rows');
+    const facts = byId('job-recovery-facts');
+    const participants = (job && job.participants) || [];
+    rows.replaceChildren(...participants.map(participant => {
+      const disconnections = (participant.disconnection_events || []).map(event => event.message || event.type).join('；');
+      const errors = [participant.error_code, disconnections].filter(Boolean).join('；');
+      const current = participant.online ? (states[participant.state] || participant.state) : '离线';
+      return tableRow([
+        `节点 ${participant.node_id}`,
+        current,
+        preparationText(participant.preparation),
+        trainingText(participant.training),
+        errors || '—'
+      ]);
+    }));
+    if (!facts) return;
+    if (!job) {
+      facts.textContent = '';
+      return;
+    }
+    const messages = [];
+    const recoveryState = (job.recovery && (job.recovery.state || job.recovery.recovery_state)) || job.recovery_state;
+    if (recoveryState === 'unconfirmed') {
+      messages.push('资源恢复未确认');
+    } else if (recoveryState === 'recovering') {
+      messages.push('资源恢复中');
+    }
+    if (job.server_recovery_complete === false) {
+      messages.push('Server 资源恢复尚未完成');
+    } else if (job.server_recovery_complete === true) {
+      messages.push('Server 资源恢复已确认');
+    }
+    if (job.recovery_missing_nodes && job.recovery_missing_nodes.length) {
+      messages.push(`未确认恢复节点：${job.recovery_missing_nodes.join('、')}`);
+    }
+    if (job.first_failure) {
+      messages.push(`首个失败：${job.first_failure.reason || job.first_failure.error || '未说明'}`);
+    }
+    if (job.liveness_events && job.liveness_events.length) {
+      messages.push(`失联事实 ${job.liveness_events.length} 条`);
+    }
+    if (job.additional_errors && job.additional_errors.length) {
+      messages.push(`附加错误 ${job.additional_errors.length} 条`);
+    }
+    if (job.recovery_reports && job.recovery_reports.length) {
+      messages.push(`恢复报告 ${job.recovery_reports.length} 条`);
+    }
+    facts.textContent = messages.join(' · ');
   }
 
   function updateTimers() {
@@ -167,6 +319,8 @@
       const fact = participant.online ? (states[participant.state] || participant.state) : '离线';
       return `节点 ${participant.node_id} · ${fact}${participant.error_code ? ` · ${participant.error_code}` : ''}${disconnections ? ` · 失联事件：${disconnections}` : ''}`;
     }).join('；') : '—';
+    renderTrainingResults(job);
+    renderParticipantResults(job);
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';
 
     const abortButton = byId('abort-job');

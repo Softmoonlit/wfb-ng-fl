@@ -1,0 +1,4 @@
+Command: mypy --follow-imports=silent --ignore-missing-imports --check-untyped-defs wfb_ng/fl/console.py
+Result: Success: no issues found in 1 source file
+
+Also passed: Python compile, Node --check for changed JS/browser helpers, and git diff --check for 07 files.
