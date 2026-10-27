@@ -1,0 +1,63 @@
+{
+  "utc": "2026-10-27T02:24:48Z",
+  "recovered": true,
+  "radio": {
+    "channel": 157,
+    "bandwidth_mhz": 40,
+    "radio_txpower_dbm": 14,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 15000,
+    "fec_k": 8,
+    "fec_n": 14,
+    "channel_width": "HT40+",
+    "guard_interval": "short"
+  },
+  "nodes": {
+    "1": "READY",
+    "2": "READY",
+    "4": "READY"
+  },
+  "links": {
+    "fl00": [
+      {
+        "pid": 148933,
+        "args": "/usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 ",
+        "start_ticks": "5323934",
+        "log": "/tmp/wfb-ng-fl/server/wfb_uplink.log",
+        "offset": 66694025
+      }
+    ],
+    "fl01": [
+      {
+        "pid": 22800,
+        "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 ",
+        "start_ticks": "5272048",
+        "log": "/tmp/wfb-ng-fl/client/wfb_uplink.log",
+        "offset": 24513236
+      }
+    ],
+    "fl02": [
+      {
+        "pid": 14299,
+        "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 ",
+        "start_ticks": "4596881",
+        "log": "/tmp/wfb-ng-fl/client/wfb_uplink.log",
+        "offset": 22118140
+      }
+    ],
+    "fl04": [
+      {
+        "pid": 22306,
+        "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 ",
+        "start_ticks": "5158074",
+        "log": "/tmp/wfb-ng-fl/client/wfb_uplink.log",
+        "offset": 24359414
+      }
+    ]
+  },
+  "no_uftp": true,
+  "matrix_paused": true,
+  "calibration_entry_not_called": true,
+  "uftp_check_note": "ps -C executable name check; earlier substring check matched diagnostic command text"
+}

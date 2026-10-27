@@ -1,0 +1,5 @@
+2026-10-26T18:46:54.651419+00:00 START 01-mcs3-r2000-8mib
+2026-10-26T18:46:59.346765+00:00 END 01-mcs3-r2000-8mib success=False sender_seconds=None error=RuntimeError('calibration not finalized')
+2026-10-26T18:46:59.347033+00:00 STOP RuntimeError('attempt failed: 01-mcs3-r2000-8mib')
+2026-10-26T18:46:59.347148+00:00 RESTORE start
+2026-10-26T18:47:32.641002+00:00 RESTORE end {"http": 200, "body": {"calibration": false, "session_id": "switch_e32b12ca59e94bd9b3d047d1a15434ba", "status": "finalized", "target_channel": 157, "applied_patch": {"channel": 157, "bandwidth_mhz": 40, "radio_txpower_dbm": 14, "downlink_mcs": 3, "uplink_mcs": 4, "uftp_rate_kbps": 15000}, "failed_phase": null, "unresponsive_nodes": [], "error_message": null, "effective_config": {"channel": 157, "bandwidth_mhz": 40, "radio_txpower_dbm": 14, "downlink_mcs": 3, "uplink_mcs": 4, "uftp_rate_kbps": 15000, "fec_k": 8, "fec_n": 14, "channel_width": "HT40+", "guard_interval": "short"}}, "elapsed_seconds": 4.1899439039989375}

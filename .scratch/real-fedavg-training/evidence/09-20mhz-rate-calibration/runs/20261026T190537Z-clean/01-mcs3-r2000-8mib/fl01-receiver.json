@@ -1,0 +1,18 @@
+{
+  "bytes": null,
+  "sha256": null,
+  "error": "final_file_missing",
+  "hash_seconds": 8.281899863504805e-05,
+  "received_files": [
+    "uftpd.status",
+    "receiver-console.log",
+    "receiver.json",
+    "tmp/_group_9C290BFE_restart",
+    "tmp/_group_9C290BFE/model-8mib.bin"
+  ],
+  "receiver_stopped": true,
+  "uftpd.log": null,
+  "uftpd.status": "CONNECT;2026/10/27-03:08:29;0A500001;9C290BFE;10.80.0.1;10.80.0.1\n",
+  "receiver-console.log": "2026/10/27 03:08:28.780814: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/10/27 03:08:28.781287: Loaded ECDSA key with curve prime256v1 and fingerprint 31:03:79:C4:D8:34:34:6E:7D:01:AF:F6:E3:90:4D:E2:A7:47:41:C4\n2026/10/27 03:08:29.364005: [9C290BFE/00:0]: Received request from 0A500001 at 10.80.0.1 (10.80.0.1)\n2026/10/27 03:08:29.364428: [9C290BFE/00:0]: Using private multicast address 239.255.42.2\n2026/10/27 03:08:29.365095: [9C290BFE/00:0]: REGISTER sent\n2026/10/27 03:08:29.576944: [9C290BFE/00:0]: Registration confirmed\n2026/10/27 03:08:29.776985: [9C290BFE/00:0001]: Name of file to receive: model-8mib.bin\n2026/10/27 03:08:29.777197: [9C290BFE/00:0001]: Bytes: 8388608, Blocks: 6453, Sections: 1\n2026/10/27 03:08:29.779244: [9C290BFE/00:0001]: FILEINFO_ACK sent\n2026/10/27 03:09:06.302061: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:06.500429: [9C290BFE/00:0001]: Sent 1692 NAKs for section 0\n2026/10/27 03:09:16.789649: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:16.987089: [9C290BFE/00:0001]: Sent 1093 NAKs for section 0\n2026/10/27 03:09:17.359122: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:17.555484: [9C290BFE/00:0001]: Sent 1093 NAKs for section 0\n2026/10/27 03:09:17.569235: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:17.765668: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:18.121885: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:18.318441: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:18.687847: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:18.884179: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:19.257134: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:19.454030: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:22.091460: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:22.288071: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:24.916059: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:25.113096: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:27.748321: [9C290BFE/00:0001]: Got DONE message for section 0\n2026/10/27 03:09:27.945409: [9C290BFE/00:0001]: Sent 1091 NAKs for section 0\n2026/10/27 03:09:31.665323: [9C290BFE/00:0001]: Transfer timed out\n2026/10/27 03:09:31.665971: [9C290BFE/00:0001]: starting file close\n2026/10/27 03:09:31.666054: [9C290BFE/00:0001]: done file close\n2026/10/27 03:09:31.666303: [9C290BFE/00:0001]: Writing restart file\n2026/10/27 03:09:32.911827: Exiting on signal 15\n",
+  "receiver.json": "{\"pid\": 19931, \"argv\": [\"uftpd\", \"-d\", \"-p\", \"1144\", \"-U\", \"0x00000001\", \"-D\", \"/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/received\", \"-T\", \"/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/tmp\", \"-I\", \"fl-c1\", \"-M\", \"239.255.42.1\", \"-L\", \"/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/uftpd.log\", \"-F\", \"/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/uftpd.status\"], \"poll\": null, \"start_ticks\": \"2659845\"}"
+}

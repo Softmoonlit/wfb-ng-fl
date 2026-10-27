@@ -1,0 +1,35 @@
+    PID                  STARTED COMMAND
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                   
+UNCONN 0      0         127.0.0.53:53         0.0.0.0:*    users:(("systemd-resolve",pid=560,fd=13))                
+UNCONN 0      0            0.0.0.0:67         0.0.0.0:*    users:(("dnsmasq",pid=698,fd=3))                         
+UNCONN 0      0            0.0.0.0:111        0.0.0.0:*    users:(("rpcbind",pid=559,fd=5),("systemd",pid=1,fd=95)) 
+UNCONN 0      0          10.80.0.1:9001       0.0.0.0:*    users:(("python3",pid=54188,fd=4))                       
+UNCONN 0      0            0.0.0.0:54109      0.0.0.0:*    users:(("avahi-daemon",pid=572,fd=14))                   
+UNCONN 0      0          127.0.0.1:9200       0.0.0.0:*    users:(("wfb_v6_uplink",pid=54200,fd=4))                 
+UNCONN 0      0            0.0.0.0:5353       0.0.0.0:*    users:(("avahi-daemon",pid=572,fd=12))                   
+UNCONN 0      0          10.80.0.1:43060      0.0.0.0:*    users:(("python3",pid=54188,fd=5))                       
+UNCONN 0      0                  *:36749            *:*    users:(("avahi-daemon",pid=572,fd=15))                   
+UNCONN 0      0                  *:111              *:*    users:(("rpcbind",pid=559,fd=7),("systemd",pid=1,fd=132))
+UNCONN 0      0                  *:5353             *:*    users:(("avahi-daemon",pid=572,fd=13))                   
+phy#1
+	Interface wlxfc221c100157
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:10:01:57
+		type monitor
+		channel 157 (5785 MHz), width: 20 MHz, center1: 5785 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP1p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:e2:3c:48
+		type managed
+		txpower -100.00 dBm
+MainPID=0
+Id=wfb-fl-client-daemon.service
+ActiveState=inactive
+
+MainPID=54188
+Id=wfb-fl-server-daemon.service
+ActiveState=active

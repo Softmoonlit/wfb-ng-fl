@@ -1,0 +1,77 @@
+{
+  "fl01": {
+    "pid": 19397,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000001",
+      "-D",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c1",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "2548293"
+  },
+  "fl04": {
+    "pid": 19316,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000004",
+      "-D",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c4",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "2431339"
+  },
+  "fl02": {
+    "pid": 10734,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000002",
+      "-D",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c2",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "1871423"
+  }
+}

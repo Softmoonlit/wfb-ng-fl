@@ -1,0 +1,199 @@
+{
+  "utc": "2026-10-26T18:46:32Z",
+  "commands": [
+    {
+      "args": [
+        "hostname"
+      ],
+      "rc": 0,
+      "elapsed": 0.0015151080006035045,
+      "output": "fl01\n"
+    },
+    {
+      "args": [
+        "uname",
+        "-a"
+      ],
+      "rc": 0,
+      "elapsed": 0.0022110079989943188,
+      "output": "Linux fl01 5.15.148-tegra #1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025 aarch64 aarch64 aarch64 GNU/Linux\n"
+    },
+    {
+      "args": [
+        "cat",
+        "/proc/loadavg"
+      ],
+      "rc": 0,
+      "elapsed": 0.002197150999563746,
+      "output": "0.07 0.19 0.29 1/578 18973\n"
+    },
+    {
+      "args": [
+        "cat",
+        "/proc/stat"
+      ],
+      "rc": 0,
+      "elapsed": 0.0022574120011995547,
+      "output": "cpu  89020 7844 90095 14838076 51011 26104 42404 0 0 0\ncpu0 20126 1511 27919 2418955 5862 17345 32314 0 0 0\ncpu1 15616 1044 14592 2481595 8136 1594 1261 0 0 0\ncpu2 12417 3027 9892 2485680 9904 1333 1130 0 0 0\ncpu3 10316 1767 9058 2489407 9678 1400 1610 0 0 0\ncpu4 15096 93 14574 2483427 8388 1370 1953 0 0 0\ncpu5 15446 400 14058 2479011 9040 3060 4133 0 0 0\nintr 28118469 0 55952 4919074 0 0 0 74923 0 0 0 0 0 0 17182502 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 50 0 0 0 0 0 79176 0 0 5145316 0 414175 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6853 0 0 0 0 64 0 0 0 0 0 0 0 0 0 0 0 0 1085 19 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 84 14 0 0 1 0 0 0 0 0 0 0 120 0 0 0 0 137 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 238479 0 0 224 219 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\nctxt 18625003\nbtime 1793015110\nprocesses 18979\nprocs_running 1\nprocs_blocked 0\nsoftirq 40619728 319417 10404185 94 2893943 112775 0 7903860 13522881 79 5462494\n"
+    },
+    {
+      "args": [
+        "cat",
+        "/proc/diskstats"
+      ],
+      "rc": 0,
+      "elapsed": 0.0027578720000747126,
+      "output": "   7       0 loop0 169 0 1343 652 55 0 56 21 0 652 673 0 0 0 0 0 0\n   7       1 loop1 65 0 160 3 0 0 0 0 0 52 3 0 0 0 0 0 0\n   7       2 loop2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   7       3 loop3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   7       4 loop4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   7       5 loop5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   7       6 loop6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   7       7 loop7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n   8       0 sda 30222 5725 2553530 112481 69622 54320 7352170 360674 0 472400 473155 0 0 0 0 0 0\n   8       1 sda1 29651 5702 2523570 110905 69619 54320 7352160 360671 0 472120 471576 0 0 0 0 0 0\n   8       2 sda2 38 0 2336 123 0 0 0 0 0 220 123 0 0 0 0 0 0\n   8       3 sda3 12 0 96 17 0 0 0 0 0 56 17 0 0 0 0 0 0\n   8       4 sda4 26 0 840 60 0 0 0 0 0 140 60 0 0 0 0 0 0\n   8       5 sda5 38 0 2336 108 0 0 0 0 0 260 108 0 0 0 0 0 0\n   8       6 sda6 12 0 96 23 0 0 0 0 0 72 23 0 0 0 0 0 0\n   8       7 sda7 26 0 840 69 0 0 0 0 0 160 69 0 0 0 0 0 0\n   8       8 sda8 38 0 2336 120 0 0 0 0 0 236 120 0 0 0 0 0 0\n   8       9 sda9 11 0 88 22 0 0 0 0 0 60 22 0 0 0 0 0 0\n   8      10 sda10 140 23 9096 395 3 0 10 3 0 468 398 0 0 0 0 0 0\n   8      11 sda11 38 0 2336 118 0 0 0 0 0 240 118 0 0 0 0 0 0\n   8      12 sda12 11 0 88 16 0 0 0 0 0 60 16 0 0 0 0 0 0\n   8      13 sda13 38 0 2336 107 0 0 0 0 0 200 107 0 0 0 0 0 0\n   8      14 sda14 38 0 2336 108 0 0 0 0 0 204 108 0 0 0 0 0 0\n   8      15 sda15 38 0 2336 117 0 0 0 0 0 220 117 0 0 0 0 0 0\n 252       0 zram0 301 0 2408 0 1 0 8 0 0 8 0 0 0 0 0 0 0\n 252       1 zram1 301 0 2408 0 1 0 8 0 0 8 0 0 0 0 0 0 0\n 252       2 zram2 301 0 2408 0 1 0 8 0 0 8 0 0 0 0 0 0 0\n 252       3 zram3 301 0 2408 0 1 0 8 0 0 8 0 0 0 0 0 0 0\n 252       4 zram4 301 0 2408 4 1 0 8 0 0 8 4 0 0 0 0 0 0\n 252       5 zram5 301 0 2408 0 1 0 8 0 0 8 0 0 0 0 0 0 0\n"
+    },
+    {
+      "args": [
+        "ps",
+        "-eo",
+        "pid,etimes,pcpu,pmem,args",
+        "--sort=-pcpu"
+      ],
+      "rc": 0,
+      "elapsed": 0.02205663900167565,
+      "output": "    PID ELAPSED %CPU %MEM COMMAND\n  18936       1  3.0  0.1 sshd: fl [priv]\n  17507    8416  2.1  0.4 python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14\n    473   25266  0.4  0.1 /usr/libexec/polkitd --no-debug\n    311   25270  0.3  0.0 /lib/systemd/systemd-udevd\n   1826   25248  0.2  2.7 /usr/bin/gnome-shell\n   1931   25243  0.2  1.0 /usr/libexec/packagekitd\n    293   25271  0.1  0.0 /lib/systemd/systemd-udevd\n    460   25266  0.1  0.0 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n    461   25266  0.1  0.2 /usr/sbin/NetworkManager --no-daemon\n   3185   24984  0.1  3.3 /usr/bin/python3 /usr/bin/update-manager --no-update --no-focus-on-map\n  11053   19913  0.1  0.0 [RTW_CMD_THREAD]\n  17523    8416  0.1  0.1 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n      1   25282  0.0  0.1 /sbin/init 2\n      2   25282  0.0  0.0 [kthreadd]\n      3   25282  0.0  0.0 [rcu_gp]\n      4   25282  0.0  0.0 [rcu_par_gp]\n      5   25282  0.0  0.0 [slub_flushwq]\n      6   25282  0.0  0.0 [netns]\n      8   25282  0.0  0.0 [kworker/0:0H-kblockd]\n     10   25282  0.0  0.0 [mm_percpu_wq]\n     11   25282  0.0  0.0 [rcu_tasks_kthre]\n     12   25282  0.0  0.0 [rcu_tasks_rude_]\n     13   25282  0.0  0.0 [rcu_tasks_trace]\n     14   25282  0.0  0.0 [ksoftirqd/0]\n     15   25282  0.0  0.0 [rcu_preempt]\n     16   25282  0.0  0.0 [migration/0]\n     17   25282  0.0  0.0 [cpuhp/0]\n     18   25282  0.0  0.0 [cpuhp/1]\n     19   25282  0.0  0.0 [migration/1]\n     20   25282  0.0  0.0 [ksoftirqd/1]\n     22   25282  0.0  0.0 [kworker/1:0H-events_highpri]\n     23   25282  0.0  0.0 [cpuhp/2]\n     24   25282  0.0  0.0 [migration/2]\n     25   25282  0.0  0.0 [ksoftirqd/2]\n     27   25282  0.0  0.0 [kworker/2:0H-kblockd]\n     28   25282  0.0  0.0 [cpuhp/3]\n     29   25282  0.0  0.0 [migration/3]\n     30   25282  0.0  0.0 [ksoftirqd/3]\n     32   25282  0.0  0.0 [kworker/3:0H-kblockd]\n     33   25282  0.0  0.0 [cpuhp/4]\n     34   25282  0.0  0.0 [migration/4]\n     35   25282  0.0  0.0 [ksoftirqd/4]\n     37   25282  0.0  0.0 [kworker/4:0H-events_highpri]\n     38   25282  0.0  0.0 [cpuhp/5]\n     39   25282  0.0  0.0 [migration/5]\n     40   25282  0.0  0.0 [ksoftirqd/5]\n     42   25282  0.0  0.0 [kworker/5:0H-kblockd]\n     43   25282  0.0  0.0 [kdevtmpfs]\n     44   25282  0.0  0.0 [inet_frag_wq]\n     51   25282  0.0  0.0 [kauditd]\n     52   25282  0.0  0.0 [oom_reaper]\n     53   25282  0.0  0.0 [writeback]\n     54   25282  0.0  0.0 [kcompactd0]\n     55   25282  0.0  0.0 [ksmd]\n     56   25282  0.0  0.0 [khugepaged]\n     67   25282  0.0  0.0 [cryptd]\n     86   25282  0.0  0.0 [kintegrityd]\n     87   25282  0.0  0.0 [kblockd]\n     88   25282  0.0  0.0 [blkcg_punt_bio]\n     89   25282  0.0  0.0 [tpm_dev_wq]\n     90   25282  0.0  0.0 [ata_sff]\n     91   25282  0.0  0.0 [edac-poller]\n     92   25282  0.0  0.0 [devfreq_wq]\n     93   25282  0.0  0.0 [watchdogd]\n     96   25282  0.0  0.0 [kworker/1:1H-kblockd]\n     97   25282  0.0  0.0 [rpciod]\n     98   25282  0.0  0.0 [kworker/u13:0]\n     99   25282  0.0  0.0 [xprtiod]\n    127   25282  0.0  0.0 [kswapd0]\n    128   25282  0.0  0.0 [nfsiod]\n    132   25282  0.0  0.0 [vfio-irqfd-clea]\n    133   25282  0.0  0.0 [dm_bufio_cache]\n    137   25278  0.0  0.0 [krfcommd]\n    138   25278  0.0  0.0 [pr/tty0]\n    139   25278  0.0  0.0 [pr/ttyTCU0]\n    142   25278  0.0  0.0 [irq/114-3160000]\n    144   25278  0.0  0.0 [irq/115-3180000]\n    146   25278  0.0  0.0 [irq/116-31b0000]\n    147   25278  0.0  0.0 [irq/166-c240000]\n    148   25278  0.0  0.0 [irq/167-c250000]\n    149   25277  0.0  0.0 [irq/124-3610000]\n    150   25277  0.0  0.0 [irq/121-3610000]\n    169   25277  0.0  0.0 [scsi_eh_0]\n    170   25277  0.0  0.0 [scsi_tmf_0]\n    171   25277  0.0  0.0 [usb-storage]\n    172   25276  0.0  0.0 [kworker/3:1H-kblockd]\n    173   25276  0.0  0.0 [kworker/0:1H-kblockd]\n    174   25276  0.0  0.0 [kworker/5:1H-kblockd]\n    175   25273  0.0  0.0 [kworker/4:1H-kblockd]\n    179   25273  0.0  0.0 [irq/190-tegra-p]\n    180   25273  0.0  0.0 [nvme-wq]\n    181   25273  0.0  0.0 [nvme-reset-wq]\n    182   25273  0.0  0.0 [nvme-delete-wq]\n    193   25273  0.0  0.0 [kworker/2:1H-kblockd]\n    194   25273  0.0  0.0 [jbd2/sda1-8]\n    195   25273  0.0  0.0 [ext4-rsv-conver]\n    205   25272  0.0  0.0 [mld]\n    206   25272  0.0  0.0 [ipv6_addrconf]\n    237   25271  0.0  0.2 /lib/systemd/systemd-journald\n    251   25271  0.0  0.0 [irq/192-tegra-p]\n    263   25271  0.0  0.0 [irq/192-aerdrv]\n    264   25271  0.0  0.0 [irq/194-tegra-p]\n    270   25271  0.0  0.0 [nvmap-bz]\n    272   25271  0.0  0.0 [irq/187-host1x_]\n    279   25271  0.0  0.0 [irq/196-gk20a_s]\n    280   25271  0.0  0.0 [irq/197-gk20a_s]\n    281   25271  0.0  0.0 [irq/198-gk20a_s]\n    282   25271  0.0  0.0 [irq/199-gk20a_n]\n    287   25271  0.0  0.0 /bin/bash /etc/systemd/nv-tee-supplicant.sh\n    289   25271  0.0  0.0 /usr/sbin/tee-supplicant\n    290   25271  0.0  0.0 [optee_bus_scan]\n    294   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    295   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    296   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    297   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    298   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    299   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    300   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    301   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    302   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    303   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    304   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    305   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    306   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    307   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    308   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    309   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    310   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    312   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    313   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    314   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    315   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    316   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    317   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    318   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    319   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    320   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    321   25270  0.0  0.0 /lib/systemd/systemd-udevd\n    325   25270  0.0  0.0 [cfg80211]\n    327   25270  0.0  0.0 [irq/218-bc00000]\n    328   25270  0.0  0.0 [capture-control]\n    329   25270  0.0  0.0 [capture]\n    330   25270  0.0  0.0 [irq/230-nvvrs-p]\n    331   25270  0.0  0.0 [irq/213-tegra_d]\n    332   25270  0.0  0.0 [irq/214-tegra_d]\n    333   25270  0.0  0.0 [dce-async-ipc-w]\n    350   25270  0.0  0.0 [irq/118-3210000]\n    355   25270  0.0  0.0 [spi0]\n    358   25270  0.0  0.0 [nv_queue]\n    359   25270  0.0  0.0 [nv_queue]\n    360   25270  0.0  0.0 [irq/119-3230000]\n    364   25270  0.0  0.0 [spi1]\n    413   25269  0.0  0.0 [irq/188-tegra-p]\n    415   25269  0.0  0.0 [irq/188-aerdrv]\n    448   25268  0.0  0.0 /usr/sbin/haveged --Foreground --verbose=1\n    449   25268  0.0  0.0 /sbin/rpcbind -f -w\n    450   25268  0.0  0.1 /lib/systemd/systemd-resolved\n    451   25268  0.0  0.0 /lib/systemd/systemd-timesyncd\n    459   25266  0.0  0.0 avahi-daemon: running [fl01.local]\n    467   25266  0.0  0.2 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers\n    470   25266  0.0  0.1 python3 /opt/nvidia/pva-allow-2/bin/nvidiaPvaAllowd.py\n    474   25266  0.0  0.0 /usr/libexec/power-profiles-daemon\n    476   25266  0.0  0.0 /usr/sbin/rsyslogd -n -iNONE\n    481   25266  0.0  0.0 seatd -g video\n    499   25266  0.0  0.1 /usr/libexec/accounts-daemon\n    500   25266  0.0  0.1 /usr/libexec/switcheroo-control\n    501   25266  0.0  0.0 /lib/systemd/systemd-logind\n    502   25266  0.0  0.1 /usr/libexec/udisks2/udisksd\n    503   25266  0.0  0.1 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant\n    514   25266  0.0  0.0 avahi-daemon: chroot helper\n    515   25266  0.0  0.0 /usr/sbin/lpd -s\n    527   25265  0.0  0.0 [sugov:0]\n    532   25265  0.0  0.0 [sugov:4]\n    569   25265  0.0  0.0 /usr/sbin/nvfancontrol &\n    636   25264  0.0  0.1 /usr/sbin/ModemManager\n    660   25263  0.0  0.0 [file-storage]\n    704   25262  0.0  0.0 [RTW_CMD_THREAD]\n    794   25260  0.0  0.0 /bin/bash /etc/systemd/nvmemwarning.sh\n    828   25260  0.0  0.0 [pr/ramoops-1]\n    830   25260  0.0  0.0 [sw-quiesce]\n    831   25260  0.0  0.0 [nvgpu_channel_p]\n    834   25260  0.0  0.0 [nvgpu_pg_init_g]\n    835   25260  0.0  0.0 [nvgpu_clk_arb_p]\n    837   25260  0.0  0.1 /usr/sbin/nvargus-daemon\n    840   25260  0.0  0.0 /usr/sbin/nvs-service\n    868   25260  0.0  0.6 /usr/bin/containerd\n    932   25260  0.0  0.0 /usr/sbin/nvphsd\n    947   25259  0.0  0.0 /usr/sbin/nvphsd\n    950   25259  0.0  0.0 /usr/sbin/cron -f -P\n    966   25259  0.0  0.1 /usr/sbin/gdm3\n    973   25259  0.0  0.0 /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyGS0 vt220\n    974   25259  0.0  0.0 /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyTCU0 vt220\n    997   25259  0.0  0.0 /usr/sbin/kerneloops --test\n    999   25259  0.0  0.0 /usr/sbin/kerneloops\n   1014   25259  0.0  0.1 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\n   1101   25259  0.0  0.1 gdm-session-worker [pam/gdm-autologin]\n   1278   25258  0.0  0.1 /lib/systemd/systemd --user\n   1279   25258  0.0  0.0 (sd-pam)\n   1285   25257  0.0  0.1 /usr/bin/pipewire\n   1286   25257  0.0  0.0 /usr/bin/pipewire-media-session\n   1287   25257  0.0  0.2 /usr/bin/pulseaudio --daemonize=no --log-target=journal\n   1291   25256  0.0  0.0 /usr/libexec/rtkit-daemon\n   1293   25256  0.0  0.0 /usr/bin/gnome-keyring-daemon --daemonize --login\n   1300   25256  0.0  0.0 /usr/libexec/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --session=ubuntu\n   1302   25256  0.0  0.7 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -nolisten tcp -background none -noreset -keeptty -novtswitch -verbose 3\n   1303   25256  0.0  0.0 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n   1308   25256  0.0  0.9 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock\n   1325   25253  0.0  0.0 [nvidia-modeset/]\n   1326   25253  0.0  0.0 [nvidia-modeset/]\n   1328   25253  0.0  0.0 [nvidia]\n   1329   25253  0.0  0.0 [nv_queue]\n   1363   25251  0.0  0.1 /usr/libexec/gnome-session-binary --session=ubuntu\n   1745   25249  0.0  0.0 /usr/libexec/at-spi-bus-launcher\n   1757   25249  0.0  0.0 /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/run/user/1000/at-spi/bus_0\n   1782   25249  0.0  0.0 /usr/libexec/gnome-session-ctl --monitor\n   1792   25249  0.0  0.0 /usr/libexec/gvfsd\n   1800   25249  0.0  0.1 /usr/libexec/gvfsd-fuse /run/user/1000/gvfs -f\n   1801   25249  0.0  0.2 /usr/libexec/gnome-session-binary --systemd-service --session=ubuntu\n   1843   25245  0.0  0.0 /usr/libexec/xdg-permission-store\n   1845   25245  0.0  0.2 /usr/libexec/gnome-shell-calendar-server\n   1852   25245  0.0  0.1 /usr/libexec/upowerd\n   1859   25244  0.0  0.3 /usr/libexec/evolution-source-registry\n   1867   25244  0.0  0.0 /usr/libexec/dconf-service\n   1873   25244  0.0  0.1 /usr/libexec/gvfs-udisks2-volume-monitor\n   1878   25244  0.0  0.4 /usr/libexec/goa-daemon\n   1881   25244  0.0  0.0 /usr/libexec/gvfs-mtp-volume-monitor\n   1885   25244  0.0  0.0 /usr/libexec/gvfs-gphoto2-volume-monitor\n   1889   25244  0.0  0.0 /usr/libexec/gvfs-afc-volume-monitor\n   1894   25244  0.0  0.0 /usr/libexec/gvfs-goa-volume-monitor\n   1899   25244  0.0  0.4 /usr/libexec/evolution-calendar-factory\n   1910   25243  0.0  0.4 /usr/libexec/evolution-addressbook-factory\n   1919   25243  0.0  0.1 /usr/libexec/goa-identity-service\n   1937   25243  0.0  0.1 /usr/libexec/gvfsd-trash --spawner :1.19 /org/gtk/gvfs/exec_spaw/0\n   1951   25242  0.0  0.3 /usr/bin/gjs /usr/share/gnome-shell/org.gnome.Shell.Notifications\n   1962   25242  0.0  0.0 /usr/libexec/at-spi2-registryd --use-gnome-session\n   1967   25242  0.0  0.0 sh -c /usr/bin/ibus-daemon --panel disable $([ \"$XDG_SESSION_TYPE\" = \"x11\" ] && echo \"--xim\")\n   1969   25242  0.0  0.0 /usr/libexec/gsd-a11y-settings\n   1970   25242  0.0  0.3 /usr/libexec/gsd-color\n   1972   25242  0.0  0.1 /usr/libexec/gsd-datetime\n   1974   25242  0.0  0.0 /usr/libexec/gsd-housekeeping\n   1975   25242  0.0  0.3 /usr/libexec/gsd-keyboard\n   1977   25242  0.0  0.3 /usr/libexec/gsd-media-keys\n   1980   25242  0.0  0.3 /usr/libexec/gsd-power\n   1982   25242  0.0  0.1 /usr/bin/ibus-daemon --panel disable --xim\n   1983   25242  0.0  0.1 /usr/libexec/gsd-print-notifications\n   1985   25242  0.0  0.1 /usr/libexec/gsd-rfkill\n   1986   25242  0.0  0.0 /usr/libexec/gsd-screensaver-proxy\n   1987   25242  0.0  0.1 /usr/libexec/gsd-sharing\n   1989   25242  0.0  0.0 /usr/libexec/gsd-smartcard\n   1990   25242  0.0  0.1 /usr/libexec/gsd-sound\n   1991   25242  0.0  0.3 /usr/libexec/gsd-wacom\n   1992   25242  0.0  0.3 /usr/libexec/gsd-xsettings\n   1994   25242  0.0  0.8 /usr/libexec/evolution-data-server/evolution-alarm-notify\n   1995   25242  0.0  0.1 /usr/libexec/gsd-disk-utility-notify\n   2000   25242  0.0  2.4 /usr/bin/gnome-software --gapplication-service\n   2004   25242  0.0  0.5 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2072   25242  0.0  0.1 /usr/libexec/xdg-desktop-portal\n   2086   25242  0.0  0.1 /usr/libexec/colord\n   2091   25242  0.0  0.1 /usr/libexec/gsd-printer\n   2101   25242  0.0  0.0 /usr/libexec/ibus-memconf\n   2105   25242  0.0  0.3 /usr/libexec/ibus-extension-gtk3\n   2112   25242  0.0  0.3 /usr/libexec/ibus-x11 --kill-daemon\n   2115   25242  0.0  0.1 /usr/libexec/ibus-portal\n   2126   25242  0.0  0.1 /usr/libexec/xdg-document-portal\n   2135   25242  0.0  0.3 /usr/bin/gjs /usr/share/gnome-shell/org.gnome.ScreenSaver\n   2145   25242  0.0  0.0 fusermount3 -o rw,nosuid,nodev,fsname=portal,auto_unmount,subtype=portal -- /run/user/1000/doc\n   2163   25242  0.0  0.6 /usr/libexec/xdg-desktop-portal-gnome\n   2165   25242  0.0  1.0 /usr/libexec/tracker-miner-fs-3\n   2169   25242  0.0  0.0 /usr/libexec/ibus-engine-simple\n   2180   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2181   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2182   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2183   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2184   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2185   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2186   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2187   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2188   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2189   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2191   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2192   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2193   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2194   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2195   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2196   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2197   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2198   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2199   25241  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2243   25240  0.0  0.3 /usr/libexec/xdg-desktop-portal-gtk\n   2321   25237  0.0  0.0 /usr/libexec/gvfsd-metadata\n   2374   25181  0.0  0.3 update-notifier\n  13416   18343  0.0  0.0 [kworker/2:0-events]\n  15836   11985  0.0  0.0 [kworker/3:0-events]\n  17508    8416  0.0  0.0 [kworker/1:0-events]\n  17612    8196  0.0  0.0 [kworker/5:0-events]\n  17654    6411  0.0  0.0 [kworker/u12:8-events_freezable_power_]\n  17665    5934  0.0  0.0 [kworker/u12:0-events_freezable_power_]\n  17686    4910  0.0  0.0 [kworker/u12:3-devfreq_wq]\n  17711    3825  0.0  0.0 [kworker/u12:9-events_freezable_power_]\n  17737    2657  0.0  0.0 [kworker/u12:4-events_freezable_power_]\n  17978    1426  0.0  0.0 [kworker/u12:7-events_freezable_power_]\n  18025    1406  0.0  0.0 [kworker/4:1-events]\n  18184    1156  0.0  0.0 [kworker/1:1-cgroup_destroy]\n  18225    1150  0.0  0.0 [kworker/3:1-events]\n  18261    1128  0.0  0.0 [kworker/u12:10-events_freezable_power_]\n  18263    1097  0.0  0.0 [kworker/5:2-cgroup_destroy]\n  18479     777  0.0  0.0 [kworker/4:0-events]\n  18522     685  0.0  0.0 [kworker/2:1-events]\n  18523     678  0.0  0.0 [kworker/0:2-events]\n  18567     475  0.0  0.0 [kworker/u12:2-events_freezable_power_]\n  18568     361  0.0  0.0 [kworker/0:1-events]\n  18807     146  0.0  0.0 [kworker/2:2-events]\n  18843     129  0.0  0.0 [kworker/1:2-events]\n  18844     127  0.0  0.0 [kworker/3:2]\n  18934      59  0.0  0.0 sleep 300\n  18935      33  0.0  0.0 [kworker/0:0-events]\n  18940       1  0.0  0.0 [kworker/u12:1]\n  18968       1  0.0  0.0 sshd: fl@notty\n  18969       0  0.0  0.0 sudo -n python3 -B -\n  18970       0  0.0  0.1 python3 -B -\n  18976       0  0.0  0.0 ps -eo pid,etimes,pcpu,pmem,args --sort=-pcpu\n"
+    },
+    {
+      "args": [
+        "iw",
+        "dev"
+      ],
+      "rc": 0,
+      "elapsed": 0.0070328039982996415,
+      "output": "phy#2\n\tInterface wlxfc221c300e99\n\t\tifindex 25\n\t\twdev 0x200000001\n\t\taddr fc:22:1c:30:0e:99\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:a6\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 44 (5220 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm\n"
+    },
+    {
+      "args": [
+        "ip",
+        "-j",
+        "address"
+      ],
+      "rc": 0,
+      "elapsed": 0.0043525380024220794,
+      "output": "[{\"ifindex\":1,\"ifname\":\"lo\",\"flags\":[\"LOOPBACK\",\"UP\",\"LOWER_UP\"],\"mtu\":65536,\"qdisc\":\"noqueue\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"loopback\",\"address\":\"00:00:00:00:00:00\",\"broadcast\":\"00:00:00:00:00:00\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"127.0.0.1\",\"prefixlen\":8,\"scope\":\"host\",\"label\":\"lo\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":2,\"ifname\":\"wlP4p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"dc:4a:9e:31:89:a6\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.137.121\",\"prefixlen\":24,\"broadcast\":\"192.168.137.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"wlP4p1s0\",\"valid_life_time\":586190,\"preferred_life_time\":586190},{\"family\":\"inet6\",\"local\":\"fe80::f705:66c4:cd7a:a952\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":3,\"ifname\":\"can0\",\"flags\":[\"NOARP\",\"ECHO\"],\"mtu\":16,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":10,\"link_type\":\"can\",\"addr_info\":[]},{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"44:49:c0:1d:7d:22\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":5,\"ifname\":\"l4tbr0\",\"flags\":[\"BROADCAST\",\"MULTICAST\"],\"mtu\":1500,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3e:c7:e7:79:f3:87\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":6,\"ifname\":\"usb0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"4e:b3:26:aa:e4:ad\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":7,\"ifname\":\"usb1\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"4e:b3:26:aa:e4:af\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":12,\"ifname\":\"docker0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"noqueue\",\"operstate\":\"DOWN\",\"group\":\"default\",\"link_type\":\"ether\",\"address\":\"02:42:d1:dd:9f:58\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"172.17.0.1\",\"prefixlen\":16,\"broadcast\":\"172.17.255.255\",\"scope\":\"global\",\"label\":\"docker0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":25,\"ifname\":\"wlxfc221c300e99\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":4052,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ieee802.11/radiotap\",\"address\":\"fc:22:1c:30:0e:99\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":51,\"ifname\":\"fl-c1\",\"flags\":[\"POINTOPOINT\",\"MULTICAST\",\"NOARP\",\"UP\",\"LOWER_UP\"],\"mtu\":3982,\"qdisc\":\"pfifo_fast\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":500,\"link_type\":\"none\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.80.0.11\",\"prefixlen\":24,\"scope\":\"global\",\"label\":\"fl-c1\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]}]\n"
+    },
+    {
+      "args": [
+        "ip",
+        "route"
+      ],
+      "rc": 0,
+      "elapsed": 0.0029986289991938975,
+      "output": "default via 192.168.137.2 dev wlP4p1s0 proto dhcp metric 600 \n10.80.0.0/24 dev fl-c1 proto kernel scope link src 10.80.0.11 \n169.254.0.0/16 dev fl-c1 scope link metric 1000 \n172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown \n192.168.137.0/24 dev wlP4p1s0 proto kernel scope link src 192.168.137.121 metric 600 \n"
+    },
+    {
+      "args": [
+        "ss",
+        "-lunp"
+      ],
+      "rc": 0,
+      "elapsed": 0.05191085299884435,
+      "output": "State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                   \nUNCONN 0      0            0.0.0.0:9000       0.0.0.0:*    users:((\"python3\",pid=17507,fd=4))                       \nUNCONN 0      0          127.0.0.1:9200       0.0.0.0:*    users:((\"wfb_v6_uplink\",pid=17523,fd=4))                 \nUNCONN 0      0            0.0.0.0:37931      0.0.0.0:*    users:((\"python3\",pid=17507,fd=5))                       \nUNCONN 0      0            0.0.0.0:5353       0.0.0.0:*    users:((\"avahi-daemon\",pid=459,fd=12))                   \nUNCONN 0      0         127.0.0.53:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=450,fd=13))                \nUNCONN 0      0            0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=449,fd=5),(\"systemd\",pid=1,fd=299))\nUNCONN 0      0            0.0.0.0:57691      0.0.0.0:*    users:((\"avahi-daemon\",pid=459,fd=14))                   \nUNCONN 0      0                  *:5353             *:*    users:((\"avahi-daemon\",pid=459,fd=13))                   \nUNCONN 0      0                  *:51392            *:*    users:((\"avahi-daemon\",pid=459,fd=15))                   \nUNCONN 0      0                  *:111              *:*    users:((\"rpcbind\",pid=449,fd=7),(\"systemd\",pid=1,fd=303))\n"
+    },
+    {
+      "args": [
+        "lsusb",
+        "-t"
+      ],
+      "rc": 0,
+      "elapsed": 0.00517197000226588,
+      "output": "/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M\n    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M\n        |__ Port 1: Dev 4, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M\n/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M\n    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M\n    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M\n"
+    },
+    {
+      "args": [
+        "df",
+        "-h",
+        "/var/tmp"
+      ],
+      "rc": 0,
+      "elapsed": 0.0032031900009314995,
+      "output": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        28G   23G  3.9G  86% /\n"
+    },
+    {
+      "args": [
+        "systemctl",
+        "show",
+        "wfb-fl-server-daemon",
+        "wfb-fl-client-daemon",
+        "-p",
+        "MainPID",
+        "-p",
+        "ActiveState",
+        "-p",
+        "ExecStart"
+      ],
+      "rc": 0,
+      "elapsed": 0.02825906599900918,
+      "output": "MainPID=0\nExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }\nActiveState=inactive\n\nMainPID=17507\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14 ; ignore_errors=no ; start_time=[Tue 2026-10-27 00:26:16 CST] ; stop_time=[n/a] ; pid=17507 ; code=(null) ; status=0/0 }\nActiveState=active\n"
+    },
+    {
+      "args": [
+        "sha256sum",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "elapsed": 0.0065438980018370785,
+      "output": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0  /usr/bin/wfb_v6_uplink\n"
+    },
+    {
+      "args": [
+        "pgrep",
+        "-a",
+        "-x",
+        "wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "elapsed": 0.029239568000775762,
+      "output": "17523 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n"
+    },
+    {
+      "args": [
+        "uftp",
+        "-h"
+      ],
+      "rc": 1,
+      "elapsed": 0.011864616000821115,
+      "output": "uftp: option requires an argument -- 'h'\nuftp [ -R txrate ] [ -L logfile ] [ -B udp_buf_size ]\n    [ -g max_log_size ] [ -n max_log_count ] [ -m max_nak_count ]\n    [ -Y keytype ] [ -h hashtype ] [ -e curve ] [ -c ]\n    [ -k key_file ] [ -K rsa:key_length | ec:curve ] [ -l ] [ -T ]\n    [ -b block_size ] [ -t ttl ] [ -Q dscp ] [ -z | -Z ] [ -I interface ]\n    [ -U UID ] [ -p port ] [ -u source_port ] [ -j proxylist_file ]\n    [ -q ] [ -f ] [ -y ] [ -x log_level ] [ -a max_passes ]\n    [ -H host[,host...] | -H @hostlist_file | -F restart_file ] [ -o ]\n    [ -X exclude_file ] [ -M pub_multicast_addr ] [ -P priv_multicast_addr ]\n    [ -C cc_type ] [ -D dest_name ] [ -E base_dir[,base_dir... ] ]\n    [ -S status_file ] [ -r init_grtt[:min_grtt:max_grtt] ] [ -s robust ] \n    [ -W txweight ] [ -N max_nak_pct ] { -i list_file | file [ file... ] }\n"
+    },
+    {
+      "args": [
+        "uftpd",
+        "-h"
+      ],
+      "rc": 1,
+      "elapsed": 0.004315864000091096,
+      "output": "uftpd: option requires an argument -- 'h'\nuftpd [ -d ] [ -p port ] [ -B buf_size ]\n    [ -E ] [ -Q dscp ] [ -U UID ] [ -x log_level ] [ -t ] [ -T temp_dir ]\n    [ -D dest_dir [ dest_dir... ]] [ -A backup_dir [ backup_dir... ]]\n    [ -c cache_size ] [ -s postreceive_script ]\n    [ -F status_file ] [ -q ] [ -L logfile ] [ -P pidfile ]\n    [ -o ] [ -S serverlist_file ] [ -R proxylist_file ] [ -r v4proxy[/fp] ]\n    [ -k keyfile ] [ -K rsa:key_length | ec:curve ]\n    [ -m ] [ -N priority ] [ -i ] [ -g max_log_size ] [ -n max_log_count ]\n    [ -H hb_server[:port][,hb_server[:port]...] ] [ -h hb_interval ]\n    [ -I interface[,interface...] ] [ -M pub_mcast_addr[,pub_mcast_addr...] ]\n"
+    }
+  ],
+  "installed_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng",
+  "installed_files": {
+    "fl/build_identity.json": {
+      "sha256": "a27b0792cd8d7a885a591b90e0ce09f0bfe57e5476c8af17df587ae1b0ccd6f4",
+      "size": 76,
+      "content": "{\"commit\": \"99865efe224a9ad35fefd13ae1340721f374b521\", \"schema_version\": 1}\n"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "8a22952ccbaee6d38f4150f55c62097f5c61c0ee8ec7b1c29da7e9f84cced609",
+      "size": 87886
+    },
+    "fl/client_daemon.py": {
+      "sha256": "29ab16b9f2a10269d04cc72098d0fb86de5b28a644fd1766022da6b77e86c26e",
+      "size": 65591
+    },
+    "fl/radio.py": {
+      "sha256": "ff1f71836c9fb1684581c540556f41de9dd5026a03887efaefa2d60486026858",
+      "size": 34018
+    }
+  },
+  "link_processes": [
+    {
+      "pid": 17523,
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 ",
+      "stat": "17523 (wfb_v6_uplink) S 17507 17507 17507 0 -1 4194560 843 313 0 0 409 821 0 0 20 0 1 0 1686682 16609280 2750 18446744073709551615 187650439905280 187650440118903 281474415031920 0 0 0 0 0 0 1 0 0 17 1 0 0 0 0 0 187650440187648 187650440192048 187651427819520 281474415033720 281474415034112 281474415034112 281474415034337 0\n",
+      "stdout": "/tmp/wfb-ng-fl/client/wfb_uplink.log"
+    }
+  ]
+}

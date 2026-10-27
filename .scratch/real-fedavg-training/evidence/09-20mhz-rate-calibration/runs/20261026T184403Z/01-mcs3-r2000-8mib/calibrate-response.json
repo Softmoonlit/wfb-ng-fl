@@ -1,0 +1,11 @@
+{
+  "http": 409,
+  "body": {
+    "error": "radio_target_nodes_not_ready",
+    "message": "目标节点必须全部 IDLE/READY",
+    "unready_nodes": [
+      1
+    ]
+  },
+  "elapsed_seconds": 0.0022449919997598045
+}

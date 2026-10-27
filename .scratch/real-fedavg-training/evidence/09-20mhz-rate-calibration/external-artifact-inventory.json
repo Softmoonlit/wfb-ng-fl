@@ -1,0 +1,383 @@
+{
+  "utc": "2026-10-27T02:36:06Z",
+  "hosts": {
+    "fl00": {
+      "base": "/srv/wfb-ng-fl/calibration/09",
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184403Z/source/model-40mib.bin",
+          "bytes": 41943040,
+          "sha256": "cd065e71e90ca5d4ebc2d30df45dc4e30be036912077bcaf36b6df38c55c46d0",
+          "hash_seconds": 0.06914975999825401
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184403Z/source/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "8c6628581057bddbbc52752d6c6456d0230ebbdcb1e060bebfbbdb40645f4a08",
+          "hash_seconds": 0.013052544003585353
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/source/model-40mib.bin",
+          "bytes": 41943040,
+          "sha256": "9487bce0e5f5400a6dd0e1fe9e92a7e1f1e1d139d6c67d5b56745fff68710e03",
+          "hash_seconds": 0.06984908800222911
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/source/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "860f16f4148047b729e13768200743cd70c64abac8b615ea4bd4c6c8c68e2618",
+          "hash_seconds": 0.014171071998134721
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/source/model-40mib.bin",
+          "bytes": 41943040,
+          "sha256": "6064fdca38a8bdce68a0ceed2acc0b19ae6ea98f2d9b42fcedf9f6cf246698ef",
+          "hash_seconds": 0.0584100159976515
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/source/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "c6b09ae37ee66a57b378321f1f62dcabaaa29ed822ced9dcb4885bd579b2f039",
+          "hash_seconds": 0.011845408000226598
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/source/model-40mib.bin",
+          "bytes": 41943040,
+          "sha256": "5d31613497a843f571bdf4d9c029fcdded9b32828c2b0354ed87f70e6a419126",
+          "hash_seconds": 0.06920620799792232
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/source/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "3a04b846ec4bcb0413240b729a50ad8272d23e5e26ed283e1dd6a19c68a24143",
+          "hash_seconds": 0.013202399997680914
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/fl00-tun-feedback.jsonl",
+          "bytes": 139499,
+          "sha256": "e9d33c53dbad3aa230eb73b9fa8c0da1b771a5dcd2a5a77bf0516526bcbe7939",
+          "hash_seconds": 0.00031014400155982
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/observer.stderr",
+          "bytes": 112,
+          "sha256": "790035a47149f0a3c731831e27934c7c04f2a35fe61ff34baafd5529c51b9ceb",
+          "hash_seconds": 6.687999848509207e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/server-link-before-restart.log",
+          "bytes": 66443554,
+          "sha256": "f2ca27236aea09002857c1350491cef6dc1e90e13116bd2be2b5305e1aee7225",
+          "hash_seconds": 0.08986268800072139
+        }
+      ],
+      "total_bytes": 267909757
+    },
+    "fl01": {
+      "base": "/srv/wfb-ng-fl/calibration/09",
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 1866,
+          "sha256": "7f626f7869771c13076ac02c372aaf4122c05e1888c8bfa0d26a18946304961e",
+          "hash_seconds": 0.00014938000094844028
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 478,
+          "sha256": "4488eadca17a791e394c6704d0ebd35322a43c01e0248dc5c5f46cacd995f315",
+          "hash_seconds": 8.40659995446913e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp/_group_147C8C87/model-8mib.bin",
+          "bytes": 8076900,
+          "sha256": "8a452ba31648b7d7b3591fec6d4faa887866c1171c494d75ec53523d48c361c5",
+          "hash_seconds": 0.01248254399979487
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "35b3178e20e6aa21e41fc61333adfc4d2f084b0414fed0e202899e43434330c2",
+          "hash_seconds": 0.0003407119947951287
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 2670,
+          "sha256": "b10f9ef9a8990ee80336dd77298ec3c12811588a57069e20d2d1ce7bf377cbae",
+          "hash_seconds": 6.025799666531384e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 510,
+          "sha256": "f83c84229671d3cf1544a656277c5e37d263d14cf4e426af613d96db8719ab01",
+          "hash_seconds": 4.451299901120365e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/tmp/_group_9C290BFE/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "56166968b6a010d41a6d92093922229fade23f0027b0bc0e1638dea8488c1e28",
+          "hash_seconds": 0.012079398999048863
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/tmp/_group_9C290BFE_restart",
+          "bytes": 6790,
+          "sha256": "66d89207bb43aadce6f883b0bbcae5daa5687d34ccc8c1b68795256c61757b7b",
+          "hash_seconds": 0.0003037839996977709
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 66,
+          "sha256": "4837dd5baa43e1a67c56be8446d6ccf535e5bb0c32a9603ecc2ac501648834d7",
+          "hash_seconds": 5.193700053496286e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/received/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "3a04b846ec4bcb0413240b729a50ad8272d23e5e26ed283e1dd6a19c68a24143",
+          "hash_seconds": 0.012576082001032773
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 3023,
+          "sha256": "9af087823a6c8cbd7072aab793d45c4de11dbe2b44bde0594ba14f0b0f36b571",
+          "hash_seconds": 0.0002679739991435781
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 554,
+          "sha256": "0bee2b6e20e9c31fa7fae113e4d381216fc263409e735494ae7676465e5476a6",
+          "hash_seconds": 5.360200157156214e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "3e093de8df01e898964f20f88f305b3b7278629cd45166e2904b5dbeff2d04d5",
+          "hash_seconds": 3.654500324046239e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/client-link-before-restart.log",
+          "bytes": 24489487,
+          "sha256": "f71cb2b605d9fb1e6c6a7da4a43751964c88c6f582cceaf67a6a563d88eb3c42",
+          "hash_seconds": 0.029565040000306908
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/fl01-tun-feedback.jsonl",
+          "bytes": 59117,
+          "sha256": "ff7b3214fcb310978d88d619ce9bc85dcfc931565448524e4abdf13486801aac",
+          "hash_seconds": 0.0004134499977226369
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/observer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "hash_seconds": 0.00012262699601706117
+        }
+      ],
+      "total_bytes": 49418957
+    },
+    "fl02": {
+      "base": "/srv/wfb-ng-fl/calibration/09",
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 308743,
+          "sha256": "224c3f51b0158f5735339471c8ae9d80cc1a4c47a11368b9b826cf3b05f4d047",
+          "hash_seconds": 0.0007031889981590211
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 478,
+          "sha256": "b1cd91be9cff1e8231a938dc1d2b48df89f2716c8a598b7b32d943f95bc2b38d",
+          "hash_seconds": 9.844399755820632e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp/_group_147C8C87_restart",
+          "bytes": 336,
+          "sha256": "52a3e0804d93dc525ec3c67ef8ac5b01756ecf0513e36f3c19435e4c82cb5d29",
+          "hash_seconds": 4.579699452733621e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 66,
+          "sha256": "efab9d93ac49b819399d51ca4f9b96be3795684f11f569e5d39436618a9ef051",
+          "hash_seconds": 4.0261002141050994e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 1979,
+          "sha256": "6739a8dc602cb5b5b5760e88376e82c8512c8744730e0e396f8e2c5ee2722638",
+          "hash_seconds": 4.8838002840057015e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 510,
+          "sha256": "f68e741cbd8165a1522bf5d467beeed179b251e897ba5e3fbffe9bad8ea809f2",
+          "hash_seconds": 3.875699621858075e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/tmp/_group_9C290BFE/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "1e7ff00bffab538de4c399185d4494dc182cf41eaae35f970dc4d0a09993c345",
+          "hash_seconds": 0.012657402003242169
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/tmp/_group_9C290BFE_restart",
+          "bytes": 6790,
+          "sha256": "dcd7bae4680b237e6a1d0e55e63b08dbf905d1200c52ef0d20a4f8c9a17a32be",
+          "hash_seconds": 0.0003559789984137751
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 66,
+          "sha256": "4837dd5baa43e1a67c56be8446d6ccf535e5bb0c32a9603ecc2ac501648834d7",
+          "hash_seconds": 5.0406000809744e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 3841,
+          "sha256": "3c473e89746f92ea20e6783be08c3d44cd8014a0558216bddeba96710725cf39",
+          "hash_seconds": 4.861399793298915e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 554,
+          "sha256": "e54280ead6ec51fa5c2b4333ef6a5625a5185f9aff7e0af7b9dc4f43c17b5cda",
+          "hash_seconds": 4.307700146455318e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/tmp/_group_91504BFF/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "3a04b846ec4bcb0413240b729a50ad8272d23e5e26ed283e1dd6a19c68a24143",
+          "hash_seconds": 0.012144476000685245
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/tmp/_group_91504BFF_restart",
+          "bytes": 336,
+          "sha256": "80e6aa6a8838ddd0fd1f4e520942d266166dd719904b6e3db2322a7c5fde3ff7",
+          "hash_seconds": 0.0002876510043279268
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "a4584c0ef58ff72453627dd03efd7f173bdcf76582e7c37a88a118236377d672",
+          "hash_seconds": 5.1846996939275414e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/client-link-before-restart.log",
+          "bytes": 22094646,
+          "sha256": "6e4c239019c7f5616d1c428e8956a6970a6d25a22f994c4993d7302529bcaf1c",
+          "hash_seconds": 0.026622769997629803
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/fl02-tun-feedback.jsonl",
+          "bytes": 59335,
+          "sha256": "6cd7a21624d3dc6073fc37a5868a0f7d408e4a072de9616a177b9129e76ca770",
+          "hash_seconds": 0.0003564910002751276
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/observer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "hash_seconds": 9.165899973595515e-05
+        }
+      ],
+      "total_bytes": 39255036
+    },
+    "fl04": {
+      "base": "/srv/wfb-ng-fl/calibration/09",
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/received/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "860f16f4148047b729e13768200743cd70c64abac8b615ea4bd4c6c8c68e2618",
+          "hash_seconds": 0.011895512005139608
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 3420,
+          "sha256": "9bc6c583cdf8b2a0bdd5145adde35bd24e05167e982bb0c6446dca73c9aa5930",
+          "hash_seconds": 0.0002776259934762493
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 478,
+          "sha256": "09746c47639e8ec1a6ce5cd7992fe5d6ae46cd8aecc81213dcdc94127889acc5",
+          "hash_seconds": 4.835700383409858e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "1e27fe46d0c2944107bb799d9ffe0c8b48d0de15388d7c4b13459f07a050a2b9",
+          "hash_seconds": 4.041999636683613e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/received/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "c6b09ae37ee66a57b378321f1f62dcabaaa29ed822ced9dcb4885bd579b2f039",
+          "hash_seconds": 0.011267359004705213
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 3421,
+          "sha256": "c0d75a656b8dea2011b8994769e3142c81c14767eea27d714825cc2ac136b653",
+          "hash_seconds": 0.00027871299971593544
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 510,
+          "sha256": "4cc3bb13bb6c0fd2712a76516287c840cdb67098b6d2e490f742a042f0a6d07f",
+          "hash_seconds": 4.144299600739032e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261026T190537Z-clean/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "70acee9f6e32d60b7c524699b46a42bf779d47ef18e33112a41eef7ca6b0eaf0",
+          "hash_seconds": 3.737899533007294e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/received/model-8mib.bin",
+          "bytes": 8388608,
+          "sha256": "3a04b846ec4bcb0413240b729a50ad8272d23e5e26ed283e1dd6a19c68a24143",
+          "hash_seconds": 0.010695755001506768
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver-console.log",
+          "bytes": 4076,
+          "sha256": "db991d1d8084b57311c8c9ad9fd9fc08ec7a99a98fe180bacd92a289cb77fdd0",
+          "hash_seconds": 0.00025083799846470356
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/receiver.json",
+          "bytes": 554,
+          "sha256": "557da80cc6fa33ac8ad6db5a96893ba5d6acf201399103af523040de532320d8",
+          "hash_seconds": 4.349200025899336e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status",
+          "bytes": 140,
+          "sha256": "828bd20c710f96f154b8a369da286cafbb83c6f78cce84c4818f56166fbb82c4",
+          "hash_seconds": 3.497900615911931e-05
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/client-link-before-restart.log",
+          "bytes": 24346276,
+          "sha256": "875933ee2f6281ddc9289b4971dc337a57516796de54d15e2c5da17c5a0380fb",
+          "hash_seconds": 0.027957321995927487
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/fl04-tun-feedback.jsonl",
+          "bytes": 55075,
+          "sha256": "9de4cfc640c0925d06949d91a63a6560cd5d4409a616f30029229eea60de9331",
+          "hash_seconds": 0.00040832500235410407
+        },
+        {
+          "path": "/srv/wfb-ng-fl/calibration/09/20261027T022037Z-fixed-small-diagnostic/observer.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "hash_seconds": 9.440899884793907e-05
+        }
+      ],
+      "total_bytes": 49580054
+    }
+  }
+}

@@ -1,0 +1,38 @@
+24138208	RX_ANT	5785:3:40	1	12:-54:-52:-52:13:16:18
+24138208	RX_ANT	5785:3:40	0	12:-54:-52:-52:12:15:19
+24138208	PKT	20:746:0:0:12:12:1:0:0:1:41
+24138208	PKT_SRC	255:12:522:1:0:1:41
+24138208	GRANT_FILTER	64246:33064:0:31182:0:0:0:0:0
+24138208	READY_FILTER	0:0:0:0:0
+24138208	REASSEMBLY	0:40
+24138208	TOKEN_AUTH	33064:0:1640:4450
+redeclare node_id=4 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=24139038
+24139208	PKT	7:196:0:0:0:0:0:0:0:0:0
+24139208	PKT_SRC	255:0:0:0:0:0:0
+24139208	GRANT_FILTER	64253:33064:0:31189:0:0:0:0:0
+24139208	READY_FILTER	0:0:0:0:0
+24139208	REASSEMBLY	0:40
+24139208	TOKEN_AUTH	33064:0:1640:4452
+grant_accept node_id=4 sequence=64835 duration_ms=120 expires_at_ms=24139338
+grant_accept node_id=4 sequence=64836 duration_ms=120 expires_at_ms=24139468
+grant_accept node_id=4 sequence=64837 duration_ms=120 expires_at_ms=24139598
+grant_accept node_id=4 sequence=64838 duration_ms=120 expires_at_ms=24139729
+grant_accept node_id=4 sequence=64839 duration_ms=120 expires_at_ms=24139859
+grant_accept node_id=4 sequence=64840 duration_ms=120 expires_at_ms=24139989
+grant_accept node_id=4 sequence=64841 duration_ms=120 expires_at_ms=24140119
+grant_accept node_id=4 sequence=64842 duration_ms=120 expires_at_ms=24140249
+24140208	RX_ANT	5785:3:40	1	13:-54:-52:-52:14:15:20
+24140208	RX_ANT	5785:3:40	0	13:-54:-52:-52:14:15:20
+24140208	PKT	21:769:0:0:13:13:1:0:0:1:41
+24140208	PKT_SRC	255:13:545:1:0:1:41
+24140208	GRANT_FILTER	64261:33072:0:31189:0:0:0:0:0
+24140208	READY_FILTER	0:0:0:0:0
+24140208	REASSEMBLY	0:40
+24140208	TOKEN_AUTH	33072:0:1641:4453
+grant_accept node_id=4 sequence=64843 duration_ms=120 expires_at_ms=24140379
+grant_accept node_id=4 sequence=64844 duration_ms=120 expires_at_ms=24140509
+grant_accept node_id=4 sequence=64845 duration_ms=120 expires_at_ms=24140640
+grant_accept node_id=4 sequence=64846 duration_ms=120 expires_at_ms=24140770
+grant_accept node_id=4 sequence=64847 duration_ms=120 expires_at_ms=24140900
+grant_accept node_id=4 sequence=64848 duration_ms=120 expires_at_ms=24141031
+grant_accept node_id=4 sequence=64849 duration_ms=120 expires_at_ms=24141161

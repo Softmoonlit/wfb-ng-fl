@@ -1,0 +1,20 @@
+{
+  "matrix_mib": 8,
+  "rates": [
+    2000,
+    4000
+  ],
+  "mcs": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "repeats": 3,
+  "long_mib": 40,
+  "long_repeats": 1,
+  "recommendation_rule": "choose 2000 only if three matrix repeats succeed; one 40MiB confirmation does not extend range",
+  "positions": "unchanged by experiment; coordinates/distances not measured",
+  "no_training": true,
+  "no_deployment": true
+}

@@ -1,0 +1,36 @@
+    PID                  STARTED COMMAND
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                  
+UNCONN 0      0            0.0.0.0:49187      0.0.0.0:*    users:(("python3",pid=8576,fd=5))                       
+UNCONN 0      0         127.0.0.53:53         0.0.0.0:*    users:(("systemd-resolve",pid=448,fd=13))               
+UNCONN 0      0            0.0.0.0:111        0.0.0.0:*    users:(("rpcbind",pid=447,fd=5),("systemd",pid=1,fd=56))
+UNCONN 0      0            0.0.0.0:9000       0.0.0.0:*    users:(("python3",pid=8576,fd=4))                       
+UNCONN 0      0          127.0.0.1:9200       0.0.0.0:*    users:(("wfb_v6_uplink",pid=8591,fd=4))                 
+UNCONN 0      0            0.0.0.0:5353       0.0.0.0:*    users:(("avahi-daemon",pid=458,fd=12))                  
+UNCONN 0      0            0.0.0.0:35986      0.0.0.0:*    users:(("avahi-daemon",pid=458,fd=14))                  
+UNCONN 0      0                  *:111              *:*    users:(("rpcbind",pid=447,fd=7),("systemd",pid=1,fd=58))
+UNCONN 0      0                  *:45525            *:*    users:(("avahi-daemon",pid=458,fd=15))                  
+UNCONN 0      0                  *:5353             *:*    users:(("avahi-daemon",pid=458,fd=13))                  
+phy#1
+	Interface wlxfc221c300cbb
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:30:0c:bb
+		type monitor
+		channel 157 (5785 MHz), width: 20 MHz, center1: 5785 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 4
+		wdev 0x1
+		addr dc:4a:9e:31:89:86
+		ssid HONOR 500
+		type managed
+		channel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+MainPID=8576
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+
+MainPID=0
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive

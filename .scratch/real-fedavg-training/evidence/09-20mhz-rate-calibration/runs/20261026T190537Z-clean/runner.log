@@ -1,0 +1,5 @@
+2026-10-26T19:08:15.285870+00:00 START 01-mcs3-r2000-8mib
+2026-10-26T19:09:34.235676+00:00 END 01-mcs3-r2000-8mib success=False sender_seconds=59.65248751999752 error=None
+2026-10-26T19:09:34.235944+00:00 STOP RuntimeError('attempt failed: 01-mcs3-r2000-8mib')
+2026-10-26T19:09:34.236174+00:00 RESTORE start
+2026-10-26T19:10:01.333086+00:00 RESTORE end {"http": 409, "body": {"error": "radio_target_nodes_not_ready", "message": "\u76ee\u6807\u8282\u70b9\u5fc5\u987b\u5168\u90e8 IDLE/READY", "unready_nodes": [2]}, "elapsed_seconds": 0.0022397760003514122}

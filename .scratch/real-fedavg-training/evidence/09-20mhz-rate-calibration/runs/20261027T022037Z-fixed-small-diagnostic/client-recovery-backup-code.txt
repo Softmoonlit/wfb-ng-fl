@@ -1,0 +1,8 @@
+sys_run='20261027T022037Z-fixed-small-diagnostic'
+import pathlib,subprocess,hashlib,json,time,shutil
+out=pathlib.Path('/srv/wfb-ng-fl/calibration/09')/sys_run;out.mkdir(parents=True,exist_ok=True)
+p=pathlib.Path('/tmp/wfb-ng-fl/client/wfb_uplink.log');q=out/'client-link-before-restart.log';shutil.copyfile(p,q)
+r={'utc':time.time(),'log_path':str(q),'log_bytes':q.stat().st_size,'log_sha256':hashlib.sha256(q.read_bytes()).hexdigest()}
+for key,args in [('service',['systemctl','show','wfb-fl-client-daemon','-p','MainPID','-p','ExecStart','-p','ActiveState']),('unit',['systemctl','cat','wfb-fl-client-daemon']),('process',['ps','-C','wfb_v6_uplink','-o','pid,lstart,args']),('iw',['iw','dev']),('journal',['journalctl','-u','wfb-fl-client-daemon','--since','2026-10-27 10:00:00','--no-pager'])]:
+ p=subprocess.run(args,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=10);r[key]=p.stdout
+print(json.dumps(r))

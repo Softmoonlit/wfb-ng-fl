@@ -1,0 +1,2218 @@
+18703617	PKT	8:224:0:0:0:0:0:0:0:0:0
+18703617	PKT_SRC	255:0:0:0:0:0:0
+18703617	GRANT_FILTER	63990:18952:0:45038:0:0:0:0:0
+18703617	READY_FILTER	0:0:0:0:0
+18703617	REASSEMBLY	0:40
+18703617	TOKEN_AUTH	18952:0:1982:6099
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18703774
+18704617	RX_ANT	5785:3:40	1	38:-60:-58:-58:13:14:17
+18704617	RX_ANT	5785:3:40	0	38:-66:-64:-64:12:14:16
+18704617	PKT	44:4814:0:0:38:38:3:0:0:3:615
+18704617	PKT_SRC	255:38:4646:3:0:3:615
+18704617	GRANT_FILTER	63996:18952:0:45044:0:0:0:0:0
+18704617	READY_FILTER	0:0:0:0:0
+18704617	REASSEMBLY	0:40
+18704617	TOKEN_AUTH	18952:0:1982:6114
+18705617	PKT	8:224:0:0:0:0:0:0:0:0:0
+18705617	PKT_SRC	255:0:0:0:0:0:0
+18705617	GRANT_FILTER	64004:18952:0:45052:0:0:0:0:0
+18705617	READY_FILTER	0:0:0:0:0
+18705617	REASSEMBLY	0:40
+18705617	TOKEN_AUTH	18952:0:1982:6123
+18706617	PKT	7:196:0:0:0:0:0:0:0:0:0
+18706617	PKT_SRC	255:0:0:0:0:0:0
+18706617	GRANT_FILTER	64011:18952:0:45059:0:0:0:0:0
+18706617	READY_FILTER	0:0:0:0:0
+18706617	REASSEMBLY	0:40
+18706617	TOKEN_AUTH	18952:0:1982:6131
+18707617	RX_ANT	5785:3:40	1	27:-60:-58:-58:12:14:17
+18707617	RX_ANT	5785:3:40	0	27:-66:-64:-64:12:13:16
+18707617	PKT	35:1378:0:0:27:27:1:0:0:2:82
+18707617	PKT_SRC	255:27:1154:1:0:2:82
+18707617	GRANT_FILTER	64019:18952:0:45067:0:0:0:0:0
+18707617	READY_FILTER	0:0:0:0:0
+18707617	REASSEMBLY	0:40
+18707617	TOKEN_AUTH	18952:0:1982:6146
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18707828
+grant_accept node_id=2 sequence=66127 duration_ms=120 expires_at_ms=18708339
+grant_accept node_id=2 sequence=66128 duration_ms=120 expires_at_ms=18708469
+grant_accept node_id=2 sequence=66129 duration_ms=120 expires_at_ms=18708600
+grant_accept node_id=2 sequence=66130 duration_ms=120 expires_at_ms=18708729
+18708617	RX_ANT	5785:3:40	1	26:-60:-59:-58:11:13:16
+18708617	RX_ANT	5785:3:40	0	26:-66:-64:-64:11:13:16
+18708617	PKT	33:3907:0:0:26:26:0:0:0:3:639
+18708617	PKT_SRC	255:26:3711:0:0:3:639
+18708617	GRANT_FILTER	64026:18956:0:45070:0:0:0:0:0
+18708617	READY_FILTER	0:0:0:0:0
+18708617	REASSEMBLY	0:40
+18708617	TOKEN_AUTH	18956:0:1984:6150
+grant_accept node_id=2 sequence=66131 duration_ms=120 expires_at_ms=18708860
+grant_accept node_id=2 sequence=66132 duration_ms=120 expires_at_ms=18708991
+grant_accept node_id=2 sequence=66133 duration_ms=120 expires_at_ms=18709121
+grant_accept node_id=2 sequence=66134 duration_ms=120 expires_at_ms=18709252
+grant_accept node_id=2 sequence=66135 duration_ms=120 expires_at_ms=18709382
+grant_accept node_id=2 sequence=66136 duration_ms=120 expires_at_ms=18709510
+grant_accept node_id=2 sequence=66137 duration_ms=120 expires_at_ms=18709641
+18709617	PKT	7:196:0:0:0:0:0:0:0:0:0
+18709617	PKT_SRC	255:0:0:0:0:0:0
+18709617	GRANT_FILTER	64033:18963:0:45070:0:0:0:0:0
+18709617	READY_FILTER	0:0:0:0:0
+18709617	REASSEMBLY	0:40
+18709617	TOKEN_AUTH	18963:0:1984:6150
+grant_accept node_id=2 sequence=66138 duration_ms=120 expires_at_ms=18709772
+grant_accept node_id=2 sequence=66139 duration_ms=120 expires_at_ms=18709900
+grant_accept node_id=2 sequence=66140 duration_ms=120 expires_at_ms=18710031
+grant_accept node_id=2 sequence=66141 duration_ms=120 expires_at_ms=18710162
+grant_accept node_id=2 sequence=66142 duration_ms=120 expires_at_ms=18710292
+grant_accept node_id=2 sequence=66144 duration_ms=120 expires_at_ms=18710552
+grant_accept node_id=2 sequence=66145 duration_ms=120 expires_at_ms=18710681
+v6_radio_update generation=1 bandwidth=20 mcs_index=4 short_gi=1 radiotap_flags=0x04 sync=data+control fec=8/14
+v6_radio_command req_id=2662495538 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=data generation=1 bandwidth=20 mcs_index=4 short_gi=1
+18710617	RX_ANT	5785:3:20	1	28:-62:-61:-60:13:15:17
+18710617	RX_ANT	5785:3:20	0	28:-64:-62:-62:13:15:18
+18710617	PKT	35:3843:0:0:28:28:0:0:0:2:429
+18710617	PKT_SRC	255:28:3647:0:0:2:429
+18710617	GRANT_FILTER	64040:18970:0:45070:0:0:0:0:0
+18710617	READY_FILTER	0:0:0:0:0
+18710617	REASSEMBLY	0:40
+18710617	TOKEN_AUTH	18970:0:1985:6150
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=4 short_gi=1
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18710826
+grant_accept node_id=2 sequence=66148 duration_ms=120 expires_at_ms=18711072
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18711091
+grant_accept node_id=2 sequence=66151 duration_ms=120 expires_at_ms=18711462
+18711617	RX_ANT	5785:3:20	1	119:-68:-61:-60:12:16:21
+18711617	RX_ANT	5785:3:20	0	119:-68:-63:-62:13:16:21
+18711617	PKT	127:11367:0:0:119:119:13:0:0:17:3148
+18711617	PKT_SRC	255:119:11143:13:0:17:3148
+18711617	GRANT_FILTER	64048:18972:0:45076:0:0:0:0:0
+18711617	READY_FILTER	0:0:0:0:0
+18711617	REASSEMBLY	0:40
+18711617	TOKEN_AUTH	18972:0:1991:6170
+grant_accept node_id=2 sequence=66154 duration_ms=120 expires_at_ms=18711852
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18712089
+grant_accept node_id=2 sequence=66157 duration_ms=120 expires_at_ms=18712242
+grant_accept node_id=2 sequence=66160 duration_ms=120 expires_at_ms=18712633
+18712617	RX_ANT	5785:3:20	1	21:-62:-62:-62:13:15:19
+18712617	RX_ANT	5785:3:20	0	21:-66:-63:-62:13:15:18
+18712617	PKT	28:5278:0:0:21:21:2:0:0:2:1022
+18712617	PKT_SRC	255:21:5082:2:0:2:1022
+18712617	GRANT_FILTER	64055:18975:0:45080:0:0:0:0:0
+18712617	READY_FILTER	0:0:0:0:0
+18712617	REASSEMBLY	0:40
+18712617	TOKEN_AUTH	18975:0:1993:6178
+grant_accept node_id=2 sequence=66163 duration_ms=120 expires_at_ms=18713023
+18713617	PKT	7:196:0:0:0:0:0:0:0:0:0
+18713617	PKT_SRC	255:0:0:0:0:0:0
+18713617	GRANT_FILTER	64062:18976:0:45086:0:0:0:0:0
+18713617	READY_FILTER	0:0:0:0:0
+18713617	REASSEMBLY	0:40
+18713617	TOKEN_AUTH	18976:0:1993:6178
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18714252
+18714617	PKT	8:224:0:0:0:0:0:0:0:0:0
+18714617	PKT_SRC	255:0:0:0:0:0:0
+18714617	GRANT_FILTER	64070:18976:0:45094:0:0:0:0:0
+18714617	READY_FILTER	0:0:0:0:0
+18714617	REASSEMBLY	0:40
+18714617	TOKEN_AUTH	18976:0:1993:6183
+18715617	RX_ANT	5785:3:20	1	14:-62:-61:-60:14:16:21
+18715617	RX_ANT	5785:3:20	0	14:-64:-63:-62:15:16:18
+18715617	PKT	21:1078:0:0:14:14:0:0:0:1:80
+18715617	PKT_SRC	255:14:882:0:0:1:80
+18715617	GRANT_FILTER	64077:18976:0:45101:0:0:0:0:0
+18715617	READY_FILTER	0:0:0:0:0
+18715617	REASSEMBLY	0:40
+18715617	TOKEN_AUTH	18976:0:1993:6197
+18716617	RX_ANT	5785:3:20	1	53:-62:-61:-60:13:16:21
+18716617	RX_ANT	5785:3:20	0	53:-66:-63:-62:13:16:19
+18716617	PKT	61:3017:0:0:53:53:2:0:0:4:241
+18716617	PKT_SRC	255:53:2793:2:0:4:241
+18716617	GRANT_FILTER	64085:18976:0:45109:0:0:0:0:0
+18716617	READY_FILTER	0:0:0:0:0
+18716617	REASSEMBLY	0:40
+18716617	TOKEN_AUTH	18976:0:1993:6222
+18717617	PKT	2:56:0:0:0:0:0:0:0:0:0
+18717617	PKT_SRC	255:0:0:0:0:0:0
+18717617	GRANT_FILTER	64087:18976:0:45111:0:0:0:0:0
+18717617	READY_FILTER	0:0:0:0:0
+18717617	REASSEMBLY	0:40
+18717617	TOKEN_AUTH	18976:0:1993:6228
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18718301
+18718617	PKT	0:0:0:0:0:0:0:0:0:0:0
+18718617	PKT_SRC	255:0:0:0:0:0:0
+18718617	GRANT_FILTER	64087:18976:0:45111:0:0:0:0:0
+18718617	READY_FILTER	0:0:0:0:0
+18718617	REASSEMBLY	0:40
+18718617	TOKEN_AUTH	18976:0:1993:6235
+PACKET_LOSS source_node=255 previous_seq=40423 current_seq=40472 lost_count=48
+18719617	RX_ANT	5785:3:20	1	27:-62:-61:-60:13:16:19
+18719617	RX_ANT	5785:3:20	0	27:-64:-62:-62:13:15:18
+18719617	PKT	32:1769:0:0:27:27:1:48:0:2:144
+18719617	PKT_SRC	255:27:1629:1:48:2:144
+18719617	GRANT_FILTER	64092:18976:0:45116:0:0:0:0:0
+18719617	READY_FILTER	0:0:0:0:0
+18719617	REASSEMBLY	0:40
+48 packets lost
+18719617	TOKEN_AUTH	18976:0:1993:6249
+18720617	PKT	0:0:0:0:0:0:0:0:0:0:0
+18720617	PKT_SRC	255:0:0:0:0:0:0
+18720617	GRANT_FILTER	64092:18976:0:45116:0:0:0:0:0
+18720617	READY_FILTER	0:0:0:0:0
+18720617	REASSEMBLY	0:40
+18720617	TOKEN_AUTH	18976:0:1993:6255
+18721617	PKT	0:0:0:0:0:0:0:0:0:0:0
+18721617	PKT_SRC	255:0:0:0:0:0:0
+18721617	GRANT_FILTER	64092:18976:0:45116:0:0:0:0:0
+18721617	READY_FILTER	0:0:0:0:0
+18721617	REASSEMBLY	0:40
+18721617	TOKEN_AUTH	18976:0:1993:6260
+PACKET_LOSS source_node=255 previous_seq=40487 current_seq=40536 lost_count=48
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18722463
+18722618	RX_ANT	5785:3:20	1	14:-62:-61:-60:14:16:19
+18722618	RX_ANT	5785:3:20	0	14:-64:-62:-62:15:16:19
+18722618	PKT	18:938:0:0:14:14:0:48:0:1:72
+18722618	PKT_SRC	255:14:826:0:48:1:72
+18722618	GRANT_FILTER	64096:18976:0:45120:0:0:0:0:0
+18722618	READY_FILTER	0:0:0:0:0
+18722618	REASSEMBLY	0:40
+48 packets lost
+18722618	TOKEN_AUTH	18976:0:1993:6272
+18723618	PKT	0:0:0:0:0:0:0:0:0:0:0
+18723618	PKT_SRC	255:0:0:0:0:0:0
+18723618	GRANT_FILTER	64096:18976:0:45120:0:0:0:0:0
+18723618	READY_FILTER	0:0:0:0:0
+18723618	REASSEMBLY	0:40
+18723618	TOKEN_AUTH	18976:0:1993:6278
+PACKET_LOSS source_node=255 previous_seq=40543 current_seq=40808 lost_count=264
+PACKET_LOSS source_node=255 previous_seq=40991 current_seq=41000 lost_count=8
+18724618	RX_ANT	5785:3:20	1	601:-64:-61:-60:12:16:24
+18724618	RX_ANT	5785:3:20	0	601:-66:-63:-62:11:15:23
+18724618	PKT	603:418127:0:0:601:601:15:272:0:46:62192
+18724618	PKT_SRC	255:601:418071:15:272:46:62192
+18724618	GRANT_FILTER	64098:18976:0:45122:0:0:0:0:0
+18724618	READY_FILTER	0:0:0:0:0
+18724618	REASSEMBLY	0:40
+272 packets lost
+18724618	TOKEN_AUTH	18976:0:1993:6494
+PACKET_LOSS source_node=255 previous_seq=41264 current_seq=41272 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=41335 current_seq=41352 lost_count=16
+PACKET_LOSS source_node=255 previous_seq=41729 current_seq=41736 lost_count=6
+18725618	RX_ANT	5745:3:20	1	40:-62:-61:-60:12:16:22
+18725618	RX_ANT	5745:3:20	0	40:-66:-63:-62:12:16:21
+18725618	RX_ANT	5785:3:20	1	949:-62:-61:-60:11:16:25
+18725618	RX_ANT	5785:3:20	0	949:-68:-63:-62:10:16:23
+18725618	PKT	991:685283:0:0:989:989:24:29:0:75:101400
+18725618	PKT_SRC	255:989:685227:24:29:75:101400
+18725618	GRANT_FILTER	64100:18976:0:45124:0:0:0:0:0
+18725618	READY_FILTER	0:0:0:0:0
+18725618	REASSEMBLY	0:40
+29 packets lost
+18725618	TOKEN_AUTH	18976:0:1993:6853
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18726566
+18726618	PKT	0:0:0:0:0:0:0:0:0:0:0
+18726618	PKT_SRC	255:0:0:0:0:0:0
+18726618	GRANT_FILTER	64100:18976:0:45124:0:0:0:0:0
+18726618	READY_FILTER	0:0:0:0:0
+18726618	REASSEMBLY	0:40
+18726618	TOKEN_AUTH	18976:0:1993:6858
+PACKET_LOSS source_node=255 previous_seq=41799 current_seq=44992 lost_count=3192
+PACKET_LOSS source_node=255 previous_seq=45298 current_seq=45304 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=45555 current_seq=45557 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=45558 current_seq=45568 lost_count=9
+PACKET_LOSS source_node=255 previous_seq=45608 current_seq=45616 lost_count=7
+18727618	RX_ANT	5785:4:20	1	736:-62:-61:-60:10:18:26
+18727618	RX_ANT	5785:4:20	0	736:-68:-63:-62:11:17:25
+18727618	RX_ANT	5785:3:20	1	460:-64:-61:-60:10:18:26
+18727618	RX_ANT	5785:3:20	0	460:-66:-64:-62:10:17:24
+18727618	PKT	1200:837468:0:0:1196:1196:24:3214:0:91:123032
+18727618	PKT_SRC	255:1196:837356:24:3214:91:123032
+18727618	GRANT_FILTER	64104:18976:0:45128:0:0:0:0:0
+18727618	READY_FILTER	0:0:0:0:0
+18727618	REASSEMBLY	0:40
+3214 packets lost
+18727618	TOKEN_AUTH	18976:0:1993:7240
+18728618	RX_ANT	5745:4:20	1	37:-62:-61:-60:11:17:26
+18728618	RX_ANT	5745:4:20	0	37:-66:-63:-62:10:16:24
+18728618	RX_ANT	5785:4:20	1	425:-62:-61:-60:11:17:26
+18728618	RX_ANT	5785:4:20	0	425:-66:-63:-62:10:17:24
+18728618	PKT	463:317599:0:0:462:462:12:0:0:35:46009
+18728618	PKT_SRC	255:462:317571:12:0:35:46009
+18728618	GRANT_FILTER	64105:18976:0:45129:0:0:0:0:0
+18728618	READY_FILTER	0:0:0:0:0
+18728618	REASSEMBLY	0:40
+18728618	TOKEN_AUTH	18976:0:1993:7380
+18729618	PKT	0:0:0:0:0:0:0:0:0:0:0
+18729618	PKT_SRC	255:0:0:0:0:0:0
+18729618	GRANT_FILTER	64105:18976:0:45129:0:0:0:0:0
+18729618	READY_FILTER	0:0:0:0:0
+18729618	REASSEMBLY	0:40
+18729618	TOKEN_AUTH	18976:0:1993:7386
+PACKET_LOSS source_node=255 previous_seq=45999 current_seq=49096 lost_count=3096
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=13464 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=167
+PACKET_LOSS source_node=255 previous_seq=49624 current_seq=49632 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=50017 current_seq=50024 lost_count=6
+18730618	RX_ANT	5745:4:20	1	35:-64:-61:-60:12:18:24
+18730618	RX_ANT	5745:4:20	0	35:-66:-64:-62:12:17:23
+18730618	RX_ANT	5785:4:20	1	1634:-64:-61:-60:10:17:25
+18730618	RX_ANT	5785:4:20	0	1634:-68:-64:-62:10:17:24
+18730618	PKT	1674:1171503:0:0:1669:1669:21:3109:0:124:167648
+18730618	PKT_SRC	255:1669:1171363:21:3109:124:167648
+18730618	GRANT_FILTER	64110:18976:0:45134:0:0:0:0:0
+18730618	READY_FILTER	0:0:0:0:0
+18730618	REASSEMBLY	0:40
+3109 packets lost
+18730618	TOKEN_AUTH	18976:0:1993:7876
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18730618
+18731619	PKT	0:0:0:0:0:0:0:0:0:0:0
+18731619	PKT_SRC	255:0:0:0:0:0:0
+18731619	GRANT_FILTER	64110:18976:0:45134:0:0:0:0:0
+18731619	READY_FILTER	0:0:0:0:0
+18731619	REASSEMBLY	0:40
+18731619	TOKEN_AUTH	18976:0:1993:7877
+REASSEMBLY_OVERFLOW_EVICT source_node=255 evicted_block_idx=0x1874 evicted_has_fragments=1 unfinished_blocks=40 unfinished_block_limit=40 total=1
+PACKET_LOSS source_node=255 previous_seq=50080 current_seq=53168 lost_count=3087
+18732619	RX_ANT	5785:4:20	1	161:-64:-61:-60:2:18:25
+18732619	RX_ANT	5785:4:20	0	161:-66:-64:-62:1:17:23
+18732619	PKT	161:114567:0:0:161:161:7:3087:0:13:17576
+18732619	PKT_SRC	255:161:114567:7:3087:13:17576
+18732619	GRANT_FILTER	64110:18976:0:45134:0:0:0:0:0
+18732619	READY_FILTER	0:0:0:0:0
+18732619	REASSEMBLY	1:40
+REASSEMBLY_OVERFLOW_SUMMARY interval_evict=1 total=1 unfinished_block_limit=40
+3087 packets lost
+18732619	TOKEN_AUTH	18976:0:1993:7926
+PACKET_LOSS source_node=255 previous_seq=53641 current_seq=53648 lost_count=6
+18733619	RX_ANT	5745:4:20	1	42:-62:-61:-60:12:18:24
+18733619	RX_ANT	5745:4:20	0	42:-66:-64:-62:12:17:23
+18733619	RX_ANT	5785:4:20	1	1471:-64:-61:-60:10:17:26
+18733619	RX_ANT	5785:4:20	0	1471:-68:-64:-62:10:17:25
+18733619	PKT	1517:1050304:0:0:1513:1513:15:6:0:112:150113
+18733619	PKT_SRC	255:1513:1050192:15:6:112:150113
+18733619	GRANT_FILTER	64114:18976:0:45138:0:0:0:0:0
+18733619	READY_FILTER	0:0:0:0:0
+18733619	REASSEMBLY	1:40
+6 packets lost
+18733619	TOKEN_AUTH	18976:0:1993:8369
+18734620	PKT	0:0:0:0:0:0:0:0:0:0:0
+18734620	PKT_SRC	255:0:0:0:0:0:0
+18734620	GRANT_FILTER	64114:18976:0:45138:0:0:0:0:0
+18734620	READY_FILTER	0:0:0:0:0
+18734620	REASSEMBLY	1:40
+18734620	TOKEN_AUTH	18976:0:1993:8370
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18734620
+REASSEMBLY_OVERFLOW_EVICT source_node=255 evicted_block_idx=0x1a71 evicted_has_fragments=1 unfinished_blocks=40 unfinished_block_limit=40 total=2
+PACKET_LOSS source_node=255 previous_seq=54152 current_seq=57248 lost_count=3095
+18735620	RX_ANT	5785:4:20	1	961:-64:-62:-60:10:18:26
+18735620	RX_ANT	5785:4:20	0	961:-66:-64:-62:11:17:25
+18735620	PKT	964:661683:0:0:961:961:11:3095:0:71:95992
+18735620	PKT_SRC	255:961:661599:11:3095:71:95992
+18735620	GRANT_FILTER	64117:18976:0:45141:0:0:0:0:0
+18735620	READY_FILTER	0:0:0:0:0
+18735620	REASSEMBLY	2:40
+REASSEMBLY_OVERFLOW_SUMMARY interval_evict=1 total=2 unfinished_block_limit=40
+3095 packets lost
+18735620	TOKEN_AUTH	18976:0:1993:8648
+PACKET_LOSS source_node=255 previous_seq=57984 current_seq=57992 lost_count=7
+18736621	RX_ANT	5745:4:20	1	41:-64:-62:-60:10:18:24
+18736621	RX_ANT	5745:4:20	0	41:-66:-64:-62:12:17:22
+18736621	RX_ANT	5785:4:20	1	599:-64:-62:-60:11:18:26
+18736621	RX_ANT	5785:4:20	0	599:-66:-64:-62:11:17:25
+18736621	PKT	642:463640:0:0:640:640:30:7:0:53:71656
+18736621	PKT_SRC	255:640:463584:30:7:53:71656
+18736621	GRANT_FILTER	64119:18976:0:45143:0:0:0:0:0
+18736621	READY_FILTER	0:0:0:0:0
+18736621	REASSEMBLY	2:40
+7 packets lost
+18736621	TOKEN_AUTH	18976:0:1993:8852
+18737622	PKT	0:0:0:0:0:0:0:0:0:0:0
+18737622	PKT_SRC	255:0:0:0:0:0:0
+18737622	GRANT_FILTER	64119:18976:0:45143:0:0:0:0:0
+18737622	READY_FILTER	0:0:0:0:0
+18737622	REASSEMBLY	2:40
+18737622	TOKEN_AUTH	18976:0:1993:8853
+REASSEMBLY_OVERFLOW_EVICT source_node=255 evicted_block_idx=0x1c6c evicted_has_fragments=1 unfinished_blocks=40 unfinished_block_limit=40 total=3
+PACKET_LOSS source_node=255 previous_seq=58208 current_seq=61360 lost_count=3151
+PACKET_LOSS source_node=255 previous_seq=61519 current_seq=61522 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=61522 current_seq=61528 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=61999 current_seq=62001 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=62001 current_seq=62008 lost_count=6
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18738620
+18738622	RX_ANT	5745:4:20	1	13:-64:-62:-62:12:17:24
+18738622	RX_ANT	5745:4:20	0	13:-66:-64:-64:12:17:23
+18738622	RX_ANT	5785:4:20	1	1606:-66:-62:-60:6:18:27
+18738622	RX_ANT	5785:4:20	0	1606:-68:-64:-62:7:17:25
+18738622	PKT	1624:1128482:0:0:1619:1619:43:3165:0:122:163633
+18738622	PKT_SRC	255:1619:1128342:43:3165:122:163633
+18738622	GRANT_FILTER	64124:18976:0:45148:0:0:0:0:0
+18738622	READY_FILTER	0:0:0:0:0
+18738622	REASSEMBLY	3:40
+REASSEMBLY_OVERFLOW_SUMMARY interval_evict=1 total=3 unfinished_block_limit=40
+3165 packets lost
+18738622	TOKEN_AUTH	18976:0:1993:9335
+18739624	RX_ANT	5745:4:20	1	26:-62:-62:-62:12:18:25
+18739624	RX_ANT	5745:4:20	0	26:-66:-64:-62:10:17:23
+18739624	PKT	26:16822:0:0:26:26:0:0:0:2:2704
+18739624	PKT_SRC	255:26:16822:0:0:2:2704
+18739624	GRANT_FILTER	64124:18976:0:45148:0:0:0:0:0
+18739624	READY_FILTER	0:0:0:0:0
+18739624	REASSEMBLY	3:40
+18739624	TOKEN_AUTH	18976:0:1993:9346
+18740625	PKT	0:0:0:0:0:0:0:0:0:0:0
+18740625	PKT_SRC	255:0:0:0:0:0:0
+18740625	GRANT_FILTER	64124:18976:0:45148:0:0:0:0:0
+18740625	READY_FILTER	0:0:0:0:0
+18740625	REASSEMBLY	3:40
+18740625	TOKEN_AUTH	18976:0:1993:9347
+PACKET_LOSS source_node=255 previous_seq=62359 current_seq=65472 lost_count=3112
+grant_accept node_id=2 sequence=66377 duration_ms=120 expires_at_ms=18740870
+tun_read_resume node_id=2 queued_bytes=13424 queued_packets=63 resume_total=167
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=13704 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=168
+tun_read_resume node_id=2 queued_bytes=13664 queued_packets=63 resume_total=168
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=13752 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=169
+tun_read_resume node_id=2 queued_bytes=13664 queued_packets=63 resume_total=169
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=13944 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=170
+tun_read_resume node_id=2 queued_bytes=13904 queued_packets=63 resume_total=170
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14184 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=171
+tun_read_resume node_id=2 queued_bytes=14144 queued_packets=63 resume_total=171
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14424 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=172
+tun_read_resume node_id=2 queued_bytes=14148 queued_packets=63 resume_total=172
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14236 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=173
+tun_read_resume node_id=2 queued_bytes=14148 queued_packets=63 resume_total=173
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14428 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=174
+tun_read_resume node_id=2 queued_bytes=14152 queued_packets=63 resume_total=174
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14432 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=175
+tun_read_resume node_id=2 queued_bytes=14154 queued_packets=63 resume_total=175
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14434 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=176
+tun_read_resume node_id=2 queued_bytes=14346 queued_packets=63 resume_total=176
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14434 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=177
+tun_read_resume node_id=2 queued_bytes=14156 queued_packets=63 resume_total=177
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14436 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=178
+tun_read_resume node_id=2 queued_bytes=14158 queued_packets=63 resume_total=178
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14438 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=179
+tun_read_resume node_id=2 queued_bytes=14350 queued_packets=63 resume_total=179
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14630 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=180
+tun_read_resume node_id=2 queued_bytes=14351 queued_packets=63 resume_total=180
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14631 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=181
+tun_read_resume node_id=2 queued_bytes=14352 queued_packets=63 resume_total=181
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14440 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=182
+tun_read_resume node_id=2 queued_bytes=14161 queued_packets=63 resume_total=182
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14441 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=183
+tun_read_resume node_id=2 queued_bytes=14353 queued_packets=63 resume_total=183
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14633 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=184
+tun_read_resume node_id=2 queued_bytes=14354 queued_packets=63 resume_total=184
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14634 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=185
+tun_read_resume node_id=2 queued_bytes=14355 queued_packets=63 resume_total=185
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14443 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=186
+tun_read_resume node_id=2 queued_bytes=14355 queued_packets=63 resume_total=186
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14635 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=187
+tun_read_resume node_id=2 queued_bytes=14356 queued_packets=63 resume_total=187
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14636 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=188
+tun_read_resume node_id=2 queued_bytes=14357 queued_packets=63 resume_total=188
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14637 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=189
+tun_read_resume node_id=2 queued_bytes=14549 queued_packets=63 resume_total=189
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14637 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=190
+tun_read_resume node_id=2 queued_bytes=14358 queued_packets=63 resume_total=190
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14638 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=191
+tun_read_resume node_id=2 queued_bytes=14359 queued_packets=63 resume_total=191
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14639 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=192
+tun_read_resume node_id=2 queued_bytes=14551 queued_packets=63 resume_total=192
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14831 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=193
+tun_read_resume node_id=2 queued_bytes=14552 queued_packets=63 resume_total=193
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14640 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=194
+tun_read_resume node_id=2 queued_bytes=14361 queued_packets=63 resume_total=194
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14641 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=195
+tun_read_resume node_id=2 queued_bytes=14553 queued_packets=63 resume_total=195
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14833 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=196
+tun_read_resume node_id=2 queued_bytes=14554 queued_packets=63 resume_total=196
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14834 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=197
+tun_read_resume node_id=2 queued_bytes=14555 queued_packets=63 resume_total=197
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14643 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=198
+tun_read_resume node_id=2 queued_bytes=14555 queued_packets=63 resume_total=198
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14835 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=199
+tun_read_resume node_id=2 queued_bytes=14556 queued_packets=63 resume_total=199
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14836 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=200
+tun_read_resume node_id=2 queued_bytes=14557 queued_packets=63 resume_total=200
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14837 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=201
+tun_read_resume node_id=2 queued_bytes=14749 queued_packets=63 resume_total=201
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14837 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=202
+tun_read_resume node_id=2 queued_bytes=14558 queued_packets=63 resume_total=202
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14838 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=203
+tun_read_resume node_id=2 queued_bytes=14559 queued_packets=63 resume_total=203
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14839 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=204
+tun_read_resume node_id=2 queued_bytes=14560 queued_packets=63 resume_total=204
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14840 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=205
+tun_read_resume node_id=2 queued_bytes=14752 queued_packets=63 resume_total=205
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14840 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=206
+tun_read_resume node_id=2 queued_bytes=14561 queued_packets=63 resume_total=206
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14841 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=207
+tun_read_resume node_id=2 queued_bytes=14562 queued_packets=63 resume_total=207
+tun_read_pause node_id=2 reason=queued_packets_limit queued_bytes=14842 queued_packets=64 pause_threshold_bytes=131072 resume_threshold_bytes=65536 queued_packets_limit=64 pause_total=208
+tun_read_resume node_id=2 queued_bytes=14754 queued_packets=63 resume_total=208
+PACKET_LOSS source_node=255 previous_seq=65568 current_seq=65576 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=65576 current_seq=65580 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=65580 current_seq=65582 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65639 current_seq=65641 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65641 current_seq=65643 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65644 current_seq=65646 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65646 current_seq=65648 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65673 current_seq=65675 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=65675 current_seq=65680 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=65747 current_seq=65752 lost_count=4
+grant_accept node_id=2 sequence=66378 duration_ms=120 expires_at_ms=18740998
+grant_accept node_id=2 sequence=66379 duration_ms=120 expires_at_ms=18741129
+grant_accept node_id=2 sequence=66380 duration_ms=120 expires_at_ms=18741260
+grant_accept node_id=2 sequence=66381 duration_ms=120 expires_at_ms=18741388
+PACKET_LOSS source_node=255 previous_seq=66360 current_seq=66368 lost_count=7
+grant_accept node_id=2 sequence=66382 duration_ms=120 expires_at_ms=18741520
+grant_accept node_id=2 sequence=66383 duration_ms=120 expires_at_ms=18741651
+18741625	RX_ANT	5785:4:20	1	2312:-64:-62:-60:10:18:27
+18741625	RX_ANT	5785:4:20	0	2312:-68:-64:-62:9:17:24
+18741625	PKT	2319:1599120:0:0:2312:2312:101:3143:0:237:241764
+18741625	PKT_SRC	255:2312:1598924:101:3143:237:241764
+18741625	GRANT_FILTER	64131:18983:0:45148:0:0:0:0:0
+18741625	READY_FILTER	0:0:0:0:0
+18741625	REASSEMBLY	3:40
+3143 packets lost
+18741625	TOKEN_AUTH	18983:0:2101:9402
+grant_accept node_id=2 sequence=66384 duration_ms=120 expires_at_ms=18741779
+grant_accept node_id=2 sequence=66385 duration_ms=120 expires_at_ms=18741911
+grant_accept node_id=2 sequence=66386 duration_ms=120 expires_at_ms=18742038
+PACKET_LOSS source_node=255 previous_seq=67601 current_seq=67608 lost_count=6
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18742097
+grant_accept node_id=2 sequence=66389 duration_ms=120 expires_at_ms=18742429
+grant_accept node_id=2 sequence=66391 duration_ms=120 expires_at_ms=18742688
+PACKET_LOSS source_node=255 previous_seq=68376 current_seq=68384 lost_count=7
+18742625	RX_ANT	5785:4:20	1	2424:-64:-62:-60:9:18:27
+18742625	RX_ANT	5785:4:20	0	2424:-68:-64:-62:9:17:25
+18742625	PKT	2432:1737905:0:0:2424:2424:157:13:0:190:255569
+18742625	PKT_SRC	255:2424:1737681:157:13:190:255569
+18742625	GRANT_FILTER	64139:18988:0:45151:0:0:0:0:0
+18742625	READY_FILTER	0:0:0:0:0
+18742625	REASSEMBLY	3:40
+13 packets lost
+18742625	TOKEN_AUTH	18988:0:2102:9558
+grant_accept node_id=2 sequence=66393 duration_ms=120 expires_at_ms=18742951
+grant_accept node_id=2 sequence=66394 duration_ms=120 expires_at_ms=18743078
+grant_accept node_id=2 sequence=66395 duration_ms=120 expires_at_ms=18743209
+PACKET_LOSS source_node=255 previous_seq=69152 current_seq=69154 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69154 current_seq=69160 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=69183 current_seq=69187 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=69188 current_seq=69193 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=69194 current_seq=69199 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=69199 current_seq=69203 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=69203 current_seq=69209 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=69212 current_seq=69218 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=69218 current_seq=69220 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69220 current_seq=69222 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69222 current_seq=69226 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=69226 current_seq=69228 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69230 current_seq=69232 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69232 current_seq=69234 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69234 current_seq=69236 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69236 current_seq=69238 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69240 current_seq=69245 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=69247 current_seq=69249 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69249 current_seq=69251 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69251 current_seq=69253 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69253 current_seq=69255 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69255 current_seq=69259 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=69260 current_seq=69262 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69262 current_seq=69265 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69266 current_seq=69268 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69268 current_seq=69270 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69271 current_seq=69274 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69277 current_seq=69283 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=69283 current_seq=69285 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69285 current_seq=69288 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69290 current_seq=69292 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69293 current_seq=69301 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=69302 current_seq=69304 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69311 current_seq=69313 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69313 current_seq=69316 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69318 current_seq=69320 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69321 current_seq=69324 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69324 current_seq=69326 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69327 current_seq=69339 lost_count=11
+PACKET_LOSS source_node=255 previous_seq=69339 current_seq=69342 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=69342 current_seq=69344 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69344 current_seq=69351 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=69617 current_seq=69619 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=69620 current_seq=69624 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=69631 current_seq=69640 lost_count=8
+grant_accept node_id=2 sequence=66398 duration_ms=120 expires_at_ms=18743601
+18743625	RX_ANT	5785:4:20	1	2115:-70:-62:-60:-4:18:27
+18743625	RX_ANT	5785:4:20	0	2115:-72:-64:-62:-4:17:25
+18743625	PKT	2120:1484609:0:0:2115:2115:191:114:0:175:235289
+18743625	PKT_SRC	255:2115:1484469:191:114:175:235289
+18743625	GRANT_FILTER	64144:18992:0:45152:0:0:0:0:0
+18743625	READY_FILTER	0:0:0:0:0
+18743625	REASSEMBLY	3:40
+114 packets lost
+18743625	TOKEN_AUTH	18992:0:2103:9558
+PACKET_LOSS source_node=255 previous_seq=70383 current_seq=70385 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=70385 current_seq=70392 lost_count=6
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18744212
+grant_accept node_id=2 sequence=66405 duration_ms=120 expires_at_ms=18744509
+PACKET_LOSS source_node=255 previous_seq=71088 current_seq=71090 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71090 current_seq=71092 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71092 current_seq=71095 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71160 current_seq=71168 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=71226 current_seq=71228 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71228 current_seq=71230 lost_count=1
+grant_accept node_id=2 sequence=66406 duration_ms=120 expires_at_ms=18744641
+PACKET_LOSS source_node=255 previous_seq=71311 current_seq=71313 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71314 current_seq=71316 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71316 current_seq=71318 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71318 current_seq=71320 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71379 current_seq=71382 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71382 current_seq=71384 lost_count=1
+18744625	RX_ANT	5785:4:20	1	2178:-68:-62:-60:9:17:26
+18744625	RX_ANT	5785:4:20	0	2178:-70:-64:-62:9:17:25
+18744625	PKT	2184:1514478:0:0:2178:2178:243:27:0:186:251472
+18744625	PKT_SRC	255:2178:1514310:243:27:186:251472
+18744625	GRANT_FILTER	64150:18994:0:45156:0:0:0:0:0
+18744625	READY_FILTER	0:0:0:0:0
+18744625	REASSEMBLY	3:40
+27 packets lost
+18744625	TOKEN_AUTH	18994:0:2104:9685
+PACKET_LOSS source_node=255 previous_seq=71447 current_seq=71450 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71450 current_seq=71453 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71453 current_seq=71455 lost_count=1
+grant_accept node_id=2 sequence=66407 duration_ms=120 expires_at_ms=18744768
+PACKET_LOSS source_node=255 previous_seq=71546 current_seq=71548 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71549 current_seq=71551 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71632 current_seq=71635 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71635 current_seq=71638 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71638 current_seq=71640 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71664 current_seq=71666 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71666 current_seq=71670 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=71671 current_seq=71679 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=71679 current_seq=71681 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71681 current_seq=71683 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71687 current_seq=71690 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71691 current_seq=71694 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71694 current_seq=71698 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=71698 current_seq=71700 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71701 current_seq=71703 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71703 current_seq=71706 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71706 current_seq=71708 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71711 current_seq=71713 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71713 current_seq=71721 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=71721 current_seq=71723 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71724 current_seq=71726 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71727 current_seq=71729 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71732 current_seq=71738 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=71742 current_seq=71745 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=71746 current_seq=71748 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71748 current_seq=71751 lost_count=2
+grant_accept node_id=2 sequence=66409 duration_ms=120 expires_at_ms=18745032
+PACKET_LOSS source_node=255 previous_seq=71936 current_seq=71944 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=71944 current_seq=71946 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71947 current_seq=71949 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=71949 current_seq=71951 lost_count=1
+grant_accept node_id=2 sequence=66410 duration_ms=120 expires_at_ms=18745159
+grant_accept node_id=2 sequence=66411 duration_ms=120 expires_at_ms=18745291
+PACKET_LOSS source_node=255 previous_seq=72400 current_seq=72402 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=72403 current_seq=72408 lost_count=4
+grant_accept node_id=2 sequence=66412 duration_ms=120 expires_at_ms=18745418
+grant_accept node_id=2 sequence=66413 duration_ms=120 expires_at_ms=18745549
+18745625	RX_ANT	5785:4:20	1	1999:-68:-62:-60:0:17:26
+18745625	RX_ANT	5785:4:20	0	1999:-72:-64:-62:0:17:25
+18745625	PKT	2005:1376513:0:0:1999:1999:290:73:0:179:242008
+18745625	PKT_SRC	255:1999:1376345:290:73:179:242008
+18745625	GRANT_FILTER	64156:19000:0:45156:0:0:0:0:0
+18745625	READY_FILTER	0:0:0:0:0
+18745625	REASSEMBLY	3:40
+73 packets lost
+18745625	TOKEN_AUTH	19000:0:2105:9685
+PACKET_LOSS source_node=255 previous_seq=72960 current_seq=72963 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=72963 current_seq=72966 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=72966 current_seq=72968 lost_count=1
+grant_accept node_id=2 sequence=66415 duration_ms=120 expires_at_ms=18745808
+PACKET_LOSS source_node=255 previous_seq=73144 current_seq=73146 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73147 current_seq=73149 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73149 current_seq=73152 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=73177 current_seq=73184 lost_count=6
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18745873
+PACKET_LOSS source_node=255 previous_seq=73327 current_seq=73329 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73329 current_seq=73331 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73332 current_seq=73334 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73503 current_seq=73505 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73505 current_seq=73507 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73507 current_seq=73509 lost_count=1
+grant_accept node_id=2 sequence=66418 duration_ms=120 expires_at_ms=18746199
+PACKET_LOSS source_node=255 previous_seq=73642 current_seq=73644 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=73644 current_seq=73647 lost_count=2
+grant_accept node_id=2 sequence=66419 duration_ms=120 expires_at_ms=18746331
+PACKET_LOSS source_node=255 previous_seq=73952 current_seq=73960 lost_count=7
+grant_accept node_id=2 sequence=66420 duration_ms=120 expires_at_ms=18746459
+PACKET_LOSS source_node=255 previous_seq=74159 current_seq=74161 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74162 current_seq=74164 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74164 current_seq=74166 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74166 current_seq=74168 lost_count=1
+grant_accept node_id=2 sequence=66421 duration_ms=120 expires_at_ms=18746589
+PACKET_LOSS source_node=255 previous_seq=74417 current_seq=74419 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74419 current_seq=74422 lost_count=2
+grant_accept node_id=2 sequence=66422 duration_ms=120 expires_at_ms=18746722
+18746625	RX_ANT	5785:4:20	1	1985:-66:-62:-60:9:17:26
+18746625	RX_ANT	5785:4:20	0	1985:-68:-64:-62:9:16:25
+18746625	PKT	1991:1410032:0:0:1985:1985:356:38:0:188:252865
+18746625	PKT_SRC	255:1985:1409864:356:38:188:252865
+18746625	GRANT_FILTER	64162:19006:0:45156:0:0:0:0:0
+18746625	READY_FILTER	0:0:0:0:0
+18746625	REASSEMBLY	3:40
+38 packets lost
+18746625	TOKEN_AUTH	19006:0:2107:9828
+PACKET_LOSS source_node=255 previous_seq=74551 current_seq=74554 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=74554 current_seq=74556 lost_count=1
+grant_accept node_id=2 sequence=66423 duration_ms=120 expires_at_ms=18746849
+PACKET_LOSS source_node=255 previous_seq=74639 current_seq=74641 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74641 current_seq=74644 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=74645 current_seq=74647 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74728 current_seq=74735 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=74795 current_seq=74797 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=74797 current_seq=74799 lost_count=1
+grant_accept node_id=2 sequence=66425 duration_ms=120 expires_at_ms=18747109
+PACKET_LOSS source_node=255 previous_seq=75073 current_seq=75075 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75077 current_seq=75080 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75192 current_seq=75194 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75194 current_seq=75200 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=75311 current_seq=75313 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75313 current_seq=75316 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75318 current_seq=75320 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75351 current_seq=75354 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75355 current_seq=75358 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75358 current_seq=75360 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75393 current_seq=75396 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75396 current_seq=75400 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=75449 current_seq=75451 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75451 current_seq=75453 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75453 current_seq=75456 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75503 current_seq=75510 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=75599 current_seq=75601 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75602 current_seq=75604 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75605 current_seq=75607 lost_count=1
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18747385
+PACKET_LOSS source_node=255 previous_seq=75615 current_seq=75618 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75618 current_seq=75620 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75620 current_seq=75622 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75658 current_seq=75662 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=75662 current_seq=75664 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75673 current_seq=75675 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75675 current_seq=75679 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=75695 current_seq=75697 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75698 current_seq=75701 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75701 current_seq=75703 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75927 current_seq=75929 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75933 current_seq=75936 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=75936 current_seq=75944 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=75967 current_seq=75969 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=75969 current_seq=75976 lost_count=6
+18747625	RX_ANT	5785:4:20	1	1877:-70:-62:-60:7:17:25
+18747625	RX_ANT	5785:4:20	0	1877:-70:-64:-62:8:16:25
+18747625	PKT	1880:1347935:0:0:1877:1877:372:84:0:179:242008
+18747625	PKT_SRC	255:1877:1347851:372:84:179:242008
+18747625	GRANT_FILTER	64165:19008:0:45157:0:0:0:0:0
+18747625	READY_FILTER	0:0:0:0:0
+18747625	REASSEMBLY	3:40
+84 packets lost
+18747625	TOKEN_AUTH	19008:0:2107:9990
+grant_accept node_id=2 sequence=66430 duration_ms=120 expires_at_ms=18747758
+PACKET_LOSS source_node=255 previous_seq=76016 current_seq=76018 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76018 current_seq=76020 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76021 current_seq=76024 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76031 current_seq=76033 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76033 current_seq=76035 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76035 current_seq=76037 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76038 current_seq=76040 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76255 current_seq=76257 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76257 current_seq=76259 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76260 current_seq=76262 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76263 current_seq=76265 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76265 current_seq=76270 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=76270 current_seq=76273 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76274 current_seq=76277 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76277 current_seq=76280 lost_count=2
+grant_accept node_id=2 sequence=66432 duration_ms=120 expires_at_ms=18748021
+PACKET_LOSS source_node=255 previous_seq=76290 current_seq=76292 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76292 current_seq=76300 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=76300 current_seq=76303 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76303 current_seq=76305 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76305 current_seq=76308 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76308 current_seq=76317 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=76318 current_seq=76320 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76322 current_seq=76324 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76324 current_seq=76327 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76327 current_seq=76330 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76330 current_seq=76332 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76332 current_seq=76334 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76334 current_seq=76338 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=76338 current_seq=76346 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=76351 current_seq=76357 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=76357 current_seq=76362 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=76362 current_seq=76371 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=76371 current_seq=76373 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76375 current_seq=76379 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=76379 current_seq=76382 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76384 current_seq=76386 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76386 current_seq=76390 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=76390 current_seq=76404 lost_count=13
+PACKET_LOSS source_node=255 previous_seq=76406 current_seq=76408 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76432 current_seq=76434 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76437 current_seq=76439 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76567 current_seq=76571 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=76571 current_seq=76573 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76573 current_seq=76576 lost_count=2
+grant_accept node_id=2 sequence=66433 duration_ms=120 expires_at_ms=18748154
+PACKET_LOSS source_node=255 previous_seq=76643 current_seq=76645 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76645 current_seq=76648 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76673 current_seq=76675 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76675 current_seq=76677 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76677 current_seq=76679 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76736 current_seq=76744 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=76815 current_seq=76817 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76817 current_seq=76819 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76821 current_seq=76823 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76871 current_seq=76873 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76873 current_seq=76875 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76877 current_seq=76880 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76887 current_seq=76890 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76890 current_seq=76892 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76892 current_seq=76894 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76894 current_seq=76896 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76943 current_seq=76946 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76947 current_seq=76951 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=76959 current_seq=76962 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76965 current_seq=76968 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76977 current_seq=76980 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=76980 current_seq=76982 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=76982 current_seq=76984 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77064 current_seq=77066 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77066 current_seq=77068 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77068 current_seq=77071 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77143 current_seq=77145 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77146 current_seq=77148 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77148 current_seq=77150 lost_count=1
+grant_accept node_id=2 sequence=66436 duration_ms=120 expires_at_ms=18748544
+PACKET_LOSS source_node=255 previous_seq=77199 current_seq=77201 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77201 current_seq=77204 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77204 current_seq=77208 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=77279 current_seq=77282 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77282 current_seq=77285 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77285 current_seq=77287 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77336 current_seq=77339 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77340 current_seq=77342 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77342 current_seq=77352 lost_count=9
+PACKET_LOSS source_node=255 previous_seq=77455 current_seq=77458 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77458 current_seq=77461 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77461 current_seq=77464 lost_count=2
+18748625	RX_ANT	5785:4:20	1	1725:-66:-62:-60:-4:16:26
+18748625	RX_ANT	5785:4:20	0	1725:-68:-64:-62:-4:16:24
+18748625	PKT	1730:1239039:0:0:1725:1725:364:184:0:162:219024
+18748625	PKT_SRC	255:1725:1238899:364:184:162:219024
+18748625	GRANT_FILTER	64170:19012:0:45158:0:0:0:0:0
+18748625	READY_FILTER	0:0:0:0:0
+18748625	REASSEMBLY	3:40
+184 packets lost
+18748625	TOKEN_AUTH	19012:0:2109:9999
+PACKET_LOSS source_node=255 previous_seq=77497 current_seq=77499 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77499 current_seq=77503 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=77511 current_seq=77520 lost_count=8
+grant_accept node_id=2 sequence=66438 duration_ms=120 expires_at_ms=18748802
+PACKET_LOSS source_node=255 previous_seq=77632 current_seq=77635 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77636 current_seq=77638 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77638 current_seq=77640 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77671 current_seq=77678 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=77678 current_seq=77680 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77703 current_seq=77705 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77705 current_seq=77712 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=77715 current_seq=77717 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77717 current_seq=77728 lost_count=10
+PACKET_LOSS source_node=255 previous_seq=77729 current_seq=77735 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=77760 current_seq=77763 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77763 current_seq=77765 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77765 current_seq=77768 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=77775 current_seq=77777 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77779 current_seq=77781 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77781 current_seq=77783 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77826 current_seq=77832 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=77945 current_seq=77950 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=77950 current_seq=77952 lost_count=1
+grant_accept node_id=2 sequence=66440 duration_ms=120 expires_at_ms=18749061
+PACKET_LOSS source_node=255 previous_seq=77975 current_seq=77977 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77978 current_seq=77984 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=77985 current_seq=77987 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77987 current_seq=77989 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77989 current_seq=77991 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77991 current_seq=77993 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77995 current_seq=77997 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=77997 current_seq=78000 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78063 current_seq=78065 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78066 current_seq=78072 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=78080 current_seq=78096 lost_count=15
+PACKET_LOSS source_node=255 previous_seq=78111 current_seq=78114 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78116 current_seq=78121 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=78121 current_seq=78123 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78123 current_seq=78125 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78125 current_seq=78127 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78168 current_seq=78170 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78172 current_seq=78174 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78175 current_seq=78180 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=78180 current_seq=78183 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78183 current_seq=78185 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78185 current_seq=78188 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78192 current_seq=78194 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78194 current_seq=78196 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78196 current_seq=78198 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78198 current_seq=78201 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78201 current_seq=78205 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78205 current_seq=78207 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78208 current_seq=78210 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78212 current_seq=78214 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78214 current_seq=78220 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=78223 current_seq=78227 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78227 current_seq=78229 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78229 current_seq=78231 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78233 current_seq=78235 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78239 current_seq=78241 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78241 current_seq=78243 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78244 current_seq=78246 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78246 current_seq=78248 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78280 current_seq=78286 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=78286 current_seq=78288 lost_count=1
+grant_accept node_id=2 sequence=66442 duration_ms=120 expires_at_ms=18749321
+PACKET_LOSS source_node=255 previous_seq=78431 current_seq=78435 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78436 current_seq=78438 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78438 current_seq=78440 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78459 current_seq=78474 lost_count=14
+PACKET_LOSS source_node=255 previous_seq=78475 current_seq=78479 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78519 current_seq=78521 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78521 current_seq=78524 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78524 current_seq=78528 lost_count=3
+grant_accept node_id=2 sequence=66443 duration_ms=120 expires_at_ms=18749452
+PACKET_LOSS source_node=255 previous_seq=78583 current_seq=78586 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78589 current_seq=78591 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78703 current_seq=78705 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78705 current_seq=78710 lost_count=4
+grant_accept node_id=2 sequence=66444 duration_ms=120 expires_at_ms=18749580
+PACKET_LOSS source_node=255 previous_seq=78745 current_seq=78752 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=78769 current_seq=78771 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78772 current_seq=78776 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78809 current_seq=78811 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78811 current_seq=78819 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=78819 current_seq=78828 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=78831 current_seq=78834 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78835 current_seq=78845 lost_count=9
+PACKET_LOSS source_node=255 previous_seq=78845 current_seq=78847 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78887 current_seq=78890 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=78890 current_seq=78892 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78893 current_seq=78895 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78896 current_seq=78898 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78898 current_seq=78900 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78901 current_seq=78903 lost_count=1
+grant_accept node_id=2 sequence=66445 duration_ms=120 expires_at_ms=18749711
+PACKET_LOSS source_node=255 previous_seq=78944 current_seq=78946 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78946 current_seq=78948 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78948 current_seq=78950 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=78975 current_seq=78979 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=78981 current_seq=78983 lost_count=1
+18749625	RX_ANT	5785:4:20	1	1625:-70:-62:-60:-3:16:27
+18749625	RX_ANT	5785:4:20	0	1625:-76:-64:-62:-4:16:25
+18749625	PKT	1632:1188123:0:0:1625:1625:378:238:0:161:217672
+18749625	PKT_SRC	255:1625:1187927:378:238:161:217672
+18749625	GRANT_FILTER	64177:19018:0:45159:0:0:0:0:0
+18749625	READY_FILTER	0:0:0:0:0
+18749625	REASSEMBLY	3:40
+238 packets lost
+18749625	TOKEN_AUTH	19018:0:2110:9999
+PACKET_LOSS source_node=255 previous_seq=79072 current_seq=79077 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=79077 current_seq=79080 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79127 current_seq=79132 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=79133 current_seq=79136 lost_count=2
+grant_accept node_id=2 sequence=66446 duration_ms=120 expires_at_ms=18749854
+PACKET_LOSS source_node=255 previous_seq=79207 current_seq=79211 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79212 current_seq=79214 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79214 current_seq=79216 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79233 current_seq=79236 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79236 current_seq=79240 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79376 current_seq=79379 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79379 current_seq=79384 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=79399 current_seq=79403 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79405 current_seq=79408 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79417 current_seq=79419 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79420 current_seq=79423 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79447 current_seq=79451 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79451 current_seq=79454 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79454 current_seq=79463 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=79520 current_seq=79528 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=79591 current_seq=79593 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79595 current_seq=79599 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79607 current_seq=79610 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79612 current_seq=79614 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79614 current_seq=79616 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79672 current_seq=79674 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79677 current_seq=79680 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79712 current_seq=79714 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79714 current_seq=79718 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79718 current_seq=79720 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79743 current_seq=79747 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=79749 current_seq=79768 lost_count=18
+PACKET_LOSS source_node=255 previous_seq=79791 current_seq=79793 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79795 current_seq=79797 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79797 current_seq=79800 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=79818 current_seq=79820 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79820 current_seq=79822 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79822 current_seq=79828 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=79828 current_seq=79830 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79830 current_seq=79832 lost_count=1
+grant_accept node_id=2 sequence=66450 duration_ms=120 expires_at_ms=18750361
+PACKET_LOSS source_node=255 previous_seq=79985 current_seq=79987 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79987 current_seq=79989 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=79990 current_seq=79992 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80009 current_seq=80011 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80012 current_seq=80016 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80056 current_seq=80061 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=80062 current_seq=80064 lost_count=1
+grant_accept node_id=2 sequence=66451 duration_ms=120 expires_at_ms=18750500
+PACKET_LOSS source_node=255 previous_seq=80103 current_seq=80105 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80105 current_seq=80107 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80107 current_seq=80111 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80111 current_seq=80113 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80114 current_seq=80116 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80118 current_seq=80128 lost_count=9
+PACKET_LOSS source_node=255 previous_seq=80128 current_seq=80130 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80131 current_seq=80137 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=80137 current_seq=80140 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80140 current_seq=80147 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=80148 current_seq=80150 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80185 current_seq=80187 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80188 current_seq=80190 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80281 current_seq=80285 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80296 current_seq=80304 lost_count=7
+grant_accept node_id=2 sequence=66452 duration_ms=120 expires_at_ms=18750620
+PACKET_LOSS source_node=255 previous_seq=80415 current_seq=80417 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80417 current_seq=80419 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80420 current_seq=80422 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80425 current_seq=80428 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80429 current_seq=80433 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80435 current_seq=80439 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80451 current_seq=80453 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80453 current_seq=80456 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80487 current_seq=80489 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80489 current_seq=80491 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80493 current_seq=80496 lost_count=2
+18750625	RX_ANT	5785:4:20	1	1698:-68:-62:-60:8:16:25
+18750625	RX_ANT	5785:4:20	0	1698:-70:-64:-62:8:15:25
+18750625	PKT	1702:1231630:0:0:1698:1698:386:179:0:168:227136
+18750625	PKT_SRC	255:1698:1231518:386:179:168:227136
+18750625	GRANT_FILTER	64181:19022:0:45159:0:0:0:0:0
+18750625	READY_FILTER	0:0:0:0:0
+18750625	REASSEMBLY	3:40
+179 packets lost
+18750625	TOKEN_AUTH	19022:0:2111:9999
+PACKET_LOSS source_node=255 previous_seq=80506 current_seq=80510 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80510 current_seq=80520 lost_count=9
+grant_accept node_id=2 sequence=66453 duration_ms=120 expires_at_ms=18750754
+PACKET_LOSS source_node=255 previous_seq=80697 current_seq=80703 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=80705 current_seq=80709 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80710 current_seq=80712 lost_count=1
+grant_accept node_id=2 sequence=66454 duration_ms=120 expires_at_ms=18750883
+PACKET_LOSS source_node=255 previous_seq=80720 current_seq=80722 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80722 current_seq=80725 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80725 current_seq=80727 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80764 current_seq=80770 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=80770 current_seq=80772 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80772 current_seq=80774 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80774 current_seq=80776 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80776 current_seq=80781 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=80781 current_seq=80783 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80823 current_seq=80826 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80826 current_seq=80830 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80847 current_seq=80850 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80850 current_seq=80853 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80853 current_seq=80856 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80879 current_seq=80881 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80881 current_seq=80885 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=80919 current_seq=80921 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80921 current_seq=80924 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80924 current_seq=80926 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80926 current_seq=80928 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=80952 current_seq=80955 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=80955 current_seq=80961 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=80962 current_seq=80964 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81032 current_seq=81037 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=81037 current_seq=81040 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81071 current_seq=81077 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=81080 current_seq=81082 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81082 current_seq=81084 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81086 current_seq=81088 lost_count=1
+grant_accept node_id=2 sequence=66456 duration_ms=120 expires_at_ms=18751142
+PACKET_LOSS source_node=255 previous_seq=81112 current_seq=81114 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81115 current_seq=81117 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81117 current_seq=81120 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81120 current_seq=81122 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81122 current_seq=81124 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81124 current_seq=81126 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81159 current_seq=81163 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=81163 current_seq=81165 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81165 current_seq=81168 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81191 current_seq=81194 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81194 current_seq=81197 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81197 current_seq=81199 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81226 current_seq=81231 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=81232 current_seq=81234 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81234 current_seq=81238 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=81239 current_seq=81243 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=81243 current_seq=81245 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81245 current_seq=81248 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81256 current_seq=81258 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81258 current_seq=81261 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81262 current_seq=81264 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81288 current_seq=81290 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81291 current_seq=81293 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81293 current_seq=81296 lost_count=2
+grant_accept node_id=2 sequence=66457 duration_ms=120 expires_at_ms=18751271
+PACKET_LOSS source_node=255 previous_seq=81415 current_seq=81418 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81419 current_seq=81421 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81422 current_seq=81424 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81424 current_seq=81428 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=81428 current_seq=81430 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81430 current_seq=81432 lost_count=1
+grant_accept node_id=2 sequence=66458 duration_ms=120 expires_at_ms=18751401
+PACKET_LOSS source_node=255 previous_seq=81504 current_seq=81507 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81507 current_seq=81510 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81510 current_seq=81512 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81522 current_seq=81524 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81524 current_seq=81527 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81527 current_seq=81529 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81529 current_seq=81533 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=81536 current_seq=81544 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=81739 current_seq=81741 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81741 current_seq=81743 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81801 current_seq=81803 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81803 current_seq=81805 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81805 current_seq=81808 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=81856 current_seq=81858 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81858 current_seq=81860 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81862 current_seq=81864 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81880 current_seq=81882 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81882 current_seq=81884 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81885 current_seq=81887 lost_count=1
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18751615
+PACKET_LOSS source_node=255 previous_seq=81984 current_seq=81986 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=81989 current_seq=82000 lost_count=10
+PACKET_LOSS source_node=255 previous_seq=82001 current_seq=82008 lost_count=6
+18751625	RX_ANT	5785:4:20	1	1669:-64:-62:-60:9:15:26
+18751625	RX_ANT	5785:4:20	0	1669:-68:-64:-62:9:15:25
+18751625	PKT	1674:1186375:0:0:1669:1669:380:177:0:175:236600
+18751625	PKT_SRC	255:1669:1186235:380:177:175:236600
+18751625	GRANT_FILTER	64186:19027:0:45159:0:0:0:0:0
+18751625	READY_FILTER	0:0:0:0:0
+18751625	REASSEMBLY	3:40
+177 packets lost
+18751625	TOKEN_AUTH	19027:0:2112:10006
+PACKET_LOSS source_node=255 previous_seq=82023 current_seq=82026 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82026 current_seq=82028 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82028 current_seq=82030 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82030 current_seq=82032 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82159 current_seq=82161 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82162 current_seq=82165 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82165 current_seq=82168 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82184 current_seq=82188 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=82189 current_seq=82192 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82295 current_seq=82298 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82299 current_seq=82301 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82302 current_seq=82304 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82312 current_seq=82320 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=82352 current_seq=82354 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82354 current_seq=82356 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82356 current_seq=82358 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82358 current_seq=82360 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82400 current_seq=82405 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=82405 current_seq=82407 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82431 current_seq=82433 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82433 current_seq=82435 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82435 current_seq=82437 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82437 current_seq=82439 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82463 current_seq=82465 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82465 current_seq=82467 lost_count=1
+grant_accept node_id=2 sequence=66463 duration_ms=120 expires_at_ms=18752056
+PACKET_LOSS source_node=255 previous_seq=82504 current_seq=82507 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82507 current_seq=82509 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82509 current_seq=82512 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82519 current_seq=82522 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82523 current_seq=82525 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82525 current_seq=82527 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82615 current_seq=82619 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=82621 current_seq=82623 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82640 current_seq=82643 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82643 current_seq=82645 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82645 current_seq=82647 lost_count=1
+grant_accept node_id=2 sequence=66464 duration_ms=120 expires_at_ms=18752184
+PACKET_LOSS source_node=255 previous_seq=82690 current_seq=82694 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=82694 current_seq=82696 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82720 current_seq=82722 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82722 current_seq=82725 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82725 current_seq=82727 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82743 current_seq=82752 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=82754 current_seq=82756 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82757 current_seq=82759 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82799 current_seq=82801 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82802 current_seq=82804 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82804 current_seq=82807 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82815 current_seq=82818 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82822 current_seq=82824 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82833 current_seq=82835 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82835 current_seq=82837 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82864 current_seq=82866 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82866 current_seq=82869 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=82869 current_seq=82872 lost_count=2
+grant_accept node_id=2 sequence=66465 duration_ms=120 expires_at_ms=18752315
+PACKET_LOSS source_node=255 previous_seq=82928 current_seq=82930 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82931 current_seq=82933 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82933 current_seq=82935 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82959 current_seq=82961 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82962 current_seq=82966 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=82966 current_seq=82968 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82995 current_seq=82997 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=82997 current_seq=83000 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83008 current_seq=83012 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83012 current_seq=83014 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83023 current_seq=83025 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83027 current_seq=83032 lost_count=4
+grant_accept node_id=2 sequence=66466 duration_ms=120 expires_at_ms=18752447
+PACKET_LOSS source_node=255 previous_seq=83087 current_seq=83096 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=83104 current_seq=83116 lost_count=11
+PACKET_LOSS source_node=255 previous_seq=83117 current_seq=83119 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83119 current_seq=83122 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83122 current_seq=83124 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83125 current_seq=83127 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83127 current_seq=83132 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83132 current_seq=83135 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83160 current_seq=83163 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83163 current_seq=83166 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83166 current_seq=83168 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83177 current_seq=83179 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83179 current_seq=83181 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83181 current_seq=83183 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83191 current_seq=83193 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83193 current_seq=83196 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83196 current_seq=83198 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83226 current_seq=83229 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83229 current_seq=83231 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83240 current_seq=83242 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83242 current_seq=83244 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83246 current_seq=83248 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83271 current_seq=83273 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83274 current_seq=83276 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83276 current_seq=83278 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83278 current_seq=83280 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83337 current_seq=83340 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83340 current_seq=83342 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83383 current_seq=83386 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83386 current_seq=83388 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83389 current_seq=83392 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83407 current_seq=83412 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83416 current_seq=83420 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83421 current_seq=83423 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83426 current_seq=83430 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83430 current_seq=83432 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83441 current_seq=83443 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83443 current_seq=83445 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83445 current_seq=83447 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83471 current_seq=83473 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83474 current_seq=83479 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83495 current_seq=83497 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83499 current_seq=83501 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83501 current_seq=83504 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83520 current_seq=83524 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83524 current_seq=83527 lost_count=2
+18752625	RX_ANT	5785:4:20	1	1654:-64:-62:-60:9:15:25
+18752625	RX_ANT	5785:4:20	0	1654:-68:-64:-62:8:15:24
+18752625	PKT	1659:1129492:0:0:1654:1654:369:199:0:172:227300
+18752625	PKT_SRC	255:1654:1129352:369:199:172:227300
+18752625	GRANT_FILTER	64191:19031:0:45160:0:0:0:0:0
+18752625	READY_FILTER	0:0:0:0:0
+18752625	REASSEMBLY	3:40
+199 packets lost
+18752625	TOKEN_AUTH	19031:0:2113:10217
+PACKET_LOSS source_node=255 previous_seq=83551 current_seq=83554 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83554 current_seq=83556 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83556 current_seq=83561 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83563 current_seq=83568 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83575 current_seq=83577 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83577 current_seq=83581 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83600 current_seq=83605 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83606 current_seq=83608 lost_count=1
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18752672
+PACKET_LOSS source_node=255 previous_seq=83625 current_seq=83627 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83628 current_seq=83630 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83630 current_seq=83632 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83632 current_seq=83635 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83636 current_seq=83638 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83638 current_seq=83640 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83690 current_seq=83694 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83703 current_seq=83708 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83716 current_seq=83718 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83718 current_seq=83722 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83722 current_seq=83724 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83724 current_seq=83728 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=83744 current_seq=83746 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83747 current_seq=83749 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83750 current_seq=83752 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83799 current_seq=83801 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83801 current_seq=83803 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83803 current_seq=83805 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83805 current_seq=83807 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83872 current_seq=83875 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83875 current_seq=83880 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=83905 current_seq=83908 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83909 current_seq=83912 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83936 current_seq=83938 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83938 current_seq=83940 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83940 current_seq=83943 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83992 current_seq=83994 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=83994 current_seq=83997 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=83998 current_seq=84000 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84039 current_seq=84048 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=84055 current_seq=84057 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84057 current_seq=84059 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84059 current_seq=84061 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84063 current_seq=84065 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84066 current_seq=84069 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84070 current_seq=84072 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84080 current_seq=84082 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84083 current_seq=84085 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84085 current_seq=84087 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84096 current_seq=84098 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84099 current_seq=84102 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84104 current_seq=84107 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84108 current_seq=84110 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84110 current_seq=84112 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84247 current_seq=84250 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84250 current_seq=84255 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=84335 current_seq=84344 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=84360 current_seq=84362 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84363 current_seq=84365 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84366 current_seq=84368 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84377 current_seq=84379 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84379 current_seq=84383 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=84423 current_seq=84425 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84425 current_seq=84428 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84428 current_seq=84430 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84431 current_seq=84434 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84434 current_seq=84438 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=84438 current_seq=84440 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84458 current_seq=84461 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84461 current_seq=84463 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84463 current_seq=84465 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84465 current_seq=84467 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84468 current_seq=84471 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84487 current_seq=84489 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84489 current_seq=84491 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84491 current_seq=84493 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84494 current_seq=84496 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84535 current_seq=84537 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84537 current_seq=84540 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84540 current_seq=84542 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84542 current_seq=84544 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84567 current_seq=84569 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84569 current_seq=84571 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84571 current_seq=84573 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84574 current_seq=84576 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84623 current_seq=84626 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84679 current_seq=84682 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84682 current_seq=84684 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84684 current_seq=84686 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84686 current_seq=84688 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84705 current_seq=84708 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84708 current_seq=84710 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84710 current_seq=84713 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84713 current_seq=84715 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84735 current_seq=84737 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84739 current_seq=84744 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=84775 current_seq=84777 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84777 current_seq=84780 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84791 current_seq=84794 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84795 current_seq=84797 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84798 current_seq=84801 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84801 current_seq=84803 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84804 current_seq=84806 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84806 current_seq=84808 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84816 current_seq=84818 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84818 current_seq=84820 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84822 current_seq=84825 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84825 current_seq=84827 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84828 current_seq=84830 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84871 current_seq=84874 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84875 current_seq=84877 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84877 current_seq=84879 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84895 current_seq=84897 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84897 current_seq=84899 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84900 current_seq=84902 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84902 current_seq=84904 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84927 current_seq=84930 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=84930 current_seq=84932 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84934 current_seq=84936 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84936 current_seq=84938 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84939 current_seq=84941 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84959 current_seq=84961 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84963 current_seq=84965 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=84965 current_seq=84967 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85015 current_seq=85017 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85018 current_seq=85022 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85031 current_seq=85033 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85033 current_seq=85036 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85037 current_seq=85040 lost_count=2
+18753625	RX_ANT	5785:4:20	1	1612:-64:-62:-60:9:15:25
+18753625	RX_ANT	5785:4:20	0	1612:-68:-64:-62:9:14:24
+18753625	PKT	1616:1022796:0:0:1612:1612:317:204:0:159:214968
+18753625	PKT_SRC	255:1612:1022684:317:204:159:214968
+18753625	GRANT_FILTER	64195:19031:0:45164:0:0:0:0:0
+18753625	READY_FILTER	0:0:0:0:0
+18753625	REASSEMBLY	3:40
+204 packets lost
+18753625	TOKEN_AUTH	19031:0:2113:10809
+PACKET_LOSS source_node=255 previous_seq=85079 current_seq=85081 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85082 current_seq=85086 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85090 current_seq=85092 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85092 current_seq=85095 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85112 current_seq=85120 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=85137 current_seq=85139 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85139 current_seq=85142 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85142 current_seq=85145 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85145 current_seq=85151 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=85191 current_seq=85193 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85195 current_seq=85197 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85197 current_seq=85200 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85247 current_seq=85249 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85252 current_seq=85256 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85312 current_seq=85314 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85315 current_seq=85320 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=85327 current_seq=85330 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85330 current_seq=85332 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85333 current_seq=85335 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85359 current_seq=85361 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85361 current_seq=85363 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85363 current_seq=85365 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85366 current_seq=85368 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85415 current_seq=85419 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85420 current_seq=85424 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85424 current_seq=85426 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85427 current_seq=85430 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85431 current_seq=85436 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=85437 current_seq=85440 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85519 current_seq=85524 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=85525 current_seq=85527 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85527 current_seq=85529 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85529 current_seq=85531 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85531 current_seq=85533 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85534 current_seq=85536 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85615 current_seq=85617 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85617 current_seq=85622 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=85623 current_seq=85625 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85626 current_seq=85629 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85629 current_seq=85631 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85655 current_seq=85657 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85657 current_seq=85659 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85659 current_seq=85661 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85661 current_seq=85664 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85689 current_seq=85692 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85693 current_seq=85695 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85743 current_seq=85745 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85747 current_seq=85749 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85750 current_seq=85752 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85791 current_seq=85793 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85795 current_seq=85797 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85798 current_seq=85800 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85800 current_seq=85802 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85804 current_seq=85807 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85817 current_seq=85819 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85819 current_seq=85821 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85824 current_seq=85826 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85828 current_seq=85831 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85847 current_seq=85849 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85851 current_seq=85853 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85879 current_seq=85881 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85881 current_seq=85883 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85883 current_seq=85885 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85888 current_seq=85897 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=85898 current_seq=85912 lost_count=13
+PACKET_LOSS source_node=255 previous_seq=85936 current_seq=85938 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85938 current_seq=85940 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85940 current_seq=85944 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=85953 current_seq=85960 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=85991 current_seq=85993 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=85993 current_seq=85996 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=85997 current_seq=85999 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86033 current_seq=86035 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86035 current_seq=86040 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=86057 current_seq=86059 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86059 current_seq=86061 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86061 current_seq=86063 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86071 current_seq=86075 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=86076 current_seq=86078 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86078 current_seq=86080 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86112 current_seq=86114 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86115 current_seq=86118 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86119 current_seq=86122 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86125 current_seq=86128 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86135 current_seq=86137 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86141 current_seq=86143 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86160 current_seq=86162 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86163 current_seq=86165 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86207 current_seq=86209 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86209 current_seq=86211 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86212 current_seq=86215 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86217 current_seq=86219 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86219 current_seq=86221 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86221 current_seq=86223 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86263 current_seq=86266 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86268 current_seq=86270 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86270 current_seq=86272 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86279 current_seq=86281 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86282 current_seq=86284 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86284 current_seq=86287 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86303 current_seq=86306 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86306 current_seq=86308 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86308 current_seq=86310 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86354 current_seq=86360 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=86448 current_seq=86450 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86451 current_seq=86453 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86453 current_seq=86458 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=86462 current_seq=86464 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86464 current_seq=86466 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86467 current_seq=86470 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86470 current_seq=86472 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86479 current_seq=86482 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86482 current_seq=86484 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86484 current_seq=86488 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=86551 current_seq=86554 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86555 current_seq=86557 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86557 current_seq=86560 lost_count=2
+18754625	RX_ANT	5785:4:20	1	1611:-64:-62:-60:6:14:25
+18754625	RX_ANT	5785:4:20	0	1611:-68:-64:-62:7:14:24
+18754625	PKT	1614:1037617:0:0:1611:1611:308:211:0:159:214968
+18754625	PKT_SRC	255:1611:1037533:308:211:159:214968
+18754625	GRANT_FILTER	64198:19031:0:45167:0:0:0:0:0
+18754625	READY_FILTER	0:0:0:0:0
+18754625	REASSEMBLY	3:40
+211 packets lost
+18754625	TOKEN_AUTH	19031:0:2113:11450
+PACKET_LOSS source_node=255 previous_seq=86599 current_seq=86601 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86605 current_seq=86608 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86627 current_seq=86630 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86664 current_seq=86669 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=86679 current_seq=86682 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86682 current_seq=86684 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86685 current_seq=86687 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86695 current_seq=86697 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86701 current_seq=86704 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86704 current_seq=86706 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86707 current_seq=86709 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86709 current_seq=86711 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86713 current_seq=86721 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=86721 current_seq=86723 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86724 current_seq=86726 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86729 current_seq=86731 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86731 current_seq=86733 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86752 current_seq=86754 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86756 current_seq=86758 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86800 current_seq=86803 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86804 current_seq=86806 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86815 current_seq=86818 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86819 current_seq=86822 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=86822 current_seq=86824 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86879 current_seq=86881 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86883 current_seq=86885 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86885 current_seq=86891 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=86891 current_seq=86895 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=86896 current_seq=86898 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86899 current_seq=86901 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86902 current_seq=86904 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=86928 current_seq=86936 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=86976 current_seq=86984 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=87023 current_seq=87025 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87026 current_seq=87029 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87029 current_seq=87031 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87039 current_seq=87042 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87043 current_seq=87045 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87095 current_seq=87100 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=87100 current_seq=87103 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87120 current_seq=87123 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87123 current_seq=87137 lost_count=13
+PACKET_LOSS source_node=255 previous_seq=87137 current_seq=87139 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87139 current_seq=87141 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87202 current_seq=87204 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87204 current_seq=87206 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87233 current_seq=87235 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87235 current_seq=87237 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87238 current_seq=87240 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87247 current_seq=87250 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87253 current_seq=87258 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=87259 current_seq=87261 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87262 current_seq=87264 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87329 current_seq=87331 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87333 current_seq=87335 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87345 current_seq=87348 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87348 current_seq=87352 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=87360 current_seq=87362 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87364 current_seq=87366 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87366 current_seq=87368 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87372 current_seq=87375 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87407 current_seq=87410 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87410 current_seq=87412 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87412 current_seq=87414 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87414 current_seq=87416 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87490 current_seq=87493 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87493 current_seq=87495 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87495 current_seq=87499 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=87499 current_seq=87501 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87502 current_seq=87504 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87511 current_seq=87513 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87513 current_seq=87515 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87516 current_seq=87518 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87551 current_seq=87554 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87555 current_seq=87558 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87663 current_seq=87666 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87666 current_seq=87668 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87668 current_seq=87671 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87728 current_seq=87731 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87732 current_seq=87734 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87784 current_seq=87787 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87789 current_seq=87791 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87815 current_seq=87818 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=87820 current_seq=87822 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87822 current_seq=87824 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87840 current_seq=87842 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87842 current_seq=87844 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87844 current_seq=87846 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87904 current_seq=87912 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=87944 current_seq=87946 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87946 current_seq=87948 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=87950 current_seq=87952 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88043 current_seq=88045 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88045 current_seq=88047 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88063 current_seq=88067 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88067 current_seq=88071 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88073 current_seq=88075 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88077 current_seq=88082 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=88084 current_seq=88087 lost_count=2
+18755625	RX_ANT	5785:4:20	1	1627:-64:-62:-60:9:14:25
+18755625	RX_ANT	5785:4:20	0	1627:-68:-64:-62:9:14:24
+18755625	PKT	1633:1023197:0:0:1627:1627:301:185:0:167:225784
+18755625	PKT_SRC	255:1627:1023029:301:185:167:225784
+18755625	GRANT_FILTER	64204:19031:0:45173:0:0:0:0:0
+18755625	READY_FILTER	0:0:0:0:0
+18755625	REASSEMBLY	3:40
+185 packets lost
+18755625	TOKEN_AUTH	19031:0:2113:12081
+PACKET_LOSS source_node=255 previous_seq=88127 current_seq=88129 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88130 current_seq=88132 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88132 current_seq=88134 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88134 current_seq=88136 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88153 current_seq=88156 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88157 current_seq=88159 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88207 current_seq=88209 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88210 current_seq=88213 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88213 current_seq=88215 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88215 current_seq=88217 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88221 current_seq=88224 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88279 current_seq=88281 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88281 current_seq=88283 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88284 current_seq=88286 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88335 current_seq=88339 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88343 current_seq=88345 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88345 current_seq=88348 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88348 current_seq=88351 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88472 current_seq=88475 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88476 current_seq=88478 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88478 current_seq=88481 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88484 current_seq=88486 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88486 current_seq=88492 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=88493 current_seq=88495 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88503 current_seq=88505 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88505 current_seq=88507 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88507 current_seq=88510 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88510 current_seq=88512 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88520 current_seq=88522 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88523 current_seq=88525 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88536 current_seq=88542 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=88544 current_seq=88546 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88546 current_seq=88549 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88550 current_seq=88554 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88554 current_seq=88556 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88591 current_seq=88593 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88593 current_seq=88596 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88598 current_seq=88602 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88603 current_seq=88605 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88605 current_seq=88607 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88647 current_seq=88649 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88650 current_seq=88653 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88654 current_seq=88656 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88679 current_seq=88688 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=88704 current_seq=88707 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88707 current_seq=88710 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88710 current_seq=88712 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88807 current_seq=88810 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88814 current_seq=88818 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88818 current_seq=88820 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88831 current_seq=88833 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88833 current_seq=88835 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88888 current_seq=88890 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88890 current_seq=88892 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88892 current_seq=88896 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=88911 current_seq=88913 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88913 current_seq=88915 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88915 current_seq=88918 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88944 current_seq=88946 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=88947 current_seq=88952 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=88960 current_seq=88963 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=88964 current_seq=88967 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89007 current_seq=89010 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89010 current_seq=89012 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89012 current_seq=89014 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89014 current_seq=89016 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89040 current_seq=89042 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89043 current_seq=89045 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89046 current_seq=89048 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89057 current_seq=89059 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89059 current_seq=89065 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=89067 current_seq=89083 lost_count=15
+PACKET_LOSS source_node=255 previous_seq=89083 current_seq=89087 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=89097 current_seq=89100 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89101 current_seq=89104 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89121 current_seq=89123 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89124 current_seq=89127 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89135 current_seq=89138 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89141 current_seq=89144 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89147 current_seq=89152 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=89192 current_seq=89195 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89195 current_seq=89198 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89223 current_seq=89225 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89225 current_seq=89228 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89228 current_seq=89230 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89230 current_seq=89232 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89303 current_seq=89305 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89306 current_seq=89308 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89310 current_seq=89312 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89359 current_seq=89363 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=89376 current_seq=89379 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89380 current_seq=89382 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89391 current_seq=89393 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89393 current_seq=89395 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89396 current_seq=89398 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89472 current_seq=89474 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89475 current_seq=89477 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89478 current_seq=89480 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89480 current_seq=89482 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89482 current_seq=89485 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89485 current_seq=89487 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89561 current_seq=89564 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89565 current_seq=89568 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89583 current_seq=89585 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89586 current_seq=89588 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89589 current_seq=89592 lost_count=2
+18756625	RX_ANT	5785:4:20	1	1643:-70:-62:-60:5:14:25
+18756625	RX_ANT	5785:4:20	0	1643:-72:-64:-62:5:14:24
+18756625	PKT	1646:1074857:0:0:1643:1643:325:190:0:162:219024
+18756625	PKT_SRC	255:1643:1074773:325:190:162:219024
+18756625	GRANT_FILTER	64207:19031:0:45176:0:0:0:0:0
+18756625	READY_FILTER	0:0:0:0:0
+18756625	REASSEMBLY	3:40
+190 packets lost
+18756625	TOKEN_AUTH	19031:0:2113:12713
+PACKET_LOSS source_node=255 previous_seq=89610 current_seq=89612 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89613 current_seq=89615 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89631 current_seq=89633 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89633 current_seq=89635 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89635 current_seq=89638 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89658 current_seq=89660 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89661 current_seq=89663 lost_count=1
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18756672
+PACKET_LOSS source_node=255 previous_seq=89679 current_seq=89683 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=89683 current_seq=89685 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89686 current_seq=89688 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89751 current_seq=89753 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89753 current_seq=89755 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89756 current_seq=89758 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89775 current_seq=89778 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89782 current_seq=89784 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89847 current_seq=89849 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89851 current_seq=89853 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89853 current_seq=89855 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89858 current_seq=89860 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89860 current_seq=89863 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89920 current_seq=89928 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=89943 current_seq=89945 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89945 current_seq=89947 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=89947 current_seq=89949 lost_count=1
+grant_accept node_id=2 sequence=66501 duration_ms=120 expires_at_ms=18756999
+PACKET_LOSS source_node=255 previous_seq=89992 current_seq=89995 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=89996 current_seq=89999 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90025 current_seq=90027 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90027 current_seq=90029 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90029 current_seq=90032 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90047 current_seq=90049 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90051 current_seq=90054 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90087 current_seq=90090 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90094 current_seq=90096 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90103 current_seq=90106 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90106 current_seq=90108 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90109 current_seq=90112 lost_count=2
+grant_accept node_id=2 sequence=66502 duration_ms=120 expires_at_ms=18757130
+PACKET_LOSS source_node=255 previous_seq=90231 current_seq=90235 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=90237 current_seq=90240 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90272 current_seq=90275 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90276 current_seq=90280 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=90304 current_seq=90306 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90306 current_seq=90308 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90309 current_seq=90311 lost_count=1
+grant_accept node_id=2 sequence=66503 duration_ms=120 expires_at_ms=18757259
+PACKET_LOSS source_node=255 previous_seq=90385 current_seq=90388 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90389 current_seq=90391 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90395 current_seq=90400 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=90503 current_seq=90506 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90507 current_seq=90510 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90510 current_seq=90512 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90535 current_seq=90539 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=90540 current_seq=90542 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90695 current_seq=90704 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=90719 current_seq=90722 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90726 current_seq=90728 lost_count=1
+grant_accept node_id=2 sequence=66505 duration_ms=120 expires_at_ms=18757517
+PACKET_LOSS source_node=255 previous_seq=90823 current_seq=90826 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90829 current_seq=90831 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90853 current_seq=90856 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90856 current_seq=90858 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90859 current_seq=90864 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=90864 current_seq=90867 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90870 current_seq=90872 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90911 current_seq=90913 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90913 current_seq=90915 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90918 current_seq=90920 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=90943 current_seq=90946 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90947 current_seq=90950 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=90984 current_seq=90987 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91031 current_seq=91033 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91033 current_seq=91035 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91036 current_seq=91038 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91038 current_seq=91040 lost_count=1
+18757625	RX_ANT	5785:4:20	1	1757:-64:-61:-60:9:14:26
+18757625	RX_ANT	5785:4:20	0	1757:-68:-64:-62:8:14:24
+18757625	PKT	1761:1133021:0:0:1757:1757:313:120:0:173:231274
+18757625	PKT_SRC	255:1757:1132909:313:120:173:231274
+18757625	GRANT_FILTER	64211:19035:0:45176:0:0:0:0:0
+18757625	READY_FILTER	0:0:0:0:0
+18757625	REASSEMBLY	3:40
+120 packets lost
+18757625	TOKEN_AUTH	19035:0:2122:12870
+PACKET_LOSS source_node=255 previous_seq=91137 current_seq=91140 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91141 current_seq=91144 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91159 current_seq=91161 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91164 current_seq=91166 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91166 current_seq=91168 lost_count=1
+grant_accept node_id=2 sequence=66507 duration_ms=120 expires_at_ms=18757781
+PACKET_LOSS source_node=255 previous_seq=91311 current_seq=91315 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=91315 current_seq=91317 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91342 current_seq=91344 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91344 current_seq=91347 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91349 current_seq=91351 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91399 current_seq=91401 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91403 current_seq=91408 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=91471 current_seq=91480 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=91519 current_seq=91521 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91521 current_seq=91524 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91524 current_seq=91528 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=91618 current_seq=91620 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91620 current_seq=91624 lost_count=3
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18757960
+PACKET_LOSS source_node=255 previous_seq=91631 current_seq=91640 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=91791 current_seq=91796 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=91796 current_seq=91800 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=91839 current_seq=91843 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=91844 current_seq=91846 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91846 current_seq=91848 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=91936 current_seq=91939 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=91939 current_seq=91944 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=92137 current_seq=92144 lost_count=6
+18758625	RX_ANT	5785:4:20	1	1269:-64:-62:-60:1:14:25
+18758625	RX_ANT	5785:4:20	0	1269:-68:-64:-62:1:14:24
+18758625	PKT	1274:864523:0:0:1269:1269:232:70:0:124:164753
+18758625	PKT_SRC	255:1269:864383:232:70:124:164753
+18758625	GRANT_FILTER	64216:19036:0:45180:0:0:0:0:0
+18758625	READY_FILTER	0:0:0:0:0
+18758625	REASSEMBLY	3:40
+70 packets lost
+18758625	TOKEN_AUTH	19036:0:2122:13113
+PACKET_LOSS source_node=255 previous_seq=92215 current_seq=92219 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92247 current_seq=92260 lost_count=12
+PACKET_LOSS source_node=255 previous_seq=92261 current_seq=92264 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92295 current_seq=92298 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92299 current_seq=92301 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92301 current_seq=92303 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92311 current_seq=92313 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92313 current_seq=92315 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92316 current_seq=92318 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92327 current_seq=92330 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92331 current_seq=92333 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92334 current_seq=92336 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92336 current_seq=92338 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92338 current_seq=92340 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92341 current_seq=92346 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=92347 current_seq=92349 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92392 current_seq=92394 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92394 current_seq=92396 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92396 current_seq=92399 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92399 current_seq=92401 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92401 current_seq=92403 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92404 current_seq=92406 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92406 current_seq=92408 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92408 current_seq=92411 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92411 current_seq=92418 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=92418 current_seq=92420 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92420 current_seq=92422 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92422 current_seq=92424 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92439 current_seq=92441 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92441 current_seq=92443 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92443 current_seq=92445 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92445 current_seq=92447 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92455 current_seq=92464 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=92471 current_seq=92473 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92475 current_seq=92477 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92477 current_seq=92480 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92496 current_seq=92498 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92499 current_seq=92501 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92502 current_seq=92504 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92530 current_seq=92532 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92533 current_seq=92535 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92551 current_seq=92553 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92553 current_seq=92555 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92555 current_seq=92557 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92557 current_seq=92559 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92568 current_seq=92570 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92570 current_seq=92573 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92573 current_seq=92577 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92577 current_seq=92579 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92582 current_seq=92584 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92592 current_seq=92595 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92595 current_seq=92597 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92597 current_seq=92599 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92608 current_seq=92610 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92610 current_seq=92613 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92614 current_seq=92619 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=92621 current_seq=92623 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92632 current_seq=92634 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92636 current_seq=92640 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92671 current_seq=92674 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92674 current_seq=92676 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92677 current_seq=92680 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92687 current_seq=92690 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92690 current_seq=92692 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92692 current_seq=92696 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92769 current_seq=92771 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92774 current_seq=92776 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92783 current_seq=92788 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=92788 current_seq=92790 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92793 current_seq=92797 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92798 current_seq=92808 lost_count=9
+PACKET_LOSS source_node=255 previous_seq=92855 current_seq=92857 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92857 current_seq=92859 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92859 current_seq=92861 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92861 current_seq=92863 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92887 current_seq=92889 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92891 current_seq=92893 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92893 current_seq=92895 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92898 current_seq=92900 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92900 current_seq=92903 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92903 current_seq=92909 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=92910 current_seq=92912 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92920 current_seq=92936 lost_count=15
+PACKET_LOSS source_node=255 previous_seq=92937 current_seq=92940 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92940 current_seq=92944 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=92944 current_seq=92952 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=92954 current_seq=92957 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92958 current_seq=92960 lost_count=1
+18759625	RX_ANT	5785:4:20	1	797:-68:-61:-60:5:14:27
+18759625	RX_ANT	5785:4:20	0	797:-70:-64:-62:3:14:24
+18759625	PKT	803:540595:0:0:797:797:139:179:0:113:151480
+18759625	PKT_SRC	255:797:540427:139:179:113:151480
+18759625	GRANT_FILTER	64222:19036:0:45186:0:0:0:0:0
+18759625	READY_FILTER	0:0:0:0:0
+18759625	REASSEMBLY	3:40
+179 packets lost
+18759625	TOKEN_AUTH	19036:0:2122:13430
+PACKET_LOSS source_node=255 previous_seq=92983 current_seq=92985 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92986 current_seq=92989 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92989 current_seq=92991 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=92991 current_seq=92994 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=92994 current_seq=92998 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93000 current_seq=93002 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93002 current_seq=93004 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93005 current_seq=93007 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93039 current_seq=93042 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93042 current_seq=93044 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93044 current_seq=93046 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93071 current_seq=93074 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93075 current_seq=93077 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93077 current_seq=93083 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=93083 current_seq=93085 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93085 current_seq=93087 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93119 current_seq=93121 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93121 current_seq=93123 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93125 current_seq=93127 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93180 current_seq=93182 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93182 current_seq=93184 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93193 current_seq=93195 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93196 current_seq=93200 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93232 current_seq=93241 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=93244 current_seq=93247 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93248 current_seq=93251 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93251 current_seq=93253 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93279 current_seq=93282 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93282 current_seq=93287 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=93288 current_seq=93290 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93290 current_seq=93293 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93294 current_seq=93296 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93319 current_seq=93321 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93321 current_seq=93323 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93323 current_seq=93326 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93326 current_seq=93328 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93351 current_seq=93354 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93355 current_seq=93357 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93375 current_seq=93377 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93377 current_seq=93379 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93380 current_seq=93383 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93392 current_seq=93397 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=93397 current_seq=93400 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93431 current_seq=93434 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93434 current_seq=93437 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93479 current_seq=93483 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93484 current_seq=93486 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93487 current_seq=93490 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93493 current_seq=93496 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=93506 current_seq=93510 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93511 current_seq=93515 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93515 current_seq=93517 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=93518 current_seq=93520 lost_count=1
+18760625	RX_ANT	5785:4:20	1	649:-64:-61:-60:9:14:25
+18760625	RX_ANT	5785:4:20	0	649:-66:-64:-62:9:14:24
+18760625	PKT	654:411203:0:0:649:649:107:96:0:61:82472
+18760625	PKT_SRC	255:649:411063:107:96:61:82472
+18760625	GRANT_FILTER	64227:19036:0:45191:0:0:0:0:0
+18760625	READY_FILTER	0:0:0:0:0
+18760625	REASSEMBLY	3:40
+96 packets lost
+18760625	TOKEN_AUTH	19036:0:2122:13684
+PACKET_LOSS source_node=255 previous_seq=93576 current_seq=93580 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=93581 current_seq=93583 lost_count=1
+18761625	RX_ANT	5785:4:20	1	76:-62:-61:-60:12:18:25
+18761625	RX_ANT	5785:4:20	0	76:-66:-63:-62:12:17:23
+18761625	PKT	84:78316:0:0:76:76:14:4:0:41:51552
+18761625	PKT_SRC	255:76:78092:14:4:41:51552
+18761625	GRANT_FILTER	64235:19036:0:45199:0:0:0:0:0
+18761625	READY_FILTER	0:0:0:0:0
+18761625	REASSEMBLY	3:40
+4 packets lost
+18761625	TOKEN_AUTH	19036:0:2122:13719
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18762038
+18762625	RX_ANT	5785:4:20	1	13:-62:-61:-60:12:18:23
+18762625	RX_ANT	5785:4:20	0	13:-64:-62:-62:13:17:21
+18762625	PKT	20:887:0:0:13:13:1:0:0:1:56
+18762625	PKT_SRC	255:13:691:1:0:1:56
+18762625	GRANT_FILTER	64242:19036:0:45206:0:0:0:0:0
+18762625	READY_FILTER	0:0:0:0:0
+18762625	REASSEMBLY	3:40
+18762625	TOKEN_AUTH	19036:0:2122:13732
+18763625	RX_ANT	5785:4:20	1	42:-62:-61:-60:12:18:26
+18763625	RX_ANT	5785:4:20	0	42:-66:-63:-62:13:18:25
+18763625	PKT	49:2233:0:0:42:42:0:0:0:3:153
+18763625	PKT_SRC	255:42:2037:0:0:3:153
+18763625	GRANT_FILTER	64249:19036:0:45213:0:0:0:0:0
+18763625	READY_FILTER	0:0:0:0:0
+18763625	REASSEMBLY	3:40
+18763625	TOKEN_AUTH	19036:0:2122:13750
+18764625	RX_ANT	5785:4:20	1	28:-62:-61:-60:6:16:24
+18764625	RX_ANT	5785:4:20	0	28:-66:-63:-62:5:15:22
+18764625	PKT	36:1652:0:0:28:28:0:0:0:2:112
+18764625	PKT_SRC	255:28:1428:0:0:2:112
+18764625	GRANT_FILTER	64257:19036:0:45221:0:0:0:0:0
+18764625	READY_FILTER	0:0:0:0:0
+18764625	REASSEMBLY	3:40
+18764625	TOKEN_AUTH	19036:0:2122:13767
+18765625	RX_ANT	5785:4:20	1	14:-62:-62:-62:12:17:22
+18765625	RX_ANT	5785:4:20	0	14:-64:-63:-62:13:16:22
+18765625	PKT	22:938:0:0:14:14:0:0:0:1:56
+18765625	PKT_SRC	255:14:714:0:0:1:56
+18765625	GRANT_FILTER	64265:19036:0:45229:0:0:0:0:0
+18765625	READY_FILTER	0:0:0:0:0
+18765625	REASSEMBLY	3:40
+18765625	TOKEN_AUTH	19036:0:2122:13780
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18766113
+grant_accept node_id=2 sequence=66574 duration_ms=120 expires_at_ms=18766494
+grant_accept node_id=2 sequence=66575 duration_ms=120 expires_at_ms=18766623
+18766625	RX_ANT	5785:4:20	1	55:-62:-61:-60:12:17:23
+18766625	RX_ANT	5785:4:20	0	55:-66:-62:-62:12:16:22
+18766625	PKT	62:2778:0:0:55:55:1:0:0:4:194
+18766625	PKT_SRC	255:55:2582:1:0:4:194
+18766625	GRANT_FILTER	64272:19038:0:45234:0:0:0:0:0
+18766625	READY_FILTER	0:0:0:0:0
+18766625	REASSEMBLY	3:40
+18766625	TOKEN_AUTH	19038:0:2132:13793
+grant_accept node_id=2 sequence=66576 duration_ms=120 expires_at_ms=18766753
+grant_accept node_id=2 sequence=66577 duration_ms=120 expires_at_ms=18766884
+grant_accept node_id=2 sequence=66578 duration_ms=120 expires_at_ms=18767014
+grant_accept node_id=2 sequence=66579 duration_ms=120 expires_at_ms=18767145
+grant_accept node_id=2 sequence=66580 duration_ms=120 expires_at_ms=18767274
+grant_accept node_id=2 sequence=66581 duration_ms=120 expires_at_ms=18767404
+grant_accept node_id=2 sequence=66582 duration_ms=120 expires_at_ms=18767542
+PACKET_LOSS source_node=255 previous_seq=93736 current_seq=93744 lost_count=7
+grant_accept node_id=2 sequence=66583 duration_ms=120 expires_at_ms=18767665
+18767625	RX_ANT	5785:4:20	1	33:-62:-61:-60:11:17:25
+18767625	RX_ANT	5785:4:20	0	33:-66:-63:-62:12:17:24
+18767625	PKT	41:1972:0:0:33:33:0:7:0:3:153
+18767625	PKT_SRC	255:33:1748:0:7:3:153
+18767625	GRANT_FILTER	64280:19046:0:45234:0:0:0:0:0
+18767625	READY_FILTER	0:0:0:0:0
+18767625	REASSEMBLY	3:40
+7 packets lost
+18767625	TOKEN_AUTH	19046:0:2134:13793
+grant_accept node_id=2 sequence=66584 duration_ms=120 expires_at_ms=18767795
+grant_accept node_id=2 sequence=66585 duration_ms=120 expires_at_ms=18767926
+grant_accept node_id=2 sequence=66586 duration_ms=120 expires_at_ms=18768055
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18768540
+18768625	RX_ANT	5785:4:20	1	41:-62:-61:-60:12:16:24
+18768625	RX_ANT	5785:4:20	0	41:-66:-63:-62:12:16:24
+18768625	PKT	48:2169:0:0:41:41:1:0:0:3:153
+18768625	PKT_SRC	255:41:1973:1:0:3:153
+18768625	GRANT_FILTER	64287:19049:0:45238:0:0:0:0:0
+18768625	READY_FILTER	0:0:0:0:0
+18768625	REASSEMBLY	3:40
+18768625	TOKEN_AUTH	19049:0:2134:13799
+grant_accept node_id=2 sequence=66592 duration_ms=120 expires_at_ms=18768836
+grant_accept node_id=2 sequence=66593 duration_ms=120 expires_at_ms=18768966
+grant_accept node_id=2 sequence=66594 duration_ms=120 expires_at_ms=18769096
+grant_accept node_id=2 sequence=66595 duration_ms=120 expires_at_ms=18769226
+grant_accept node_id=2 sequence=66596 duration_ms=120 expires_at_ms=18769356
+grant_accept node_id=2 sequence=66597 duration_ms=120 expires_at_ms=18769486
+grant_accept node_id=2 sequence=66598 duration_ms=120 expires_at_ms=18769617
+18769626	RX_ANT	5785:4:20	1	9:-64:-62:-60:7:14:18
+18769626	RX_ANT	5785:4:20	0	9:-66:-64:-62:7:14:18
+18769626	PKT	16:795:0:0:9:9:5:0:0:1:56
+18769626	PKT_SRC	255:9:599:5:0:1:56
+18769626	GRANT_FILTER	64294:19056:0:45238:0:0:0:0:0
+18769626	READY_FILTER	0:0:0:0:0
+18769626	REASSEMBLY	3:40
+18769626	TOKEN_AUTH	19056:0:2137:13800
+grant_accept node_id=2 sequence=66599 duration_ms=120 expires_at_ms=18769746
+grant_accept node_id=2 sequence=66600 duration_ms=120 expires_at_ms=18769877
+grant_accept node_id=2 sequence=66601 duration_ms=120 expires_at_ms=18770006
+grant_accept node_id=2 sequence=66602 duration_ms=120 expires_at_ms=18770137
+grant_accept node_id=2 sequence=66603 duration_ms=120 expires_at_ms=18770266
+grant_accept node_id=2 sequence=66604 duration_ms=120 expires_at_ms=18770396
+grant_accept node_id=2 sequence=66605 duration_ms=120 expires_at_ms=18770526
+grant_accept node_id=2 sequence=66606 duration_ms=120 expires_at_ms=18770656
+18770627	RX_ANT	5785:4:20	1	28:-62:-61:-60:12:15:25
+18770627	RX_ANT	5785:4:20	0	28:-66:-64:-62:12:15:22
+18770627	PKT	36:1652:0:0:28:28:0:0:0:2:112
+18770627	PKT_SRC	255:28:1428:0:0:2:112
+18770627	GRANT_FILTER	64302:19064:0:45238:0:0:0:0:0
+18770627	READY_FILTER	0:0:0:0:0
+18770627	REASSEMBLY	3:40
+18770627	TOKEN_AUTH	19064:0:2137:13800
+grant_accept node_id=2 sequence=66607 duration_ms=120 expires_at_ms=18770786
+grant_accept node_id=2 sequence=66608 duration_ms=120 expires_at_ms=18770917
+grant_accept node_id=2 sequence=66609 duration_ms=120 expires_at_ms=18771047
+grant_accept node_id=2 sequence=66610 duration_ms=120 expires_at_ms=18771177
+grant_accept node_id=2 sequence=66611 duration_ms=120 expires_at_ms=18771306
+grant_accept node_id=2 sequence=66612 duration_ms=120 expires_at_ms=18771437
+grant_accept node_id=2 sequence=66613 duration_ms=120 expires_at_ms=18771566
+grant_accept node_id=2 sequence=66614 duration_ms=120 expires_at_ms=18771697
+18771627	RX_ANT	5785:4:20	1	28:-62:-62:-62:12:15:24
+18771627	RX_ANT	5785:4:20	0	28:-66:-64:-62:12:15:22
+18771627	PKT	36:1652:0:0:28:28:0:0:0:2:112
+18771627	PKT_SRC	255:28:1428:0:0:2:112
+18771627	GRANT_FILTER	64310:19072:0:45238:0:0:0:0:0
+18771627	READY_FILTER	0:0:0:0:0
+18771627	REASSEMBLY	3:40
+18771627	TOKEN_AUTH	19072:0:2137:13800
+grant_accept node_id=2 sequence=66615 duration_ms=120 expires_at_ms=18771827
+grant_accept node_id=2 sequence=66616 duration_ms=120 expires_at_ms=18771957
+grant_accept node_id=2 sequence=66617 duration_ms=120 expires_at_ms=18772088
+grant_accept node_id=2 sequence=66618 duration_ms=120 expires_at_ms=18772217
+grant_accept node_id=2 sequence=66619 duration_ms=120 expires_at_ms=18772347
+grant_accept node_id=2 sequence=66620 duration_ms=120 expires_at_ms=18772477
+grant_accept node_id=2 sequence=66621 duration_ms=120 expires_at_ms=18772607
+grant_accept node_id=2 sequence=66622 duration_ms=120 expires_at_ms=18772738
+18772627	RX_ANT	5785:4:20	1	28:-62:-61:-60:12:16:21
+18772627	RX_ANT	5785:4:20	0	28:-66:-63:-62:12:15:19
+18772627	PKT	36:1547:0:0:28:28:0:0:0:2:97
+18772627	PKT_SRC	255:28:1323:0:0:2:97
+18772627	GRANT_FILTER	64318:19080:0:45238:0:0:0:0:0
+18772627	READY_FILTER	0:0:0:0:0
+18772627	REASSEMBLY	3:40
+18772627	TOKEN_AUTH	19080:0:2138:13800
+grant_accept node_id=2 sequence=66623 duration_ms=120 expires_at_ms=18772866
+grant_accept node_id=2 sequence=66624 duration_ms=120 expires_at_ms=18772997
+18773628	RX_ANT	5785:4:20	1	50:-62:-62:-62:12:15:22
+18773628	RX_ANT	5785:4:20	0	50:-66:-63:-62:12:15:21
+18773628	PKT	57:2740:0:0:50:50:5:0:0:4:205
+18773628	PKT_SRC	255:50:2544:5:0:4:205
+18773628	GRANT_FILTER	64325:19082:0:45243:0:0:0:0:0
+18773628	READY_FILTER	0:0:0:0:0
+18773628	REASSEMBLY	3:40
+18773628	TOKEN_AUTH	19082:0:2138:13800
+18774628	PKT	8:224:0:0:0:0:0:0:0:0:0
+18774628	PKT_SRC	255:0:0:0:0:0:0
+18774628	GRANT_FILTER	64333:19082:0:45251:0:0:0:0:0
+18774628	READY_FILTER	0:0:0:0:0
+18774628	REASSEMBLY	3:40
+18774628	TOKEN_AUTH	19082:0:2138:13800
+18775628	PKT	8:224:0:0:0:0:0:0:0:0:0
+18775628	PKT_SRC	255:0:0:0:0:0:0
+18775628	GRANT_FILTER	64341:19082:0:45259:0:0:0:0:0
+18775628	READY_FILTER	0:0:0:0:0
+18775628	REASSEMBLY	3:40
+18775628	TOKEN_AUTH	19082:0:2138:13800
+18776629	PKT	7:196:0:0:0:0:0:0:0:0:0
+18776629	PKT_SRC	255:0:0:0:0:0:0
+18776629	GRANT_FILTER	64348:19082:0:45266:0:0:0:0:0
+18776629	READY_FILTER	0:0:0:0:0
+18776629	REASSEMBLY	3:40
+18776629	TOKEN_AUTH	19082:0:2138:13800
+redeclare node_id=2 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=18777212
+grant_accept node_id=2 sequence=66659 duration_ms=120 expires_at_ms=18777556
+grant_accept node_id=2 sequence=66660 duration_ms=120 expires_at_ms=18777687
+18777629	RX_ANT	5785:4:20	1	14:-64:-62:-62:12:16:19
+18777629	RX_ANT	5785:4:20	0	14:-66:-63:-62:13:16:19
+18777629	PKT	22:833:0:0:14:14:0:0:0:1:41
+18777629	PKT_SRC	255:14:609:0:0:1:41
+18777629	GRANT_FILTER	64356:19084:0:45272:0:0:0:0:0
+18777629	READY_FILTER	0:0:0:0:0
+18777629	REASSEMBLY	3:40
+18777629	TOKEN_AUTH	19084:0:2141:13803
+grant_accept node_id=2 sequence=66661 duration_ms=120 expires_at_ms=18777817
+grant_accept node_id=2 sequence=66662 duration_ms=120 expires_at_ms=18777946
+grant_accept node_id=2 sequence=66663 duration_ms=120 expires_at_ms=18778077
+grant_accept node_id=2 sequence=66664 duration_ms=120 expires_at_ms=18778207
+18778629	RX_ANT	5785:4:20	1	14:-62:-62:-62:13:16:19
+18778629	RX_ANT	5785:4:20	0	14:-66:-63:-62:14:16:19
+18778629	PKT	21:805:0:0:14:14:0:0:0:1:41
+18778629	PKT_SRC	255:14:609:0:0:1:41
+18778629	GRANT_FILTER	64363:19088:0:45275:0:0:0:0:0
+18778629	READY_FILTER	0:0:0:0:0
+18778629	REASSEMBLY	3:40
+18778629	TOKEN_AUTH	19088:0:2141:13803
+18779630	PKT	7:196:0:0:0:0:0:0:0:0:0
+18779630	PKT_SRC	255:0:0:0:0:0:0
+18779630	GRANT_FILTER	64370:19088:0:45282:0:0:0:0:0
+18779630	READY_FILTER	0:0:0:0:0
+18779630	REASSEMBLY	3:40
+18779630	TOKEN_AUTH	19088:0:2141:13803
+18780631	PKT	7:196:0:0:0:0:0:0:0:0:0
+18780631	PKT_SRC	255:0:0:0:0:0:0
+18780631	GRANT_FILTER	64377:19088:0:45289:0:0:0:0:0
+18780631	READY_FILTER	0:0:0:0:0
+18780631	REASSEMBLY	3:40
+18780631	TOKEN_AUTH	19088:0:2141:13803

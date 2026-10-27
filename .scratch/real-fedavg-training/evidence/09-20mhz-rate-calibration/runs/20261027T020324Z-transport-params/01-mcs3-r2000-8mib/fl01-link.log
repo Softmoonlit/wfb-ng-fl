@@ -1,0 +1,1180 @@
+grant_accept node_id=1 sequence=266093 duration_ms=120 expires_at_ms=51500343
+grant_accept node_id=1 sequence=266094 duration_ms=120 expires_at_ms=51500473
+grant_accept node_id=1 sequence=266095 duration_ms=120 expires_at_ms=51500604
+grant_accept node_id=1 sequence=266097 duration_ms=120 expires_at_ms=51500868
+51501005	RX_ANT	5785:4:40	1	38:-58:-56:-56:10:15:18
+51501005	RX_ANT	5785:4:40	0	38:-58:-58:-58:9:14:17
+51501005	PKT	46:4296:0:0:38:38:1:0:0:3:615
+51501005	PKT_SRC	255:38:4072:1:0:3:615
+51501005	GRANT_FILTER	255530:88534:0:166996:0:0:0:0:0
+51501005	READY_FILTER	0:0:0:0:0
+51501005	REASSEMBLY	12:40
+51501005	TOKEN_AUTH	88534:0:7245:26279
+51502005	PKT	6:168:0:0:0:0:0:0:0:0:0
+51502005	PKT_SRC	255:0:0:0:0:0:0
+51502005	GRANT_FILTER	255536:88534:0:167002:0:0:0:0:0
+51502005	READY_FILTER	0:0:0:0:0
+51502005	REASSEMBLY	12:40
+51502005	TOKEN_AUTH	88534:0:7245:26279
+51503005	RX_ANT	5785:4:40	1	14:-58:-57:-56:10:14:16
+51503005	RX_ANT	5785:4:40	0	14:-68:-59:-58:-1:10:15
+51503005	PKT	21:805:0:0:14:14:0:0:0:1:41
+51503005	PKT_SRC	255:14:609:0:0:1:41
+51503005	GRANT_FILTER	255543:88534:0:167009:0:0:0:0:0
+51503005	READY_FILTER	0:0:0:0:0
+51503005	REASSEMBLY	12:40
+51503005	TOKEN_AUTH	88534:0:7245:26279
+51504005	PKT	8:224:0:0:0:0:0:0:0:0:0
+51504005	PKT_SRC	255:0:0:0:0:0:0
+51504005	GRANT_FILTER	255551:88534:0:167017:0:0:0:0:0
+51504005	READY_FILTER	0:0:0:0:0
+51504005	REASSEMBLY	12:40
+51504005	TOKEN_AUTH	88534:0:7245:26279
+51505005	RX_ANT	5785:4:40	1	15:-58:-56:-56:12:15:17
+51505005	RX_ANT	5785:4:40	0	15:-60:-58:-58:12:14:16
+51505005	PKT	22:2974:0:0:15:15:0:0:0:3:639
+51505005	PKT_SRC	255:15:2778:0:0:3:639
+51505005	GRANT_FILTER	255558:88534:0:167024:0:0:0:0:0
+51505005	READY_FILTER	0:0:0:0:0
+51505005	REASSEMBLY	12:40
+51505005	TOKEN_AUTH	88534:0:7245:26279
+51506005	PKT	8:224:0:0:0:0:0:0:0:0:0
+51506005	PKT_SRC	255:0:0:0:0:0:0
+51506005	GRANT_FILTER	255566:88534:0:167032:0:0:0:0:0
+51506005	READY_FILTER	0:0:0:0:0
+51506005	REASSEMBLY	12:40
+51506005	TOKEN_AUTH	88534:0:7245:26279
+PACKET_LOSS source_node=255 previous_seq=289424 current_seq=289432 lost_count=7
+51507006	RX_ANT	5785:3:20	1	13:-54:-52:-52:13:18:22
+51507006	RX_ANT	5785:3:20	0	13:-58:-56:-56:12:17:21
+51507006	PKT	20:2823:0:0:13:13:0:7:0:1:388
+51507006	PKT_SRC	255:13:2627:0:7:1:388
+51507006	GRANT_FILTER	255573:88534:0:167039:0:0:0:0:0
+51507006	READY_FILTER	0:0:0:0:0
+51507006	REASSEMBLY	12:40
+7 packets lost
+51507006	TOKEN_AUTH	88534:0:7245:26279
+v6_radio_update generation=5 bandwidth=20 mcs_index=4 short_gi=1 radiotap_flags=0x04 sync=data+control fec=8/14
+v6_radio_command req_id=3296366914 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=5 bandwidth=20 mcs_index=4 short_gi=1
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51507146
+grant_accept node_id=1 sequence=266148 duration_ms=120 expires_at_ms=51507501
+v6_radio_frame kind=data generation=5 bandwidth=20 mcs_index=4 short_gi=1
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51507648
+grant_accept node_id=1 sequence=266151 duration_ms=120 expires_at_ms=51507890
+51508007	RX_ANT	5785:3:20	1	115:-54:-52:-52:12:18:24
+51508007	RX_ANT	5785:3:20	0	115:-58:-56:-56:11:17:22
+51508007	PKT	122:12739:0:0:115:115:8:0:0:17:3148
+51508007	PKT_SRC	255:115:12543:8:0:17:3148
+51508007	GRANT_FILTER	255580:88536:0:167044:0:0:0:0:0
+51508007	READY_FILTER	0:0:0:0:0
+51508007	REASSEMBLY	12:40
+51508007	TOKEN_AUTH	88536:0:7252:26298
+grant_accept node_id=1 sequence=266154 duration_ms=120 expires_at_ms=51508282
+grant_accept node_id=1 sequence=266157 duration_ms=120 expires_at_ms=51508675
+grant_accept node_id=1 sequence=266159 duration_ms=120 expires_at_ms=51508932
+grant_accept node_id=1 sequence=266160 duration_ms=120 expires_at_ms=51509063
+51509007	RX_ANT	5785:3:20	1	12:-52:-52:-52:16:19:22
+51509007	RX_ANT	5785:3:20	0	12:-58:-56:-56:16:18:21
+51509007	PKT	19:3538:0:0:12:12:1:0:0:1:511
+51509007	PKT_SRC	255:12:3342:1:0:1:511
+51509007	GRANT_FILTER	255587:88540:0:167047:0:0:0:0:0
+51509007	READY_FILTER	0:0:0:0:0
+51509007	REASSEMBLY	12:40
+51509007	TOKEN_AUTH	88540:0:7253:26298
+grant_accept node_id=1 sequence=266161 duration_ms=120 expires_at_ms=51509193
+grant_accept node_id=1 sequence=266162 duration_ms=120 expires_at_ms=51509324
+grant_accept node_id=1 sequence=266163 duration_ms=120 expires_at_ms=51509456
+grant_accept node_id=1 sequence=266164 duration_ms=120 expires_at_ms=51509587
+grant_accept node_id=1 sequence=266165 duration_ms=120 expires_at_ms=51509714
+grant_accept node_id=1 sequence=266166 duration_ms=120 expires_at_ms=51509845
+grant_accept node_id=1 sequence=266167 duration_ms=120 expires_at_ms=51509973
+grant_accept node_id=1 sequence=266168 duration_ms=120 expires_at_ms=51510104
+51510007	RX_ANT	5785:3:20	1	14:-54:-52:-52:13:19:22
+51510007	RX_ANT	5785:3:20	0	14:-56:-56:-56:12:18:22
+51510007	PKT	22:4123:0:0:14:14:0:0:0:1:511
+51510007	PKT_SRC	255:14:3899:0:0:1:511
+51510007	GRANT_FILTER	255595:88548:0:167047:0:0:0:0:0
+51510007	READY_FILTER	0:0:0:0:0
+51510007	REASSEMBLY	12:40
+51510007	TOKEN_AUTH	88548:0:7254:26298
+grant_accept node_id=1 sequence=266169 duration_ms=120 expires_at_ms=51510235
+grant_accept node_id=1 sequence=266170 duration_ms=120 expires_at_ms=51510365
+grant_accept node_id=1 sequence=266171 duration_ms=120 expires_at_ms=51510496
+grant_accept node_id=1 sequence=266172 duration_ms=120 expires_at_ms=51510627
+grant_accept node_id=1 sequence=266173 duration_ms=120 expires_at_ms=51510755
+grant_accept node_id=1 sequence=266174 duration_ms=120 expires_at_ms=51510885
+grant_accept node_id=1 sequence=266175 duration_ms=120 expires_at_ms=51511016
+51511007	RX_ANT	5785:3:20	1	14:-54:-52:-52:12:17:21
+51511007	RX_ANT	5785:3:20	0	14:-58:-56:-56:12:16:20
+51511007	PKT	21:4095:0:0:14:14:0:0:0:1:511
+51511007	PKT_SRC	255:14:3899:0:0:1:511
+51511007	GRANT_FILTER	255602:88555:0:167047:0:0:0:0:0
+51511007	READY_FILTER	0:0:0:0:0
+51511007	REASSEMBLY	12:40
+51511007	TOKEN_AUTH	88555:0:7255:26298
+grant_accept node_id=1 sequence=266176 duration_ms=120 expires_at_ms=51511145
+grant_accept node_id=1 sequence=266177 duration_ms=120 expires_at_ms=51511275
+grant_accept node_id=1 sequence=266178 duration_ms=120 expires_at_ms=51511406
+grant_accept node_id=1 sequence=266179 duration_ms=120 expires_at_ms=51511535
+grant_accept node_id=1 sequence=266180 duration_ms=120 expires_at_ms=51511665
+grant_accept node_id=1 sequence=266181 duration_ms=120 expires_at_ms=51511796
+grant_accept node_id=1 sequence=266182 duration_ms=120 expires_at_ms=51511927
+grant_accept node_id=1 sequence=266183 duration_ms=120 expires_at_ms=51512058
+51512007	RX_ANT	5785:3:20	1	9:-52:-52:-52:12:17:21
+51512007	RX_ANT	5785:3:20	0	9:-58:-56:-56:12:16:20
+51512007	PKT	17:2475:0:0:9:9:3:0:0:1:511
+51512007	PKT_SRC	255:9:2251:3:0:1:511
+51512007	GRANT_FILTER	255610:88563:0:167047:0:0:0:0:0
+51512007	READY_FILTER	0:0:0:0:0
+51512007	REASSEMBLY	12:40
+51512007	TOKEN_AUTH	88563:0:7256:26298
+grant_accept node_id=1 sequence=266184 duration_ms=120 expires_at_ms=51512188
+grant_accept node_id=1 sequence=266185 duration_ms=120 expires_at_ms=51512318
+grant_accept node_id=1 sequence=266186 duration_ms=120 expires_at_ms=51512448
+grant_accept node_id=1 sequence=266187 duration_ms=120 expires_at_ms=51512579
+grant_accept node_id=1 sequence=266188 duration_ms=120 expires_at_ms=51512709
+grant_accept node_id=1 sequence=266189 duration_ms=120 expires_at_ms=51512839
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51512997
+51513007	RX_ANT	5785:3:20	1	68:-54:-52:-52:13:17:22
+51513007	RX_ANT	5785:3:20	0	68:-58:-56:-56:10:17:22
+51513007	PKT	76:8781:0:0:68:68:1:0:0:6:1186
+51513007	PKT_SRC	255:68:8557:1:0:6:1186
+51513007	GRANT_FILTER	255618:88569:0:167049:0:0:0:0:0
+51513007	READY_FILTER	0:0:0:0:0
+51513007	REASSEMBLY	12:40
+51513007	TOKEN_AUTH	88569:0:7258:26305
+grant_accept node_id=1 sequence=266195 duration_ms=120 expires_at_ms=51513621
+grant_accept node_id=1 sequence=266198 duration_ms=120 expires_at_ms=51514016
+51514007	RX_ANT	5785:3:20	1	27:-54:-52:-52:13:18:22
+51514007	RX_ANT	5785:3:20	0	27:-58:-56:-56:12:17:22
+51514007	PKT	33:1322:0:0:27:27:0:0:0:1:41
+51514007	PKT_SRC	255:27:1154:0:0:1:41
+51514007	GRANT_FILTER	255624:88571:0:167053:0:0:0:0:0
+51514007	READY_FILTER	0:0:0:0:0
+51514007	REASSEMBLY	12:40
+51514007	TOKEN_AUTH	88571:0:7259:26315
+grant_accept node_id=1 sequence=266200 duration_ms=120 expires_at_ms=51514273
+grant_accept node_id=1 sequence=266201 duration_ms=120 expires_at_ms=51514402
+grant_accept node_id=1 sequence=266202 duration_ms=120 expires_at_ms=51514533
+grant_accept node_id=1 sequence=266203 duration_ms=120 expires_at_ms=51514663
+grant_accept node_id=1 sequence=266204 duration_ms=120 expires_at_ms=51514795
+grant_accept node_id=1 sequence=266205 duration_ms=120 expires_at_ms=51514923
+grant_accept node_id=1 sequence=266206 duration_ms=120 expires_at_ms=51515053
+51515007	PKT	8:224:0:0:0:0:0:0:0:0:0
+51515007	PKT_SRC	255:0:0:0:0:0:0
+51515007	GRANT_FILTER	255632:88578:0:167054:0:0:0:0:0
+51515007	READY_FILTER	0:0:0:0:0
+51515007	REASSEMBLY	12:40
+51515007	TOKEN_AUTH	88578:0:7259:26315
+grant_accept node_id=1 sequence=266207 duration_ms=120 expires_at_ms=51515183
+grant_accept node_id=1 sequence=266208 duration_ms=120 expires_at_ms=51515314
+grant_accept node_id=1 sequence=266209 duration_ms=120 expires_at_ms=51515444
+grant_accept node_id=1 sequence=266210 duration_ms=120 expires_at_ms=51515574
+grant_accept node_id=1 sequence=266212 duration_ms=120 expires_at_ms=51515834
+grant_accept node_id=1 sequence=266213 duration_ms=120 expires_at_ms=51515964
+51516007	PKT	7:196:0:0:0:0:0:0:0:0:0
+51516007	PKT_SRC	255:0:0:0:0:0:0
+51516007	GRANT_FILTER	255639:88584:0:167055:0:0:0:0:0
+51516007	READY_FILTER	0:0:0:0:0
+51516007	REASSEMBLY	12:40
+51516007	TOKEN_AUTH	88584:0:7260:26315
+grant_accept node_id=1 sequence=266216 duration_ms=120 expires_at_ms=51516355
+grant_accept node_id=1 sequence=266219 duration_ms=120 expires_at_ms=51516748
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51516751
+51517007	RX_ANT	5785:3:20	1	14:-54:-52:-52:15:18:22
+51517007	RX_ANT	5785:3:20	0	14:-56:-56:-56:13:18:22
+51517007	PKT	21:1078:0:0:14:14:0:0:0:1:80
+51517007	PKT_SRC	255:14:882:0:0:1:80
+51517007	GRANT_FILTER	255646:88586:0:167060:0:0:0:0:0
+51517007	READY_FILTER	0:0:0:0:0
+51517007	REASSEMBLY	12:40
+51517007	TOKEN_AUTH	88586:0:7261:26319
+grant_accept node_id=1 sequence=266222 duration_ms=120 expires_at_ms=51517133
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51517284
+grant_accept node_id=1 sequence=266225 duration_ms=120 expires_at_ms=51517524
+PACKET_LOSS source_node=255 previous_seq=289799 current_seq=289808 lost_count=8
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51517679
+PACKET_LOSS source_node=255 previous_seq=289921 current_seq=289925 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=289925 current_seq=289928 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=289935 current_seq=289952 lost_count=16
+grant_accept node_id=1 sequence=266228 duration_ms=120 expires_at_ms=51517936
+PACKET_LOSS source_node=255 previous_seq=290016 current_seq=290019 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=290020 current_seq=290024 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=290050 current_seq=290056 lost_count=5
+51518007	RX_ANT	5785:3:20	1	892:-76:-52:-52:-4:18:25
+51518007	RX_ANT	5785:3:20	0	892:-58:-56:-56:3:17:23
+51518007	PKT	899:600469:0:0:892:892:65:39:0:75:97545
+51518007	PKT_SRC	255:892:600273:65:39:75:97545
+51518007	GRANT_FILTER	255653:88589:0:167064:0:0:0:0:0
+51518007	READY_FILTER	0:0:0:0:0
+51518007	REASSEMBLY	12:40
+39 packets lost
+51518007	TOKEN_AUTH	88589:0:7266:26414
+PACKET_LOSS source_node=255 previous_seq=290223 current_seq=290234 lost_count=10
+PACKET_LOSS source_node=255 previous_seq=290235 current_seq=290237 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=290248 current_seq=290252 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=290489 current_seq=290504 lost_count=14
+PACKET_LOSS source_node=255 previous_seq=290583 current_seq=290592 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=290984 current_seq=291000 lost_count=15
+grant_accept node_id=1 sequence=266234 duration_ms=120 expires_at_ms=51518697
+51519007	RX_ANT	5785:3:20	1	2554:-80:-52:-48:-1:18:27
+51519007	RX_ANT	5785:3:20	0	2554:-64:-56:-54:4:17:25
+51519007	PKT	2560:1766527:0:0:2554:2554:84:51:0:199:267737
+51519007	PKT_SRC	255:2554:1766359:84:51:199:267737
+51519007	GRANT_FILTER	255659:88590:0:167069:0:0:0:0:0
+51519007	READY_FILTER	0:0:0:0:0
+51519007	REASSEMBLY	12:40
+51 packets lost
+51519007	TOKEN_AUTH	88590:0:7266:26414
+PACKET_LOSS source_node=255 previous_seq=291863 current_seq=291872 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=291932 current_seq=291936 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=292047 current_seq=292056 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=292375 current_seq=292392 lost_count=16
+PACKET_LOSS source_node=255 previous_seq=292924 current_seq=292936 lost_count=11
+51520007	RX_ANT	5785:3:20	1	2409:-78:-52:-52:-3:18:27
+51520007	RX_ANT	5785:3:20	0	2409:-64:-56:-56:4:17:25
+51520007	PKT	2416:1640147:0:0:2409:2409:57:46:0:183:247416
+51520007	PKT_SRC	255:2409:1639951:57:46:183:247416
+51520007	GRANT_FILTER	255666:88590:0:167076:0:0:0:0:0
+51520007	READY_FILTER	0:0:0:0:0
+51520007	REASSEMBLY	12:40
+46 packets lost
+51520007	TOKEN_AUTH	88590:0:7266:26414
+PACKET_LOSS source_node=255 previous_seq=293367 current_seq=293376 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=294719 current_seq=294727 lost_count=7
+51521007	RX_ANT	5785:3:20	1	2500:-78:-52:-52:0:19:28
+51521007	RX_ANT	5785:3:20	0	2500:-64:-56:-56:7:17:25
+51521007	PKT	2507:1720656:0:0:2500:2500:73:15:0:189:255528
+51521007	PKT_SRC	255:2500:1720460:73:15:189:255528
+51521007	GRANT_FILTER	255673:88590:0:167083:0:0:0:0:0
+51521007	READY_FILTER	0:0:0:0:0
+51521007	REASSEMBLY	12:40
+15 packets lost
+51521007	TOKEN_AUTH	88590:0:7266:26414
+PACKET_LOSS source_node=255 previous_seq=294877 current_seq=294880 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=295028 current_seq=295032 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=295791 current_seq=295793 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=295794 current_seq=295796 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=295798 current_seq=295802 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=295879 current_seq=295881 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=295883 current_seq=295885 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=296063 current_seq=296065 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=296199 current_seq=296203 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=296203 current_seq=296205 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=296263 current_seq=296271 lost_count=7
+51522008	RX_ANT	5785:3:20	1	2362:-74:-52:-52:-1:19:28
+51522008	RX_ANT	5785:3:20	0	2362:-70:-56:-56:4:18:25
+51522008	PKT	2370:1574198:0:0:2362:2362:94:24:0:184:248768
+51522008	PKT_SRC	255:2362:1573974:94:24:184:248768
+51522008	GRANT_FILTER	255681:88590:0:167091:0:0:0:0:0
+51522008	READY_FILTER	0:0:0:0:0
+51522008	REASSEMBLY	12:40
+24 packets lost
+51522008	TOKEN_AUTH	88590:0:7266:26414
+PACKET_LOSS source_node=255 previous_seq=296793 current_seq=296799 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=297504 current_seq=297512 lost_count=7
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51522874
+51523008	RX_ANT	5785:3:20	1	2506:-84:-52:-52:0:19:30
+51523008	RX_ANT	5785:3:20	0	2506:-66:-56:-56:4:18:25
+51523008	PKT	2514:1728934:0:0:2506:2506:54:12:0:189:255528
+51523008	PKT_SRC	255:2506:1728710:54:12:189:255528
+51523008	GRANT_FILTER	255689:88590:0:167099:0:0:0:0:0
+51523008	READY_FILTER	0:0:0:0:0
+51523008	REASSEMBLY	12:40
+12 packets lost
+51523008	TOKEN_AUTH	88590:0:7266:26537
+grant_accept node_id=1 sequence=266269 duration_ms=120 expires_at_ms=51523255
+PACKET_LOSS source_node=255 previous_seq=298583 current_seq=298585 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=298586 current_seq=298588 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=298588 current_seq=298592 lost_count=3
+grant_accept node_id=1 sequence=266272 duration_ms=120 expires_at_ms=51523645
+PACKET_LOSS source_node=255 previous_seq=299055 current_seq=299064 lost_count=8
+51524008	RX_ANT	5785:3:20	1	2472:-78:-52:-52:0:19:28
+51524008	RX_ANT	5785:3:20	0	2472:-58:-56:-56:9:18:25
+51524008	PKT	2479:1718824:0:0:2472:2472:84:13:0:193:254381
+51524008	PKT_SRC	255:2472:1718628:84:13:193:254381
+51524008	GRANT_FILTER	255696:88592:0:167104:0:0:0:0:0
+51524008	READY_FILTER	0:0:0:0:0
+51524008	REASSEMBLY	12:40
+13 packets lost
+51524008	TOKEN_AUTH	88592:0:7267:26651
+PACKET_LOSS source_node=255 previous_seq=300298 current_seq=300304 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=300783 current_seq=300792 lost_count=8
+51525008	RX_ANT	5785:3:20	1	2507:-82:-52:-52:0:19:29
+51525008	RX_ANT	5785:3:20	0	2507:-64:-56:-54:3:18:25
+51525008	PKT	2515:1720845:0:0:2507:2507:42:13:0:188:254176
+51525008	PKT_SRC	255:2507:1720621:42:13:188:254176
+51525008	GRANT_FILTER	255704:88592:0:167112:0:0:0:0:0
+51525008	READY_FILTER	0:0:0:0:0
+51525008	REASSEMBLY	12:40
+13 packets lost
+51525008	TOKEN_AUTH	88592:0:7267:26651
+PACKET_LOSS source_node=255 previous_seq=301063 current_seq=301065 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=301065 current_seq=301068 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=301068 current_seq=301072 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=301375 current_seq=301384 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=301567 current_seq=301569 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=301569 current_seq=301575 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=301575 current_seq=301582 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=301584 current_seq=301587 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=301588 current_seq=301592 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=301989 current_seq=301992 lost_count=2
+51526008	RX_ANT	5785:3:20	1	2485:-76:-52:-52:-1:19:29
+51526008	RX_ANT	5785:3:20	0	2485:-60:-56:-56:2:18:26
+51526008	PKT	2492:1714903:0:0:2485:2485:44:33:0:185:250120
+51526008	PKT_SRC	255:2485:1714707:44:33:185:250120
+51526008	GRANT_FILTER	255711:88592:0:167119:0:0:0:0:0
+51526008	READY_FILTER	0:0:0:0:0
+51526008	REASSEMBLY	12:40
+33 packets lost
+51526008	TOKEN_AUTH	88592:0:7267:26651
+PACKET_LOSS source_node=255 previous_seq=303847 current_seq=303851 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=303851 current_seq=303856 lost_count=4
+51527008	RX_ANT	5785:3:20	1	2507:-76:-52:-52:-1:19:30
+51527008	RX_ANT	5785:3:20	0	2507:-66:-56:-56:5:18:25
+51527008	PKT	2513:1719437:0:0:2507:2507:64:7:0:189:255528
+51527008	PKT_SRC	255:2507:1719269:64:7:189:255528
+51527008	GRANT_FILTER	255717:88592:0:167125:0:0:0:0:0
+51527008	READY_FILTER	0:0:0:0:0
+51527008	REASSEMBLY	12:40
+7 packets lost
+51527008	TOKEN_AUTH	88592:0:7267:26651
+PACKET_LOSS source_node=255 previous_seq=304135 current_seq=304144 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=304345 current_seq=304352 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=304623 current_seq=304632 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=305304 current_seq=305309 lost_count=4
+51528008	RX_ANT	5785:3:20	1	2473:-76:-52:-52:-1:20:30
+51528008	RX_ANT	5785:3:20	0	2473:-62:-56:-56:4:18:26
+51528008	PKT	2481:1703839:0:0:2473:2473:65:26:0:187:252824
+51528008	PKT_SRC	255:2473:1703615:65:26:187:252824
+51528008	GRANT_FILTER	255725:88592:0:167133:0:0:0:0:0
+51528008	READY_FILTER	0:0:0:0:0
+51528008	REASSEMBLY	12:40
+26 packets lost
+51528008	TOKEN_AUTH	88592:0:7267:26651
+PACKET_LOSS source_node=255 previous_seq=305496 current_seq=305499 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=305501 current_seq=305503 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=305512 current_seq=305514 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=305516 current_seq=305520 lost_count=3
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51528106
+PACKET_LOSS source_node=255 previous_seq=305856 current_seq=305859 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=305860 current_seq=305862 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=305862 current_seq=305865 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=305865 current_seq=305869 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=305869 current_seq=305871 lost_count=1
+grant_accept node_id=1 sequence=266309 duration_ms=120 expires_at_ms=51528463
+grant_accept node_id=1 sequence=266310 duration_ms=120 expires_at_ms=51528590
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51528591
+PACKET_LOSS source_node=255 previous_seq=306639 current_seq=306648 lost_count=8
+grant_accept node_id=1 sequence=266313 duration_ms=120 expires_at_ms=51528981
+51529008	RX_ANT	5785:3:20	1	2451:-78:-52:-52:-1:20:30
+51529008	RX_ANT	5785:3:20	0	2451:-58:-56:-54:9:18:25
+51529008	PKT	2459:1695631:0:0:2451:2451:75:24:0:193:253070
+51529008	PKT_SRC	255:2451:1695407:75:24:193:253070
+51529008	GRANT_FILTER	255733:88595:0:167138:0:0:0:0:0
+51529008	READY_FILTER	0:0:0:0:0
+51529008	REASSEMBLY	12:40
+24 packets lost
+51529008	TOKEN_AUTH	88595:0:7271:27105
+PACKET_LOSS source_node=255 previous_seq=307687 current_seq=307696 lost_count=8
+grant_accept node_id=1 sequence=266319 duration_ms=120 expires_at_ms=51529768
+grant_accept node_id=1 sequence=266320 duration_ms=120 expires_at_ms=51529895
+grant_accept node_id=1 sequence=266321 duration_ms=120 expires_at_ms=51530026
+51530008	RX_ANT	5785:3:20	1	2510:-76:-52:-52:-4:20:36
+51530008	RX_ANT	5785:3:20	0	2510:-58:-56:-56:0:18:31
+51530008	PKT	2515:1730294:0:0:2510:2510:47:8:0:188:254176
+51530008	PKT_SRC	255:2510:1730154:47:8:188:254176
+51530008	GRANT_FILTER	255738:88598:0:167140:0:0:0:0:0
+51530008	READY_FILTER	0:0:0:0:0
+51530008	REASSEMBLY	12:40
+8 packets lost
+51530008	TOKEN_AUTH	88598:0:7271:27105
+grant_accept node_id=1 sequence=266322 duration_ms=120 expires_at_ms=51530158
+PACKET_LOSS source_node=255 previous_seq=308599 current_seq=308608 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=308648 current_seq=308656 lost_count=7
+grant_accept node_id=1 sequence=266323 duration_ms=120 expires_at_ms=51530285
+grant_accept node_id=1 sequence=266324 duration_ms=120 expires_at_ms=51530417
+PACKET_LOSS source_node=255 previous_seq=308959 current_seq=308967 lost_count=7
+grant_accept node_id=1 sequence=266325 duration_ms=120 expires_at_ms=51530544
+PACKET_LOSS source_node=255 previous_seq=309231 current_seq=309240 lost_count=8
+grant_accept node_id=1 sequence=266326 duration_ms=120 expires_at_ms=51530676
+PACKET_LOSS source_node=255 previous_seq=309424 current_seq=309427 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=309427 current_seq=309432 lost_count=4
+grant_accept node_id=1 sequence=266327 duration_ms=120 expires_at_ms=51530808
+grant_accept node_id=1 sequence=266328 duration_ms=120 expires_at_ms=51530935
+grant_accept node_id=1 sequence=266329 duration_ms=120 expires_at_ms=51531066
+51531008	RX_ANT	5785:3:20	1	2508:-72:-52:-52:-2:20:30
+51531008	RX_ANT	5785:3:20	0	2508:-58:-56:-56:9:19:26
+51531008	PKT	2516:1741148:0:0:2508:2508:50:36:0:187:252824
+51531008	PKT_SRC	255:2508:1740924:50:36:187:252824
+51531008	GRANT_FILTER	255746:88606:0:167140:0:0:0:0:0
+51531008	READY_FILTER	0:0:0:0:0
+51531008	REASSEMBLY	12:40
+36 packets lost
+51531008	TOKEN_AUTH	88606:0:7271:27105
+grant_accept node_id=1 sequence=266330 duration_ms=120 expires_at_ms=51531194
+grant_accept node_id=1 sequence=266331 duration_ms=120 expires_at_ms=51531325
+grant_accept node_id=1 sequence=266332 duration_ms=120 expires_at_ms=51531457
+grant_accept node_id=1 sequence=266333 duration_ms=120 expires_at_ms=51531584
+grant_accept node_id=1 sequence=266334 duration_ms=120 expires_at_ms=51531715
+PACKET_LOSS source_node=255 previous_seq=310879 current_seq=310888 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=310975 current_seq=310981 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=310981 current_seq=310984 lost_count=2
+grant_accept node_id=1 sequence=266335 duration_ms=120 expires_at_ms=51531848
+grant_accept node_id=1 sequence=266336 duration_ms=120 expires_at_ms=51531975
+PACKET_LOSS source_node=255 previous_seq=311441 current_seq=311445 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=311445 current_seq=311448 lost_count=2
+grant_accept node_id=1 sequence=266337 duration_ms=120 expires_at_ms=51532106
+51532008	RX_ANT	5785:3:20	1	2518:-76:-52:-52:-2:20:31
+51532008	RX_ANT	5785:3:20	0	2518:-58:-56:-56:4:19:26
+51532008	PKT	2526:1742730:0:0:2518:2518:43:20:0:187:252824
+51532008	PKT_SRC	255:2518:1742506:43:20:187:252824
+51532008	GRANT_FILTER	255754:88614:0:167140:0:0:0:0:0
+51532008	READY_FILTER	0:0:0:0:0
+51532008	REASSEMBLY	12:40
+20 packets lost
+51532008	TOKEN_AUTH	88614:0:7271:27105
+grant_accept node_id=1 sequence=266338 duration_ms=120 expires_at_ms=51532234
+grant_accept node_id=1 sequence=266339 duration_ms=120 expires_at_ms=51532365
+PACKET_LOSS source_node=255 previous_seq=311904 current_seq=311912 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=312207 current_seq=312212 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=312213 current_seq=312216 lost_count=2
+grant_accept node_id=1 sequence=266341 duration_ms=120 expires_at_ms=51532625
+grant_accept node_id=1 sequence=266342 duration_ms=120 expires_at_ms=51532756
+grant_accept node_id=1 sequence=266343 duration_ms=120 expires_at_ms=51532888
+PACKET_LOSS source_node=255 previous_seq=312743 current_seq=312752 lost_count=8
+51533008	RX_ANT	5785:3:20	1	2480:-76:-52:-52:-3:20:31
+51533008	RX_ANT	5785:3:20	0	2480:-66:-56:-54:7:18:28
+51533008	PKT	2485:1718788:0:0:2480:2480:55:21:0:188:254176
+51533008	PKT_SRC	255:2480:1718648:55:21:188:254176
+51533008	GRANT_FILTER	255759:88619:0:167140:0:0:0:0:0
+51533008	READY_FILTER	0:0:0:0:0
+51533008	REASSEMBLY	12:40
+21 packets lost
+51533008	TOKEN_AUTH	88619:0:7271:27105
+grant_accept node_id=1 sequence=266345 duration_ms=120 expires_at_ms=51533147
+PACKET_LOSS source_node=255 previous_seq=313127 current_seq=313129 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=313215 current_seq=313224 lost_count=8
+grant_accept node_id=1 sequence=266346 duration_ms=120 expires_at_ms=51533279
+grant_accept node_id=1 sequence=266347 duration_ms=120 expires_at_ms=51533411
+PACKET_LOSS source_node=255 previous_seq=313451 current_seq=313456 lost_count=4
+grant_accept node_id=1 sequence=266348 duration_ms=120 expires_at_ms=51533539
+grant_accept node_id=1 sequence=266349 duration_ms=120 expires_at_ms=51533670
+grant_accept node_id=1 sequence=266350 duration_ms=120 expires_at_ms=51533801
+PACKET_LOSS source_node=255 previous_seq=314201 current_seq=314205 lost_count=3
+51534008	RX_ANT	5785:4:20	1	2357:-78:-52:-52:-3:20:30
+51534008	RX_ANT	5785:4:20	0	2357:-62:-56:-54:0:19:26
+51534008	RX_ANT	5785:3:20	1	35:-54:-52:-52:15:22:29
+51534008	RX_ANT	5785:3:20	0	35:-58:-56:-54:13:20:27
+51534008	PKT	2400:1611515:0:0:2392:2392:76:16:0:191:252988
+51534008	PKT_SRC	255:2392:1611291:76:16:191:252988
+51534008	GRANT_FILTER	255767:88625:0:167142:0:0:0:0:0
+51534008	READY_FILTER	0:0:0:0:0
+51534008	REASSEMBLY	12:40
+16 packets lost
+51534008	TOKEN_AUTH	88625:0:7272:27105
+grant_accept node_id=1 sequence=266353 duration_ms=120 expires_at_ms=51534189
+PACKET_LOSS source_node=255 previous_seq=314639 current_seq=314642 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=314642 current_seq=314645 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=315720 current_seq=315728 lost_count=7
+51535008	RX_ANT	5785:4:20	1	2351:-64:-52:-52:2:20:30
+51535008	RX_ANT	5785:4:20	0	2351:-58:-56:-54:10:18:26
+51535008	PKT	2359:1614505:0:0:2351:2351:99:11:0:188:254176
+51535008	PKT_SRC	255:2351:1614281:99:11:188:254176
+51535008	GRANT_FILTER	255775:88626:0:167149:0:0:0:0:0
+51535008	READY_FILTER	0:0:0:0:0
+51535008	REASSEMBLY	12:40
+11 packets lost
+51535008	TOKEN_AUTH	88626:0:7272:27105
+PACKET_LOSS source_node=255 previous_seq=316088 current_seq=316096 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=316187 current_seq=316192 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=316408 current_seq=316416 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=316432 current_seq=316440 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=316651 current_seq=316656 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=317424 current_seq=317432 lost_count=7
+51536008	RX_ANT	5785:4:20	1	2365:-82:-52:-52:-2:20:29
+51536008	RX_ANT	5785:4:20	0	2365:-58:-56:-54:9:18:27
+51536008	PKT	2369:1630939:0:0:2365:2365:119:36:0:190:256880
+51536008	PKT_SRC	255:2365:1630827:119:36:190:256880
+51536008	GRANT_FILTER	255779:88626:0:167153:0:0:0:0:0
+51536008	READY_FILTER	0:0:0:0:0
+51536008	REASSEMBLY	12:40
+36 packets lost
+51536008	TOKEN_AUTH	88626:0:7272:27105
+PACKET_LOSS source_node=255 previous_seq=317737 current_seq=317739 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=317739 current_seq=317744 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=318043 current_seq=318046 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=318046 current_seq=318053 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=318191 current_seq=318200 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=318971 current_seq=318976 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=318980 current_seq=318984 lost_count=3
+51537008	RX_ANT	5785:4:20	1	2408:-80:-52:-52:-4:19:29
+51537008	RX_ANT	5785:4:20	0	2408:-58:-56:-54:-4:18:26
+51537008	PKT	2415:1622548:0:0:2408:2408:69:28:0:187:252824
+51537008	PKT_SRC	255:2408:1622352:69:28:187:252824
+51537008	GRANT_FILTER	255786:88626:0:167160:0:0:0:0:0
+51537008	READY_FILTER	0:0:0:0:0
+51537008	REASSEMBLY	12:40
+28 packets lost
+51537008	TOKEN_AUTH	88626:0:7272:27105
+PACKET_LOSS source_node=255 previous_seq=319288 current_seq=319294 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=319294 current_seq=319296 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=319761 current_seq=319768 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=319984 current_seq=319992 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=320215 current_seq=320217 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=320217 current_seq=320219 lost_count=1
+51538008	RX_ANT	5785:4:20	1	2436:-80:-52:-52:2:20:29
+51538008	RX_ANT	5785:4:20	0	2436:-64:-56:-54:3:18:27
+51538008	PKT	2443:1647528:0:0:2436:2436:74:21:0:188:254176
+51538008	PKT_SRC	255:2436:1647332:74:21:188:254176
+51538008	GRANT_FILTER	255793:88626:0:167167:0:0:0:0:0
+51538008	READY_FILTER	0:0:0:0:0
+51538008	REASSEMBLY	12:40
+21 packets lost
+51538008	TOKEN_AUTH	88626:0:7272:27105
+PACKET_LOSS source_node=255 previous_seq=320528 current_seq=320536 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=320879 current_seq=320881 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=320882 current_seq=320887 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=321359 current_seq=321368 lost_count=8
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51538645
+PACKET_LOSS source_node=255 previous_seq=321627 current_seq=321640 lost_count=12
+PACKET_LOSS source_node=255 previous_seq=321762 current_seq=321768 lost_count=5
+grant_accept node_id=1 sequence=266390 duration_ms=120 expires_at_ms=51539009
+PACKET_LOSS source_node=255 previous_seq=321911 current_seq=321913 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=321913 current_seq=321915 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=321916 current_seq=321919 lost_count=2
+51539008	RX_ANT	5785:4:20	1	2344:-78:-52:-52:-4:20:30
+51539008	RX_ANT	5785:4:20	0	2344:-62:-56:-54:-4:19:26
+51539008	PKT	2350:1594049:0:0:2344:2344:91:41:0:187:251513
+51539008	PKT_SRC	255:2344:1593881:91:41:187:251513
+51539008	GRANT_FILTER	255799:88627:0:167172:0:0:0:0:0
+51539008	READY_FILTER	0:0:0:0:0
+51539008	REASSEMBLY	12:40
+41 packets lost
+51539008	TOKEN_AUTH	88627:0:7273:27277
+grant_accept node_id=1 sequence=266393 duration_ms=120 expires_at_ms=51539400
+PACKET_LOSS source_node=255 previous_seq=322444 current_seq=322448 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=322520 current_seq=322528 lost_count=7
+grant_accept node_id=1 sequence=266396 duration_ms=120 expires_at_ms=51539786
+PACKET_LOSS source_node=255 previous_seq=323392 current_seq=323408 lost_count=15
+51540008	RX_ANT	5785:4:20	1	2347:-88:-52:-52:-4:20:30
+51540008	RX_ANT	5785:4:20	0	2347:-58:-56:-54:9:19:26
+51540008	PKT	2355:1611914:0:0:2347:2347:102:25:0:193:254381
+51540008	PKT_SRC	255:2347:1611690:102:25:193:254381
+51540008	GRANT_FILTER	255807:88629:0:167178:0:0:0:0:0
+51540008	READY_FILTER	0:0:0:0:0
+51540008	REASSEMBLY	12:40
+25 packets lost
+51540008	TOKEN_AUTH	88629:0:7273:27277
+PACKET_LOSS source_node=255 previous_seq=323631 current_seq=323648 lost_count=16
+PACKET_LOSS source_node=255 previous_seq=324288 current_seq=324296 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=324351 current_seq=324360 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=324417 current_seq=324424 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=324511 current_seq=324518 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=324519 current_seq=324521 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=324523 current_seq=324531 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=324535 current_seq=324543 lost_count=7
+51541008	RX_ANT	5785:4:20	1	2294:-82:-52:-52:-4:20:31
+51541008	RX_ANT	5785:4:20	0	2294:-60:-56:-54:5:19:27
+51541008	PKT	2301:1564494:0:0:2294:2294:109:58:0:181:244712
+51541008	PKT_SRC	255:2294:1564298:109:58:181:244712
+51541008	GRANT_FILTER	255814:88629:0:167185:0:0:0:0:0
+51541008	READY_FILTER	0:0:0:0:0
+51541008	REASSEMBLY	12:40
+58 packets lost
+51541008	TOKEN_AUTH	88629:0:7273:27277
+PACKET_LOSS source_node=255 previous_seq=325455 current_seq=325462 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=325752 current_seq=325754 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=325754 current_seq=325760 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=325929 current_seq=325934 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=326040 current_seq=326056 lost_count=15
+PACKET_LOSS source_node=255 previous_seq=326063 current_seq=326080 lost_count=16
+PACKET_LOSS source_node=255 previous_seq=326188 current_seq=326190 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=326191 current_seq=326208 lost_count=16
+51542008	RX_ANT	5785:4:20	1	2347:-76:-52:-52:-4:21:31
+51542008	RX_ANT	5785:4:20	0	2347:-58:-56:-54:10:19:27
+51542008	PKT	2355:1627933:0:0:2347:2347:113:64:0:185:250120
+51542008	PKT_SRC	255:2347:1627709:113:64:185:250120
+51542008	GRANT_FILTER	255822:88629:0:167193:0:0:0:0:0
+51542008	READY_FILTER	0:0:0:0:0
+51542008	REASSEMBLY	12:40
+64 packets lost
+51542008	TOKEN_AUTH	88629:0:7273:27277
+PACKET_LOSS source_node=255 previous_seq=326767 current_seq=326770 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=326772 current_seq=326776 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=327159 current_seq=327162 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=327162 current_seq=327164 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=327164 current_seq=327167 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=327392 current_seq=327400 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=327855 current_seq=327872 lost_count=16
+PACKET_LOSS source_node=255 previous_seq=327951 current_seq=327968 lost_count=16
+51543008	RX_ANT	5785:4:20	1	2364:-82:-52:-52:-4:21:30
+51543008	RX_ANT	5785:4:20	0	2364:-58:-56:-54:0:19:28
+51543008	PKT	2371:1622888:0:0:2364:2364:87:49:0:183:247416
+51543008	PKT_SRC	255:2364:1622692:87:49:183:247416
+51543008	GRANT_FILTER	255829:88629:0:167200:0:0:0:0:0
+51543008	READY_FILTER	0:0:0:0:0
+51543008	REASSEMBLY	12:40
+49 packets lost
+51543008	TOKEN_AUTH	88629:0:7273:27277
+PACKET_LOSS source_node=255 previous_seq=328231 current_seq=328240 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=328695 current_seq=328698 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=328700 current_seq=328702 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=329000 current_seq=329004 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=329005 current_seq=329008 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=329320 current_seq=329328 lost_count=7
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51543876
+PACKET_LOSS source_node=255 previous_seq=329367 current_seq=329376 lost_count=8
+51544008	RX_ANT	5785:4:20	1	2378:-78:-52:-52:-1:21:31
+51544008	RX_ANT	5785:4:20	0	2378:-58:-56:-54:10:19:26
+51544008	PKT	2385:1625914:0:0:2378:2378:103:31:0:186:251472
+51544008	PKT_SRC	255:2378:1625718:103:31:186:251472
+51544008	GRANT_FILTER	255836:88629:0:167207:0:0:0:0:0
+51544008	READY_FILTER	0:0:0:0:0
+51544008	REASSEMBLY	12:40
+31 packets lost
+51544008	TOKEN_AUTH	88629:0:7273:27369
+PACKET_LOSS source_node=255 previous_seq=329632 current_seq=329634 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=329634 current_seq=329637 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=329637 current_seq=329640 lost_count=2
+grant_accept node_id=1 sequence=266430 duration_ms=120 expires_at_ms=51544211
+grant_accept node_id=1 sequence=266431 duration_ms=120 expires_at_ms=51544342
+PACKET_LOSS source_node=255 previous_seq=329944 current_seq=329952 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=330207 current_seq=330215 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=330239 current_seq=330248 lost_count=8
+grant_accept node_id=1 sequence=266433 duration_ms=120 expires_at_ms=51544602
+PACKET_LOSS source_node=255 previous_seq=330280 current_seq=330287 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=330291 current_seq=330295 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=330424 current_seq=330432 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=330455 current_seq=330464 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=330632 current_seq=330636 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=330636 current_seq=330639 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=330720 current_seq=330728 lost_count=7
+51545008	RX_ANT	5785:4:20	1	2342:-80:-52:-52:0:21:30
+51545008	RX_ANT	5785:4:20	0	2342:-58:-56:-56:10:19:27
+51545008	PKT	2350:1607579:0:0:2342:2342:97:63:0:188:252865
+51545008	PKT_SRC	255:2342:1607355:97:63:188:252865
+51545008	GRANT_FILTER	255844:88632:0:167212:0:0:0:0:0
+51545008	READY_FILTER	0:0:0:0:0
+51545008	REASSEMBLY	12:40
+63 packets lost
+51545008	TOKEN_AUTH	88632:0:7274:27427
+PACKET_LOSS source_node=255 previous_seq=331648 current_seq=331653 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=331653 current_seq=331656 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=331953 current_seq=331955 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=331955 current_seq=331959 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=332024 current_seq=332031 lost_count=6
+PACKET_LOSS source_node=255 previous_seq=332117 current_seq=332120 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=332415 current_seq=332424 lost_count=8
+51546008	RX_ANT	5785:4:20	1	2367:-78:-52:-52:0:21:30
+51546008	RX_ANT	5785:4:20	0	2367:-58:-56:-54:9:19:27
+51546008	PKT	2374:1622957:0:0:2367:2367:115:26:0:188:254176
+51546008	PKT_SRC	255:2367:1622761:115:26:188:254176
+51546008	GRANT_FILTER	255851:88632:0:167219:0:0:0:0:0
+51546008	READY_FILTER	0:0:0:0:0
+51546008	REASSEMBLY	12:40
+26 packets lost
+51546008	TOKEN_AUTH	88632:0:7274:27427
+PACKET_LOSS source_node=255 previous_seq=332880 current_seq=332888 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=332888 current_seq=332896 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=333119 current_seq=333121 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=333122 current_seq=333128 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=333312 current_seq=333320 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=333665 current_seq=333671 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=334033 current_seq=334040 lost_count=6
+51547008	RX_ANT	5785:4:20	1	2399:-80:-52:-52:-3:21:30
+51547008	RX_ANT	5785:4:20	0	2399:-66:-56:-54:3:19:27
+51547008	PKT	2407:1650761:0:0:2399:2399:89:38:0:188:254176
+51547008	PKT_SRC	255:2399:1650537:89:38:188:254176
+51547008	GRANT_FILTER	255859:88632:0:167227:0:0:0:0:0
+51547008	READY_FILTER	0:0:0:0:0
+51547008	REASSEMBLY	12:40
+38 packets lost
+51547008	TOKEN_AUTH	88632:0:7274:27427
+PACKET_LOSS source_node=255 previous_seq=334168 current_seq=334176 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=334440 current_seq=334448 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=334728 current_seq=334736 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=334799 current_seq=334808 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=334832 current_seq=334840 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=334863 current_seq=334866 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=334866 current_seq=334872 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=334903 current_seq=334920 lost_count=16
+51548008	RX_ANT	5785:4:20	1	2342:-76:-52:-52:-4:21:31
+51548008	RX_ANT	5785:4:20	0	2342:-70:-56:-54:-2:19:27
+51548008	PKT	2348:1631818:0:0:2342:2342:107:59:0:186:251472
+51548008	PKT_SRC	255:2342:1631650:107:59:186:251472
+51548008	GRANT_FILTER	255865:88632:0:167233:0:0:0:0:0
+51548008	READY_FILTER	0:0:0:0:0
+51548008	REASSEMBLY	12:40
+59 packets lost
+51548008	TOKEN_AUTH	88632:0:7274:27427
+PACKET_LOSS source_node=255 previous_seq=335683 current_seq=335688 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=335735 current_seq=335737 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=335741 current_seq=335744 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=336448 current_seq=336450 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=336450 current_seq=336456 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=336847 current_seq=336856 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=336900 current_seq=336903 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=336991 current_seq=337008 lost_count=16
+51549008	RX_ANT	5785:4:20	1	2355:-78:-52:-52:-4:21:31
+51549008	RX_ANT	5785:4:20	0	2355:-62:-56:-54:6:19:27
+51549008	PKT	2362:1628130:0:0:2355:2355:115:39:0:186:250161
+51549008	PKT_SRC	255:2355:1627934:115:39:186:250161
+51549008	GRANT_FILTER	255872:88632:0:167240:0:0:0:0:0
+51549008	READY_FILTER	0:0:0:0:0
+51549008	REASSEMBLY	12:40
+39 packets lost
+51549008	TOKEN_AUTH	88632:0:7274:27427
+PACKET_LOSS source_node=255 previous_seq=337224 current_seq=337232 lost_count=7
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51549124
+PACKET_LOSS source_node=255 previous_seq=337407 current_seq=337409 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=337410 current_seq=337416 lost_count=5
+PACKET_LOSS source_node=255 previous_seq=337490 current_seq=337492 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=337492 current_seq=337496 lost_count=3
+grant_accept node_id=1 sequence=266470 duration_ms=120 expires_at_ms=51549419
+PACKET_LOSS source_node=255 previous_seq=337623 current_seq=337632 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=337688 current_seq=337696 lost_count=7
+grant_accept node_id=1 sequence=266471 duration_ms=120 expires_at_ms=51549558
+PACKET_LOSS source_node=255 previous_seq=337991 current_seq=338000 lost_count=8
+PACKET_LOSS source_node=255 previous_seq=338191 current_seq=338195 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=338195 current_seq=338198 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=338198 current_seq=338200 lost_count=1
+grant_accept node_id=1 sequence=266474 duration_ms=120 expires_at_ms=51549937
+51550008	RX_ANT	5785:4:20	1	2368:-80:-52:-52:-4:21:32
+51550008	RX_ANT	5785:4:20	0	2368:-66:-56:-54:0:19:31
+51550008	PKT	2376:1661028:0:0:2368:2368:118:46:0:191:251677
+51550008	PKT_SRC	255:2368:1660804:118:46:191:251677
+51550008	GRANT_FILTER	255880:88635:0:167245:0:0:0:0:0
+51550008	READY_FILTER	0:0:0:0:0
+51550008	REASSEMBLY	12:40
+46 packets lost
+51550008	TOKEN_AUTH	88635:0:7275:27549
+PACKET_LOSS source_node=255 previous_seq=338922 current_seq=338924 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=338924 current_seq=338926 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=339023 current_seq=339025 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=339028 current_seq=339032 lost_count=3
+PACKET_LOSS source_node=255 previous_seq=339992 current_seq=340000 lost_count=7
+PACKET_LOSS source_node=255 previous_seq=340059 current_seq=340061 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=340061 current_seq=340063 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=340063 current_seq=340080 lost_count=16
+51551008	RX_ANT	5785:4:20	1	2315:-82:-52:-52:1:21:31
+51551008	RX_ANT	5785:4:20	0	2315:-68:-56:-54:7:19:27
+51551008	PKT	2323:1612325:0:0:2315:2315:141:31:0:186:251472
+51551008	PKT_SRC	255:2315:1612101:141:31:186:251472
+51551008	GRANT_FILTER	255888:88635:0:167253:0:0:0:0:0
+51551008	READY_FILTER	0:0:0:0:0
+51551008	REASSEMBLY	12:40
+31 packets lost
+51551008	TOKEN_AUTH	88635:0:7275:27549
+PACKET_LOSS source_node=255 previous_seq=340387 current_seq=340392 lost_count=4
+PACKET_LOSS source_node=255 previous_seq=340761 current_seq=340768 lost_count=6
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51551880
+51552008	RX_ANT	5785:4:20	1	1419:-84:-52:-52:-2:21:33
+51552008	RX_ANT	5785:4:20	0	1419:-58:-56:-54:10:19:29
+51552008	PKT	1426:1001881:0:0:1419:1419:94:10:0:116:155252
+51552008	PKT_SRC	255:1419:1001685:94:10:116:155252
+51552008	GRANT_FILTER	255895:88635:0:167260:0:0:0:0:0
+51552008	READY_FILTER	0:0:0:0:0
+51552008	REASSEMBLY	12:40
+10 packets lost
+51552008	TOKEN_AUTH	88635:0:7275:27551
+grant_accept node_id=1 sequence=266492 duration_ms=120 expires_at_ms=51552282
+grant_accept node_id=1 sequence=266495 duration_ms=120 expires_at_ms=51552669
+PACKET_LOSS source_node=255 previous_seq=341167 current_seq=341170 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=341170 current_seq=341184 lost_count=13
+PACKET_LOSS source_node=255 previous_seq=341256 current_seq=341259 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=341259 current_seq=341261 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=341261 current_seq=341264 lost_count=2
+PACKET_LOSS source_node=255 previous_seq=341321 current_seq=341328 lost_count=6
+grant_accept node_id=1 sequence=266497 duration_ms=120 expires_at_ms=51552930
+PACKET_LOSS source_node=255 previous_seq=341407 current_seq=341409 lost_count=1
+PACKET_LOSS source_node=255 previous_seq=341411 current_seq=341415 lost_count=3
+grant_accept node_id=1 sequence=266498 duration_ms=120 expires_at_ms=51553058
+51553008	RX_ANT	5785:4:20	1	912:-78:-52:-52:-1:20:28
+51553008	RX_ANT	5785:4:20	0	912:-58:-56:-56:12:19:26
+51553008	PKT	920:673228:0:0:912:912:30:30:0:115:154180
+51553008	PKT_SRC	255:912:673004:30:30:115:154180
+51553008	GRANT_FILTER	255903:88639:0:167264:0:0:0:0:0
+51553008	READY_FILTER	0:0:0:0:0
+51553008	REASSEMBLY	12:40
+30 packets lost
+51553008	TOKEN_AUTH	88639:0:7276:27553
+grant_accept node_id=1 sequence=266499 duration_ms=120 expires_at_ms=51553189
+grant_accept node_id=1 sequence=266500 duration_ms=120 expires_at_ms=51553321
+grant_accept node_id=1 sequence=266501 duration_ms=120 expires_at_ms=51553450
+grant_accept node_id=1 sequence=266502 duration_ms=120 expires_at_ms=51553581
+grant_accept node_id=1 sequence=266503 duration_ms=120 expires_at_ms=51553709
+grant_accept node_id=1 sequence=266504 duration_ms=120 expires_at_ms=51553841
+grant_accept node_id=1 sequence=266505 duration_ms=120 expires_at_ms=51553971
+51554008	RX_ANT	5785:4:20	1	1170:-76:-52:-52:6:21:30
+51554008	RX_ANT	5785:4:20	0	1170:-68:-56:-56:7:19:27
+51554008	PKT	1178:804598:0:0:1170:1170:42:0:0:90:120392
+51554008	PKT_SRC	255:1170:804374:42:0:90:120392
+51554008	GRANT_FILTER	255911:88646:0:167265:0:0:0:0:0
+51554008	READY_FILTER	0:0:0:0:0
+51554008	REASSEMBLY	12:40
+51554008	TOKEN_AUTH	88646:0:7277:27553
+grant_accept node_id=1 sequence=266507 duration_ms=120 expires_at_ms=51554230
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51554332
+grant_accept node_id=1 sequence=266510 duration_ms=120 expires_at_ms=51554621
+grant_accept node_id=1 sequence=266512 duration_ms=120 expires_at_ms=51554882
+51555008	RX_ANT	5785:4:20	1	55:-54:-52:-52:15:20:27
+51555008	RX_ANT	5785:4:20	0	55:-58:-56:-56:13:19:24
+51555008	PKT	61:17294:0:0:55:55:0:0:0:9:6962
+51555008	PKT_SRC	255:55:17126:0:0:9:6962
+51555008	GRANT_FILTER	255917:88649:0:167268:0:0:0:0:0
+51555008	READY_FILTER	0:0:0:0:0
+51555008	REASSEMBLY	12:40
+51555008	TOKEN_AUTH	88649:0:7279:27555
+grant_accept node_id=1 sequence=266514 duration_ms=120 expires_at_ms=51555141
+51556008	RX_ANT	5785:4:20	1	13:-54:-52:-52:15:18:23
+51556008	RX_ANT	5785:4:20	0	13:-56:-56:-56:14:17:22
+51556008	PKT	21:915:0:0:13:13:1:0:0:1:56
+51556008	PKT_SRC	255:13:691:1:0:1:56
+51556008	GRANT_FILTER	255925:88650:0:167275:0:0:0:0:0
+51556008	READY_FILTER	0:0:0:0:0
+51556008	REASSEMBLY	12:40
+51556008	TOKEN_AUTH	88650:0:7279:27555
+51557008	RX_ANT	5785:4:20	1	28:-54:-52:-52:16:19:24
+51557008	RX_ANT	5785:4:20	0	28:-58:-56:-56:16:18:24
+51557008	PKT	36:1652:0:0:28:28:0:0:0:2:112
+51557008	PKT_SRC	255:28:1428:0:0:2:112
+51557008	GRANT_FILTER	255933:88650:0:167283:0:0:0:0:0
+51557008	READY_FILTER	0:0:0:0:0
+51557008	REASSEMBLY	12:40
+51557008	TOKEN_AUTH	88650:0:7279:27555
+51558009	RX_ANT	5785:4:20	1	14:-54:-52:-52:16:19:24
+51558009	RX_ANT	5785:4:20	0	14:-56:-55:-54:15:18:22
+51558009	PKT	21:910:0:0:14:14:0:0:0:1:56
+51558009	PKT_SRC	255:14:714:0:0:1:56
+51558009	GRANT_FILTER	255940:88650:0:167290:0:0:0:0:0
+51558009	READY_FILTER	0:0:0:0:0
+51558009	REASSEMBLY	12:40
+51558009	TOKEN_AUTH	88650:0:7279:27555
+51559010	RX_ANT	5785:4:20	1	14:-52:-52:-52:17:19:23
+51559010	RX_ANT	5785:4:20	0	14:-56:-55:-54:16:18:21
+51559010	PKT	22:938:0:0:14:14:0:0:0:1:56
+51559010	PKT_SRC	255:14:714:0:0:1:56
+51559010	GRANT_FILTER	255948:88650:0:167298:0:0:0:0:0
+51559010	READY_FILTER	0:0:0:0:0
+51559010	REASSEMBLY	12:40
+51559010	TOKEN_AUTH	88650:0:7279:27555
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51559533
+grant_accept node_id=1 sequence=266550 duration_ms=120 expires_at_ms=51559828
+grant_accept node_id=1 sequence=266551 duration_ms=120 expires_at_ms=51559958
+grant_accept node_id=1 sequence=266552 duration_ms=120 expires_at_ms=51560087
+51560010	RX_ANT	5785:4:20	1	39:-54:-52:-52:15:19:24
+51560010	RX_ANT	5785:4:20	0	39:-58:-55:-54:15:18:22
+51560010	PKT	47:2069:0:0:39:39:0:0:0:3:153
+51560010	PKT_SRC	255:39:1845:0:0:3:153
+51560010	GRANT_FILTER	255956:88653:0:167303:0:0:0:0:0
+51560010	READY_FILTER	0:0:0:0:0
+51560010	REASSEMBLY	12:40
+51560010	TOKEN_AUTH	88653:0:7280:27557
+grant_accept node_id=1 sequence=266553 duration_ms=120 expires_at_ms=51560219
+grant_accept node_id=1 sequence=266554 duration_ms=120 expires_at_ms=51560348
+grant_accept node_id=1 sequence=266555 duration_ms=120 expires_at_ms=51560479
+grant_accept node_id=1 sequence=266556 duration_ms=120 expires_at_ms=51560615
+grant_accept node_id=1 sequence=266557 duration_ms=120 expires_at_ms=51560739
+grant_accept node_id=1 sequence=266558 duration_ms=120 expires_at_ms=51560874
+grant_accept node_id=1 sequence=266559 duration_ms=120 expires_at_ms=51561000
+grant_accept node_id=1 sequence=266560 duration_ms=120 expires_at_ms=51561129
+51561010	RX_ANT	5785:4:20	1	14:-54:-52:-52:16:18:22
+51561010	RX_ANT	5785:4:20	0	14:-56:-55:-54:15:18:21
+51561010	PKT	22:938:0:0:14:14:0:0:0:1:56
+51561010	PKT_SRC	255:14:714:0:0:1:56
+51561010	GRANT_FILTER	255964:88661:0:167303:0:0:0:0:0
+51561010	READY_FILTER	0:0:0:0:0
+51561010	REASSEMBLY	12:40
+51561010	TOKEN_AUTH	88661:0:7280:27557
+grant_accept node_id=1 sequence=266561 duration_ms=120 expires_at_ms=51561260
+grant_accept node_id=1 sequence=266562 duration_ms=120 expires_at_ms=51561390
+grant_accept node_id=1 sequence=266563 duration_ms=120 expires_at_ms=51561520
+grant_accept node_id=1 sequence=266564 duration_ms=120 expires_at_ms=51561651
+grant_accept node_id=1 sequence=266565 duration_ms=120 expires_at_ms=51561780
+grant_accept node_id=1 sequence=266566 duration_ms=120 expires_at_ms=51561910
+grant_accept node_id=1 sequence=266567 duration_ms=120 expires_at_ms=51562041
+51562010	RX_ANT	5785:4:20	1	14:-54:-52:-52:17:19:24
+51562010	RX_ANT	5785:4:20	0	14:-56:-56:-56:16:18:23
+51562010	PKT	21:910:0:0:14:14:0:0:0:1:56
+51562010	PKT_SRC	255:14:714:0:0:1:56
+51562010	GRANT_FILTER	255971:88668:0:167303:0:0:0:0:0
+51562010	READY_FILTER	0:0:0:0:0
+51562010	REASSEMBLY	12:40
+51562010	TOKEN_AUTH	88668:0:7280:27557
+grant_accept node_id=1 sequence=266568 duration_ms=120 expires_at_ms=51562170
+grant_accept node_id=1 sequence=266569 duration_ms=120 expires_at_ms=51562300
+grant_accept node_id=1 sequence=266570 duration_ms=120 expires_at_ms=51562430
+grant_accept node_id=1 sequence=266571 duration_ms=120 expires_at_ms=51562560
+grant_accept node_id=1 sequence=266572 duration_ms=120 expires_at_ms=51562690
+grant_accept node_id=1 sequence=266573 duration_ms=120 expires_at_ms=51562820
+grant_accept node_id=1 sequence=266574 duration_ms=120 expires_at_ms=51562951
+grant_accept node_id=1 sequence=266575 duration_ms=120 expires_at_ms=51563081
+51563010	RX_ANT	5785:4:20	1	28:-54:-52:-52:16:18:22
+51563010	RX_ANT	5785:4:20	0	28:-56:-55:-54:16:18:22
+51563010	PKT	36:1652:0:0:28:28:0:0:0:2:112
+51563010	PKT_SRC	255:28:1428:0:0:2:112
+51563010	GRANT_FILTER	255979:88676:0:167303:0:0:0:0:0
+51563010	READY_FILTER	0:0:0:0:0
+51563010	REASSEMBLY	12:40
+51563010	TOKEN_AUTH	88676:0:7280:27557
+grant_accept node_id=1 sequence=266576 duration_ms=120 expires_at_ms=51563211
+grant_accept node_id=1 sequence=266577 duration_ms=120 expires_at_ms=51563341
+grant_accept node_id=1 sequence=266578 duration_ms=120 expires_at_ms=51563472
+grant_accept node_id=1 sequence=266579 duration_ms=120 expires_at_ms=51563602
+grant_accept node_id=1 sequence=266580 duration_ms=120 expires_at_ms=51563731
+grant_accept node_id=1 sequence=266581 duration_ms=120 expires_at_ms=51563862
+grant_accept node_id=1 sequence=266582 duration_ms=120 expires_at_ms=51563992
+grant_accept node_id=1 sequence=266583 duration_ms=120 expires_at_ms=51564121
+51564010	RX_ANT	5785:4:20	1	14:-52:-52:-52:16:18:22
+51564010	RX_ANT	5785:4:20	0	14:-56:-56:-56:16:18:22
+51564010	PKT	22:938:0:0:14:14:0:0:0:1:56
+51564010	PKT_SRC	255:14:714:0:0:1:56
+51564010	GRANT_FILTER	255987:88684:0:167303:0:0:0:0:0
+51564010	READY_FILTER	0:0:0:0:0
+51564010	REASSEMBLY	12:40
+51564010	TOKEN_AUTH	88684:0:7280:27557
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51564737
+grant_accept node_id=1 sequence=266590 duration_ms=120 expires_at_ms=51565032
+51565010	RX_ANT	5785:4:20	1	41:-54:-52:-52:16:19:23
+51565010	RX_ANT	5785:4:20	0	41:-56:-55:-54:15:18:23
+51565010	PKT	48:2064:0:0:41:41:0:0:0:3:138
+51565010	PKT_SRC	255:41:1868:0:0:3:138
+51565010	GRANT_FILTER	255994:88685:0:167309:0:0:0:0:0
+51565010	READY_FILTER	0:0:0:0:0
+51565010	REASSEMBLY	12:40
+51565010	TOKEN_AUTH	88685:0:7281:27559
+grant_accept node_id=1 sequence=266591 duration_ms=120 expires_at_ms=51565163
+grant_accept node_id=1 sequence=266592 duration_ms=120 expires_at_ms=51565293
+grant_accept node_id=1 sequence=266594 duration_ms=120 expires_at_ms=51565553
+grant_accept node_id=1 sequence=266596 duration_ms=120 expires_at_ms=51565814
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51565831
+51566010	RX_ANT	5785:4:20	1	269:-54:-52:-52:6:19:25
+51566010	RX_ANT	5785:4:20	0	269:-58:-55:-54:5:18:24
+51566010	PKT	274:11949:0:0:269:269:19:0:0:22:940
+51566010	PKT_SRC	255:269:11809:19:0:22:940
+51566010	GRANT_FILTER	255999:88689:0:167310:0:0:0:0:0
+51566010	READY_FILTER	0:0:0:0:0
+51566010	REASSEMBLY	12:40
+51566010	TOKEN_AUTH	88689:0:7281:27608
+grant_accept node_id=1 sequence=266599 duration_ms=120 expires_at_ms=51566205
+grant_accept node_id=1 sequence=266601 duration_ms=120 expires_at_ms=51566466
+grant_accept node_id=1 sequence=266602 duration_ms=120 expires_at_ms=51566595
+grant_accept node_id=1 sequence=266603 duration_ms=120 expires_at_ms=51566725
+grant_accept node_id=1 sequence=266604 duration_ms=120 expires_at_ms=51566854
+grant_accept node_id=1 sequence=266605 duration_ms=120 expires_at_ms=51566985
+51567010	RX_ANT	5785:4:20	1	28:-54:-52:-52:16:18:23
+51567010	RX_ANT	5785:4:20	0	28:-56:-56:-56:15:18:22
+51567010	PKT	35:1624:0:0:28:28:0:0:0:2:112
+51567010	PKT_SRC	255:28:1428:0:0:2:112
+51567010	GRANT_FILTER	256006:88695:0:167311:0:0:0:0:0
+51567010	READY_FILTER	0:0:0:0:0
+51567010	REASSEMBLY	12:40
+51567010	TOKEN_AUTH	88695:0:7283:27609
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51567580
+grant_accept node_id=1 sequence=266612 duration_ms=120 expires_at_ms=51567896
+51568010	RX_ANT	5785:4:20	1	26:-54:-52:-52:16:19:25
+51568010	RX_ANT	5785:4:20	0	26:-56:-55:-54:16:19:22
+51568010	PKT	33:1494:0:0:26:26:1:0:0:2:108
+51568010	PKT_SRC	255:26:1298:1:0:2:108
+51568010	GRANT_FILTER	256013:88696:0:167317:0:0:0:0:0
+51568010	READY_FILTER	0:0:0:0:0
+51568010	REASSEMBLY	12:40
+51568010	TOKEN_AUTH	88696:0:7284:27611
+grant_accept node_id=1 sequence=266614 duration_ms=120 expires_at_ms=51568158
+grant_accept node_id=1 sequence=266617 duration_ms=120 expires_at_ms=51568548
+grant_accept node_id=1 sequence=266618 duration_ms=120 expires_at_ms=51568679
+grant_accept node_id=1 sequence=266619 duration_ms=120 expires_at_ms=51568809
+grant_accept node_id=1 sequence=266620 duration_ms=120 expires_at_ms=51568939
+grant_accept node_id=1 sequence=266621 duration_ms=120 expires_at_ms=51569068
+51569010	RX_ANT	5785:4:20	1	27:-54:-52:-52:15:18:22
+51569010	RX_ANT	5785:4:20	0	27:-56:-56:-56:15:18:22
+51569010	PKT	34:1601:0:0:27:27:1:0:0:2:112
+51569010	PKT_SRC	255:27:1405:1:0:2:112
+51569010	GRANT_FILTER	256020:88702:0:167318:0:0:0:0:0
+51569010	READY_FILTER	0:0:0:0:0
+51569010	REASSEMBLY	12:40
+51569010	TOKEN_AUTH	88702:0:7284:27611
+grant_accept node_id=1 sequence=266622 duration_ms=120 expires_at_ms=51569204
+grant_accept node_id=1 sequence=266623 duration_ms=120 expires_at_ms=51569328
+grant_accept node_id=1 sequence=266624 duration_ms=120 expires_at_ms=51569460
+grant_accept node_id=1 sequence=266625 duration_ms=120 expires_at_ms=51569589
+grant_accept node_id=1 sequence=266626 duration_ms=120 expires_at_ms=51569719
+grant_accept node_id=1 sequence=266627 duration_ms=120 expires_at_ms=51569849
+grant_accept node_id=1 sequence=266628 duration_ms=120 expires_at_ms=51569978
+grant_accept node_id=1 sequence=266629 duration_ms=120 expires_at_ms=51570108
+51570010	RX_ANT	5785:4:20	1	28:-54:-52:-52:16:19:24
+51570010	RX_ANT	5785:4:20	0	28:-56:-56:-56:15:18:22
+51570010	PKT	36:1547:0:0:28:28:0:0:0:2:97
+51570010	PKT_SRC	255:28:1323:0:0:2:97
+51570010	GRANT_FILTER	256028:88710:0:167318:0:0:0:0:0
+51570010	READY_FILTER	0:0:0:0:0
+51570010	REASSEMBLY	12:40
+51570010	TOKEN_AUTH	88710:0:7285:27611
+grant_accept node_id=1 sequence=266630 duration_ms=120 expires_at_ms=51570241
+grant_accept node_id=1 sequence=266632 duration_ms=120 expires_at_ms=51570498
+grant_accept node_id=1 sequence=266633 duration_ms=120 expires_at_ms=51570629
+grant_accept node_id=1 sequence=266634 duration_ms=120 expires_at_ms=51570760
+grant_accept node_id=1 sequence=266635 duration_ms=120 expires_at_ms=51570891
+grant_accept node_id=1 sequence=266636 duration_ms=120 expires_at_ms=51571021
+51571010	RX_ANT	5785:4:20	1	12:-54:-52:-52:17:19:25
+51571010	RX_ANT	5785:4:20	0	12:-56:-56:-56:17:18:23
+51571010	PKT	18:836:0:0:12:12:2:0:0:1:56
+51571010	PKT_SRC	255:12:668:2:0:1:56
+51571010	GRANT_FILTER	256034:88716:0:167318:0:0:0:0:0
+51571010	READY_FILTER	0:0:0:0:0
+51571010	REASSEMBLY	12:40
+51571010	TOKEN_AUTH	88716:0:7285:27611
+51572010	RX_ANT	5785:4:20	1	39:-54:-52:-52:14:19:25
+51572010	RX_ANT	5785:4:20	0	39:-56:-55:-54:15:18:22
+51572010	PKT	46:2052:0:0:39:39:1:0:0:3:153
+51572010	PKT_SRC	255:39:1856:1:0:3:153
+51572010	GRANT_FILTER	256041:88716:0:167325:0:0:0:0:0
+51572010	READY_FILTER	0:0:0:0:0
+51572010	REASSEMBLY	12:40
+51572010	TOKEN_AUTH	88716:0:7285:27611
+51573010	RX_ANT	5785:4:20	1	14:-54:-52:-52:15:19:22
+51573010	RX_ANT	5785:4:20	0	14:-56:-55:-54:15:18:22
+51573010	PKT	22:938:0:0:14:14:0:0:0:1:56
+51573010	PKT_SRC	255:14:714:0:0:1:56
+51573010	GRANT_FILTER	256049:88716:0:167333:0:0:0:0:0
+51573010	READY_FILTER	0:0:0:0:0
+51573010	REASSEMBLY	12:40
+51573010	TOKEN_AUTH	88716:0:7285:27611
+51574010	RX_ANT	5785:4:20	1	14:-54:-52:-52:16:19:22
+51574010	RX_ANT	5785:4:20	0	14:-58:-56:-56:16:18:21
+51574010	PKT	21:910:0:0:14:14:0:0:0:1:56
+51574010	PKT_SRC	255:14:714:0:0:1:56
+51574010	GRANT_FILTER	256056:88716:0:167340:0:0:0:0:0
+51574010	READY_FILTER	0:0:0:0:0
+51574010	REASSEMBLY	12:40
+51574010	TOKEN_AUTH	88716:0:7285:27611
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51574969
+51575010	RX_ANT	5785:4:20	1	24:-54:-52:-52:15:20:25
+51575010	RX_ANT	5785:4:20	0	24:-58:-56:-56:16:19:24
+51575010	PKT	31:1476:0:0:24:24:4:0:0:2:112
+51575010	PKT_SRC	255:24:1280:4:0:2:112
+51575010	GRANT_FILTER	256063:88716:0:167347:0:0:0:0:0
+51575010	READY_FILTER	0:0:0:0:0
+51575010	REASSEMBLY	12:40
+51575010	TOKEN_AUTH	88716:0:7285:27616
+51576010	RX_ANT	5785:4:20	1	13:-54:-52:-52:15:18:22
+51576010	RX_ANT	5785:4:20	0	13:-56:-56:-56:15:17:21
+51576010	PKT	21:859:0:0:13:13:1:0:0:1:56
+51576010	PKT_SRC	255:13:635:1:0:1:56
+51576010	GRANT_FILTER	256071:88716:0:167355:0:0:0:0:0
+51576010	READY_FILTER	0:0:0:0:0
+51576010	REASSEMBLY	12:40
+51576010	TOKEN_AUTH	88716:0:7285:27627
+51577010	RX_ANT	5785:4:20	1	26:-54:-52:-52:15:19:25
+51577010	RX_ANT	5785:4:20	0	26:-56:-55:-54:15:18:22
+51577010	PKT	32:1445:0:0:26:26:2:0:0:2:97
+51577010	PKT_SRC	255:26:1277:2:0:2:97
+51577010	GRANT_FILTER	256077:88716:0:167361:0:0:0:0:0
+51577010	READY_FILTER	0:0:0:0:0
+51577010	REASSEMBLY	12:40
+51577010	TOKEN_AUTH	88716:0:7285:27639
+51578011	RX_ANT	5785:4:20	1	14:-52:-52:-52:16:18:21
+51578011	RX_ANT	5785:4:20	0	14:-58:-56:-56:16:17:21
+51578011	PKT	21:910:0:0:14:14:0:0:0:1:56
+51578011	PKT_SRC	255:14:714:0:0:1:56
+51578011	GRANT_FILTER	256084:88716:0:167368:0:0:0:0:0
+51578011	READY_FILTER	0:0:0:0:0
+51578011	REASSEMBLY	12:40
+51578011	TOKEN_AUTH	88716:0:7285:27650
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51578976
+51579011	RX_ANT	5785:4:20	1	28:-54:-52:-52:16:19:22
+51579011	RX_ANT	5785:4:20	0	28:-58:-56:-56:15:18:22
+51579011	PKT	36:1652:0:0:28:28:0:0:0:2:112
+51579011	PKT_SRC	255:28:1428:0:0:2:112
+51579011	GRANT_FILTER	256092:88716:0:167376:0:0:0:0:0
+51579011	READY_FILTER	0:0:0:0:0
+51579011	REASSEMBLY	12:40
+51579011	TOKEN_AUTH	88716:0:7285:27664
+grant_accept node_id=1 sequence=266700 duration_ms=120 expires_at_ms=51579357
+grant_accept node_id=1 sequence=266701 duration_ms=120 expires_at_ms=51579488
+grant_accept node_id=1 sequence=266702 duration_ms=120 expires_at_ms=51579616
+grant_accept node_id=1 sequence=266703 duration_ms=120 expires_at_ms=51579746
+grant_accept node_id=1 sequence=266704 duration_ms=120 expires_at_ms=51579876
+grant_accept node_id=1 sequence=266705 duration_ms=120 expires_at_ms=51580006
+51580012	RX_ANT	5785:4:20	1	26:-54:-52:-52:15:18:23
+51580012	RX_ANT	5785:4:20	0	26:-56:-56:-56:14:18:22
+51580012	PKT	33:1432:0:0:26:26:1:0:0:2:97
+51580012	PKT_SRC	255:26:1236:1:0:2:97
+51580012	GRANT_FILTER	256099:88722:0:167377:0:0:0:0:0
+51580012	READY_FILTER	0:0:0:0:0
+51580012	REASSEMBLY	12:40
+51580012	TOKEN_AUTH	88722:0:7286:27666
+grant_accept node_id=1 sequence=266706 duration_ms=120 expires_at_ms=51580137
+grant_accept node_id=1 sequence=266707 duration_ms=120 expires_at_ms=51580268
+grant_accept node_id=1 sequence=266708 duration_ms=120 expires_at_ms=51580402
+grant_accept node_id=1 sequence=266709 duration_ms=120 expires_at_ms=51580527
+grant_accept node_id=1 sequence=266710 duration_ms=120 expires_at_ms=51580657
+grant_accept node_id=1 sequence=266711 duration_ms=120 expires_at_ms=51580787
+grant_accept node_id=1 sequence=266712 duration_ms=120 expires_at_ms=51580918
+grant_accept node_id=1 sequence=266713 duration_ms=120 expires_at_ms=51581048
+51581012	RX_ANT	5785:4:20	1	28:-54:-52:-52:15:18:25
+51581012	RX_ANT	5785:4:20	0	28:-56:-55:-54:14:17:23
+51581012	PKT	36:1547:0:0:28:28:0:0:0:2:97
+51581012	PKT_SRC	255:28:1323:0:0:2:97
+51581012	GRANT_FILTER	256107:88730:0:167377:0:0:0:0:0
+51581012	READY_FILTER	0:0:0:0:0
+51581012	REASSEMBLY	12:40
+51581012	TOKEN_AUTH	88730:0:7287:27666
+grant_accept node_id=1 sequence=266714 duration_ms=120 expires_at_ms=51581179
+grant_accept node_id=1 sequence=266715 duration_ms=120 expires_at_ms=51581310
+51582012	RX_ANT	5785:4:20	1	13:-54:-52:-52:15:18:22
+51582012	RX_ANT	5785:4:20	0	13:-58:-56:-56:15:17:21
+51582012	PKT	21:769:0:0:13:13:0:0:0:1:41
+51582012	PKT_SRC	255:13:545:0:0:1:41
+51582012	GRANT_FILTER	256115:88732:0:167383:0:0:0:0:0
+51582012	READY_FILTER	0:0:0:0:0
+51582012	REASSEMBLY	12:40
+51582012	TOKEN_AUTH	88732:0:7287:27666
+51583012	PKT	6:168:0:0:0:0:0:0:0:0:0
+51583012	PKT_SRC	255:0:0:0:0:0:0
+51583012	GRANT_FILTER	256121:88732:0:167389:0:0:0:0:0
+51583012	READY_FILTER	0:0:0:0:0
+51583012	REASSEMBLY	12:40
+51583012	TOKEN_AUTH	88732:0:7287:27666
+51584012	PKT	8:224:0:0:0:0:0:0:0:0:0
+51584012	PKT_SRC	255:0:0:0:0:0:0
+51584012	GRANT_FILTER	256129:88732:0:167397:0:0:0:0:0
+51584012	READY_FILTER	0:0:0:0:0
+51584012	REASSEMBLY	12:40
+51584012	TOKEN_AUTH	88732:0:7287:27666
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51584768
+grant_accept node_id=1 sequence=266744 duration_ms=120 expires_at_ms=51585083
+51585012	PKT	7:196:0:0:0:0:0:0:0:0:0
+51585012	PKT_SRC	255:0:0:0:0:0:0
+51585012	GRANT_FILTER	256136:88733:0:167403:0:0:0:0:0
+51585012	READY_FILTER	0:0:0:0:0
+51585012	REASSEMBLY	12:40
+51585012	TOKEN_AUTH	88733:0:7288:27668
+grant_accept node_id=1 sequence=266745 duration_ms=120 expires_at_ms=51585213
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=51585229
+grant_accept node_id=1 sequence=266748 duration_ms=120 expires_at_ms=51585604
+grant_accept node_id=1 sequence=266749 duration_ms=120 expires_at_ms=51585734
+grant_accept node_id=1 sequence=266750 duration_ms=120 expires_at_ms=51585868
+grant_accept node_id=1 sequence=266751 duration_ms=120 expires_at_ms=51585993
+grant_accept node_id=1 sequence=266752 duration_ms=120 expires_at_ms=51586124
+51586012	RX_ANT	5785:4:20	1	14:-52:-52:-52:16:19:21
+51586012	RX_ANT	5785:4:20	0	14:-56:-55:-54:16:18:22
+51586012	PKT	20:777:0:0:14:14:0:0:0:1:41
+51586012	PKT_SRC	255:14:609:0:0:1:41
+51586012	GRANT_FILTER	256142:88739:0:167403:0:0:0:0:0
+51586012	READY_FILTER	0:0:0:0:0
+51586012	REASSEMBLY	12:40
+51586012	TOKEN_AUTH	88739:0:7290:27670
+grant_accept node_id=1 sequence=266753 duration_ms=120 expires_at_ms=51586254
+grant_accept node_id=1 sequence=266754 duration_ms=120 expires_at_ms=51586384
+grant_accept node_id=1 sequence=266755 duration_ms=120 expires_at_ms=51586515
+51587012	RX_ANT	5785:4:20	1	13:-54:-52:-52:16:19:21
+51587012	RX_ANT	5785:4:20	0	13:-56:-55:-54:16:18:20
+51587012	PKT	20:741:0:0:13:13:0:0:0:1:41
+51587012	PKT_SRC	255:13:545:0:0:1:41
+51587012	GRANT_FILTER	256149:88742:0:167407:0:0:0:0:0
+51587012	READY_FILTER	0:0:0:0:0
+51587012	REASSEMBLY	12:40
+51587012	TOKEN_AUTH	88742:0:7290:27670

@@ -1,0 +1,17 @@
+{
+  "bytes": null,
+  "sha256": null,
+  "error": "final_file_missing",
+  "hash_seconds": 7.88529978308361e-05,
+  "received_files": [
+    "uftpd.status",
+    "receiver-console.log",
+    "receiver.json",
+    "tmp/_group_147C8C87/model-8mib.bin"
+  ],
+  "receiver_stopped": true,
+  "uftpd.log": null,
+  "uftpd.status": "CONNECT;2026/10/27-02:49:53;0A500001;147C8C87;10.80.0.1;10.80.0.1\nRESULT;2026/10/27-02:50:52;0A500001;147C8C87;model-8mib.bin;8192KB;copied\n",
+  "receiver-console.log": "2026/10/27 02:49:53.258841: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/10/27 02:49:53.259247: Loaded ECDSA key with curve prime256v1 and fingerprint 13:1A:F6:5C:CD:62:70:7C:C0:7B:8E:67:BD:67:24:E3:A6:9C:77:CB\n2026/10/27 02:49:53.968027: [147C8C87/00:0]: Received request from 0A500001 at 10.80.0.1 (10.80.0.1)\n2026/10/27 02:49:53.968419: [147C8C87/00:0]: Using private multicast address 239.255.42.2\n2026/10/27 02:49:53.968973: [147C8C87/00:0]: REGISTER sent\n2026/10/27 02:49:55.287759: [147C8C87/00:0]: Registration confirmed\n2026/10/27 02:50:03.149809: [147C8C87/00:0001]: Name of file to receive: model-8mib.bin\n2026/10/27 02:50:03.150188: [147C8C87/00:0001]: Bytes: 8388608, Blocks: 6453, Sections: 1\n2026/10/27 02:50:03.151613: [147C8C87/00:0001]: FILEINFO_ACK sent\n2026/10/27 02:50:41.157584: [147C8C87/00:0001]: Got DONE message for section 0\n2026/10/27 02:50:41.370164: [147C8C87/00:0001]: Sent 654 NAKs for section 0\n2026/10/27 02:50:44.150768: [147C8C87/00:0001]: Got DONE message for section 0\n2026/10/27 02:50:44.363019: [147C8C87/00:0001]: Sent 654 NAKs for section 0\n2026/10/27 02:50:46.540950: [147C8C87/00:0001]: Got DONE message for section 0\n2026/10/27 02:50:46.753611: [147C8C87/00:0001]: Sent 654 NAKs for section 0\n2026/10/27 02:50:49.537470: [147C8C87/00:0001]: Got DONE message for section 0\n2026/10/27 02:50:49.749739: [147C8C87/00:0001]: Sent 654 NAKs for section 0\n2026/10/27 02:50:51.931289: [147C8C87/00:0001]: Got DONE message for section 0\n2026/10/27 02:50:51.970222: [147C8C87/00:0]: Got DONE message for group\n2026/10/27 02:50:52.142951: [147C8C87/00:0]: File transfer complete\n2026/10/27 02:50:52.143216: [147C8C87/00:0]: COMPLETE sent\n2026/10/27 02:50:52.143372: [147C8C87/00:0]: starting file close\n2026/10/27 02:50:52.143430: [147C8C87/00:0]: done file close\n2026/10/27 02:50:53.795530: Exiting on signal 15\n",
+  "receiver.json": "{\"pid\": 19397, \"argv\": [\"uftpd\", \"-d\", \"-p\", \"1144\", \"-U\", \"0x00000001\", \"-D\", \"/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/received\", \"-T\", \"/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/tmp\", \"-I\", \"fl-c1\", \"-M\", \"239.255.42.1\", \"-L\", \"/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.log\", \"-F\", \"/var/tmp/wfb-ticket09/20261026T184920Z-retry/01-mcs3-r2000-8mib/uftpd.status\"], \"poll\": null, \"start_ticks\": \"2548293\"}"
+}

@@ -1,0 +1,77 @@
+{
+  "fl04": {
+    "pid": 21432,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000004",
+      "-D",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c4",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "5034575"
+  },
+  "fl02": {
+    "pid": 13490,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000002",
+      "-D",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c2",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "4474728"
+  },
+  "fl01": {
+    "pid": 22236,
+    "argv": [
+      "uftpd",
+      "-d",
+      "-p",
+      "1144",
+      "-U",
+      "0x00000001",
+      "-D",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/received",
+      "-T",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/tmp",
+      "-I",
+      "fl-c1",
+      "-M",
+      "239.255.42.1",
+      "-L",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.log",
+      "-F",
+      "/srv/wfb-ng-fl/calibration/09/20261027T020324Z-transport-params/01-mcs3-r2000-8mib/uftpd.status"
+    ],
+    "poll": null,
+    "start_ticks": "5151591"
+  }
+}

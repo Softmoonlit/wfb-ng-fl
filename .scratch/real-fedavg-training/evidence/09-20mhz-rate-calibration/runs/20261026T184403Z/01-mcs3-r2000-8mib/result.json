@@ -1,0 +1,31 @@
+{
+  "attempt": "01-mcs3-r2000-8mib",
+  "mcs": 3,
+  "rate_kbps": 2000,
+  "mib": 8,
+  "target_nodes": [
+    1,
+    2,
+    4
+  ],
+  "started_utc": "2026-10-26T18:46:54.651181+00:00",
+  "error": "RuntimeError('calibration not finalized')",
+  "pid_tun_unchanged": true,
+  "rx_ant_targets": {
+    "fl01": false,
+    "fl02": false,
+    "fl04": false
+  },
+  "tx_application_lines": {
+    "fl00": [],
+    "fl01": [],
+    "fl02": [],
+    "fl04": []
+  },
+  "group_complete": false,
+  "nak_lines": [],
+  "pass_lines": [],
+  "all_hashes_match": false,
+  "success": false,
+  "ended_utc": "2026-10-26T18:46:59.346168+00:00"
+}
