@@ -1,0 +1,23 @@
+Focused verification for the Ticket 10 algorithm/coordinator slice.
+
+Red:
+python -m pytest -q wfb_ng/tests/test_fl_algorithm_context.py -k 'mixed_and_oversized'
+The mixed-key case reproduced the old `TypeError` from `sorted(unknown)`.
+
+Green:
+python -m pytest -q wfb_ng/tests/test_fl_algorithm_context.py -k 'mixed_and_oversized'
+1 passed, 7 deselected
+
+Full focused command:
+python -m pytest -q wfb_ng/tests/test_fl_algorithm_context.py wfb_ng/tests/test_fl_coordinator.py
+
+Result after the P2 correction:
+45 passed in 2.45s
+
+Covered sequencing and validation:
+
+- `round_completion` success is recorded before `supervisor.end_round`.
+- The old short round deadline is cleared before an inter-round policy waits for a host control event.
+- Abort still invokes the existing 06 cancellation callback and leaves no terminal summary until the cooperative policy call returns.
+- No final-round policy call is made.
+- Mixed key types and a 10 KB unknown key return bounded `invalid_radio_patch` errors without echoing/sorting the key.

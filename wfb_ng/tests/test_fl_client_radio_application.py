@@ -80,6 +80,34 @@ class TestClientRadioApplication(unittest.TestCase):
         self.control._uplink_sock.sendto.side_effect = lambda data, addr: self.datagrams.append(json.loads(data))
         self.spawned.clear()
 
+    def test_idle_nonparticipant_accepts_job_bound_wire_transaction(self):
+        """在线待命节点同样参加任务事务，继续复用已有 idle link。"""
+        process = self.processes[0]
+        owner = dict(self.adapter.tun_interfaces)
+        patch = {'uplink_mcs': 5, 'radio_txpower_dbm': 14}
+        base = dict(job_id='other-participants-job', session_id='job-idle', target_nodes=[1])
+        self.control.handle_broadcast(dict(base, type='CONFIG_RADIO_PREPARE', patch=patch))
+        ack = next(item for item in self.datagrams if item['type'] == 'PREPARE_ACK')
+        self.assertTrue(ack['ok'])
+        self.assertEqual(ack['job_id'], base['job_id'])
+        self.control.handle_broadcast(dict(base, type='CONFIG_RADIO_COMMIT', patch=patch, delay_ms=0))
+        self.assertTrue(self.spawned.wait(2))
+        self.assertTrue(self.control.radio_switch_pending)
+        config = RadioConfig(channel=self.control.current_channel,
+            bandwidth_mhz=self.control.bandwidth_mhz, radio_txpower_dbm=self.control.txpower_dbm,
+            uplink_mcs=self.control.uplink_mcs, downlink_mcs=self.control.downlink_mcs,
+            uftp_rate_kbps=self.control.uftp_rate_kbps)
+        final = dict(base, channel=config.channel, config=config.to_dict(), calibration=False)
+        for kind in ('NEW_CHANNEL_PING', 'RADIO_SWITCH_FINALIZED', 'RADIO_SWITCH_CONFIRMED'):
+            self.control.handle_broadcast(dict(final, type=kind))
+        self.assertFalse(self.control.radio_switch_pending)
+        self.assertIsNone(self.daemon._current_job_id)
+        self.assertEqual(self.daemon._effective_radio, config)
+        self.assertEqual(self.adapter.tun_interfaces, owner)
+        self.assertEqual(self.processes, [process])
+        process.terminate.assert_not_called()
+        self.assertEqual(self.updates[-1], (self.daemon.config.radio_control_port, 40, 5))
+
     def commit(self, patch=None):
         if patch is None:
             patch = {'uplink_mcs': 5, 'radio_txpower_dbm': 14}

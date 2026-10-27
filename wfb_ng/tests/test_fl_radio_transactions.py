@@ -104,7 +104,10 @@ class TestRadioTransaction(unittest.TestCase):
                 self.assertEqual(result.status, status)
                 self.assertEqual(result.failed_phase, phase)
                 self.assertEqual(result.unresponsive_nodes, [1])
-                self.assertEqual(result.effective_config.channel, channel)
+                if status == "radio_error":
+                    self.assertIsNone(result.effective_config)
+                else:
+                    self.assertEqual(result.effective_config.channel, channel)
                 self.assertEqual(server.active_radio_config.channel, channel)
 
     def test_broadcast_exceptions(self):
@@ -176,17 +179,18 @@ class TestRadioTransaction(unittest.TestCase):
                 replies = server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001))
                 self.assertEqual(len(replies), 1)
 
-    def test_prepare_failure_from_nonbenchmark_notifies_before_fallback(self):
+    def test_prepare_failure_restores_nonbenchmark_previous_channel(self):
         server = ControlPlaneServer(RadioConfig(channel=149, radio_txpower_dbm=12))
         sent = []
         server.broadcast_downlink = sent.append
         result = server.reconfigure_radio({"channel": 153}, [1], prepare_timeout_seconds=.001,
                                           commit_timeout_seconds=.01, ping_interval_seconds=.002)
-        self.assertEqual(result.status, "radio_error")
-        self.assertIsNone(result.effective_config)
+        self.assertEqual(result.status, "rolled_back")
+        self.assertEqual(result.effective_config.channel, 149)
         aborts = [msg for msg in sent if msg["type"] == "CONFIG_RADIO_ABORT"]
+        self.assertTrue(aborts)
         self.assertEqual(aborts[0]["channel"], 149)
-        self.assertEqual(aborts[-1]["channel"], 157)
+        self.assertEqual(aborts[-1]["channel"], 149)
 
 
     def test_failed_transaction_can_be_followed_by_successful_public_reconfigure(self):
@@ -214,9 +218,133 @@ class TestRadioTransaction(unittest.TestCase):
         _, server, _ = self.run_switch(drop="RADIO_SWITCH_CONFIRMED")
         with self.assertRaises(FLRuntimeError):
             server.reconfigure_radio({"channel": 157}, [1])
+    def test_job_bound_prepare_checks_client_identity_before_ack(self):
+        client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
+        sent = []
+        observed = []
+        client._send_unicast_datagram = lambda data: sent.append(json.loads(data))
+        client.on_radio_prepare = lambda job_id, config: observed.append(
+            (job_id, config, client.radio_switch_pending)
+        )
+        try:
+            client.bind_job_context("job-a")
+            message = {
+                "type": "CONFIG_RADIO_PREPARE",
+                "session_id": "session-a",
+                "job_id": "job-a",
+                "target_nodes": [1],
+                "patch": {"uplink_mcs": 5},
+                "config": RadioConfig(channel=157, uplink_mcs=5).to_dict(),
+                "calibration": False,
+            }
+            client.handle_broadcast(message)
+            self.assertEqual(observed[0][0], "job-a")
+            self.assertFalse(observed[0][2], "prepare callback must precede local pending state")
+            self.assertEqual(sent[-1]["type"], "PREPARE_ACK")
+            self.assertEqual(sent[-1]["job_id"], "job-a")
 
+            sent_before = len(sent)
+            client.handle_broadcast(dict(message, session_id="session-b", job_id="job-b"))
+            self.assertEqual(len(sent), sent_before)
+        finally:
+            client.handle_broadcast({
+                "type": "CONFIG_RADIO_ABORT", "session_id": "session-a", "job_id": "job-a",
+                "target_nodes": [1], "channel": 157,
+                "config": client._current_radio_config().to_dict(), "calibration": False,
+            })
+            client.clear_job_context("job-a")
+            client.stop()
 
-class TestClientFinalBarrier(unittest.TestCase):
+    def test_unbound_idle_client_accepts_job_bound_prepare(self):
+        client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
+        sent = []
+        client._send_unicast_datagram = lambda data: sent.append(json.loads(data))
+        try:
+            client.handle_broadcast({
+                "type": "CONFIG_RADIO_PREPARE", "session_id": "session-idle", "job_id": "job-a",
+                "target_nodes": [1], "patch": {"uplink_mcs": 5},
+                "config": RadioConfig(channel=157, uplink_mcs=5).to_dict(), "calibration": False,
+            })
+            self.assertEqual(sent[-1]["job_id"], "job-a")
+        finally:
+            client.stop()
+
+    def test_stop_before_commit_restores_full_previous_config(self):
+        server = ControlPlaneServer(RadioConfig(
+            channel=149, radio_txpower_dbm=15, uplink_mcs=5,
+        ))
+        stop_event = threading.Event()
+        sent = []
+
+        def broadcast(message):
+            sent.append(message)
+            kind = message["type"]
+            if kind == "CONFIG_RADIO_PREPARE":
+                server.handle_datagram(json.dumps({
+                    "type": "PREPARE_ACK", "node_id": 1,
+                    "session_id": message["session_id"], "job_id": message["job_id"], "ok": True,
+                }).encode(), ("127.0.0.1", 12001))
+            elif kind == "CONFIG_RADIO_COMMIT":
+                stop_event.set()
+            elif kind == "CONFIG_RADIO_ABORT":
+                server.handle_datagram(json.dumps({
+                    "type": "RADIO_SWITCH_ROLLBACK_ACK", "node_id": 1,
+                    "session_id": message["session_id"], "job_id": message["job_id"],
+                    "channel": message["channel"], "config": message["config"],
+                    "calibration": message["calibration"],
+                }).encode(), ("127.0.0.1", 12001))
+
+        server.broadcast_downlink = broadcast
+        result = server.reconfigure_radio(
+            {"channel": 153, "radio_txpower_dbm": 18, "uplink_mcs": 6}, [1],
+            commit_delay_seconds=0, commit_timeout_seconds=.05,
+            ping_interval_seconds=.005, job_id="job-stop", stop_event=stop_event,
+        )
+        self.assertEqual(result.status, "rolled_back")
+        self.assertEqual(result.effective_config.channel, 149)
+        self.assertEqual(result.effective_config.radio_txpower_dbm, 15)
+        self.assertEqual(result.effective_config.uplink_mcs, 5)
+        self.assertTrue(any(
+            message["type"] == "CONFIG_RADIO_ABORT" and message["channel"] == 149
+            for message in sent
+        ))
+        self.assertTrue(all(message.get("job_id") == "job-stop" for message in sent))
+
+    def test_stop_after_confirmed_commit_fails_closed_with_unknown_effective_config(self):
+        server = ControlPlaneServer(RadioConfig(channel=149, radio_txpower_dbm=12))
+        stop_event = threading.Event()
+
+        def broadcast(message):
+            kind = message["type"]
+            reply_type = {
+                "CONFIG_RADIO_PREPARE": "PREPARE_ACK",
+                "NEW_CHANNEL_PING": "COMMIT_SUCCESS",
+                "RADIO_SWITCH_FINALIZED": "RADIO_SWITCH_FINALIZED_ACK",
+            }.get(kind)
+            if reply_type is None:
+                if kind == "RADIO_SWITCH_CONFIRMED":
+                    stop_event.set()
+                return
+            payload = {
+                "type": reply_type, "node_id": 1,
+                "session_id": message["session_id"], "job_id": message["job_id"],
+                "current_channel": message.get("channel", 153),
+                "channel": message.get("channel", 153), "ok": True,
+                "config": message["config"], "calibration": message["calibration"],
+            }
+            server.handle_datagram(json.dumps(payload).encode(), ("127.0.0.1", 12002))
+
+        server.broadcast_downlink = broadcast
+        result = server.reconfigure_radio(
+            {"channel": 153}, [1], commit_delay_seconds=0,
+            commit_timeout_seconds=.05, ping_interval_seconds=.005,
+            job_id="job-stop", stop_event=stop_event,
+        )
+        self.assertEqual(result.status, "radio_error")
+        self.assertIsNone(result.effective_config)
+        self.assertTrue(server.radio_error)
+        self.assertEqual(server.active_radio_config.channel, 153)
+
     def setUp(self):
         self.client = ControlPlaneClient(1, "10.80.0.11", initial_channel=149, txpower_dbm=12)
         self.sent = []
@@ -331,7 +459,7 @@ class TestClientFinalBarrier(unittest.TestCase):
         self.assertFalse(self.client.hunt_once([157]))
         self.assertEqual(self.client.current_channel, 149)
 
-    def test_prepare_abort_from_nonbenchmark_returns_to_benchmark(self):
+    def test_prepare_abort_from_nonbenchmark_returns_to_previous_channel(self):
         client = ControlPlaneClient(2, "10.80.0.12", initial_channel=149)
         client._send_unicast_datagram = Mock()
         try:
@@ -339,7 +467,7 @@ class TestClientFinalBarrier(unittest.TestCase):
                 "session_id": "prepare-only", "target_nodes": [2], "patch": {"channel": 153}})
             client.handle_broadcast({"type": "CONFIG_RADIO_ABORT",
                 "session_id": "prepare-only", "target_nodes": [2], "channel": 149})
-            self.assertEqual(client.current_channel, 157)
+            self.assertEqual(client.current_channel, 149)
             self.assertFalse(client.lease_watchdog.is_armed)
         finally:
             client.stop()

@@ -35,7 +35,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence
 from pyroute2 import IPRoute, NetlinkError
 
 from .algorithm import validate_algorithm_config
-from .artifacts import validate_path_safe_identifier, write_json_atomic
+from .artifacts import read_json, validate_path_safe_identifier, write_json_atomic
 from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
 from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio
@@ -463,6 +463,7 @@ class ClientJobConfig:
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     max_update_size_bytes: int = 1073741824
+    radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT
     algorithm: Optional[str] = None
     algorithm_config: Optional[Dict[str, Any]] = None
     target_nodes: Sequence[int] = ()
@@ -493,6 +494,8 @@ class ClientJobConfig:
             object.__setattr__(self, "uftp_bind_host", clean_ip)
         _hardware_radio_config(self.channel, self.bandwidth_mhz,
                                self.radio_txpower_dbm, self.uplink_mcs)
+        if type(self.radio_control_port) is not int or not 1 <= self.radio_control_port <= 65535:
+            raise FLRuntimeError('invalid_job_config', 'radio_control_port 必须为 1..65535 的整数')
         if type(self.link_id) is not int or self.link_id <= 0:
             raise ValueError("link_id 必须为正整数")
 
@@ -527,6 +530,7 @@ class JobSandbox:
         self.supervised = False
         self._prepared = False
         self._completed_round = 0
+        self._radio_boundary_round: Optional[int] = None
         self.evidence_dir = evidence_dir if evidence_dir is not None else DEFAULT_EVIDENCE_DIR
         self.last_evidence_error: Optional[str] = None
         self.retained_sandbox_dir: Optional[str] = None
@@ -606,6 +610,8 @@ class JobSandbox:
                     "--radio-mcs-index",
                     str(job.uplink_mcs),
                     "--radio-short-gi",
+                    "--radio-control-port",
+                    str(job.radio_control_port),
                     "--air-interface",
                     air_interface,
                 ]
@@ -676,6 +682,7 @@ class JobSandbox:
                 notify_socket = None
                 self._prepared = False
                 self._completed_round = 0
+                self._radio_boundary_round = None
                 notify_path = os.path.join(self._job_work_dir, "notify.sock")
                 child_env = None
                 if self._command_prefix is None and self._require_ready_notification:
@@ -751,6 +758,14 @@ class JobSandbox:
                                 raise FLRuntimeError('invalid_algorithm_report', '算法错误报告无效')
                         else:
                             raise FLRuntimeError('invalid_algorithm_report', '未知算法报告')
+                        # submit 已返回；先记录本地等待边界，再等待控制报告 ACK。
+                        with self._lock:
+                            if kind == 'prepared':
+                                self._radio_boundary_round = 0
+                            elif kind == 'round_complete':
+                                self._radio_boundary_round = event['round_index']
+                            else:
+                                self._radio_boundary_round = None
                         on_event(event)
                         with self._lock:
                             if stop_event.is_set() or self._process is not proc:
@@ -762,6 +777,8 @@ class JobSandbox:
                                 self._completed_round = event['round_index']
                             accepted = True
                     except Exception as exc:
+                        with self._lock:
+                            self._radio_boundary_round = None
                         logger.warning('算法报告未获确认: %s', exc)
                     try:
                         notify.sendto(json.dumps({'accepted': accepted}).encode('utf-8'), sender)
@@ -1321,7 +1338,10 @@ class ClientDaemon:
                     bandwidth_mhz=self._effective_radio.bandwidth_mhz,
                     radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
                     uplink_mcs=self._effective_radio.uplink_mcs,
+                    radio_control_port=self.config.radio_control_port,
                 )
+                if self.control_plane is not None:
+                    self.control_plane.bind_job_context(job_config.job_id)
                 self._current_job_id = job_config.job_id
                 self._last_accepted_job_id = job_config.job_id
             self._stop_idle_link()
@@ -1416,6 +1436,7 @@ class ClientDaemon:
                     with self._lock:
                         if (self.control_plane is control and self._recovery_fact == fact and
                                 self._current_job_id == job_id and fact[2] == 'ready'):
+                            control.clear_job_context(job_id)
                             self._current_job_id = None
                             control.notify_state_change(ClientNodeState.IDLE)
                 except Exception:
@@ -1487,6 +1508,7 @@ class ClientDaemon:
                     return
 
                 # 合法身份的拒绝也保留绑定，服务器终态才能取得恢复事实。
+                control.bind_job_context(rejected_job_id)
                 self._current_job_id = rejected_job_id
                 self._last_accepted_job_id = rejected_job_id
                 self._terminal_job_id = None
@@ -1583,6 +1605,8 @@ class ClientDaemon:
                 io_timeout_seconds=io_timeout_seconds,
                 live_observation=live_observation,
             )
+            if self.control_plane is not None:
+                self.control_plane.bind_job_context(job_id)
             self._current_job_id = job_id
             self._last_accepted_job_id = job_id
             self._terminal_job_id = None
@@ -1661,6 +1685,9 @@ class ClientDaemon:
                     broadcast_port=self.config.broadcast_port,
                     state_lock=self._lock,
                 )
+                if self._current_job_id is not None:
+                    self.control_plane.bind_job_context(self._current_job_id)
+                self.control_plane.on_radio_prepare = self._on_radio_prepare
                 self.control_plane.on_radio_applied = self._on_radio_applied
                 self.control_plane.on_radio_finalized = self._on_radio_finalized
                 self.control_plane.register_broadcast_handler(
@@ -1674,12 +1701,58 @@ class ClientDaemon:
                 )
                 self.control_plane.start()
 
+    def _on_radio_prepare(self, job_id: Optional[str], new_config: RadioConfig) -> None:
+        """物理修改前核对任务身份及既有 Runtime 持久阶段。"""
+        with self._lock:
+            if self._current_job_id is None:
+                return  # 在线非参与节点及初始策略仍使用既有空闲路径。
+            if job_id != self._current_job_id:
+                raise FLRuntimeError('radio_job_mismatch', '射频事务与当前任务身份不一致')
+            if self._job_stop_event.is_set() or self._terminal_job_id == job_id:
+                raise FLRuntimeError('job_stopped', '任务停止或恢复中，拒绝射频事务')
+            job = self.sandbox._active_job
+            process = self.sandbox._process
+            boundary = self.sandbox._radio_boundary_round
+            if (job is None or job.job_id != job_id or process is None or
+                    process.poll() is not None or boundary is None):
+                raise FLRuntimeError('radio_job_busy', '当前任务未到达本地等待模型边界')
+            # wait_for_model 返回前先写 model_received；不能沿用旧 notice
+            # 把下一轮训练或传输误判为安全屏障。跨进程发布仍由服务端屏障串行。
+            rounds_dir = os.path.join(self.sandbox._job_work_dir or '', 'rounds')
+            completed = 0
+            if os.path.isdir(rounds_dir):
+                for round_name in os.listdir(rounds_dir):
+                    state_path = os.path.join(rounds_dir, round_name, 'round-state.json')
+                    try:
+                        state = read_json(state_path)
+                    except Exception as exc:
+                        raise FLRuntimeError('radio_job_busy', '任务轮次阶段无法确认') from exc
+                    if (state.get('schema_version') != 1 or state.get('role') != 'client' or
+                            state.get('round_id') != round_name or state.get('state') != 'succeeded'):
+                        raise FLRuntimeError('radio_job_busy', '任务已接收模型或仍有活动轮次')
+                    completed += 1
+            if completed != boundary:
+                raise FLRuntimeError('radio_job_busy', '本地完成报告与 Runtime 轮次状态不一致')
+            if new_config.channel != self._effective_radio.channel:
+                raise FLRuntimeError('radio_job_channel_forbidden', '任务射频事务不得修改操作者信道')
+
     def _on_radio_applied(self, new_config: RadioConfig) -> None:
         """本机在线更新成功后才发布生效配置，失败交由原事务租约恢复。"""
         with self._lock:
-            if self._current_job_id is not None or self.sandbox.is_running:
-                raise FLRuntimeError('radio_job_active', '作业运行时拒绝更新空闲射频链路')
-            if self.is_idle_link_running:
+            if self._current_job_id is not None:
+                job, process = self.sandbox._active_job, self.sandbox._process
+                if (job is None or job.job_id != self._current_job_id or
+                        process is None or process.poll() is not None):
+                    raise FLRuntimeError('radio_job_busy', '任务链路所有者已退出或无法确认')
+                # 前置门禁由 ControlPeer 在物理修改前调用；这里也允许已成立
+                # 事务在停止时回滚完整旧配置，直到任务 link 真正退出。
+                # 当前任务 link 持有同名 TUN；只更新原进程，禁止进入 idle 路径。
+                apply_link_radio(self.config.radio_control_port,
+                                 new_config.bandwidth_mhz, new_config.uplink_mcs)
+                self._effective_radio = new_config
+            elif self.sandbox.is_running:
+                raise FLRuntimeError('radio_job_active', '未绑定的任务资源仍运行，拒绝射频更新')
+            elif self.is_idle_link_running:
                 # 每次都发送完整目标，包括失败后的回退，不能用缓存推断发射器状态。
                 apply_link_radio(self.config.radio_control_port,
                                  new_config.bandwidth_mhz, new_config.uplink_mcs)

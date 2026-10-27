@@ -46,7 +46,8 @@ from urllib.parse import parse_qs, urlparse
 
 from .artifacts import archive_file, write_json_atomic
 from .algorithm import (AlgorithmContext, freeze_algorithm_config, load_algorithm,
-                        validate_algorithm_config, validate_evaluation_result)
+                        validate_algorithm_config, validate_evaluation_result,
+                        validate_radio_policy_patch)
 from .client_daemon import (
     LinuxNetworkAdapter,
     NetworkAdapter,
@@ -174,11 +175,15 @@ class ServerDaemonConfig:
     client_entry: str = 'wfb_ng.fl.mnist:client_entry'
     aggregate_entry: str = 'wfb_ng.fl.mnist:aggregate_entry'
     evaluate_entry: str = 'wfb_ng.fl.mnist:evaluate_entry'
+    radio_policy_entry: Optional[str] = None
     algorithm_config: Dict[str, Any] = field(default_factory=lambda: {'data_seed': 2026})
 
     def __post_init__(self) -> None:
         object.__setattr__(self, 'algorithm_config', validate_algorithm_config(self.algorithm_config))
-        for entry in (self.client_entry, self.aggregate_entry, self.evaluate_entry):
+        entries: Tuple[str, ...] = (self.client_entry, self.aggregate_entry, self.evaluate_entry)
+        if self.radio_policy_entry is not None:
+            entries += (self.radio_policy_entry,)
+        for entry in entries:
             if not isinstance(entry, str) or entry.count(':') != 1 or not all(entry.split(':')):
                 raise FLRuntimeError('invalid_configuration', '部署算法入口格式须为 module:callable')
         if self.mnist_data_dir is not None and (not isinstance(self.mnist_data_dir, str)
@@ -299,6 +304,7 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         client_entry=data.get('client_entry', 'wfb_ng.fl.mnist:client_entry'),
         aggregate_entry=data.get('aggregate_entry', 'wfb_ng.fl.mnist:aggregate_entry'),
         evaluate_entry=data.get('evaluate_entry', 'wfb_ng.fl.mnist:evaluate_entry'),
+        radio_policy_entry=data.get('radio_policy_entry'),
         algorithm_config=data.get('algorithm_config', {'data_seed': 2026}),
     )
 
@@ -820,6 +826,7 @@ class ServerDaemon:
                 event_for_history = self._on_training_round_event(event)
                 if event_type == 'ROUND_STARTED':
                     self.active_job['current_round'] = event.get('round_index')
+                    self.active_job.pop('radio_boundary_round', None)
                     self.active_job['server_phase'] = 'preparing'
                     self.active_job['round_started_at'] = time.time()
                     self.active_job['phase_started_at'] = time.time()
@@ -833,6 +840,8 @@ class ServerDaemon:
                     if event.get('round_index') == self.active_job['rounds']:
                         self.active_job['effect_result'] = {
                             key: deepcopy(event.get(key)) for key in ('round_index', 'metrics', 'verdict', 'reason')}
+                elif event_type == 'ROUND_REPORT_COMPLETED':
+                    self.active_job['radio_boundary_round'] = event.get('round_index')
                 elif event_type == 'ROUND_COMPLETED':
                     self.active_job['rounds_completed'] = event.get('round_index', 0)
                     self.active_job.setdefault('round_results', []).append(deepcopy(event_for_history.get('summary', {})))
@@ -1085,6 +1094,93 @@ class ServerDaemon:
                 "effective_config": self.radio_config.to_dict() if self._radio_config_confirmed else None,
             }
 
+    def _configure_job_radio(
+        self, job: JobConfig, round_index: int, stop_event: threading.Event,
+        preparation: _JobPreparation, results: List[Dict[str, Any]],
+        failures: List[FLRuntimeError], patch: Any,
+    ) -> Dict[str, Any]:
+        """作业合法窗口内冻结确认集合；复用控制事务，不走空闲状态切换。"""
+        if failures:
+            raise failures[0]
+        normalized = validate_radio_policy_patch(patch)
+        with self._lock:
+            if stop_event.is_set() or self._stop_event.is_set():
+                raise FLRuntimeError('job_aborted', '作业已请求停止')
+            if round_index == 0:
+                valid_window = (self.server_state == ServerState.PREPARING
+                                and self._preparation is preparation and self.active_job is None)
+            else:
+                valid_window = (self.server_state == ServerState.RUNNING and self.active_job is not None
+                                and self.active_job['job_id'] == job.job_id
+                                and self.active_job.get('radio_boundary_round') == round_index
+                                and round_index < job.rounds)
+            if not valid_window:
+                raise FLRuntimeError('radio_policy_phase_required', '作业无线配置不在安全边界')
+            if self.control_plane.radio_error or not self._radio_config_confirmed:
+                raise FLRuntimeError('radio_error', '当前无线配置尚未获得确认')
+            before = self.radio_config
+            # 范围与实测表拒绝发生在控制事务开始之前，可由策略处理。
+            try:
+                target = validate_radio_patch(normalized, before)
+            except (TypeError, ValueError) as exc:
+                raise FLRuntimeError('invalid_radio_patch', str(exc)) from exc
+            with self.control_plane.registry.admission_window():
+                online = {node for node, record in self.control_plane.registry.get_all_nodes().items()
+                          if record.readiness != NodeReadiness.OFFLINE and record.tun_ip != self.config.tun_ip}
+                targets = sorted(set(job.target_nodes) | online)
+            fact: Dict[str, Any] = {
+                'request_id': uuid.uuid4().hex, 'job_id': job.job_id, 'round_index': round_index,
+                'phase': 'preparing', 'transaction_state': 'in_progress',
+                'before_config': before.to_dict(), 'requested_patch': dict(normalized),
+                'target_config': target.to_dict(), 'target_nodes': targets,
+                'confirmed_nodes': [], 'unconfirmed_nodes': targets,
+                'effective_config': None, 'recovery_state': 'recovering',
+                'error_code': None, 'reason': None,
+            }
+
+        try:
+            outcome = self.control_plane.reconfigure_radio(
+                normalized, target_nodes=targets, job_id=job.job_id, stop_event=stop_event)
+        except Exception as exc:
+            fact.update(phase='unknown', transaction_state='radio_error', recovery_state='blocked',
+                        error_code=getattr(exc, 'error_code', 'radio_transaction_failed'),
+                        reason=str(exc)[:512])
+            with self._lock:
+                self.control_plane.radio_error = True
+                self._radio_config_confirmed = False
+        else:
+            fact.update(
+                session_id=outcome.session_id,
+                phase=outcome.failed_phase or 'CONFIRMED', transaction_state=outcome.status,
+                confirmed_nodes=sorted(outcome.confirmed_nodes),
+                unconfirmed_nodes=sorted(set(targets) - set(outcome.confirmed_nodes)),
+                effective_config=outcome.effective_config.to_dict() if outcome.effective_config is not None else None,
+                recovery_state='ready' if outcome.effective_config is not None else 'blocked',
+                error_code=None if outcome.success else 'radio_transaction_failed',
+                reason=outcome.error_message[:512] if outcome.error_message else None,
+            )
+            with self._lock:
+                self.radio_config = self.control_plane.active_radio_config
+                self._radio_config_confirmed = outcome.effective_config is not None
+                if outcome.status == 'radio_error':
+                    self.control_plane.radio_error = True
+                if outcome.success and self.server_role is not None:
+                    # 下一次 start_downlink 才读取该属性；当前 operation 已越过完成屏障。
+                    assert outcome.effective_config is not None
+                    self.server_role.transport.uftp_rate_kbps = outcome.effective_config.uftp_rate_kbps
+        with self._lock:
+            results.append(deepcopy(fact))
+            for record in (self.active_job, self._recent_job):
+                if record is not None and record.get('job_id') == job.job_id:
+                    record['radio_results'] = deepcopy(results)
+            if fact['error_code'] is not None:
+                failure = FLRuntimeError(fact['error_code'], fact['reason'] or '无线事务失败', details=deepcopy(fact))
+                failures.append(failure)
+                if not self._radio_config_confirmed and self.server_state != ServerState.STOPPED:
+                    self.server_state = ServerState.RADIO_ERROR
+                raise failure
+        return deepcopy(fact)
+
     def run_spectrum_survey(
         self, duration_ms: float = 300.0, congestion_threshold_fps: float = 50.0
     ) -> SpectrumSurveyReport:
@@ -1166,7 +1262,7 @@ class ServerDaemon:
     def start_job(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """冻结已部署算法，先完成初始评估与全员准备，再启动真实轮次。"""
         if any(key in payload for key in ('algorithm', 'algorithm_config', 'client_entry',
-                                          'aggregate_entry', 'evaluate_entry')):
+                                          'aggregate_entry', 'evaluate_entry', 'radio_policy_entry')):
             raise FLRuntimeError('invalid_job_config', '算法入口和参数只从服务器部署配置选择')
         payload = {**payload,
                    "preparation_timeout_seconds": self.config.preparation_timeout_seconds,
@@ -1177,8 +1273,32 @@ class ServerDaemon:
         algorithm_context: Optional[AlgorithmContext] = None
         aggregate_fn: Optional[Callable[..., Any]] = None
         evaluate_fn: Optional[Callable[..., Any]] = None
+        radio_policy_fn: Optional[Callable[..., Any]] = None
+        radio_policy_entry = self.config.radio_policy_entry
         initial_result: Dict[str, Any] = {}
+        radio_results: List[Dict[str, Any]] = []
+        radio_failure: List[FLRuntimeError] = []
         preparation_started_at = time.monotonic()
+
+        def remember_radio_preparation_failure(exc: BaseException) -> None:
+            # 初始策略可能已改变全网；后续准备拒绝也不能丢掉这些事务事实。
+            if not radio_results:
+                return
+            if self._recent_job is not None and self._recent_job.get('job_id') == job.job_id:
+                return
+            code = getattr(exc, 'error_code', 'job_preparation_failed')
+            execution = 'aborted' if code == 'job_preparation_cancelled' else 'failed'
+            record = job.to_dict()
+            record.update(
+                radio_results=deepcopy(radio_results), initial_metrics=deepcopy(initial_result.get('metrics')),
+                rounds_completed=0, execution_result=execution, effect_result=None,
+                algorithm={'radio_policy_entry': radio_policy_entry, 'config': deepcopy(algorithm_config)},
+                recovery_state='blocked' if self.control_plane.radio_error or self._stop_event.is_set() else 'ready',
+                reason=code, error=str(exc),
+                terminal_result={'status': execution, 'job_id': job.job_id, 'reason': code})
+            if self._stop_event.is_set():
+                record['recovery_error'] = 'DAEMON_STOPPED'
+            self._recent_job = record
 
         with self._lock:
             if self.control_plane.calibration:
@@ -1221,7 +1341,7 @@ class ServerDaemon:
             self._preparation = model_preparation
 
             def prepare_model() -> Tuple[Any, Optional[Any]]:
-                nonlocal aggregate_fn, evaluate_fn, algorithm_context, initial_result, job
+                nonlocal aggregate_fn, evaluate_fn, radio_policy_fn, algorithm_context, initial_result, job
                 if model_preparation.cancelled:
                     raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
                 if not os.path.isfile(job.model_path):
@@ -1258,6 +1378,32 @@ class ServerDaemon:
                 load_algorithm(self.config.client_entry, arity=3)
                 aggregate_fn = load_algorithm(self.config.aggregate_entry, arity=5)
                 evaluate_fn = load_algorithm(self.config.evaluate_entry, arity=3)
+                if radio_policy_entry is not None:
+                    deployed_policy = load_algorithm(radio_policy_entry, arity=2)
+
+                    def invoke_policy(config: Any, context: AlgorithmContext) -> None:
+                        context.check_stop()
+                        window_open = True
+
+                        def configure(patch: Any) -> Dict[str, Any]:
+                            if not window_open:
+                                raise FLRuntimeError('radio_policy_phase_required', '无线策略调用窗口已结束')
+                            return self._configure_job_radio(
+                                job, context.round_index, context.stop_event,
+                                model_preparation, radio_results, radio_failure, patch)
+
+                        bound_context = replace(context, radio_configure_callback=configure)
+                        try:
+                            result = deployed_policy(config, bound_context)
+                        finally:
+                            window_open = False
+                            if radio_failure:
+                                raise radio_failure[0]
+                        context.check_stop()
+                        if result is not None:
+                            raise FLRuntimeError('algorithm_contract_error', '无线策略必须返回 None')
+
+                    radio_policy_fn = invoke_policy
                 algorithm_context = AlgorithmContext(
                     job_id=job.job_id, node_id=255, target_nodes=tuple(job.target_nodes),
                     rounds=job.rounds,
@@ -1277,6 +1423,10 @@ class ServerDaemon:
                 algorithm_context.check_stop()
                 os.makedirs(algorithm_context.artifact_dir, exist_ok=True)
                 write_json_atomic(Path(algorithm_context.artifact_dir) / 'initial_evaluation.json', initial_result)
+                if radio_policy_fn is not None:
+                    radio_policy_fn(freeze_algorithm_config(algorithm_config),
+                                    algorithm_context.for_phase('radio_policy', round_index=0,
+                                                                initial_metrics=initial_result['metrics']))
                 if calculate_file_sha256(job.model_path, model_preparation.cancellation_event) != digest:
                     raise FLRuntimeError('preflight_model_checksum_failed', '初始评估期间模型被修改')
                 return actual_size, digest
@@ -1305,6 +1455,7 @@ class ServerDaemon:
 
             self._preparation = None
             if model_error is not None:
+                remember_radio_preparation_failure(model_error)
                 if self.server_state == ServerState.PREPARING:
                     self.server_state = ServerState.IDLE
                 raise model_error
@@ -1322,6 +1473,8 @@ class ServerDaemon:
                                      'aggregate_entry': self.config.aggregate_entry,
                                      'evaluate_entry': self.config.evaluate_entry,
                                      'config': deepcopy(algorithm_config)}
+            job_dict['algorithm']['radio_policy_entry'] = radio_policy_entry
+            job_dict['radio_results'] = deepcopy(radio_results)
             job_dict['initial_metrics'] = deepcopy(initial_result['metrics'])
             job_dict['server_preparation'] = deepcopy(initial_result['preparation'])
 
@@ -1403,6 +1556,7 @@ class ServerDaemon:
                 self._lock.acquire()
 
             if preparation_error is not None:
+                remember_radio_preparation_failure(preparation_error)
                 self._preparation = None
                 if self.server_state == ServerState.PREPARING:
                     self.server_state = ServerState.IDLE
@@ -1410,12 +1564,16 @@ class ServerDaemon:
             if self.server_state != ServerState.PREPARING or self._stop_event.is_set():
                 preparation.cancel_and_wait()
                 self._preparation = None
-                raise FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                cancelled = FLRuntimeError("job_preparation_cancelled", "作业准备被停止")
+                remember_radio_preparation_failure(cancelled)
+                raise cancelled
             if time.monotonic() - preparation_started_at > preparation_timeout_seconds:
                 preparation.cancel_and_wait()
                 self._preparation = None
                 self.server_state = ServerState.IDLE
-                raise FLRuntimeError("preflight_preparation_timeout", "作业准备超过配置期限")
+                expired = FLRuntimeError("preflight_preparation_timeout", "作业准备超过配置期限")
+                remember_radio_preparation_failure(expired)
+                raise expired
 
             # 仅在最终写入 active_job 的瞬间锁住注册表，避免目标在受理边界竞态失效。
             admission_error: Optional[FLRuntimeError] = None
@@ -1441,6 +1599,7 @@ class ServerDaemon:
                     self._preparation = None
 
             if admission_error is not None:
+                remember_radio_preparation_failure(admission_error)
                 self.server_state = ServerState.IDLE
                 preparation.cancel_and_wait()
                 self._preparation = None
@@ -1571,6 +1730,7 @@ class ServerDaemon:
                         initial_metrics=initial_result['metrics'],
                         prepare_round=prepare_round, round_completion=complete_round,
                         cancel_callback=lambda cause: self._on_coordinator_cancel(job.job_id, cause),
+                        radio_policy_fn=radio_policy_fn,
                     )
                     self.coordinator = coordinator
                     coordinator.start()
@@ -1818,11 +1978,13 @@ class ServerDaemon:
                 if (recent.get('terminal_delivery_errors')
                         and not recent.get('terminal_delivery_succeeded')):
                     recent.setdefault('recovery_error', 'TERMINAL_BROADCAST_FAILED')
+                if self.control_plane.radio_error:
+                    recent.setdefault('recovery_error', 'RADIO_CONFIGURATION_UNKNOWN')
                 if self._stop_event.is_set():
                     recent['recovery_error'] = 'DAEMON_STOPPED'
                 self._refresh_job_recovery()
                 if not self._stop_event.is_set():
-                    self.server_state = ServerState.IDLE
+                    self.server_state = ServerState.RADIO_ERROR if self.control_plane.radio_error else ServerState.IDLE
                 self.console.record_event({'type': 'RECOVERY_COMPLETED' if recent['recovery_state'] == 'ready'
                                            else 'RECOVERY_BLOCKED', 'job_id': job_id})
             self._terminal_done.set()

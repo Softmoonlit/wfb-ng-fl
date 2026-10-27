@@ -524,6 +524,7 @@ class FLCoordinator:
         on_completed: Optional[Callable[[Dict[str, Any]], None]] = None,
         on_failed: Optional[Callable[[Exception], None]] = None,
         cancel_callback: Optional[Callable[[str], None]] = None,
+        radio_policy_fn: Optional[Callable[[Mapping[str, Any], AlgorithmContext], None]] = None,
     ):
         if not isinstance(job, JobConfig):
             raise FLRuntimeError("invalid_job_config", "job 必须为 JobConfig 实例")
@@ -562,6 +563,16 @@ class FLCoordinator:
             raise FLRuntimeError(
                 "invalid_cancel_callback", "cancel_callback 必须可调用"
             )
+        if radio_policy_fn is not None:
+            if not callable(radio_policy_fn):
+                raise FLRuntimeError(
+                    "invalid_radio_policy", "radio_policy_fn 必须可调用"
+                )
+            if not callable(getattr(context, "configure_radio", None)):
+                raise FLRuntimeError(
+                    "invalid_algorithm_context",
+                    "radio policy context 必须提供 configure_radio(...)",
+                )
 
         self.job = job
         self.runtime = runtime
@@ -584,6 +595,7 @@ class FLCoordinator:
         self.on_completed = on_completed
         self.on_failed = on_failed
         self.cancel_callback = cancel_callback
+        self.radio_policy_fn = radio_policy_fn
 
         self.state = CoordinatorState.IDLE
         self.events: List[Dict[str, Any]] = []
@@ -936,6 +948,35 @@ class FLCoordinator:
         finally:
             self._supervisor.close()
 
+    def _call_radio_policy(self, round_index: int) -> None:
+        if self.radio_policy_fn is None:
+            return
+        context = self._phase_context("radio_policy", round_index)
+        self._emit_event(
+            "RADIO_POLICY_START",
+            round_index=round_index,
+        )
+        try:
+            result = self.radio_policy_fn(self.algorithm_config, context)
+        except FLRuntimeError:
+            raise
+        except TypeError as exc:
+            raise FLRuntimeError(
+                "algorithm_contract_error",
+                "radio_policy_fn 必须使用二参数接口",
+            ) from exc
+        except Exception as exc:
+            raise FLRuntimeError("algorithm_failed", "无线策略函数执行失败") from exc
+        if result is not None:
+            raise FLRuntimeError(
+                "algorithm_contract_error",
+                "radio_policy_fn 必须返回 None；配置结果由 context.configure_radio 返回",
+            )
+        self._emit_event(
+            "RADIO_POLICY_COMPLETED",
+            round_index=round_index,
+        )
+
     def _run_synchronous_loop(self, initial_model_path: str) -> str:
         target_nodes = tuple(sorted(self.job.target_nodes))
         current_model_path = initial_model_path
@@ -1108,9 +1149,20 @@ class FLCoordinator:
                 round_deadline_monotonic=round_deadline,
             )
             self.round_completion(round_index)
-            self._supervisor.end_round(round_index)
+            # The client submission barrier is complete. Record it before
+            # closing the round budget; radio policy belongs to the gap after
+            # this completed round, not to the completed round's deadline.
             round_summary['client_submission_returns_received'] = True
-            self._emit_event("ROUND_REPORT_COMPLETED", round_index=round_index)
+            self._emit_event(
+                "ROUND_REPORT_COMPLETED",
+                round_index=round_index,
+                round_deadline_monotonic=round_deadline,
+            )
+            self._supervisor.end_round(round_index)
+            self._check_stop()
+            if round_index < self.job.rounds:
+                self._call_radio_policy(round_index)
+                self._check_stop()
 
             self._emit_event("ROUND_COMPLETED", round_index=round_index, summary=round_summary)
             current_model_path = output_model_path

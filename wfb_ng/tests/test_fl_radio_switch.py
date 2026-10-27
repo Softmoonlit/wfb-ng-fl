@@ -30,6 +30,7 @@ from wfb_ng.fl.control import (
     ControlPlaneServer,
     ControlPlaneClient,
 )
+from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.radio import (
     RadioConfig,
     normalize_radio_patch,
@@ -516,25 +517,15 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
                 target_nodes=[1, 2],
             )
 
-    def test_auto_discovery_of_target_nodes(self):
-        """When target_nodes is None, reconfigure_radio auto-discovers online READY nodes."""
+    def test_explicit_target_set_is_required_for_radio_transaction(self):
+        """Host, not ControlPlane, owns the frozen target set."""
         self._bring_clients_online()
-
-        res = self.server.reconfigure_radio(
-            patch={"target_channel": 149},
-            target_nodes=None,  # Auto-discover [1, 2]
-            prepare_timeout_seconds=1.0,
-            commit_delay_seconds=0.05,
-            commit_timeout_seconds=1.5,
-            lease_timeout_seconds=2.0,
-            ping_interval_seconds=0.08,
-        )
-        self.assertTrue(res.success)
-        self.assertEqual(res.target_channel, 149)
-        self.assertEqual(self.server.active_radio_config.channel, 149)
-        time.sleep(0.1)
-        self.assertEqual(self.client1.locked_channel, 149)
-        self.assertEqual(self.client2.locked_channel, 149)
+        with self.assertRaises(FLRuntimeError) as caught:
+            self.server.reconfigure_radio(
+                patch={"target_channel": 149},
+                target_nodes=None,  # type: ignore[arg-type]
+            )
+        self.assertEqual(caught.exception.error_code, "invalid_radio_targets")
 
     def test_stale_session_id_and_non_target_node_ignored(self):
         """Messages with stale session_id or excluding the node are safely ignored."""

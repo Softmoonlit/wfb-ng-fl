@@ -9,7 +9,7 @@ import tempfile
 import threading
 import unittest
 from unittest.mock import patch
-from typing import Any, Dict, List, Mapping
+from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from wfb_ng.fl.coordinator import CoordinatorState, FLCoordinator, JobConfig
 from wfb_ng.fl.errors import FLRuntimeError
@@ -30,6 +30,9 @@ class FrozenContext:
     local_config: Mapping[str, Any]
     initial_metrics: Mapping[str, Any]
     stop_event: threading.Event = field(compare=False, repr=False)
+    radio_configure_callback: Optional[Callable[[Mapping[str, Any]], Mapping[str, Any]]] = field(
+        default=None, compare=False, repr=False
+    )
 
     def for_phase(self, phase, *, round_index, initial_metrics):
         return replace(
@@ -37,7 +40,17 @@ class FrozenContext:
             phase=phase,
             round_index=round_index,
             initial_metrics=dict(initial_metrics),
+            radio_configure_callback=(
+                self.radio_configure_callback if phase == 'radio_policy' else None
+            ),
         )
+
+    def configure_radio(self, patch):
+        if self.phase != 'radio_policy':
+            raise FLRuntimeError('radio_policy_phase_required', 'radio policy phase required')
+        if self.radio_configure_callback is None:
+            raise FLRuntimeError('radio_configuration_unavailable', 'radio callback unavailable')
+        return self.radio_configure_callback(patch)
 
     def check_stop(self):
         if self.stop_event.is_set():
@@ -147,6 +160,8 @@ class TestFLCoordinator(unittest.TestCase):
         io_timeout_seconds=None,
         cancel_callback=None,
         on_failed=None,
+        radio_policy=None,
+        radio_callback=None,
     ):
         job_overrides = {}
         if round_timeout_seconds is not None:
@@ -182,6 +197,14 @@ class TestFLCoordinator(unittest.TestCase):
         coordinator_kwargs = {}
         if cancel_callback is not None:
             coordinator_kwargs["cancel_callback"] = cancel_callback
+        if radio_policy is not None:
+            coordinator_kwargs["radio_policy_fn"] = radio_policy
+            if radio_callback is None:
+                radio_callback = lambda patch: {
+                    'transaction_state': 'confirmed',
+                    'requested_patch': dict(patch),
+                    'effective_config': None,
+                }
 
         return FLCoordinator(
             job=job,
@@ -194,6 +217,7 @@ class TestFLCoordinator(unittest.TestCase):
                 self.base_context,
                 rounds=rounds,
                 initial_metrics=dict(initial),
+                radio_configure_callback=radio_callback if radio_policy is not None else None,
             ),
             initial_metrics=initial,
             prepare_round=prepare,
@@ -402,6 +426,119 @@ class TestFLCoordinator(unittest.TestCase):
         self.assertEqual(len(self.evaluate_calls), 1)
         self.assertEqual(summary["initial_metrics"], {"loss": 9.0, "accuracy": 0.01})
         self.assertNotEqual(summary["initial_metrics"], summary["rounds"][0]["metrics"])
+
+    def test_radio_policy_runs_after_completion_before_next_publish_and_not_after_final(self):
+        policy_contexts = []
+        radio_results = []
+
+        def policy(config, context):
+            self.callback_order.append(f'radio:{context.round_index}')
+            policy_contexts.append((dict(config), context))
+            radio_results.append(context.configure_radio({'uplink_mcs': 4}))
+            return None
+
+        coordinator = self._coordinator(rounds=2, radio_policy=policy)
+        summary = coordinator.run()
+
+        self.assertEqual(summary['rounds_completed'], 2)
+        self.assertEqual(
+            self.callback_order,
+            ['prepare:1', 'publish:1', 'complete:1', 'radio:1',
+             'prepare:2', 'publish:2', 'complete:2'],
+        )
+        self.assertEqual([context.phase for _, context in policy_contexts], ['radio_policy'])
+        self.assertEqual([context.round_index for _, context in policy_contexts], [1])
+        self.assertEqual(radio_results[0]['effective_config'], None)
+        event_types = [event['type'] for event in coordinator.events]
+        self.assertLess(event_types.index('ROUND_REPORT_COMPLETED'),
+                        event_types.index('RADIO_POLICY_START'))
+        self.assertLess(event_types.index('RADIO_POLICY_COMPLETED'),
+                        event_types.index('ROUND_COMPLETED'))
+        self.assertEqual(event_types.count('RADIO_POLICY_START'), 1)
+
+    def test_radio_policy_failure_blocks_next_publish_and_preserves_submit_barrier(self):
+        def policy(config, context):
+            raise FLRuntimeError('radio_transaction_failed', 'fixture transaction failed')
+
+        coordinator = self._coordinator(rounds=2, radio_policy=policy)
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.run()
+        self.assertEqual(raised.exception.error_code, 'radio_transaction_failed')
+        self.assertEqual(len(self.runtime.published_models), 1)
+        summary = coordinator.get_summary()
+        self.assertEqual(summary['rounds_completed'], 1)
+        self.assertTrue(summary['rounds'][0]['client_submission_returns_received'])
+
+    def test_radio_policy_must_return_none(self):
+        coordinator = self._coordinator(
+            rounds=2,
+            radio_policy=lambda config, context: {'transaction_state': 'confirmed'},
+        )
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.run()
+        self.assertEqual(raised.exception.error_code, 'algorithm_contract_error')
+        self.assertEqual(len(self.runtime.published_models), 1)
+
+    def test_radio_policy_after_round_budget_is_not_truncated_by_old_deadline(self):
+        entered = threading.Event()
+        control_event = threading.Event()
+        cancel_reasons = []
+
+        def policy(config, context):
+            entered.set()
+            control_event.wait()
+            context.check_stop()
+
+        coordinator = self._coordinator(
+            rounds=2,
+            round_timeout_seconds=0.05,
+            radio_policy=policy,
+            cancel_callback=cancel_reasons.append,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        # Wait past the short round budget. end_round() already cleared it;
+        # the policy is waiting for the host transaction/control event.
+        threading.Event().wait(0.12)
+        self.assertIsNone(coordinator.current_round_deadline)
+        self.assertEqual(cancel_reasons, [])
+        self.assertFalse(self.runtime.abort_event.is_set())
+        self.assertIsNone(coordinator.get_summary())
+
+        control_event.set()
+        self.assertEqual(coordinator.wait(timeout=2.0), 0)
+        self.assertEqual(coordinator.state, CoordinatorState.SUCCEEDED)
+
+    def test_abort_during_radio_policy_calls_callback_and_waits_for_real_exit(self):
+        entered = threading.Event()
+        release = threading.Event()
+        cancel_reasons = []
+
+        def policy(config, context):
+            entered.set()
+            release.wait()
+            context.check_stop()
+
+        coordinator = self._coordinator(
+            rounds=2,
+            round_timeout_seconds=0.05,
+            radio_policy=policy,
+            cancel_callback=cancel_reasons.append,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        coordinator.abort('operator_stop')
+        self.assertEqual(cancel_reasons, ['operator_stop'])
+        self.assertIsNone(coordinator.get_summary())
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.wait(timeout=0.01)
+        self.assertEqual(raised.exception.error_code, 'coordinator_wait_timeout')
+
+        release.set()
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.ABORTED)
+        self.assertEqual(coordinator.get_summary()['error_code'], 'aborted')
+
 
     def test_old_two_argument_aggregate_is_rejected(self):
         def old_aggregate(model_path, updates_by_node):
