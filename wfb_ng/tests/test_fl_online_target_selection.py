@@ -6,6 +6,8 @@
 from contextlib import contextmanager
 from dataclasses import replace
 import http.client
+import ipaddress
+import socket
 import io
 import json
 import threading
@@ -22,6 +24,44 @@ from wfb_ng.fl.control import NodeHeartbeat
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig, ServerState, load_server_config
 
+
+
+@pytest.fixture(autouse=True)
+def isolated_socket_boundary(monkeypatch):
+    """只在真实 socket 出站边界拦截：本文件绝不访问板卡或共享控制端口。"""
+    sendto = socket.socket.sendto
+    connect = socket.socket.connect
+    connect_ex = socket.socket.connect_ex
+
+    def require_isolated(sock, address):
+        if sock.family in (socket.AF_INET, socket.AF_INET6):
+            host, port = address[:2]
+            assert ipaddress.ip_address(host).is_loopback, f'禁止测试访问非 loopback 地址: {address}'
+            assert port not in (9000, 9001, 9002, 9200), f'禁止测试访问共享控制端口: {address}'
+
+    def isolated_sendto(sock, data, *args):
+        require_isolated(sock, args[-1])
+        return sendto(sock, data, *args)
+
+    def isolated_connect(sock, address):
+        require_isolated(sock, address)
+        return connect(sock, address)
+
+    def isolated_connect_ex(sock, address):
+        require_isolated(sock, address)
+        return connect_ex(sock, address)
+
+    monkeypatch.setattr(socket.socket, 'sendto', isolated_sendto)
+    monkeypatch.setattr(socket.socket, 'connect', isolated_connect)
+    monkeypatch.setattr(socket.socket, 'connect_ex', isolated_connect_ex)
+
+
+@pytest.fixture
+def isolated_control_address(isolated_socket_boundary):
+    """持有 OS 分配的 loopback UDP 接收端，不复用实机默认端口。"""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sink:
+        sink.bind(('127.0.0.1', 0))
+        yield sink.getsockname()
 
 def selection_client(runtime, config, context):
     """部署入口只参与装配，本文件不执行客户端计算。"""
@@ -63,22 +103,34 @@ class SelectionRuntime:
 
 def ready_taskpeer(daemon, message):
     """通过正式报告和相关确认释放所选完整节点集合的准备门禁。"""
+    if message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+        for node in daemon.get_status_report()['recent_job']['target_nodes']:
+            replies = daemon.control_plane.handle_datagram(json.dumps({
+                'type': 'JOB_RECOVERY', 'node_id': node, 'job_id': message['job_id'],
+                'report_id': f"recovery-{message['job_id']}-{node}",
+                'report': {'recovery_epoch': 1, 'recovery_state': 'ready'},
+            }).encode(), (f'127.0.0.{10 + node}', daemon.config.control_broadcast_port))
+            assert replies and json.loads(replies[0])['ok'] is True
+        return
     if message['type'] != 'TASK_ANNOUNCE':
         return
     for node in message['target_nodes']:
         replies = daemon.control_plane.handle_datagram(json.dumps({
             'type': 'TASK_READY', 'node_id': node, 'job_id': message['job_id'],
             'report_id': f"prepared-{message['job_id']}-{node}", 'report': {'ready': True},
-        }).encode(), (f'10.80.0.{10 + node}', 9001))
+        }).encode(), (f'127.0.0.{10 + node}', daemon.config.control_broadcast_port))
         assert replies and json.loads(replies[0])['ok'] is True
 
 
 @pytest.fixture
-def daemon(tmp_path):
+def daemon(tmp_path, isolated_control_address):
     adapter = Mock(spec=NetworkAdapter)
     adapter.is_tun_active.return_value = True
     result = ServerDaemon(ServerDaemonConfig(
-        enable_link_process=False, enable_control_plane=False,
+        enable_link_process=False, enable_control_plane=False, io_timeout_seconds=0.15,
+        ipc_host='127.0.0.1', ipc_port=0, control_bind_host='127.0.0.1', control_bind_port=0,
+        control_broadcast_addr=isolated_control_address[0],
+        control_broadcast_port=isolated_control_address[1], radio_control_port=isolated_control_address[1],
         client_entry=f'{__name__}:selection_client',
         aggregate_entry=f'{__name__}:selection_aggregate',
         evaluate_entry=f'{__name__}:selection_evaluate', algorithm_config={'fixture': 'selection'},
@@ -93,9 +145,9 @@ def heartbeat(daemon, node_id, state='IDLE', error=None):
     hb = NodeHeartbeat(node_id=node_id, state='HUNTING', elapsed_ms=0,
                        current_channel=157, txpower_dbm=12, uplink_mcs=6)
     registry = daemon.control_plane.registry
-    registry.update_heartbeat(hb, ('10.80.0.11', 9001), daemon.radio_config)
+    registry.update_heartbeat(hb, ('127.0.0.11', daemon.config.control_broadcast_port), daemon.radio_config)
     registry.update_heartbeat(replace(hb, state=state, error_code=error),
-                              ('10.80.0.11', 9001), daemon.radio_config)
+                              ('127.0.0.11', daemon.config.control_broadcast_port), daemon.radio_config)
 
 
 def body(daemon, targets):
@@ -212,17 +264,24 @@ def test_daemon_rejects_every_invalid_target_before_any_admission(daemon):
 
 
 def test_disconnection_events_stay_with_the_job_that_observed_them(daemon):
+    daemon.control_plane.offline_threshold_seconds = 0.08
+    daemon.control_plane.registry.offline_threshold_seconds = 0.08
     heartbeat(daemon, 1)
     daemon.console.snapshot()
     first = payload(daemon, [1])
     with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda msg: ready_taskpeer(daemon, msg)):
         daemon.start_job(first)
-    with patch('wfb_ng.fl.control.time.monotonic', return_value=time.monotonic() + 31):
-        offline = daemon.console.snapshot()['current_job']['participants'][0]
-    assert offline['disconnection_events']
-    with patch.object(daemon.control_plane, 'broadcast_downlink'):
-        daemon._finalize_job(outcome='failed', job_id=first['job_id'], reason='test_failure', error='test')
-
+        deadline = time.monotonic() + 2
+        while time.monotonic() < deadline:
+            state = daemon.console.snapshot()
+            recent = state['recent_job']
+            if recent and recent['recovery_state'] == 'ready':
+                break
+            time.sleep(0.005)
+    assert recent and recent['execution_result'] == 'failed'
+    assert recent['participants'][0]['disconnection_events']
+    daemon.control_plane.offline_threshold_seconds = 30
+    daemon.control_plane.registry.offline_threshold_seconds = 30
     heartbeat(daemon, 1)
     second = payload(daemon, [1])
     second['job_id'] = 'second-selection-job'
@@ -273,6 +332,7 @@ def test_role_preparation_timeout_requests_resource_close(daemon):
     heartbeat(daemon, 1)
     release_role = threading.Event()
     role = Mock()
+    role.poll_failure.return_value = None
     role.runtime = SelectionRuntime()
     role.start.side_effect = lambda: release_role.wait(2)
     role.close.side_effect = lambda: release_role.set()
@@ -296,6 +356,7 @@ def test_role_start_does_not_hold_daemon_lock_against_stop(daemon):
     result: Dict[str, Any] = {}
 
     role = Mock()
+    role.poll_failure.return_value = None
     role.runtime = SelectionRuntime()
     def start_role():
         nonlocal listener_open
@@ -352,8 +413,11 @@ def test_readiness_wait_releases_daemon_lock_for_abort(daemon):
     def observe_announcement(message):
         if message['type'] == 'TASK_ANNOUNCE':
             wait_started.set()
+        else:
+            ready_taskpeer(daemon, message)
 
     role = Mock()
+    role.poll_failure.return_value = None
     role.runtime = SelectionRuntime()
     with patch('wfb_ng.fl.role.ServerRole', return_value=role), \
             patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=observe_announcement), \
@@ -397,11 +461,11 @@ def test_http_accepted_startup_timeout_is_a_recent_failed_job(daemon, recovery_f
     request_body = body(daemon, [1])
     daemon.config = replace(daemon.config, enable_link_process=True, preparation_timeout_seconds=0.15)
     role = Mock()
+    role.poll_failure.return_value = None
     role.runtime = SelectionRuntime()
     with patch('wfb_ng.fl.role.ServerRole', return_value=role), \
-            patch.object(daemon.control_plane, 'broadcast_downlink'), \
-            patch.object(daemon, '_stop_link_process'), \
-            patch.object(daemon, '_start_link_process', side_effect=RuntimeError('reset failed') if recovery_fails else None), \
+            patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=lambda message:
+                         ready_taskpeer(daemon, message) if message['type'] != 'TASK_ANNOUNCE' and not recovery_fails else None), \
             http_server(daemon) as request:
         status, result = request('POST', '/api/v1/jobs', request_body)
         assert status == 202 and result['status'] == 'accepted'
@@ -415,9 +479,8 @@ def test_http_accepted_startup_timeout_is_a_recent_failed_job(daemon, recovery_f
     assert recent['execution_result'] == 'failed'
     assert recent['reason'] == 'client_startup_timeout'
     assert recent['error']
-    assert recent['recovery_state'] == ('blocked' if recovery_fails else 'ready')
-    if recovery_fails:
-        assert recent['recovery_error'] == 'LINK_RESET_FAILED'
+    assert recent['recovery_state'] == ('unconfirmed' if recovery_fails else 'ready')
+    assert daemon.get_status_report()['recent_job']['recovery_missing_nodes'] == ([1] if recovery_fails else [])
 
 
 def test_http_accepted_announcement_failure_becomes_recent_failed_job(daemon):

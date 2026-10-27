@@ -1,5 +1,6 @@
 """客户端宿主事件通过私有 socket 传递，并等待 Daemon 确认。"""
 import json
+from wfb_ng.tests._client_test_network import client_network_kwargs, isolated_client_network
 import socket
 import threading
 
@@ -45,7 +46,7 @@ def test_local_event_size_limit_rejects_before_sending():
 def test_job_context_uses_local_dataset_and_keeps_algorithm_config_unchanged(tmp_path):
     from wfb_ng.fl.client_daemon import ClientDaemonConfig, ClientJobConfig, JobSandbox
     from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
-    config = ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11', mnist_data_dir='/local/mnist')
+    config = ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11', mnist_data_dir='/local/mnist')
     sandbox = JobSandbox(str(tmp_path), MockNetworkAdapter(),
                          _command_prefix=['/bin/sleep', '30'],
                          local_config={'mnist_data_dir': config.mnist_data_dir})
@@ -183,7 +184,7 @@ def test_daemon_rejects_remote_dataset_path_without_starting_role(tmp_path, algo
     from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
     from wfb_ng.fl.control import ControlPlaneClient, ClientNodeState
     from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
-    daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+    daemon = ClientDaemon(ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11',
         work_dir=str(tmp_path), enable_link_process=False, mnist_data_dir='/local/mnist'),
         network_adapter=MockNetworkAdapter(['wlan0']))
     daemon.poll_hardware_once()
@@ -231,7 +232,7 @@ def test_daemon_launch_does_not_block_control_and_stop_joins_supervisor(tmp_path
     from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
     from wfb_ng.fl.control import ControlPlaneClient
     from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
-    daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+    daemon = ClientDaemon(ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11',
         work_dir=str(tmp_path), enable_link_process=False), network_adapter=MockNetworkAdapter(['wlan0']))
     daemon.poll_hardware_once()
     with mock.patch.object(ControlPlaneClient, 'start'):
@@ -429,7 +430,7 @@ def test_daemon_role_exit_reports_next_uncompleted_round_to_real_control(tmp_pat
         def settimeout(self, timeout): pass
         def close(self): pass
 
-    daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+    daemon = ClientDaemon(ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11',
         work_dir=str(tmp_path), enable_link_process=False), MockNetworkAdapter(['wlan0']))
     daemon.poll_hardware_once()
     with mock.patch.object(control.ControlPlaneClient, 'start'):
@@ -542,7 +543,7 @@ def test_finished_job_cannot_be_restarted_by_delayed_announce(tmp_path, monkeypa
     from wfb_ng.fl.control import ControlPlaneClient
     from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 
-    daemon = ClientDaemon(ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+    daemon = ClientDaemon(ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11',
         work_dir=str(tmp_path), enable_link_process=False),
         network_adapter=MockNetworkAdapter(['wlan0']))
     daemon.poll_hardware_once()
@@ -572,6 +573,14 @@ n.round_complete(1)
 
     monkeypatch.setattr(subprocess, 'Popen', spawn)
     completed = threading.Event()
+    recovered = {'job1': threading.Event(), 'job2': threading.Event()}
+    recoveries = []
+
+    def recovery(job_id, epoch, state, **kwargs):
+        recoveries.append((job_id, epoch, state))
+        recovered[job_id].set()
+
+    monkeypatch.setattr(daemon.control_plane, 'notify_job_recovery', recovery)
     monkeypatch.setattr(daemon.control_plane, 'notify_task_ready', lambda *a, **kw: None)
     monkeypatch.setattr(daemon.control_plane, 'notify_round_complete', lambda *a, **kw: completed.set())
     announce = dict(type='TASK_ANNOUNCE', job_id='job1', run_id='run1', target_nodes=[1],
@@ -586,14 +595,18 @@ n.round_complete(1)
         daemon._startup_thread.join(3)
         assert not daemon.sandbox.is_running
         daemon.control_plane.handle_broadcast(dict(type='JOB_COMPLETED', job_id='job1'))
+        assert recovered['job1'].wait(3), '新作业必须在服务器终态触发的恢复事实后启动'
+        assert recoveries[-1] == ('job1', 1, 'ready')
         daemon.control_plane.handle_broadcast(announce)
         daemon._startup_thread.join(3)
         assert len(processes) == 1, '终态后重复启动消息不能再次创建任务角色'
         completed.clear()
         daemon.control_plane.handle_broadcast({**announce, 'job_id': 'job2'})
         assert completed.wait(3), '新的作业身份应创建新的执行上下文'
-        if terminal != 'natural':
-            daemon.control_plane.handle_broadcast(dict(type=terminal, job_id='job2'))
+        daemon.control_plane.handle_broadcast(dict(
+            type='JOB_COMPLETED' if terminal == 'natural' else terminal, job_id='job2'))
+        assert recovered['job2'].wait(3)
+        assert recoveries[-1] == ('job2', 1, 'ready')
         daemon._startup_thread.join(3)
         assert len(processes) == 2
         assert [context['job_id'] for context in contexts] == ['job1', 'job2']

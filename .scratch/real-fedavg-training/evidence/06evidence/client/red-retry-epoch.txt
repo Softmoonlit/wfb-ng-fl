@@ -1,0 +1,45 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_real_cleanup_retry_advances_epoch_after_blocked _____________
+
+host = (<wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff8520bd30>, <wfb_ng.tests.test_fl_client_daemon.MockNetworkAdapt...error_code': 'idle_link_recovery_failed', 'reason': '待命 TUN 地址或控制路由未就绪'})], <threading.Event object at 0xffff85209840>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff85209e40>
+
+    def test_real_cleanup_retry_advances_epoch_after_blocked(host, monkeypatch):
+        daemon, adapter, reports, reported = host
+        daemon.sandbox._command_prefix = [sys.executable, '-c', 'import time; time.sleep(30)']
+        daemon.trigger_job(_make_client_job(job_id='job1'))
+        real_ready = adapter.is_tun_ready
+        monkeypatch.setattr(adapter, 'is_tun_ready', lambda *a: False)
+        daemon.control_plane.handle_broadcast({'type': 'JOB_ABORT', 'job_id': 'job1'})
+        assert reported.wait(3)
+        assert reports[0][:3] == ('job1', 1, 'blocked')
+        # 只有显式再次执行真实清理并重新检查，才能形成新的恢复事实。
+        reported.clear()
+        monkeypatch.setattr(adapter, 'is_tun_ready', real_ready)
+        daemon.abort_job()
+>       assert reported.wait(2)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xffff85209840>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xffff85209840>> = <threading.Event object at 0xffff85209840>.wait
+
+wfb_ng/tests/test_fl_client_recovery.py:179: AssertionError
+----------------------------- Captured stderr call -----------------------------
+作业 job1 资源未恢复
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1366, in _recover_job_resources
+    raise FLRuntimeError('idle_link_recovery_failed', '待命 TUN 地址或控制路由未就绪')
+wfb_ng.fl.errors.FLRuntimeError: 待命 TUN 地址或控制路由未就绪
+解析或应用对齐指令失败: 作业运行时拒绝更新空闲射频链路
+解析或应用对齐指令失败: 作业运行时拒绝更新空闲射频链路
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_recovery.py::test_real_cleanup_retry_advances_epoch_after_blocked
+1 failed, 2 warnings in 2.70s

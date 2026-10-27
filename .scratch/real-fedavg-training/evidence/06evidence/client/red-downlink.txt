@@ -1,0 +1,60 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_terminal_does_not_block_downlink_and_replays_same_recovery ________
+
+host = (<wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff8ed66ec0>, <wfb_ng.tests.test_fl_client_daemon.MockNetworkAdapter object at 0xffff8ed67b20>, [], <threading.Event object at 0xffff8ed64790>)
+tmp_path = PosixPath('/tmp/pytest-of-fl/pytest-174/test_terminal_does_not_block_d0')
+
+    def test_terminal_does_not_block_downlink_and_replays_same_recovery(host, tmp_path):
+        daemon, adapter, reports, reported = host
+        entered = tmp_path / 'terminating'
+        release = tmp_path / 'release'
+        ready = tmp_path / 'started'
+        daemon.sandbox._command_prefix = [sys.executable, '-c', f'''
+    import pathlib, signal, time
+    entered, release, ready = map(pathlib.Path, {list(map(str, (entered, release, ready)))!r})
+    def stop(*args):
+        entered.touch()
+        while not release.exists():
+            time.sleep(.01)
+        raise SystemExit(0)
+    signal.signal(signal.SIGTERM, stop)
+    ready.touch()
+    while True:
+        signal.pause()
+    ''']
+        proc = daemon.trigger_job(_make_client_job(job_id='job1'))
+        # 文件产生是子进程已装好 TERM handler 的证据。
+        from time import monotonic
+        until = monotonic() + 3
+        while not ready.exists() and monotonic() < until:
+            threading.Event().wait(.01)
+        assert ready.exists()
+        dispatched = threading.Event()
+        daemon.control_plane.register_broadcast_handler('PROBE', lambda msg: dispatched.set())
+
+        def downlink():
+            daemon.control_plane.handle_broadcast({'type': 'JOB_ABORT', 'job_id': 'job1'})
+            daemon.control_plane.handle_broadcast({'type': 'PROBE'})
+
+        receiver = threading.Thread(target=downlink)
+        receiver.start()
+        try:
+>           assert dispatched.wait(.5), '任务回收不能占满唯一下行接收线程'
+E           AssertionError: 任务回收不能占满唯一下行接收线程
+E           assert False
+E            +  where False = <bound method Event.wait of <threading.Event object at 0xffff8ed656f0>>(0.5)
+E            +    where <bound method Event.wait of <threading.Event object at 0xffff8ed656f0>> = <threading.Event object at 0xffff8ed656f0>.wait
+
+wfb_ng/tests/test_fl_client_recovery.py:70: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_recovery.py::test_terminal_does_not_block_downlink_and_replays_same_recovery
+1 failed, 2 warnings in 1.24s

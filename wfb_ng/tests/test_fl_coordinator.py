@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 from typing import Any, Dict, List, Mapping
 
 from wfb_ng.fl.coordinator import CoordinatorState, FLCoordinator, JobConfig
@@ -142,8 +143,17 @@ class TestFLCoordinator(unittest.TestCase):
         initial_metrics=None,
         prepare_round=None,
         round_completion=None,
+        round_timeout_seconds=None,
+        io_timeout_seconds=None,
+        cancel_callback=None,
+        on_failed=None,
     ):
-        job = self._job(rounds=rounds)
+        job_overrides = {}
+        if round_timeout_seconds is not None:
+            job_overrides["round_timeout_seconds"] = round_timeout_seconds
+        if io_timeout_seconds is not None:
+            job_overrides["io_timeout_seconds"] = io_timeout_seconds
+        job = self._job(rounds=rounds, **job_overrides)
         aggregate_fn, evaluate_fn = self._algorithm_functions(
             aggregate=aggregate, evaluate=evaluate
         )
@@ -169,6 +179,10 @@ class TestFLCoordinator(unittest.TestCase):
 
         self.runtime.publish_model = publish
 
+        coordinator_kwargs = {}
+        if cancel_callback is not None:
+            coordinator_kwargs["cancel_callback"] = cancel_callback
+
         return FLCoordinator(
             job=job,
             runtime=self.runtime,
@@ -185,6 +199,8 @@ class TestFLCoordinator(unittest.TestCase):
             prepare_round=prepare,
             round_completion=complete,
             on_event=self.events.append,
+            on_failed=on_failed,
+            **coordinator_kwargs,
         )
 
     def test_job_config_defaults_to_five_strict_sync_rounds(self):
@@ -447,6 +463,370 @@ class TestFLCoordinator(unittest.TestCase):
             coordinator.run()
         self.assertEqual(raised.exception.error_code, "sync_quorum_failed")
         self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+
+    def test_publish_return_after_io_deadline_keeps_io_first_cause(self):
+        class Clock:
+            def __init__(self):
+                self.now = 100.0
+
+            def __call__(self):
+                return self.now
+
+        class LatePublishRuntime(MockServerRuntime):
+            def publish_model(self, model_path):
+                self.published_models.append(model_path)
+                self.active_round_model = model_path
+                self.round_id = f"round_{len(self.published_models)}"
+                clock.now = 103.001
+
+        clock = Clock()
+        self.runtime = LatePublishRuntime(
+            participant_node_ids=(1, 2),
+            update_fixtures_by_node=self.client_updates,
+        )
+        reasons = []
+        coordinator = self._coordinator(
+            round_timeout_seconds=10.0,
+            io_timeout_seconds=3.0,
+            cancel_callback=reasons.append,
+        )
+        with patch("wfb_ng.fl.coordinator.time.monotonic", new=clock):
+            with self.assertRaises(FLRuntimeError) as raised:
+                coordinator.run()
+        self.assertEqual(raised.exception.error_code, "io_timeout")
+        self.assertEqual(coordinator.get_summary()["error_code"], "io_timeout")
+        self.assertEqual(reasons, ["io_timeout"])
+        self.assertEqual(self.runtime.abort_reason, "io_timeout")
+        self.assertIsNone(coordinator.current_round_deadline)
+
+    def test_expired_round_wins_late_operator_abort(self):
+        class Clock:
+            def __init__(self):
+                self.now = 100.0
+
+            def __call__(self):
+                return self.now
+
+        clock = Clock()
+        entered = threading.Event()
+        release = threading.Event()
+        reasons = []
+
+        def blocked_prepare(index):
+            entered.set()
+            release.wait()
+
+        self.runtime = MockServerRuntime(
+            participant_node_ids=(1, 2),
+            update_fixtures_by_node=self.client_updates,
+        )
+        coordinator = self._coordinator(
+            round_timeout_seconds=10.0,
+            io_timeout_seconds=20.0,
+            prepare_round=blocked_prepare,
+            cancel_callback=reasons.append,
+        )
+        with patch("wfb_ng.fl.coordinator.time.monotonic", new=clock):
+            coordinator.start()
+            self.assertTrue(entered.wait(timeout=2.0))
+            clock.now = 110.001
+            coordinator.abort(reason="late_operator_stop")
+            self.assertEqual(reasons, ["round_timeout"])
+            self.assertEqual(self.runtime.abort_reason, "round_timeout")
+            self.assertIsNone(coordinator.get_summary())
+            release.set()
+            self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_cancel_callback_precedes_blocking_runtime_abort_without_terminal(self):
+        compute_entered = threading.Event()
+        compute_release = threading.Event()
+        runtime_abort_entered = threading.Event()
+        runtime_abort_release = threading.Event()
+        callback_seen = threading.Event()
+        sequence = []
+
+        class BlockingAbortRuntime(MockServerRuntime):
+            def abort(self, reason="aborted"):
+                sequence.append("runtime_abort")
+                runtime_abort_entered.set()
+                runtime_abort_release.wait()
+                super().abort(reason=reason)
+
+        self.runtime = BlockingAbortRuntime(
+            participant_node_ids=(1, 2),
+            update_fixtures_by_node=self.client_updates,
+        )
+
+        def blocking_aggregate(model_path, updates_by_node, output_model_path, config, context):
+            compute_entered.set()
+            compute_release.wait()
+            context.check_stop()
+
+        def cancel_callback(reason):
+            sequence.append("cancel_callback")
+            callback_seen.set()
+
+        coordinator = self._coordinator(
+            aggregate=blocking_aggregate,
+            round_timeout_seconds=0.05,
+            cancel_callback=cancel_callback,
+        )
+        coordinator.start()
+        self.assertTrue(compute_entered.wait(timeout=2.0))
+        self.assertTrue(callback_seen.wait(timeout=2.0))
+        self.assertTrue(runtime_abort_entered.wait(timeout=2.0))
+        self.assertEqual(sequence[:2], ["cancel_callback", "runtime_abort"])
+        self.assertIsNone(coordinator.get_summary())
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.wait(timeout=0.01)
+        self.assertEqual(raised.exception.error_code, "coordinator_wait_timeout")
+
+        compute_release.set()
+        runtime_abort_release.set()
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_round_timeout_starts_before_prepare_and_publish(self):
+        entered = threading.Event()
+        cancel_reasons = []
+
+        def blocked_prepare(index):
+            entered.set()
+            self.stop_event.wait()
+
+        coordinator = self._coordinator(
+            round_timeout_seconds=0.05,
+            prepare_round=blocked_prepare,
+            cancel_callback=cancel_reasons.append,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+        self.assertEqual(cancel_reasons, ["round_timeout"])
+        self.assertTrue(self.runtime.aborted)
+        self.assertEqual(self.runtime.abort_reason, "round_timeout")
+        self.assertEqual(self.runtime.published_models, [])
+        self.assertNotIn("JOB_ABORTED", [event["type"] for event in self.events])
+
+    def test_round_timeout_wakes_wait_for_updates_without_io_budget(self):
+        entered = threading.Event()
+
+        class NoTimeoutRuntime(MockServerRuntime):
+            def wait_for_updates(self):
+                entered.set()
+                self.abort_event.wait()
+                raise FLRuntimeError("aborted", "Runtime 已被中止")
+
+        self.runtime = NoTimeoutRuntime(
+            participant_node_ids=(1, 2),
+            update_fixtures_by_node=self.client_updates,
+        )
+        coordinator = self._coordinator(
+            round_timeout_seconds=0.05,
+            io_timeout_seconds=0.01,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+        self.assertEqual(self.runtime.abort_reason, "round_timeout")
+
+    def test_publish_io_deadline_uses_minimum_io_and_round_budget(self):
+        entered = threading.Event()
+
+        class SlowPublishRuntime(MockServerRuntime):
+            def publish_model(self, model_path):
+                entered.set()
+                self.abort_event.wait()
+                raise FLRuntimeError("aborted", "Runtime 已被中止")
+
+        self.runtime = SlowPublishRuntime(
+            participant_node_ids=(1, 2),
+            update_fixtures_by_node=self.client_updates,
+        )
+        coordinator = self._coordinator(
+            round_timeout_seconds=0.5,
+            io_timeout_seconds=0.05,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "io_timeout")
+        self.assertEqual(self.runtime.abort_reason, "io_timeout")
+
+    def test_round_timeout_covers_aggregate_and_waits_for_cooperative_exit(self):
+        entered = threading.Event()
+        release = threading.Event()
+        failed = threading.Event()
+
+        def blocking_aggregate(model_path, updates_by_node, output_model_path, config, context):
+            entered.set()
+            release.wait()
+            context.check_stop()
+
+        coordinator = self._coordinator(
+            aggregate=blocking_aggregate,
+            round_timeout_seconds=0.05,
+            on_failed=lambda exc: failed.set(),
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        self.assertTrue(self.runtime.abort_event.wait(timeout=2.0))
+        self.assertIsNone(coordinator.get_summary())
+        self.assertFalse(failed.is_set())
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.wait(timeout=0.01)
+        self.assertEqual(raised.exception.error_code, "coordinator_wait_timeout")
+
+        release.set()
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertTrue(failed.is_set())
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_round_timeout_covers_evaluate_and_report_barrier(self):
+        for phase in ("evaluate", "report"):
+            with self.subTest(phase=phase):
+                self.runtime = MockServerRuntime(
+                    participant_node_ids=(1, 2),
+                    update_fixtures_by_node=self.client_updates,
+                )
+                self.stop_event.clear()
+                entered = threading.Event()
+
+                def blocking_evaluate(model_path, config, context):
+                    entered.set()
+                    self.stop_event.wait()
+                    context.check_stop()
+                    return {
+                        "metrics": {"loss": 1.0, "accuracy": 0.2},
+                        "preparation": None,
+                        "verdict": True,
+                        "reason": "fixture improved",
+                    }
+
+                def blocking_report(index):
+                    entered.set()
+                    self.stop_event.wait()
+                    raise FLRuntimeError("round_report_timeout", "报告未收齐")
+
+                coordinator = self._coordinator(
+                    evaluate=blocking_evaluate if phase == "evaluate" else None,
+                    round_completion=blocking_report if phase == "report" else None,
+                    round_timeout_seconds=0.5,
+                )
+                coordinator.start()
+                self.assertTrue(entered.wait(timeout=2.0))
+                self.assertEqual(coordinator.wait(timeout=2.0), 1)
+                self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+                self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_operator_abort_waits_for_compute_exit_before_summary(self):
+        entered = threading.Event()
+        release = threading.Event()
+        cancel_reasons = []
+
+        def blocking_aggregate(model_path, updates_by_node, output_model_path, config, context):
+            entered.set()
+            release.wait()
+            context.check_stop()
+
+        coordinator = self._coordinator(
+            aggregate=blocking_aggregate,
+            cancel_callback=cancel_reasons.append,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        coordinator.abort(reason="operator_interrupted")
+        self.assertIsNone(coordinator.get_summary())
+        self.assertEqual(cancel_reasons, ["operator_interrupted"])
+        with self.assertRaises(FLRuntimeError) as raised:
+            coordinator.wait(timeout=0.01)
+        self.assertEqual(raised.exception.error_code, "coordinator_wait_timeout")
+
+        release.set()
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.ABORTED)
+        self.assertEqual(coordinator.get_summary()["status"], "aborted")
+        self.assertEqual(coordinator.get_summary()["error_code"], "aborted")
+
+    def test_first_cancellation_cause_is_not_overwritten(self):
+        entered = threading.Event()
+        timeout_observed = threading.Event()
+        operator_finished = threading.Event()
+        reasons = []
+
+        def blocking_aggregate(model_path, updates_by_node, output_model_path, config, context):
+            entered.set()
+            self.stop_event.wait()
+            context.check_stop()
+
+        def cancel(reason):
+            reasons.append(reason)
+            if reason == "round_timeout":
+                timeout_observed.set()
+
+        coordinator = self._coordinator(
+            aggregate=blocking_aggregate,
+            round_timeout_seconds=0.05,
+            cancel_callback=cancel,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+
+        def request_operator_abort():
+            self.assertTrue(timeout_observed.wait(timeout=2.0))
+            coordinator.abort(reason="operator_interrupted")
+            operator_finished.set()
+
+        operator = threading.Thread(target=request_operator_abort)
+        operator.start()
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        operator.join(timeout=2.0)
+        self.assertTrue(operator_finished.is_set())
+        self.assertEqual(reasons, ["round_timeout"])
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_round_timeout_does_not_start_next_round(self):
+        entered = threading.Event()
+
+        def blocking_report(index):
+            entered.set()
+            self.stop_event.wait()
+            raise FLRuntimeError("round_report_timeout", "报告未收齐")
+
+        coordinator = self._coordinator(
+            rounds=2,
+            round_completion=blocking_report,
+            round_timeout_seconds=0.05,
+        )
+        coordinator.start()
+        self.assertTrue(entered.wait(timeout=2.0))
+        self.assertEqual(coordinator.wait(timeout=2.0), 1)
+        self.assertEqual(len(self.runtime.published_models), 1)
+        self.assertEqual(coordinator.state, CoordinatorState.FAILED)
+        self.assertEqual(coordinator.get_summary()["error_code"], "round_timeout")
+
+    def test_nonfinite_round_or_io_timeout_is_rejected(self):
+        for field in ("round_timeout_seconds", "io_timeout_seconds"):
+            for value in (float("nan"), float("inf"), float("-inf")):
+                with self.subTest(field=field, value=value), self.assertRaises(FLRuntimeError) as raised:
+                    self._job(**{field: value})
+                self.assertEqual(raised.exception.error_code, "invalid_" + field.removesuffix("_seconds"))
+
+    def test_fractional_io_timeout_is_accepted(self):
+        job = self._job(io_timeout_seconds=0.25)
+        self.assertEqual(job.io_timeout_seconds, 0.25)
 
     def test_abort_terminates_coordinator_and_runtime(self):
         waiting = threading.Event()

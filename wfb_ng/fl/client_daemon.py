@@ -14,6 +14,7 @@ Per ADR-0010, ADR-0012, ADR-0014:
 """
 
 import argparse
+import errno
 import ipaddress
 import json
 import logging
@@ -26,6 +27,7 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Sequence
@@ -447,7 +449,7 @@ class ClientJobConfig:
     node_id: int
     tun_name: str
     tun_ip: str
-    io_timeout_seconds: int
+    io_timeout_seconds: float
     live_observation: bool
     server_http_host: str = "10.80.0.1"
     server_http_port: int = 8080
@@ -479,8 +481,10 @@ class ClientJobConfig:
             raise FLRuntimeError('invalid_job_config', '参与节点无效')
         validate_path_safe_identifier(self.run_id, "run_id")
         validate_path_safe_identifier(self.job_id, "job_id")
-        if type(self.io_timeout_seconds) is not int or self.io_timeout_seconds <= 0:
-            raise FLRuntimeError("invalid_io_timeout", "io_timeout_seconds 必须为正整数")
+        if (isinstance(self.io_timeout_seconds, bool) or
+                not isinstance(self.io_timeout_seconds, (int, float)) or
+                not math.isfinite(self.io_timeout_seconds) or self.io_timeout_seconds <= 0):
+            raise FLRuntimeError("invalid_io_timeout", "io_timeout_seconds 必须为有限正数")
         if type(self.live_observation) is not bool:
             raise FLRuntimeError("invalid_live_observation", "live_observation 必须为布尔值")
         if self.uftp_bind_host is None:
@@ -897,14 +901,37 @@ class JobSandbox:
             except FileNotFoundError:
                 pass
             self._notify_path = None
-        # Always terminate any lingering descendant processes in the process group
+        # 复用现有组终止路径；信号送达后必须确认退出，未确认保留身份。
         pgid = self._pgid
         if pgid is not None:
             try:
                 os.killpg(pgid, signal.SIGKILL)
-            except OSError:
+            except ProcessLookupError:
                 pass
+            except OSError as exc:
+                if exc.errno != errno.ESRCH:
+                    self.state = DaemonState.STOPPED
+                    raise FLRuntimeError('task_process_group_not_exited', '任务进程组无法确认退出') from exc
+            deadline = time.monotonic() + 2.0
+            poll_wait = threading.Event()
+            while True:
+                if self._process is not None:
+                    self._process.poll()
+                try:
+                    os.killpg(pgid, 0)
+                except OSError as exc:
+                    if exc.errno == errno.ESRCH:
+                        break
+                    self.state = DaemonState.STOPPED
+                    raise FLRuntimeError('task_process_group_not_exited', '任务进程组无法确认退出') from exc
+                if time.monotonic() >= deadline:
+                    self.state = DaemonState.STOPPED
+                    raise FLRuntimeError('task_process_group_not_exited', '任务进程组仍未退出，停止接单')
+                poll_wait.wait(min(0.05, max(0, deadline - time.monotonic())))
             self._pgid = None
+        if self._process is not None and self._process.poll() is None:
+            self.state = DaemonState.STOPPED
+            raise FLRuntimeError('task_process_not_exited', '任务角色仍未退出，停止接单')
 
         if self._log_file is not None:
             try:
@@ -953,13 +980,14 @@ class JobSandbox:
         if self._job_work_dir and os.path.lexists(self._job_work_dir):
             self.retained_sandbox_dir = self._job_work_dir
 
-        self._process = None
         self.supervised = False
+        if cleanup_error is not None:
+            self.state = DaemonState.STOPPED
+            raise FLRuntimeError('task_tun_cleanup_failed', '任务 TUN 清理失败，停止接单') from cleanup_error
+        self._process = None
         self._active_job = None
         self._job_work_dir = None
-        self.state = DaemonState.STOPPED if cleanup_error is not None else DaemonState.IDLE
-        if cleanup_error is not None:
-            raise FLRuntimeError('task_tun_cleanup_failed', '任务 TUN 清理失败，停止接单') from cleanup_error
+        self.state = DaemonState.IDLE
 
 
 class ClientDaemon:
@@ -998,6 +1026,14 @@ class ClientDaemon:
         self._stop_event = threading.Event()
         self._job_stop_event = threading.Event()
         self._startup_thread: Optional[threading.Thread] = None
+        self._recovery_thread: Optional[threading.Thread] = None
+        self._recovery_pending: Optional[str] = None
+        self._terminal_job_id: Optional[str] = None
+        self._terminal_aborted = False
+        # 单一回收所有者；daemon 锁只保护身份，不覆盖退出或 ACK 等待。
+        self._recovery_lock = threading.Lock()
+        self._transport_lock = threading.RLock()
+        self._recovery_fact: Optional[tuple[str, int, str, Optional[str], Optional[str], str]] = None
         self._lock = threading.RLock()
 
     def _load_cached_channel(self) -> int:
@@ -1032,7 +1068,11 @@ class ClientDaemon:
     def state(self) -> DaemonState:
         """Derive authoritative daemon state from active sub-components."""
         with self._lock:
-            if self._stop_event.is_set() or self.sandbox.state == DaemonState.STOPPED:
+            if (self._stop_event.is_set() or self.sandbox.state == DaemonState.STOPPED or
+                    (self.current_interface is not None and
+                     self._recovery_fact is not None and
+                     self._recovery_fact[0] == self._current_job_id and
+                     self._recovery_fact[2] == 'blocked')):
                 return DaemonState.STOPPED
             if self.sandbox.state in (
                 DaemonState.PREPARING,
@@ -1040,6 +1080,11 @@ class ClientDaemon:
                 DaemonState.ABORTING,
             ):
                 return self.sandbox.state
+            if (self._current_job_id is not None and self.current_interface is not None and
+                    (self._terminal_job_id == self._current_job_id or
+                     (self._recovery_fact is not None and
+                      self._recovery_fact[0] == self._current_job_id))):
+                return DaemonState.ABORTING
             if self.control_plane is not None and self.control_plane.is_running:
                 if self.control_plane.state == ClientNodeState.HUNTING:
                     return DaemonState.HUNTING
@@ -1055,19 +1100,14 @@ class ClientDaemon:
         - If wl* interface is found: configures wireless and returns interface (state: IDLE).
         - If known interface disappeared: triggers hardware unplug recovery.
         """
+        candidates = ([self.config.interface] if self.config.interface
+                      else self.network_adapter.find_interfaces())
+        if not candidates:
+            if self.current_interface is not None:
+                logger.warning("检测到无线网卡 %s 被拔出", self.current_interface)
+                self._on_interface_lost()
+            return None
         with self._lock:
-            # If explicit interface was specified in config, use it
-            if self.config.interface:
-                candidates = [self.config.interface]
-            else:
-                candidates = self.network_adapter.find_interfaces()
-
-            if not candidates:
-                if self.current_interface is not None:
-                    logger.warning("检测到无线网卡 %s 被拔出！进行安全自愈重置...", self.current_interface)
-                    self._on_interface_lost()
-                return None
-
             target_iface = candidates[0]
             if target_iface != self.current_interface:
                 logger.info("检测到无线网卡 %s，开始接管配置...", target_iface)
@@ -1103,7 +1143,7 @@ class ClientDaemon:
 
     def start_idle_link(self) -> None:
         """Start the client link that carries control-plane traffic while idle."""
-        with self._lock:
+        with self._transport_lock:
             if (
                 not self.config.enable_link_process
                 or self.current_interface is None
@@ -1172,7 +1212,7 @@ class ClientDaemon:
 
     def _stop_idle_link(self) -> None:
         """Stop the idle client link and release its TUN."""
-        with self._lock:
+        with self._transport_lock:
             if self._link_process is not None:
                 try:
                     self._link_process.terminate()
@@ -1183,6 +1223,8 @@ class ClientDaemon:
                         self._link_process.wait(timeout=1.0)
                     except Exception:
                         pass
+                if self._link_process.poll() is None:
+                    raise FLRuntimeError('idle_link_not_exited', '旧待命链路尚未退出，拒绝任务接管')
                 self._link_process = None
             if self._link_log_file is not None:
                 try:
@@ -1201,20 +1243,25 @@ class ClientDaemon:
             self._restore_tun_if_idle()
 
     def _on_interface_lost(self) -> None:
-        """Safely handle interface unplugging while running."""
+        """硬件丢失仍通过同一回收所有者处理，锁外等待工作线程。"""
         self._job_stop_event.set()
-        if self.sandbox.is_running:
-            logger.warning("网卡丢失，紧急中止正在运行的作业沙箱...")
-            self.sandbox.abort()
-        if self.control_plane is not None:
-            if self.control_plane.locked_channel is not None:
-                self._last_locked_channel = self.control_plane.locked_channel
-            self.control_plane.stop()
+        with self._lock:
+            job_id, worker = self._current_job_id, self._startup_thread
+            control = self.control_plane
             self.control_plane = None
+            self.current_interface = None
+            if control is not None and control.locked_channel is not None:
+                self._last_locked_channel = control.locked_channel
+        if worker is not None and worker is not threading.current_thread():
+            worker.join()
+        if job_id is not None:
+            self._recover_job_resources(job_id, 'aborted')
+        else:
+            with self._recovery_lock:
+                self.sandbox.abort()
+        if control is not None:
+            control.stop()
         self._stop_idle_link()
-        if self.current_interface is not None:
-            self.network_adapter.teardown_tun(self.config.tun_name)
-        self.current_interface = None
 
     def _restore_tun_if_idle(self) -> None:
         """Ensure persistent TUN interface is active when daemon is idle with interface."""
@@ -1231,82 +1278,165 @@ class ClientDaemon:
 
     def trigger_job(self, job_config: ClientJobConfig) -> subprocess.Popen:
         """Start a job in the sandbox using the active wireless interface."""
-        with self._lock:
-            if threading.current_thread() is self._startup_thread and (self._job_stop_event.is_set() or self._stop_event.is_set()):
-                raise FLRuntimeError('job_stopped', '启动前作业已停止')
-            if self.control_plane is not None and self.control_plane.radio_switch_pending:
-                raise FLRuntimeError('radio_switch_pending', '射频切换未完成，拒绝启动作业')
-            if self.state == DaemonState.STOPPED:
-                raise FLRuntimeError('sandbox_stopped', '任务资源清理失败，拒绝启动新作业')
-            if self.current_interface is None:
-                raise FLRuntimeError(
-                    "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
+        with self._recovery_lock:
+            with self._lock:
+                if (self._current_job_id is not None and
+                        threading.current_thread() is not self._startup_thread):
+                    raise FLRuntimeError('job_recovery_pending', '前一作业恢复尚未获得服务器确认，拒绝接单')
+                if threading.current_thread() is self._startup_thread and (self._job_stop_event.is_set() or self._stop_event.is_set()):
+                    raise FLRuntimeError('job_stopped', '启动前作业已停止')
+                if self.control_plane is not None and self.control_plane.radio_switch_pending:
+                    raise FLRuntimeError('radio_switch_pending', '射频切换未完成，拒绝启动作业')
+                if self.state == DaemonState.STOPPED:
+                    raise FLRuntimeError('sandbox_stopped', '任务资源清理失败，拒绝启动新作业')
+                if self.current_interface is None:
+                    raise FLRuntimeError(
+                        "hardware_unavailable", "无线网卡未就绪，无法启动算法作业"
+                    )
+                if job_config.node_id != self.config.node_id:
+                    raise FLRuntimeError(
+                        "invalid_job_config",
+                        f"作业节点 ID ({job_config.node_id}) 与守护进程节点 ID ({self.config.node_id}) 不符",
+                    )
+                if job_config.tun_name != self.config.tun_name:
+                    raise FLRuntimeError(
+                        "invalid_job_config",
+                        f"作业 TUN 名称 ({job_config.tun_name}) 与守护进程 TUN 名称 ({self.config.tun_name}) 不符",
+                    )
+                if job_config.tun_ip != self.config.tun_ip:
+                    raise FLRuntimeError(
+                        "invalid_job_config",
+                        f"作业 TUN IP ({job_config.tun_ip}) 与守护进程 TUN IP ({self.config.tun_ip}) 不符",
+                    )
+                if job_config.link_id != self.config.link_id:
+                    raise FLRuntimeError(
+                        "invalid_job_config",
+                        f"作业 link_id ({job_config.link_id}) 与守护进程 link_id ({self.config.link_id}) 不符",
+                    )
+                channel = (self.control_plane.current_channel if self.control_plane is not None
+                           else self._effective_radio.channel)
+                job_config = replace(
+                    job_config,
+                    channel=channel,
+                    bandwidth_mhz=self._effective_radio.bandwidth_mhz,
+                    radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
+                    uplink_mcs=self._effective_radio.uplink_mcs,
                 )
-            if job_config.node_id != self.config.node_id:
-                raise FLRuntimeError(
-                    "invalid_job_config",
-                    f"作业节点 ID ({job_config.node_id}) 与守护进程节点 ID ({self.config.node_id}) 不符",
-                )
-            if job_config.tun_name != self.config.tun_name:
-                raise FLRuntimeError(
-                    "invalid_job_config",
-                    f"作业 TUN 名称 ({job_config.tun_name}) 与守护进程 TUN 名称 ({self.config.tun_name}) 不符",
-                )
-            if job_config.tun_ip != self.config.tun_ip:
-                raise FLRuntimeError(
-                    "invalid_job_config",
-                    f"作业 TUN IP ({job_config.tun_ip}) 与守护进程 TUN IP ({self.config.tun_ip}) 不符",
-                )
-            if job_config.link_id != self.config.link_id:
-                raise FLRuntimeError(
-                    "invalid_job_config",
-                    f"作业 link_id ({job_config.link_id}) 与守护进程 link_id ({self.config.link_id}) 不符",
-                )
-            channel = (self.control_plane.current_channel if self.control_plane is not None
-                       else self._effective_radio.channel)
-            job_config = replace(
-                job_config,
-                channel=channel,
-                bandwidth_mhz=self._effective_radio.bandwidth_mhz,
-                radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
-                uplink_mcs=self._effective_radio.uplink_mcs,
-            )
+                self._current_job_id = job_config.job_id
+                self._last_accepted_job_id = job_config.job_id
             self._stop_idle_link()
             try:
                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
-                self._current_job_id = job_config.job_id
-                self._last_accepted_job_id = job_config.job_id
                 return proc
             except Exception:
-                self._current_job_id = None
                 self._ensure_idle_transport()
                 raise
 
     def _handle_job_terminal(self, msg: Dict[str, Any], aborted: bool) -> None:
-        job_id = msg.get("job_id")
+        """下行线程只登记终态，退出确认与报告交工作线程。"""
+        job_id = msg.get('job_id')
         with self._lock:
-            if not isinstance(job_id, str) or job_id != self._current_job_id:
+            fact = self._recovery_fact
+            if (not isinstance(job_id, str) or
+                    (job_id != self._current_job_id and
+                     (fact is None or job_id != fact[0] or
+                      job_id != self._last_accepted_job_id))):
                 return
-            logger.info("收到作业终态 type=%s job_id=%s node_id=%s",
-                        "JOB_ABORT" if aborted else "JOB_COMPLETED", job_id, self.config.node_id)
-            self._job_stop_event.set()
-            self.sandbox.abort(outcome='aborted' if aborted else 'succeeded')
-            self._ensure_idle_transport()
-            self._current_job_id = None
-            if self.control_plane is not None:
-                if aborted:
-                    self.control_plane.notify_state_change(ClientNodeState.ABORTING)
-                self.control_plane.notify_state_change(ClientNodeState.IDLE)
+            if self._terminal_job_id != job_id:
+                self._terminal_job_id = job_id
+                self._terminal_aborted = aborted
+            if self._current_job_id == job_id:
+                self._job_stop_event.set()
+            self._recovery_pending = job_id
+            if self._recovery_thread is None:
+                self._recovery_thread = threading.Thread(
+                    target=self._report_job_recovery,
+                    name='fl-client-recovery-' + job_id, daemon=True)
+                self._recovery_thread.start()
+
+    def _recover_job_resources(self, job_id: str, outcome: str, *, retry: bool = False) -> None:
+        """串行回收任务资源，只缓存实际验证后的恢复事实。"""
+        with self._recovery_lock:
+            with self._lock:
+                fact = self._recovery_fact
+                if fact is not None and fact[0] == job_id and (not retry or fact[2] == 'ready'):
+                    return
+                if self._current_job_id != job_id:
+                    return
+                epoch = fact[1] + 1 if fact is not None and fact[0] == job_id else 1
+            code = reason = None
+            state = 'ready'
+            try:
+                self.sandbox.supervised = False
+                self.sandbox.abort(outcome=outcome)
+                if self._stop_event.is_set():
+                    raise FLRuntimeError('client_stopped', '客户端正在退出，待命链路未恢复')
+                if self.current_interface is None:
+                    raise FLRuntimeError('hardware_unavailable', '无线网卡不可用，待命链路未恢复')
+                self._ensure_idle_transport()
+                if self.config.enable_link_process and self.config.enable_control_plane:
+                    if not self.is_idle_link_running:
+                        raise FLRuntimeError('idle_link_recovery_failed', '待命链路进程未运行')
+                if not self.network_adapter.is_tun_ready(
+                        self.config.tun_name, self.config.tun_cidr,
+                        self.config.server_control_host):
+                    raise FLRuntimeError('idle_link_recovery_failed', '待命 TUN 地址或控制路由未就绪')
+            except Exception as exc:
+                state = 'blocked'
+                code = str(getattr(exc, 'error_code', None) or 'client_recovery_failed').encode('utf-8')[:128].decode('utf-8', 'ignore')
+                reason = str(getattr(exc, 'error_message', None) or '客户端资源恢复失败').encode('utf-8')[:512].decode('utf-8', 'ignore')
+                logger.exception('作业 %s 资源未恢复', job_id)
+            with self._lock:
+                self._recovery_fact = (job_id, epoch, state, code, reason, uuid.uuid4().hex)
+                if self.control_plane is not None:
+                    self.control_plane.notify_state_change(
+                        ClientNodeState.ABORTING)
+
+    def _report_job_recovery(self) -> None:
+        """终态重试只重报缓存事实，不再次复位任务或待命链路。"""
+        while True:
+            with self._lock:
+                job_id = self._recovery_pending
+                self._recovery_pending = None
+                if job_id is None:
+                    self._recovery_thread = None
+                    return
+                worker = self._startup_thread if self._current_job_id == job_id else None
+                aborted = self._terminal_aborted
+            if worker is not None and worker is not threading.current_thread():
+                worker.join()
+            self._recover_job_resources(job_id, 'aborted' if aborted else 'succeeded')
+            with self._lock:
+                fact, control = self._recovery_fact, self.control_plane
+            if fact is not None and fact[0] == job_id and control is not None:
+                try:
+                    control.notify_job_recovery(
+                        fact[0], fact[1], fact[2], error_code=fact[3], reason=fact[4],
+                        report_id=fact[5])
+                    with self._lock:
+                        if (self.control_plane is control and self._recovery_fact == fact and
+                                self._current_job_id == job_id and fact[2] == 'ready'):
+                            self._current_job_id = None
+                            control.notify_state_change(ClientNodeState.IDLE)
+                except Exception:
+                    logger.exception('作业 %s 恢复报告未获确认，保留事实供重报', job_id)
+            with self._lock:
+                if self._recovery_pending is None:
+                    self._recovery_thread = None
+                    return
 
     def _terminate_job(self, intermediate_state: Optional[ClientNodeState] = None) -> None:
+        """本地显式清理可在 blocked 后重新验证，重复广播不会触发此路径。"""
         with self._lock:
             self._job_stop_event.set()
-            self.sandbox.abort(outcome='aborted' if intermediate_state is not None else 'succeeded')
-            self._ensure_idle_transport()
-            if self.control_plane is not None:
-                if intermediate_state is not None:
-                    self.control_plane.notify_state_change(intermediate_state)
-                self.control_plane.notify_state_change(ClientNodeState.IDLE)
+            job_id, worker = self._current_job_id, self._startup_thread
+        if worker is not None and worker is not threading.current_thread():
+            worker.join()
+        if job_id is not None:
+            self._recover_job_resources(
+                job_id, 'aborted' if intermediate_state is not None else 'succeeded', retry=True)
+            if self._terminal_job_id == job_id:
+                self._handle_job_terminal({'job_id': job_id}, self._terminal_aborted)
 
     def finish_job(self) -> None:
         self._terminate_job()
@@ -1318,7 +1448,8 @@ class ClientDaemon:
         ret = self.sandbox.wait(timeout=timeout)
         with self._lock:
             self._ensure_idle_transport()
-            if self.control_plane is not None and not self.sandbox.is_running:
+            if (self.control_plane is not None and not self.sandbox.is_running and
+                    self._terminal_job_id != self._current_job_id):
                 self.control_plane.notify_state_change(ClientNodeState.IDLE)
         return ret
 
@@ -1336,7 +1467,9 @@ class ClientDaemon:
             if self.control_plane is not None and self.control_plane.radio_switch_pending:
                 logger.warning("射频切换未完成，忽略 TASK_ANNOUNCE")
                 return
-            if self.state != DaemonState.IDLE or (self._startup_thread is not None and self._startup_thread.is_alive()):
+            if (self._current_job_id is not None or
+                    self.state != DaemonState.IDLE or
+                    (self._startup_thread is not None and self._startup_thread.is_alive())):
                 logger.warning("收到 TASK_ANNOUNCE 但节点非 IDLE (当前: %s)，忽略", self.state)
                 return
             if self.control_plane is not None:
@@ -1353,6 +1486,12 @@ class ClientDaemon:
                     control.notify_state_change(ClientNodeState.IDLE)
                     return
 
+                # 合法身份的拒绝也保留绑定，服务器终态才能取得恢复事实。
+                self._current_job_id = rejected_job_id
+                self._last_accepted_job_id = rejected_job_id
+                self._terminal_job_id = None
+                self._job_stop_event = threading.Event()
+
                 def report_rejection():
                     try:
                         control.notify_task_error(rejected_job_id, 'prepare', 'invalid_job_config',
@@ -1362,7 +1501,7 @@ class ClientDaemon:
                     finally:
                         with self._lock:
                             if self.control_plane is control:
-                                control.notify_state_change(ClientNodeState.IDLE)
+                                control.notify_state_change(ClientNodeState.ABORTING)
 
                 self._startup_thread = threading.Thread(target=report_rejection,
                                                         name='fl-client-rejection', daemon=True)
@@ -1375,7 +1514,9 @@ class ClientDaemon:
                 return _reject(f"TASK_ANNOUNCE 标识非法: {exc}")
 
             raw_io_timeout = msg.get("io_timeout_seconds")
-            if raw_io_timeout is None or type(raw_io_timeout) is not int or raw_io_timeout <= 0:
+            if (isinstance(raw_io_timeout, bool) or
+                    not isinstance(raw_io_timeout, (int, float)) or
+                    not math.isfinite(raw_io_timeout) or raw_io_timeout <= 0):
                 return _reject(f"TASK_ANNOUNCE 缺失或无效的 io_timeout_seconds 字段: {raw_io_timeout!r}")
             io_timeout_seconds = raw_io_timeout
 
@@ -1444,6 +1585,7 @@ class ClientDaemon:
             )
             self._current_job_id = job_id
             self._last_accepted_job_id = job_id
+            self._terminal_job_id = None
             self._job_stop_event = threading.Event()
             self.sandbox.state = DaemonState.PREPARING
             self.sandbox.supervised = True
@@ -1497,15 +1639,8 @@ class ClientDaemon:
                 except Exception:
                     logger.exception('客户端作业失败报告未获确认')
         finally:
-            with self._lock:
-                if self._current_job_id == job.job_id:
-                    self.sandbox.supervised = False
-                    self.sandbox.abort(outcome='aborted' if stop_event.is_set() else outcome)
-                    self._current_job_id = None
-                    if not self._stop_event.is_set():
-                        self._ensure_idle_transport()
-                        if self.control_plane is not None:
-                            self.control_plane.notify_state_change(ClientNodeState.IDLE)
+            self._recover_job_resources(
+                job.job_id, 'aborted' if stop_event.is_set() else outcome)
 
     def start_control_plane(self) -> None:
         """Start client UDP control plane if network interface is available."""
@@ -1542,7 +1677,7 @@ class ClientDaemon:
     def _on_radio_applied(self, new_config: RadioConfig) -> None:
         """本机在线更新成功后才发布生效配置，失败交由原事务租约恢复。"""
         with self._lock:
-            if self.sandbox.is_running:
+            if self._current_job_id is not None or self.sandbox.is_running:
                 raise FLRuntimeError('radio_job_active', '作业运行时拒绝更新空闲射频链路')
             if self.is_idle_link_running:
                 # 每次都发送完整目标，包括失败后的回退，不能用缓存推断发射器状态。
@@ -1589,6 +1724,7 @@ class ClientDaemon:
             if (
                 self.config.enable_control_plane
                 and self.current_interface is not None
+                and self._current_job_id is None
                 and not self.sandbox.is_running
             ):
                 try:
@@ -1606,9 +1742,11 @@ class ClientDaemon:
                 self.start_control_plane()
 
             # Check if active job finished and reconcile control-plane state
-            self.sandbox.poll()
+            if self._current_job_id is None or not self.sandbox.supervised:
+                self.sandbox.poll()
             if (
                 self.control_plane is not None
+                and self._current_job_id is None
                 and not self.sandbox.is_running
                 and self.control_plane.state in (ClientNodeState.RUNNING, ClientNodeState.PREPARING)
             ):
@@ -1619,7 +1757,8 @@ class ClientDaemon:
                     self._last_locked_channel = self.control_plane.locked_channel
                     self._save_cached_channel(self.control_plane.locked_channel)
 
-            if self.current_interface is not None and not self.sandbox.is_running:
+            if (self.current_interface is not None and self._current_job_id is None
+                    and not self.sandbox.is_running):
                 self._ensure_idle_transport()
 
             # Periodic hardware check (ensure interface hasn't vanished)
@@ -1640,28 +1779,22 @@ class ClientDaemon:
 
     def _cleanup(self) -> None:
         self._job_stop_event.set()
-        cleanup_error = None
-        with self._lock:
-            if self.sandbox.is_running:
+        for worker in (self._startup_thread, self._recovery_thread):
+            if worker is not None and worker is not threading.current_thread():
+                worker.join()
+        try:
+            with self._recovery_lock:
                 try:
                     self.sandbox.abort()
-                except Exception as exc:
-                    cleanup_error = exc
-        worker = self._startup_thread
-        if worker is not None and worker is not threading.current_thread():
-            worker.join()
-        with self._lock:
-            if self.control_plane is not None:
-                self.control_plane.stop()
+                finally:
+                    self._stop_idle_link()
+        finally:
+            with self._lock:
+                control = self.control_plane
                 self.control_plane = None
-            if self.sandbox.is_running:
-                self.sandbox.abort()
-            self._stop_idle_link()
-            if self.current_interface is not None:
-                self.network_adapter.teardown_tun(self.config.tun_name)
-            logger.info("wfb-fl-client-daemon 已安全停止")
-        if cleanup_error is not None:
-            raise cleanup_error
+            if control is not None:
+                control.stop()
+        logger.info("wfb-fl-client-daemon 已安全停止")
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

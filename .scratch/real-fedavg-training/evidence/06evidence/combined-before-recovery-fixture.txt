@@ -1,0 +1,132 @@
+........................................................................ [ 21%]
+......作业终态发送失败，预算内重试 (job=selection-job): Server broadcast socket is not initialized
+.................................................................. [ 43%]
+........................................................................ [ 65%]
+........................................................................ [ 87%]
+...............................F..........                               [100%]
+=================================== FAILURES ===================================
+_ TestControlPlaneNetworkLoop.test_client_daemon_task_announce_and_abort_handling _
+
+self = <wfb_ng.tests.test_fl_control_plane.TestControlPlaneNetworkLoop testMethod=test_client_daemon_task_announce_and_abort_handling>
+
+    def test_client_daemon_task_announce_and_abort_handling(self):
+        """
+        Verify that ClientDaemon receives TASK_ANNOUNCE and JOB_ABORT over control plane:
+        - TASK_ANNOUNCE transitions daemon to PREPARING / triggers job.
+        - JOB_ABORT broadcasts abort and restores IDLE.
+        """
+        import sys
+        import subprocess
+        from unittest.mock import patch
+        work = tempfile.TemporaryDirectory()
+        self.addCleanup(work.cleanup)
+        adapter = MockNetworkAdapter(["wlan0"])
+        config = ClientDaemonConfig(
+            work_dir=work.name,
+            node_id=1,
+            tun_ip="10.80.0.11",
+            channel=153,
+            server_control_host="127.0.0.1",
+            server_control_port=self.server_port,
+            broadcast_port=self.client_broadcast_port,
+            enable_control_plane=True,
+            enable_link_process=False,
+            poll_interval_seconds=0.05,
+        )
+        daemon = ClientDaemon(config, network_adapter=adapter)
+        daemon.sandbox.evidence_dir = work.name + '/evidence'
+        stub_script = (
+            "import os, threading\n"
+            "from wfb_ng.fl.service import AlgorithmNotifications\n"
+            "AlgorithmNotifications(os.environ['WFB_FL_NOTIFY_SOCKET'], 'job_fl_001', "
+            "threading.Event(), timeout=3).prepared({'sample_count': 60000})\n"
+            "threading.Event().wait(10)\n"
+        )
+        real_popen = subprocess.Popen
+        process_patch = patch('wfb_ng.fl.client_daemon.subprocess.Popen',
+                              side_effect=lambda cmd, **kwargs: real_popen(
+                                  [sys.executable, '-c', stub_script], **kwargs))
+        process_patch.start()
+        self.addCleanup(process_patch.stop)
+        self.addCleanup(daemon.stop)
+
+        daemon_thread = threading.Thread(target=daemon.run, daemon=True)
+        daemon_thread.start()
+
+        # Wait for daemon to be ready in IDLE
+        start_t = time.monotonic()
+        while time.monotonic() - start_t < 2.0:
+            if daemon.state == DaemonState.IDLE and self.server.registry.is_node_ready(1):
+                break
+            time.sleep(0.05)
+
+        self.assertEqual(daemon.state, DaemonState.IDLE)
+
+        # 使用真实 prepared 报告及相关确认，心跳回执不能代替准备确认。
+        self.server.prepare_task_readiness("job_fl_001", [1])
+        # Broadcast TASK_ANNOUNCE targeted to node 1
+        self.server.broadcast_downlink({
+            "type": "TASK_ANNOUNCE",
+            "run_id": "run_fl_001",
+            "job_id": "job_fl_001",
+            "target_nodes": [1],
+            "rounds": 1,
+            "preparation_timeout_seconds": 3,
+            "algorithm": "wfb_ng.fl.mnist:client_entry",
+            "algorithm_config": {"data_seed": 2026},
+            "server_http_host": "10.80.0.1",
+            "server_http_port": 8080,
+            "uftp_port": 1044,
+            "link_id": 7669206,
+            "io_timeout_seconds": 120,
+            "live_observation": True,
+        })
+
+        self.assertTrue(self.server.wait_for_task_readiness(2))
+        self.assertEqual(self.server.get_task_preparation_reports("job_fl_001")[1]["report"],
+                         {"sample_count": 60000})
+
+        # Wait for job to start
+        start_t = time.monotonic()
+        while time.monotonic() - start_t < 2.0:
+            if daemon.state == DaemonState.RUNNING:
+                break
+            time.sleep(0.05)
+
+        self.assertEqual(daemon.state, DaemonState.RUNNING)
+
+        # Broadcast JOB_ABORT
+        self.server.broadcast_downlink({"type": "JOB_ABORT", "job_id": "job_fl_001"})
+
+        # Wait for job to be aborted and return to IDLE
+        start_t = time.monotonic()
+        while time.monotonic() - start_t < 2.0:
+            if daemon.state == DaemonState.IDLE:
+                break
+            time.sleep(0.05)
+
+>       self.assertEqual(daemon.state, DaemonState.IDLE)
+E       AssertionError: <DaemonState.ABORTING: 'ABORTING'> != <DaemonState.IDLE: 'IDLE'>
+
+wfb_ng/tests/test_fl_control_plane.py:989: AssertionError
+----------------------------- Captured stderr call -----------------------------
+作业 job_fl_001 恢复报告未获确认，保留事实供重报
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1413, in _report_job_recovery
+    control.notify_job_recovery(
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2810, in notify_job_recovery
+    self._notify_report(
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2672, in _notify_report
+    raise FLRuntimeError(
+wfb_ng.fl.errors.FLRuntimeError: RECOVERY_NOT_PREPARED
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_task_announce_and_abort_handling
+1 failed, 329 passed, 2 warnings in 71.14s (0:01:11)

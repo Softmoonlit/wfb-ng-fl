@@ -1,5 +1,6 @@
 """Client radio transactions observed at UDP and link-process boundaries."""
 import json
+from wfb_ng.tests._client_test_network import client_network_kwargs, isolated_client_network
 from dataclasses import replace
 import os
 import socket
@@ -61,7 +62,7 @@ class TestClientRadioApplication(unittest.TestCase):
         updater.start()
         self.addCleanup(updater.stop)
         self.daemon = ClientDaemon(
-            ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11', work_dir=work.name,
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11', work_dir=work.name,
                                uplink_mcs=3, radio_txpower_dbm=12),
             network_adapter=self.adapter, _link_process_factory=spawn,
         )
@@ -112,16 +113,20 @@ class TestClientRadioApplication(unittest.TestCase):
                                            'patch': patch, 'delay_ms': 0, 'calibration': True})
         self.assertTrue(self.spawned.wait(1))
         self.assertTrue(self.control.radio_switch_pending)
-        self.assertEqual(self.updates[-1], (9200, 20, 5))
+        self.assertEqual(self.updates[-1], (self.daemon.config.radio_control_port, 20, 5))
         self.assertEqual(self.adapter.wireless_states['wlx-test']['channel_width'], 'HT20')
         self.dispatch('CONFIG_RADIO_ABORT')
-        self.assertEqual(self.updates[-1], (9200, 40, 3))
+        self.assertEqual(self.updates[-1], (self.daemon.config.radio_control_port, 40, 3))
         self.assertEqual(self.adapter.wireless_states['wlx-test']['channel_width'], 'HT40+')
         self.assertEqual(len(self.processes), 1)
         self.processes[0].terminate.assert_not_called()
         self.assertTrue(self.adapter.is_tun_active('fl-c1'))
 
     def _rebuild_control_and_receive_idle(self):
+        # 此检查需要真实心跳往返；两端均显式回环与临时端口。
+        real_udp = mock.patch('wfb_ng.fl.control.socket', socket)
+        real_udp.start()
+        self.addCleanup(real_udp.stop)
         peer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         peer.bind(('127.0.0.1', 0))
         peer.settimeout(.05)
@@ -208,7 +213,7 @@ class TestClientRadioApplication(unittest.TestCase):
         with mock.patch.object(self.adapter, 'is_tun_ready', side_effect=ready, create=True):
             self.daemon.start_idle_link()
         self.assertGreaterEqual(len(checks), 3)
-        self.assertTrue(all(item == ('fl-c1', '10.80.0.11/24', '10.80.0.1') for item in checks))
+        self.assertTrue(all(item == ('fl-c1', '10.80.0.11/24', self.daemon.config.server_control_host) for item in checks))
 
     def test_task_role_uses_confirmed_effective_mcs_and_power(self):
         self.commit()
@@ -276,8 +281,7 @@ class TestClientRadioApplication(unittest.TestCase):
         self.commit()
         self.assertEqual(self.mcs_commands(), ['3', '5'])
         self.fail_update = True
-        # Keep the real broadcast socket independent of the injected uplink.
-        self.control.broadcast_port = 0
+        # 广播通过直接分发注入；控制 UDP 由测试边界隔离。
         self.control._uplink_sock.recvfrom.side_effect = socket.timeout
         self.control.start()
         self.addCleanup(self.control.stop)

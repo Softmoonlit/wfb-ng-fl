@@ -1,0 +1,4 @@
+command: python -m pytest -q wfb_ng/tests/test_fl_coordinator.py wfb_ng/tests/test_fl_training_host.py wfb_ng/tests/test_fl_mnist.py wfb_ng/tests/test_fl_real_job.py
+result: 120 passed, 3 skipped
+
+The skipped cases are existing environment-dependent tests in the selected files.

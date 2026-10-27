@@ -1,0 +1,7 @@
+Success: no issues found in 1 source file
+command: mypy --follow-imports=silent --ignore-missing-imports --check-untyped-defs wfb_ng/fl/coordinator.py
+
+command: python -m py_compile wfb_ng/fl/coordinator.py wfb_ng/tests/test_fl_coordinator.py
+result: passed
+command: import JobConfig, FLCoordinator
+result: passed

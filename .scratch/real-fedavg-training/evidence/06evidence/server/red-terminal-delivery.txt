@@ -1,0 +1,106 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_first_terminal_send_exception_is_retried_within_frozen_recovery_budget __
+
+host_factory = <function host_factory.<locals>.make at 0xffff02f411b0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff02ef1d80>
+
+    def test_first_terminal_send_exception_is_retried_within_frozen_recovery_budget(host_factory, monkeypatch):
+        from dataclasses import replace
+        host = host_factory()
+        host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.7)
+        receive = host.receive_downlink
+        attempts = []
+
+        def transient_send_failure(message):
+            if message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+                attempts.append(deepcopy(message))
+                if len(attempts) == 1:
+                    raise OSError('fixture transient UDP send failure')
+            receive(message)
+
+        monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', transient_send_failure)
+        host.launch()
+>       assert host.terminal.wait(2), '首个 send 异常后仍须在同一恢复预算内重试终态'
+E       AssertionError: 首个 send 异常后仍须在同一恢复预算内重试终态
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xffff02f89900>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xffff02f89900>> = <threading.Event object at 0xffff02f89900>.wait
+E        +      where <threading.Event object at 0xffff02f89900> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xffff02f1e110>.terminal
+
+wfb_ng/tests/test_fl_training_host.py:893: AssertionError
+----------------------------- Captured stderr call -----------------------------
+作业终态广播失败 (job=training-host-job)
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1689, in _finalize_job
+    self.control_plane.broadcast_downlink(message)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_training_host.py", line 888, in transient_send_failure
+    raise OSError('fixture transient UDP send failure')
+OSError: fixture transient UDP send failure
+_ test_blocked_recovery_does_not_stop_terminal_retries_to_other_missing_target _
+
+host_factory = <function host_factory.<locals>.make at 0xffff02f40ca0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff02f8ae30>
+
+    def test_blocked_recovery_does_not_stop_terminal_retries_to_other_missing_target(host_factory, monkeypatch):
+        from dataclasses import replace
+        host = host_factory(auto_round_ready=False)
+        host.auto_recovery = False
+        host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.7)
+        receive = host.receive_downlink
+        attempts = []
+        second_received_stop = threading.Event()
+
+        def one_blocked_one_missing(message):
+            receive(message)
+            if message['type'] == 'JOB_ABORT':
+                attempts.append(deepcopy(message))
+                if len(attempts) == 1:
+                    assert host.recovery(1, state='blocked')['ok'] is True
+                else:
+                    assert host.recovery(2)['ok'] is True
+                    second_received_stop.set()
+
+        monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', one_blocked_one_missing)
+        host.launch()
+        assert host.final_evaluated.wait(2)
+        result = host.daemon.abort_job('operator_stop')
+        assert result['status'] == 'aborted'
+>       assert second_received_stop.is_set(), '一节点blocked不能让另一丢包节点收不到stop'
+E       AssertionError: 一节点blocked不能让另一丢包节点收不到stop
+E       assert False
+E        +  where False = <bound method Event.is_set of <threading.Event object at 0xffff02d6f460>>()
+E        +    where <bound method Event.is_set of <threading.Event object at 0xffff02d6f460>> = <threading.Event object at 0xffff02d6f460>.is_set
+
+wfb_ng/tests/test_fl_training_host.py:926: AssertionError
+----------------------------- Captured stderr call -----------------------------
+FLCoordinator execution failed for job training-host-job
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 877, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 1103, in _run_synchronous_loop
+    self.round_completion(round_index)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/server_daemon.py", line 1546, in complete_round
+    raise FLRuntimeError('round_report_timeout', '未在本轮期限内收齐提交完成报告')
+wfb_ng.fl.errors.FLRuntimeError: 未在本轮期限内收齐提交完成报告
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 614, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 903, in run
+    raise terminal_exc
+wfb_ng.fl.errors.FLRuntimeError: operator_stop
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_training_host.py::test_first_terminal_send_exception_is_retried_within_frozen_recovery_budget
+FAILED wfb_ng/tests/test_fl_training_host.py::test_blocked_recovery_does_not_stop_terminal_retries_to_other_missing_target
+2 failed, 32 deselected, 2 warnings in 6.38s

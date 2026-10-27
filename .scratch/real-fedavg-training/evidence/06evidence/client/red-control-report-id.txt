@@ -1,0 +1,49 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________ test_rebuilt_control_encodes_host_cached_report_id ______________
+
+host = (<wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff7d4d6e60>, <wfb_ng.tests.test_fl_client_daemon.MockNetworkAdapter object at 0xffff7d4d6d40>, [], <threading.Event object at 0xffff7d4d6590>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff7d4d6e00>
+
+    def test_rebuilt_control_encodes_host_cached_report_id(host, monkeypatch):
+        daemon, adapter, reports, reported = host
+        daemon.sandbox._command_prefix = [sys.executable, '-c', 'import time; time.sleep(30)']
+        daemon.trigger_job(_make_client_job(job_id='job1'))
+        envelopes = []
+        sent = threading.Event()
+
+        def wire(control, payload, *args, **kwargs):
+            envelopes.append(payload)
+            sent.set()
+            if len(envelopes) == 1:
+                raise TimeoutError('服务器已收到但 ACK 丢失')
+
+        # 真实 ControlPeer 编码，仅在网络报告边界控制 ACK。
+        monkeypatch.delattr(daemon.control_plane, 'notify_job_recovery')
+        monkeypatch.setattr(ControlPlaneClient, '_notify_report', wire)
+        first = daemon.control_plane
+        daemon.control_plane.handle_broadcast({'type': 'JOB_ABORT', 'job_id': 'job1'})
+>       assert sent.wait(3)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xffff7d4d5ba0>>(3)
+E        +    where <bound method Event.wait of <threading.Event object at 0xffff7d4d5ba0>> = <threading.Event object at 0xffff7d4d5ba0>.wait
+
+wfb_ng/tests/test_fl_client_recovery.py:503: AssertionError
+----------------------------- Captured stderr call -----------------------------
+解析或应用对齐指令失败: 作业运行时拒绝更新空闲射频链路
+作业 job1 恢复报告未获确认，保留事实供重报
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1405, in _report_job_recovery
+    control.notify_job_recovery(
+TypeError: ControlPlaneClient.notify_job_recovery() got an unexpected keyword argument 'report_id'
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_recovery.py::test_rebuilt_control_encodes_host_cached_report_id
+1 failed, 2 warnings in 3.71s

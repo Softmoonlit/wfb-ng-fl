@@ -1,0 +1,61 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_stop_preserves_recovering_until_algorithm_actually_exits _________
+
+host_factory = <function host_factory.<locals>.make at 0xffff8cb048b0>
+
+    def test_stop_preserves_recovering_until_algorithm_actually_exits(host_factory):
+        host = host_factory()
+        host.evaluation_mode = 'hold_final'
+        host.launch()
+        assert host.final_evaluated.wait(2)
+        result = []
+        stopper = threading.Thread(target=lambda: result.append(host.daemon.abort_job('operator_stop')))
+        stopper.start()
+        try:
+            assert host.runtime.closed.wait(1), '停止必须显式唤醒 Runtime 等待'
+            recent = host.daemon.get_status_report()['recent_job']
+            assert recent['execution_result'] == 'aborted'
+            assert recent['recovery_state'] == 'recovering'
+>           assert host.terminal.wait(1), '服务端计算未退出也必须先向客户端请求停止'
+E           AssertionError: 服务端计算未退出也必须先向客户端请求停止
+E           assert False
+E            +  where False = <bound method Event.wait of <threading.Event object at 0xfffed8a35a50>>(1)
+E            +    where <bound method Event.wait of <threading.Event object at 0xfffed8a35a50>> = <threading.Event object at 0xfffed8a35a50>.wait
+E            +      where <threading.Event object at 0xfffed8a35a50> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffed8a35960>.terminal
+
+wfb_ng/tests/test_fl_training_host.py:553: AssertionError
+----------------------------- Captured stderr call -----------------------------
+FLCoordinator execution failed for job training-host-job
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 870, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 1047, in _run_synchronous_loop
+    evaluation = self._call_evaluate(output_model_path, round_index)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 797, in _call_evaluate
+    result = self.evaluate_fn(model_path, self.algorithm_config, context)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_training_host.py", line 143, in evaluate_entry
+    context.check_stop()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/algorithm.py", line 124, in check_stop
+    raise FLRuntimeError('job_aborted', '作业已请求停止')
+wfb_ng.fl.errors.FLRuntimeError: 作业已请求停止
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 610, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 896, in run
+    raise terminal_exc
+wfb_ng.fl.errors.FLRuntimeError: operator_stop
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_training_host.py::test_stop_preserves_recovering_until_algorithm_actually_exits
+1 failed, 30 deselected, 2 warnings in 4.64s

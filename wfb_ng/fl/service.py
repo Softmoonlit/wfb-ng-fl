@@ -4,6 +4,7 @@
 import argparse
 import ipaddress
 import json
+import math
 import os
 import shutil
 import signal
@@ -18,6 +19,7 @@ from typing import List, Union
 from .algorithm import freeze_algorithm_config
 from .errors import FLRuntimeError
 from .role import ClientRole, ServerRole
+from .transport import validate_server_http_host
 
 
 _COMMON_FIELDS = {
@@ -324,11 +326,23 @@ def _read_config(path):
     if (not isinstance(config.get('work_dir'), str) or
             not os.path.isabs(config['work_dir'])):
         raise FLRuntimeError('invalid_configuration', '工作目录必须是绝对路径')
-    for name in ('node_id', 'uftp_port', 'max_update_size_bytes',
-                 'io_timeout_seconds'):
+    for name in ('node_id', 'uftp_port', 'max_update_size_bytes'):
         if type(config.get(name)) is not int or config[name] <= 0:
             raise FLRuntimeError(
                 'invalid_configuration', '角色服务整数参数无效')
+    io_timeout = config['io_timeout_seconds']
+    if type(io_timeout) not in (int, float):
+        raise FLRuntimeError('invalid_configuration', '角色服务 I/O 期限必须为有限正数')
+    try:
+        io_timeout = float(io_timeout)
+    except OverflowError as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', '角色服务 I/O 期限必须为有限正数') from exc
+    if not math.isfinite(io_timeout) or io_timeout <= 0:
+        raise FLRuntimeError('invalid_configuration', '角色服务 I/O 期限必须为有限正数')
+    config['io_timeout_seconds'] = io_timeout
+    if role == 'client':
+        config['server_http_host'] = validate_server_http_host(config['server_http_host'])
     if 'radio_txpower_dbm' in config and (
             type(config['radio_txpower_dbm']) is not int or
             config['radio_txpower_dbm'] <= 0):

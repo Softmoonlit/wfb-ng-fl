@@ -32,3 +32,20 @@ class TrainingDeploymentConfigTests(unittest.TestCase):
                        {'nested': {'train_data_path': '/server/train'}}):
             with self.subTest(config=config), self.assertRaises(FLRuntimeError):
                 ServerDaemonConfig(algorithm_config=config)
+
+    def test_all_deployment_deadlines_are_loaded_and_reject_nonfinite_and_boolean(self):
+        import json
+        from dataclasses import FrozenInstanceError
+        for field in ('preparation_timeout_seconds', 'round_timeout_seconds', 'io_timeout_seconds'):
+            for invalid in (True, False, 0, -1, float('inf'), float('nan'), None):
+                with self.subTest(field=field, invalid=invalid), self.assertRaises(FLRuntimeError):
+                    ServerDaemonConfig(**{field: invalid})
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'server.json'
+            path.write_text(json.dumps(dict(preparation_timeout_seconds=11,
+                                            round_timeout_seconds=900, io_timeout_seconds=180)))
+            config = load_server_config(str(path))
+            self.assertEqual((config.preparation_timeout_seconds, config.round_timeout_seconds,
+                              config.io_timeout_seconds), (11.0, 900.0, 180.0))
+            with self.assertRaises(FrozenInstanceError):
+                config.round_timeout_seconds = 1

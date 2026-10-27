@@ -1,0 +1,39 @@
+
+==================================== ERRORS ====================================
+___________ ERROR collecting wfb_ng/tests/test_fl_client_recovery.py ___________
+/usr/lib/python3/dist-packages/_pytest/python.py:578: in _importtestmodule
+    mod = import_path(self.fspath, mode=importmode)
+/usr/lib/python3/dist-packages/_pytest/pathlib.py:524: in import_path
+    importlib.import_module(module_name)
+/usr/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1050: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1027: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1006: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:688: in _load_unlocked
+    ???
+/usr/lib/python3/dist-packages/_pytest/assertion/rewrite.py:170: in exec_module
+    exec(co, module.__dict__)
+wfb_ng/tests/test_fl_client_recovery.py:8: in <module>
+    from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig
+wfb_ng/fl/client_daemon.py:46: in <module>
+    from .control import (
+E     File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 1588
+E       }
+E       ^
+E   SyntaxError: unmatched '}'
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+ERROR wfb_ng/tests/test_fl_client_recovery.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2 warnings, 1 error in 0.86s

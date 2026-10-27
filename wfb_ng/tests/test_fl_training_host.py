@@ -6,6 +6,8 @@
 from copy import deepcopy
 import json
 import hashlib
+import ipaddress
+import socket
 from pathlib import Path
 import sys
 import threading
@@ -20,6 +22,44 @@ from wfb_ng.fl.reference_model import MODEL_FORMAT, initialize_model
 from wfb_ng.fl.server_daemon import ServerDaemon, ServerDaemonConfig
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 
+
+
+@pytest.fixture(autouse=True)
+def isolated_socket_boundary(monkeypatch):
+    """只在真实 socket 出站边界拦截：本文件绝不访问板卡或共享控制端口。"""
+    sendto = socket.socket.sendto
+    connect = socket.socket.connect
+    connect_ex = socket.socket.connect_ex
+
+    def require_isolated(sock, address):
+        if sock.family in (socket.AF_INET, socket.AF_INET6):
+            host, port = address[:2]
+            assert ipaddress.ip_address(host).is_loopback, f'禁止测试访问非 loopback 地址: {address}'
+            assert port not in (9000, 9001, 9002, 9200), f'禁止测试访问共享控制端口: {address}'
+
+    def isolated_sendto(sock, data, *args):
+        require_isolated(sock, args[-1])
+        return sendto(sock, data, *args)
+
+    def isolated_connect(sock, address):
+        require_isolated(sock, address)
+        return connect(sock, address)
+
+    def isolated_connect_ex(sock, address):
+        require_isolated(sock, address)
+        return connect_ex(sock, address)
+
+    monkeypatch.setattr(socket.socket, 'sendto', isolated_sendto)
+    monkeypatch.setattr(socket.socket, 'connect', isolated_connect)
+    monkeypatch.setattr(socket.socket, 'connect_ex', isolated_connect_ex)
+
+
+@pytest.fixture
+def isolated_control_address(isolated_socket_boundary):
+    """持有 OS 分配的 loopback UDP 接收端，不复用实机默认端口。"""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sink:
+        sink.bind(('127.0.0.1', 0))
+        yield sink.getsockname()
 
 def preparation_report(*, server=False):
     prefix = 't10k' if server else 'train'
@@ -76,15 +116,19 @@ class ControlledRuntime:
 
 class TrainingHost:
     def __init__(self, tmp_path, monkeypatch, model_path, *, budget=1.5,
-                 auto_ready=True, auto_round_ready=True, runtime_missing=False,
-                 invalid_entry=None, reference_client=False, algorithm_config=None):
+                 control_address, auto_ready=True, auto_round_ready=True, runtime_missing=False,
+                 invalid_entry=None, reference_client=False, algorithm_config=None, round_budget=1.5):
+        self.control_address = control_address
         self.trace = []
         self.announced = threading.Event()
         self.terminal = threading.Event()
         self.evaluation_started = threading.Event()
         self.evaluation_exited = threading.Event()
         self.final_evaluated = threading.Event()
+        self.release_final_evaluation = threading.Event()
+        self.final_evaluation_exited = threading.Event()
         self.start_done = threading.Event()
+        self.auto_recovery = True
         self.auto_ready = auto_ready
         self.auto_round_ready = auto_round_ready
         self.hold_final_reports = False
@@ -96,6 +140,10 @@ class TrainingHost:
         self.errors = []
         self.result = None
         self.aggregate_contexts = []
+        self.hold_aggregate = False
+        self.aggregate_started = threading.Event()
+        self.release_aggregate = threading.Event()
+        self.aggregate_exited = threading.Event()
         self.evaluate_contexts = []
         self.updates = {node: tmp_path / f'update-{node}.bin' for node in (1, 2)}
         for node, path in self.updates.items():
@@ -110,6 +158,11 @@ class TrainingHost:
 
         def aggregate_entry(current, updates, output, config, context):
             self.trace.append('aggregate')
+            if self.hold_aggregate:
+                self.aggregate_started.set()
+                self.release_aggregate.wait()
+                self.aggregate_exited.set()
+                context.check_stop()
             self.aggregate_contexts.append((dict(config), context, dict(updates)))
             Path(output).parent.mkdir(parents=True, exist_ok=True)
             Path(output).write_bytes(f'explicit-test-aggregate-output-{context.round_index}'.encode())
@@ -133,6 +186,11 @@ class TrainingHost:
                         'preparation': dict(self.initial_preparation),
                         'verdict': None, 'reason': None}
             self.trace.append('final_evaluate')
+            if self.evaluation_mode == 'hold_final':
+                self.final_evaluated.set()
+                self.release_final_evaluation.wait()
+                self.final_evaluation_exited.set()
+                context.check_stop()
             if context.round_index == context.rounds:
                 self.final_evaluated.set()
             final = context.round_index == context.rounds
@@ -155,8 +213,10 @@ class TrainingHost:
         config = ServerDaemonConfig(
             work_dir=str(tmp_path / 'server'), model_library_dir=str(tmp_path / 'models'),
             ipc_host='127.0.0.1', ipc_port=0, control_bind_host='127.0.0.1',
-            control_bind_port=0, enable_control_plane=False, enable_link_process=False,
-            preparation_timeout_seconds=budget, mnist_data_dir=str(tmp_path / 'local-test-data'),
+            control_bind_port=0, control_broadcast_addr=control_address[0],
+            control_broadcast_port=control_address[1], radio_control_port=control_address[1],
+            enable_control_plane=False, enable_link_process=False,
+            preparation_timeout_seconds=budget, round_timeout_seconds=round_budget, io_timeout_seconds=0.2, mnist_data_dir=str(tmp_path / 'local-test-data'),
             algorithm_config={'data_seed': 2026} if algorithm_config is None else algorithm_config, **entries)
 
         def runtime_factory(job, payload):
@@ -175,7 +235,7 @@ class TrainingHost:
                     uplink_mcs=config.uplink_mcs, downlink_mcs=config.downlink_mcs,
                     uftp_rate_kbps=self.daemon.radio_config.uftp_rate_kbps,
                     bandwidth_mhz=config.bandwidth_mhz, timestamp_ms=int(time.time() * 1000))
-                self.daemon.control_plane.handle_datagram(heartbeat.to_bytes(), (f'10.80.0.{10 + node}', 9001))
+                self.daemon.control_plane.handle_datagram(heartbeat.to_bytes(), (f'127.0.0.{10 + node}', self.control_address[1]))
         self.payload = dict(job_id='training-host-job', run_id='training-host-run',
             model_path=str(model_path), model_size_bytes=model_path.stat().st_size,
             target_nodes=[1, 2], rounds=1, mode='sync', round_timeout_seconds=1.5,
@@ -192,11 +252,14 @@ class TrainingHost:
                 for node in (1, 2):
                     self.task_ready(node)
         elif message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+            if self.auto_recovery:
+                for node in (1, 2):
+                    self.recovery(node)
             self.terminal.set()
 
     def send(self, payload):
         replies = self.daemon.control_plane.handle_datagram(
-            json.dumps(payload).encode(), (f"10.80.0.{10 + payload['node_id']}", 9001))
+            json.dumps(payload).encode(), (f"127.0.0.{10 + payload['node_id']}", self.control_address[1]))
         ack = json.loads(replies[0]) if replies else None
         self.acks.append(ack)
         return ack
@@ -207,6 +270,13 @@ class TrainingHost:
         if not bare:
             payload['report'] = deepcopy(self.client_report) if report is None else report
         return self.send(payload)
+
+    def recovery(self, node, *, state='ready', epoch=1):
+        report = dict(recovery_epoch=epoch, recovery_state=state)
+        if state == 'blocked':
+            report.update(error_code='FIXTURE_CLEANUP_BLOCKED', reason='任务资源仍存在')
+        return self.send(dict(type='JOB_RECOVERY', job_id=self.payload['job_id'], node_id=node,
+                              report_id=f'recovery-{node}-{epoch}', report=report))
 
     def round_ready(self, node):
         index = self.runtime.wait_calls or 1
@@ -231,7 +301,12 @@ class TrainingHost:
         assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
         assert not self.errors, f'start_job failed: {self.errors}'
         assert self.terminal.wait(2), f'no terminal after complete reports; trace={self.trace}'
-        recent = self.daemon.get_status_report()['recent_job']
+        deadline = time.monotonic() + 2
+        while time.monotonic() < deadline:
+            recent = self.daemon.get_status_report()['recent_job']
+            if recent and recent['recovery_state'] != 'recovering':
+                break
+            time.sleep(0.005)
         assert recent and recent['execution_result'] == 'succeeded', recent
         return recent
 
@@ -250,11 +325,12 @@ def initial_model(tmp_path_factory):
 
 
 @pytest.fixture
-def host_factory(tmp_path, monkeypatch, initial_model):
+def host_factory(tmp_path, monkeypatch, initial_model, isolated_control_address):
     hosts = []
     def make(**kwargs):
         model_path = kwargs.pop('model_path', initial_model)
-        host = TrainingHost(tmp_path, monkeypatch, model_path, **kwargs)
+        host = TrainingHost(tmp_path, monkeypatch, model_path,
+                            control_address=isolated_control_address, **kwargs)
         hosts.append(host)
         return host
     yield make
@@ -474,3 +550,393 @@ def test_five_round_host_reuses_runtime_and_waits_for_all_final_submission_retur
     rows = recent['summary']['rounds']
     assert host.runtime.models == [rows[0]['input_model_path']] + [row['output_model_path'] for row in rows[:4]]
     assert recent['recovery_state'] == 'ready'
+
+
+def test_request_cannot_override_deployment_deadlines(host_factory):
+    host = host_factory()
+    host.payload.update(preparation_timeout_seconds=999, round_timeout_seconds=999,
+                        io_timeout_seconds=999)
+    host.launch()
+    recent = host.assert_succeeded()
+    announce = next(message for message in host.messages if message['type'] == 'TASK_ANNOUNCE')
+    for name in ('preparation_timeout_seconds', 'round_timeout_seconds', 'io_timeout_seconds'):
+        assert recent[name] == getattr(host.daemon.config, name)
+        assert announce[name] == getattr(host.daemon.config, name)
+
+
+def test_terminal_requires_recovery_from_all_targets_and_late_ready_only_updates_recovery(host_factory):
+    host = host_factory()
+    host.auto_recovery = False
+    host.launch()
+    recent = host.assert_succeeded()
+    assert recent['recovery_state'] == 'unconfirmed'
+    assert recent['recovery_missing_nodes'] == [1, 2]
+    frozen_summary = deepcopy(recent['summary'])
+    with pytest.raises(FLRuntimeError) as caught:
+        host.daemon.start_job(dict(host.payload, job_id='conflicting-job'))
+    assert caught.value.error_code == 'preflight_engine_conflict'
+    assert host.recovery(1)['ok'] is True
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['recovery_state'] == 'unconfirmed'
+    assert recent['recovery_missing_nodes'] == [2]
+    assert host.recovery(2, state='blocked')['ok'] is True
+    assert host.daemon.get_status_report()['recent_job']['recovery_state'] == 'blocked'
+    assert host.recovery(2, epoch=2)['ok'] is True
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['recovery_state'] == 'ready'
+    assert recent['summary'] == frozen_summary
+    assert recent['execution_result'] == 'succeeded'
+    assert host.daemon.abort_job()['status'] == 'completed'
+    assert len([m for m in host.messages if m['type'] in ('JOB_ABORT', 'JOB_COMPLETED')]) == 1
+
+
+def test_stop_preserves_recovering_until_algorithm_actually_exits(host_factory):
+    host = host_factory()
+    host.evaluation_mode = 'hold_final'
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    result = []
+    stopper = threading.Thread(target=lambda: result.append(host.daemon.abort_job('operator_stop')))
+    stopper.start()
+    try:
+        assert host.runtime.closed.wait(1), '停止必须显式唤醒 Runtime 等待'
+        recent = host.daemon.get_status_report()['recent_job']
+        assert recent['execution_result'] == 'aborted'
+        assert recent['recovery_state'] == 'recovering'
+        assert host.terminal.wait(1), '服务端计算未退出也必须先向客户端请求停止'
+        assert recent['server_recovery_complete'] is False
+        assert not host.final_evaluation_exited.is_set()
+        recent = host.daemon.get_status_report()['recent_job']
+        assert recent['recovery_missing_nodes'] == [], '客户端已确认恢复也不能替代服务端退出证明'
+        assert recent['recovery_state'] == 'recovering'
+        with pytest.raises(FLRuntimeError) as caught:
+            host.daemon.start_job(dict(host.payload, job_id='while-server-compute-held'))
+        assert caught.value.error_code == 'preflight_engine_conflict'
+        assert stopper.is_alive()
+    finally:
+        host.release_final_evaluation.set()
+        stopper.join(3)
+    assert not stopper.is_alive()
+    assert host.final_evaluation_exited.is_set()
+    assert result[0]['status'] == 'aborted'
+    assert host.daemon.get_status_report()['recent_job']['recovery_state'] == 'ready'
+    assert host.daemon.abort_job('late_stop') == result[0]
+
+
+def test_role_failure_is_supervised_without_status_polling(host_factory, monkeypatch):
+    from dataclasses import replace
+    host = host_factory(auto_round_ready=False)
+    failed = threading.Event()
+    closed = threading.Event()
+
+    class Role:
+        runtime = host.runtime
+
+        def start(self):
+            pass
+
+        def poll_failure(self):
+            return FLRuntimeError('fixture_role_exit', '任务 HTTP 接收器异常退出') if failed.is_set() else None
+
+        def close(self):
+            closed.set()
+
+    monkeypatch.setattr('wfb_ng.fl.role.ServerRole', lambda **kwargs: Role())
+    host.daemon.runtime_factory = None
+    host.daemon.config = replace(host.daemon.config, enable_link_process=True)
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    failed.set()
+    assert host.terminal.wait(2), '角色失败必须主动触发终态，不能依赖 get_status_report'
+    assert closed.wait(1)
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'failed'
+    assert 'fixture_role_exit' in recent['reason'] or 'HTTP' in recent['error']
+    assert host.runtime.closed.wait(1)
+
+
+def test_frozen_participant_offline_fails_job_without_status_poll(host_factory):
+    host = host_factory(auto_round_ready=False)
+    host.daemon.control_plane.offline_threshold_seconds = 0.12
+    host.daemon.control_plane.registry.offline_threshold_seconds = 0.12
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    assert host.terminal.wait(2), '心跳失联由活动作业监管主动收尾'
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'failed'
+    assert recent['reason'] == 'participant_offline'
+    assert recent['target_nodes'] == [1, 2]
+    assert recent['liveness_events'][0]['state'] == 'offline'
+    assert host.runtime.closed.wait(1)
+
+
+def test_client_business_error_is_acknowledged_and_wakes_round_barrier(host_factory):
+    host = host_factory(auto_round_ready=False)
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    error = dict(type='TASK_ERROR', job_id=host.payload['job_id'], node_id=1,
+                 report_id='error-1', phase='round', round_index=1,
+                 error_code='GPU_TRAINING_FAILED', reason='设备训练失败')
+    ack = host.send(error)
+    assert ack['ok'] is True
+    assert host.send(error)['ok'] is True
+    assert host.terminal.wait(2)
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'failed'
+    assert recent['client_error']['error_code'] == 'GPU_TRAINING_FAILED'
+    assert host.runtime.closed.wait(1)
+
+
+def test_round_deadline_freezes_failure_before_compute_exit_and_cannot_be_overwritten_by_stop(host_factory):
+    host = host_factory(round_budget=0.08)
+    host.evaluation_mode = 'hold_final'
+    host.launch()
+    try:
+        assert host.final_evaluated.wait(2)
+        assert host.runtime.closed.wait(1), '完整轮次期限必须主动请求 Runtime 取消'
+        deadline = time.monotonic() + 1
+        while time.monotonic() < deadline:
+            recent = host.daemon.get_status_report()['recent_job']
+            if recent:
+                break
+            time.sleep(0.005)
+        assert recent and recent['execution_result'] == 'failed'
+        assert recent['reason'] == 'round_timeout'
+        assert recent['recovery_state'] == 'recovering'
+        assert host.terminal.wait(1)
+        assert recent['server_recovery_complete'] is False
+        assert host.daemon.abort_job('late_operator_stop')['status'] == 'failed'
+    finally:
+        host.release_final_evaluation.set()
+    assert host.terminal.wait(2)
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        recent = host.daemon.get_status_report()['recent_job']
+        if recent.get('summary'):
+            break
+        time.sleep(0.005)
+    assert recent['execution_result'] == 'failed'
+    assert recent['summary']['error_code'] == 'round_timeout'
+
+
+def test_operator_stop_cancels_initial_preparation_before_announcement(host_factory):
+    host = host_factory()
+    host.evaluation_mode = 'wait_for_cancel'
+    host.launch()
+    assert host.evaluation_started.wait(1)
+    result = host.daemon.abort_job('operator_stop')
+    assert result['status'] == 'aborted'
+    assert host.evaluation_exited.is_set()
+    assert host.start_done.wait(2)
+    assert host.errors[0].error_code == 'job_preparation_cancelled'
+    assert not host.announced.is_set()
+    assert not host.runtime.published.is_set()
+
+
+def test_terminal_retry_keeps_identity_and_waits_for_real_recovery(host_factory, monkeypatch):
+    host = host_factory()
+    terminal_attempts = []
+    receive = host.receive_downlink
+
+    def lose_first_terminal(message):
+        if message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+            terminal_attempts.append(deepcopy(message))
+            if len(terminal_attempts) == 1:
+                return
+        receive(message)
+
+    monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', lose_first_terminal)
+    from dataclasses import replace
+    host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.6)
+    host.launch()
+    recent = host.assert_succeeded()
+    assert recent['recovery_state'] == 'ready'
+    assert len(terminal_attempts) == 2
+    assert terminal_attempts[0] == terminal_attempts[1]
+
+
+def test_runtime_close_failure_blocks_recovery_and_next_job(host_factory, monkeypatch):
+    host = host_factory()
+
+    def fail_close():
+        raise FLRuntimeError('fixture_close_failed', '任务资源尚未释放')
+
+    monkeypatch.setattr(host.runtime, 'close', fail_close)
+    host.launch()
+    assert host.start_done.wait(2)
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        recent = host.daemon.get_status_report()['recent_job']
+        if recent and recent['recovery_state'] == 'blocked':
+            break
+        time.sleep(0.005)
+    assert recent['execution_result'] == 'succeeded'
+    assert recent['recovery_error'] == 'fixture_close_failed'
+    assert recent['server_recovery_complete'] is False
+    assert recent['recovery_missing_nodes'] == []
+    assert host.terminal.wait(1), '服务端清理失败也必须向客户端发送停止／完成'
+    with pytest.raises(FLRuntimeError) as caught:
+        host.daemon.start_job(dict(host.payload, job_id='blocked-next-job'))
+    assert caught.value.error_code == 'preflight_engine_conflict'
+
+
+def test_daemon_stop_during_terminal_cleanup_waits_same_compute_and_closes_role_once(host_factory, monkeypatch):
+    from dataclasses import replace
+    host = host_factory()
+    host.evaluation_mode = 'hold_final'
+    close_count = []
+
+    class Role:
+        runtime = host.runtime
+
+        def start(self):
+            pass
+
+        def poll_failure(self):
+            return None
+
+        def close(self):
+            close_count.append('closed')
+
+    monkeypatch.setattr('wfb_ng.fl.role.ServerRole', lambda **kwargs: Role())
+    host.daemon.runtime_factory = None
+    host.daemon.config = replace(host.daemon.config, enable_link_process=True)
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    aborter = threading.Thread(target=lambda: host.daemon.abort_job('operator_stop'))
+    stopper = threading.Thread(target=host.daemon.stop)
+    aborter.start()
+    try:
+        assert host.runtime.closed.wait(1)
+        stopper.start()
+        assert not host.final_evaluation_exited.is_set()
+        assert not close_count, '计算未退出，任务角色不能关闭'
+        assert host.terminal.wait(1)
+    finally:
+        host.release_final_evaluation.set()
+        aborter.join(3)
+        if stopper.ident is not None:
+            stopper.join(3)
+    assert not aborter.is_alive()
+    assert not stopper.is_alive()
+    assert host.final_evaluation_exited.is_set()
+    assert close_count == ['closed']
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'aborted'
+    assert recent['reason'] == 'operator_stop'
+    assert recent['recovery_state'] == 'blocked'
+    assert recent['recovery_error'] == 'DAEMON_STOPPED'
+
+
+def test_blocked_aggregate_does_not_delay_client_abort_or_terminal_retry(host_factory, monkeypatch):
+    from dataclasses import replace
+    host = host_factory()
+    host.hold_aggregate = True
+    host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.8)
+    receive = host.receive_downlink
+    attempts = []
+
+    def drop_first_abort(message):
+        if message['type'] == 'JOB_ABORT':
+            attempts.append(deepcopy(message))
+            if len(attempts) == 1:
+                return
+        receive(message)
+
+    monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', drop_first_abort)
+    host.launch()
+    assert host.aggregate_started.wait(2)
+    stopper = threading.Thread(target=lambda: host.daemon.abort_job('operator_stop'))
+    stopper.start()
+    try:
+        assert host.terminal.wait(1), '阻塞聚合不能阻挡向客户端发送并重试停止'
+        assert len(attempts) == 2
+        assert attempts[0] == attempts[1]
+        assert not host.aggregate_exited.is_set()
+        recent = host.daemon.get_status_report()['recent_job']
+        assert recent['execution_result'] == 'aborted'
+        assert recent['recovery_state'] == 'recovering'
+        assert recent['server_recovery_complete'] is False
+        assert recent['recovery_missing_nodes'] == []
+        assert set(recent['recovery_reports']) == {1, 2}
+        with pytest.raises(FLRuntimeError) as caught:
+            host.daemon.start_job(dict(host.payload, job_id='conflicts-with-blocked-aggregate'))
+        assert caught.value.error_code == 'preflight_engine_conflict'
+        assert stopper.is_alive()
+    finally:
+        host.release_aggregate.set()
+        stopper.join(3)
+    assert not stopper.is_alive()
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'aborted'
+    assert recent['server_recovery_complete'] is True
+    assert recent['recovery_state'] == 'ready'
+    assert recent['summary']['status'] == 'aborted'
+
+
+def test_first_terminal_send_exception_is_retried_within_frozen_recovery_budget(host_factory, monkeypatch):
+    from dataclasses import replace
+    host = host_factory()
+    host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.7)
+    receive = host.receive_downlink
+    attempts = []
+
+    def transient_send_failure(message):
+        if message['type'] in ('JOB_ABORT', 'JOB_COMPLETED'):
+            attempts.append(deepcopy(message))
+            if len(attempts) == 1:
+                raise OSError('fixture transient UDP send failure')
+        receive(message)
+
+    monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', transient_send_failure)
+    host.launch()
+    assert host.terminal.wait(2), '首个 send 异常后仍须在同一恢复预算内重试终态'
+    recent = host.assert_succeeded()
+    assert recent['recovery_state'] == 'ready'
+    assert recent['recovery_missing_nodes'] == []
+    assert len(attempts) == 2
+    assert attempts[0] == attempts[1]
+    assert recent['terminal_delivery_errors'][0]['reason'] == 'fixture transient UDP send failure'
+
+
+def test_blocked_recovery_does_not_stop_terminal_retries_to_other_missing_target(host_factory, monkeypatch):
+    from dataclasses import replace
+    host = host_factory(auto_round_ready=False)
+    host.auto_recovery = False
+    host.daemon.config = replace(host.daemon.config, io_timeout_seconds=0.7)
+    receive = host.receive_downlink
+    attempts = []
+    second_received_stop = threading.Event()
+
+    def one_blocked_one_missing(message):
+        receive(message)
+        if message['type'] == 'JOB_ABORT':
+            attempts.append(deepcopy(message))
+            if len(attempts) == 1:
+                assert host.recovery(1, state='blocked')['ok'] is True
+            else:
+                assert host.recovery(2)['ok'] is True
+                second_received_stop.set()
+
+    monkeypatch.setattr(host.daemon.control_plane, 'broadcast_downlink', one_blocked_one_missing)
+    host.launch()
+    assert host.final_evaluated.wait(2)
+    result = host.daemon.abort_job('operator_stop')
+    assert result['status'] == 'aborted'
+    assert second_received_stop.is_set(), '一节点blocked不能让另一丢包节点收不到stop'
+    assert len(attempts) >= 2
+    assert all(message == attempts[0] for message in attempts)
+    recent = host.daemon.get_status_report()['recent_job']
+    assert recent['execution_result'] == 'aborted'
+    assert recent['recovery_state'] == 'blocked'
+    assert recent['recovery_missing_nodes'] == [1]
+    assert recent['recovery_reports'][1]['report']['error_code'] == 'FIXTURE_CLEANUP_BLOCKED'
+    with pytest.raises(FLRuntimeError):
+        host.daemon.start_job(dict(host.payload, job_id='must-remain-blocked'))
+    assert host.recovery(1, epoch=2)['ok'] is True
+    progressed = host.daemon.get_status_report()['recent_job']
+    assert progressed['recovery_state'] == 'ready'
+    assert progressed['execution_result'] == 'aborted'
+    assert progressed['recovery_report_history'][1][0]['report']['error_code'] == 'FIXTURE_CLEANUP_BLOCKED'
+    assert progressed['recovery_report_history'][1][1]['report']['recovery_state'] == 'ready'
+    assert host.daemon.abort_job('late-stop') == result

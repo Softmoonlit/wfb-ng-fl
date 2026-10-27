@@ -1,0 +1,156 @@
+......................................F...FE............................ [ 89%]
+........                                                                 [100%]
+==================================== ERRORS ====================================
+_ ERROR at teardown of TestClientDaemonLifecycle.test_startup_bandwidth_is_the_source_for_hardware_and_link _
+wfb_ng/fl/client_daemon.py:1752: in stop
+    self._cleanup()
+wfb_ng/fl/client_daemon.py:1761: in _cleanup
+    self._stop_idle_link()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff88028d30>
+
+    def _stop_idle_link(self) -> None:
+        """Stop the idle client link and release its TUN."""
+        with self._transport_lock:
+            if self._link_process is not None:
+                try:
+                    self._link_process.terminate()
+                    self._link_process.wait(timeout=2.0)
+                except Exception:
+                    try:
+                        self._link_process.kill()
+                        self._link_process.wait(timeout=1.0)
+                    except Exception:
+                        pass
+                if self._link_process.poll() is None:
+>                   raise FLRuntimeError('idle_link_not_exited', '旧待命链路尚未退出，拒绝任务接管')
+E                   wfb_ng.fl.errors.FLRuntimeError: 旧待命链路尚未退出，拒绝任务接管
+
+wfb_ng/fl/client_daemon.py:1219: FLRuntimeError
+=================================== FAILURES ===================================
+_ TestClientDaemonLifecycle.test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion _
+
+self = <wfb_ng.tests.test_fl_client_daemon.TestClientDaemonLifecycle testMethod=test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion>
+
+    def test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion(self):
+        config = ClientDaemonConfig(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            work_dir=self.temp_dir,
+            link_id=7669206,
+        )
+        link_processes = []
+
+        class FakeLinkProcess:
+            def __init__(self):
+                self.returncode = None
+                link_processes.append(self)
+                self.adapter = None
+
+            def poll(self):
+                return self.returncode
+
+            def terminate(self):
+                self.returncode = 0
+
+            def wait(self, timeout=None):
+                return self.returncode
+
+            def kill(self):
+                self.returncode = -9
+
+        def start_link(cmd, **kwargs):
+            self.adapter.setup_tun("fl-c1", "10.80.0.11/24")
+            return FakeLinkProcess()
+
+        daemon = ClientDaemon(
+            config=config,
+            network_adapter=self.adapter,
+            _link_process_factory=start_link,
+        )
+        daemon.poll_hardware_once()
+        daemon.sandbox._process = mock.Mock()
+        daemon.sandbox._process.poll.return_value = None
+        daemon.sandbox.state = DaemonState.RUNNING
+        daemon.start_idle_link()
+        self.assertFalse(daemon.is_idle_link_running)
+        self.assertEqual(link_processes, [])
+        daemon.sandbox._process = None
+        daemon.sandbox.state = DaemonState.IDLE
+
+        daemon.start_idle_link()
+        self.assertTrue(daemon.is_idle_link_running)
+        self.assertEqual(len(link_processes), 1)
+
+        sandbox_proc = mock.Mock()
+        sandbox_proc.poll.return_value = None
+        with mock.patch.object(daemon.sandbox, "start", return_value=sandbox_proc) as sandbox_start:
+            job = _make_client_job(
+                job_id="handoff",
+                node_id=1,
+                tun_name="fl-c1",
+                tun_ip="10.80.0.11",
+                link_id=7669206,
+            )
+            daemon.trigger_job(job)
+            self.assertFalse(daemon.is_idle_link_running)
+            self.assertEqual(link_processes[0].returncode, 0)
+            sandbox_start.assert_called_once()
+
+        daemon.sandbox._process = None
+        daemon.sandbox.state = DaemonState.IDLE
+        daemon.start_idle_link()
+        self.assertTrue(daemon.is_idle_link_running)
+        self.assertEqual(len(link_processes), 2)
+
+        daemon._handle_job_terminal({"job_id": "stale"}, aborted=False)
+        self.assertEqual(len(link_processes), 2)
+        daemon._handle_job_terminal({"job_id": "handoff"}, aborted=False)
+        self.assertIsNone(link_processes[1].returncode)
+        self.assertTrue(daemon.is_idle_link_running)
+        self.assertEqual(len(link_processes), 2)
+>       self.assertIsNone(daemon._current_job_id)
+E       AssertionError: 'handoff' is not None
+
+wfb_ng/tests/test_fl_client_daemon.py:694: AssertionError
+_ TestClientDaemonLifecycle.test_startup_bandwidth_is_the_source_for_hardware_and_link _
+wfb_ng/fl/client_daemon.py:1752: in stop
+    self._cleanup()
+wfb_ng/fl/client_daemon.py:1761: in _cleanup
+    self._stop_idle_link()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff86e61630>
+
+    def _stop_idle_link(self) -> None:
+        """Stop the idle client link and release its TUN."""
+        with self._transport_lock:
+            if self._link_process is not None:
+                try:
+                    self._link_process.terminate()
+                    self._link_process.wait(timeout=2.0)
+                except Exception:
+                    try:
+                        self._link_process.kill()
+                        self._link_process.wait(timeout=1.0)
+                    except Exception:
+                        pass
+                if self._link_process.poll() is None:
+>                   raise FLRuntimeError('idle_link_not_exited', '旧待命链路尚未退出，拒绝任务接管')
+E                   wfb_ng.fl.errors.FLRuntimeError: 旧待命链路尚未退出，拒绝任务接管
+
+wfb_ng/fl/client_daemon.py:1219: FLRuntimeError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_daemon.py::TestClientDaemonLifecycle::test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion
+FAILED wfb_ng/tests/test_fl_client_daemon.py::TestClientDaemonLifecycle::test_startup_bandwidth_is_the_source_for_hardware_and_link
+ERROR wfb_ng/tests/test_fl_client_daemon.py::TestClientDaemonLifecycle::test_startup_bandwidth_is_the_source_for_hardware_and_link
+2 failed, 77 passed, 2 warnings, 1 error in 52.77s

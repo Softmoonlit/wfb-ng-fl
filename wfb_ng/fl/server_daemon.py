@@ -168,6 +168,8 @@ class ServerDaemonConfig:
     enable_link_process: bool = True
     enable_control_plane: bool = True
     preparation_timeout_seconds: float = 30.0
+    round_timeout_seconds: float = 900.0
+    io_timeout_seconds: float = 120.0
     mnist_data_dir: Optional[str] = None
     client_entry: str = 'wfb_ng.fl.mnist:client_entry'
     aggregate_entry: str = 'wfb_ng.fl.mnist:aggregate_entry'
@@ -217,14 +219,18 @@ class ServerDaemonConfig:
         if self.web_port != DEFAULT_WEB_PORT:
             raise FLRuntimeError("invalid_web_port", "管理 Web 端口固定为 8080")
 
-        # Validate preparation budget
-        try:
-            preparation_timeout = float(self.preparation_timeout_seconds)
-        except (TypeError, ValueError) as exc:
-            raise FLRuntimeError("invalid_preparation_timeout", "preparation_timeout_seconds 必须为正数") from exc
-        if not math.isfinite(preparation_timeout) or preparation_timeout <= 0:
-            raise FLRuntimeError("invalid_preparation_timeout", "preparation_timeout_seconds 必须为正数")
-        object.__setattr__(self, "preparation_timeout_seconds", preparation_timeout)
+        for name in ('preparation_timeout_seconds', 'round_timeout_seconds', 'io_timeout_seconds'):
+            raw = getattr(self, name)
+            code = 'invalid_' + name.removesuffix('_seconds')
+            try:
+                if isinstance(raw, bool):
+                    raise ValueError('布尔值不是期限')
+                value = float(raw)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise FLRuntimeError(code, f'{name} 必须为有限正数') from exc
+            if not math.isfinite(value) or value <= 0:
+                raise FLRuntimeError(code, f'{name} 必须为有限正数')
+            object.__setattr__(self, name, value)
 
         # Validate known_clients
         if self.known_clients != ALL_KNOWN_CLIENT_IDS:
@@ -287,6 +293,8 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         enable_link_process=bool(data.get("enable_link_process", True)),
         enable_control_plane=bool(data.get("enable_control_plane", True)),
         preparation_timeout_seconds=data.get("preparation_timeout_seconds", 30.0),
+        round_timeout_seconds=data.get("round_timeout_seconds", 900.0),
+        io_timeout_seconds=data.get("io_timeout_seconds", 120.0),
         mnist_data_dir=data.get('mnist_data_dir'),
         client_entry=data.get('client_entry', 'wfb_ng.fl.mnist:client_entry'),
         aggregate_entry=data.get('aggregate_entry', 'wfb_ng.fl.mnist:aggregate_entry'),
@@ -683,6 +691,7 @@ class ServerDaemon:
         self._recent_job: Optional[Dict[str, Any]] = None
         self.coordinator: Optional[Any] = None
         self.server_role: Optional[Any] = None
+        self._job_runtime: Optional[Any] = None
         self._preparation: Optional[_JobPreparation] = None
 
         self.event_bus = ServerEventBus()
@@ -718,7 +727,10 @@ class ServerDaemon:
         )
 
         self.control_plane.register_task_error_handler(self._on_task_report_error)
-        self._job_error_thread: Optional[threading.Thread] = None
+        self._terminal_done = threading.Event()
+        self._terminal_done.set()
+        self._job_monitor_stop = threading.Event()
+        self._job_monitor_thread: Optional[threading.Thread] = None
 
         # HTTP REST IPC Server
         self._httpd: Optional[ThreadingHTTPServer] = None
@@ -742,7 +754,6 @@ class ServerDaemon:
                 'run_id': f'web-{uuid.uuid4().hex}',
                 'job_id': f'web-{uuid.uuid4().hex}',
                 'mode': 'sync',
-                'io_timeout_seconds': 120,
                 'live_observation': False,
             })
         result = self.start_job(payload)
@@ -801,7 +812,8 @@ class ServerDaemon:
             return
 
         with self._lock:
-            if self.active_job is not None:
+            if (self.active_job is not None and
+                    event.get('job_id', self.active_job['job_id']) == self.active_job['job_id']):
                 event_type = event.get('type')
                 if event_type == 'ROUND_STARTED':
                     self.active_job['current_round'] = event.get('round_index')
@@ -866,6 +878,7 @@ class ServerDaemon:
     def get_status_report(self) -> Dict[str, Any]:
         """Generate structured status snapshot for GET /api/v1/status."""
         with self._lock:
+            self._refresh_job_recovery()
             all_nodes = self.control_plane.registry.get_all_nodes() if self.control_plane is not None else {}
             now = time.monotonic()
             nodes_dict: Dict[str, Any] = {}
@@ -1097,25 +1110,65 @@ class ServerDaemon:
                     self.server_state = ServerState.IDLE
 
     def _on_task_report_error(self, report: Dict[str, Any]) -> None:
-        """接收线程只记录事实并调度收尾，不能在发送报告ACK前等待计算退出。"""
-        with self._lock:
-            job_id = report['job_id']
-            if self.active_job is None or self.active_job['job_id'] != job_id:
-                return
-            if self._job_error_thread is not None and self._job_error_thread.is_alive():
-                return
-            self.active_job['client_error'] = deepcopy(report)
-            exc = FLRuntimeError(report['error_code'], report['reason'], details=deepcopy(report))
-            self._job_error_thread = threading.Thread(
-                target=self._on_job_failed, args=(job_id, exc),
-                name=f'fl-client-error-{job_id}', daemon=True)
-            self._job_error_thread.start()
+        """可靠错误 ACK 不等待宿主锁、计算或资源回收。"""
+        frozen = deepcopy(report)
+
+        def fail() -> None:
+            with self._lock:
+                if self.active_job is None or self.active_job['job_id'] != frozen['job_id']:
+                    if self._recent_job is not None and self._recent_job['job_id'] == frozen['job_id']:
+                        self._recent_job['client_error'] = frozen
+                    return
+                self.active_job['client_error'] = frozen
+            self._finalize_job(outcome='failed', job_id=frozen['job_id'],
+                               reason=frozen['error_code'], error=frozen['reason'])
+
+        threading.Thread(target=fail, name=f"fl-client-error-{frozen['job_id']}", daemon=True).start()
+
+    def _on_job_liveness(self, event: Dict[str, Any]) -> None:
+        """控制面负责心跳期限及无线租约；这里只处理固定目标的失联事实。"""
+        if event['state'] != 'offline':
+            return
+
+        def fail() -> None:
+            with self._lock:
+                if self.active_job is None or self.active_job['job_id'] != event['job_id']:
+                    return
+                self.active_job.setdefault('liveness_events', []).append(deepcopy(event))
+            self._finalize_job(outcome='failed', job_id=event['job_id'], reason='participant_offline',
+                               error=f"固定参与者 {event['node_id']} 心跳失联")
+
+        threading.Thread(target=fail, name=f"fl-offline-{event['job_id']}", daemon=True).start()
+
+    def _watch_job_role(self, job_id: str, role: Any) -> None:
+        stop = threading.Event()
+        self._job_monitor_stop = stop
+        self._job_monitor_thread = None
+        if role is None:
+            return
+
+        def monitor() -> None:
+            while not stop.wait(0.05):
+                try:
+                    failure = role.poll_failure()
+                except Exception as exc:
+                    failure = exc
+                if failure is not None:
+                    self._on_job_failed(job_id, failure)
+                    return
+
+        self._job_monitor_thread = threading.Thread(target=monitor, name=f'fl-role-{job_id}', daemon=True)
+        self._job_monitor_thread.start()
 
     def start_job(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """冻结已部署算法，先完成初始评估与全员准备，再启动真实轮次。"""
         if any(key in payload for key in ('algorithm', 'algorithm_config', 'client_entry',
                                           'aggregate_entry', 'evaluate_entry')):
             raise FLRuntimeError('invalid_job_config', '算法入口和参数只从服务器部署配置选择')
+        payload = {**payload,
+                   "preparation_timeout_seconds": self.config.preparation_timeout_seconds,
+                   "round_timeout_seconds": self.config.round_timeout_seconds,
+                   "io_timeout_seconds": self.config.io_timeout_seconds}
         job = JobConfig.from_dict(payload)
         algorithm_config = validate_algorithm_config(self.config.algorithm_config)
         algorithm_context: Optional[AlgorithmContext] = None
@@ -1135,6 +1188,7 @@ class ServerDaemon:
                     "preflight_engine_conflict",
                     f"当前协同引擎正处于 {self.server_state.value} 状态，存在并发作业冲突 (作业: {conflict_id})",
                 )
+            self._refresh_job_recovery()
             if self._recent_job is not None and self._recent_job.get("recovery_state") != "ready":
                 raise FLRuntimeError(
                     "preflight_engine_conflict",
@@ -1379,6 +1433,7 @@ class ServerDaemon:
                     self.active_job = job_dict
                     self.server_state = ServerState.RUNNING
                     self.server_role = server_role
+                    self._job_runtime = runtime
                     self._preparation = None
 
             if admission_error is not None:
@@ -1397,14 +1452,12 @@ class ServerDaemon:
                 "model_size_bytes": actual_file_size,
                 "model_sha256": computed_sha256,
                 "preparation_timeout_seconds": preparation_timeout_seconds,
+                "round_timeout_seconds": job.round_timeout_seconds,
+                "io_timeout_seconds": job.io_timeout_seconds,
             }
 
             def finalize_accepted_failure(reason: str, error: str) -> Dict[str, Any]:
                 """把已写入 active_job 的准备错误收口为最近作业事实。"""
-                try:
-                    self.control_plane.clear_task_readiness(job.job_id)
-                except Exception:
-                    logger.exception("清理作业就绪屏障失败 (job=%s)", job.job_id)
                 self._lock.release()
                 try:
                     self._finalize_job(
@@ -1459,6 +1512,8 @@ class ServerDaemon:
                         preparation_reference.update(deepcopy(comparable))
 
                 self.control_plane.prepare_task_readiness(job.job_id, job.target_nodes, validate_task_report)
+                self.control_plane.watch_job_liveness(job.job_id, job.target_nodes, self._on_job_liveness)
+                self._watch_job_role(job.job_id, server_role)
                 self.control_plane.broadcast_downlink(announce_msg)
                 remaining_preparation_timeout = max(
                     0.0, preparation_timeout_seconds - (time.monotonic() - preparation_started_at))
@@ -1479,15 +1534,14 @@ class ServerDaemon:
                     algorithm_context,
                     local_config={**algorithm_context.local_config, 'client_preparation_reports': reports},
                     initial_metrics=initial_result['metrics'])
-                round_deadline = 0.0
-
                 def prepare_round(index: int) -> None:
-                    nonlocal round_deadline
-                    round_deadline = time.monotonic() + job.round_timeout_seconds
                     self.control_plane.prepare_round_completion(job.job_id, index)
 
                 def complete_round(index: int) -> None:
-                    remaining = max(0.0, round_deadline - time.monotonic())
+                    deadline = coordinator.current_round_deadline
+                    if deadline is None:
+                        raise FLRuntimeError('round_not_started', '轮次完成屏障缺少 Coordinator 期限')
+                    remaining = max(0.0, deadline - time.monotonic())
                     if not self.control_plane.wait_for_round_completion(job.job_id, index, remaining):
                         raise FLRuntimeError('round_report_timeout', '未在本轮期限内收齐提交完成报告')
 
@@ -1499,7 +1553,7 @@ class ServerDaemon:
                 })
 
                 if runtime is not None:
-                    self.coordinator = FLCoordinator(
+                    coordinator = FLCoordinator(
                         job=job,
                         runtime=runtime,
                         work_dir=os.path.join(self.config.work_dir, f"job_{job.job_id}"),
@@ -1510,8 +1564,10 @@ class ServerDaemon:
                         algorithm_config=algorithm_config, context=algorithm_context,
                         initial_metrics=initial_result['metrics'],
                         prepare_round=prepare_round, round_completion=complete_round,
+                        cancel_callback=lambda cause: self._on_coordinator_cancel(job.job_id, cause),
                     )
-                    self.coordinator.start()
+                    self.coordinator = coordinator
+                    coordinator.start()
 
                 logger.info(
                     "作业 %s 成功通过前置门禁并启动 (模式: %s, 轮次: %d, 节点: %s, 模型大小: %d B)",
@@ -1523,7 +1579,31 @@ class ServerDaemon:
                 )
                 return accepted
             except Exception as exc:
-                return finalize_accepted_failure("job_preparation_failed", str(exc))
+                return finalize_accepted_failure(getattr(exc, 'error_code', 'job_preparation_failed'), str(exc))
+
+    def _refresh_job_recovery(self) -> None:
+        """恢复报告可迟到；它们只更新资源事实，不能改写首次执行／效果终态。"""
+        recent = self._recent_job
+        if recent is None or 'server_recovery_complete' not in recent:
+            return
+        reports = self.control_plane.get_job_recovery_reports(recent['job_id'])
+        recent['recovery_reports'] = deepcopy(reports)
+        for node, envelope in reports.items():
+            history = recent.setdefault('recovery_report_history', {}).setdefault(node, [])
+            epoch = envelope['report']['recovery_epoch']
+            if not any(entry['report']['recovery_epoch'] == epoch for entry in history):
+                history.append(deepcopy(envelope))
+        missing = sorted(node for node in recent['target_nodes']
+                         if node not in reports or reports[node]['report']['recovery_state'] != 'ready')
+        recent['recovery_missing_nodes'] = missing
+        if not recent.get('recovery_wait_finished'):
+            return
+        blocked = any(entry['report']['recovery_state'] == 'blocked' for entry in reports.values())
+        state = ('blocked' if recent.get('recovery_error') or blocked
+                 or not recent.get('server_recovery_complete') else
+                 'unconfirmed' if missing else 'ready')
+        recent['recovery_state'] = state
+        recent['server_phase'] = 'ready' if state == 'ready' else 'recovery_' + state
 
     def _finalize_job(
         self,
@@ -1533,178 +1613,190 @@ class ServerDaemon:
         summary: Optional[Dict[str, Any]] = None,
         error: str = "",
     ) -> Dict[str, Any]:
-        """统一收口任务终态，回收角色并保存独立结果，保留服务端持久链路。
-
-        终态广播失败或角色回收未获确认时，保留恢复失败事实。
-        """
-        target_job_id = job_id
-        coord = None
-        role_to_close = None
-
+        """首次终态冻结结果；取消屏障、等待实际计算退出后才回收角色并确认恢复。"""
+        reason = reason or outcome
         with self._lock:
+            if self.active_job is None or (job_id is not None and self.active_job['job_id'] != job_id):
+                if self._recent_job is not None and (job_id is None or self._recent_job['job_id'] == job_id):
+                    if error and (reason != self._recent_job.get('reason') or error != self._recent_job.get('error')):
+                        diagnostic = {'reason': reason, 'error': error}
+                        diagnostics = self._recent_job.setdefault('additional_errors', [])
+                        if diagnostic not in diagnostics:
+                            diagnostics.append(diagnostic)
+                    return deepcopy(self._recent_job['terminal_result'])
+                return {'status': 'ignored', 'job_id': job_id}
             if self.server_state == ServerState.STOPPED:
-                logger.warning("服务已处于 STOPPED 状态，忽略终态收口 (job=%s)", target_job_id)
-                return {"status": "ignored", "job_id": target_job_id}
-
-            if self.active_job is None or (target_job_id is not None and self.active_job.get("job_id") != target_job_id):
-                logger.warning(
-                    "忽略针对已失活作业 %s 的终态收口 (当前活跃: %s)",
-                    target_job_id,
-                    self.active_job.get("job_id") if self.active_job else None,
-                )
-                return {"status": "ignored", "job_id": target_job_id}
-
-            if target_job_id is None:
-                target_job_id = self.active_job.get("job_id")
-
+                return {'status': 'ignored', 'job_id': job_id}
+            job_id = self.active_job['job_id']
+            first_failure = self.active_job.get('first_failure')
+            if first_failure is not None:
+                outcome, reason, error = 'failed', first_failure['reason'], first_failure['error']
             terminal_summary = summary if summary is not None else self.active_job.get('summary', {})
-            effect_failed = (isinstance(terminal_summary, dict)
-                             and terminal_summary.get('error_code') == 'effect_criterion_not_met')
+            effect_failed = terminal_summary.get('error_code') == 'effect_criterion_not_met'
             if outcome == 'completed' or (outcome == 'failed' and effect_failed):
-                if (not isinstance(terminal_summary, dict)
-                        or terminal_summary.get('execution_result') != 'succeeded'):
+                if terminal_summary.get('execution_result') != 'succeeded':
                     raise FLRuntimeError('invalid_coordinator_summary', '完整执行终态缺少明确的执行成功事实')
-                execution_result = terminal_summary['execution_result']
-            elif outcome == 'failed':
-                execution_result = 'failed'
-            elif outcome == 'aborted':
-                execution_result = 'aborted'
+                execution = 'succeeded'
+            elif outcome in ('failed', 'aborted'):
+                execution = outcome
             else:
                 raise FLRuntimeError('invalid_job_outcome', '未知作业终态')
-            self._recent_job = deepcopy(self.active_job)
+            result = {'status': outcome, 'job_id': job_id, 'reason': reason}
+            recent = deepcopy(self.active_job)
+            recent.update(execution_result=execution, recovery_state='recovering',
+                          server_phase='recovering', phase_started_at=time.time(), reason=reason,
+                          error=error, terminal_result=result, recovery_wait_finished=False,
+                          server_recovery_complete=False,
+                          recovery_missing_nodes=list(recent['target_nodes']))
             if terminal_summary:
-                # 在清空 active_job 前保存权威终态，不能依赖稍后的终态事件回填。
-                self._recent_job['summary'] = deepcopy(terminal_summary)
-                self._recent_job['rounds_completed'] = terminal_summary.get(
-                    'rounds_completed', self._recent_job.get('rounds_completed', 0))
+                recent['summary'] = deepcopy(terminal_summary)
+                recent['rounds_completed'] = terminal_summary.get('rounds_completed', recent['rounds_completed'])
                 if 'effect_result' in terminal_summary:
-                    self._recent_job['effect_result'] = deepcopy(terminal_summary['effect_result'])
-            self._recent_job.update(
-                execution_result=execution_result,
-                recovery_state="recovering", server_phase="recovering", reason=reason, error=error,
-                phase_started_at=time.time(),
-            )
-            self.console.record_event({"type": "RECOVERY_STARTED", "job_id": target_job_id})
-
-            if outcome == "aborted":
-                self.server_state = ServerState.ABORTING
-
-            coord = self.coordinator
-            role_to_close = self.server_role
-            self.coordinator = None
+                    recent['effect_result'] = deepcopy(terminal_summary['effect_result'])
+            self._recent_job = recent
+            coord, role, runtime = self.coordinator, self.server_role, self._job_runtime
             self.active_job = None
-            self.server_role = None
-            self.control_plane.cancel_task_readiness()
-        recovery_error = None
-        # 先等待计算退出，才能关闭仍可能被计算使用的任务资源。
-        if coord is not None and outcome in ('aborted', 'failed'):
-            try:
-                coord.abort(reason=reason)
-                coord.wait(timeout=None)
-            except Exception as exc:
-                logger.warning("中止 coordinator 失败: %s", exc)
-                recovery_error = "COORDINATOR_STOP_FAILED"
+            self.server_state = ServerState.ABORTING
+            self._terminal_done.clear()
+            self._job_monitor_stop.set()
+            self.control_plane.unwatch_job_liveness(job_id)
+            self.console.record_event({'type': 'RECOVERY_STARTED', 'job_id': job_id})
 
-        self.control_plane.clear_task_readiness(target_job_id)
+        terminal_type = 'JOB_COMPLETED' if outcome == 'completed' else 'JOB_ABORT'
+        message = {'type': terminal_type, 'job_id': job_id, 'timestamp_ms': int(time.time() * 1000)}
+        if outcome != 'completed':
+            message['reason'] = reason or error
+        recovery_deadline = time.monotonic() + recent['io_timeout_seconds']
+        delivery_thread: Optional[threading.Thread] = None
 
-        # 2. Close server role
-        if role_to_close is not None:
-            try:
-                role_to_close.close()
-            except Exception as exc:
-                logger.warning("关闭 server_role 失败: %s", exc)
-                recovery_error = "ROLE_CLOSE_FAILED"
+        def deliver_terminal() -> None:
+            # 与本地退出并行；单次发送失败或部分 blocked 都不能漏停其他目标。
+            while not self._stop_event.is_set() and time.monotonic() < recovery_deadline:
+                retry_at = min(recovery_deadline, time.monotonic() + 0.25)
+                try:
+                    self.control_plane.broadcast_downlink(message)
+                    with self._lock:
+                        recent['terminal_delivery_succeeded'] = True
+                except Exception as exc:
+                    with self._lock:
+                        recent.setdefault('terminal_delivery_errors', []).append({
+                            'error_code': getattr(exc, 'error_code', 'TERMINAL_BROADCAST_FAILED'),
+                            'reason': str(exc),
+                        })
+                    logger.warning('作业终态发送失败，预算内重试 (job=%s): %s', job_id, exc)
+                try:
+                    ready = self.control_plane.wait_for_job_recovery(
+                        job_id, max(0.0, retry_at - time.monotonic()))
+                    with self._lock:
+                        self._refresh_job_recovery()
+                    if ready:
+                        return
+                except Exception as exc:
+                    with self._lock:
+                        recent.setdefault('terminal_delivery_errors', []).append({
+                            'error_code': getattr(exc, 'error_code', 'RECOVERY_WAIT_FAILED'),
+                            'reason': str(exc),
+                        })
+                # blocked epoch 可以提前唤醒控制面等待；仍等到同一重试时点，避免忙循环。
+                self._stop_event.wait(max(0.0, retry_at - time.monotonic()))
 
-        # 持久链路属于 Daemon；终态只关闭任务角色，不重启链路或恢复初始无线值。
-        # 下一项作业继续使用已确认的配置和同一条服务端链路。
-        terminal_type = "JOB_COMPLETED" if outcome == "completed" else "JOB_ABORT"
         try:
-            if self.control_plane is None or target_job_id is None:
-                raise RuntimeError("终态广播缺少控制面或 job_id")
-            terminal_message = {
-                "type": terminal_type,
-                "job_id": target_job_id,
-                "timestamp_ms": int(time.time() * 1000),
-            }
-            if outcome != "completed":
-                terminal_message["reason"] = reason or error
-            self.control_plane.broadcast_downlink(terminal_message)
-        except Exception as broadcast_exc:
+            # 先为客户端恢复事实留门；投递线程不以某次 send 成功为建立条件。
+            self.control_plane.prepare_job_recovery(job_id, recent['target_nodes'])
+        except Exception as exc:
             with self._lock:
-                self.server_state = ServerState.STOPPED
-                self._recent_job.update(recovery_state="blocked", recovery_error="TERMINAL_BROADCAST_FAILED")
-                self.console.record_event({"type": "RECOVERY_BLOCKED", "job_id": target_job_id})
-            logger.error(
-                "作业终态广播失败 type=%s job_id=%s: %s",
-                terminal_type, target_job_id, broadcast_exc,
-            )
-            raise FLRuntimeError(
-                "terminal_broadcast_failed", f"作业终态广播失败: {broadcast_exc}"
-            ) from broadcast_exc
-        logger.info(
-            "作业终态广播成功 type=%s job_id=%s", terminal_type, target_job_id
-        )
+                recent['recovery_error'] = getattr(exc, 'error_code', 'RECOVERY_PREPARATION_FAILED')
+                recent['recovery_reason'] = str(exc)
+            logger.exception('作业恢复屏障建立失败 (job=%s)', job_id)
+        delivery_thread = threading.Thread(target=deliver_terminal,
+                                           name=f'fl-terminal-delivery-{job_id}', daemon=True)
+        delivery_thread.start()
 
+        try:
+            if coord is not None and outcome in ('aborted', 'failed'):
+                coord.abort(reason=reason)
+            self.control_plane.cancel_job_barriers(job_id, reason)
+            if coord is not None:
+                # 无限 join 只表示等待真实退出，不能用有限等待伪造退出证明。
+                coord.wait(timeout=None)
+                coordinator_summary = coord.get_summary()
+                with self._lock:
+                    if coordinator_summary and not recent.get('summary'):
+                        recent['summary'] = coordinator_summary
+                        recent['rounds_completed'] = coordinator_summary.get('rounds_completed', recent['rounds_completed'])
+            monitor = self._job_monitor_thread
+            if monitor is not None and monitor is not threading.current_thread():
+                monitor.join()
+            with self._lock:
+                self.coordinator = None
+            if role is not None:
+                role.close()
+            elif runtime is not None:
+                runtime.close()
+            with self._lock:
+                self.server_role = None
+                self._job_runtime = None
+                recent['server_recovery_complete'] = True
+        except Exception as exc:
+            logger.exception('作业终态资源恢复失败 (job=%s)', job_id)
+            with self._lock:
+                recent['recovery_error'] = getattr(exc, 'error_code', 'RESOURCE_RECOVERY_FAILED')
+                recent['recovery_reason'] = str(exc)
+        finally:
+            if delivery_thread is not None:
+                delivery_thread.join()
+            with self._lock:
+                recent['recovery_wait_finished'] = True
+                if (recent.get('terminal_delivery_errors')
+                        and not recent.get('terminal_delivery_succeeded')):
+                    recent.setdefault('recovery_error', 'TERMINAL_BROADCAST_FAILED')
+                if self._stop_event.is_set():
+                    recent['recovery_error'] = 'DAEMON_STOPPED'
+                self._refresh_job_recovery()
+                if not self._stop_event.is_set():
+                    self.server_state = ServerState.IDLE
+                self.console.record_event({'type': 'RECOVERY_COMPLETED' if recent['recovery_state'] == 'ready'
+                                           else 'RECOVERY_BLOCKED', 'job_id': job_id})
+            self._terminal_done.set()
+
+        self.publish_event({'type': {'completed': 'JOB_COMPLETED', 'failed': 'JOB_FAILED',
+                                     'aborted': 'JOB_ABORTED'}[outcome],
+                            'job_id': job_id, 'summary': deepcopy(terminal_summary),
+                            'reason': reason, 'error': error})
+        return deepcopy(result)
+
+    def _schedule_job_terminal(self, **kwargs: Any) -> None:
+        # UDP 接收和 Coordinator 回调只调度；关闭角色前必须从别的线程 join 计算。
+        threading.Thread(target=self._finalize_job, kwargs=kwargs,
+                         name=f"fl-terminal-{kwargs['job_id']}", daemon=True).start()
+
+    def _on_coordinator_cancel(self, job_id: str, cause: str) -> None:
+        """Coordinator 首因立即冻结，取消屏障后异步等待计算；不能在回调中 join。"""
+        self.control_plane.cancel_job_barriers(job_id, cause)
         with self._lock:
-            if not self._stop_event.is_set():
-                self.server_state = ServerState.IDLE
-            if self.server_state == ServerState.STOPPED or self._stop_event.is_set():
-                recovery_error = recovery_error or "DAEMON_STOPPED"
-            self._recent_job["recovery_state"] = "blocked" if recovery_error else "ready"
-            self._recent_job["server_phase"] = "recovery_blocked" if recovery_error else "ready"
-            self._recent_job["phase_started_at"] = time.time()
-            if recovery_error:
-                self._recent_job["recovery_error"] = recovery_error
-            self.console.record_event({"type": "RECOVERY_BLOCKED" if recovery_error else "RECOVERY_COMPLETED",
-                                       "job_id": target_job_id})
-
-        # 5. Publish SSE event
-        if outcome == "completed":
-            self.publish_event({
-                "type": "JOB_COMPLETED",
-                "job_id": target_job_id,
-                "summary": summary or {},
-            })
-        elif outcome == "failed":
-            self.publish_event({
-                "type": "JOB_FAILED",
-                "job_id": target_job_id,
-                "error": error,
-            })
-        else:  # aborted
-            self.publish_event({
-                "type": "JOB_ABORTED",
-                "job_id": target_job_id,
-                "reason": reason,
-                "timestamp": time.time(),
-            })
-
-        logger.info(
-            "作业 %s 终态收口完成 (outcome=%s, reason=%s)",
-            target_job_id,
-            outcome,
-            reason or error,
-        )
-
-        return {
-            "status": "aborted" if outcome == "aborted" else outcome,
-            "job_id": target_job_id,
-            "reason": reason,
-        }
+            if self.active_job is None or self.active_job['job_id'] != job_id:
+                return
+            self.active_job.setdefault('first_failure', {'reason': cause, 'error': cause})
+        self._schedule_job_terminal(outcome='failed', job_id=job_id, reason=cause, error=cause)
 
     def _on_job_completed(self, job_id: str, summary: Dict[str, Any]) -> None:
-        self._finalize_job(outcome="completed", job_id=job_id, summary=summary)
+        self._schedule_job_terminal(outcome="completed", job_id=job_id, summary=summary)
 
     def _on_job_failed(self, job_id: str, exc: Exception) -> None:
-        self._finalize_job(
+        self._schedule_job_terminal(
             outcome="failed",
             job_id=job_id,
             error=str(exc),
-            reason=f"job_failed: {exc}",
+            reason=getattr(exc, 'error_code', 'job_failed'),
         )
 
     def abort_job(self, reason: str = "user_requested") -> Dict[str, Any]:
-        """Forcefully abort active job and reset server state to IDLE."""
+        """停止准备或活动作业，保留首次终态与独立恢复事实。"""
+        with self._lock:
+            preparation = self._preparation if self.active_job is None else None
+        if preparation is not None:
+            preparation.cancel_and_wait()
+            return {'status': 'aborted', 'job_id': None, 'reason': reason}
         return self._finalize_job(outcome="aborted", reason=reason)
 
     def _apply_radio_runtime(self, config: RadioConfig) -> None:
@@ -1890,25 +1982,35 @@ class ServerDaemon:
                 return
 
             self._stop_event.set()
+            terminal_in_progress = not self._terminal_done.is_set()
+            self._job_monitor_stop.set()
+            stopping_job = self.active_job or self._recent_job
+            if stopping_job is not None:
+                self.control_plane.cancel_job_barriers(stopping_job['job_id'], 'daemon_stopped')
+                self.control_plane.unwatch_job_liveness(stopping_job['job_id'])
             if self.active_job is not None:
                 self._recent_job = deepcopy(self.active_job)
-                self._recent_job.update(execution_result="aborted", recovery_state="blocked",
-                                        reason="daemon_stopped", recovery_error="DAEMON_STOPPED")
+                first_failure = self.active_job.get('first_failure')
+                execution = 'failed' if first_failure else 'aborted'
+                reason = first_failure['reason'] if first_failure else 'daemon_stopped'
+                self._recent_job.update(execution_result=execution, recovery_state="blocked",
+                                        reason=reason, recovery_error="DAEMON_STOPPED",
+                                        terminal_result={'status': execution, 'job_id': self.active_job['job_id'],
+                                                         'reason': reason})
             elif self._recent_job and self._recent_job["recovery_state"] == "recovering":
                 self._recent_job.update(recovery_state="blocked", recovery_error="DAEMON_STOPPED")
             self.server_state = ServerState.STOPPED
 
             httpd = self._httpd
             http_thread = self._http_thread
-            coord = self.coordinator
-            role_to_close = self.server_role
+            coord = None if terminal_in_progress else self.coordinator
+            role_to_close = None if terminal_in_progress else self.server_role
+            runtime_to_close = None if terminal_in_progress else self._job_runtime
             preparation_to_cancel = self._preparation
 
             self._httpd = None
             self._http_thread = None
-            self.coordinator = None
             self.active_job = None
-            self.server_role = None
             self._preparation = None
             self.control_plane.cancel_task_readiness()
             self._best_effort_console_refresh()
@@ -1930,20 +2032,35 @@ class ServerDaemon:
             logger.exception("管理 Web 停止失败，继续清理核心资源")
 
         # Stop Control Plane outside lock
-        if self.config.enable_control_plane:
-            self.control_plane.stop()
+        self.control_plane.stop()
+        self._terminal_done.wait()
 
         # Stop active coordinator and server role outside lock
+        computation_exited = True
         if coord is not None:
             try:
                 coord.abort(reason="daemon_stopped")
                 coord.wait(timeout=None)
+                with self._lock:
+                    self.coordinator = None
+                    if self._recent_job is not None and not self._recent_job.get('summary'):
+                        self._recent_job['summary'] = coord.get_summary()
             except Exception as exc:
-                logger.warning("停止 coordinator 失败: %s", exc)
+                computation_exited = False
+                logger.warning("停止 coordinator 失败，保留任务资源: %s", exc)
 
-        if role_to_close is not None:
+        monitor = self._job_monitor_thread
+        if monitor is not None and monitor is not threading.current_thread():
+            monitor.join()
+        if computation_exited and (role_to_close is not None or runtime_to_close is not None):
             try:
-                role_to_close.close()
+                if role_to_close is not None:
+                    role_to_close.close()
+                elif runtime_to_close is not None:
+                    runtime_to_close.close()
+                with self._lock:
+                    self.server_role = None
+                    self._job_runtime = None
             except Exception as exc:
                 logger.warning("关闭 server_role 失败: %s", exc)
 

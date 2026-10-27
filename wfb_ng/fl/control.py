@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 import json
 import logging
+import math
 import os
 import socket
 import threading
@@ -729,6 +730,7 @@ class ControlPlaneServer:
         self._task_ready_completed = False
         self._task_ready_active = False
         self._task_ready_cancelled = False
+        self._task_ready_cancel_reason: Optional[str] = None
         self._task_ready_error: Optional[Dict[str, Any]] = None
         self._task_ready_event = threading.Event()
 
@@ -740,8 +742,21 @@ class ControlPlaneServer:
         self._round_seen: Dict[int, Dict[str, Any]] = {}
         self._round_error: Optional[Dict[str, Any]] = None
         self._round_active = False
+        self._round_cancelled = False
+        self._round_cancel_reason: Optional[str] = None
         self._round_event = threading.Event()
         self._task_error_handlers: List[Callable[[Dict[str, Any]], None]] = []
+
+        # 终态恢复屏障。恢复报告按节点保存最新 envelope，按 epoch 保存幂等 receipt。
+        self._recovery_job_id: Optional[str] = None
+        self._recovery_expected_nodes: Set[int] = set()
+        self._recovery_reports: Dict[int, Dict[str, Any]] = {}
+        self._recovery_seen: Dict[int, Dict[int, Dict[str, Any]]] = {}
+        self._recovery_last_epochs: Dict[int, int] = {}
+        self._recovery_wait_observed_epochs: Dict[int, int] = {}
+        self._recovery_active = False
+        self._recovery_cancelled = False
+        self._recovery_event = threading.Event()
 
         # 只保留最近结束任务的有限报告 receipt，不形成历史数据库。
         self._recent_report_job_id: Optional[str] = None
@@ -749,7 +764,14 @@ class ControlPlaneServer:
             "preparation": [],
             "round": [],
             "error": [],
+            "recovery": [],
         }
+
+        # 作业级 liveness 观察依赖单调时钟；监视线程不持控制锁调用外部回调。
+        self._liveness_condition = threading.Condition(self._lock)
+        self._liveness_watches: Dict[str, Dict[str, Any]] = {}
+        self._liveness_leases: Dict[Tuple[str, str], float] = {}
+        self._liveness_thread: Optional[threading.Thread] = None
 
     def start(self) -> None:
         """Bind sockets and start receiving client heartbeats."""
@@ -776,13 +798,29 @@ class ControlPlaneServer:
                 daemon=True,
             )
             self._recv_thread.start()
+            self._start_liveness_monitor_locked()
 
     def stop(self) -> None:
-        """Stop background worker and close sockets."""
+        """设置停止事实并等待控制面工作线程真实退出后关闭套接字。"""
         self._stop_event.set()
-        if self._recv_thread is not None and self._recv_thread.is_alive():
-            self._recv_thread.join(timeout=1.0)
-            self._recv_thread = None
+        with self._liveness_condition:
+            self._cancel_barriers_locked(cancel_recovery=True)
+            self._liveness_condition.notify_all()
+
+        current_thread = threading.current_thread()
+        recv_thread = self._recv_thread
+        if recv_thread is not None and recv_thread is not current_thread:
+            recv_thread.join()
+            with self._lock:
+                if self._recv_thread is recv_thread:
+                    self._recv_thread = None
+
+        liveness_thread = self._liveness_thread
+        if liveness_thread is not None and liveness_thread is not current_thread:
+            liveness_thread.join()
+            with self._lock:
+                if self._liveness_thread is liveness_thread:
+                    self._liveness_thread = None
 
         with self._lock:
             if self._server_sock is not None:
@@ -846,6 +884,7 @@ class ControlPlaneServer:
                 "preparation": [],
                 "round": [],
                 "error": [],
+                "recovery": [],
             }
             self._task_ready_job_id = job_id
             self._task_ready_expected_nodes = expected_nodes
@@ -856,6 +895,7 @@ class ControlPlaneServer:
             self._task_ready_completed = False
             self._task_ready_active = True
             self._task_ready_cancelled = False
+            self._task_ready_cancel_reason = None
             self._task_ready_error = None
             self._task_ready_event.clear()
             self._round_job_id = None
@@ -865,7 +905,18 @@ class ControlPlaneServer:
             self._round_seen.clear()
             self._round_error = None
             self._round_active = False
+            self._round_cancelled = False
+            self._round_cancel_reason = None
             self._round_event.clear()
+            self._recovery_job_id = None
+            self._recovery_expected_nodes.clear()
+            self._recovery_reports.clear()
+            self._recovery_seen.clear()
+            self._recovery_last_epochs.clear()
+            self._recovery_wait_observed_epochs.clear()
+            self._recovery_active = False
+            self._recovery_cancelled = False
+            self._recovery_event.clear()
 
     def wait_for_task_readiness(self, timeout: float) -> bool:
         """等待全部准备报告；收到客户端错误时抛出异常。"""
@@ -901,6 +952,8 @@ class ControlPlaneServer:
                 raise FLRuntimeError('round_not_prepared', 'job_id 没有对应的任务准备上下文')
             if not self._task_ready_completed:
                 raise FLRuntimeError('task_not_ready', '任务准备屏障尚未完成')
+            if self._task_ready_cancelled:
+                raise FLRuntimeError('task_cancelled', '任务准备屏障已取消')
             if (self._round_active and self._round_job_id == job_id and
                     self._round_index != round_index and
                     self._round_error is None and
@@ -913,6 +966,7 @@ class ControlPlaneServer:
             self._round_seen.clear()
             self._round_error = None
             self._round_active = True
+            self._round_cancelled = False
             self._round_event.clear()
 
     def wait_for_round_completion(
@@ -929,6 +983,8 @@ class ControlPlaneServer:
                     raise FLRuntimeError('round_not_prepared', '轮次完成屏障未准备')
                 if self._round_error is not None:
                     raise self._report_error(self._round_error)
+                if self._round_cancelled:
+                    return False
                 if self._round_expected_nodes.issubset(self._round_reports):
                     return True
             remaining = deadline - time.monotonic()
@@ -936,20 +992,113 @@ class ControlPlaneServer:
                 return False
             self._round_event.wait(remaining)
 
+    def _cancel_barriers_locked(self, *, cancel_recovery: bool = False) -> None:
+        """Wake task/round waiters; recovery is cancelled only during daemon stop."""
+        self._task_ready_cancelled = True
+        self._round_cancelled = True
+        self._task_ready_event.set()
+        self._round_event.set()
+        if cancel_recovery and self._recovery_active:
+            self._recovery_cancelled = True
+            self._recovery_event.set()
+
     def cancel_task_readiness(self) -> None:
-        """唤醒等待中的作业准备屏障，由停止或急停路径调用。"""
+        """唤醒准备和轮次等待；不取消恢复屏障。"""
         with self._lock:
+            self._cancel_barriers_locked()
+
+    def cancel_job_barriers(self, job_id: str, reason: str = "job_cancelled") -> None:
+        """按作业取消准备/轮次屏障，不触碰已启动的恢复屏障。"""
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError("invalid_job_id", "job_id 无效")
+        if not isinstance(reason, str) or not reason:
+            raise FLRuntimeError("invalid_cancel_reason", "取消原因无效")
+        with self._lock:
+            if job_id != self._task_ready_job_id and job_id != self._recovery_job_id:
+                return
+            self._task_ready_cancel_reason = reason
+            self._round_cancel_reason = reason
             self._task_ready_cancelled = True
+            self._round_cancelled = True
             self._task_ready_event.set()
+            self._round_event.set()
+
+    def prepare_job_recovery(self, job_id: str, target_nodes: Sequence[int]) -> None:
+        """只初始化恢复子状态；不得清除准备/轮次 receipt 或屏障。"""
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError("invalid_recovery", "job_id 无效")
+        try:
+            expected_nodes = set(target_nodes)
+        except TypeError as exc:
+            raise FLRuntimeError("invalid_recovery", "target_nodes 无效") from exc
+        if (not expected_nodes or
+                any(type(node_id) is not int or not 1 <= node_id <= 10
+                    for node_id in expected_nodes)):
+            raise FLRuntimeError("invalid_recovery", "target_nodes 无效")
+        with self._lock:
+            if job_id != self._task_ready_job_id:
+                raise FLRuntimeError("recovery_not_prepared", "job_id 没有对应的任务上下文")
+            if expected_nodes != self._task_ready_expected_nodes:
+                raise FLRuntimeError("recovery_target_mismatch", "恢复目标集合与任务参与集合不一致")
+            if self._recovery_active and not self._recovery_cancelled:
+                raise FLRuntimeError("recovery_in_progress", "恢复屏障已经开启")
+            self._recovery_job_id = job_id
+            self._recovery_expected_nodes = expected_nodes
+            self._recovery_reports.clear()
+            self._recovery_seen.clear()
+            self._recovery_last_epochs.clear()
+            self._recovery_wait_observed_epochs.clear()
+            self._recovery_active = True
+            self._recovery_cancelled = False
+            self._recovery_event.clear()
+
+    def wait_for_job_recovery(self, job_id: str, timeout: float) -> bool:
+        """等待全部目标 ready；新的 blocked epoch 返回 False 但保留恢复屏障。"""
+        deadline = self._wait_deadline(timeout)
+        while True:
+            with self._lock:
+                if not self._recovery_active or self._recovery_job_id != job_id:
+                    raise FLRuntimeError("recovery_not_prepared", "恢复屏障未准备")
+                if self._recovery_cancelled:
+                    return False
+                if (self._recovery_expected_nodes and
+                        all(
+                            self._recovery_reports.get(node_id, {}).get("report", {}).get(
+                                "recovery_state") == "ready"
+                            for node_id in self._recovery_expected_nodes
+                        )):
+                    return True
+                for node_id, envelope in self._recovery_reports.items():
+                    report = envelope.get("report", {})
+                    epoch = report.get("recovery_epoch")
+                    if (report.get("recovery_state") == "blocked"
+                            and type(epoch) is int
+                            and epoch > self._recovery_wait_observed_epochs.get(node_id, 0)):
+                        self._recovery_wait_observed_epochs[node_id] = epoch
+                        self._recovery_event.clear()
+                        return False
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            self._recovery_event.wait(remaining)
+
+    def get_job_recovery_reports(self, job_id: str) -> Dict[int, Dict[str, Any]]:
+        """返回恢复报告 envelope；实际事实位于 entry['report']。"""
+        with self._lock:
+            if job_id != self._recovery_job_id:
+                return {}
+            return deepcopy(self._recovery_reports)
 
     def clear_task_readiness(self, job_id: Optional[str] = None) -> None:
-        """清除当前准备和轮次状态，并保留任务参与者快照供轮次屏障使用。"""
+        """终态后清除 task/round/recovery 状态，并归档所有有限 receipt。"""
         with self._lock:
-            if job_id is not None and job_id != self._task_ready_job_id:
+            current_job_id = self._task_ready_job_id or self._recovery_job_id
+            if job_id is not None and job_id != current_job_id:
                 return
             self._archive_report_receipts_locked()
             self._task_ready_active = False
             self._task_ready_cancelled = False
+            self._task_ready_cancel_reason = None
             self._task_ready_nodes.clear()
             self._task_ready_reports.clear()
             self._task_ready_seen.clear()
@@ -963,7 +1112,176 @@ class ControlPlaneServer:
             self._round_seen.clear()
             self._round_error = None
             self._round_active = False
+            self._round_cancelled = False
+            self._round_cancel_reason = None
             self._round_event.clear()
+            self._recovery_job_id = None
+            self._recovery_expected_nodes.clear()
+            self._recovery_reports.clear()
+            self._recovery_seen.clear()
+            self._recovery_last_epochs.clear()
+            self._recovery_wait_observed_epochs.clear()
+            self._recovery_active = False
+            self._recovery_cancelled = False
+            self._recovery_event.clear()
+
+    def watch_job_liveness(
+        self,
+        job_id: str,
+        target_nodes: Sequence[int],
+        on_change: Callable[[Dict[str, Any]], None],
+    ) -> None:
+        """注册 job-scoped liveness watcher，不阻塞 UDP 接收线程。"""
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError("invalid_liveness_watch", "job_id 无效")
+        if not callable(on_change):
+            raise FLRuntimeError("invalid_liveness_watch", "on_change 不可调用")
+        try:
+            expected_nodes = set(target_nodes)
+        except TypeError as exc:
+            raise FLRuntimeError("invalid_liveness_watch", "target_nodes 无效") from exc
+        if (not expected_nodes or
+                any(type(node_id) is not int or not 1 <= node_id <= 10
+                    for node_id in expected_nodes)):
+            raise FLRuntimeError("invalid_liveness_watch", "target_nodes 无效")
+        with self._liveness_condition:
+            if self._stop_event.is_set():
+                raise FLRuntimeError("control_plane_stopped", "控制面已经停止")
+            if job_id in self._liveness_watches:
+                raise FLRuntimeError("liveness_watch_in_progress", "作业 liveness watcher 已存在")
+            states = {
+                node_id: self._node_online_locked(node_id)
+                for node_id in expected_nodes
+            }
+            self._liveness_watches[job_id] = {
+                "target_nodes": expected_nodes,
+                "on_change": on_change,
+                "states": states,
+            }
+            self._start_liveness_monitor_locked()
+            self._liveness_condition.notify_all()
+
+    def unwatch_job_liveness(self, job_id: str) -> None:
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError("invalid_liveness_watch", "job_id 无效")
+        with self._liveness_condition:
+            self._liveness_watches.pop(job_id, None)
+            for key in list(self._liveness_leases):
+                if key[0] == job_id:
+                    self._liveness_leases.pop(key, None)
+            self._liveness_condition.notify_all()
+
+    def begin_job_liveness_lease(
+        self, job_id: str, transaction_id: str, timeout_seconds: float
+    ) -> None:
+        if (not isinstance(job_id, str) or not job_id or
+                not isinstance(transaction_id, str) or not transaction_id):
+            raise FLRuntimeError("invalid_liveness_lease", "job_id 或 transaction_id 无效")
+        if (isinstance(timeout_seconds, bool) or
+                not isinstance(timeout_seconds, (int, float)) or
+                not math.isfinite(float(timeout_seconds)) or timeout_seconds <= 0):
+            raise FLRuntimeError("invalid_liveness_lease", "liveness lease 期限无效")
+        with self._liveness_condition:
+            if job_id not in self._liveness_watches:
+                raise FLRuntimeError("liveness_watch_not_prepared", "作业 liveness watcher 未准备")
+            self._liveness_leases[(job_id, transaction_id)] = (
+                time.monotonic() + float(timeout_seconds)
+            )
+            self._liveness_condition.notify_all()
+
+    def end_job_liveness_lease(self, job_id: str, transaction_id: str) -> None:
+        if (not isinstance(job_id, str) or not job_id or
+                not isinstance(transaction_id, str) or not transaction_id):
+            raise FLRuntimeError("invalid_liveness_lease", "job_id 或 transaction_id 无效")
+        with self._liveness_condition:
+            self._liveness_leases.pop((job_id, transaction_id), None)
+            self._liveness_condition.notify_all()
+
+    def _start_liveness_monitor_locked(self) -> None:
+        if self._liveness_thread is not None and self._liveness_thread.is_alive():
+            return
+        self._liveness_thread = threading.Thread(
+            target=self._liveness_loop,
+            name="wfb-server-job-liveness",
+            daemon=True,
+        )
+        self._liveness_thread.start()
+
+    def _node_online_locked(self, node_id: int) -> bool:
+        record = self.registry.get_node(node_id)
+        return record is not None and record.readiness != NodeReadiness.OFFLINE
+
+    def _active_liveness_lease_deadline_locked(
+        self, job_id: str, now: float
+    ) -> Optional[float]:
+        deadlines: List[float] = []
+        for key, deadline in list(self._liveness_leases.items()):
+            if deadline <= now:
+                self._liveness_leases.pop(key, None)
+            elif key[0] == job_id:
+                deadlines.append(deadline)
+        return min(deadlines) if deadlines else None
+
+    def _liveness_loop(self) -> None:
+        while not self._stop_event.is_set():
+            callbacks: List[Tuple[Callable[[Dict[str, Any]], None], Dict[str, Any]]] = []
+            with self._liveness_condition:
+                now = time.monotonic()
+                next_deadline: Optional[float] = None
+                for job_id, watch in list(self._liveness_watches.items()):
+                    target_nodes = watch["target_nodes"]
+                    states = watch["states"]
+                    lease_deadline = self._active_liveness_lease_deadline_locked(job_id, now)
+                    if lease_deadline is not None:
+                        next_deadline = (
+                            lease_deadline if next_deadline is None
+                            else min(next_deadline, lease_deadline)
+                        )
+                    for node_id in target_nodes:
+                        record = self.registry.get_node(node_id)
+                        online = record is not None and record.readiness != NodeReadiness.OFFLINE
+                        previous = states.get(node_id)
+                        if online and previous is False:
+                            states[node_id] = True
+                            callbacks.append((watch["on_change"], {
+                                "job_id": job_id,
+                                "node_id": node_id,
+                                "state": "online",
+                                "reason": "heartbeat_received",
+                                "observed_at": now,
+                                "last_heartbeat_at": record.last_heartbeat_time if record else None,
+                            }))
+                        elif not online and previous is True and lease_deadline is None:
+                            states[node_id] = False
+                            callbacks.append((watch["on_change"], {
+                                "job_id": job_id,
+                                "node_id": node_id,
+                                "state": "offline",
+                                "reason": "heartbeat_timeout",
+                                "observed_at": now,
+                                "last_heartbeat_at": record.last_heartbeat_time if record else None,
+                            }))
+                        if online and lease_deadline is None and record is not None:
+                            heartbeat_deadline = (
+                                record.last_heartbeat_time + self.offline_threshold_seconds
+                            )
+                            next_deadline = (
+                                heartbeat_deadline if next_deadline is None
+                                else min(next_deadline, heartbeat_deadline)
+                            )
+                if callbacks:
+                    wait_timeout = 0.0
+                elif next_deadline is None:
+                    wait_timeout = None
+                else:
+                    wait_timeout = max(0.0, next_deadline - time.monotonic())
+                if not callbacks:
+                    self._liveness_condition.wait(wait_timeout)
+            for callback, event in callbacks:
+                try:
+                    callback(event)
+                except Exception as exc:
+                    logger.warning("作业 liveness watcher 回调异常: %s", exc)
 
     @staticmethod
     def _wait_deadline(timeout: float) -> float:
@@ -1031,6 +1349,8 @@ class ControlPlaneServer:
             return "round"
         if report_type == "TASK_ERROR":
             return "error"
+        if report_type == "JOB_RECOVERY":
+            return "recovery"
         return None
 
     def _recent_report_status_locked(
@@ -1068,6 +1388,7 @@ class ControlPlaneServer:
             "preparation": [],
             "round": [],
             "error": [],
+            "recovery": [],
         }
 
         def append_seen(seen: Dict[str, Any]) -> None:
@@ -1090,6 +1411,9 @@ class ControlPlaneServer:
             append_seen(seen)
         for seen in self._round_seen.values():
             append_seen(seen)
+        for node_seen in self._recovery_seen.values():
+            for seen in node_seen.values():
+                append_seen(seen)
         self._recent_report_job_id = job_id
         self._recent_report_receipts = receipts
 
@@ -1162,6 +1486,30 @@ class ControlPlaneServer:
                     return "PREPARE_ROUND_INDEX_FORBIDDEN"
             elif type(round_index) is not int or round_index <= 0:
                 return "ROUND_INDEX_REQUIRED"
+        elif report_type == "JOB_RECOVERY":
+            report = payload.get("report")
+            if not isinstance(report, dict) or not report:
+                return "RECOVERY_REPORT_REQUIRED"
+            epoch = report.get("recovery_epoch")
+            state = report.get("recovery_state")
+            if type(epoch) is not int or epoch <= 0:
+                return "INVALID_RECOVERY_EPOCH"
+            if state not in ("ready", "blocked"):
+                return "INVALID_RECOVERY_STATE"
+            if state == "ready":
+                if set(report) != {"recovery_epoch", "recovery_state"}:
+                    return "READY_REPORT_FIELDS_INVALID"
+            else:
+                if set(report) != {"recovery_epoch", "recovery_state", "error_code", "reason"}:
+                    return "BLOCKED_REPORT_FIELDS_INVALID"
+                if (not isinstance(report.get("error_code"), str)
+                        or not report["error_code"]
+                        or len(report["error_code"].encode("utf-8")) > 128):
+                    return "INVALID_RECOVERY_ERROR_CODE"
+                if (not isinstance(report.get("reason"), str)
+                        or not report["reason"]
+                        or len(report["reason"].encode("utf-8")) > 512):
+                    return "INVALID_RECOVERY_REASON"
         return None
 
     @classmethod
@@ -1211,10 +1559,10 @@ class ControlPlaneServer:
                 return self._report_ack("TASK_READY", payload, True)
             if status == "conflict":
                 return self._report_ack("TASK_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._task_ready_cancelled:
+                return self._report_ack("TASK_READY", payload, False, "BARRIER_CANCELLED")
             if self._task_ready_error is not None:
                 return self._report_ack("TASK_READY", payload, False, "BARRIER_FAILED")
-            if self._task_ready_completed:
-                return self._report_ack("TASK_READY", payload, False, "BARRIER_COMPLETE")
             validator = self._task_ready_report_validator
 
         if validator is not None:
@@ -1238,6 +1586,8 @@ class ControlPlaneServer:
                 return self._report_ack("TASK_READY", payload, True)
             if status == "conflict":
                 return self._report_ack("TASK_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._task_ready_cancelled:
+                return self._report_ack("TASK_READY", payload, False, "BARRIER_CANCELLED")
             if self._task_ready_error is not None:
                 return self._report_ack("TASK_READY", payload, False, "BARRIER_FAILED")
             record = {
@@ -1286,6 +1636,8 @@ class ControlPlaneServer:
                 return self._report_ack("ROUND_READY", payload, True)
             if status == "conflict":
                 return self._report_ack("ROUND_READY", payload, False, "REPORT_ID_CONFLICT")
+            if self._round_cancelled:
+                return self._report_ack("ROUND_READY", payload, False, "BARRIER_CANCELLED")
             if self._round_error is not None:
                 return self._report_ack("ROUND_READY", payload, False, "BARRIER_FAILED")
             if self._round_expected_nodes.issubset(self._round_reports):
@@ -1307,6 +1659,68 @@ class ControlPlaneServer:
             if self._round_expected_nodes.issubset(self._round_reports):
                 self._round_event.set()
         return self._report_ack("ROUND_READY", payload, True)
+
+    def _validate_recovery_report(
+        self, payload: Dict[str, Any], client_addr: Tuple[str, int]
+    ) -> Optional[List[bytes]]:
+        envelope_error = self._report_envelope_error(payload, "JOB_RECOVERY")
+        if envelope_error is not None:
+            return self._report_ack("JOB_RECOVERY", payload, False, envelope_error)
+
+        with self._lock:
+            recent_status = self._recent_report_status_locked(
+                payload, "JOB_RECOVERY", client_addr
+            )
+            if recent_status == "idempotent":
+                return self._report_ack("JOB_RECOVERY", payload, True)
+            if recent_status == "conflict":
+                return self._report_ack("JOB_RECOVERY", payload, False, "REPORT_ID_CONFLICT")
+            if (not self._recovery_active or
+                    payload["job_id"] != self._recovery_job_id):
+                return self._report_ack("JOB_RECOVERY", payload, False, "RECOVERY_NOT_PREPARED")
+            if payload["node_id"] not in self._recovery_expected_nodes:
+                return self._report_ack("JOB_RECOVERY", payload, False, "REPORT_NOT_PARTICIPANT")
+            if self._recovery_cancelled:
+                return self._report_ack("JOB_RECOVERY", payload, False, "RECOVERY_CANCELLED")
+
+            node_id = payload["node_id"]
+            report = payload["report"]
+            epoch = report["recovery_epoch"]
+            state = report["recovery_state"]
+            seen_by_epoch = self._recovery_seen.setdefault(node_id, {})
+            seen = seen_by_epoch.get(epoch)
+            status = self._seen_status(seen, payload, client_addr)
+            if status == "idempotent":
+                return self._report_ack("JOB_RECOVERY", payload, True)
+            if status == "conflict":
+                return self._report_ack("JOB_RECOVERY", payload, False, "REPORT_ID_CONFLICT")
+
+            current = self._recovery_reports.get(node_id)
+            current_report = current.get("report", {}) if current else {}
+            if current_report.get("recovery_state") == "ready":
+                return self._report_ack("JOB_RECOVERY", payload, False, "RECOVERY_ALREADY_READY")
+            last_epoch = self._recovery_last_epochs.get(node_id, 0)
+            if epoch != last_epoch + 1:
+                return self._report_ack("JOB_RECOVERY", payload, False, "RECOVERY_EPOCH_REQUIRED")
+
+            record = {
+                "report_id": payload["report_id"],
+                "job_id": payload["job_id"],
+                "node_id": node_id,
+                "report": deepcopy(report),
+                "source": client_addr,
+            }
+            seen_by_epoch[epoch] = {
+                "type": "JOB_RECOVERY",
+                "payload": deepcopy(payload),
+                "report_id": payload["report_id"],
+                "fingerprint": self._report_fingerprint(payload),
+                "source_host": self._report_source_host(client_addr),
+            }
+            self._recovery_last_epochs[node_id] = epoch
+            self._recovery_reports[node_id] = record
+            self._recovery_event.set()
+        return self._report_ack("JOB_RECOVERY", payload, True)
 
     def _validate_error_report(
         self, payload: Dict[str, Any], client_addr: Tuple[str, int]
@@ -1352,6 +1766,10 @@ class ControlPlaneServer:
                 return self._report_ack("TASK_ERROR", payload, True)
             if status == "conflict":
                 return self._report_ack("TASK_ERROR", payload, False, "REPORT_ID_CONFLICT")
+            if phase == "prepare" and self._task_ready_cancelled:
+                return self._report_ack("TASK_ERROR", payload, False, "BARRIER_CANCELLED")
+            if phase == "round" and self._round_cancelled:
+                return self._report_ack("TASK_ERROR", payload, False, "BARRIER_CANCELLED")
             if current_error is not None:
                 return self._report_ack("TASK_ERROR", payload, False, "BARRIER_FAILED")
             record = {
@@ -1411,6 +1829,8 @@ class ControlPlaneServer:
             return self._validate_round_report(payload, client_addr)
         if msg_type == "TASK_ERROR":
             return self._validate_error_report(payload, client_addr)
+        if msg_type == "JOB_RECOVERY":
+            return self._validate_recovery_report(payload, client_addr)
 
         if msg_type in ("RADIO_SWITCH_FINALIZED_ACK", "RADIO_SWITCH_CONFIRMED_ACK",
                         "RADIO_SWITCH_ROLLBACK_ACK"):
@@ -1477,6 +1897,7 @@ class ControlPlaneServer:
                 heartbeat=hb, client_addr=client_addr,
                 server_radio=self.active_radio_config,
             )
+            self._liveness_condition.notify_all()
             if self.radio_error or (
                 self._active_switch_session is not None and hb.node_id in self._expected_target_nodes
             ):
@@ -2345,6 +2766,61 @@ class ControlPlaneClient:
         self._notify_report(
             payload, "TASK_ERROR_ACK", timeout, "task_error_timeout",
             f"作业 {job_id} 的 TASK_ERROR 未在 {timeout:g} 秒内获得服务端确认",
+        )
+
+    def notify_job_recovery(
+        self,
+        job_id: str,
+        recovery_epoch: int,
+        recovery_state: str,
+        *,
+        report_id: str,
+        error_code: Optional[str] = None,
+        reason: Optional[str] = None,
+        timeout: float = 8.0,
+    ) -> None:
+        """发送调用方持久化的恢复事实；ACK 丢失时重用同一 report_id。"""
+        if not isinstance(job_id, str) or not job_id:
+            raise FLRuntimeError("invalid_recovery_report", "job_id 无效")
+        if type(recovery_epoch) is not int or recovery_epoch <= 0:
+            raise FLRuntimeError("invalid_recovery_report", "recovery_epoch 无效")
+        if not isinstance(report_id, str) or not report_id:
+            raise FLRuntimeError("invalid_recovery_report", "report_id 无效")
+        if recovery_state not in ("ready", "blocked"):
+            raise FLRuntimeError("invalid_recovery_report", "recovery_state 无效")
+        if recovery_state == "ready":
+            if error_code is not None or reason is not None:
+                raise FLRuntimeError("invalid_recovery_report", "ready 报告不能包含错误字段")
+            report = {
+                "recovery_epoch": recovery_epoch,
+                "recovery_state": recovery_state,
+            }
+        else:
+            if (not isinstance(error_code, str) or not error_code
+                    or len(error_code.encode("utf-8")) > 128
+                    or not isinstance(reason, str) or not reason
+                    or len(reason.encode("utf-8")) > 512):
+                raise FLRuntimeError("invalid_recovery_report", "blocked 报告错误字段无效")
+            report = {
+                "recovery_epoch": recovery_epoch,
+                "recovery_state": recovery_state,
+                "error_code": error_code,
+                "reason": reason,
+            }
+
+        payload = {
+            "type": "JOB_RECOVERY",
+            "report_id": report_id,
+            "job_id": job_id,
+            "node_id": self.node_id,
+            "report": report,
+        }
+        self._notify_report(
+            payload,
+            "JOB_RECOVERY_ACK",
+            timeout,
+            "job_recovery_timeout",
+            f"作业 {job_id} 恢复报告未在 {timeout:g} 秒内获得服务端确认",
         )
 
     def _send_unicast_datagram(self, data: bytes) -> None:

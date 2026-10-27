@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+from wfb_ng.tests._client_test_network import client_network_kwargs, isolated_client_network
 import os
 import signal
 import shutil
@@ -258,7 +259,7 @@ class TestNetworkAdapter(unittest.TestCase):
 class TestHardwarePolling(unittest.TestCase):
     def test_polling_suspends_and_takes_over_when_card_plugged(self):
         adapter = MockNetworkAdapter(interfaces=[])
-        config = ClientDaemonConfig(
+        config = ClientDaemonConfig(**client_network_kwargs(),
             node_id=1,
             tun_ip="10.80.0.11",
             poll_interval_seconds=0.05,
@@ -296,7 +297,7 @@ class TestHardwarePolling(unittest.TestCase):
 
     def test_polling_detects_card_unplugged(self):
         adapter = MockNetworkAdapter(interfaces=["wlx_hotplug_01"])
-        config = ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", poll_interval_seconds=0.05)
+        config = ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", poll_interval_seconds=0.05)
         daemon = ClientDaemon(config=config, network_adapter=adapter)
 
         daemon.poll_hardware_once()
@@ -319,7 +320,7 @@ def _make_client_job(
     node_id: int = 1,
     tun_name: str = "fl-c1",
     tun_ip: str = "10.80.0.11",
-    io_timeout_seconds: int = 120,
+    io_timeout_seconds: float = 120,
     live_observation: bool = True,
     **kwargs,
 ) -> ClientJobConfig:
@@ -615,7 +616,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_idle_link_hands_tun_to_sandbox_and_recovers_after_completion(self):
-        config = ClientDaemonConfig(
+        config = ClientDaemonConfig(**client_network_kwargs(),
             node_id=1,
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
@@ -685,24 +686,39 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertTrue(daemon.is_idle_link_running)
         self.assertEqual(len(link_processes), 2)
 
+        # 本地资源恢复仍需服务器确认，才可解除接单门禁。
+        with mock.patch('wfb_ng.fl.client_daemon.ControlPlaneClient.start'):
+            daemon.start_control_plane()
+        recovery_reports = []
+        daemon.control_plane.notify_job_recovery = lambda *args, **kwargs: recovery_reports.append((args, kwargs))
         daemon._handle_job_terminal({"job_id": "stale"}, aborted=False)
         self.assertEqual(len(link_processes), 2)
         daemon._handle_job_terminal({"job_id": "handoff"}, aborted=False)
+        worker = daemon._recovery_thread
+        if worker is not None:
+            worker.join(timeout=3)
+            self.assertFalse(worker.is_alive(), "异步终态回收必须有界完成")
         self.assertIsNone(link_processes[1].returncode)
         self.assertTrue(daemon.is_idle_link_running)
         self.assertEqual(len(link_processes), 2)
         self.assertIsNone(daemon._current_job_id)
+        self.assertEqual(recovery_reports[0][0], ('handoff', 1, 'ready'))
         daemon._handle_job_terminal({"job_id": "handoff"}, aborted=False)
+        worker = daemon._recovery_thread
+        if worker is not None:
+            worker.join(timeout=3)
+            self.assertFalse(worker.is_alive())
         self.assertEqual(len(link_processes), 2)
+        self.assertEqual(recovery_reports[1], recovery_reports[0])
         daemon.stop()
 
     def test_startup_bandwidth_is_the_source_for_hardware_and_link(self):
         for channel, bandwidth, width in ((157, 20, 'HT20'), (153, 40, 'HT40-')):
             with self.subTest(channel=channel, bandwidth=bandwidth):
                 adapter = MockNetworkAdapter(['wlx-test'])
-                config = ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11',
+                config = ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11',
                                             work_dir=self.temp_dir, channel=channel,
-                                            bandwidth_mhz=bandwidth, radio_control_port=9234,
+                                            bandwidth_mhz=bandwidth,
                                             enable_control_plane=False)
                 commands = []
 
@@ -710,6 +726,9 @@ class TestClientDaemonLifecycle(unittest.TestCase):
                     commands.append(cmd)
                     proc = mock.Mock()
                     proc.poll.return_value = None
+                    proc.terminate.side_effect = lambda: setattr(proc.poll, 'return_value', 0)
+                    proc.kill.side_effect = lambda: setattr(proc.poll, 'return_value', -9)
+                    proc.wait.side_effect = lambda timeout=None: proc.poll()
                     adapter.setup_tun(config.tun_name, config.tun_cidr)
                     return proc
 
@@ -720,11 +739,11 @@ class TestClientDaemonLifecycle(unittest.TestCase):
                     daemon.start_idle_link()
                 self.assertEqual(adapter.wireless_states['wlx-test']['channel_width'], width)
                 self.assertEqual(commands[0][commands[0].index('--radio-bandwidth') + 1], str(bandwidth))
-                self.assertEqual(commands[0][commands[0].index('--radio-control-port') + 1], '9234')
+                self.assertEqual(commands[0][commands[0].index('--radio-control-port') + 1], str(config.radio_control_port))
 
     def test_config_rejects_165_ht40_instead_of_downgrading(self):
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip='10.80.0.11', channel=165, bandwidth_mhz=40)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11', channel=165, bandwidth_mhz=40)
         with self.assertRaises(ValueError):
             _make_client_job(channel=165, bandwidth_mhz=40)
         self.assertEqual(_make_client_job(channel=165, bandwidth_mhz=20).channel_width, 'HT20')
@@ -753,7 +772,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertEqual(job.uftp_private_multicast_host, "239.80.41.2")
 
     def test_daemon_full_lifecycle(self):
-        config = ClientDaemonConfig(
+        config = ClientDaemonConfig(**client_network_kwargs(),
             node_id=1,
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
@@ -883,7 +902,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
 
     def test_daemon_background_loop_and_hotplug(self):
         adapter = MockNetworkAdapter(interfaces=[])
-        config = ClientDaemonConfig(
+        config = ClientDaemonConfig(**client_network_kwargs(),
             node_id=1,
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
@@ -968,7 +987,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         self.assertIn("Restart=always", content)
 
     def test_trigger_job_validates_matching_identity_and_restores_on_failure(self):
-        config = ClientDaemonConfig(
+        config = ClientDaemonConfig(**client_network_kwargs(),
             node_id=1,
             tun_ip="10.80.0.11",
             work_dir=self.temp_dir,
@@ -1006,31 +1025,31 @@ class TestClientDaemonLifecycle(unittest.TestCase):
     def test_rf_parameter_ranges_validation(self):
         # Forbidden channel 161
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=161)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", channel=161)
 
         # Out of pool channel 36
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=36)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", channel=36)
 
         # Out of range txpower
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=25)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=25)
 
         # Out of range uplink_mcs
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=7)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", uplink_mcs=7)
 
         # Non-integer channel
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", channel=157.0)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", channel=157.0)
 
         # Non-integer txpower
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=12.5)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=12.5)
 
         # Non-integer uplink_mcs
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", uplink_mcs=3.5)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", uplink_mcs=3.5)
 
     def test_default_template_node_json_validity(self):
         template_path = "scripts/default/node.json"

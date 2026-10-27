@@ -1,0 +1,38 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_rejected_task_reports_recovery_for_its_server_terminal __________
+
+host = (<wfb_ng.fl.client_daemon.ClientDaemon object at 0xffffa3178340>, <wfb_ng.tests.test_fl_client_daemon.MockNetworkAdapter object at 0xffffa31783a0>, [], <threading.Event object at 0xffffa3178e50>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffffa3178160>
+
+    def test_rejected_task_reports_recovery_for_its_server_terminal(host, monkeypatch):
+        daemon, adapter, reports, reported = host
+        rejected = threading.Event()
+        monkeypatch.setattr(daemon.control_plane, 'notify_task_error', lambda *a, **kw: rejected.set())
+        daemon.control_plane.handle_broadcast(dict(type='TASK_ANNOUNCE', job_id='badjob', run_id='run1',
+            target_nodes=[1], rounds=1, preparation_timeout_seconds=10,
+            algorithm='wfb_ng.fl.mnist:client_entry', algorithm_config={'local_dir': 'forbidden'},
+            io_timeout_seconds=10, live_observation=False, server_http_host='10.80.0.1',
+            server_http_port=8080, uftp_port=1044, link_id=7669206))
+        assert rejected.wait(2)
+        daemon.control_plane.handle_broadcast({'type': 'JOB_ABORT', 'job_id': 'badjob'})
+>       assert reported.wait(2), '已拒绝且未启动进程的参与者也必须交付恢复事实'
+E       AssertionError: 已拒绝且未启动进程的参与者也必须交付恢复事实
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xffffa3178e50>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xffffa3178e50>> = <threading.Event object at 0xffffa3178e50>.wait
+
+wfb_ng/tests/test_fl_client_recovery.py:324: AssertionError
+----------------------------- Captured stderr call -----------------------------
+算法配置不得包含本机路径字段
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_recovery.py::test_rejected_task_reports_recovery_for_its_server_terminal
+1 failed, 2 warnings in 2.65s

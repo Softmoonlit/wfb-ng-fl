@@ -1,0 +1,80 @@
+.....................F............                                       [100%]
+=================================== FAILURES ===================================
+___ TestFLCoordinator.test_round_timeout_covers_evaluate_and_report_barrier ____
+
+self = <wfb_ng.tests.test_fl_coordinator.TestFLCoordinator testMethod=test_round_timeout_covers_evaluate_and_report_barrier>
+
+    def test_round_timeout_covers_evaluate_and_report_barrier(self):
+        for phase in ("evaluate", "report"):
+            with self.subTest(phase=phase):
+                self.runtime = MockServerRuntime(
+                    participant_node_ids=(1, 2),
+                    update_fixtures_by_node=self.client_updates,
+                )
+                entered = threading.Event()
+
+                def blocking_evaluate(model_path, config, context):
+                    entered.set()
+                    self.stop_event.wait()
+                    context.check_stop()
+                    return {
+                        "metrics": {"loss": 1.0, "accuracy": 0.2},
+                        "preparation": None,
+                        "verdict": True,
+                        "reason": "fixture improved",
+                    }
+
+                def blocking_report(index):
+                    entered.set()
+                    self.stop_event.wait()
+                    raise FLRuntimeError("round_report_timeout", "报告未收齐")
+
+                coordinator = self._coordinator(
+                    evaluate=blocking_evaluate if phase == "evaluate" else None,
+                    round_completion=blocking_report if phase == "report" else None,
+                    round_timeout_seconds=0.5,
+                )
+                coordinator.start()
+>               self.assertTrue(entered.wait(timeout=2.0))
+E               AssertionError: False is not true
+
+wfb_ng/tests/test_fl_coordinator.py:652: AssertionError
+----------------------------- Captured stderr call -----------------------------
+FLCoordinator execution failed for job job-test
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 873, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 1050, in _run_synchronous_loop
+    evaluation = self._call_evaluate(output_model_path, round_index)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 800, in _call_evaluate
+    result = self.evaluate_fn(model_path, self.algorithm_config, context)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_coordinator.py", line 633, in blocking_evaluate
+    context.check_stop()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_coordinator.py", line 44, in check_stop
+    raise FLRuntimeError("aborted", "算法被停止")
+wfb_ng.fl.errors.FLRuntimeError: 算法被停止
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 610, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 899, in run
+    raise terminal_exc
+wfb_ng.fl.errors.FLRuntimeError: 第 1 轮超过配置期限
+FLCoordinator execution failed for job job-test
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 610, in _run_wrapper
+    summary = self.run()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 899, in run
+    raise terminal_exc
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 873, in run
+    current_model_path = self._run_synchronous_loop(current_model_path)
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 936, in _run_synchronous_loop
+    self._check_stop()
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/coordinator.py", line 750, in _check_stop
+    raise FLRuntimeError("aborted", "协同作业被主动中止")
+wfb_ng.fl.errors.FLRuntimeError: 协同作业被主动中止
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_coordinator.py::TestFLCoordinator::test_round_timeout_covers_evaluate_and_report_barrier
+1 failed, 33 passed in 3.67s

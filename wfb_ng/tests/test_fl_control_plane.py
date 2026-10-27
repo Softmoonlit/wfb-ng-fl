@@ -3,6 +3,7 @@ Tests for WFB-ng Stage 2 Symmetric UDP Control Plane, Three-Tier Hunting,
 and Anti-Desync State Machine (Ticket 03).
 """
 
+import ipaddress
 import json
 import socket
 import threading
@@ -10,7 +11,7 @@ import time
 import tempfile
 import unittest
 from typing import Dict, List, Optional, Tuple
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from wfb_ng.fl.control import (
     CANDIDATE_CHANNELS,
@@ -44,6 +45,24 @@ from wfb_ng.fl.client_daemon import (
     NetworkAdapter,
 )
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+
+
+_REAL_SOCKET = socket.socket
+_PRODUCTION_UDP_PORTS = {9000, 9001, 9002, 9200}
+
+
+class _LoopbackOnlyDatagramSocket(_REAL_SOCKET):
+    """真实 UDP socket；测试发送不得离开 loopback 或命中生产端口。"""
+
+    def sendto(self, data, address):
+        if self.family == socket.AF_INET and self.type & socket.SOCK_DGRAM:
+            host, port = address[:2]
+            target = ipaddress.ip_address(host)
+            if not target.is_loopback:
+                raise AssertionError(f"测试 UDP 禁止发送到非 loopback 地址: {host}")
+            if port in _PRODUCTION_UDP_PORTS:
+                raise AssertionError(f"测试 UDP 禁止发送到生产端口: {port}")
+        return super().sendto(data, address)
 
 
 class FaultInjectingControlPlaneServer(ControlPlaneServer):
@@ -421,7 +440,10 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
     """End-to-end socket testing of UDP control plane, hunting, and anti-desync."""
 
     def setUp(self):
-        # Use loopback and dynamic ports for test isolation
+        self.socket_guard = patch("socket.socket", _LoopbackOnlyDatagramSocket)
+        self.socket_guard.start()
+        self.addCleanup(self.socket_guard.stop)
+        # 使用 loopback 和动态端口，socket guard 防止测试流量逃逸。
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s1:
             s1.bind(("127.0.0.1", 0))
             self.server_port = s1.getsockname()[1]
@@ -439,7 +461,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             active_radio_config=self.server_radio,
             bind_host="127.0.0.1",
             bind_port=self.server_port,
-            broadcast_addr="255.255.255.255",
+            broadcast_addr="127.255.255.255",
             broadcast_port=self.client_broadcast_port,
         )
         self.server.start()
@@ -954,7 +976,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         self.assertEqual(daemon.state, DaemonState.RUNNING)
 
-        # Broadcast JOB_ABORT
+        # 终态广播前必须先开启恢复屏障；客户端恢复 ACK 不能进入未准备的 barrier。
+        self.server.prepare_job_recovery("job_fl_001", [1])
         self.server.broadcast_downlink({"type": "JOB_ABORT", "job_id": "job_fl_001"})
 
         # Wait for job to be aborted and return to IDLE
@@ -965,6 +988,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             time.sleep(0.05)
 
         self.assertEqual(daemon.state, DaemonState.IDLE)
+        self.assertTrue(self.server.wait_for_job_recovery("job_fl_001", 2))
 
         daemon.stop()
         daemon_thread.join(timeout=1.0)

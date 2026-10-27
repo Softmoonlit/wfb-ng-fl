@@ -4,6 +4,8 @@
 import base64
 import hashlib
 import http.server
+import io
+import ipaddress
 import json
 import os
 import shutil
@@ -22,6 +24,63 @@ from .observation import LiveObservation
 DEFAULT_UFTP_DATA_PORT = 1044
 DEFAULT_UFTP_MULTICAST_HOST = '239.80.41.1'
 DEFAULT_UFTP_PRIVATE_MULTICAST_HOST = '239.80.41.2'
+
+
+def validate_server_http_host(host):
+    """任务 HTTP 直接连接 TUN 数值 IPv4，不允许隐式 DNS 等待。"""
+    if not isinstance(host, str):
+        raise FLRuntimeError('invalid_configuration', 'HTTP server 地址必须为数值 IPv4')
+    try:
+        return str(ipaddress.IPv4Address(host))
+    except ipaddress.AddressValueError as exc:
+        raise FLRuntimeError(
+            'invalid_configuration', 'HTTP server 地址必须为数值 IPv4') from exc
+
+
+class _IODeadline:
+    """一次 HTTP operation 的绝对预算；每次底层 I/O 只使用剩余时间。"""
+    def __init__(self, sock, expires_at):
+        self.sock = sock
+        self.expires_at = expires_at
+
+    def remaining(self):
+        remaining = self.expires_at - time.monotonic()
+        if remaining <= 0:
+            raise socket.timeout('HTTP operation I/O 期限已到')
+        return remaining
+
+    def prepare(self):
+        self.sock.settimeout(self.remaining())
+
+    def sendall(self, data):
+        self.prepare()
+        self.sock.sendall(data)
+
+
+class _DeadlineReader(io.RawIOBase):
+    def __init__(self, deadline):
+        super().__init__()
+        self.deadline = deadline
+
+    def readable(self):
+        return True
+
+    def readinto(self, buffer):
+        self.deadline.prepare()
+        return self.deadline.sock.recv_into(buffer)
+
+
+class _DeadlineWriter(io.BufferedIOBase):
+    def __init__(self, deadline):
+        super().__init__()
+        self.deadline = deadline
+
+    def writable(self):
+        return True
+
+    def write(self, data):
+        self.deadline.sendall(data)
+        return len(data)
 
 
 @dataclass(frozen=True)
@@ -124,10 +183,16 @@ class ServerTransport(object):
 
         class UpdateHandler(http.server.BaseHTTPRequestHandler):
             protocol_version = 'HTTP/1.1'
+            _upload_context: _UploadContext
 
             def setup(self):
                 super().setup()
-                self.connection.settimeout(transport.io_timeout)
+                self._io_deadline = _IODeadline(
+                    self.connection, time.monotonic() + transport.io_timeout)
+                self.rfile.close()
+                self.wfile.close()
+                self.rfile = io.BufferedReader(_DeadlineReader(self._io_deadline))
+                self.wfile = _DeadlineWriter(self._io_deadline)
 
             def handle_expect_100(self):
                 error = transport._reserve_upload(self)
@@ -182,6 +247,32 @@ class ServerTransport(object):
             daemon_threads = False
             block_on_close = True
             allow_reuse_address = True
+
+            def __init__(self, *args):
+                self._connections = set()
+                self._connections_lock = threading.Lock()
+                super().__init__(*args)
+
+            def get_request(self):
+                request, address = super().get_request()
+                with self._connections_lock:
+                    self._connections.add(request)
+                return request, address
+
+            def shutdown_request(self, request):
+                try:
+                    super().shutdown_request(request)
+                finally:
+                    with self._connections_lock:
+                        self._connections.discard(request)
+
+            def shutdown_connections(self):
+                with self._connections_lock:
+                    for request in self._connections:
+                        try:
+                            request.shutdown(socket.SHUT_RDWR)
+                        except OSError:
+                            pass
 
         try:
             self._http_server = UpdateServer(
@@ -343,10 +434,11 @@ class ServerTransport(object):
             self.cancel_downlink(operation.handle)
         if self._http_server is not None:
             self._http_server.shutdown()
+            self._http_server.shutdown_connections()
             self._http_server.server_close()
             self._http_server = None
         if self._http_thread is not None:
-            self._http_thread.join(2)
+            self._http_thread.join()
             self._http_thread = None
         self._observation.close()
         self._state = 'closed'
@@ -421,6 +513,7 @@ class ServerTransport(object):
             self._used_uploads.add(update_key)
             handler._upload_context = _UploadContext(
                 context, node_id, content_length, digest, time.monotonic())
+            # 接受上传只冻结上下文，不刷新 setup 建立的请求 I/O 预算。
             upload_context = handler._upload_context
             active_node_ids = sorted(
                 active_node_id for active_round_id, active_node_id
@@ -501,6 +594,7 @@ class ServerTransport(object):
                 with target:
                     while received < content_length:
                         try:
+                            handler._io_deadline.prepare()
                             chunk = handler.rfile.read(
                                 min(64 * 1024, content_length - received))
                         except (OSError, socket.timeout):
@@ -535,6 +629,7 @@ class ServerTransport(object):
                     'digest_mismatch', 'update 摘要不匹配')
                 return
 
+            handler._io_deadline.prepare()
             try:
                 os.replace(temp_path, update_path)
             except OSError:
@@ -618,7 +713,8 @@ class ClientTransport(object):
         self.work_dir = os.path.abspath(work_dir)
         self.uftp_uid = uftp_uid
         self.uftp_port = uftp_port
-        self.server_http_address = server_http_address
+        host, port = server_http_address
+        self.server_http_address = (validate_server_http_host(host), port)
         self.uftp_bind_host = uftp_bind_host
         self.uftp_multicast_host = uftp_multicast_host
         self.io_timeout = io_timeout
@@ -712,7 +808,8 @@ class ClientTransport(object):
                         os.path.isfile(os.path.join(candidate, 'model.manifest.json'))):
                     self._delivered_candidates.add(candidate)
                     return candidate
-            if self._uftpd_process.poll() is not None:
+            process = self._uftpd_process
+            if process is not None and process.poll() is not None:
                 raise FLRuntimeError('transport_failed', 'uftpd 意外退出')
             time.sleep(0.02)
         raise FLRuntimeError('transport_not_ready', 'Transport 尚未 ready')
@@ -728,10 +825,20 @@ class ClientTransport(object):
         sock = None
         response_file = None
         phase = 'connect'
+        expires_at = observation.started_at + self.io_timeout
         try:
             try:
-                sock = socket.create_connection(
-                    (host, port), timeout=self.io_timeout)
+                # TUN 地址已校验为数值 IPv4，无 DNS 或地址重试等待。
+                with self._operation_condition:
+                    if self._state in ('stopping', 'closed'):
+                        raise FLRuntimeError(
+                            'transport_not_ready', 'Transport 尚未 ready',
+                            round_id=round_id, node_id=node_id)
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+                    self._operation_socket = sock
+                deadline = _IODeadline(sock, expires_at)
+                deadline.prepare()
+                sock.connect((host, port))
             except (OSError, socket.timeout) as exc:
                 self._emit_upload_phase(
                     phase, observation,
@@ -743,14 +850,12 @@ class ClientTransport(object):
                 phase, observation,
                 'connected')
             with self._operation_condition:
-                self._operation_socket = sock
-                if self._state == 'stopping':
+                if self._state in ('stopping', 'closed'):
                     sock.close()
                     raise FLRuntimeError(
                         'transport_not_ready', 'Transport 尚未 ready',
                         round_id=round_id, node_id=node_id)
-            sock.settimeout(self.io_timeout)
-            response_file = sock.makefile('rb')
+            response_file = io.BufferedReader(_DeadlineReader(deadline))
             path = '/v1/rounds/%s/updates/%d' % (round_id, node_id)
             digest = base64.b64encode(bytes.fromhex(digest_hex)).decode('ascii')
             headers = (
@@ -764,7 +869,7 @@ class ClientTransport(object):
             ) % (path, host, port, size_bytes, digest)
             phase = 'continue'
             try:
-                sock.sendall(headers.encode('ascii'))
+                deadline.sendall(headers.encode('ascii'))
             except (OSError, socket.timeout) as exc:
                 self._raise_upload_io_failure(phase, observation, exc)
             status, response_headers = self._read_upload_response(
@@ -788,7 +893,7 @@ class ClientTransport(object):
                         chunk = fh.read(64 * 1024)
                         if not chunk:
                             break
-                        sock.sendall(chunk)
+                        deadline.sendall(chunk)
             except (OSError, socket.timeout) as exc:
                 self._emit_upload_phase(
                     phase, observation,
@@ -961,7 +1066,7 @@ def _read_http_response(response_file):
     parts = status_line.split(' ', 2)
     if len(parts) < 2 or not parts[0].startswith('HTTP/'):
         raise FLRuntimeError('invalid_http_response', 'HTTP 响应状态行无效')
-    headers = {}
+    headers: dict[str, list[str]] = {}
     while True:
         line = response_file.readline()
         if line in (b'\r\n', b'\n'):

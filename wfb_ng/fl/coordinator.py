@@ -9,6 +9,7 @@ Coordinator 只负责服务端发布、收齐、聚合调用和轮次推进；�
 
 from copy import deepcopy
 import logging
+import math
 import os
 import stat
 import threading
@@ -34,6 +35,316 @@ logger = logging.getLogger(__name__)
 VALID_FL_MODES = ("sync",)
 
 
+class _JobSupervisor:
+    """为单个 Coordinator 维护绝对期限和首因取消。"""
+
+    def __init__(
+        self,
+        *,
+        job_id: str,
+        round_timeout_seconds: float,
+        io_timeout_seconds: float,
+        stop_event: threading.Event,
+        runtime: Any,
+        cancel_callback: Optional[Callable[[str], None]],
+    ) -> None:
+        self._job_id = job_id
+        self._round_timeout_seconds = round_timeout_seconds
+        self._io_timeout_seconds = io_timeout_seconds
+        self._stop_event = stop_event
+        self._runtime_abort = getattr(runtime, "abort", None)
+        self._cancel_callback = cancel_callback
+        self._condition = threading.Condition()
+        self._thread: Optional[threading.Thread] = None
+        self._started = False
+        self._closed = False
+        self._round_index: Optional[int] = None
+        self._round_started_monotonic: Optional[float] = None
+        self._round_deadline: Optional[float] = None
+        self._active_deadline: Optional[float] = None
+        self._active_error_code: Optional[str] = None
+        self._cause: Optional[str] = None
+        self._cause_reason: Optional[str] = None
+        self._cause_round_index: Optional[int] = None
+        self._cancel_dispatched = False
+
+    def start(self) -> None:
+        with self._condition:
+            if self._started:
+                return
+            if self._closed:
+                raise FLRuntimeError("coordinator_already_started", "作业 supervisor 已关闭")
+            self._started = True
+            self._thread = threading.Thread(
+                target=self._watch,
+                name=f"FLCoordinatorDeadline-{self._job_id}",
+                daemon=True,
+            )
+            self._thread.start()
+
+    def begin_round(self, round_index: int) -> Dict[str, float]:
+        dispatch = False
+        with self._condition:
+            dispatch = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._error_locked()
+            elif self._round_index is not None:
+                error = FLRuntimeError("round_in_progress", "已有活动轮次预算")
+            else:
+                started = time.monotonic()
+                deadline = started + self._round_timeout_seconds
+                self._round_index = round_index
+                self._round_started_monotonic = started
+                self._round_deadline = deadline
+                self._active_deadline = deadline
+                self._active_error_code = "round_timeout"
+                self._condition.notify_all()
+                error = None
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+        assert self._round_started_monotonic is not None
+        assert self._round_deadline is not None
+        return {
+            "started_monotonic": self._round_started_monotonic,
+            "deadline_monotonic": self._round_deadline,
+        }
+
+    def begin_io(self) -> Dict[str, float]:
+        dispatch = False
+        with self._condition:
+            dispatch = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._error_locked()
+            elif self._round_deadline is None or self._round_index is None:
+                error = FLRuntimeError("round_not_started", "轮次预算尚未开启")
+            else:
+                started = time.monotonic()
+                io_deadline = min(
+                    self._round_deadline,
+                    started + self._io_timeout_seconds,
+                )
+                self._active_deadline = io_deadline
+                # 同一时刻到达时由完整轮次预算裁决，避免把 round 失败伪装成 I/O 失败。
+                self._active_error_code = (
+                    "io_timeout" if started + self._io_timeout_seconds < self._round_deadline
+                    else "round_timeout"
+                )
+                self._condition.notify_all()
+                error = None
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+        assert self._active_deadline is not None
+        return {
+            "started_monotonic": started,
+            "deadline_monotonic": self._active_deadline,
+        }
+
+    def end_io(self) -> None:
+        dispatch = False
+        with self._condition:
+            # 必须先裁决 publish 的旧 I/O 期限，再把活动阶段切回 round。
+            dispatch = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._error_locked()
+            elif self._round_deadline is None:
+                error = FLRuntimeError("round_not_started", "轮次预算尚未开启")
+            else:
+                self._active_deadline = self._round_deadline
+                self._active_error_code = "round_timeout"
+                self._condition.notify_all()
+                error = None
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+        self.check()
+
+    def end_round(self, round_index: int) -> None:
+        self._finish_active(round_index)
+        with self._condition:
+            if self._cause is not None:
+                error = self._error_locked()
+            elif self._round_index != round_index:
+                error = FLRuntimeError("round_not_started", "轮次预算身份不匹配")
+            else:
+                self._round_index = None
+                self._round_started_monotonic = None
+                self._round_deadline = None
+                self._active_deadline = None
+                self._active_error_code = None
+                self._condition.notify_all()
+                error = None
+        if error is not None:
+            raise error
+
+    def cancel_round(self, round_index: int) -> None:
+        # 取消轮次也必须先裁决当前期限，不能清理期限后丢失首因。
+        dispatch = False
+        with self._condition:
+            dispatch = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._error_locked()
+            elif self._round_index == round_index:
+                self._round_index = None
+                self._round_started_monotonic = None
+                self._round_deadline = None
+                self._active_deadline = None
+                self._active_error_code = None
+                self._condition.notify_all()
+                error = None
+            else:
+                error = None
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+
+    def check(self) -> None:
+        with self._condition:
+            dispatch = self._expire_locked(time.monotonic())
+            error = self._error_locked() if self._cause is not None else None
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+
+    def request_abort(self, reason: str) -> bool:
+        with self._condition:
+            # 先在同一临界区裁决已到期的期限，晚到的人工停止不能覆盖 timeout 首因。
+            expired = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._cause
+            else:
+                self._cause = "aborted"
+                self._cause_reason = reason or "user_requested"
+                self._cause_round_index = self._round_index
+                self._stop_event.set()
+                self._condition.notify_all()
+                error = None
+        if expired or error is None:
+            self._dispatch_cancel()
+        return error is None
+
+    @property
+    def current_round_deadline(self) -> Optional[float]:
+        """返回当前轮次的绝对 monotonic deadline；无活动轮次时为 None。"""
+        with self._condition:
+            return self._round_deadline
+
+    @property
+    def cause(self) -> Optional[str]:
+        with self._condition:
+            return self._cause
+
+    def cancellation_error(self) -> Optional[FLRuntimeError]:
+        with self._condition:
+            return self._error_locked() if self._cause is not None else None
+
+    def close(self) -> None:
+        self._dispatch_cancel()
+        with self._condition:
+            self._closed = True
+            self._active_deadline = None
+            self._round_index = None
+            self._round_started_monotonic = None
+            self._round_deadline = None
+            self._active_error_code = None
+            self._condition.notify_all()
+            thread = self._thread
+        if thread is not None and thread is not threading.current_thread():
+            thread.join()
+
+    def _finish_active(self, phase: Any) -> None:
+        dispatch = False
+        with self._condition:
+            dispatch = self._expire_locked(time.monotonic())
+            if self._cause is not None:
+                error = self._error_locked()
+            elif phase == "io":
+                error = FLRuntimeError("invalid_deadline_transition", "I/O 阶段不能通过通用路径切换")
+            elif self._round_index != phase:
+                error = FLRuntimeError("round_not_started", "轮次预算身份不匹配")
+            else:
+                error = None
+            if error is None:
+                self._condition.notify_all()
+        if dispatch:
+            self._dispatch_cancel()
+        if error is not None:
+            raise error
+
+    def _expire_locked(self, now: float) -> bool:
+        if (self._cause is not None or self._active_deadline is None or
+                now < self._active_deadline):
+            return False
+        self._cause = self._active_error_code or "round_timeout"
+        self._cause_reason = self._cause
+        self._cause_round_index = self._round_index
+        self._stop_event.set()
+        self._condition.notify_all()
+        return True
+
+    def _error_locked(self) -> FLRuntimeError:
+        cause = self._cause
+        round_index = self._cause_round_index
+        if cause == "aborted":
+            return FLRuntimeError(
+                "aborted",
+                self._cause_reason or "作业被主动中止",
+                details={"round_index": round_index},
+            )
+        if cause == "io_timeout":
+            return FLRuntimeError(
+                "io_timeout",
+                f"第 {round_index} 轮模型发布 I/O 超过配置期限",
+                details={"round_index": round_index},
+            )
+        return FLRuntimeError(
+            "round_timeout",
+            f"第 {round_index} 轮超过配置期限",
+            details={"round_index": round_index},
+        )
+
+    def _dispatch_cancel(self) -> None:
+        with self._condition:
+            if self._cause is None or self._cancel_dispatched:
+                return
+            self._cancel_dispatched = True
+            reason = self._cause_reason or self._cause
+        if self._cancel_callback is not None:
+            try:
+                self._cancel_callback(reason)
+            except Exception as exc:
+                logger.warning("作业取消 callback 异常: %s", exc)
+        if callable(self._runtime_abort):
+            try:
+                self._runtime_abort(reason=reason)
+            except Exception as exc:
+                logger.warning("Runtime abort failed: %s", exc)
+
+    def _watch(self) -> None:
+        while True:
+            with self._condition:
+                while (not self._closed and
+                       (self._active_deadline is None or self._cause is not None)):
+                    self._condition.wait()
+                if self._closed:
+                    return
+                deadline = self._active_deadline
+                assert deadline is not None
+                remaining = deadline - time.monotonic()
+                if remaining > 0:
+                    self._condition.wait(remaining)
+                    continue
+                dispatch = self._expire_locked(time.monotonic())
+            if dispatch:
+                self._dispatch_cancel()
+
+
 @dataclass(frozen=True)
 class JobConfig:
     """单项严格同步作业的已校验配置。"""
@@ -46,7 +357,7 @@ class JobConfig:
     model_size_bytes: int
     rounds: int = 5
     round_timeout_seconds: float = 120.0
-    io_timeout_seconds: int = 120
+    io_timeout_seconds: float = 120.0
     live_observation: bool = False
     model_sha256: Optional[str] = None
     radio_config: Optional[Dict[str, Any]] = None
@@ -71,10 +382,13 @@ class JobConfig:
             job_id = f"job_{int(time.time())}_{uuid.uuid4().hex[:6]}"
 
         raw_io_timeout = data.get("io_timeout_seconds")
-        if raw_io_timeout is None or type(raw_io_timeout) is not int or raw_io_timeout <= 0:
+        if (isinstance(raw_io_timeout, bool) or
+                not isinstance(raw_io_timeout, (int, float)) or
+                not math.isfinite(float(raw_io_timeout)) or
+                raw_io_timeout <= 0):
             raise FLRuntimeError(
                 "invalid_io_timeout",
-                "缺少必填参数 'io_timeout_seconds' 或值非法，必须为大于 0 的正整数",
+                "缺少必填参数 'io_timeout_seconds' 或值非法，必须为有限正数",
             )
 
         raw_live_obs = data.get("live_observation")
@@ -119,9 +433,12 @@ class JobConfig:
             raise FLRuntimeError("invalid_rounds", "rounds 轮次数必须为大于 0 的整数")
 
         raw_round_timeout = data.get("round_timeout_seconds", 120.0)
-        if type(raw_round_timeout) not in (int, float) or raw_round_timeout <= 0:
+        if (isinstance(raw_round_timeout, bool) or
+                not isinstance(raw_round_timeout, (int, float)) or
+                not math.isfinite(float(raw_round_timeout)) or
+                raw_round_timeout <= 0):
             raise FLRuntimeError(
-                "invalid_round_timeout", "round_timeout_seconds 必须为大于 0 的数值"
+                "invalid_round_timeout", "round_timeout_seconds 必须为有限正数"
             )
 
         model_sha256 = data.get("model_sha256")
@@ -151,7 +468,7 @@ class JobConfig:
             model_size_bytes=model_size,
             rounds=raw_rounds,
             round_timeout_seconds=float(raw_round_timeout),
-            io_timeout_seconds=raw_io_timeout,
+            io_timeout_seconds=float(raw_io_timeout),
             live_observation=raw_live_obs,
             model_sha256=model_sha256,
             radio_config=radio_config,
@@ -206,6 +523,7 @@ class FLCoordinator:
         on_event: Optional[Callable[[Dict[str, Any]], None]] = None,
         on_completed: Optional[Callable[[Dict[str, Any]], None]] = None,
         on_failed: Optional[Callable[[Exception], None]] = None,
+        cancel_callback: Optional[Callable[[str], None]] = None,
     ):
         if not isinstance(job, JobConfig):
             raise FLRuntimeError("invalid_job_config", "job 必须为 JobConfig 实例")
@@ -240,6 +558,10 @@ class FLCoordinator:
                 "invalid_round_callbacks",
                 "必须显式提供 prepare_round(index) 和 round_completion(index)",
             )
+        if cancel_callback is not None and not callable(cancel_callback):
+            raise FLRuntimeError(
+                "invalid_cancel_callback", "cancel_callback 必须可调用"
+            )
 
         self.job = job
         self.runtime = runtime
@@ -261,6 +583,7 @@ class FLCoordinator:
         self.on_event = on_event
         self.on_completed = on_completed
         self.on_failed = on_failed
+        self.cancel_callback = cancel_callback
 
         self.state = CoordinatorState.IDLE
         self.events: List[Dict[str, Any]] = []
@@ -271,6 +594,14 @@ class FLCoordinator:
         self._stop_event: threading.Event = cast(threading.Event, stop_event)
         self._thread: Optional[threading.Thread] = None
         self._exit_code = 0
+        self._supervisor = _JobSupervisor(
+            job_id=job.job_id,
+            round_timeout_seconds=job.round_timeout_seconds,
+            io_timeout_seconds=job.io_timeout_seconds,
+            stop_event=self._stop_event,
+            runtime=runtime,
+            cancel_callback=cancel_callback,
+        )
 
     def start(self) -> "FLCoordinator":
         """在作业资源已装配后启动后台协调线程。"""
@@ -322,27 +653,20 @@ class FLCoordinator:
         return self._exit_code
 
     def abort(self, reason: str = "user_requested") -> None:
-        """发出协作停止并请求 Runtime 取消已接受的工作。"""
+        """请求协作停止；终态须等协调线程和计算真正退出后裁决。"""
         with self._lock:
             if self.state in (CoordinatorState.SUCCEEDED, CoordinatorState.FAILED, CoordinatorState.ABORTED):
                 return
-            self._stop_event.set()
-            self.state = CoordinatorState.ABORTED
-            self._emit_event("JOB_ABORTED", reason=reason)
-            try:
-                self.runtime.abort(reason=reason)
-            except Exception as exc:
-                logger.warning("Runtime abort failed: %s", exc)
-            self._finalize_summary(
-                status="aborted",
-                error_code="aborted",
-                error_message=reason,
-                final_model_path=self._last_model_path,
-            )
+        self._supervisor.request_abort(reason)
 
     def get_summary(self) -> Optional[Dict[str, Any]]:
         with self._lock:
             return deepcopy(self._summary)
+
+    @property
+    def current_round_deadline(self) -> Optional[float]:
+        """当前轮次绝对 monotonic deadline 的只读快照。"""
+        return self._supervisor.current_round_deadline
 
     def _emit_event(self, event_type: str, **kwargs: Any) -> None:
         event = {
@@ -430,6 +754,9 @@ class FLCoordinator:
             return deepcopy(summary)
 
     def _check_stop(self) -> None:
+        cancellation_error = self._supervisor.cancellation_error()
+        if cancellation_error is not None:
+            raise cancellation_error
         if self._stop_event.is_set():
             raise FLRuntimeError("aborted", "协同作业被主动中止")
         self.context.check_stop()
@@ -552,86 +879,137 @@ class FLCoordinator:
             )
             raise exc
 
+        self._supervisor.start()
         try:
             current_model_path = self._run_synchronous_loop(current_model_path)
             with self._lock:
-                if self.state == CoordinatorState.ABORTED:
-                    return self._summary or {}
                 self.state = CoordinatorState.SUCCEEDED
             summary = self._finalize_summary(status="succeeded", final_model_path=current_model_path)
             self._emit_event("JOB_COMPLETED", summary=summary)
             return summary
         except FLRuntimeError as exc:
+            failure_exc = self._supervisor.cancellation_error() or exc
+            aborted = failure_exc.error_code == "aborted"
             with self._lock:
-                if self.state == CoordinatorState.ABORTED:
-                    return self._summary or {}
-                self.state = CoordinatorState.FAILED
+                self.state = CoordinatorState.ABORTED if aborted else CoordinatorState.FAILED
             summary = self._finalize_summary(
-                status="failed",
-                error_code=exc.error_code,
-                error_message=exc.error_message,
+                status="aborted" if aborted else "failed",
+                error_code=failure_exc.error_code,
+                error_message=failure_exc.error_message,
                 final_model_path=self._last_model_path,
             )
-            self._emit_event(
-                "JOB_FAILED",
-                error_code=exc.error_code,
-                error_message=exc.error_message,
-                summary=summary,
-            )
-            raise
+            if aborted:
+                self._emit_event("JOB_ABORTED", reason=failure_exc.error_message)
+            else:
+                self._emit_event(
+                    "JOB_FAILED",
+                    error_code=failure_exc.error_code,
+                    error_message=failure_exc.error_message,
+                    summary=summary,
+                )
+            raise failure_exc
         except Exception as exc:
+            terminal_exc: Optional[FLRuntimeError] = self._supervisor.cancellation_error()
+            if terminal_exc is None:
+                terminal_exc = FLRuntimeError(
+                    "coordinator_internal_error", f"协同器运行异常: {exc}"
+                )
+            aborted = terminal_exc.error_code == "aborted"
             with self._lock:
-                if self.state == CoordinatorState.ABORTED:
-                    return self._summary or {}
-                self.state = CoordinatorState.FAILED
-            message = str(exc)
+                self.state = CoordinatorState.ABORTED if aborted else CoordinatorState.FAILED
             summary = self._finalize_summary(
-                status="failed",
-                error_code="coordinator_internal_error",
-                error_message=message,
+                status="aborted" if aborted else "failed",
+                error_code=terminal_exc.error_code,
+                error_message=terminal_exc.error_message,
                 final_model_path=self._last_model_path,
             )
-            self._emit_event(
-                "JOB_FAILED",
-                error_code="coordinator_internal_error",
-                error_message=message,
-                summary=summary,
-            )
-            raise FLRuntimeError("coordinator_internal_error", f"协同器运行异常: {message}") from exc
+            if aborted:
+                self._emit_event("JOB_ABORTED", reason=terminal_exc.error_message)
+            else:
+                self._emit_event(
+                    "JOB_FAILED",
+                    error_code=terminal_exc.error_code,
+                    error_message=terminal_exc.error_message,
+                    summary=summary,
+                )
+            raise terminal_exc from exc
+        finally:
+            self._supervisor.close()
 
     def _run_synchronous_loop(self, initial_model_path: str) -> str:
         target_nodes = tuple(sorted(self.job.target_nodes))
         current_model_path = initial_model_path
 
         for round_index in range(1, self.job.rounds + 1):
+            round_budget = self._supervisor.begin_round(round_index)
+            round_start = round_budget["started_monotonic"]
+            round_deadline = round_budget["deadline_monotonic"]
             self._check_stop()
-            round_start = time.monotonic()
             input_sha256 = file_sha256(current_model_path)
             self._emit_event(
                 "ROUND_STARTED",
                 round_index=round_index,
                 input_model_sha256=input_sha256,
+                round_started_monotonic=round_start,
+                round_deadline_monotonic=round_deadline,
             )
 
             # Daemon 在客户端可能收到当前模型前先打开本轮完成报告门。
             self.prepare_round(round_index)
+            self._check_stop()
 
             with self._lock:
                 self.state = CoordinatorState.PUBLISHING
-            self._emit_event("MODEL_PUBLISH_START", round_index=round_index)
-            self.runtime.publish_model(current_model_path)
-            self._emit_event("MODEL_PUBLISHED", round_index=round_index, model_sha256=input_sha256)
+            io_budget = self._supervisor.begin_io()
+            self._emit_event(
+                "MODEL_PUBLISH_START",
+                round_index=round_index,
+                io_started_monotonic=io_budget["started_monotonic"],
+                io_deadline_monotonic=io_budget["deadline_monotonic"],
+                round_deadline_monotonic=round_deadline,
+            )
+            publish_error: Optional[BaseException] = None
+            try:
+                self.runtime.publish_model(current_model_path)
+            except BaseException as exc:
+                publish_error = exc
+            finally:
+                try:
+                    self._supervisor.end_io()
+                except FLRuntimeError as deadline_error:
+                    publish_error = deadline_error
+            if publish_error is not None:
+                cancellation_error = self._supervisor.cancellation_error()
+                if cancellation_error is not None:
+                    raise cancellation_error
+                if isinstance(publish_error, FLRuntimeError):
+                    raise publish_error
+                raise FLRuntimeError("runtime_failed", "模型发布失败") from publish_error
+
+            io_completed = time.monotonic()
+            self._emit_event(
+                "MODEL_PUBLISHED",
+                round_index=round_index,
+                model_sha256=input_sha256,
+                io_completed_monotonic=io_completed,
+                round_deadline_monotonic=round_deadline,
+            )
 
             self._check_stop()
             with self._lock:
                 self.state = CoordinatorState.WAITING_UPDATES
-            self._emit_event("WAIT_FOR_UPDATES_START", round_index=round_index)
+            self._emit_event(
+                "WAIT_FOR_UPDATES_START",
+                round_index=round_index,
+                round_deadline_monotonic=round_deadline,
+            )
             try:
                 updates_by_node = self.runtime.wait_for_updates()
             except TypeError as exc:
                 raise FLRuntimeError(
                     "runtime_contract_error", "wait_for_updates 必须使用无参数接口"
                 ) from exc
+            self._check_stop()
             submitted_nodes = sorted(updates_by_node.keys())
             if set(submitted_nodes) != set(target_nodes):
                 raise FLRuntimeError(
@@ -653,12 +1031,14 @@ class FLCoordinator:
                 round_index=round_index,
                 submitted_nodes=submitted_nodes,
                 dropped_out_nodes=[],
+                round_deadline_monotonic=round_deadline,
             )
 
             self._check_stop()
             with self._lock:
                 self.state = CoordinatorState.AGGREGATING
-            self._emit_event("AGGREGATE_START", round_index=round_index, submitted_nodes=submitted_nodes)
+            self._emit_event("AGGREGATE_START", round_index=round_index, submitted_nodes=submitted_nodes,
+                             round_deadline_monotonic=round_deadline)
             output_model_path = os.path.join(
                 self.artifact_dir, f"global-model-round-{round_index:04d}.bin"
             )
@@ -674,10 +1054,12 @@ class FLCoordinator:
                 "AGGREGATION_COMPLETED",
                 round_index=round_index,
                 output_model_sha256=output_sha256,
+                round_deadline_monotonic=round_deadline,
             )
 
             self._check_stop()
             evaluation = self._call_evaluate(output_model_path, round_index)
+            self._check_stop()
             metrics = deepcopy(evaluation["metrics"])
             verdict = evaluation["verdict"]
             reason = evaluation["reason"]
@@ -687,6 +1069,7 @@ class FLCoordinator:
                 metrics=metrics,
                 verdict=verdict,
                 reason=reason,
+                round_deadline_monotonic=round_deadline,
             )
             if round_index == self.job.rounds:
                 self.effect_result = {
@@ -708,14 +1091,24 @@ class FLCoordinator:
                 "metrics": metrics,
                 "verdict": verdict,
                 "reason": reason,
+                "round_started_monotonic": round_start,
+                "round_deadline_monotonic": round_deadline,
+                "publish_io_started_monotonic": io_budget["started_monotonic"],
+                "publish_io_deadline_monotonic": io_budget["deadline_monotonic"],
+                "publish_io_completed_monotonic": io_completed,
                 "duration_seconds": round(time.monotonic() - round_start, 3),
             }
             self.rounds_summary.append(round_summary)
 
             with self._lock:
                 self.state = CoordinatorState.WAITING_ROUND_REPORT
-            self._emit_event("ROUND_REPORT_WAIT_START", round_index=round_index)
+            self._emit_event(
+                "ROUND_REPORT_WAIT_START",
+                round_index=round_index,
+                round_deadline_monotonic=round_deadline,
+            )
             self.round_completion(round_index)
+            self._supervisor.end_round(round_index)
             round_summary['client_submission_returns_received'] = True
             self._emit_event("ROUND_REPORT_COMPLETED", round_index=round_index)
 
