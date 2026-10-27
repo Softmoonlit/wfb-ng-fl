@@ -1,0 +1,42 @@
+节点 fl00 角色 server 阶段 install-config
+安装env {'COMMIT': '69a94d84b006666d01e257155bc7a2fc969bedef', 'VERSION': '0.0.0', 'PREFIX': '/usr'}
+/usr/bin/python3 setup.py --name >/dev/null
+UTC 2026-10-27T08:10:09Z 命令 ['/usr/bin/python3', '-B', '-c', "from wfb_ng.fl.server_daemon import load_server_config; c=load_server_config('/etc/wfb-ng-fl/server.json.08-new'); print(c)"]
+ServerDaemonConfig(ipc_host='127.0.0.1', startup_config_path='/etc/wfb-ng-fl/server.json.08-new', ipc_port=9090, web_host='192.168.108.100', web_port=8080, channel=157, radio_txpower_dbm=14, downlink_mcs=3, uplink_mcs=4, bandwidth_mhz=40, radio_control_port=9200, uftp_rate_kbps=15000, tun_name='fl-s', tun_ip='10.80.0.1', tun_cidr='10.80.0.1/24', tun_txqueuelen=5000, control_bind_host='10.80.0.1', control_bind_port=9001, control_broadcast_addr='255.255.255.255', control_broadcast_port=9000, air_interface=None, link_id=7669206, known_clients=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), work_dir='/srv/wfb-ng-fl/server', model_library_dir='/var/lib/wfb-ng-fl/models', enable_link_process=True, enable_control_plane=True, preparation_timeout_seconds=300.0, round_timeout_seconds=1800.0, io_timeout_seconds=120.0, mnist_data_dir='/srv/wfb-ng-fl/mnist', client_entry='wfb_ng.fl.mnist:client_entry', aggregate_entry='wfb_ng.fl.mnist:aggregate_entry', evaluate_entry='wfb_ng.fl.mnist:evaluate_entry', radio_policy_entry=None, algorithm_config={'data_seed': 2026})
+退出码 0
+UTC 2026-10-27T08:10:10Z 命令 ['systemctl', 'daemon-reload']
+退出码 0
+UTC 2026-10-27T08:10:10Z 命令 ['systemctl', 'cat', 'wfb-fl-server-daemon.service']
+# /lib/systemd/system/wfb-fl-server-daemon.service
+[Unit]
+Description=WFB-ng FL server persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+退出码 0
+UTC 2026-10-27T08:10:10Z 命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'ExecStart', '-p', 'User', '-p', 'Group', '-p', 'KillMode']
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+User=
+Group=
+KillMode=control-group
+退出码 0
+/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py {'commit': '69a94d84b006666d01e257155bc7a2fc969bedef', 'schema_version': 1}
+NODE_PHASE_PASS server install-config

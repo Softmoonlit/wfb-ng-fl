@@ -1,0 +1,7 @@
+节点 fl00 角色 server 阶段 start
+UTC 2026-10-27T13:38:17Z 命令 ['systemctl', 'start', 'wfb-fl-server-daemon.service']
+退出码 0
+UTC 2026-10-27T13:38:17Z 命令 ['systemctl', 'is-active', 'wfb-fl-server-daemon.service']
+active
+退出码 0
+NODE_PHASE_PASS server start

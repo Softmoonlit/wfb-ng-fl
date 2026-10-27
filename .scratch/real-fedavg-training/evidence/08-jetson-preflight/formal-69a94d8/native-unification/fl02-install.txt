@@ -1,0 +1,36 @@
+fl02 install
+UTC 2026-10-27T12:24:09Z CMD ['install', '-o', 'root', '-g', 'root', '-m', '0755', '/tmp/wfb08-native69-unified', '/usr/bin/wfb_v6_uplink']
+RC 0
+UTC 2026-10-27T12:24:09Z CMD ['readelf', '-n', '/usr/bin/wfb_v6_uplink']
+
+Displaying notes found in: .note.gnu.build-id
+  Owner                Data size 	Description
+  GNU                  0x00000014	NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: d1b2f1ef2705ef1d67a202178410533d83baad40
+
+Displaying notes found in: .note.ABI-tag
+  Owner                Data size 	Description
+  GNU                  0x00000010	NT_GNU_ABI_TAG (ABI version tag)
+    OS: Linux, ABI: 3.7.0
+RC 0
+UTC 2026-10-27T12:24:09Z CMD ['ldd', '/usr/bin/wfb_v6_uplink']
+	linux-vdso.so.1 (0x0000ffff81233000)
+	libsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffff81130000)
+	libpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffff810d0000)
+	libstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffff80ea0000)
+	libgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffff80e70000)
+	libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff80cc0000)
+	/lib/ld-linux-aarch64.so.1 (0x0000ffff811fa000)
+	libdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffff80c60000)
+	libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff80bc0000)
+	libsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffff80ae0000)
+	liblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffff80aa0000)
+	libzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffff809d0000)
+	liblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffff809a0000)
+	libcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffff80980000)
+	libgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffff80890000)
+	libgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffff80850000)
+RC 0
+NATIVE_PHASE_PASS fl02 install
+
+Exit 0

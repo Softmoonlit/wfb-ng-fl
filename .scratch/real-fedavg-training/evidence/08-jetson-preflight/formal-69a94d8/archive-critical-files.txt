@@ -1,0 +1,11 @@
+scripts/install/install-v8.sh
+scripts/systemd/wfb-fl-client-daemon.service
+scripts/systemd/wfb-fl-client.service
+scripts/systemd/wfb-fl-server-daemon.service
+scripts/systemd/wfb-fl-server.service
+wfb_ng/fl/client_daemon.py
+wfb_ng/fl/console.py
+wfb_ng/fl/control.py
+wfb_ng/fl/mnist.py
+wfb_ng/fl/server_daemon.py
+wfb_ng/fl/service.py

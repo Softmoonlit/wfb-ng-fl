@@ -1,0 +1,2261 @@
+{
+  "duration_s": 85.0473441919894,
+  "capture_drop_server": 0,
+  "capture_drop_client": 0,
+  "client_hb": 63,
+  "server_hb": 69,
+  "matched_hb": 52,
+  "client_max_HB_gap_s": 5.231384113998502,
+  "server_max_HB_gap_s": 14.852230880002026,
+  "hunt_ratio": 0.7619047619047619,
+  "states": {
+    "HUNTING": 48,
+    "IDLE": 15
+  },
+  "channels": {
+    "153": 16,
+    "157": 33,
+    "149": 14
+  },
+  "ACK_nearest_median_ms": 185.97150999994483,
+  "ACK_nearest_max_ms": 4346.683265001047,
+  "server_offline_samples": 4,
+  "server_api_samples": 18,
+  "server_max_HB_age_s": 21.08,
+  "server_node2_grants": 122,
+  "client_node2_accepts": 97,
+  "matched_grantseq": 97,
+  "ready_events": [
+    {
+      "anchor_ms": 90466221,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90472222,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90478223,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90483225,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90488225,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90493226,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90499226,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90504227,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90513228,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90523229,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90524229,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90533230,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90534230,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    }
+  ],
+  "silent_removals": [
+    {
+      "anchor_ms": 90468221,
+      "line": "silent_remove node_id=2 silence_ms=554 consecutive_silent_grants=4 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90474223,
+      "line": "silent_remove node_id=2 silence_ms=647 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90478223,
+      "line": "silent_remove node_id=2 silence_ms=517 consecutive_silent_grants=3 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90484225,
+      "line": "silent_remove node_id=2 silence_ms=517 consecutive_silent_grants=3 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90489225,
+      "line": "silent_remove node_id=2 silence_ms=779 consecutive_silent_grants=5 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90497226,
+      "line": "silent_remove node_id=2 silence_ms=3121 consecutive_silent_grants=23 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90502226,
+      "line": "silent_remove node_id=2 silence_ms=3122 consecutive_silent_grants=22 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90507227,
+      "line": "silent_remove node_id=2 silence_ms=3298 consecutive_silent_grants=24 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90514228,
+      "line": "silent_remove node_id=2 silence_ms=364 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90523229,
+      "line": "silent_remove node_id=2 silence_ms=650 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90524229,
+      "line": "silent_remove node_id=2 silence_ms=388 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 90534230,
+      "line": "silent_remove node_id=2 silence_ms=648 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 90535230,
+      "line": "silent_remove node_id=2 silence_ms=381 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4"
+    }
+  ],
+  "bursts": [
+    {
+      "server_mono": 90467.809832224,
+      "packet_count": 43,
+      "arrival_span_s": 0.3384264960041037,
+      "source_timestamp_span_s": 32.175
+    },
+    {
+      "server_mono": 90514.273308704,
+      "packet_count": 16,
+      "arrival_span_s": 0.009972255997126922,
+      "source_timestamp_span_s": 4.603
+    }
+  ],
+  "grant_sequences": [
+    {
+      "sequence": 8565,
+      "server": {
+        "anchor_ms": 90466221,
+        "line": "grant seq=8565 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8567,
+      "server": {
+        "anchor_ms": 90466221,
+        "line": "grant seq=8567 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8568,
+      "server": {
+        "anchor_ms": 90466221,
+        "line": "grant seq=8568 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8569,
+      "server": {
+        "anchor_ms": 90466221,
+        "line": "grant seq=8569 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8570,
+      "server": {
+        "anchor_ms": 90466221,
+        "line": "grant seq=8570 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8571,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8571 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8572,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8572 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8573,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8573 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8574,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8574 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8575,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8575 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83088600,
+        "line": "grant_accept node_id=2 sequence=8575 duration_ms=120 expires_at_ms=83089226",
+        "accepted_at_ms_estimate": 83089106
+      }
+    },
+    {
+      "sequence": 8576,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8576 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8577,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8577 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83088600,
+        "line": "grant_accept node_id=2 sequence=8577 duration_ms=120 expires_at_ms=83089486",
+        "accepted_at_ms_estimate": 83089366
+      }
+    },
+    {
+      "sequence": 8578,
+      "server": {
+        "anchor_ms": 90467221,
+        "line": "grant seq=8578 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83088600,
+        "line": "grant_accept node_id=2 sequence=8578 duration_ms=120 expires_at_ms=83089616",
+        "accepted_at_ms_estimate": 83089496
+      }
+    },
+    {
+      "sequence": 8579,
+      "server": {
+        "anchor_ms": 90468221,
+        "line": "grant seq=8579 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83089600,
+        "line": "grant_accept node_id=2 sequence=8579 duration_ms=120 expires_at_ms=83089746",
+        "accepted_at_ms_estimate": 83089626
+      }
+    },
+    {
+      "sequence": 8580,
+      "server": {
+        "anchor_ms": 90468221,
+        "line": "grant seq=8580 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83089600,
+        "line": "grant_accept node_id=2 sequence=8580 duration_ms=120 expires_at_ms=83089882",
+        "accepted_at_ms_estimate": 83089762
+      }
+    },
+    {
+      "sequence": 8581,
+      "server": {
+        "anchor_ms": 90468221,
+        "line": "grant seq=8581 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83089600,
+        "line": "grant_accept node_id=2 sequence=8581 duration_ms=120 expires_at_ms=83090007",
+        "accepted_at_ms_estimate": 83089887
+      }
+    },
+    {
+      "sequence": 8618,
+      "server": {
+        "anchor_ms": 90473222,
+        "line": "grant seq=8618 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8619,
+      "server": {
+        "anchor_ms": 90473222,
+        "line": "grant seq=8619 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8620,
+      "server": {
+        "anchor_ms": 90473222,
+        "line": "grant seq=8620 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8621,
+      "server": {
+        "anchor_ms": 90473222,
+        "line": "grant seq=8621 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83094600,
+        "line": "grant_accept node_id=2 sequence=8621 duration_ms=120 expires_at_ms=83095212",
+        "accepted_at_ms_estimate": 83095092
+      }
+    },
+    {
+      "sequence": 8623,
+      "server": {
+        "anchor_ms": 90473222,
+        "line": "grant seq=8623 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83094600,
+        "line": "grant_accept node_id=2 sequence=8623 duration_ms=120 expires_at_ms=83095472",
+        "accepted_at_ms_estimate": 83095352
+      }
+    },
+    {
+      "sequence": 8625,
+      "server": {
+        "anchor_ms": 90474223,
+        "line": "grant seq=8625 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8658,
+      "server": {
+        "anchor_ms": 90478223,
+        "line": "grant seq=8658 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83099600,
+        "line": "grant_accept node_id=2 sequence=8658 duration_ms=120 expires_at_ms=83100026",
+        "accepted_at_ms_estimate": 83099906
+      }
+    },
+    {
+      "sequence": 8659,
+      "server": {
+        "anchor_ms": 90478223,
+        "line": "grant seq=8659 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83099600,
+        "line": "grant_accept node_id=2 sequence=8659 duration_ms=120 expires_at_ms=83100157",
+        "accepted_at_ms_estimate": 83100037
+      }
+    },
+    {
+      "sequence": 8660,
+      "server": {
+        "anchor_ms": 90478223,
+        "line": "grant seq=8660 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8661,
+      "server": {
+        "anchor_ms": 90478223,
+        "line": "grant seq=8661 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83099600,
+        "line": "grant_accept node_id=2 sequence=8661 duration_ms=120 expires_at_ms=83100417",
+        "accepted_at_ms_estimate": 83100297
+      }
+    },
+    {
+      "sequence": 8698,
+      "server": {
+        "anchor_ms": 90483225,
+        "line": "grant seq=8698 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83104602,
+        "line": "grant_accept node_id=2 sequence=8698 duration_ms=120 expires_at_ms=83105229",
+        "accepted_at_ms_estimate": 83105109
+      }
+    },
+    {
+      "sequence": 8699,
+      "server": {
+        "anchor_ms": 90483225,
+        "line": "grant seq=8699 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8700,
+      "server": {
+        "anchor_ms": 90483225,
+        "line": "grant seq=8700 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83104602,
+        "line": "grant_accept node_id=2 sequence=8700 duration_ms=120 expires_at_ms=83105490",
+        "accepted_at_ms_estimate": 83105370
+      }
+    },
+    {
+      "sequence": 8701,
+      "server": {
+        "anchor_ms": 90483225,
+        "line": "grant seq=8701 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83104602,
+        "line": "grant_accept node_id=2 sequence=8701 duration_ms=120 expires_at_ms=83105619",
+        "accepted_at_ms_estimate": 83105499
+      }
+    },
+    {
+      "sequence": 8738,
+      "server": {
+        "anchor_ms": 90488225,
+        "line": "grant seq=8738 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83109604,
+        "line": "grant_accept node_id=2 sequence=8738 duration_ms=120 expires_at_ms=83110436",
+        "accepted_at_ms_estimate": 83110316
+      }
+    },
+    {
+      "sequence": 8739,
+      "server": {
+        "anchor_ms": 90488225,
+        "line": "grant seq=8739 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83109604,
+        "line": "grant_accept node_id=2 sequence=8739 duration_ms=120 expires_at_ms=83110566",
+        "accepted_at_ms_estimate": 83110446
+      }
+    },
+    {
+      "sequence": 8740,
+      "server": {
+        "anchor_ms": 90489225,
+        "line": "grant seq=8740 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83109604,
+        "line": "grant_accept node_id=2 sequence=8740 duration_ms=120 expires_at_ms=83110697",
+        "accepted_at_ms_estimate": 83110577
+      }
+    },
+    {
+      "sequence": 8741,
+      "server": {
+        "anchor_ms": 90489225,
+        "line": "grant seq=8741 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83110604,
+        "line": "grant_accept node_id=2 sequence=8741 duration_ms=120 expires_at_ms=83110827",
+        "accepted_at_ms_estimate": 83110707
+      }
+    },
+    {
+      "sequence": 8742,
+      "server": {
+        "anchor_ms": 90489225,
+        "line": "grant seq=8742 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83110604,
+        "line": "grant_accept node_id=2 sequence=8742 duration_ms=120 expires_at_ms=83110959",
+        "accepted_at_ms_estimate": 83110839
+      }
+    },
+    {
+      "sequence": 8743,
+      "server": {
+        "anchor_ms": 90489225,
+        "line": "grant seq=8743 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83110604,
+        "line": "grant_accept node_id=2 sequence=8743 duration_ms=120 expires_at_ms=83111087",
+        "accepted_at_ms_estimate": 83110967
+      }
+    },
+    {
+      "sequence": 8778,
+      "server": {
+        "anchor_ms": 90493226,
+        "line": "grant seq=8778 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83114605,
+        "line": "grant_accept node_id=2 sequence=8778 duration_ms=120 expires_at_ms=83115646",
+        "accepted_at_ms_estimate": 83115526
+      }
+    },
+    {
+      "sequence": 8779,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8779 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8779 duration_ms=120 expires_at_ms=83115776",
+        "accepted_at_ms_estimate": 83115656
+      }
+    },
+    {
+      "sequence": 8780,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8780 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8780 duration_ms=120 expires_at_ms=83115910",
+        "accepted_at_ms_estimate": 83115790
+      }
+    },
+    {
+      "sequence": 8781,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8781 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8782,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8782 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8782 duration_ms=120 expires_at_ms=83116166",
+        "accepted_at_ms_estimate": 83116046
+      }
+    },
+    {
+      "sequence": 8783,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8783 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8783 duration_ms=120 expires_at_ms=83116296",
+        "accepted_at_ms_estimate": 83116176
+      }
+    },
+    {
+      "sequence": 8784,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8784 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8784 duration_ms=120 expires_at_ms=83116426",
+        "accepted_at_ms_estimate": 83116306
+      }
+    },
+    {
+      "sequence": 8785,
+      "server": {
+        "anchor_ms": 90494226,
+        "line": "grant seq=8785 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83115605,
+        "line": "grant_accept node_id=2 sequence=8785 duration_ms=120 expires_at_ms=83116557",
+        "accepted_at_ms_estimate": 83116437
+      }
+    },
+    {
+      "sequence": 8786,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8786 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8787,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8787 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8787 duration_ms=120 expires_at_ms=83116817",
+        "accepted_at_ms_estimate": 83116697
+      }
+    },
+    {
+      "sequence": 8788,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8788 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8788 duration_ms=120 expires_at_ms=83116947",
+        "accepted_at_ms_estimate": 83116827
+      }
+    },
+    {
+      "sequence": 8789,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8789 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8790,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8790 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8790 duration_ms=120 expires_at_ms=83117209",
+        "accepted_at_ms_estimate": 83117089
+      }
+    },
+    {
+      "sequence": 8791,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8791 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8791 duration_ms=120 expires_at_ms=83117337",
+        "accepted_at_ms_estimate": 83117217
+      }
+    },
+    {
+      "sequence": 8792,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8792 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8792 duration_ms=120 expires_at_ms=83117467",
+        "accepted_at_ms_estimate": 83117347
+      }
+    },
+    {
+      "sequence": 8793,
+      "server": {
+        "anchor_ms": 90495226,
+        "line": "grant seq=8793 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83116606,
+        "line": "grant_accept node_id=2 sequence=8793 duration_ms=120 expires_at_ms=83117597",
+        "accepted_at_ms_estimate": 83117477
+      }
+    },
+    {
+      "sequence": 8794,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8794 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8794 duration_ms=120 expires_at_ms=83117727",
+        "accepted_at_ms_estimate": 83117607
+      }
+    },
+    {
+      "sequence": 8795,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8795 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8795 duration_ms=120 expires_at_ms=83117858",
+        "accepted_at_ms_estimate": 83117738
+      }
+    },
+    {
+      "sequence": 8796,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8796 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8796 duration_ms=120 expires_at_ms=83117988",
+        "accepted_at_ms_estimate": 83117868
+      }
+    },
+    {
+      "sequence": 8797,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8797 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8797 duration_ms=120 expires_at_ms=83118118",
+        "accepted_at_ms_estimate": 83117998
+      }
+    },
+    {
+      "sequence": 8798,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8798 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8798 duration_ms=120 expires_at_ms=83118248",
+        "accepted_at_ms_estimate": 83118128
+      }
+    },
+    {
+      "sequence": 8799,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8799 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8799 duration_ms=120 expires_at_ms=83118379",
+        "accepted_at_ms_estimate": 83118259
+      }
+    },
+    {
+      "sequence": 8800,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8800 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8800 duration_ms=120 expires_at_ms=83118508",
+        "accepted_at_ms_estimate": 83118388
+      }
+    },
+    {
+      "sequence": 8801,
+      "server": {
+        "anchor_ms": 90496226,
+        "line": "grant seq=8801 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83117607,
+        "line": "grant_accept node_id=2 sequence=8801 duration_ms=120 expires_at_ms=83118639",
+        "accepted_at_ms_estimate": 83118519
+      }
+    },
+    {
+      "sequence": 8818,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8818 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83120607,
+        "line": "grant_accept node_id=2 sequence=8818 duration_ms=120 expires_at_ms=83120853",
+        "accepted_at_ms_estimate": 83120733
+      }
+    },
+    {
+      "sequence": 8820,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8820 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83120607,
+        "line": "grant_accept node_id=2 sequence=8820 duration_ms=120 expires_at_ms=83121116",
+        "accepted_at_ms_estimate": 83120996
+      }
+    },
+    {
+      "sequence": 8821,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8821 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83120607,
+        "line": "grant_accept node_id=2 sequence=8821 duration_ms=120 expires_at_ms=83121243",
+        "accepted_at_ms_estimate": 83121123
+      }
+    },
+    {
+      "sequence": 8822,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8822 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83120607,
+        "line": "grant_accept node_id=2 sequence=8822 duration_ms=120 expires_at_ms=83121375",
+        "accepted_at_ms_estimate": 83121255
+      }
+    },
+    {
+      "sequence": 8823,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8823 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8824,
+      "server": {
+        "anchor_ms": 90499226,
+        "line": "grant seq=8824 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83120607,
+        "line": "grant_accept node_id=2 sequence=8824 duration_ms=120 expires_at_ms=83121634",
+        "accepted_at_ms_estimate": 83121514
+      }
+    },
+    {
+      "sequence": 8825,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8825 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8825 duration_ms=120 expires_at_ms=83121764",
+        "accepted_at_ms_estimate": 83121644
+      }
+    },
+    {
+      "sequence": 8826,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8826 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8826 duration_ms=120 expires_at_ms=83121895",
+        "accepted_at_ms_estimate": 83121775
+      }
+    },
+    {
+      "sequence": 8827,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8827 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8827 duration_ms=120 expires_at_ms=83122031",
+        "accepted_at_ms_estimate": 83121911
+      }
+    },
+    {
+      "sequence": 8828,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8828 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8828 duration_ms=120 expires_at_ms=83122155",
+        "accepted_at_ms_estimate": 83122035
+      }
+    },
+    {
+      "sequence": 8829,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8829 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8829 duration_ms=120 expires_at_ms=83122285",
+        "accepted_at_ms_estimate": 83122165
+      }
+    },
+    {
+      "sequence": 8830,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8830 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8830 duration_ms=120 expires_at_ms=83122414",
+        "accepted_at_ms_estimate": 83122294
+      }
+    },
+    {
+      "sequence": 8831,
+      "server": {
+        "anchor_ms": 90500226,
+        "line": "grant seq=8831 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83121607,
+        "line": "grant_accept node_id=2 sequence=8831 duration_ms=120 expires_at_ms=83122545",
+        "accepted_at_ms_estimate": 83122425
+      }
+    },
+    {
+      "sequence": 8832,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8832 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8833,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8833 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8833 duration_ms=120 expires_at_ms=83122805",
+        "accepted_at_ms_estimate": 83122685
+      }
+    },
+    {
+      "sequence": 8834,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8834 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8834 duration_ms=120 expires_at_ms=83122936",
+        "accepted_at_ms_estimate": 83122816
+      }
+    },
+    {
+      "sequence": 8835,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8835 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8835 duration_ms=120 expires_at_ms=83123066",
+        "accepted_at_ms_estimate": 83122946
+      }
+    },
+    {
+      "sequence": 8836,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8836 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8836 duration_ms=120 expires_at_ms=83123196",
+        "accepted_at_ms_estimate": 83123076
+      }
+    },
+    {
+      "sequence": 8837,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8837 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8838,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8838 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8838 duration_ms=120 expires_at_ms=83123458",
+        "accepted_at_ms_estimate": 83123338
+      }
+    },
+    {
+      "sequence": 8839,
+      "server": {
+        "anchor_ms": 90501226,
+        "line": "grant seq=8839 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8839 duration_ms=120 expires_at_ms=83123592",
+        "accepted_at_ms_estimate": 83123472
+      }
+    },
+    {
+      "sequence": 8840,
+      "server": {
+        "anchor_ms": 90502226,
+        "line": "grant seq=8840 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83122608,
+        "line": "grant_accept node_id=2 sequence=8840 duration_ms=120 expires_at_ms=83123716",
+        "accepted_at_ms_estimate": 83123596
+      }
+    },
+    {
+      "sequence": 8841,
+      "server": {
+        "anchor_ms": 90502226,
+        "line": "grant seq=8841 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83123608,
+        "line": "grant_accept node_id=2 sequence=8841 duration_ms=120 expires_at_ms=83123847",
+        "accepted_at_ms_estimate": 83123727
+      }
+    },
+    {
+      "sequence": 8858,
+      "server": {
+        "anchor_ms": 90504227,
+        "line": "grant seq=8858 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8859,
+      "server": {
+        "anchor_ms": 90504227,
+        "line": "grant seq=8859 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83125609,
+        "line": "grant_accept node_id=2 sequence=8859 duration_ms=120 expires_at_ms=83126189",
+        "accepted_at_ms_estimate": 83126069
+      }
+    },
+    {
+      "sequence": 8860,
+      "server": {
+        "anchor_ms": 90504227,
+        "line": "grant seq=8860 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83125609,
+        "line": "grant_accept node_id=2 sequence=8860 duration_ms=120 expires_at_ms=83126318",
+        "accepted_at_ms_estimate": 83126198
+      }
+    },
+    {
+      "sequence": 8861,
+      "server": {
+        "anchor_ms": 90504227,
+        "line": "grant seq=8861 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83125609,
+        "line": "grant_accept node_id=2 sequence=8861 duration_ms=120 expires_at_ms=83126449",
+        "accepted_at_ms_estimate": 83126329
+      }
+    },
+    {
+      "sequence": 8862,
+      "server": {
+        "anchor_ms": 90504227,
+        "line": "grant seq=8862 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83125609,
+        "line": "grant_accept node_id=2 sequence=8862 duration_ms=120 expires_at_ms=83126579",
+        "accepted_at_ms_estimate": 83126459
+      }
+    },
+    {
+      "sequence": 8863,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8863 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83125609,
+        "line": "grant_accept node_id=2 sequence=8863 duration_ms=120 expires_at_ms=83126709",
+        "accepted_at_ms_estimate": 83126589
+      }
+    },
+    {
+      "sequence": 8864,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8864 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8864 duration_ms=120 expires_at_ms=83126840",
+        "accepted_at_ms_estimate": 83126720
+      }
+    },
+    {
+      "sequence": 8865,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8865 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8865 duration_ms=120 expires_at_ms=83126970",
+        "accepted_at_ms_estimate": 83126850
+      }
+    },
+    {
+      "sequence": 8866,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8866 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8866 duration_ms=120 expires_at_ms=83127100",
+        "accepted_at_ms_estimate": 83126980
+      }
+    },
+    {
+      "sequence": 8867,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8867 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8867 duration_ms=120 expires_at_ms=83127230",
+        "accepted_at_ms_estimate": 83127110
+      }
+    },
+    {
+      "sequence": 8868,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8868 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 8869,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8869 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8869 duration_ms=120 expires_at_ms=83127490",
+        "accepted_at_ms_estimate": 83127370
+      }
+    },
+    {
+      "sequence": 8870,
+      "server": {
+        "anchor_ms": 90505227,
+        "line": "grant seq=8870 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83126609,
+        "line": "grant_accept node_id=2 sequence=8870 duration_ms=120 expires_at_ms=83127620",
+        "accepted_at_ms_estimate": 83127500
+      }
+    },
+    {
+      "sequence": 8871,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8871 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8871 duration_ms=120 expires_at_ms=83127750",
+        "accepted_at_ms_estimate": 83127630
+      }
+    },
+    {
+      "sequence": 8872,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8872 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8872 duration_ms=120 expires_at_ms=83127880",
+        "accepted_at_ms_estimate": 83127760
+      }
+    },
+    {
+      "sequence": 8873,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8873 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8873 duration_ms=120 expires_at_ms=83128010",
+        "accepted_at_ms_estimate": 83127890
+      }
+    },
+    {
+      "sequence": 8874,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8874 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8874 duration_ms=120 expires_at_ms=83128146",
+        "accepted_at_ms_estimate": 83128026
+      }
+    },
+    {
+      "sequence": 8875,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8875 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8875 duration_ms=120 expires_at_ms=83128271",
+        "accepted_at_ms_estimate": 83128151
+      }
+    },
+    {
+      "sequence": 8876,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8876 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8876 duration_ms=120 expires_at_ms=83128400",
+        "accepted_at_ms_estimate": 83128280
+      }
+    },
+    {
+      "sequence": 8877,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8877 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8877 duration_ms=120 expires_at_ms=83128532",
+        "accepted_at_ms_estimate": 83128412
+      }
+    },
+    {
+      "sequence": 8878,
+      "server": {
+        "anchor_ms": 90506227,
+        "line": "grant seq=8878 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83127609,
+        "line": "grant_accept node_id=2 sequence=8878 duration_ms=120 expires_at_ms=83128662",
+        "accepted_at_ms_estimate": 83128542
+      }
+    },
+    {
+      "sequence": 8879,
+      "server": {
+        "anchor_ms": 90507227,
+        "line": "grant seq=8879 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83128609,
+        "line": "grant_accept node_id=2 sequence=8879 duration_ms=120 expires_at_ms=83128791",
+        "accepted_at_ms_estimate": 83128671
+      }
+    },
+    {
+      "sequence": 8880,
+      "server": {
+        "anchor_ms": 90507227,
+        "line": "grant seq=8880 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83128609,
+        "line": "grant_accept node_id=2 sequence=8880 duration_ms=120 expires_at_ms=83128921",
+        "accepted_at_ms_estimate": 83128801
+      }
+    },
+    {
+      "sequence": 8881,
+      "server": {
+        "anchor_ms": 90507227,
+        "line": "grant seq=8881 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83128609,
+        "line": "grant_accept node_id=2 sequence=8881 duration_ms=120 expires_at_ms=83129052",
+        "accepted_at_ms_estimate": 83128932
+      }
+    },
+    {
+      "sequence": 8932,
+      "server": {
+        "anchor_ms": 90514228,
+        "line": "grant seq=8932 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83134610,
+        "line": "grant_accept node_id=2 sequence=8932 duration_ms=120 expires_at_ms=83135690",
+        "accepted_at_ms_estimate": 83135570
+      }
+    },
+    {
+      "sequence": 8933,
+      "server": {
+        "anchor_ms": 90514228,
+        "line": "grant seq=8933 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83135610,
+        "line": "grant_accept node_id=2 sequence=8933 duration_ms=120 expires_at_ms=83135821",
+        "accepted_at_ms_estimate": 83135701
+      }
+    },
+    {
+      "sequence": 8934,
+      "server": {
+        "anchor_ms": 90514228,
+        "line": "grant seq=8934 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": null
+    },
+    {
+      "sequence": 9003,
+      "server": {
+        "anchor_ms": 90523229,
+        "line": "grant seq=9003 node_id=2 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=2 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83144613,
+        "line": "grant_accept node_id=2 sequence=9003 duration_ms=120 expires_at_ms=83144928",
+        "accepted_at_ms_estimate": 83144808
+      }
+    },
+    {
+      "sequence": 9005,
+      "server": {
+        "anchor_ms": 90523229,
+        "line": "grant seq=9005 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83144613,
+        "line": "grant_accept node_id=2 sequence=9005 duration_ms=120 expires_at_ms=83145189",
+        "accepted_at_ms_estimate": 83145069
+      }
+    },
+    {
+      "sequence": 9007,
+      "server": {
+        "anchor_ms": 90523229,
+        "line": "grant seq=9007 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83144613,
+        "line": "grant_accept node_id=2 sequence=9007 duration_ms=120 expires_at_ms=83145450",
+        "accepted_at_ms_estimate": 83145330
+      }
+    },
+    {
+      "sequence": 9012,
+      "server": {
+        "anchor_ms": 90524229,
+        "line": "grant seq=9012 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83145613,
+        "line": "grant_accept node_id=2 sequence=9012 duration_ms=120 expires_at_ms=83146101",
+        "accepted_at_ms_estimate": 83145981
+      }
+    },
+    {
+      "sequence": 9013,
+      "server": {
+        "anchor_ms": 90524229,
+        "line": "grant seq=9013 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83145613,
+        "line": "grant_accept node_id=2 sequence=9013 duration_ms=120 expires_at_ms=83146231",
+        "accepted_at_ms_estimate": 83146111
+      }
+    },
+    {
+      "sequence": 9014,
+      "server": {
+        "anchor_ms": 90524229,
+        "line": "grant seq=9014 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83145613,
+        "line": "grant_accept node_id=2 sequence=9014 duration_ms=120 expires_at_ms=83146369",
+        "accepted_at_ms_estimate": 83146249
+      }
+    },
+    {
+      "sequence": 9084,
+      "server": {
+        "anchor_ms": 90533230,
+        "line": "grant seq=9084 node_id=2 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=2 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83154614,
+        "line": "grant_accept node_id=2 sequence=9084 duration_ms=120 expires_at_ms=83155468",
+        "accepted_at_ms_estimate": 83155348
+      }
+    },
+    {
+      "sequence": 9086,
+      "server": {
+        "anchor_ms": 90534230,
+        "line": "grant seq=9086 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83154614,
+        "line": "grant_accept node_id=2 sequence=9086 duration_ms=120 expires_at_ms=83155729",
+        "accepted_at_ms_estimate": 83155609
+      }
+    },
+    {
+      "sequence": 9088,
+      "server": {
+        "anchor_ms": 90534230,
+        "line": "grant seq=9088 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83155614,
+        "line": "grant_accept node_id=2 sequence=9088 duration_ms=120 expires_at_ms=83155988",
+        "accepted_at_ms_estimate": 83155868
+      }
+    },
+    {
+      "sequence": 9092,
+      "server": {
+        "anchor_ms": 90534230,
+        "line": "grant seq=9092 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 83155614,
+        "line": "grant_accept node_id=2 sequence=9092 duration_ms=120 expires_at_ms=83156509",
+        "accepted_at_ms_estimate": 83156389
+      }
+    },
+    {
+      "sequence": 9093,
+      "server": {
+        "anchor_ms": 90534230,
+        "line": "grant seq=9093 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 83155614,
+        "line": "grant_accept node_id=2 sequence=9093 duration_ms=120 expires_at_ms=83156640",
+        "accepted_at_ms_estimate": 83156520
+      }
+    },
+    {
+      "sequence": 9094,
+      "server": {
+        "anchor_ms": 90535230,
+        "line": "grant seq=9094 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 83156614,
+        "line": "grant_accept node_id=2 sequence=9094 duration_ms=120 expires_at_ms=83156773",
+        "accepted_at_ms_estimate": 83156653
+      }
+    }
+  ],
+  "client_snapshots": [
+    {
+      "mono": 83078.129873231,
+      "token": [
+        1706,
+        0,
+        1686,
+        3969197
+      ],
+      "grant_filter": [
+        4775,
+        1706,
+        0,
+        3069,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83083.143119663,
+      "token": [
+        1706,
+        0,
+        1686,
+        3969226
+      ],
+      "grant_filter": [
+        4784,
+        1706,
+        0,
+        3078,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83088.019459909,
+      "token": [
+        1706,
+        0,
+        1686,
+        3969258
+      ],
+      "grant_filter": [
+        4794,
+        1706,
+        0,
+        3088,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83093.096718344,
+      "token": [
+        1712,
+        0,
+        1727,
+        3969264
+      ],
+      "grant_filter": [
+        4819,
+        1712,
+        0,
+        3107,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83098.148820306,
+      "token": [
+        1714,
+        0,
+        1728,
+        3969267
+      ],
+      "grant_filter": [
+        4847,
+        1714,
+        0,
+        3133,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83103.162215913,
+      "token": [
+        1717,
+        0,
+        1729,
+        3969269
+      ],
+      "grant_filter": [
+        4880,
+        1717,
+        0,
+        3163,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83108.121056476,
+      "token": [
+        1720,
+        0,
+        1730,
+        3969271
+      ],
+      "grant_filter": [
+        4907,
+        1720,
+        0,
+        3187,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83113.097835022,
+      "token": [
+        1726,
+        0,
+        1731,
+        3969272
+      ],
+      "grant_filter": [
+        4939,
+        1726,
+        0,
+        3213,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83118.125285299,
+      "token": [
+        1739,
+        0,
+        1732,
+        3969274
+      ],
+      "grant_filter": [
+        4971,
+        1739,
+        0,
+        3232,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83123.030705347,
+      "token": [
+        1759,
+        0,
+        1733,
+        3969277
+      ],
+      "grant_filter": [
+        5008,
+        1759,
+        0,
+        3249,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83128.055681029,
+      "token": [
+        1778,
+        0,
+        1734,
+        3969278
+      ],
+      "grant_filter": [
+        5038,
+        1778,
+        0,
+        3260,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83133.271152124,
+      "token": [
+        1789,
+        0,
+        1734,
+        3969291
+      ],
+      "grant_filter": [
+        5066,
+        1789,
+        0,
+        3277,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83138.102420005,
+      "token": [
+        1791,
+        0,
+        1750,
+        3969310
+      ],
+      "grant_filter": [
+        5088,
+        1791,
+        0,
+        3297,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83143.160758075,
+      "token": [
+        1791,
+        0,
+        1750,
+        3969332
+      ],
+      "grant_filter": [
+        5124,
+        1791,
+        0,
+        3333,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83148.07080593,
+      "token": [
+        1797,
+        0,
+        1752,
+        3969353
+      ],
+      "grant_filter": [
+        5160,
+        1797,
+        0,
+        3363,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83153.116312435,
+      "token": [
+        1797,
+        0,
+        1752,
+        3969369
+      ],
+      "grant_filter": [
+        5193,
+        1797,
+        0,
+        3396,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83158.026201512,
+      "token": [
+        1803,
+        0,
+        1754,
+        3969391
+      ],
+      "grant_filter": [
+        5226,
+        1803,
+        0,
+        3423,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 83163.017435735,
+      "token": [
+        1803,
+        0,
+        1754,
+        3969399
+      ],
+      "grant_filter": [
+        5258,
+        1803,
+        0,
+        3455,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    }
+  ],
+  "API": [
+    {
+      "mono": 90456.353021024,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "HUNTING",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 59875,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90445.094533888,
+        "last_heartbeat_timestamp_ms": 1793104941838,
+        "last_heartbeat_ago_seconds": 11.26,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    },
+    {
+      "mono": 90461.151154752,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "HUNTING",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 59875,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90445.094533888,
+        "last_heartbeat_timestamp_ms": 1793104941838,
+        "last_heartbeat_ago_seconds": 16.06,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    },
+    {
+      "mono": 90466.174314272,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "HUNTING",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 59875,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90445.094533888,
+        "last_heartbeat_timestamp_ms": 1793104941838,
+        "last_heartbeat_ago_seconds": 21.08,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    },
+    {
+      "mono": 90471.287936192,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90468.148287712,
+        "last_heartbeat_timestamp_ms": 1793104964891,
+        "last_heartbeat_ago_seconds": 3.14,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90476.193936832,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 5025,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90473.779307488,
+        "last_heartbeat_timestamp_ms": 1793104970522,
+        "last_heartbeat_ago_seconds": 2.41,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90481.230214144,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 10256,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90478.594600768,
+        "last_heartbeat_timestamp_ms": 1793104975338,
+        "last_heartbeat_ago_seconds": 2.63,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90486.187733664,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 15480,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90483.797903488,
+        "last_heartbeat_timestamp_ms": 1793104980541,
+        "last_heartbeat_ago_seconds": 2.39,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90491.162656416,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 20675,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90489.00390592,
+        "last_heartbeat_timestamp_ms": 1793104985747,
+        "last_heartbeat_ago_seconds": 2.16,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90496.19355568,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 25883,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90494.214019936,
+        "last_heartbeat_timestamp_ms": 1793104990957,
+        "last_heartbeat_ago_seconds": 1.98,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90501.251459968,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 31090,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90499.420749568,
+        "last_heartbeat_timestamp_ms": 1793104996164,
+        "last_heartbeat_ago_seconds": 1.83,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90506.176817696,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 31090,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90499.420749568,
+        "last_heartbeat_timestamp_ms": 1793104996164,
+        "last_heartbeat_ago_seconds": 6.75,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90511.2704616,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 31090,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90499.420749568,
+        "last_heartbeat_timestamp_ms": 1793104996164,
+        "last_heartbeat_ago_seconds": 11.85,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    },
+    {
+      "mono": 90516.177935232,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90514.30172224,
+        "last_heartbeat_timestamp_ms": 1793105011045,
+        "last_heartbeat_ago_seconds": 1.88,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90521.23133808,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90514.30172224,
+        "last_heartbeat_timestamp_ms": 1793105011045,
+        "last_heartbeat_ago_seconds": 6.93,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90526.290487424,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 10246,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90524.668778464,
+        "last_heartbeat_timestamp_ms": 1793105021412,
+        "last_heartbeat_ago_seconds": 1.62,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90531.190075072,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 10246,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90524.668778464,
+        "last_heartbeat_timestamp_ms": 1793105021412,
+        "last_heartbeat_ago_seconds": 6.52,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90536.242985408,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 20645,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90535.083601792,
+        "last_heartbeat_timestamp_ms": 1793105031827,
+        "last_heartbeat_ago_seconds": 1.16,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 90541.142382912,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 20645,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 90535.083601792,
+        "last_heartbeat_timestamp_ms": 1793105031827,
+        "last_heartbeat_ago_seconds": 6.06,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  ],
+  "notes": "native event timestamps use prior stats anchor (~1s), grant expiry gives exact client accepted time minus120ms. Server/client clocks have separate offsets. Nearest ACK not causal identity. Seq boundary mismatch not packet-loss proof."
+}

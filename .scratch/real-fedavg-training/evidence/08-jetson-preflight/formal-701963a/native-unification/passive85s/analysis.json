@@ -1,0 +1,3112 @@
+{
+  "duration_s": 85.05096604800201,
+  "capture_drop_server": 0,
+  "capture_drop_client": 0,
+  "client_hb": 41,
+  "server_hb": 34,
+  "matched_hb": 34,
+  "client_max_HB_gap_s": 5.238046732003568,
+  "server_max_HB_gap_s": 13.438430207999772,
+  "hunt_ratio": 0.6097560975609756,
+  "states": {
+    "IDLE": 16,
+    "HUNTING": 25
+  },
+  "channels": {
+    "157": 25,
+    "149": 8,
+    "153": 8
+  },
+  "ACK_nearest_median_ms": 185.7517834941973,
+  "ACK_nearest_max_ms": 4354.374130998622,
+  "server_offline_samples": 1,
+  "server_api_samples": 18,
+  "server_max_HB_age_s": 12.06,
+  "server_node2_grants": 195,
+  "client_node2_accepts": 168,
+  "matched_grantseq": 168,
+  "ready_events": [
+    {
+      "anchor_ms": 106986926,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "ready_accept node_id=2 active_queue=[4,1,2] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "ready_refresh node_id=2 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    }
+  ],
+  "silent_removals": [
+    {
+      "anchor_ms": 106987926,
+      "line": "silent_remove node_id=2 silence_ms=426 consecutive_silent_grants=3 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "silent_remove node_id=2 silence_ms=1169 consecutive_silent_grants=8 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "silent_remove node_id=2 silence_ms=596 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "silent_remove node_id=2 silence_ms=645 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "silent_remove node_id=2 silence_ms=808 consecutive_silent_grants=6 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "silent_remove node_id=2 silence_ms=779 consecutive_silent_grants=5 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "silent_remove node_id=2 silence_ms=3507 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "silent_remove node_id=2 silence_ms=778 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "silent_remove node_id=2 silence_ms=778 consecutive_silent_grants=5 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "silent_remove node_id=2 silence_ms=3564 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "silent_remove node_id=2 silence_ms=3377 consecutive_silent_grants=23 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "silent_remove node_id=2 silence_ms=3380 consecutive_silent_grants=25 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "silent_remove node_id=2 silence_ms=3563 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    }
+  ],
+  "bursts": [
+    {
+      "server_mono": 107007.17256272,
+      "packet_count": 22,
+      "arrival_span_s": 0.02138281599036418,
+      "source_timestamp_span_s": 8.125
+    }
+  ],
+  "grant_sequences": [
+    {
+      "sequence": 1276,
+      "server": {
+        "anchor_ms": 106986926,
+        "line": "grant seq=1276 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99608857,
+        "line": "grant_accept node_id=2 sequence=1276 duration_ms=120 expires_at_ms=99609485",
+        "accepted_at_ms_estimate": 99609365
+      }
+    },
+    {
+      "sequence": 1277,
+      "server": {
+        "anchor_ms": 106986926,
+        "line": "grant seq=1277 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1278,
+      "server": {
+        "anchor_ms": 106986926,
+        "line": "grant seq=1278 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99608857,
+        "line": "grant_accept node_id=2 sequence=1278 duration_ms=120 expires_at_ms=99609744",
+        "accepted_at_ms_estimate": 99609624
+      }
+    },
+    {
+      "sequence": 1279,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1279 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1280,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1280 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99609857,
+        "line": "grant_accept node_id=2 sequence=1280 duration_ms=120 expires_at_ms=99610005",
+        "accepted_at_ms_estimate": 99609885
+      }
+    },
+    {
+      "sequence": 1281,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1281 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99609857,
+        "line": "grant_accept node_id=2 sequence=1281 duration_ms=120 expires_at_ms=99610136",
+        "accepted_at_ms_estimate": 99610016
+      }
+    },
+    {
+      "sequence": 1282,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1282 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1283,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1283 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99609857,
+        "line": "grant_accept node_id=2 sequence=1283 duration_ms=120 expires_at_ms=99610396",
+        "accepted_at_ms_estimate": 99610276
+      }
+    },
+    {
+      "sequence": 1284,
+      "server": {
+        "anchor_ms": 106987926,
+        "line": "grant seq=1284 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99609857,
+        "line": "grant_accept node_id=2 sequence=1284 duration_ms=120 expires_at_ms=99610528",
+        "accepted_at_ms_estimate": 99610408
+      }
+    },
+    {
+      "sequence": 1322,
+      "server": {
+        "anchor_ms": 106992927,
+        "line": "grant seq=1322 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1323,
+      "server": {
+        "anchor_ms": 106992927,
+        "line": "grant seq=1323 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99614859,
+        "line": "grant_accept node_id=2 sequence=1323 duration_ms=120 expires_at_ms=99615614",
+        "accepted_at_ms_estimate": 99615494
+      }
+    },
+    {
+      "sequence": 1324,
+      "server": {
+        "anchor_ms": 106992927,
+        "line": "grant seq=1324 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99614859,
+        "line": "grant_accept node_id=2 sequence=1324 duration_ms=120 expires_at_ms=99615745",
+        "accepted_at_ms_estimate": 99615625
+      }
+    },
+    {
+      "sequence": 1325,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1325 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99614859,
+        "line": "grant_accept node_id=2 sequence=1325 duration_ms=120 expires_at_ms=99615875",
+        "accepted_at_ms_estimate": 99615755
+      }
+    },
+    {
+      "sequence": 1326,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1326 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99615859,
+        "line": "grant_accept node_id=2 sequence=1326 duration_ms=120 expires_at_ms=99616005",
+        "accepted_at_ms_estimate": 99615885
+      }
+    },
+    {
+      "sequence": 1327,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1327 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99615859,
+        "line": "grant_accept node_id=2 sequence=1327 duration_ms=120 expires_at_ms=99616136",
+        "accepted_at_ms_estimate": 99616016
+      }
+    },
+    {
+      "sequence": 1328,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1328 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99615859,
+        "line": "grant_accept node_id=2 sequence=1328 duration_ms=120 expires_at_ms=99616267",
+        "accepted_at_ms_estimate": 99616147
+      }
+    },
+    {
+      "sequence": 1329,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1329 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99615859,
+        "line": "grant_accept node_id=2 sequence=1329 duration_ms=120 expires_at_ms=99616404",
+        "accepted_at_ms_estimate": 99616284
+      }
+    },
+    {
+      "sequence": 1330,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1330 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99615859,
+        "line": "grant_accept node_id=2 sequence=1330 duration_ms=120 expires_at_ms=99616527",
+        "accepted_at_ms_estimate": 99616407
+      }
+    },
+    {
+      "sequence": 1331,
+      "server": {
+        "anchor_ms": 106993927,
+        "line": "grant seq=1331 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1426,
+      "server": {
+        "anchor_ms": 107006928,
+        "line": "grant seq=1426 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99628863,
+        "line": "grant_accept node_id=2 sequence=1426 duration_ms=120 expires_at_ms=99629042",
+        "accepted_at_ms_estimate": 99628922
+      }
+    },
+    {
+      "sequence": 1427,
+      "server": {
+        "anchor_ms": 107006928,
+        "line": "grant seq=1427 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99628863,
+        "line": "grant_accept node_id=2 sequence=1427 duration_ms=120 expires_at_ms=99629173",
+        "accepted_at_ms_estimate": 99629053
+      }
+    },
+    {
+      "sequence": 1428,
+      "server": {
+        "anchor_ms": 107006928,
+        "line": "grant seq=1428 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99628863,
+        "line": "grant_accept node_id=2 sequence=1428 duration_ms=120 expires_at_ms=99629302",
+        "accepted_at_ms_estimate": 99629182
+      }
+    },
+    {
+      "sequence": 1429,
+      "server": {
+        "anchor_ms": 107006928,
+        "line": "grant seq=1429 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99628863,
+        "line": "grant_accept node_id=2 sequence=1429 duration_ms=120 expires_at_ms=99629433",
+        "accepted_at_ms_estimate": 99629313
+      }
+    },
+    {
+      "sequence": 1430,
+      "server": {
+        "anchor_ms": 107006928,
+        "line": "grant seq=1430 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99628863,
+        "line": "grant_accept node_id=2 sequence=1430 duration_ms=120 expires_at_ms=99629563",
+        "accepted_at_ms_estimate": 99629443
+      }
+    },
+    {
+      "sequence": 1466,
+      "server": {
+        "anchor_ms": 107011929,
+        "line": "grant seq=1466 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99633863,
+        "line": "grant_accept node_id=2 sequence=1466 duration_ms=120 expires_at_ms=99634254",
+        "accepted_at_ms_estimate": 99634134
+      }
+    },
+    {
+      "sequence": 1467,
+      "server": {
+        "anchor_ms": 107011929,
+        "line": "grant seq=1467 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1468,
+      "server": {
+        "anchor_ms": 107011929,
+        "line": "grant seq=1468 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1469,
+      "server": {
+        "anchor_ms": 107011929,
+        "line": "grant seq=1469 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99633863,
+        "line": "grant_accept node_id=2 sequence=1469 duration_ms=120 expires_at_ms=99634645",
+        "accepted_at_ms_estimate": 99634525
+      }
+    },
+    {
+      "sequence": 1470,
+      "server": {
+        "anchor_ms": 107011929,
+        "line": "grant seq=1470 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99633863,
+        "line": "grant_accept node_id=2 sequence=1470 duration_ms=120 expires_at_ms=99634775",
+        "accepted_at_ms_estimate": 99634655
+      }
+    },
+    {
+      "sequence": 1538,
+      "server": {
+        "anchor_ms": 107020930,
+        "line": "grant seq=1538 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99642866,
+        "line": "grant_accept node_id=2 sequence=1538 duration_ms=120 expires_at_ms=99643633",
+        "accepted_at_ms_estimate": 99643513
+      }
+    },
+    {
+      "sequence": 1539,
+      "server": {
+        "anchor_ms": 107020930,
+        "line": "grant seq=1539 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99642866,
+        "line": "grant_accept node_id=2 sequence=1539 duration_ms=120 expires_at_ms=99643765",
+        "accepted_at_ms_estimate": 99643645
+      }
+    },
+    {
+      "sequence": 1540,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1540 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99642866,
+        "line": "grant_accept node_id=2 sequence=1540 duration_ms=120 expires_at_ms=99643893",
+        "accepted_at_ms_estimate": 99643773
+      }
+    },
+    {
+      "sequence": 1541,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1541 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1541 duration_ms=120 expires_at_ms=99644023",
+        "accepted_at_ms_estimate": 99643903
+      }
+    },
+    {
+      "sequence": 1542,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1542 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1542 duration_ms=120 expires_at_ms=99644158",
+        "accepted_at_ms_estimate": 99644038
+      }
+    },
+    {
+      "sequence": 1543,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1543 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1543 duration_ms=120 expires_at_ms=99644284",
+        "accepted_at_ms_estimate": 99644164
+      }
+    },
+    {
+      "sequence": 1544,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1544 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1544 duration_ms=120 expires_at_ms=99644414",
+        "accepted_at_ms_estimate": 99644294
+      }
+    },
+    {
+      "sequence": 1545,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1545 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1546,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1546 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1546 duration_ms=120 expires_at_ms=99644674",
+        "accepted_at_ms_estimate": 99644554
+      }
+    },
+    {
+      "sequence": 1547,
+      "server": {
+        "anchor_ms": 107021930,
+        "line": "grant seq=1547 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1547 duration_ms=120 expires_at_ms=99644805",
+        "accepted_at_ms_estimate": 99644685
+      }
+    },
+    {
+      "sequence": 1548,
+      "server": {
+        "anchor_ms": 107022930,
+        "line": "grant seq=1548 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99643866,
+        "line": "grant_accept node_id=2 sequence=1548 duration_ms=120 expires_at_ms=99644936",
+        "accepted_at_ms_estimate": 99644816
+      }
+    },
+    {
+      "sequence": 1549,
+      "server": {
+        "anchor_ms": 107022930,
+        "line": "grant seq=1549 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99644866,
+        "line": "grant_accept node_id=2 sequence=1549 duration_ms=120 expires_at_ms=99645066",
+        "accepted_at_ms_estimate": 99644946
+      }
+    },
+    {
+      "sequence": 1550,
+      "server": {
+        "anchor_ms": 107022930,
+        "line": "grant seq=1550 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99644866,
+        "line": "grant_accept node_id=2 sequence=1550 duration_ms=120 expires_at_ms=99645197",
+        "accepted_at_ms_estimate": 99645077
+      }
+    },
+    {
+      "sequence": 1585,
+      "server": {
+        "anchor_ms": 107026930,
+        "line": "grant seq=1585 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99648866,
+        "line": "grant_accept node_id=2 sequence=1585 duration_ms=120 expires_at_ms=99649754",
+        "accepted_at_ms_estimate": 99649634
+      }
+    },
+    {
+      "sequence": 1586,
+      "server": {
+        "anchor_ms": 107027930,
+        "line": "grant seq=1586 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99648866,
+        "line": "grant_accept node_id=2 sequence=1586 duration_ms=120 expires_at_ms=99649886",
+        "accepted_at_ms_estimate": 99649766
+      }
+    },
+    {
+      "sequence": 1587,
+      "server": {
+        "anchor_ms": 107027930,
+        "line": "grant seq=1587 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99649866,
+        "line": "grant_accept node_id=2 sequence=1587 duration_ms=120 expires_at_ms=99650016",
+        "accepted_at_ms_estimate": 99649896
+      }
+    },
+    {
+      "sequence": 1588,
+      "server": {
+        "anchor_ms": 107027930,
+        "line": "grant seq=1588 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1589,
+      "server": {
+        "anchor_ms": 107027930,
+        "line": "grant seq=1589 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99649866,
+        "line": "grant_accept node_id=2 sequence=1589 duration_ms=120 expires_at_ms=99650277",
+        "accepted_at_ms_estimate": 99650157
+      }
+    },
+    {
+      "sequence": 1590,
+      "server": {
+        "anchor_ms": 107027930,
+        "line": "grant seq=1590 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1625,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1625 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99653867,
+        "line": "grant_accept node_id=2 sequence=1625 duration_ms=120 expires_at_ms=99654965",
+        "accepted_at_ms_estimate": 99654845
+      }
+    },
+    {
+      "sequence": 1626,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1626 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1626 duration_ms=120 expires_at_ms=99655095",
+        "accepted_at_ms_estimate": 99654975
+      }
+    },
+    {
+      "sequence": 1627,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1627 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1627 duration_ms=120 expires_at_ms=99655224",
+        "accepted_at_ms_estimate": 99655104
+      }
+    },
+    {
+      "sequence": 1628,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1628 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1628 duration_ms=120 expires_at_ms=99655354",
+        "accepted_at_ms_estimate": 99655234
+      }
+    },
+    {
+      "sequence": 1629,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1629 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1629 duration_ms=120 expires_at_ms=99655485",
+        "accepted_at_ms_estimate": 99655365
+      }
+    },
+    {
+      "sequence": 1630,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1630 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1630 duration_ms=120 expires_at_ms=99655615",
+        "accepted_at_ms_estimate": 99655495
+      }
+    },
+    {
+      "sequence": 1631,
+      "server": {
+        "anchor_ms": 107032930,
+        "line": "grant seq=1631 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1631 duration_ms=120 expires_at_ms=99655746",
+        "accepted_at_ms_estimate": 99655626
+      }
+    },
+    {
+      "sequence": 1632,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1632 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99654867,
+        "line": "grant_accept node_id=2 sequence=1632 duration_ms=120 expires_at_ms=99655876",
+        "accepted_at_ms_estimate": 99655756
+      }
+    },
+    {
+      "sequence": 1633,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1633 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1633 duration_ms=120 expires_at_ms=99656006",
+        "accepted_at_ms_estimate": 99655886
+      }
+    },
+    {
+      "sequence": 1634,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1634 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1634 duration_ms=120 expires_at_ms=99656136",
+        "accepted_at_ms_estimate": 99656016
+      }
+    },
+    {
+      "sequence": 1635,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1635 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1635 duration_ms=120 expires_at_ms=99656266",
+        "accepted_at_ms_estimate": 99656146
+      }
+    },
+    {
+      "sequence": 1636,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1636 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1636 duration_ms=120 expires_at_ms=99656396",
+        "accepted_at_ms_estimate": 99656276
+      }
+    },
+    {
+      "sequence": 1637,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1637 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1638,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1638 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1638 duration_ms=120 expires_at_ms=99656656",
+        "accepted_at_ms_estimate": 99656536
+      }
+    },
+    {
+      "sequence": 1639,
+      "server": {
+        "anchor_ms": 107033930,
+        "line": "grant seq=1639 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1639 duration_ms=120 expires_at_ms=99656787",
+        "accepted_at_ms_estimate": 99656667
+      }
+    },
+    {
+      "sequence": 1640,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1640 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99655867,
+        "line": "grant_accept node_id=2 sequence=1640 duration_ms=120 expires_at_ms=99656916",
+        "accepted_at_ms_estimate": 99656796
+      }
+    },
+    {
+      "sequence": 1641,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1641 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1641 duration_ms=120 expires_at_ms=99657047",
+        "accepted_at_ms_estimate": 99656927
+      }
+    },
+    {
+      "sequence": 1642,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1642 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1642 duration_ms=120 expires_at_ms=99657177",
+        "accepted_at_ms_estimate": 99657057
+      }
+    },
+    {
+      "sequence": 1643,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1643 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1643 duration_ms=120 expires_at_ms=99657308",
+        "accepted_at_ms_estimate": 99657188
+      }
+    },
+    {
+      "sequence": 1644,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1644 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1644 duration_ms=120 expires_at_ms=99657436",
+        "accepted_at_ms_estimate": 99657316
+      }
+    },
+    {
+      "sequence": 1645,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1645 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1645 duration_ms=120 expires_at_ms=99657567",
+        "accepted_at_ms_estimate": 99657447
+      }
+    },
+    {
+      "sequence": 1646,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1646 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1646 duration_ms=120 expires_at_ms=99657697",
+        "accepted_at_ms_estimate": 99657577
+      }
+    },
+    {
+      "sequence": 1647,
+      "server": {
+        "anchor_ms": 107034930,
+        "line": "grant seq=1647 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1647 duration_ms=120 expires_at_ms=99657827",
+        "accepted_at_ms_estimate": 99657707
+      }
+    },
+    {
+      "sequence": 1648,
+      "server": {
+        "anchor_ms": 107035930,
+        "line": "grant seq=1648 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99656867,
+        "line": "grant_accept node_id=2 sequence=1648 duration_ms=120 expires_at_ms=99657958",
+        "accepted_at_ms_estimate": 99657838
+      }
+    },
+    {
+      "sequence": 1649,
+      "server": {
+        "anchor_ms": 107035930,
+        "line": "grant seq=1649 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99657867,
+        "line": "grant_accept node_id=2 sequence=1649 duration_ms=120 expires_at_ms=99658088",
+        "accepted_at_ms_estimate": 99657968
+      }
+    },
+    {
+      "sequence": 1650,
+      "server": {
+        "anchor_ms": 107035930,
+        "line": "grant seq=1650 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99657867,
+        "line": "grant_accept node_id=2 sequence=1650 duration_ms=120 expires_at_ms=99658219",
+        "accepted_at_ms_estimate": 99658099
+      }
+    },
+    {
+      "sequence": 1651,
+      "server": {
+        "anchor_ms": 107035930,
+        "line": "grant seq=1651 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99657867,
+        "line": "grant_accept node_id=2 sequence=1651 duration_ms=120 expires_at_ms=99658349",
+        "accepted_at_ms_estimate": 99658229
+      }
+    },
+    {
+      "sequence": 1665,
+      "server": {
+        "anchor_ms": 107037930,
+        "line": "grant seq=1665 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99659867,
+        "line": "grant_accept node_id=2 sequence=1665 duration_ms=120 expires_at_ms=99660172",
+        "accepted_at_ms_estimate": 99660052
+      }
+    },
+    {
+      "sequence": 1667,
+      "server": {
+        "anchor_ms": 107037930,
+        "line": "grant seq=1667 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99659867,
+        "line": "grant_accept node_id=2 sequence=1667 duration_ms=120 expires_at_ms=99660431",
+        "accepted_at_ms_estimate": 99660311
+      }
+    },
+    {
+      "sequence": 1668,
+      "server": {
+        "anchor_ms": 107037930,
+        "line": "grant seq=1668 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99659867,
+        "line": "grant_accept node_id=2 sequence=1668 duration_ms=120 expires_at_ms=99660562",
+        "accepted_at_ms_estimate": 99660442
+      }
+    },
+    {
+      "sequence": 1669,
+      "server": {
+        "anchor_ms": 107037930,
+        "line": "grant seq=1669 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99659867,
+        "line": "grant_accept node_id=2 sequence=1669 duration_ms=120 expires_at_ms=99660692",
+        "accepted_at_ms_estimate": 99660572
+      }
+    },
+    {
+      "sequence": 1670,
+      "server": {
+        "anchor_ms": 107037930,
+        "line": "grant seq=1670 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99659867,
+        "line": "grant_accept node_id=2 sequence=1670 duration_ms=120 expires_at_ms=99660825",
+        "accepted_at_ms_estimate": 99660705
+      }
+    },
+    {
+      "sequence": 1705,
+      "server": {
+        "anchor_ms": 107042931,
+        "line": "grant seq=1705 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99664867,
+        "line": "grant_accept node_id=2 sequence=1705 duration_ms=120 expires_at_ms=99665379",
+        "accepted_at_ms_estimate": 99665259
+      }
+    },
+    {
+      "sequence": 1706,
+      "server": {
+        "anchor_ms": 107042931,
+        "line": "grant seq=1706 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99664867,
+        "line": "grant_accept node_id=2 sequence=1706 duration_ms=120 expires_at_ms=99665509",
+        "accepted_at_ms_estimate": 99665389
+      }
+    },
+    {
+      "sequence": 1707,
+      "server": {
+        "anchor_ms": 107042931,
+        "line": "grant seq=1707 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99664867,
+        "line": "grant_accept node_id=2 sequence=1707 duration_ms=120 expires_at_ms=99665639",
+        "accepted_at_ms_estimate": 99665519
+      }
+    },
+    {
+      "sequence": 1708,
+      "server": {
+        "anchor_ms": 107042931,
+        "line": "grant seq=1708 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1709,
+      "server": {
+        "anchor_ms": 107043931,
+        "line": "grant seq=1709 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99664867,
+        "line": "grant_accept node_id=2 sequence=1709 duration_ms=120 expires_at_ms=99665900",
+        "accepted_at_ms_estimate": 99665780
+      }
+    },
+    {
+      "sequence": 1710,
+      "server": {
+        "anchor_ms": 107043931,
+        "line": "grant seq=1710 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99665867,
+        "line": "grant_accept node_id=2 sequence=1710 duration_ms=120 expires_at_ms=99666030",
+        "accepted_at_ms_estimate": 99665910
+      }
+    },
+    {
+      "sequence": 1745,
+      "server": {
+        "anchor_ms": 107047931,
+        "line": "grant seq=1745 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1746,
+      "server": {
+        "anchor_ms": 107047931,
+        "line": "grant seq=1746 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99669868,
+        "line": "grant_accept node_id=2 sequence=1746 duration_ms=120 expires_at_ms=99670721",
+        "accepted_at_ms_estimate": 99670601
+      }
+    },
+    {
+      "sequence": 1747,
+      "server": {
+        "anchor_ms": 107047931,
+        "line": "grant seq=1747 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99669868,
+        "line": "grant_accept node_id=2 sequence=1747 duration_ms=120 expires_at_ms=99670850",
+        "accepted_at_ms_estimate": 99670730
+      }
+    },
+    {
+      "sequence": 1748,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1748 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99669868,
+        "line": "grant_accept node_id=2 sequence=1748 duration_ms=120 expires_at_ms=99670981",
+        "accepted_at_ms_estimate": 99670861
+      }
+    },
+    {
+      "sequence": 1749,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1749 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1750,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1750 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1751,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1751 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99670868,
+        "line": "grant_accept node_id=2 sequence=1751 duration_ms=120 expires_at_ms=99671372",
+        "accepted_at_ms_estimate": 99671252
+      }
+    },
+    {
+      "sequence": 1752,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1752 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99670868,
+        "line": "grant_accept node_id=2 sequence=1752 duration_ms=120 expires_at_ms=99671502",
+        "accepted_at_ms_estimate": 99671382
+      }
+    },
+    {
+      "sequence": 1753,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1753 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99670868,
+        "line": "grant_accept node_id=2 sequence=1753 duration_ms=120 expires_at_ms=99671632",
+        "accepted_at_ms_estimate": 99671512
+      }
+    },
+    {
+      "sequence": 1754,
+      "server": {
+        "anchor_ms": 107048931,
+        "line": "grant seq=1754 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99670868,
+        "line": "grant_accept node_id=2 sequence=1754 duration_ms=120 expires_at_ms=99671763",
+        "accepted_at_ms_estimate": 99671643
+      }
+    },
+    {
+      "sequence": 1755,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1755 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99670868,
+        "line": "grant_accept node_id=2 sequence=1755 duration_ms=120 expires_at_ms=99671892",
+        "accepted_at_ms_estimate": 99671772
+      }
+    },
+    {
+      "sequence": 1756,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1756 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1757,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1757 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1757 duration_ms=120 expires_at_ms=99672153",
+        "accepted_at_ms_estimate": 99672033
+      }
+    },
+    {
+      "sequence": 1758,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1758 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1758 duration_ms=120 expires_at_ms=99672283",
+        "accepted_at_ms_estimate": 99672163
+      }
+    },
+    {
+      "sequence": 1759,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1759 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1760,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1760 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1760 duration_ms=120 expires_at_ms=99672544",
+        "accepted_at_ms_estimate": 99672424
+      }
+    },
+    {
+      "sequence": 1761,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1761 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1761 duration_ms=120 expires_at_ms=99672673",
+        "accepted_at_ms_estimate": 99672553
+      }
+    },
+    {
+      "sequence": 1762,
+      "server": {
+        "anchor_ms": 107049931,
+        "line": "grant seq=1762 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1762 duration_ms=120 expires_at_ms=99672805",
+        "accepted_at_ms_estimate": 99672685
+      }
+    },
+    {
+      "sequence": 1763,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1763 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99671868,
+        "line": "grant_accept node_id=2 sequence=1763 duration_ms=120 expires_at_ms=99672933",
+        "accepted_at_ms_estimate": 99672813
+      }
+    },
+    {
+      "sequence": 1764,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1764 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1764 duration_ms=120 expires_at_ms=99673064",
+        "accepted_at_ms_estimate": 99672944
+      }
+    },
+    {
+      "sequence": 1765,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1765 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1765 duration_ms=120 expires_at_ms=99673195",
+        "accepted_at_ms_estimate": 99673075
+      }
+    },
+    {
+      "sequence": 1766,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1766 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1766 duration_ms=120 expires_at_ms=99673323",
+        "accepted_at_ms_estimate": 99673203
+      }
+    },
+    {
+      "sequence": 1767,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1767 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1767 duration_ms=120 expires_at_ms=99673454",
+        "accepted_at_ms_estimate": 99673334
+      }
+    },
+    {
+      "sequence": 1768,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1768 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1768 duration_ms=120 expires_at_ms=99673585",
+        "accepted_at_ms_estimate": 99673465
+      }
+    },
+    {
+      "sequence": 1769,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1769 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1769 duration_ms=120 expires_at_ms=99673715",
+        "accepted_at_ms_estimate": 99673595
+      }
+    },
+    {
+      "sequence": 1770,
+      "server": {
+        "anchor_ms": 107050931,
+        "line": "grant seq=1770 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99672868,
+        "line": "grant_accept node_id=2 sequence=1770 duration_ms=120 expires_at_ms=99673846",
+        "accepted_at_ms_estimate": 99673726
+      }
+    },
+    {
+      "sequence": 1785,
+      "server": {
+        "anchor_ms": 107052931,
+        "line": "grant seq=1785 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99674868,
+        "line": "grant_accept node_id=2 sequence=1785 duration_ms=120 expires_at_ms=99675800",
+        "accepted_at_ms_estimate": 99675680
+      }
+    },
+    {
+      "sequence": 1787,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1787 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1787 duration_ms=120 expires_at_ms=99676060",
+        "accepted_at_ms_estimate": 99675940
+      }
+    },
+    {
+      "sequence": 1789,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1789 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1789 duration_ms=120 expires_at_ms=99676320",
+        "accepted_at_ms_estimate": 99676200
+      }
+    },
+    {
+      "sequence": 1790,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1790 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1790 duration_ms=120 expires_at_ms=99676451",
+        "accepted_at_ms_estimate": 99676331
+      }
+    },
+    {
+      "sequence": 1791,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1791 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1791 duration_ms=120 expires_at_ms=99676580",
+        "accepted_at_ms_estimate": 99676460
+      }
+    },
+    {
+      "sequence": 1792,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1792 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1792 duration_ms=120 expires_at_ms=99676711",
+        "accepted_at_ms_estimate": 99676591
+      }
+    },
+    {
+      "sequence": 1793,
+      "server": {
+        "anchor_ms": 107053931,
+        "line": "grant seq=1793 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1793 duration_ms=120 expires_at_ms=99676841",
+        "accepted_at_ms_estimate": 99676721
+      }
+    },
+    {
+      "sequence": 1794,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1794 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99675868,
+        "line": "grant_accept node_id=2 sequence=1794 duration_ms=120 expires_at_ms=99676970",
+        "accepted_at_ms_estimate": 99676850
+      }
+    },
+    {
+      "sequence": 1795,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1795 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1795 duration_ms=120 expires_at_ms=99677101",
+        "accepted_at_ms_estimate": 99676981
+      }
+    },
+    {
+      "sequence": 1796,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1796 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1796 duration_ms=120 expires_at_ms=99677231",
+        "accepted_at_ms_estimate": 99677111
+      }
+    },
+    {
+      "sequence": 1797,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1797 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1797 duration_ms=120 expires_at_ms=99677361",
+        "accepted_at_ms_estimate": 99677241
+      }
+    },
+    {
+      "sequence": 1798,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1798 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1798 duration_ms=120 expires_at_ms=99677492",
+        "accepted_at_ms_estimate": 99677372
+      }
+    },
+    {
+      "sequence": 1799,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1799 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1799 duration_ms=120 expires_at_ms=99677622",
+        "accepted_at_ms_estimate": 99677502
+      }
+    },
+    {
+      "sequence": 1800,
+      "server": {
+        "anchor_ms": 107054932,
+        "line": "grant seq=1800 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1801,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1801 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99676868,
+        "line": "grant_accept node_id=2 sequence=1801 duration_ms=120 expires_at_ms=99677882",
+        "accepted_at_ms_estimate": 99677762
+      }
+    },
+    {
+      "sequence": 1802,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1802 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1802 duration_ms=120 expires_at_ms=99678012",
+        "accepted_at_ms_estimate": 99677892
+      }
+    },
+    {
+      "sequence": 1803,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1803 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1803 duration_ms=120 expires_at_ms=99678143",
+        "accepted_at_ms_estimate": 99678023
+      }
+    },
+    {
+      "sequence": 1804,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1804 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1804 duration_ms=120 expires_at_ms=99678273",
+        "accepted_at_ms_estimate": 99678153
+      }
+    },
+    {
+      "sequence": 1805,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1805 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1805 duration_ms=120 expires_at_ms=99678404",
+        "accepted_at_ms_estimate": 99678284
+      }
+    },
+    {
+      "sequence": 1806,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1806 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1806 duration_ms=120 expires_at_ms=99678533",
+        "accepted_at_ms_estimate": 99678413
+      }
+    },
+    {
+      "sequence": 1807,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1807 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1807 duration_ms=120 expires_at_ms=99678663",
+        "accepted_at_ms_estimate": 99678543
+      }
+    },
+    {
+      "sequence": 1808,
+      "server": {
+        "anchor_ms": 107055932,
+        "line": "grant seq=1808 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1808 duration_ms=120 expires_at_ms=99678794",
+        "accepted_at_ms_estimate": 99678674
+      }
+    },
+    {
+      "sequence": 1809,
+      "server": {
+        "anchor_ms": 107056932,
+        "line": "grant seq=1809 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99677868,
+        "line": "grant_accept node_id=2 sequence=1809 duration_ms=120 expires_at_ms=99678924",
+        "accepted_at_ms_estimate": 99678804
+      }
+    },
+    {
+      "sequence": 1810,
+      "server": {
+        "anchor_ms": 107056932,
+        "line": "grant seq=1810 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99678869,
+        "line": "grant_accept node_id=2 sequence=1810 duration_ms=120 expires_at_ms=99679054",
+        "accepted_at_ms_estimate": 99678934
+      }
+    },
+    {
+      "sequence": 1857,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1857 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99684870,
+        "line": "grant_accept node_id=2 sequence=1857 duration_ms=120 expires_at_ms=99685174",
+        "accepted_at_ms_estimate": 99685054
+      }
+    },
+    {
+      "sequence": 1858,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1858 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99684870,
+        "line": "grant_accept node_id=2 sequence=1858 duration_ms=120 expires_at_ms=99685304",
+        "accepted_at_ms_estimate": 99685184
+      }
+    },
+    {
+      "sequence": 1859,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1859 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99684870,
+        "line": "grant_accept node_id=2 sequence=1859 duration_ms=120 expires_at_ms=99685434",
+        "accepted_at_ms_estimate": 99685314
+      }
+    },
+    {
+      "sequence": 1860,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1860 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1861,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1861 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99684870,
+        "line": "grant_accept node_id=2 sequence=1861 duration_ms=120 expires_at_ms=99685695",
+        "accepted_at_ms_estimate": 99685575
+      }
+    },
+    {
+      "sequence": 1862,
+      "server": {
+        "anchor_ms": 107062932,
+        "line": "grant seq=1862 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99684870,
+        "line": "grant_accept node_id=2 sequence=1862 duration_ms=120 expires_at_ms=99685826",
+        "accepted_at_ms_estimate": 99685706
+      }
+    },
+    {
+      "sequence": 1863,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1863 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1864,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1864 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99685871,
+        "line": "grant_accept node_id=2 sequence=1864 duration_ms=120 expires_at_ms=99686086",
+        "accepted_at_ms_estimate": 99685966
+      }
+    },
+    {
+      "sequence": 1865,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1865 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1866,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1866 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99685871,
+        "line": "grant_accept node_id=2 sequence=1866 duration_ms=120 expires_at_ms=99686346",
+        "accepted_at_ms_estimate": 99686226
+      }
+    },
+    {
+      "sequence": 1867,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1867 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1868,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1868 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99685871,
+        "line": "grant_accept node_id=2 sequence=1868 duration_ms=120 expires_at_ms=99686606",
+        "accepted_at_ms_estimate": 99686486
+      }
+    },
+    {
+      "sequence": 1869,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1869 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99685871,
+        "line": "grant_accept node_id=2 sequence=1869 duration_ms=120 expires_at_ms=99686736",
+        "accepted_at_ms_estimate": 99686616
+      }
+    },
+    {
+      "sequence": 1870,
+      "server": {
+        "anchor_ms": 107063932,
+        "line": "grant seq=1870 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99685871,
+        "line": "grant_accept node_id=2 sequence=1870 duration_ms=120 expires_at_ms=99686866",
+        "accepted_at_ms_estimate": 99686746
+      }
+    },
+    {
+      "sequence": 1871,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1871 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1872,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1872 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1872 duration_ms=120 expires_at_ms=99687127",
+        "accepted_at_ms_estimate": 99687007
+      }
+    },
+    {
+      "sequence": 1873,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1873 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1873 duration_ms=120 expires_at_ms=99687258",
+        "accepted_at_ms_estimate": 99687138
+      }
+    },
+    {
+      "sequence": 1874,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1874 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1874 duration_ms=120 expires_at_ms=99687388",
+        "accepted_at_ms_estimate": 99687268
+      }
+    },
+    {
+      "sequence": 1875,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1875 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1875 duration_ms=120 expires_at_ms=99687518",
+        "accepted_at_ms_estimate": 99687398
+      }
+    },
+    {
+      "sequence": 1876,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1876 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1876 duration_ms=120 expires_at_ms=99687649",
+        "accepted_at_ms_estimate": 99687529
+      }
+    },
+    {
+      "sequence": 1877,
+      "server": {
+        "anchor_ms": 107064932,
+        "line": "grant seq=1877 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1877 duration_ms=120 expires_at_ms=99687779",
+        "accepted_at_ms_estimate": 99687659
+      }
+    },
+    {
+      "sequence": 1878,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1878 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99686872,
+        "line": "grant_accept node_id=2 sequence=1878 duration_ms=120 expires_at_ms=99687908",
+        "accepted_at_ms_estimate": 99687788
+      }
+    },
+    {
+      "sequence": 1879,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1879 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1879 duration_ms=120 expires_at_ms=99688039",
+        "accepted_at_ms_estimate": 99687919
+      }
+    },
+    {
+      "sequence": 1880,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1880 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1880 duration_ms=120 expires_at_ms=99688168",
+        "accepted_at_ms_estimate": 99688048
+      }
+    },
+    {
+      "sequence": 1881,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1881 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1882,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1882 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1882 duration_ms=120 expires_at_ms=99688429",
+        "accepted_at_ms_estimate": 99688309
+      }
+    },
+    {
+      "sequence": 1883,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1883 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1883 duration_ms=120 expires_at_ms=99688559",
+        "accepted_at_ms_estimate": 99688439
+      }
+    },
+    {
+      "sequence": 1884,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1884 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1884 duration_ms=120 expires_at_ms=99688689",
+        "accepted_at_ms_estimate": 99688569
+      }
+    },
+    {
+      "sequence": 1885,
+      "server": {
+        "anchor_ms": 107065932,
+        "line": "grant seq=1885 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1885 duration_ms=120 expires_at_ms=99688820",
+        "accepted_at_ms_estimate": 99688700
+      }
+    },
+    {
+      "sequence": 1886,
+      "server": {
+        "anchor_ms": 107066933,
+        "line": "grant seq=1886 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99687873,
+        "line": "grant_accept node_id=2 sequence=1886 duration_ms=120 expires_at_ms=99688949",
+        "accepted_at_ms_estimate": 99688829
+      }
+    },
+    {
+      "sequence": 1887,
+      "server": {
+        "anchor_ms": 107066933,
+        "line": "grant seq=1887 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99688873,
+        "line": "grant_accept node_id=2 sequence=1887 duration_ms=120 expires_at_ms=99689080",
+        "accepted_at_ms_estimate": 99688960
+      }
+    },
+    {
+      "sequence": 1888,
+      "server": {
+        "anchor_ms": 107066933,
+        "line": "grant seq=1888 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99688873,
+        "line": "grant_accept node_id=2 sequence=1888 duration_ms=120 expires_at_ms=99689210",
+        "accepted_at_ms_estimate": 99689090
+      }
+    },
+    {
+      "sequence": 1889,
+      "server": {
+        "anchor_ms": 107066933,
+        "line": "grant seq=1889 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99688873,
+        "line": "grant_accept node_id=2 sequence=1889 duration_ms=120 expires_at_ms=99689340",
+        "accepted_at_ms_estimate": 99689220
+      }
+    },
+    {
+      "sequence": 1904,
+      "server": {
+        "anchor_ms": 107068933,
+        "line": "grant seq=1904 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1905,
+      "server": {
+        "anchor_ms": 107068933,
+        "line": "grant seq=1905 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99690873,
+        "line": "grant_accept node_id=2 sequence=1905 duration_ms=120 expires_at_ms=99691422",
+        "accepted_at_ms_estimate": 99691302
+      }
+    },
+    {
+      "sequence": 1906,
+      "server": {
+        "anchor_ms": 107068933,
+        "line": "grant seq=1906 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99690873,
+        "line": "grant_accept node_id=2 sequence=1906 duration_ms=120 expires_at_ms=99691553",
+        "accepted_at_ms_estimate": 99691433
+      }
+    },
+    {
+      "sequence": 1907,
+      "server": {
+        "anchor_ms": 107068933,
+        "line": "grant seq=1907 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99690873,
+        "line": "grant_accept node_id=2 sequence=1907 duration_ms=120 expires_at_ms=99691682",
+        "accepted_at_ms_estimate": 99691562
+      }
+    },
+    {
+      "sequence": 1908,
+      "server": {
+        "anchor_ms": 107068933,
+        "line": "grant seq=1908 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1909,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1909 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99690873,
+        "line": "grant_accept node_id=2 sequence=1909 duration_ms=120 expires_at_ms=99691943",
+        "accepted_at_ms_estimate": 99691823
+      }
+    },
+    {
+      "sequence": 1910,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1910 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1910 duration_ms=120 expires_at_ms=99692073",
+        "accepted_at_ms_estimate": 99691953
+      }
+    },
+    {
+      "sequence": 1911,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1911 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1911 duration_ms=120 expires_at_ms=99692204",
+        "accepted_at_ms_estimate": 99692084
+      }
+    },
+    {
+      "sequence": 1912,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1912 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1912 duration_ms=120 expires_at_ms=99692334",
+        "accepted_at_ms_estimate": 99692214
+      }
+    },
+    {
+      "sequence": 1913,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1913 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1913 duration_ms=120 expires_at_ms=99692463",
+        "accepted_at_ms_estimate": 99692343
+      }
+    },
+    {
+      "sequence": 1914,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1914 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": null
+    },
+    {
+      "sequence": 1915,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1915 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1915 duration_ms=120 expires_at_ms=99692724",
+        "accepted_at_ms_estimate": 99692604
+      }
+    },
+    {
+      "sequence": 1916,
+      "server": {
+        "anchor_ms": 107069933,
+        "line": "grant seq=1916 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1916 duration_ms=120 expires_at_ms=99692854",
+        "accepted_at_ms_estimate": 99692734
+      }
+    },
+    {
+      "sequence": 1917,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1917 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99691873,
+        "line": "grant_accept node_id=2 sequence=1917 duration_ms=120 expires_at_ms=99692984",
+        "accepted_at_ms_estimate": 99692864
+      }
+    },
+    {
+      "sequence": 1918,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1918 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1918 duration_ms=120 expires_at_ms=99693114",
+        "accepted_at_ms_estimate": 99692994
+      }
+    },
+    {
+      "sequence": 1919,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1919 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1919 duration_ms=120 expires_at_ms=99693244",
+        "accepted_at_ms_estimate": 99693124
+      }
+    },
+    {
+      "sequence": 1920,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1920 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1920 duration_ms=120 expires_at_ms=99693374",
+        "accepted_at_ms_estimate": 99693254
+      }
+    },
+    {
+      "sequence": 1921,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1921 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1921 duration_ms=120 expires_at_ms=99693505",
+        "accepted_at_ms_estimate": 99693385
+      }
+    },
+    {
+      "sequence": 1922,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1922 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1922 duration_ms=120 expires_at_ms=99693636",
+        "accepted_at_ms_estimate": 99693516
+      }
+    },
+    {
+      "sequence": 1923,
+      "server": {
+        "anchor_ms": 107070933,
+        "line": "grant seq=1923 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1923 duration_ms=120 expires_at_ms=99693765",
+        "accepted_at_ms_estimate": 99693645
+      }
+    },
+    {
+      "sequence": 1924,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1924 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99692873,
+        "line": "grant_accept node_id=2 sequence=1924 duration_ms=120 expires_at_ms=99693896",
+        "accepted_at_ms_estimate": 99693776
+      }
+    },
+    {
+      "sequence": 1925,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1925 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99693873,
+        "line": "grant_accept node_id=2 sequence=1925 duration_ms=120 expires_at_ms=99694026",
+        "accepted_at_ms_estimate": 99693906
+      }
+    },
+    {
+      "sequence": 1926,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1926 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99693873,
+        "line": "grant_accept node_id=2 sequence=1926 duration_ms=120 expires_at_ms=99694157",
+        "accepted_at_ms_estimate": 99694037
+      }
+    },
+    {
+      "sequence": 1927,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1927 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99693873,
+        "line": "grant_accept node_id=2 sequence=1927 duration_ms=120 expires_at_ms=99694288",
+        "accepted_at_ms_estimate": 99694168
+      }
+    },
+    {
+      "sequence": 1928,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1928 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+      },
+      "client": {
+        "anchor_ms": 99693873,
+        "line": "grant_accept node_id=2 sequence=1928 duration_ms=120 expires_at_ms=99694417",
+        "accepted_at_ms_estimate": 99694297
+      }
+    },
+    {
+      "sequence": 1929,
+      "server": {
+        "anchor_ms": 107071933,
+        "line": "grant seq=1929 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+      },
+      "client": {
+        "anchor_ms": 99693873,
+        "line": "grant_accept node_id=2 sequence=1929 duration_ms=120 expires_at_ms=99694548",
+        "accepted_at_ms_estimate": 99694428
+      }
+    }
+  ],
+  "client_snapshots": [
+    {
+      "mono": 99608.509129009,
+      "token": [
+        163,
+        0,
+        51,
+        229
+      ],
+      "grant_filter": [
+        1166,
+        163,
+        0,
+        1003,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99613.429886681,
+      "token": [
+        169,
+        0,
+        53,
+        242
+      ],
+      "grant_filter": [
+        1197,
+        169,
+        0,
+        1028,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99618.365858011,
+      "token": [
+        177,
+        0,
+        54,
+        244
+      ],
+      "grant_filter": [
+        1231,
+        177,
+        0,
+        1054,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99623.326200169,
+      "token": [
+        177,
+        0,
+        54,
+        260
+      ],
+      "grant_filter": [
+        1253,
+        177,
+        0,
+        1076,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99628.398149949,
+      "token": [
+        177,
+        0,
+        54,
+        293
+      ],
+      "grant_filter": [
+        1263,
+        177,
+        0,
+        1086,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99633.407081832,
+      "token": [
+        182,
+        0,
+        81,
+        299
+      ],
+      "grant_filter": [
+        1291,
+        182,
+        0,
+        1109,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99638.394542872,
+      "token": [
+        185,
+        0,
+        82,
+        301
+      ],
+      "grant_filter": [
+        1320,
+        185,
+        0,
+        1135,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99643.383823503,
+      "token": [
+        185,
+        0,
+        82,
+        334
+      ],
+      "grant_filter": [
+        1353,
+        185,
+        0,
+        1168,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99648.441483909,
+      "token": [
+        197,
+        0,
+        84,
+        339
+      ],
+      "grant_filter": [
+        1387,
+        197,
+        0,
+        1190,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99653.344915808,
+      "token": [
+        201,
+        0,
+        85,
+        341
+      ],
+      "grant_filter": [
+        1419,
+        201,
+        0,
+        1218,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99658.353618984,
+      "token": [
+        224,
+        0,
+        86,
+        343
+      ],
+      "grant_filter": [
+        1456,
+        224,
+        0,
+        1232,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99663.435160715,
+      "token": [
+        232,
+        0,
+        87,
+        345
+      ],
+      "grant_filter": [
+        1491,
+        232,
+        0,
+        1259,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99668.379235698,
+      "token": [
+        237,
+        0,
+        88,
+        347
+      ],
+      "grant_filter": [
+        1523,
+        237,
+        0,
+        1286,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99673.33821949,
+      "token": [
+        251,
+        0,
+        89,
+        349
+      ],
+      "grant_filter": [
+        1554,
+        251,
+        0,
+        1303,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99678.434611572,
+      "token": [
+        272,
+        0,
+        90,
+        354
+      ],
+      "grant_filter": [
+        1589,
+        272,
+        0,
+        1317,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99683.456598457,
+      "token": [
+        281,
+        0,
+        90,
+        373
+      ],
+      "grant_filter": [
+        1625,
+        281,
+        0,
+        1344,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99688.419359341,
+      "token": [
+        298,
+        0,
+        92,
+        393
+      ],
+      "grant_filter": [
+        1655,
+        298,
+        0,
+        1357,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    },
+    {
+      "mono": 99693.31882753,
+      "token": [
+        319,
+        0,
+        93,
+        395
+      ],
+      "grant_filter": [
+        1690,
+        319,
+        0,
+        1371,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "radio": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -14.00 dBm\n"
+    }
+  ],
+  "API": [
+    {
+      "mono": 106985.740374496,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 106978.1507408,
+        "last_heartbeat_timestamp_ms": 1793121474894,
+        "last_heartbeat_ago_seconds": 7.59,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 106990.75312144,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 10239,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 106988.359555904,
+        "last_heartbeat_timestamp_ms": 1793121485103,
+        "last_heartbeat_ago_seconds": 2.39,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 106995.8324408,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 15268,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 106993.734223488,
+        "last_heartbeat_timestamp_ms": 1793121490477,
+        "last_heartbeat_ago_seconds": 2.1,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107000.814896352,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 15268,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 106993.734223488,
+        "last_heartbeat_timestamp_ms": 1793121490477,
+        "last_heartbeat_ago_seconds": 7.08,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107005.797847616,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 15268,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 106993.734223488,
+        "last_heartbeat_timestamp_ms": 1793121490477,
+        "last_heartbeat_ago_seconds": 12.06,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    },
+    {
+      "mono": 107010.700995872,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107007.20420288,
+        "last_heartbeat_timestamp_ms": 1793121503947,
+        "last_heartbeat_ago_seconds": 3.5,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107015.730925216,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 5010,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107012.35100928,
+        "last_heartbeat_timestamp_ms": 1793121509094,
+        "last_heartbeat_ago_seconds": 3.38,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107020.786562304,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 5010,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107012.35100928,
+        "last_heartbeat_timestamp_ms": 1793121509094,
+        "last_heartbeat_ago_seconds": 8.43,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107025.691866208,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 15435,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107022.600388928,
+        "last_heartbeat_timestamp_ms": 1793121519343,
+        "last_heartbeat_ago_seconds": 3.09,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107030.747186304,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 20464,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107027.835465504,
+        "last_heartbeat_timestamp_ms": 1793121524579,
+        "last_heartbeat_ago_seconds": 2.91,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107035.776855456,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 25702,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107033.045959808,
+        "last_heartbeat_timestamp_ms": 1793121529789,
+        "last_heartbeat_ago_seconds": 2.73,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107040.709032544,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 30913,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107038.24704992,
+        "last_heartbeat_timestamp_ms": 1793121534990,
+        "last_heartbeat_ago_seconds": 2.46,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107045.764194624,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 36118,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107043.451042944,
+        "last_heartbeat_timestamp_ms": 1793121540194,
+        "last_heartbeat_ago_seconds": 2.31,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107050.744900768,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 36118,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107043.451042944,
+        "last_heartbeat_timestamp_ms": 1793121540194,
+        "last_heartbeat_ago_seconds": 7.29,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107055.698018496,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 46559,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107053.869285088,
+        "last_heartbeat_timestamp_ms": 1793121550612,
+        "last_heartbeat_ago_seconds": 1.83,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107060.707911168,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 46559,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107053.869285088,
+        "last_heartbeat_timestamp_ms": 1793121550612,
+        "last_heartbeat_ago_seconds": 6.84,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107065.825311808,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 56981,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107064.14646144,
+        "last_heartbeat_timestamp_ms": 1793121560890,
+        "last_heartbeat_ago_seconds": 1.68,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    },
+    {
+      "mono": 107070.684237408,
+      "node": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 56981,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 107064.14646144,
+        "last_heartbeat_timestamp_ms": 1793121560890,
+        "last_heartbeat_ago_seconds": 6.54,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  ],
+  "notes": "native event timestamps use prior stats anchor (~1s), grant expiry gives exact client accepted time minus120ms. Server/client clocks have separate offsets. Nearest ACK not causal identity. Seq boundary mismatch not packet-loss proof."
+}

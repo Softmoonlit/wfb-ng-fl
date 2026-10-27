@@ -1,0 +1,119 @@
+{
+  "host": "fl00",
+  "utc": "2026-10-27T12:18:42Z",
+  "checks": [
+    {
+      "args": [
+        "uname",
+        "-m"
+      ],
+      "rc": 0,
+      "out": "aarch64\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "getconf",
+        "GNU_LIBC_VERSION"
+      ],
+      "rc": 0,
+      "out": "glibc 2.35\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "g++",
+        "--version"
+      ],
+      "rc": 0,
+      "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "file",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "/usr/bin/wfb_v6_uplink: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=d1b2f1ef2705ef1d67a202178410533d83baad40, for GNU/Linux 3.7.0, not stripped\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-h",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "ELF 头：\n  Magic：   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  类别:                              ELF64\n  数据:                              2 补码，小端序 (little endian)\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI 版本:                          0\n  类型:                              DYN (Position-Independent Executable file)\n  系统架构:                          AArch64\n  版本:                              0x1\n  入口点地址：               0x7780\n  程序头起点：          64 (bytes into file)\n  Start of section headers:          280072 (bytes into file)\n  标志：             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-l",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "\nElf 文件类型为 DYN (Position-Independent Executable file)\nEntry point 0x7780\nThere are 9 program headers, starting at offset 64\n\n程序头：\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034277 0x0000000000034277  R E    0x10000\n  LOAD           0x0000000000034f00 0x0000000000044f00 0x0000000000044f00\n                 0x0000000000001130 0x0000000000012858  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002d7c0 0x000000000002d7c0 0x000000000002d7c0\n                 0x00000000000009fc 0x00000000000009fc  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034f00 0x0000000000044f00 0x0000000000044f00\n                 0x0000000000001100 0x0000000000001100  R      0x1\n\n Section to Segment mapping:\n  段节...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+      "err": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-n",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "\nDisplaying notes found in: .note.gnu.build-id\n  所有者            Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: d1b2f1ef2705ef1d67a202178410533d83baad40\n\nDisplaying notes found in: .note.ABI-tag\n  所有者            Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-p",
+        ".comment",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "ldd",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "\tlinux-vdso.so.1 (0x0000ffffb4a1e000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffffb4900000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffffb48a0000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffffb4670000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffffb4640000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb4490000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb49e5000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffffb4430000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb4390000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffffb42b0000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffffb4270000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffffb41a0000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffffb4170000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffffb4150000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffffb4060000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffffb4020000)\n",
+      "err": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-d",
+        "/usr/bin/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "out": "\nDynamic section at offset 0x35880 contains 32 entries:\n  标记        类型                         名称/值\n 0x0000000000000001 (NEEDED)             共享库：[libsodium.so.23]\n 0x0000000000000001 (NEEDED)             共享库：[libpcap.so.0.8]\n 0x0000000000000001 (NEEDED)             共享库：[libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             共享库：[libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             共享库：[libc.so.6]\n 0x0000000000000001 (NEEDED)             共享库：[ld-linux-aarch64.so.1]\n 0x000000000000000c (INIT)               0x4710\n 0x000000000000000d (FINI)               0x293d0\n 0x0000000000000019 (INIT_ARRAY)         0x44f00\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x44f20\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x298\n 0x0000000000000005 (STRTAB)             0x12c0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              4455 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000003 (PLTGOT)             0x45ac0\n 0x0000000000000002 (PLTRELSZ)           3312 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x3a20\n 0x0000000000000007 (RELA)               0x26a0\n 0x0000000000000008 (RELASZ)             4992 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000000000001e (FLAGS)              BIND_NOW\n 0x000000006ffffffb (FLAGS_1)            标志： NOW PIE\n 0x000000006ffffffe (VERNEED)            0x2580\n 0x000000006fffffff (VERNEEDNUM)         4\n 0x000000006ffffff0 (VERSYM)             0x2428\n 0x000000006ffffff9 (RELACOUNT)          150\n 0x0000000000000000 (NULL)               0x0\n",
+      "err": ""
+    }
+  ],
+  "build_artifact_manifest": {
+    "src/control_envelope.o": "77d1feadca68fe7f22e763a3983b3ff35359a7e29c26c27be29d6865c19bf4cc",
+    "src/radiotap.o": "8cfe274ff168baaf02a8ab4d71679ddb1849e83ae50910ef232a112b1030514f",
+    "src/rx.link.o": "569ab488a109167d6d665fdb38b3d2fe822585967c99ae8d1445adf7dbf9adb9",
+    "src/token_authorization.o": "fb7af2e520b0f07952d72d5863566b845899ea96c303d3daa60d4677f491584b",
+    "src/token_authorization_ipc.o": "b983f17380257039a2132455d55f8c6fdcf2ea20bd164ac67fb3f60ab0b0d13a",
+    "src/token_event_ipc.o": "366346bbfc1acfe63ae6d0dbd353c97e161da9b657c947dfa0a8dd3ad92194fb",
+    "src/token_scheduler.o": "db50f9e46c1749d74840fef2cbe714c19db30019764447d7c19d414c759fd892",
+    "src/tx.link.o": "53b803a9aeb42fb1b875812656ce75406d20909a75a9dbb0b4f7831d19aa2bec",
+    "src/tx_token_gate.o": "064fae2f13ef11bbbc327e28da0b6c43dc65edb8940c69386a0faa547d17a7e2",
+    "src/v6_plaintext_fec_tx.o": "12b6227e18151ca0c278c09c2cba3a72776fc633769f7a31c8813c740078f690",
+    "src/v6_radio_control.o": "326853eae72bbe207a48f0124a8147d51d205a95d7b24790d5dd44f6434e3804",
+    "src/v6_uplink.o": "56e42743c56d3f67da48fbddc4c5bb140e043990a992006433068cd5a5c7a269",
+    "src/wifibroadcast.o": "7a354ecb26b701670a7e04c18111742a4aa23457ff3b27044348ee401266664a",
+    "src/zfex.o": "482ec45c6e5aa33e6dc1ece633252b61cec117faa4f394bda585c7f37dd359c2"
+  },
+  "native_sha": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0"
+}

@@ -1,0 +1,143 @@
+f7c73f41b730ddb3547e1730b5a5b7b40a55dd7a8e3e5f265dcc6563c6c432b1  /tmp/wfb08-native701-unified
+ELF Header:
+  Magic:   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 
+  Class:                             ELF64
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - GNU
+  ABI Version:                       0
+  Type:                              DYN (Position-Independent Executable file)
+  Machine:                           AArch64
+  Version:                           0x1
+  Entry point address:               0x7800
+  Start of program headers:          64 (bytes into file)
+  Start of section headers:          280352 (bytes into file)
+  Flags:                             0x0
+  Size of this header:               64 (bytes)
+  Size of program headers:           56 (bytes)
+  Number of program headers:         9
+  Size of section headers:           64 (bytes)
+  Number of section headers:         30
+  Section header string table index: 29
+
+Displaying notes found in: .note.gnu.build-id
+  Owner                Data size 	Description
+  GNU                  0x00000014	NT_GNU_BUILD_ID (unique build ID bitstring)
+    Build ID: 82b57ee251cc5d5bbf7284fc9f7e2819a881d0b0
+
+Displaying notes found in: .note.ABI-tag
+  Owner                Data size 	Description
+  GNU                  0x00000010	NT_GNU_ABI_TAG (ABI version tag)
+    OS: Linux, ABI: 3.7.0
+	linux-vdso.so.1 (0x0000ffffaf026000)
+	libsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffffaef20000)
+	libpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffffaeec0000)
+	libstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffffaec90000)
+	libgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffffaec60000)
+	libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffaeab0000)
+	/lib/ld-linux-aarch64.so.1 (0x0000ffffaefed000)
+	libdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffffaea50000)
+	libm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffae9b0000)
+	libsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffffae8d0000)
+	liblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffffae890000)
+	libzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffffae7c0000)
+	liblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffffae790000)
+	libcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffffae770000)
+	libgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffffae680000)
+	libgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffffae640000)
+
+	Version information:
+	/tmp/wfb08-native701-unified:
+		libgcc_s.so.1 (GCC_3.0) => /lib/aarch64-linux-gnu/libgcc_s.so.1
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.32) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.20) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (CXXABI_1.3.8) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.18) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.29) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.9) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (CXXABI_1.3) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.14) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4.21) => /lib/aarch64-linux-gnu/libstdc++.so.6
+		libstdc++.so.6 (GLIBCXX_3.4) => /lib/aarch64-linux-gnu/libstdc++.so.6
+	/lib/aarch64-linux-gnu/libsodium.so.23:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.25) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libpcap.so.0.8:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libdbus-1.so.3 (LIBDBUS_1_3) => /lib/aarch64-linux-gnu/libdbus-1.so.3
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libstdc++.so.6:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libm.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libm.so.6
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.25) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.18) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.32) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libgcc_s.so.1 (GCC_4.2.0) => /lib/aarch64-linux-gnu/libgcc_s.so.1
+		libgcc_s.so.1 (GCC_3.3) => /lib/aarch64-linux-gnu/libgcc_s.so.1
+		libgcc_s.so.1 (GCC_3.0) => /lib/aarch64-linux-gnu/libgcc_s.so.1
+		libgcc_s.so.1 (GCC_4.5.0) => /lib/aarch64-linux-gnu/libgcc_s.so.1
+	/lib/aarch64-linux-gnu/libgcc_s.so.1:
+		libc.so.6 (GLIBC_2.35) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libc.so.6:
+		ld-linux-aarch64.so.1 (GLIBC_PRIVATE) => /lib/ld-linux-aarch64.so.1
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+	/lib/aarch64-linux-gnu/libdbus-1.so.3:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libsystemd.so.0 (LIBSYSTEMD_209) => /lib/aarch64-linux-gnu/libsystemd.so.0
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libm.so.6:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_PRIVATE) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libsystemd.so.0:
+		liblzma.so.5 (XZ_5.0) => /lib/aarch64-linux-gnu/liblzma.so.5
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libgcrypt.so.20 (GCRYPT_1.6) => /lib/aarch64-linux-gnu/libgcrypt.so.20
+		libc.so.6 (GLIBC_2.30) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.28) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.25) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.27) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.26) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.32) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/liblzma.so.5:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.32) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libzstd.so.1:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/liblz4.so.1:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libcap.so.2:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libgcrypt.so.20:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libgpg-error.so.0 (GPG_ERROR_1.0) => /lib/aarch64-linux-gnu/libgpg-error.so.0
+		libc.so.6 (GLIBC_2.33) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.25) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6
+	/lib/aarch64-linux-gnu/libgpg-error.so.0:
+		ld-linux-aarch64.so.1 (GLIBC_2.17) => /lib/ld-linux-aarch64.so.1
+		libc.so.6 (GLIBC_2.32) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.34) => /lib/aarch64-linux-gnu/libc.so.6
+		libc.so.6 (GLIBC_2.17) => /lib/aarch64-linux-gnu/libc.so.6

@@ -1,0 +1,13 @@
+fl01 stop
+backup SHA b4f81258c910b9bcd96fa6675627aa830d6b6c14d8babf93ba6cdf894ad9489c
+UTC 2026-10-27T12:24:03Z CMD ['systemctl', 'show', 'wfb-fl-client-daemon.service', '-p', 'ExecStart', '-p', 'MainPID', '-p', 'DropInPaths']
+MainPID=29111
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Tue 2026-10-27 16:25:06 CST] ; stop_time=[n/a] ; pid=29111 ; code=(null) ; status=0/0 }
+DropInPaths=/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf
+RC 0
+UTC 2026-10-27T12:24:03Z CMD ['systemctl', 'stop', 'wfb-fl-client-daemon.service']
+RC 0
+
+NATIVE_PHASE_PASS fl01 stop
+
+Exit 0

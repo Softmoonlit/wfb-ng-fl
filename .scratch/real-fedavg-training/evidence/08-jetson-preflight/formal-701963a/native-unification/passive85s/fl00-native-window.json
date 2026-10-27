@@ -1,0 +1,4623 @@
+{
+  "host": "fl00",
+  "path": "/srv/wfb-ng-fl/server/wfb_uplink.log",
+  "range_ms": [
+    106983676.14969599,
+    107072727.115744
+  ],
+  "anchor_resolution_ms": 1000,
+  "events": [
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1248 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1249 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1250 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1251 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1252 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1253 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1254 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106983925,
+      "line": "grant seq=1255 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1256 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1257 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1258 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1259 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1260 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1261 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1262 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106984925,
+      "line": "grant seq=1263 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1264 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1265 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1266 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1267 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1268 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1269 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106985926,
+      "line": "grant seq=1270 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1271 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1272 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1273 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1274 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1275 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1276 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "silent_remove node_id=1 silence_ms=518 consecutive_silent_grants=3 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1277 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106986926,
+      "line": "grant seq=1278 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "106987926\tRX_ANT\t5785:4:40\t1\t17:-68:-56:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "106987926\tRX_ANT\t5785:4:40\t0\t17:-66:-59:-56:11:13:15"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1279 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1280 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1281 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1282 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1283 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1284 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1285 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "silent_remove node_id=2 silence_ms=426 consecutive_silent_grants=3 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106987926,
+      "line": "grant seq=1286 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "106988926\tRX_ANT\t5785:4:40\t1\t24:-68:-63:-58:10:12:14"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "106988926\tRX_ANT\t5785:4:40\t0\t24:-66:-55:-48:11:12:14"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1287 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1288 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1289 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1290 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1291 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1292 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106988926,
+      "line": "grant seq=1293 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "106989926\tRX_ANT\t5785:4:40\t1\t11:-60:-58:-58:11:13:15"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "106989926\tRX_ANT\t5785:4:40\t0\t11:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1294 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1295 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1296 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1297 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1298 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1299 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1300 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106989926,
+      "line": "grant seq=1301 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1302 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1303 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1304 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1305 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1306 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1307 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1308 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106990927,
+      "line": "grant seq=1309 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1310 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "ready_accept node_id=1 active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1311 node_id=4 duration_ms=120 kind=normal active_queue=[4,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1312 node_id=1 duration_ms=120 kind=normal active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "silent_remove node_id=4 silence_ms=2625 consecutive_silent_grants=20 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1313 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1314 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1315 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106991927,
+      "line": "grant seq=1316 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "106992927\tRX_ANT\t5785:4:40\t1\t10:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "106992927\tRX_ANT\t5785:4:40\t0\t10:-56:-56:-56:11:12:14"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1317 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1318 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1319 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1320 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1321 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1322 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "silent_remove node_id=1 silence_ms=1297 consecutive_silent_grants=9 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1323 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106992927,
+      "line": "grant seq=1324 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "106993927\tRX_ANT\t5785:4:40\t1\t10:-68:-68:-68:11:12:16"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "106993927\tRX_ANT\t5785:4:40\t0\t10:-66:-65:-64:12:13:17"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1325 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1326 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1327 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1328 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1329 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1330 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1331 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "grant seq=1332 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 106993927,
+      "line": "silent_remove node_id=2 silence_ms=1169 consecutive_silent_grants=8 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "106994927\tRX_ANT\t5785:4:40\t1\t9:-60:-58:-58:12:13:17"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "106994927\tRX_ANT\t5785:4:40\t0\t9:-48:-48:-48:11:12:16"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1333 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1334 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1335 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1336 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1337 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1338 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106994927,
+      "line": "grant seq=1339 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1340 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1341 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1342 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1343 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1344 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1345 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1346 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106995927,
+      "line": "grant seq=1347 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1348 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1349 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1350 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1351 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1352 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1353 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1354 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106996927,
+      "line": "grant seq=1355 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1356 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1357 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1358 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1359 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1360 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1361 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106997927,
+      "line": "grant seq=1362 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1363 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1364 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1365 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1366 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1367 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1368 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1369 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106998927,
+      "line": "grant seq=1370 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1371 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1372 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1373 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1374 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1375 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1376 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1377 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 106999927,
+      "line": "grant seq=1378 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "107000927\tRX_ANT\t5785:4:40\t1\t2:-60:-59:-58:14:14:14"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "107000927\tRX_ANT\t5785:4:40\t0\t2:-48:-48:-48:13:13:14"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1379 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1380 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1381 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1382 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1383 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "ready_accept node_id=1 active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1384 node_id=4 duration_ms=120 kind=normal active_queue=[4,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "grant seq=1385 node_id=1 duration_ms=120 kind=normal active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107000927,
+      "line": "silent_remove node_id=4 silence_ms=6898 consecutive_silent_grants=52 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "107001927\tRX_ANT\t5785:4:40\t1\t7:-48:-48:-48:10:11:13"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "107001927\tRX_ANT\t5785:4:40\t0\t7:-56:-56:-56:10:12:15"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1386 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1387 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1388 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1389 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1390 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1391 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1392 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107001927,
+      "line": "grant seq=1393 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "107002927\tRX_ANT\t5785:4:40\t1\t9:-48:-48:-48:11:13:16"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "107002927\tRX_ANT\t5785:4:40\t0\t9:-56:-56:-56:11:13:15"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1394 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1395 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1396 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1397 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1398 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1399 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1400 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107002927,
+      "line": "grant seq=1401 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1402 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1403 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1404 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1405 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1406 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1407 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1408 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107003928,
+      "line": "grant seq=1409 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1410 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1411 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1412 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "silent_remove node_id=1 silence_ms=2751 consecutive_silent_grants=21 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1413 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1414 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1415 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107004928,
+      "line": "grant seq=1416 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "107005928\tRX_ANT\t5785:4:40\t1\t13:-60:-58:-58:12:13:16"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "107005928\tRX_ANT\t5785:4:40\t0\t13:-48:-48:-48:11:13:16"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1417 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1418 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1419 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1420 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1421 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1422 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1423 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107005928,
+      "line": "grant seq=1424 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1425 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1426 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "silent_remove node_id=4 silence_ms=1818 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1427 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1428 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1429 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1430 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1431 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "silent_remove node_id=2 silence_ms=596 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107006928,
+      "line": "grant seq=1432 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "107007928\tRX_ANT\t5785:4:40\t1\t39:-68:-65:-48:11:12:18"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "107007928\tRX_ANT\t5785:4:40\t0\t39:-66:-64:-56:11:13:16"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1433 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1434 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1435 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1436 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1437 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1438 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107007928,
+      "line": "grant seq=1439 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1440 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1441 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1442 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1443 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1444 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1445 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1446 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107008928,
+      "line": "grant seq=1447 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1448 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1449 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1450 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1451 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1452 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "silent_remove node_id=1 silence_ms=2731 consecutive_silent_grants=20 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1453 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1454 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107009928,
+      "line": "grant seq=1455 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "107010928\tRX_ANT\t5785:4:40\t1\t10:-60:-58:-58:11:13:15"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "107010928\tRX_ANT\t5785:4:40\t0\t10:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1456 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1457 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1458 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1459 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1460 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1461 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107010928,
+      "line": "grant seq=1462 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1463 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1464 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1465 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1466 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "silent_remove node_id=4 silence_ms=1821 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1467 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1468 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1469 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107011929,
+      "line": "grant seq=1470 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "107012929\tRX_ANT\t5785:4:40\t1\t11:-68:-68:-68:11:12:13"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "107012929\tRX_ANT\t5785:4:40\t0\t11:-66:-65:-64:12:13:15"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1471 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "silent_remove node_id=2 silence_ms=645 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1472 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1473 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1474 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1475 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1476 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1477 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107012929,
+      "line": "grant seq=1478 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "107013929\tRX_ANT\t5785:4:40\t1\t12:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "107013929\tRX_ANT\t5785:4:40\t0\t12:-56:-56:-56:11:12:14"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1479 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1480 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1481 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1482 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1483 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1484 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107013929,
+      "line": "grant seq=1485 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1486 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1487 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1488 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1489 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1490 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1491 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1492 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "silent_remove node_id=1 silence_ms=2727 consecutive_silent_grants=20 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107014929,
+      "line": "grant seq=1493 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "107015929\tRX_ANT\t5785:4:40\t1\t5:-60:-58:-58:12:12:14"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "107015929\tRX_ANT\t5785:4:40\t0\t5:-48:-48:-48:11:12:13"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1494 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1495 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1496 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1497 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1498 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1499 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1500 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107015929,
+      "line": "grant seq=1501 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1502 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1503 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1504 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1505 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1506 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1507 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107016930,
+      "line": "grant seq=1508 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1509 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "ready_accept node_id=1 active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1510 node_id=4 duration_ms=120 kind=normal active_queue=[4,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1511 node_id=1 duration_ms=120 kind=normal active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "silent_remove node_id=4 silence_ms=2651 consecutive_silent_grants=19 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1512 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1513 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1514 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1515 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107017930,
+      "line": "grant seq=1516 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "107018930\tRX_ANT\t5785:4:40\t1\t9:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "107018930\tRX_ANT\t5785:4:40\t0\t9:-56:-56:-56:10:12:15"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1517 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1518 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1519 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1520 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1521 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1522 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1523 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107018930,
+      "line": "grant seq=1524 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1525 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1526 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1527 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1528 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1529 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1530 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107019930,
+      "line": "grant seq=1531 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1532 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "silent_remove node_id=1 silence_ms=2729 consecutive_silent_grants=20 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1533 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1534 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1535 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1536 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1537 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1538 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "silent_remove node_id=4 silence_ms=777 consecutive_silent_grants=5 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107020930,
+      "line": "grant seq=1539 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "107021930\tRX_ANT\t5785:4:40\t1\t21:-68:-62:-58:10:12:16"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "107021930\tRX_ANT\t5785:4:40\t0\t21:-66:-56:-48:11:13:15"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1540 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1541 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1542 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1543 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1544 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1545 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1546 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107021930,
+      "line": "grant seq=1547 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "107022930\tRX_ANT\t5785:4:40\t1\t8:-68:-68:-68:11:12:14"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "107022930\tRX_ANT\t5785:4:40\t0\t8:-66:-64:-64:11:13:15"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1548 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1549 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1550 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1551 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "silent_remove node_id=2 silence_ms=808 consecutive_silent_grants=6 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1552 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1553 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1554 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107022930,
+      "line": "grant seq=1555 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "107023930\tRX_ANT\t5785:4:40\t1\t9:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "107023930\tRX_ANT\t5785:4:40\t0\t9:-56:-56:-56:10:13:16"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1556 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1557 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1558 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1559 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1560 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1561 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107023930,
+      "line": "grant seq=1562 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1563 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1564 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1565 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1566 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1567 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1568 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1569 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107024930,
+      "line": "grant seq=1570 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1571 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1572 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "silent_remove node_id=1 silence_ms=2730 consecutive_silent_grants=20 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1573 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1574 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1575 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1576 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1577 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107025930,
+      "line": "grant seq=1578 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "107026930\tRX_ANT\t5785:4:40\t1\t8:-60:-59:-58:12:13:16"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "107026930\tRX_ANT\t5785:4:40\t0\t8:-48:-48:-48:12:13:16"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1579 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1580 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1581 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1582 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1583 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1584 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "grant seq=1585 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107026930,
+      "line": "silent_remove node_id=4 silence_ms=1686 consecutive_silent_grants=12 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "107027930\tRX_ANT\t5785:4:40\t1\t8:-68:-68:-68:11:12:15"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "107027930\tRX_ANT\t5785:4:40\t0\t8:-66:-65:-64:12:13:14"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1586 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1587 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1588 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1589 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1590 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1591 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "silent_remove node_id=2 silence_ms=779 consecutive_silent_grants=5 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1592 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107027930,
+      "line": "grant seq=1593 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "107028930\tRX_ANT\t5785:4:40\t1\t13:-50:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "107028930\tRX_ANT\t5785:4:40\t0\t13:-56:-56:-56:11:12:16"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1594 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1595 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1596 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1597 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1598 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1599 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1600 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107028930,
+      "line": "grant seq=1601 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1602 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1603 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1604 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1605 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1606 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1607 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107029930,
+      "line": "grant seq=1608 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1609 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1610 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1611 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1612 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "silent_remove node_id=1 silence_ms=2729 consecutive_silent_grants=20 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1613 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1614 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1615 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107030930,
+      "line": "grant seq=1616 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "107031930\tRX_ANT\t5785:4:40\t1\t13:-58:-58:-58:12:13:16"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "107031930\tRX_ANT\t5785:4:40\t0\t13:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1617 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1618 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1619 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1620 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1621 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1622 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1623 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107031930,
+      "line": "grant seq=1624 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1625 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "silent_remove node_id=4 silence_ms=1691 consecutive_silent_grants=12 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1626 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1627 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1628 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1629 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1630 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107032930,
+      "line": "grant seq=1631 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "107033930\tRX_ANT\t5785:4:40\t1\t8:-68:-68:-68:12:12:14"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "107033930\tRX_ANT\t5785:4:40\t0\t8:-66:-65:-64:13:13:14"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1632 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1633 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1634 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1635 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1636 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1637 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1638 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107033930,
+      "line": "grant seq=1639 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1640 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1641 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1642 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1643 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1644 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1645 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1646 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107034930,
+      "line": "grant seq=1647 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1648 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1649 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1650 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1651 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1652 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "silent_remove node_id=2 silence_ms=3507 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1653 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107035930,
+      "line": "grant seq=1654 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "107036930\tRX_ANT\t5785:4:40\t1\t12:-58:-58:-58:12:13:15"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "107036930\tRX_ANT\t5785:4:40\t0\t12:-48:-48:-48:12:12:15"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1655 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1656 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1657 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1658 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1659 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1660 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1661 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "ready_accept node_id=1 active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107036930,
+      "line": "grant seq=1662 node_id=4 duration_ms=120 kind=normal active_queue=[4,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1663 node_id=1 duration_ms=120 kind=normal active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "silent_remove node_id=4 silence_ms=1429 consecutive_silent_grants=10 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1664 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1665 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1666 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1667 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "silent_remove node_id=1 silence_ms=517 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1668 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1669 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107037930,
+      "line": "grant seq=1670 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "107038930\tRX_ANT\t5785:4:40\t1\t24:-68:-58:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "107038930\tRX_ANT\t5785:4:40\t0\t24:-66:-61:-56:12:13:15"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1671 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "silent_remove node_id=2 silence_ms=778 consecutive_silent_grants=4 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1672 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1673 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1674 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1675 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1676 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107038930,
+      "line": "grant seq=1677 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "107039931\tRX_ANT\t5785:4:40\t1\t10:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "107039931\tRX_ANT\t5785:4:40\t0\t10:-56:-56:-56:11:12:14"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1678 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1679 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1680 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1681 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1682 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1683 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1684 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107039931,
+      "line": "grant seq=1685 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1686 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1687 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1688 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1689 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1690 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1691 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1692 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107040931,
+      "line": "grant seq=1693 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1694 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1695 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1696 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1697 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1698 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1699 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1700 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107041931,
+      "line": "grant seq=1701 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1702 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1703 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1704 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1705 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "silent_remove node_id=1 silence_ms=4417 consecutive_silent_grants=33 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1706 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1707 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107042931,
+      "line": "grant seq=1708 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "107043931\tRX_ANT\t5785:4:40\t1\t8:-68:-68:-68:10:12:14"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "107043931\tRX_ANT\t5785:4:40\t0\t8:-66:-65:-64:12:13:15"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1709 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1710 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1711 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "silent_remove node_id=2 silence_ms=778 consecutive_silent_grants=5 active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1712 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1713 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1714 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1715 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107043931,
+      "line": "grant seq=1716 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "107044931\tRX_ANT\t5785:4:40\t1\t9:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "107044931\tRX_ANT\t5785:4:40\t0\t9:-56:-56:-56:10:12:15"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1717 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1718 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1719 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1720 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1721 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1722 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1723 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "grant seq=1724 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107044931,
+      "line": "silent_remove node_id=1 silence_ms=1685 consecutive_silent_grants=12 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "107045931\tRX_ANT\t5785:4:40\t1\t8:-60:-58:-58:12:13:15"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "107045931\tRX_ANT\t5785:4:40\t0\t8:-48:-48:-48:11:12:15"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1725 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1726 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1727 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1728 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1729 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1730 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107045931,
+      "line": "grant seq=1731 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "107046931\tRX_ANT\t5785:4:40\t1\t9:-60:-58:-58:11:12:15"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "107046931\tRX_ANT\t5785:4:40\t0\t9:-48:-48:-48:11:12:14"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1732 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1733 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1734 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1735 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1736 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1737 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1738 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107046931,
+      "line": "grant seq=1739 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1740 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1741 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1742 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1743 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1744 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1745 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "silent_remove node_id=4 silence_ms=1843 consecutive_silent_grants=14 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1746 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107047931,
+      "line": "grant seq=1747 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "107048931\tRX_ANT\t5785:4:40\t1\t7:-68:-68:-68:11:12:13"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "107048931\tRX_ANT\t5785:4:40\t0\t7:-66:-65:-64:12:13:15"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1748 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1749 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1750 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1751 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1752 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1753 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107048931,
+      "line": "grant seq=1754 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1755 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1756 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1757 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1758 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1759 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1760 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1761 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107049931,
+      "line": "grant seq=1762 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1763 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1764 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1765 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1766 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1767 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1768 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1769 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107050931,
+      "line": "grant seq=1770 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1771 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "silent_remove node_id=2 silence_ms=3564 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1772 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1773 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1774 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1775 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1776 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107051931,
+      "line": "grant seq=1777 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "107052931\tRX_ANT\t5785:4:40\t1\t14:-58:-58:-58:11:13:15"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "107052931\tRX_ANT\t5785:4:40\t0\t14:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1778 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1779 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1780 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1781 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1782 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "ready_accept node_id=1 active_queue=[4,1] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1783 node_id=4 duration_ms=120 kind=normal active_queue=[4,1] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "ready_accept node_id=2 active_queue=[4,1,2] cursor=1 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1784 node_id=1 duration_ms=120 kind=normal active_queue=[4,1,2] cursor=2 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "silent_remove node_id=4 silence_ms=1690 consecutive_silent_grants=12 active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107052931,
+      "line": "grant seq=1785 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "107053931\tRX_ANT\t5785:4:40\t1\t23:-68:-57:-48:11:12:18"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "107053931\tRX_ANT\t5785:4:40\t0\t23:-66:-60:-56:11:13:18"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1786 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1787 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1788 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1789 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "silent_remove node_id=1 silence_ms=646 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1790 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1791 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1792 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107053931,
+      "line": "grant seq=1793 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1794 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1795 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1796 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1797 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1798 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1799 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107054932,
+      "line": "grant seq=1800 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1801 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1802 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1803 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1804 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1805 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1806 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1807 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107055932,
+      "line": "grant seq=1808 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1809 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1810 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1811 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "silent_remove node_id=2 silence_ms=3377 consecutive_silent_grants=23 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1812 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1813 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1814 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1815 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107056932,
+      "line": "grant seq=1816 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "107057932\tRX_ANT\t5785:4:40\t1\t7:-60:-59:-58:11:13:15"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "107057932\tRX_ANT\t5785:4:40\t0\t7:-48:-48:-48:11:12:14"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1817 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1818 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1819 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1820 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1821 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1822 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107057932,
+      "line": "grant seq=1823 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1824 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1825 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1826 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1827 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1828 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1829 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1830 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107058932,
+      "line": "grant seq=1831 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1832 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1833 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1834 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1835 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1836 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1837 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1838 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107059933,
+      "line": "grant seq=1839 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1840 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1841 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1842 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1843 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1844 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1845 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1846 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107060932,
+      "line": "grant seq=1847 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1848 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1849 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1850 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1851 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1852 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1853 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107061932,
+      "line": "grant seq=1854 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "107062932\tRX_ANT\t5785:4:40\t1\t12:-60:-58:-58:12:12:14"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "107062932\tRX_ANT\t5785:4:40\t0\t12:-48:-48:-48:12:12:14"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1855 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1856 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1857 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "silent_remove node_id=4 silence_ms=933 consecutive_silent_grants=7 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1858 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1859 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1860 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1861 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107062932,
+      "line": "grant seq=1862 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "107063932\tRX_ANT\t5785:4:40\t1\t11:-68:-68:-68:11:11:13"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "107063932\tRX_ANT\t5785:4:40\t0\t11:-66:-65:-64:11:13:14"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1863 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "ready_refresh node_id=2 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1864 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1865 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1866 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1867 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1868 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1869 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107063932,
+      "line": "grant seq=1870 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "107064932\tRX_ANT\t5785:4:40\t1\t11:-68:-68:-68:10:12:14"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "107064932\tRX_ANT\t5785:4:40\t0\t11:-66:-66:-66:12:13:15"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1871 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1872 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1873 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1874 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1875 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1876 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107064932,
+      "line": "grant seq=1877 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1878 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1879 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1880 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1881 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1882 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1883 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1884 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107065932,
+      "line": "grant seq=1885 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1886 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1887 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1888 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1889 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1890 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "silent_remove node_id=2 silence_ms=3380 consecutive_silent_grants=25 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1891 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1892 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107066933,
+      "line": "grant seq=1893 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "107067933\tRX_ANT\t5785:4:40\t1\t12:-60:-58:-58:10:12:16"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "107067933\tRX_ANT\t5785:4:40\t0\t12:-48:-48:-48:10:12:15"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1894 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1895 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1896 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1897 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1898 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1899 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107067933,
+      "line": "grant seq=1900 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1901 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1902 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1903 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1904 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "silent_remove node_id=4 silence_ms=1819 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1905 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1906 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1907 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107068933,
+      "line": "grant seq=1908 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "107069933\tRX_ANT\t5785:4:40\t1\t3:-68:-68:-68:13:13:13"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "107069933\tRX_ANT\t5785:4:40\t0\t3:-66:-65:-64:13:13:14"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1909 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1910 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1911 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1912 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1913 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1914 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1915 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107069933,
+      "line": "grant seq=1916 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1917 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1918 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1919 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1920 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1921 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1922 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107070933,
+      "line": "grant seq=1923 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1924 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1925 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1926 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1927 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1928 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1929 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1930 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "silent_remove node_id=2 silence_ms=3563 consecutive_silent_grants=26 active_queue=[4] cursor=0 cursor_node_id=4"
+    },
+    {
+      "anchor_ms": 107071933,
+      "line": "grant seq=1931 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4"
+    }
+  ],
+  "stats": [
+    "106983925\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106983925\tRX_BATCH\t0:0:0:0:0",
+    "106983925\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106983925\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106983925\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106983925\tREADY_FILTER\t85:85:0:0:0",
+    "106984925\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106984925\tRX_BATCH\t0:0:0:0:0",
+    "106984925\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106984925\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106984925\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106984925\tREADY_FILTER\t85:85:0:0:0",
+    "106985926\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106985926\tRX_BATCH\t0:0:0:0:0",
+    "106985926\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106985926\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106985926\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106985926\tREADY_FILTER\t85:85:0:0:0",
+    "106986926\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106986926\tRX_BATCH\t0:0:0:0:0",
+    "106986926\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106986926\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106986926\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106986926\tREADY_FILTER\t85:85:0:0:0",
+    "106987926\tPKT\t18:2932:0:0:17:17:2:0:0:1:281",
+    "106987926\tRX_BATCH\t6:18:141:54:5",
+    "106987926\tPKT_SRC\t1:10:1635:2:0:1:281",
+    "106987926\tPKT_SRC\t2:7:1273:0:0:0:0",
+    "106987926\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106987926\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106987926\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106987926\tREADY_FILTER\t86:86:0:0:0",
+    "106988926\tPKT\t25:3652:0:0:24:24:1:5:0:2:559",
+    "106988926\tRX_BATCH\t8:25:259:101:7",
+    "106988926\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t2:10:1346:1:5:1:279",
+    "106988926\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t4:14:2282:0:0:1:280",
+    "106988926\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106988926\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106988926\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106988926\tREADY_FILTER\t87:87:0:0:0",
+    "106989926\tPKT\t11:1933:0:0:11:11:2:0:0:1:280",
+    "106989926\tRX_BATCH\t3:11:107:63:7",
+    "106989926\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t4:11:1933:2:0:1:280",
+    "106989926\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106989926\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106989926\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106989926\tREADY_FILTER\t87:87:0:0:0",
+    "106990927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106990927\tRX_BATCH\t0:0:0:0:0",
+    "106990927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106990927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106990927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106990927\tREADY_FILTER\t87:87:0:0:0",
+    "106991927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106991927\tRX_BATCH\t0:0:0:0:0",
+    "106991927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106991927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106991927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106991927\tREADY_FILTER\t87:87:0:0:0",
+    "106992927\tPKT\t11:1378:0:0:10:10:1:0:0:1:281",
+    "106992927\tRX_BATCH\t4:11:175:85:6",
+    "106992927\tPKT_SRC\t1:10:1354:1:0:1:281",
+    "106992927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106992927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106992927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106992927\tREADY_FILTER\t88:88:0:0:0",
+    "106993927\tPKT\t11:1370:0:0:10:10:1:0:0:1:279",
+    "106993927\tRX_BATCH\t4:11:186:86:7",
+    "106993927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t2:10:1346:1:0:1:279",
+    "106993927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106993927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106993927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106993927\tREADY_FILTER\t89:89:0:0:0",
+    "106994927\tPKT\t10:1351:0:0:9:9:2:0:0:1:280",
+    "106994927\tRX_BATCH\t4:10:190:96:5",
+    "106994927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t4:9:1327:2:0:1:280",
+    "106994927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106994927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106994927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106994927\tREADY_FILTER\t90:90:0:0:0",
+    "106995927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106995927\tRX_BATCH\t0:0:0:0:0",
+    "106995927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106995927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106995927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106995927\tREADY_FILTER\t90:90:0:0:0",
+    "106996927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106996927\tRX_BATCH\t0:0:0:0:0",
+    "106996927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106996927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106996927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106996927\tREADY_FILTER\t90:90:0:0:0",
+    "106997927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106997927\tRX_BATCH\t0:0:0:0:0",
+    "106997927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106997927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106997927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106997927\tREADY_FILTER\t90:90:0:0:0",
+    "106998927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106998927\tRX_BATCH\t0:0:0:0:0",
+    "106998927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106998927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106998927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106998927\tREADY_FILTER\t90:90:0:0:0",
+    "106999927\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "106999927\tRX_BATCH\t0:0:0:0:0",
+    "106999927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "106999927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "106999927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "106999927\tREADY_FILTER\t90:90:0:0:0",
+    "107000927\tPKT\t2:326:0:0:2:2:0:0:0:0:0",
+    "107000927\tRX_BATCH\t1:2:18:18:2",
+    "107000927\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t4:2:326:0:0:0:0",
+    "107000927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107000927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107000927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107000927\tREADY_FILTER\t90:90:0:0:0",
+    "107001927\tPKT\t8:1028:0:0:7:7:0:0:0:1:281",
+    "107001927\tRX_BATCH\t4:8:99:49:5",
+    "107001927\tPKT_SRC\t1:7:1004:0:0:1:281",
+    "107001927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107001927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107001927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107001927\tREADY_FILTER\t91:91:0:0:0",
+    "107002927\tPKT\t9:1050:0:0:9:9:2:3:0:1:281",
+    "107002927\tRX_BATCH\t2:9:159:126:7",
+    "107002927\tPKT_SRC\t1:9:1050:2:3:1:281",
+    "107002927\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107002927\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107002927\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107002927\tREADY_FILTER\t91:91:0:0:0",
+    "107003928\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107003928\tRX_BATCH\t0:0:0:0:0",
+    "107003928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107003928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107003928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107003928\tREADY_FILTER\t91:91:0:0:0",
+    "107004928\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107004928\tRX_BATCH\t0:0:0:0:0",
+    "107004928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107004928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107004928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107004928\tREADY_FILTER\t91:91:0:0:0",
+    "107005928\tPKT\t14:2003:0:0:13:13:0:7:0:1:280",
+    "107005928\tRX_BATCH\t4:14:196:91:7",
+    "107005928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t4:13:1979:0:7:1:280",
+    "107005928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107005928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107005928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107005928\tREADY_FILTER\t92:92:0:0:0",
+    "107006928\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107006928\tRX_BATCH\t0:0:0:0:0",
+    "107006928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107006928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107006928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107006928\tREADY_FILTER\t92:92:0:0:0",
+    "107007928\tPKT\t41:9935:0:0:39:39:9:5:0:23:6455",
+    "107007928\tRX_BATCH\t22:41:712:161:6",
+    "107007928\tPKT_SRC\t1:5:396:0:0:1:281",
+    "107007928\tPKT_SRC\t2:34:9491:9:5:22:6174",
+    "107007928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107007928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107007928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107007928\tREADY_FILTER\t94:94:0:0:0",
+    "107008928\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107008928\tRX_BATCH\t0:0:0:0:0",
+    "107008928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107008928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107008928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107008928\tREADY_FILTER\t94:94:0:0:0",
+    "107009928\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107009928\tRX_BATCH\t0:0:0:0:0",
+    "107009928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107009928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107009928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107009928\tREADY_FILTER\t94:94:0:0:0",
+    "107010928\tPKT\t11:1934:0:0:10:10:3:0:0:1:280",
+    "107010928\tRX_BATCH\t4:11:181:90:5",
+    "107010928\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t4:10:1910:3:0:1:280",
+    "107010928\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107010928\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107010928\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107010928\tREADY_FILTER\t95:95:0:0:0",
+    "107011929\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107011929\tRX_BATCH\t0:0:0:0:0",
+    "107011929\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107011929\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107011929\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107011929\tREADY_FILTER\t95:95:0:0:0",
+    "107012929\tPKT\t13:1969:0:0:11:11:3:0:0:1:278",
+    "107012929\tRX_BATCH\t5:13:261:88:6",
+    "107012929\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t2:11:1921:3:0:1:278",
+    "107012929\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107012929\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107012929\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107012929\tREADY_FILTER\t97:97:0:0:0",
+    "107013929\tPKT\t12:1681:0:0:12:12:1:3:0:1:281",
+    "107013929\tRX_BATCH\t2:12:117:103:8",
+    "107013929\tPKT_SRC\t1:12:1681:1:3:1:281",
+    "107013929\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107013929\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107013929\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107013929\tREADY_FILTER\t97:97:0:0:0",
+    "107014929\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107014929\tRX_BATCH\t0:0:0:0:0",
+    "107014929\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107014929\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107014929\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107014929\tREADY_FILTER\t97:97:0:0:0",
+    "107015929\tPKT\t6:979:0:0:5:5:0:0:0:0:0",
+    "107015929\tRX_BATCH\t3:6:117:90:3",
+    "107015929\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t4:5:955:0:0:0:0",
+    "107015929\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107015929\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107015929\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107015929\tREADY_FILTER\t98:98:0:0:0",
+    "107016930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107016930\tRX_BATCH\t0:0:0:0:0",
+    "107016930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107016930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107016930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107016930\tREADY_FILTER\t98:98:0:0:0",
+    "107017930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107017930\tRX_BATCH\t0:0:0:0:0",
+    "107017930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107017930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107017930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107017930\tREADY_FILTER\t98:98:0:0:0",
+    "107018930\tPKT\t10:1636:0:0:9:9:4:0:0:1:281",
+    "107018930\tRX_BATCH\t3:10:184:93:5",
+    "107018930\tPKT_SRC\t1:9:1612:4:0:1:281",
+    "107018930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107018930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107018930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107018930\tREADY_FILTER\t99:99:0:0:0",
+    "107019930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107019930\tRX_BATCH\t0:0:0:0:0",
+    "107019930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107019930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107019930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107019930\tREADY_FILTER\t99:99:0:0:0",
+    "107020930\tPKT\t1:24:0:0:0:0:0:0:0:0:0",
+    "107020930\tRX_BATCH\t1:1:85:85:1",
+    "107020930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107020930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107020930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107020930\tREADY_FILTER\t100:100:0:0:0",
+    "107021930\tPKT\t22:3302:0:0:21:21:3:6:0:2:559",
+    "107021930\tRX_BATCH\t7:22:240:97:7",
+    "107021930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t2:10:1625:2:0:1:279",
+    "107021930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t4:11:1653:1:6:1:280",
+    "107021930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107021930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107021930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107021930\tREADY_FILTER\t101:101:0:0:0",
+    "107022930\tPKT\t8:1579:0:0:8:8:4:0:0:1:279",
+    "107022930\tRX_BATCH\t3:8:102:61:4",
+    "107022930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t2:8:1579:4:0:1:279",
+    "107022930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107022930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107022930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107022930\tREADY_FILTER\t101:101:0:0:0",
+    "107023930\tPKT\t10:1074:0:0:9:9:1:0:0:1:281",
+    "107023930\tRX_BATCH\t4:10:185:84:6",
+    "107023930\tPKT_SRC\t1:9:1050:1:0:1:281",
+    "107023930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107023930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107023930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107023930\tREADY_FILTER\t102:102:0:0:0",
+    "107024930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107024930\tRX_BATCH\t0:0:0:0:0",
+    "107024930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107024930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107024930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107024930\tREADY_FILTER\t102:102:0:0:0",
+    "107025930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107025930\tRX_BATCH\t0:0:0:0:0",
+    "107025930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107025930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107025930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107025930\tREADY_FILTER\t102:102:0:0:0",
+    "107026930\tPKT\t9:1328:0:0:8:8:4:0:0:1:280",
+    "107026930\tRX_BATCH\t3:9:168:92:5",
+    "107026930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t4:8:1304:4:0:1:280",
+    "107026930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107026930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107026930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107026930\tREADY_FILTER\t103:103:0:0:0",
+    "107027930\tPKT\t9:1324:0:0:8:8:3:0:0:1:279",
+    "107027930\tRX_BATCH\t4:9:133:57:4",
+    "107027930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t2:8:1300:3:0:1:279",
+    "107027930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107027930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107027930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107027930\tREADY_FILTER\t104:104:0:0:0",
+    "107028930\tPKT\t14:2009:0:0:13:13:0:0:0:1:281",
+    "107028930\tRX_BATCH\t4:14:165:87:7",
+    "107028930\tPKT_SRC\t1:13:1985:0:0:1:281",
+    "107028930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107028930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107028930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107028930\tREADY_FILTER\t105:105:0:0:0",
+    "107029930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107029930\tRX_BATCH\t0:0:0:0:0",
+    "107029930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107029930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107029930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107029930\tREADY_FILTER\t105:105:0:0:0",
+    "107030930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107030930\tRX_BATCH\t0:0:0:0:0",
+    "107030930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107030930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107030930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107030930\tREADY_FILTER\t105:105:0:0:0",
+    "107031930\tPKT\t14:2003:0:0:13:13:0:0:0:1:280",
+    "107031930\tRX_BATCH\t4:14:149:56:7",
+    "107031930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t4:13:1979:0:0:1:280",
+    "107031930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107031930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107031930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107031930\tREADY_FILTER\t106:106:0:0:0",
+    "107032930\tPKT\t1:24:0:0:0:0:0:0:0:0:0",
+    "107032930\tRX_BATCH\t1:1:80:80:1",
+    "107032930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107032930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107032930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107032930\tREADY_FILTER\t107:107:0:0:0",
+    "107033930\tPKT\t8:742:0:0:8:8:2:0:0:1:279",
+    "107033930\tRX_BATCH\t3:8:77:49:6",
+    "107033930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t2:8:742:2:0:1:279",
+    "107033930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107033930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107033930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107033930\tREADY_FILTER\t107:107:0:0:0",
+    "107034930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107034930\tRX_BATCH\t0:0:0:0:0",
+    "107034930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107034930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107034930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107034930\tREADY_FILTER\t107:107:0:0:0",
+    "107035930\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107035930\tRX_BATCH\t0:0:0:0:0",
+    "107035930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107035930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107035930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107035930\tREADY_FILTER\t107:107:0:0:0",
+    "107036930\tPKT\t13:2260:0:0:12:12:2:0:0:1:280",
+    "107036930\tRX_BATCH\t4:13:178:88:8",
+    "107036930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t4:12:2236:2:0:1:280",
+    "107036930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107036930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107036930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107036930\tREADY_FILTER\t108:108:0:0:0",
+    "107037930\tPKT\t1:24:0:0:0:0:0:0:0:0:0",
+    "107037930\tRX_BATCH\t1:1:27:27:1",
+    "107037930\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107037930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107037930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107037930\tREADY_FILTER\t109:109:0:0:0",
+    "107038930\tPKT\t26:3398:0:0:24:24:0:0:0:2:560",
+    "107038930\tRX_BATCH\t8:26:354:91:8",
+    "107038930\tPKT_SRC\t1:11:1377:0:0:1:281",
+    "107038930\tPKT_SRC\t2:13:1973:0:0:1:279",
+    "107038930\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107038930\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107038930\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107038930\tREADY_FILTER\t111:111:0:0:0",
+    "107039931\tPKT\t10:1354:0:0:10:10:2:0:0:1:281",
+    "107039931\tRX_BATCH\t2:10:92:65:6",
+    "107039931\tPKT_SRC\t1:10:1354:2:0:1:281",
+    "107039931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107039931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107039931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107039931\tREADY_FILTER\t111:111:0:0:0",
+    "107040931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107040931\tRX_BATCH\t0:0:0:0:0",
+    "107040931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107040931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107040931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107040931\tREADY_FILTER\t111:111:0:0:0",
+    "107041931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107041931\tRX_BATCH\t0:0:0:0:0",
+    "107041931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107041931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107041931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107041931\tREADY_FILTER\t111:111:0:0:0",
+    "107042931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107042931\tRX_BATCH\t0:0:0:0:0",
+    "107042931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107042931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107042931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107042931\tREADY_FILTER\t111:111:0:0:0",
+    "107043931\tPKT\t9:1045:0:0:8:8:2:0:0:1:279",
+    "107043931\tRX_BATCH\t4:9:195:86:5",
+    "107043931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t2:8:1021:2:0:1:279",
+    "107043931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107043931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107043931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107043931\tREADY_FILTER\t112:112:0:0:0",
+    "107044931\tPKT\t10:1355:0:0:9:9:3:0:0:1:281",
+    "107044931\tRX_BATCH\t3:10:180:90:6",
+    "107044931\tPKT_SRC\t1:9:1331:3:0:1:281",
+    "107044931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107044931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107044931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107044931\tREADY_FILTER\t113:113:0:0:0",
+    "107045931\tPKT\t9:1328:0:0:8:8:3:0:0:1:280",
+    "107045931\tRX_BATCH\t4:9:122:56:4",
+    "107045931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t4:8:1304:3:0:1:280",
+    "107045931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107045931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107045931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107045931\tREADY_FILTER\t114:114:0:0:0",
+    "107046931\tPKT\t9:1047:0:0:9:9:2:0:0:1:280",
+    "107046931\tRX_BATCH\t3:9:110:65:5",
+    "107046931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t4:9:1047:2:0:1:280",
+    "107046931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107046931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107046931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107046931\tREADY_FILTER\t114:114:0:0:0",
+    "107047931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107047931\tRX_BATCH\t0:0:0:0:0",
+    "107047931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107047931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107047931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107047931\tREADY_FILTER\t114:114:0:0:0",
+    "107048931\tPKT\t8:743:0:0:7:7:0:0:0:0:0",
+    "107048931\tRX_BATCH\t3:8:100:72:5",
+    "107048931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t2:7:719:0:0:0:0",
+    "107048931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107048931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107048931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107048931\tREADY_FILTER\t115:115:0:0:0",
+    "107049931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107049931\tRX_BATCH\t0:0:0:0:0",
+    "107049931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107049931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107049931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107049931\tREADY_FILTER\t115:115:0:0:0",
+    "107050931\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107050931\tRX_BATCH\t0:0:0:0:0",
+    "107050931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107050931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107050931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107050931\tREADY_FILTER\t115:115:0:0:0",
+    "107051931\tPKT\t1:24:0:0:0:0:0:0:0:0:0",
+    "107051931\tRX_BATCH\t1:1:94:94:1",
+    "107051931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107051931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107051931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107051931\tREADY_FILTER\t116:116:0:0:0",
+    "107052931\tPKT\t14:2282:0:0:14:14:0:0:0:1:280",
+    "107052931\tRX_BATCH\t3:14:101:63:9",
+    "107052931\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t4:14:2282:0:0:1:280",
+    "107052931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107052931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107052931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107052931\tREADY_FILTER\t116:116:0:0:0",
+    "107053931\tPKT\t25:3379:0:0:23:23:3:3:0:2:560",
+    "107053931\tRX_BATCH\t6:25:381:100:6",
+    "107053931\tPKT_SRC\t1:12:1962:2:0:1:281",
+    "107053931\tPKT_SRC\t2:11:1369:1:3:1:279",
+    "107053931\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107053931\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107053931\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107053931\tREADY_FILTER\t118:118:0:0:0",
+    "107054932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107054932\tRX_BATCH\t0:0:0:0:0",
+    "107054932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107054932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107054932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107054932\tREADY_FILTER\t118:118:0:0:0",
+    "107055932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107055932\tRX_BATCH\t0:0:0:0:0",
+    "107055932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107055932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107055932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107055932\tREADY_FILTER\t118:118:0:0:0",
+    "107056932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107056932\tRX_BATCH\t0:0:0:0:0",
+    "107056932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107056932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107056932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107056932\tREADY_FILTER\t118:118:0:0:0",
+    "107057932\tPKT\t8:1585:0:0:7:7:0:0:0:1:280",
+    "107057932\tRX_BATCH\t4:8:178:92:5",
+    "107057932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t4:7:1561:0:0:1:280",
+    "107057932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107057932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107057932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107057932\tREADY_FILTER\t119:119:0:0:0",
+    "107058932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107058932\tRX_BATCH\t0:0:0:0:0",
+    "107058932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107058932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107058932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107058932\tREADY_FILTER\t119:119:0:0:0",
+    "107059933\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107059933\tRX_BATCH\t0:0:0:0:0",
+    "107059933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107059933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107059933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107059933\tREADY_FILTER\t119:119:0:0:0",
+    "107060932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107060932\tRX_BATCH\t0:0:0:0:0",
+    "107060932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107060932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107060932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107060932\tREADY_FILTER\t119:119:0:0:0",
+    "107061932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107061932\tRX_BATCH\t0:0:0:0:0",
+    "107061932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107061932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107061932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107061932\tREADY_FILTER\t119:119:0:0:0",
+    "107062932\tPKT\t12:2236:0:0:12:12:2:5:0:1:280",
+    "107062932\tRX_BATCH\t3:12:183:134:6",
+    "107062932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t4:12:2236:2:5:1:280",
+    "107062932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107062932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107062932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107062932\tREADY_FILTER\t119:119:0:0:0",
+    "107063932\tPKT\t12:1393:0:0:11:11:1:0:0:1:279",
+    "107063932\tRX_BATCH\t3:12:172:84:8",
+    "107063932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t2:11:1369:1:0:1:279",
+    "107063932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107063932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107063932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107063932\tREADY_FILTER\t120:120:0:0:0",
+    "107064932\tPKT\t12:1672:0:0:11:11:1:0:0:1:279",
+    "107064932\tRX_BATCH\t4:12:183:86:6",
+    "107064932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t2:11:1648:1:0:1:279",
+    "107064932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107064932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107064932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107064932\tREADY_FILTER\t121:121:0:0:0",
+    "107065932\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107065932\tRX_BATCH\t0:0:0:0:0",
+    "107065932\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107065932\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107065932\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107065932\tREADY_FILTER\t121:121:0:0:0",
+    "107066933\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107066933\tRX_BATCH\t0:0:0:0:0",
+    "107066933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107066933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107066933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107066933\tREADY_FILTER\t121:121:0:0:0",
+    "107067933\tPKT\t13:1980:0:0:12:12:1:0:0:1:280",
+    "107067933\tRX_BATCH\t4:13:177:85:7",
+    "107067933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t4:12:1956:1:0:1:280",
+    "107067933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107067933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107067933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107067933\tREADY_FILTER\t122:122:0:0:0",
+    "107068933\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107068933\tRX_BATCH\t0:0:0:0:0",
+    "107068933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107068933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107068933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107068933\tREADY_FILTER\t122:122:0:0:0",
+    "107069933\tPKT\t4:372:0:0:3:3:0:0:0:0:0",
+    "107069933\tRX_BATCH\t2:4:106:85:3",
+    "107069933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t2:3:348:0:0:0:0",
+    "107069933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107069933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107069933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107069933\tREADY_FILTER\t123:123:0:0:0",
+    "107070933\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107070933\tRX_BATCH\t0:0:0:0:0",
+    "107070933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107070933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107070933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107070933\tREADY_FILTER\t123:123:0:0:0",
+    "107071933\tPKT\t0:0:0:0:0:0:0:0:0:0:0",
+    "107071933\tRX_BATCH\t0:0:0:0:0",
+    "107071933\tPKT_SRC\t1:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t2:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t3:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t4:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t5:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t6:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t7:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t8:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t9:0:0:0:0:0:0",
+    "107071933\tPKT_SRC\t10:0:0:0:0:0:0",
+    "107071933\tGRANT_FILTER\t0:0:0:0:0:0:0:0:0",
+    "107071933\tREADY_FILTER\t123:123:0:0:0"
+  ]
+}

@@ -1,0 +1,13 @@
+fl00 stop
+backup SHA 8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0
+UTC 2026-10-27T12:23:57Z CMD ['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'ExecStart', '-p', 'MainPID', '-p', 'DropInPaths']
+MainPID=196920
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json ; ignore_errors=no ; start_time=[Tue 2026-10-27 16:10:29 CST] ; stop_time=[n/a] ; pid=196920 ; code=(null) ; status=0/0 }
+DropInPaths=/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf
+RC 0
+UTC 2026-10-27T12:23:57Z CMD ['systemctl', 'stop', 'wfb-fl-server-daemon.service']
+RC 0
+
+NATIVE_PHASE_PASS fl00 stop
+
+Exit 0

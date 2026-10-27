@@ -1,0 +1,13 @@
+fl04 start
+UTC 2026-10-27T17:15:23Z CMD ['systemctl', 'start', 'wfb-fl-client-daemon.service']
+RC 0
+UTC 2026-10-27T17:15:23Z CMD ['systemctl', 'is-active', 'wfb-fl-client-daemon.service']
+active
+RC 0
+UTC 2026-10-27T17:15:23Z CMD ['systemctl', 'show', 'wfb-fl-client-daemon.service', '-p', 'MainPID', '-p', 'ExecStart']
+MainPID=37508
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Wed 2026-10-28 01:15:23 CST] ; stop_time=[n/a] ; pid=37508 ; code=(null) ; status=0/0 }
+RC 0
+NATIVE_PHASE_PASS fl04 start
+
+Exit 0

@@ -1,0 +1,22 @@
+b4f81258c910b9bcd96fa6675627aa830d6b6c14d8babf93ba6cdf894ad9489c  /usr/bin/wfb_v6_uplink
+c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a  /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py
+7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc  /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py
+phy#1
+	Interface wlxfc221c500a88
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:50:0a:88
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 4
+		wdev 0x1
+		addr dc:4a:9e:31:8a:9c
+		ssid HONOR 500
+		type managed
+		channel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+inactive
+active

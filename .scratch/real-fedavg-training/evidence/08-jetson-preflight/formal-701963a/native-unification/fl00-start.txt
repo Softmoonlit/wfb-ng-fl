@@ -1,0 +1,13 @@
+fl00 start
+UTC 2026-10-27T17:15:16Z CMD ['systemctl', 'start', 'wfb-fl-server-daemon.service']
+RC 0
+UTC 2026-10-27T17:15:16Z CMD ['systemctl', 'is-active', 'wfb-fl-server-daemon.service']
+active
+RC 0
+UTC 2026-10-27T17:15:16Z CMD ['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'MainPID', '-p', 'ExecStart']
+MainPID=233198
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json ; ignore_errors=no ; start_time=[Wed 2026-10-28 01:15:16 CST] ; stop_time=[n/a] ; pid=233198 ; code=(null) ; status=0/0 }
+RC 0
+NATIVE_PHASE_PASS fl00 start
+
+Exit 0

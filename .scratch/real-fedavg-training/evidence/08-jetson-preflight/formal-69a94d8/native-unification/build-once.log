@@ -1,0 +1,26 @@
+COMMAND ['make', '-C', '/srv/wfb-ng-fl/native-69a94d8-unified/source', 'build_v6', 'COMMIT=69a94d84b006666d01e257155bc7a2fc969bedef', 'VERSION=0.0.0', 'PYTHON=/usr/bin/python3']
+make: 进入目录“/srv/wfb-ng-fl/native-69a94d8-unified/source”
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/v6_uplink.o src/v6_uplink.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/v6_radio_control.o src/v6_radio_control.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/v6_plaintext_fec_tx.o src/v6_plaintext_fec_tx.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -D__WFB_TX_SHARED_LIBRARY__ -c -o src/tx.link.o src/tx.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.link.o src/rx.cpp
+cc  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu99 -c -o src/radiotap.o src/radiotap.c
+src/radiotap.c: In function ‘ieee80211_radiotap_iterator_init’:
+src/radiotap.c:116:34: warning: taking address of packed member of ‘struct ieee80211_radiotap_header’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  116 |         iterator->_next_bitmap = &radiotap_header->it_present; // NOLINT(clang-diagnostic-address-of-packed-member)
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu99 -c -o src/zfex.o src/zfex.c
+src/zfex.c:20:9: note: ‘#pragma message: Using NEON-accelerated FEC’
+   20 | #pragma message "Using NEON-accelerated FEC"
+      |         ^~~~~~~
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/wifibroadcast.o src/wifibroadcast.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/control_envelope.o src/control_envelope.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/token_scheduler.o src/token_scheduler.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/token_authorization.o src/token_authorization.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/token_authorization_ipc.o src/token_authorization_ipc.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/token_event_ipc.o src/token_event_ipc.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-69a94d84"' -std=gnu++11 -c -o src/tx_token_gate.o src/tx_token_gate.cpp
+g++ -o wfb_v6_uplink src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap
+make: 离开目录“/srv/wfb-ng-fl/native-69a94d8-unified/source”
+UNIFIED_NATIVE_BUILD_PASS 8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0

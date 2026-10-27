@@ -1,0 +1,20 @@
+8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0  /usr/bin/wfb_v6_uplink
+c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a  /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py
+7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc  /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py
+phy#1
+	Interface wlxfc221c100157
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:10:01:57
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP1p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:e2:3c:48
+		type managed
+		txpower -100.00 dBm
+active
+inactive

@@ -1,0 +1,456 @@
+{
+  "all3": {
+    "1": {
+      "duration_client_s": 80.07650567300152,
+      "hb_client_count": 28,
+      "hb_server_count": 29,
+      "max_client_HBsend_gap_s": 5.248360482000862,
+      "max_server_HBrx_gap_s": 9.242141440001433,
+      "max_server_registry_HBage_s": 8.7,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.4642857142857143,
+      "client_states": {
+        "IDLE": 15,
+        "HUNTING": 13
+      },
+      "channels": {
+        "157": 20,
+        "149": 4,
+        "153": 4
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 15,
+      "client_nearest_ACKdelay_ms_median": 185.46884100942407,
+      "client_nearest_ACKdelay_ms_max": 447.5231590040494,
+      "client_nearest_ACKdelay_over230ms_count": 2,
+      "multiple_ACK_same_send_window": 2,
+      "server_nearest_ACKresponse_ms_max": 1.7804479866754264,
+      "token_counter_delta": [
+        133,
+        0,
+        28,
+        58
+      ],
+      "grant_filter_delta": [
+        548,
+        133,
+        0,
+        415,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 129,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    },
+    "2": {
+      "duration_client_s": 80.07800119600142,
+      "hb_client_count": 42,
+      "hb_server_count": 39,
+      "max_client_HBsend_gap_s": 5.231506712996634,
+      "max_server_HBrx_gap_s": 9.367323072001454,
+      "max_server_registry_HBage_s": 15.81,
+      "server_api_offline_samples": 2,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [
+        {
+          "from_mono": 74845.683234048,
+          "to_mono": 74855.765574112,
+          "sampled_s": 10.082340063992888
+        }
+      ],
+      "hunt_packet_ratio": 0.6190476190476191,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 26
+      },
+      "channels": {
+        "157": 26,
+        "149": 8,
+        "153": 8
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 15,
+      "client_nearest_ACKdelay_ms_median": 178.79306299437303,
+      "client_nearest_ACKdelay_ms_max": 4346.180510998238,
+      "client_nearest_ACKdelay_over230ms_count": 2,
+      "multiple_ACK_same_send_window": 2,
+      "server_nearest_ACKresponse_ms_max": 25.09321599791292,
+      "token_counter_delta": [
+        211,
+        0,
+        42,
+        182
+      ],
+      "grant_filter_delta": [
+        526,
+        211,
+        0,
+        315,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 214,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    },
+    "4": {
+      "duration_client_s": 80.04243425501045,
+      "hb_client_count": 29,
+      "hb_server_count": 29,
+      "max_client_HBsend_gap_s": 5.230594563996419,
+      "max_server_HBrx_gap_s": 9.500008160001016,
+      "max_server_registry_HBage_s": 8.64,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.4482758620689655,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 13
+      },
+      "channels": {
+        "157": 21,
+        "149": 4,
+        "153": 4
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 16,
+      "client_nearest_ACKdelay_ms_median": 184.7614694997901,
+      "client_nearest_ACKdelay_ms_max": 4355.387592004263,
+      "client_nearest_ACKdelay_over230ms_count": 3,
+      "multiple_ACK_same_send_window": 2,
+      "server_nearest_ACKresponse_ms_max": 2.2290880006039515,
+      "token_counter_delta": [
+        219,
+        0,
+        28,
+        93
+      ],
+      "grant_filter_delta": [
+        556,
+        219,
+        0,
+        337,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 221,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    }
+  },
+  "only-fl02": {
+    "2": {
+      "duration_client_s": 80.07442796199757,
+      "hb_client_count": 16,
+      "hb_server_count": 15,
+      "max_client_HBsend_gap_s": 5.231631924994872,
+      "max_server_HBrx_gap_s": 5.234360543996445,
+      "max_server_registry_HBage_s": 4.99,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.0,
+      "client_states": {
+        "IDLE": 16
+      },
+      "channels": {
+        "157": 16
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 14,
+      "client_nearest_ACKdelay_ms_median": 7.167521995143034,
+      "client_nearest_ACKdelay_ms_max": 76.69319800334051,
+      "client_nearest_ACKdelay_over230ms_count": 0,
+      "multiple_ACK_same_send_window": 0,
+      "server_nearest_ACKresponse_ms_max": 2.185856006690301,
+      "token_counter_delta": [
+        515,
+        0,
+        16,
+        3
+      ],
+      "grant_filter_delta": [
+        515,
+        515,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 465,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    }
+  },
+  "fl01-fl02": {
+    "1": {
+      "duration_client_s": 80.0792358010076,
+      "hb_client_count": 53,
+      "hb_server_count": 50,
+      "max_client_HBsend_gap_s": 5.248626572996727,
+      "max_server_HBrx_gap_s": 18.887377952007228,
+      "max_server_registry_HBage_s": 93.55,
+      "server_api_offline_samples": 2,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 1,
+      "offline_intervals_server_monotonic": [
+        {
+          "from_mono": 75007.126670144,
+          "to_mono": 75011.936609888,
+          "sampled_s": 4.809939743994619
+        },
+        {
+          "from_mono": 75056.945723712,
+          "to_mono": 75061.941009856,
+          "sampled_s": 4.995286144010606
+        }
+      ],
+      "hunt_packet_ratio": 0.7169811320754716,
+      "client_states": {
+        "IDLE": 15,
+        "HUNTING": 38
+      },
+      "channels": {
+        "157": 29,
+        "149": 12,
+        "153": 12
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 14,
+      "client_nearest_ACKdelay_ms_median": 159.5868305012118,
+      "client_nearest_ACKdelay_ms_max": 4355.4341579874745,
+      "client_nearest_ACKdelay_over230ms_count": 2,
+      "multiple_ACK_same_send_window": 3,
+      "server_nearest_ACKresponse_ms_max": 2.283552006701939,
+      "token_counter_delta": [
+        259,
+        0,
+        53,
+        141
+      ],
+      "grant_filter_delta": [
+        494,
+        252,
+        0,
+        242,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 249,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    },
+    "2": {
+      "duration_client_s": 80.08092603700061,
+      "hb_client_count": 30,
+      "hb_server_count": 27,
+      "max_client_HBsend_gap_s": 5.231521297988365,
+      "max_server_HBrx_gap_s": 10.412912127998425,
+      "max_server_registry_HBage_s": 8.76,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.4666666666666667,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 14
+      },
+      "channels": {
+        "157": 22,
+        "149": 4,
+        "153": 4
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 15,
+      "client_nearest_ACKdelay_ms_median": 161.93473699968308,
+      "client_nearest_ACKdelay_ms_max": 256.61765498807654,
+      "client_nearest_ACKdelay_over230ms_count": 3,
+      "multiple_ACK_same_send_window": 2,
+      "server_nearest_ACKresponse_ms_max": 2.1261439978843555,
+      "token_counter_delta": [
+        305,
+        0,
+        30,
+        55
+      ],
+      "grant_filter_delta": [
+        545,
+        305,
+        0,
+        240,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 284,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    }
+  },
+  "restore-all": {
+    "1": {
+      "duration_client_s": 80.07426733498869,
+      "hb_client_count": 15,
+      "hb_server_count": 14,
+      "max_client_HBsend_gap_s": 5.231896234996384,
+      "max_server_HBrx_gap_s": 10.41092304000631,
+      "max_server_registry_HBage_s": 8.71,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.0,
+      "client_states": {
+        "IDLE": 15
+      },
+      "channels": {
+        "157": 15
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 13,
+      "client_nearest_ACKdelay_ms_median": 183.7269829993602,
+      "client_nearest_ACKdelay_ms_max": 4345.1973689952865,
+      "client_nearest_ACKdelay_over230ms_count": 1,
+      "multiple_ACK_same_send_window": 0,
+      "server_nearest_ACKresponse_ms_max": 1.7256959981750697,
+      "token_counter_delta": [
+        175,
+        0,
+        14,
+        97
+      ],
+      "grant_filter_delta": [
+        544,
+        175,
+        0,
+        369,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 182,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    },
+    "2": {
+      "duration_client_s": 80.07371276299818,
+      "hb_client_count": 16,
+      "hb_server_count": 14,
+      "max_client_HBsend_gap_s": 5.232133167999564,
+      "max_server_HBrx_gap_s": 10.414758751998306,
+      "max_server_registry_HBage_s": 6.71,
+      "server_api_offline_samples": 0,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [],
+      "hunt_packet_ratio": 0.0,
+      "client_states": {
+        "IDLE": 16
+      },
+      "channels": {
+        "157": 16
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 14,
+      "client_nearest_ACKdelay_ms_median": 185.22549900808372,
+      "client_nearest_ACKdelay_ms_max": 313.85415499971714,
+      "client_nearest_ACKdelay_over230ms_count": 1,
+      "multiple_ACK_same_send_window": 0,
+      "server_nearest_ACKresponse_ms_max": 25.26662399759516,
+      "token_counter_delta": [
+        253,
+        0,
+        16,
+        34
+      ],
+      "grant_filter_delta": [
+        580,
+        253,
+        0,
+        327,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 255,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    },
+    "4": {
+      "duration_client_s": 80.04251315099827,
+      "hb_client_count": 27,
+      "hb_server_count": 29,
+      "max_client_HBsend_gap_s": 5.2341733039938845,
+      "max_server_HBrx_gap_s": 9.350459968001815,
+      "max_server_registry_HBage_s": 172.98,
+      "server_api_offline_samples": 1,
+      "api_samples": 17,
+      "server_offline_samples_after_first_current_phase_HB": 0,
+      "offline_intervals_server_monotonic": [
+        {
+          "from_mono": 75092.28180944,
+          "to_mono": 75097.184019712,
+          "sampled_s": 4.902210272004595
+        }
+      ],
+      "hunt_packet_ratio": 0.4444444444444444,
+      "client_states": {
+        "HUNTING": 12,
+        "IDLE": 15
+      },
+      "channels": {
+        "149": 4,
+        "153": 4,
+        "157": 19
+      },
+      "client_nearest_ACK_after_HB_before_next_send_count": 16,
+      "client_nearest_ACKdelay_ms_median": 186.67632700089598,
+      "client_nearest_ACKdelay_ms_max": 4359.618606991717,
+      "client_nearest_ACKdelay_over230ms_count": 2,
+      "multiple_ACK_same_send_window": 2,
+      "server_nearest_ACKresponse_ms_max": 24.898080009734258,
+      "token_counter_delta": [
+        142,
+        0,
+        29,
+        96
+      ],
+      "grant_filter_delta": [
+        576,
+        142,
+        0,
+        434,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "grant_accept_unique_sequences_in_sampled_tails_lower_bound": 142,
+      "capture_drops": 0,
+      "notes": "HB gaps exclude pre/post capture boundary. ACK nearest association is ambiguous because ACK has no HB timestamp/seq; it is not exact RTT. Grant counters sampled native tails, not full event ledger. Initial offline after stopped node starts includes stale registry and startup."
+    }
+  }
+}

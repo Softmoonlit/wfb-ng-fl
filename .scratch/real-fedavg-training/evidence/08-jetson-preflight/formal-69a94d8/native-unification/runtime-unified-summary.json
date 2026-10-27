@@ -1,0 +1,150 @@
+{
+  "fl00": {
+    "daemon_pid": "215499",
+    "proc_cwd": "/",
+    "native_pid": "215543",
+    "native_exe": "/usr/bin/wfb_v6_uplink",
+    "native_running_sha256": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0",
+    "runtime_identity": {
+      "commit": "69a94d84b006666d01e257155bc7a2fc969bedef",
+      "schema_version": 1
+    },
+    "runtime_specs": {
+      "wfb_ng": "/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py",
+      "wfb_ng.fl.service": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py",
+      "wfb_ng.fl.console": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py",
+      "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+      "wfb_ng.fl.server_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+      "wfb_ng.fl.mnist": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py"
+    },
+    "runtime_hashes": {
+      "wfb_ng": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232",
+      "wfb_ng.fl.service": "c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a",
+      "wfb_ng.fl.console": "7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc",
+      "wfb_ng.fl.client_daemon": "2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3",
+      "wfb_ng.fl.server_daemon": "2e0774b7da254580b6d29daa88125c3e4ace9d6f1d213dd235a7c34d59d440db",
+      "wfb_ng.fl.mnist": "c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9"
+    },
+    "unit_state": {
+      "rc": 0,
+      "out": "active\n",
+      "err": ""
+    },
+    "iw": {
+      "rc": 0,
+      "out": "phy#1\n\tInterface wlxfc221c100157\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:57\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm\n",
+      "err": ""
+    }
+  },
+  "fl01": {
+    "daemon_pid": "33457",
+    "proc_cwd": "/",
+    "native_pid": "33474",
+    "native_exe": "/usr/bin/wfb_v6_uplink",
+    "native_running_sha256": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0",
+    "runtime_identity": {
+      "commit": "69a94d84b006666d01e257155bc7a2fc969bedef",
+      "schema_version": 1
+    },
+    "runtime_specs": {
+      "wfb_ng": "/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py",
+      "wfb_ng.fl.service": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py",
+      "wfb_ng.fl.console": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py",
+      "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+      "wfb_ng.fl.server_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+      "wfb_ng.fl.mnist": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py"
+    },
+    "runtime_hashes": {
+      "wfb_ng": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232",
+      "wfb_ng.fl.service": "c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a",
+      "wfb_ng.fl.console": "7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc",
+      "wfb_ng.fl.client_daemon": "2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3",
+      "wfb_ng.fl.server_daemon": "2e0774b7da254580b6d29daa88125c3e4ace9d6f1d213dd235a7c34d59d440db",
+      "wfb_ng.fl.mnist": "c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9"
+    },
+    "unit_state": {
+      "rc": 0,
+      "out": "active\n",
+      "err": ""
+    },
+    "iw": {
+      "rc": 0,
+      "out": "phy#2\n\tInterface wlxfc221c300e99\n\t\tifindex 25\n\t\twdev 0x200000001\n\t\taddr fc:22:1c:30:0e:99\n\t\ttype monitor\n\t\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:a6\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm\n",
+      "err": ""
+    }
+  },
+  "fl02": {
+    "daemon_pid": "30609",
+    "proc_cwd": "/",
+    "native_pid": "30627",
+    "native_exe": "/usr/bin/wfb_v6_uplink",
+    "native_running_sha256": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0",
+    "runtime_identity": {
+      "commit": "69a94d84b006666d01e257155bc7a2fc969bedef",
+      "schema_version": 1
+    },
+    "runtime_specs": {
+      "wfb_ng": "/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py",
+      "wfb_ng.fl.service": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py",
+      "wfb_ng.fl.console": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py",
+      "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+      "wfb_ng.fl.server_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+      "wfb_ng.fl.mnist": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py"
+    },
+    "runtime_hashes": {
+      "wfb_ng": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232",
+      "wfb_ng.fl.service": "c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a",
+      "wfb_ng.fl.console": "7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc",
+      "wfb_ng.fl.client_daemon": "2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3",
+      "wfb_ng.fl.server_daemon": "2e0774b7da254580b6d29daa88125c3e4ace9d6f1d213dd235a7c34d59d440db",
+      "wfb_ng.fl.mnist": "c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9"
+    },
+    "unit_state": {
+      "rc": 0,
+      "out": "active\n",
+      "err": ""
+    },
+    "iw": {
+      "rc": 0,
+      "out": "phy#1\n\tInterface wlxfc221c300cbb\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:30:0c:bb\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:86\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm\n",
+      "err": ""
+    }
+  },
+  "fl04": {
+    "daemon_pid": "33324",
+    "proc_cwd": "/",
+    "native_pid": "33342",
+    "native_exe": "/usr/bin/wfb_v6_uplink",
+    "native_running_sha256": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0",
+    "runtime_identity": {
+      "commit": "69a94d84b006666d01e257155bc7a2fc969bedef",
+      "schema_version": 1
+    },
+    "runtime_specs": {
+      "wfb_ng": "/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py",
+      "wfb_ng.fl.service": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py",
+      "wfb_ng.fl.console": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py",
+      "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+      "wfb_ng.fl.server_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+      "wfb_ng.fl.mnist": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py"
+    },
+    "runtime_hashes": {
+      "wfb_ng": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232",
+      "wfb_ng.fl.service": "c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a",
+      "wfb_ng.fl.console": "7012ae4e8a5d8fa87ccfd3c26b6095c2313e7432dc8bc2f226f3e16ba402c9fc",
+      "wfb_ng.fl.client_daemon": "2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3",
+      "wfb_ng.fl.server_daemon": "2e0774b7da254580b6d29daa88125c3e4ace9d6f1d213dd235a7c34d59d440db",
+      "wfb_ng.fl.mnist": "c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9"
+    },
+    "unit_state": {
+      "rc": 0,
+      "out": "active\n",
+      "err": ""
+    },
+    "iw": {
+      "rc": 0,
+      "out": "phy#1\n\tInterface wlxfc221c500a88\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:50:0a:88\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:8a:9c\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm\n",
+      "err": ""
+    }
+  }
+}

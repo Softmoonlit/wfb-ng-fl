@@ -1,0 +1,137 @@
+{
+  "first": [
+    99608857,
+    [
+      163,
+      0,
+      51,
+      239
+    ]
+  ],
+  "last": [
+    99692873,
+    [
+      319,
+      0,
+      93,
+      395
+    ]
+  ],
+  "delta": [
+    156,
+    0,
+    42,
+    156
+  ],
+  "pending_noauth_intervals": [
+    {
+      "from_client_ms": 99619860,
+      "to_client_ms": 99620860,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99620860,
+      "to_client_ms": 99621861,
+      "authorized_delta": 0,
+      "denied_delta": 4
+    },
+    {
+      "from_client_ms": 99621861,
+      "to_client_ms": 99622861,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99622861,
+      "to_client_ms": 99623862,
+      "authorized_delta": 0,
+      "denied_delta": 5
+    },
+    {
+      "from_client_ms": 99623862,
+      "to_client_ms": 99624862,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99624862,
+      "to_client_ms": 99625863,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99625863,
+      "to_client_ms": 99626863,
+      "authorized_delta": 0,
+      "denied_delta": 7
+    },
+    {
+      "from_client_ms": 99626863,
+      "to_client_ms": 99627863,
+      "authorized_delta": 0,
+      "denied_delta": 9
+    },
+    {
+      "from_client_ms": 99627863,
+      "to_client_ms": 99628863,
+      "authorized_delta": 0,
+      "denied_delta": 5
+    },
+    {
+      "from_client_ms": 99638865,
+      "to_client_ms": 99639865,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99639865,
+      "to_client_ms": 99640865,
+      "authorized_delta": 0,
+      "denied_delta": 10
+    },
+    {
+      "from_client_ms": 99640865,
+      "to_client_ms": 99641866,
+      "authorized_delta": 0,
+      "denied_delta": 7
+    },
+    {
+      "from_client_ms": 99641866,
+      "to_client_ms": 99642866,
+      "authorized_delta": 0,
+      "denied_delta": 10
+    },
+    {
+      "from_client_ms": 99679869,
+      "to_client_ms": 99680869,
+      "authorized_delta": 0,
+      "denied_delta": 1
+    },
+    {
+      "from_client_ms": 99680869,
+      "to_client_ms": 99681869,
+      "authorized_delta": 0,
+      "denied_delta": 9
+    },
+    {
+      "from_client_ms": 99681869,
+      "to_client_ms": 99682870,
+      "authorized_delta": 0,
+      "denied_delta": 9
+    },
+    {
+      "from_client_ms": 99682870,
+      "to_client_ms": 99683870,
+      "authorized_delta": 0,
+      "denied_delta": 6
+    },
+    {
+      "from_client_ms": 99683870,
+      "to_client_ms": 99684870,
+      "authorized_delta": 0,
+      "denied_delta": 11
+    }
+  ],
+  "note": "denied counter increments only pending_packet nonempty and unauthorized; queue depth not instrumented"
+}

@@ -1,0 +1,57 @@
+{
+  "fl00": {
+    "RX_BATCH_sample_seconds": 85,
+    "RX_BATCH_total_batches": 175,
+    "RX_BATCH_total_packets": 504,
+    "RX_BATCH_total_elapsed_us": 7419,
+    "RX_BATCH_max_elapsed_us": 161,
+    "RX_BATCH_max_packets": 9,
+    "GRANT_SEQ_first_last": null,
+    "CLIENT_LOOP_first_last": null,
+    "CLIENT_LOOP_delta": null
+  },
+  "fl02": {
+    "RX_BATCH_sample_seconds": 85,
+    "RX_BATCH_total_batches": 637,
+    "RX_BATCH_total_packets": 1003,
+    "RX_BATCH_total_elapsed_us": 38225,
+    "RX_BATCH_max_elapsed_us": 523,
+    "RX_BATCH_max_packets": 13,
+    "GRANT_SEQ_first_last": [
+      [
+        99608857,
+        [
+          163,
+          1212
+        ]
+      ],
+      [
+        99692873,
+        [
+          319,
+          1917
+        ]
+      ]
+    ],
+    "CLIENT_LOOP_first_last": [
+      [
+        99608857,
+        {
+          "pending_unauthorized_fec_due": 0,
+          "zero_timeout_polls": 0
+        }
+      ],
+      [
+        99692873,
+        {
+          "pending_unauthorized_fec_due": 0,
+          "zero_timeout_polls": 0
+        }
+      ]
+    ],
+    "CLIENT_LOOP_delta": {
+      "pending_unauthorized_fec_due": 0,
+      "zero_timeout_polls": 0
+    }
+  }
+}

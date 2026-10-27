@@ -1,0 +1,9 @@
+节点 fl00 角色 server 阶段 stop
+UTC 2026-10-27T08:10:02Z 命令 ['systemctl', 'stop', 'wfb-fl-server-daemon.service']
+退出码 0
+UTC 2026-10-27T08:10:03Z 命令 ['systemd-cgls', '--unit', 'wfb-fl-server-daemon.service']
+Unit wfb-fl-server-daemon.service not found.
+Failed to list cgroup tree: No such file or directory
+退出码 1
+停止后进程检查  退出码 1
+NODE_PHASE_PASS server stop

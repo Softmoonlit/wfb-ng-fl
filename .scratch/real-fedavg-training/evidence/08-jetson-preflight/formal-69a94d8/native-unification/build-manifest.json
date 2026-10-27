@@ -1,0 +1,150 @@
+{
+  "commit": "69a94d84b006666d01e257155bc7a2fc969bedef",
+  "archive_sha256": "d723b33001929f5ff4ae687ff4ad0150c75b15abc2369725511b4209de20701b",
+  "command": [
+    "make",
+    "-C",
+    "/srv/wfb-ng-fl/native-69a94d8-unified/source",
+    "build_v6",
+    "COMMIT=69a94d84b006666d01e257155bc7a2fc969bedef",
+    "VERSION=0.0.0",
+    "PYTHON=/usr/bin/python3"
+  ],
+  "cwd": "/srv/wfb-ng-fl/native-69a94d8-unified/source",
+  "utc": "2026-10-27T12:20:50Z",
+  "executable_sha256": "8ddb419be0c99e174eeb91239092f266398ea248e0c3c71eff643e28bbcc08e0",
+  "object_sha256": {
+    "src/control_envelope.o": "77d1feadca68fe7f22e763a3983b3ff35359a7e29c26c27be29d6865c19bf4cc",
+    "src/radiotap.o": "8cfe274ff168baaf02a8ab4d71679ddb1849e83ae50910ef232a112b1030514f",
+    "src/rx.link.o": "569ab488a109167d6d665fdb38b3d2fe822585967c99ae8d1445adf7dbf9adb9",
+    "src/token_authorization.o": "fb7af2e520b0f07952d72d5863566b845899ea96c303d3daa60d4677f491584b",
+    "src/token_authorization_ipc.o": "b983f17380257039a2132455d55f8c6fdcf2ea20bd164ac67fb3f60ab0b0d13a",
+    "src/token_event_ipc.o": "366346bbfc1acfe63ae6d0dbd353c97e161da9b657c947dfa0a8dd3ad92194fb",
+    "src/token_scheduler.o": "db50f9e46c1749d74840fef2cbe714c19db30019764447d7c19d414c759fd892",
+    "src/tx.link.o": "53b803a9aeb42fb1b875812656ce75406d20909a75a9dbb0b4f7831d19aa2bec",
+    "src/tx_token_gate.o": "064fae2f13ef11bbbc327e28da0b6c43dc65edb8940c69386a0faa547d17a7e2",
+    "src/v6_plaintext_fec_tx.o": "12b6227e18151ca0c278c09c2cba3a72776fc633769f7a31c8813c740078f690",
+    "src/v6_radio_control.o": "326853eae72bbe207a48f0124a8147d51d205a95d7b24790d5dd44f6434e3804",
+    "src/v6_uplink.o": "56e42743c56d3f67da48fbddc4c5bb140e043990a992006433068cd5a5c7a269",
+    "src/wifibroadcast.o": "7a354ecb26b701670a7e04c18111742a4aa23457ff3b27044348ee401266664a",
+    "src/zfex.o": "482ec45c6e5aa33e6dc1ece633252b61cec117faa4f394bda585c7f37dd359c2"
+  },
+  "source_sha256": {
+    "src/control_envelope.cpp": "208ab561af7eb1e65194ce3255fd047b3c61a7e96d00fe7a08cb889a941cf1e3",
+    "src/control_envelope.hpp": "605c56fe36d72a23e0da87d02cd9a617e8ecb807fd0bc741a658a8ebaeb0c1f0",
+    "src/ieee80211_radiotap.h": "e770a27c9a80f1dd5c2c71eb9169132a293e61784c04686d23baba79eeae1e96",
+    "src/ikcp.c": "b476f4ae41b555f28e819f3a6f34b7e2307c93e17875b4864a8f5fc217f67f60",
+    "src/ikcp.h": "f04f978a0893a8209d7b82095d19c38cefcf8f30bc932a85bb7fa53b33f9e76c",
+    "src/kcp_small_receiver.cpp": "a0b5aee167a271ed83d09df3154420018b0d7b952c51514a665d6e3279947b4a",
+    "src/kcp_small_sender.cpp": "69ac6c9e62c2dfb8e317c7ab7f712408784ef51cf82333633642a888390a7136",
+    "src/keygen.c": "4eed11c825a6ef5bf1d4b6408859a21d800e85461a1f6a94a6df56141240db7a",
+    "src/main_token_namespace_bridge.cpp": "36c1798c0b95f0addd598d885e78a8d1b24b08e1c577c1f543879d4e91fdc6ec",
+    "src/main_token_scheduler.cpp": "8ac5aef917bab3d23de01f8b2a757449e0160c833bedd11736ea4f852b599b88",
+    "src/radiotap.c": "67075a791b17cb6ac7aa718384778bf8745f97045e100c14248872b71d4d74bd",
+    "src/rtsp_server.c": "0af52ea9072356a1f5c7b28d7279ee0bd2a882bc95c4e49962021cf941b1701a",
+    "src/rx.cpp": "2ce5eaa8af5b686af44f0f230cb7e493baa753784536d99496825128c6d07773",
+    "src/rx.hpp": "e8d275a1ecdcba6aa422927f75868f9e446c954f6d83e938042a7a22b42e9155",
+    "src/token_authorization.cpp": "ab01c12cead3eb2c45e149af030c9be67d122804f6cad31a80f89935639e2eda",
+    "src/token_authorization.hpp": "12f52f639456681b321f087692a17141cdb4a9d77f3dc0e55cd1f4f60fabeb36",
+    "src/token_authorization_ipc.cpp": "1874d0456de56ff118a55b8ded6955a066168609541f37f41a4b1128e404996d",
+    "src/token_authorization_ipc.hpp": "70407b73a435faf7e7ded2e225442afd4bd1283226de1d8e7b6528c29b8fcb00",
+    "src/token_event_ipc.cpp": "3b92b8d29754ac30406d02778d907ddc27fec70966b813732bf837a14affe9ef",
+    "src/token_event_ipc.hpp": "d4164d030a946ae518a8fff3a5926839be336f8a784d0900a2ab3e47c03a357b",
+    "src/token_namespace_bridge.cpp": "a32bfd19fbabb2552196466472a860334da213bc422ed63f760dd64e66500519",
+    "src/token_namespace_bridge.hpp": "c71c545af5303b21a1096c4f2a5d2bf1bd17f6f163c6dcaf03069e1c183e9104",
+    "src/token_scheduler.cpp": "ef16341b18f8e780fec626611ed9e1631c2c892d56ceed5d3bdc43c412532daf",
+    "src/token_scheduler.hpp": "4ee06823a0420b296f9b16bc0ad9b592d44aadc780db093b83add900a4aca824",
+    "src/tx.cpp": "2cc69936f7460c4dc3b796d389eccf79738f086e8abd73f94e06f72f88c487b2",
+    "src/tx.hpp": "81bb8487cfcd0d050ed1960f50ebbeab5450a58d8aa523ab21fd14f56a0138f7",
+    "src/tx_cmd.c": "e8537a6cb578d77fada34d4d787babf3888f175d4aff64d7b1e475493dd752b6",
+    "src/tx_cmd.h": "b75397f7499b52431e2101d6f48f2377bc0007b803bc0f9503c39f1df76d9b14",
+    "src/tx_token_gate.cpp": "86a2496ed9957107ebac6ecac38a5288a6c96fd88c260bd8f737bd8f67835d95",
+    "src/tx_token_gate.hpp": "200f3c121329d836fe94c054a4162ebb01f383985fb0eb78478d064790677dd1",
+    "src/v6_plaintext_fec_tx.cpp": "f1bbd495bb5a6a87e50ab2f6f87cc394b58d2863fc0aa4e1721665de598ad636",
+    "src/v6_plaintext_fec_tx.hpp": "fa4a1cc76f072d48c0765afb1dab7fcaef48507c3590d545fe96e9a5d176508f",
+    "src/v6_radio_control.cpp": "bc017a307cb15d9d59cf4bca576882119fb80ae38f6167040a98c003601ecee8",
+    "src/v6_radio_control.hpp": "10c76fb6a362705ba23ad376eef0bd7c6e9982bfc5a655a388193463d58310db",
+    "src/v6_uplink.cpp": "0cfc3f3f6f809a6bffa4552078a3a3b835b12fb310c0dd6ee488295999d8ca93",
+    "src/v6_uplink_queue.hpp": "12322ca9735e284db390101ac49442b6f817dc1004dde643e732180295008648",
+    "src/wfb_tun.c": "783083c270f67e460b52599a24d7923dffffb3ce0b5cebbbc7880fec80c03b8d",
+    "src/wifibroadcast.cpp": "0cbafed142b587c126d739a6abb7324c247c3add6232a971805f29435be90e93",
+    "src/wifibroadcast.hpp": "e235c6d9131dd556d1fe9cc7883afa552cbfde01af0db9cb429d68ad80c0d811",
+    "src/zfex.c": "994cc20be3c1901ce0ca65d29a75cbeea83031b3759e751b983351c02f812f32",
+    "src/zfex.h": "311d224a316da8e3dc2add45be1088c96d0dc13dde85c673933c1ca37b9bd836",
+    "src/zfex_bytemask.h": "2a87d030c4e273a5cf3c74878870e103ab135bc89051dc6b77375f4879428431",
+    "src/zfex_macros.h": "15bfa2d66ba2be80e332cd37dadb53b1fa8dd9e581125d2fb77738d2b7a590f6",
+    "src/zfex_pp.h": "e63f6a9a923104051115d9360d4318ec49dea53c9c25c6550771dc508025f5d7",
+    "src/zfex_status.h": "e84c7746cd8eee73301c3a90f29cef8c1ace061f768a27a0cb6cbec5d6612a47"
+  },
+  "checks": [
+    {
+      "args": [
+        "g++",
+        "--version"
+      ],
+      "rc": 0,
+      "stdout": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-h",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "ELF 头：\n  Magic：   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  类别:                              ELF64\n  数据:                              2 补码，小端序 (little endian)\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI 版本:                          0\n  类型:                              DYN (Position-Independent Executable file)\n  系统架构:                          AArch64\n  版本:                              0x1\n  入口点地址：               0x7780\n  程序头起点：          64 (bytes into file)\n  Start of section headers:          280072 (bytes into file)\n  标志：             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-l",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "\nElf 文件类型为 DYN (Position-Independent Executable file)\nEntry point 0x7780\nThere are 9 program headers, starting at offset 64\n\n程序头：\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034277 0x0000000000034277  R E    0x10000\n  LOAD           0x0000000000034f00 0x0000000000044f00 0x0000000000044f00\n                 0x0000000000001130 0x0000000000012858  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002d7c0 0x000000000002d7c0 0x000000000002d7c0\n                 0x00000000000009fc 0x00000000000009fc  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034f00 0x0000000000044f00 0x0000000000044f00\n                 0x0000000000001100 0x0000000000001100  R      0x1\n\n Section to Segment mapping:\n  段节...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-n",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "\nDisplaying notes found in: .note.gnu.build-id\n  所有者            Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: d1b2f1ef2705ef1d67a202178410533d83baad40\n\nDisplaying notes found in: .note.ABI-tag\n  所有者            Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "-p",
+        ".comment",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "readelf",
+        "--version-info",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "\nVersion symbols section '.gnu.version' contains 170 entries:\n 地址：0x0000000000002428  Offset: 0x002428  Link: 5 (.dynsym)\n  000:   0 (*本地*)       0 (*本地*)       0 (*本地*)       2 (GLIBCXX_3.4)\n  004:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  008:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  00c:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  010:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  014:   5 (GLIBCXX_3.4.14)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  018:   7 (GLIBC_2.17)    1 (*全局*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  01c:   6 (CXXABI_1.3)    3 (GLIBC_2.17)    1 (*全局*)      3 (GLIBC_2.17) \n  020:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  024:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  028:   3 (GLIBC_2.17)    1 (*全局*)      2 (GLIBCXX_3.4)   1 (*全局*)   \n  02c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  030:   2 (GLIBCXX_3.4)   1 (*全局*)      6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  034:   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    9 (GLIBC_2.34)    1 (*全局*)   \n  038:   a (GLIBCXX_3.4.29)    1 (*全局*)      3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  03c:   3 (GLIBC_2.17)    1 (*全局*)      3 (GLIBC_2.17)    1 (*全局*)   \n  040:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  044:   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  048:   1 (*全局*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)\n  04c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*全局*)   \n  050:   4 (GLIBCXX_3.4.21)    1 (*全局*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  054:   1 (*全局*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  058:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  05c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  060:   1 (*全局*)      1 (*全局*)      3 (GLIBC_2.17)    b (GLIBC_2.32) \n  064:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  068:   4 (GLIBCXX_3.4.21)    4 (GLIBCXX_3.4.21)    c (GLIBCXX_3.4.18)    2 (GLIBCXX_3.4)\n  06c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*全局*)      2 (GLIBCXX_3.4)\n  070:   3 (GLIBC_2.17)    d (CXXABI_1.3.8)   3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  074:   1 (*全局*)      6 (CXXABI_1.3)    3 (GLIBC_2.17)    e (GLIBCXX_3.4.20) \n  078:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  07c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    1 (*全局*)      3 (GLIBC_2.17) \n  080:   1 (*全局*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  084:   6 (CXXABI_1.3)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    6 (CXXABI_1.3) \n  088:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  08c:   1 (*全局*)      3 (GLIBC_2.17)    f (GCC_3.0)       1 (*全局*)   \n  090:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   1 (*全局*)      3 (GLIBC_2.17) \n  094:   3 (GLIBC_2.17)    1 (*全局*)      4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)\n  098:   1 (*全局*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  09c:   1 (*全局*)      3 (GLIBC_2.17)    1 (*全局*)      3 (GLIBC_2.17) \n  0a0:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  0a4:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   1 (*全局*)      1 (*全局*)   \n  0a8:   1 (*全局*)      1 (*全局*)   \n\nVersion needs section '.gnu.version_r' contains 4 entries:\n 地址：0x0000000000002580  Offset: 0x002580  Link: 6 (.dynstr)\n  000000: Version: 1  文件：libgcc_s.so.1  计数：1\n  0x0010:   Name: GCC_3.0  标志：无  版本：15\n  0x0020: Version: 1  文件：ld-linux-aarch64.so.1  计数：1\n  0x0030:   Name: GLIBC_2.17  标志：无  版本：7\n  0x0040: Version: 1  文件：libc.so.6  计数：3\n  0x0050:   Name: GLIBC_2.32  标志：无  版本：11\n  0x0060:   Name: GLIBC_2.34  标志：无  版本：9\n  0x0070:   Name: GLIBC_2.17  标志：无  版本：3\n  0x0080: Version: 1  文件：libstdc++.so.6  计数：9\n  0x0090:   Name: GLIBCXX_3.4.20  标志：无  版本：14\n  0x00a0:   Name: CXXABI_1.3.8  标志：无  版本：13\n  0x00b0:   Name: GLIBCXX_3.4.18  标志：无  版本：12\n  0x00c0:   Name: GLIBCXX_3.4.29  标志：无  版本：10\n  0x00d0:   Name: GLIBCXX_3.4.9  标志：无  版本：8\n  0x00e0:   Name: CXXABI_1.3  标志：无  版本：6\n  0x00f0:   Name: GLIBCXX_3.4.14  标志：无  版本：5\n  0x0100:   Name: GLIBCXX_3.4.21  标志：无  版本：4\n  0x0110:   Name: GLIBCXX_3.4  标志：无  版本：2\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "ldd",
+        "/srv/wfb-ng-fl/native-69a94d8-unified/source/wfb_v6_uplink"
+      ],
+      "rc": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x0000ffff8b8ea000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffff8b7d0000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffff8b770000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffff8b540000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffff8b510000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff8b360000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff8b8b1000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffff8b300000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff8b260000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffff8b180000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffff8b140000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffff8b070000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffff8b040000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffff8b020000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffff8af30000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffff8aef0000)\n",
+      "stderr": ""
+    }
+  ]
+}

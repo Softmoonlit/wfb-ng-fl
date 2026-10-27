@@ -1,0 +1,172 @@
+{
+  "all3": {
+    "1": {
+      "client_hb": 28,
+      "server_hb": 29,
+      "matched": 28,
+      "client_states": {
+        "IDLE": 15,
+        "HUNTING": 13
+      },
+      "channels": {
+        "157": 20,
+        "149": 4,
+        "153": 4
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 8.7,
+      "capture_duration_s": 80.07650567300152,
+      "capture_end": true
+    },
+    "2": {
+      "client_hb": 42,
+      "server_hb": 39,
+      "matched": 39,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 26
+      },
+      "channels": {
+        "157": 26,
+        "149": 8,
+        "153": 8
+      },
+      "offline_api_samples": 2,
+      "api_samples": 17,
+      "max_hb_age_s": 15.81,
+      "capture_duration_s": 80.07800119600142,
+      "capture_end": true
+    },
+    "4": {
+      "client_hb": 29,
+      "server_hb": 29,
+      "matched": 29,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 13
+      },
+      "channels": {
+        "157": 21,
+        "149": 4,
+        "153": 4
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 8.64,
+      "capture_duration_s": 80.04243425501045,
+      "capture_end": true
+    }
+  },
+  "only-fl02": {
+    "2": {
+      "client_hb": 16,
+      "server_hb": 15,
+      "matched": 15,
+      "client_states": {
+        "IDLE": 16
+      },
+      "channels": {
+        "157": 16
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 4.99,
+      "capture_duration_s": 80.07442796199757,
+      "capture_end": true
+    }
+  },
+  "fl01-fl02": {
+    "1": {
+      "client_hb": 53,
+      "server_hb": 50,
+      "matched": 47,
+      "client_states": {
+        "IDLE": 15,
+        "HUNTING": 38
+      },
+      "channels": {
+        "157": 29,
+        "149": 12,
+        "153": 12
+      },
+      "offline_api_samples": 2,
+      "api_samples": 17,
+      "max_hb_age_s": 93.55,
+      "capture_duration_s": 80.0792358010076,
+      "capture_end": true
+    },
+    "2": {
+      "client_hb": 30,
+      "server_hb": 27,
+      "matched": 26,
+      "client_states": {
+        "IDLE": 16,
+        "HUNTING": 14
+      },
+      "channels": {
+        "157": 22,
+        "149": 4,
+        "153": 4
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 8.76,
+      "capture_duration_s": 80.08092603700061,
+      "capture_end": true
+    }
+  },
+  "restore-all": {
+    "1": {
+      "client_hb": 15,
+      "server_hb": 14,
+      "matched": 13,
+      "client_states": {
+        "IDLE": 15
+      },
+      "channels": {
+        "157": 15
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 8.71,
+      "capture_duration_s": 80.07426733498869,
+      "capture_end": true
+    },
+    "2": {
+      "client_hb": 16,
+      "server_hb": 14,
+      "matched": 14,
+      "client_states": {
+        "IDLE": 16
+      },
+      "channels": {
+        "157": 16
+      },
+      "offline_api_samples": 0,
+      "api_samples": 17,
+      "max_hb_age_s": 6.71,
+      "capture_duration_s": 80.07371276299818,
+      "capture_end": true
+    },
+    "4": {
+      "client_hb": 27,
+      "server_hb": 29,
+      "matched": 27,
+      "client_states": {
+        "HUNTING": 12,
+        "IDLE": 15
+      },
+      "channels": {
+        "149": 4,
+        "153": 4,
+        "157": 19
+      },
+      "offline_api_samples": 1,
+      "api_samples": 17,
+      "max_hb_age_s": 172.98,
+      "capture_duration_s": 80.04251315099827,
+      "capture_end": true
+    }
+  }
+}
