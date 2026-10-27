@@ -1235,10 +1235,14 @@ public:
         event.sequence = packet.sequence;
         event.duration_ms = packet.grant_duration_ms;
         event.expires_at_ms = packet.grant_expires_at_ms;
-        if (!authorization_state_.apply_event(event, get_time_ms()))
+        const uint64_t now_ms = get_time_ms();
+        if (!authorization_state_.apply_event(event, now_ms))
         {
             return;
         }
+
+        accepted_grant_count_ += 1;
+        last_accepted_sequence_ = event.sequence;
 
         IPC_MSG("grant_accept node_id=%u sequence=%" PRIu64 " duration_ms=%u expires_at_ms=%" PRIu64 "\n",
                 static_cast<unsigned>(event.node_id),
@@ -1248,8 +1252,13 @@ public:
         IPC_MSG_SEND();
     }
 
+    uint64_t accepted_grant_count() const { return accepted_grant_count_; }
+    uint64_t last_accepted_sequence() const { return last_accepted_sequence_; }
+
 private:
     TokenAuthorizationState &authorization_state_;
+    uint64_t accepted_grant_count_ = 0;
+    uint64_t last_accepted_sequence_ = 0;
 };
 
 class ServerReadyListener : public TokenControlListener
@@ -1721,8 +1730,9 @@ void run_client(const Config &config, uint64_t session_id)
                                            config.uplink_resume_threshold_bytes,
                                            config.uplink_queue_packets_limit);
     sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
-
     uint64_t log_send_ts = get_time_ms();
+    uint64_t pending_unauthorized_fec_due_total = 0;
+    uint64_t fec_due_zero_timeout_polls_total = 0;
 
     for (;;)
     {
@@ -1736,6 +1746,10 @@ void run_client(const Config &config, uint64_t session_id)
             next_wakeup = min(next_wakeup, uplink_flush_deadline_ms);
         }
         int timeout_ms = static_cast<int>(next_wakeup > now_ms ? next_wakeup - now_ms : 0);
+        if (timeout_ms == 0 && uplink_flush_deadline_ms > 0 && now_ms >= uplink_flush_deadline_ms)
+        {
+            fec_due_zero_timeout_polls_total += 1;
+        }
         int rc = poll(fds.data(), fds.size(), timeout_ms);
         if (rc < 0)
         {
@@ -1756,6 +1770,14 @@ void run_client(const Config &config, uint64_t session_id)
                     authorization_state.counters().rejected_events,
                     authorization_state.counters().authorized_sends,
                     authorization_state.counters().denied_sends);
+            IPC_MSG("%" PRIu64 "\tGRANT_SEQ\t%" PRIu64 ":%" PRIu64 "\n",
+                    now_ms,
+                    grant_listener.accepted_grant_count(),
+                    grant_listener.last_accepted_sequence());
+            IPC_MSG("%" PRIu64 "\tCLIENT_LOOP\tpending_unauthorized_fec_due=%" PRIu64 " zero_timeout_polls=%" PRIu64 "\n",
+                    now_ms,
+                    pending_unauthorized_fec_due_total,
+                    fec_due_zero_timeout_polls_total);
             IPC_MSG_SEND();
             sync_queue_summary_or_throw(uplink_queue, config.queue_summary_file, "client", config.node_id);
             log_send_ts = now_ms + config.log_interval;
@@ -1822,6 +1844,7 @@ void run_client(const Config &config, uint64_t session_id)
         }
 
         now_ms = get_time_ms();
+        const uint64_t current_flush_deadline_ms = uplink->next_flush_deadline_ms();
         const QueuedTunPacket *pending_packet = uplink_queue.front();
         if (pending_packet == NULL)
         {
@@ -1831,6 +1854,10 @@ void run_client(const Config &config, uint64_t session_id)
 
         if (!authorization_state.is_authorized(now_ms))
         {
+            if (current_flush_deadline_ms > 0 && now_ms >= current_flush_deadline_ms)
+            {
+                pending_unauthorized_fec_due_total += 1;
+            }
             authorization_state.counters().denied_sends += 1;
             maybe_send_ready(*uplink, now_ms, &ready_state);
             continue;

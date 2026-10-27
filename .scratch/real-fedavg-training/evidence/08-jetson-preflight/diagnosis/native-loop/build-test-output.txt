@@ -1,0 +1,61 @@
+# Native Observation Build/Test Record
+
+Commit/source baseline: `69a94d8` native source shape; current repository production files were not deployed or run.
+
+## Tests
+
+```text
+g++ -Wall -O2 -fno-strict-aliasing -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o /tmp/rx-observe.o src/rx.cpp
+PASS (zero compiler errors)
+
+g++ -Wall -O2 -fno-strict-aliasing -std=gnu++11 -c -o /tmp/v6-uplink-observe.o src/v6_uplink.cpp
+PASS (zero compiler errors)
+
+g++ ... rx-batch-fixture.cpp /tmp/rx-observe.o ... -o /tmp/rx-batch-fixture
+/tmp/rx-batch-fixture
+receiver_batch_stats: PASS
+
+g++ ... session_recovery_test.cpp ... /tmp/rx-observe.o ... -o /tmp/session_recovery_observe
+/tmp/session_recovery_observe
+DATA TX->RX restart, FEC isolation, retired/legacy rejection: PASS
+GRANT RX->IPC->authorization restart, replay rejection and session telemetry: PASS
+Standalone scheduler GRANT and TX READY session propagation: PASS
+Expired novel session preserves current authorization: PASS
+
+g++ -o /tmp/wfb_v6_uplink_observe /tmp/v6-uplink-observe.o ... -lrt -lsodium -lpcap
+PASS (link only; binary not run)
+```
+
+The pending/FEC red semantic fixture remains intentionally red and is not a
+regression test for this observation patch:
+
+```text
+pending=1 denied=100 authorized=0 zero_timeout_polls=100 fec_flushes=0
+```
+
+## Added Periodic Lines
+
+`RX_BATCH` is emitted by the existing `Aggregator::dump_stats()` cadence:
+
+```text
+<ts_ms>\tRX_BATCH\t<batches>:<packets>:<elapsed_us>:<max_elapsed_us>:<max_packets>
+```
+
+`GRANT_SEQ` is emitted by the existing client `log_send_ts` cadence:
+
+```text
+<ts_ms>\tGRANT_SEQ\t<accepted_count>:<last_accepted_sequence>
+```
+
+The sequence is a server-global grant sequence. Gaps are expected when other
+nodes receive grants and are not a packet-loss estimate.
+
+`CLIENT_LOOP` is emitted by the same existing client cadence:
+
+```text
+<ts_ms>\tCLIENT_LOOP\tpending_unauthorized_fec_due=<count> zero_timeout_polls=<count>
+```
+
+No existing line was removed. No per-frame printf was added. No authorization,
+FEC flush, scheduler, READY, poll timeout, or packet dispatch behavior was
+changed.

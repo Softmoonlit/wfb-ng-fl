@@ -1,0 +1,16 @@
+Command:
+
+```text
+g++ -std=gnu++11 -Wall -Wextra -I/home/fl/projects/wfb-ng-fl/src \
+  /tmp/wfb_diag_native_pending_flush_control.cpp src/token_authorization.cpp \
+  -o /tmp/wfb_diag_native_pending_flush_control
+/tmp/wfb_diag_native_pending_flush_control
+```
+
+Output:
+
+```text
+pending=1 denied=100 zero_timeout_polls=100 fec_flushes=1
+```
+
+This is a /tmp-only control experiment. It changes one branch ordering and does not modify production.

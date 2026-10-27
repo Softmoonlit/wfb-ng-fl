@@ -200,6 +200,8 @@ Receiver::~Receiver()
 
 void Receiver::loop_iter(void)
 {
+    const uint64_t batch_started_us = get_time_us();
+    uint32_t packet_count = 0;
     for(;;) // loop while incoming queue is not empty
     {
         struct pcap_pkthdr hdr;
@@ -208,6 +210,7 @@ void Receiver::loop_iter(void)
         if (pkt == NULL) {
             break;
         }
+        packet_count += 1;
 
         int pktlen = hdr.caplen;
         // int pkt_rate = 0
@@ -353,6 +356,36 @@ void Receiver::loop_iter(void)
             continue;
         }
     }
+
+    if (agg != NULL)
+    {
+        agg->observe_receiver_batch(packet_count, get_time_us() - batch_started_us);
+    }
+}
+
+
+void ReceiverBatchStats::observe(uint32_t packet_count, uint64_t elapsed)
+{
+    batches += 1;
+    packets += packet_count;
+    elapsed_us += elapsed;
+    if (elapsed > max_elapsed_us)
+    {
+        max_elapsed_us = elapsed;
+    }
+    if (packet_count > max_packets)
+    {
+        max_packets = packet_count;
+    }
+}
+
+void ReceiverBatchStats::clear()
+{
+    batches = 0;
+    packets = 0;
+    elapsed_us = 0;
+    max_elapsed_us = 0;
+    max_packets = 0;
 }
 
 
@@ -678,6 +711,11 @@ int Aggregator::get_block_ring_idx(rx_source_state_t *state, uint64_t block_idx)
     return ring_idx;
 }
 
+void Aggregator::observe_receiver_batch(uint32_t packet_count, uint64_t elapsed_us)
+{
+    receiver_batch_stats.observe(packet_count, elapsed_us);
+}
+
 void Aggregator::dump_stats(void)
 {
     //timestamp in ms
@@ -699,6 +737,13 @@ void Aggregator::dump_stats(void)
             count_p_fec_recovered, count_p_lost,         // fec recovering
             count_p_bad,                                 // internal errors
             count_p_outgoing, count_b_outgoing);         // outgoing
+    IPC_MSG("%" PRIu64 "\tRX_BATCH\t%" PRIu64 ":%" PRIu64 ":%" PRIu64 ":%" PRIu64 ":%" PRIu64 "\n",
+            ts,
+            receiver_batch_stats.batches,
+            receiver_batch_stats.packets,
+            receiver_batch_stats.elapsed_us,
+            receiver_batch_stats.max_elapsed_us,
+            receiver_batch_stats.max_packets);
 
     std::set<uint8_t> nodes_to_report = known_client_node_ids_;
     for(size_t i = 1; i < 256; i++)
@@ -775,6 +820,7 @@ void Aggregator::clear_stats(void)
     count_p_override = 0;
     count_p_outgoing = 0;
     count_b_outgoing = 0;
+    receiver_batch_stats.clear();
 
     for(size_t i = 1; i < 256; i++)
     {

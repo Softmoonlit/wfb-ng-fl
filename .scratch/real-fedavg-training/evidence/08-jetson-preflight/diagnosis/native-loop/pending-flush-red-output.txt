@@ -1,0 +1,16 @@
+Command:
+
+```text
+g++ -std=gnu++11 -Wall -Wextra -I/home/fl/projects/wfb-ng-fl/src \
+  .scratch/real-fedavg-training/evidence/08-jetson-preflight/diagnosis/native-loop/pending-flush-loop.cpp \
+  src/token_authorization.cpp -o /tmp/wfb_diag_native_pending_flush_evidence
+stdbuf -o0 /tmp/wfb_diag_native_pending_flush_evidence
+```
+
+Output:
+
+```text
+pending=1 denied=100 authorized=0 zero_timeout_polls=100 fec_flushes=0
+... Assertion `fec.flush_count > 0 && "RED: pending unauthorized packet starves due FEC flush"' failed.
+exit=134
+```

@@ -102,6 +102,9 @@ public:
                                 uint8_t bandwidth, sockaddr_in *sockaddr) = 0;
 
     virtual void dump_stats(void) = 0;
+
+    // Receiver 仅在一轮 pcap drain 结束时上报，避免逐帧日志。
+    virtual void observe_receiver_batch(uint32_t, uint64_t) {}
 };
 
 
@@ -232,6 +235,18 @@ struct std::hash<rxAntennaKey>
 
 typedef std::unordered_map<rxAntennaKey, rxAntennaItem> rx_antenna_stat_t;
 
+struct ReceiverBatchStats
+{
+    uint64_t batches = 0;
+    uint64_t packets = 0;
+    uint64_t elapsed_us = 0;
+    uint64_t max_elapsed_us = 0;
+    uint64_t max_packets = 0;
+
+    void observe(uint32_t packet_count, uint64_t elapsed);
+    void clear();
+};
+
 class Aggregator : public BaseAggregator
 {
 public:
@@ -242,6 +257,7 @@ public:
                                 const int8_t *rssi, const int8_t *noise, uint16_t freq, uint8_t mcs_index,
                                 uint8_t bandwidth, sockaddr_in *sockaddr);
     virtual void dump_stats(void);
+    virtual void observe_receiver_batch(uint32_t packet_count, uint64_t elapsed_us);
 
     // Packet loss listener for immediate notifications
     void set_packet_loss_listener(PacketLossListener* listener) { packet_loss_listener_ = listener; }
@@ -267,6 +283,7 @@ public:
     uint32_t count_p_override;
     uint32_t count_p_outgoing;
     uint32_t count_b_outgoing;
+    ReceiverBatchStats receiver_batch_stats;
     GrantFilterCounters grant_filter_counters_;
     ReadyFilterCounters ready_filter_counters_;
 

@@ -1,0 +1,37 @@
+Command:
+
+```text
+set +e
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/fl/projects/wfb-ng-fl \
+  /usr/bin/python3 -B diagnosis/native-loop/hunt-delay-loop.py
+```
+
+Observed output:
+
+```json
+{
+  "fastscan": [
+    {"delay_seconds": 0.3, "result": true, "state": "IDLE", "heartbeats_received": 2, "acks_sent": 1},
+    {"delay_seconds": 0.35, "result": true, "state": "IDLE", "heartbeats_received": 2, "acks_sent": 1},
+    {"delay_seconds": 0.4, "result": true, "state": "IDLE", "heartbeats_received": 2, "acks_sent": 1},
+    {"delay_seconds": 0.47, "result": false, "state": "HUNTING", "heartbeats_received": 1, "acks_sent": 0}
+  ],
+  "idle_budget": {
+    "first_ack": false,
+    "second_ack": false,
+    "missed_acks": 2,
+    "state_after_two_misses": "HUNTING",
+    "idle_interval_seconds": 5.0,
+    "nominal_two_miss_interval_seconds": 10.0,
+    "per_attempt_wait_seconds": 0.23
+  }
+}
+```
+
+The process exits `1` at the intentional red assertion:
+
+```text
+AssertionError: RED: late attempt-1 ACK accepted during attempt-2 wait
+```
+
+The idle control case also logs the expected two-miss transition to HUNTING.

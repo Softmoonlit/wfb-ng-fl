@@ -1,0 +1,19 @@
+{
+  "all3": {
+    "fl01": {"heartbeat_count": 28, "states": {"HUNTING": 13, "IDLE": 15}, "channels": {"157": 20, "149": 4, "153": 4}, "capture_seconds": 80.076506},
+    "fl02": {"heartbeat_count": 42, "states": {"HUNTING": 26, "IDLE": 16}, "channels": {"157": 26, "149": 8, "153": 8}, "capture_seconds": 80.078001},
+    "fl04": {"heartbeat_count": 29, "states": {"HUNTING": 13, "IDLE": 16}, "channels": {"157": 21, "149": 4, "153": 4}, "capture_seconds": 80.042434}
+  },
+  "only-fl02": {
+    "fl02": {"heartbeat_count": 16, "states": {"IDLE": 16}, "channels": {"157": 16}, "capture_seconds": 80.074428}
+  },
+  "fl01-fl02": {
+    "fl01": {"heartbeat_count": 53, "states": {"HUNTING": 38, "IDLE": 15}, "channels": {"157": 29, "149": 12, "153": 12}, "capture_seconds": 80.079236},
+    "fl02": {"heartbeat_count": 30, "states": {"HUNTING": 14, "IDLE": 16}, "channels": {"157": 22, "149": 4, "153": 4}, "capture_seconds": 80.080926}
+  },
+  "restore-all": {
+    "fl01": {"heartbeat_count": 15, "states": {"IDLE": 15}, "channels": {"157": 15}, "capture_seconds": 80.074267},
+    "fl02": {"heartbeat_count": 16, "states": {"IDLE": 16}, "channels": {"157": 16}, "capture_seconds": 80.073713},
+    "fl04": {"heartbeat_count": 27, "states": {"HUNTING": 12, "IDLE": 15}, "channels": {"157": 19, "149": 4, "153": 4}, "capture_seconds": 80.042513}
+  }
+}

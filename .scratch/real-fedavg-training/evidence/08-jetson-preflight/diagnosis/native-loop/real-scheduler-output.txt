@@ -1,0 +1,29 @@
+Command:
+
+```text
+g++ -std=gnu++11 -Wall -Wextra -Isrc \
+  real-scheduler-loop.cpp src/token_scheduler.o src/token_authorization_ipc.o \
+  src/token_event_ipc.o src/wifibroadcast.o \
+  -o /tmp/wfb_diag_real_scheduler_schedule -lsodium -lrt
+/tmp/wfb_diag_real_scheduler_schedule
+```
+
+First schedule and removal edges:
+
+```text
+1000 grant node=1 duration=120 guard=10 active=[1,2,4]
+1130 grant node=2 duration=120 guard=10 active=[1,2,4]
+1260 grant node=4 duration=120 guard=10 active=[1,2,4]
+1390 grant node=1 duration=120 guard=10 active=[1,2,4]
+1520 grant node=2 duration=120 guard=10 active=[1,2,4]
+1650 grant node=4 duration=120 guard=10 active=[1,2,4]
+remove node=2 silence_ms=650 consecutive=2
+1780 grant node=1 duration=120 guard=10 active=[1,4]
+remove node=4 silence_ms=780 consecutive=2
+1910 grant node=1 duration=120 guard=10 active=[1]
+```
+
+This is the real `TokenScheduler` object with no observed uplink refreshes.
+It demonstrates the 130ms slot period and that silent-node removal can collapse
+an initially three-node queue; it does not prove that the field scheduler had
+this exact input sequence.

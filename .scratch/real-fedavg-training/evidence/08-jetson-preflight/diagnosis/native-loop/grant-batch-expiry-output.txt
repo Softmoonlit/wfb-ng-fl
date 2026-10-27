@@ -1,0 +1,15 @@
+Command:
+
+```text
+g++ -std=gnu++11 -Wall -Wextra -I/home/fl/projects/wfb-ng-fl/src \
+  .scratch/real-fedavg-training/evidence/08-jetson-preflight/diagnosis/native-loop/grant-batch-expiry-loop.cpp \
+  src/control_envelope.cpp -o /tmp/wfb_diag_grant_batch_expiry
+/tmp/wfb_diag_grant_batch_expiry
+```
+
+Output:
+
+```text
+arrival_ms=1000 processing_ms=1121batch_delay_ms=121grant_expires_at_ms=1241decision=accept
+H5_BATCH_DELAY_EXPIRES_GRANT=falsified_by_current_parser
+```
