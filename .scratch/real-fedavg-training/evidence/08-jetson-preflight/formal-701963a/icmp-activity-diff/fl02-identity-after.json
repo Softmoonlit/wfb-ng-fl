@@ -1,0 +1,58 @@
+{
+  "hostname": "fl02",
+  "utc": "2026-10-27T17:55:21Z",
+  "unit": {
+    "rc": 0,
+    "out": "MainPID=38743\nNRestarts=0\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Wed 2026-10-28 01:15:22 CST] ; stop_time=[n/a] ; pid=38743 ; code=(null) ; status=0/0 }\nEnvironment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1\nWorkingDirectory=\nActiveState=active\nDropInPaths=/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf\n",
+    "err": ""
+  },
+  "pid": "38743",
+  "proc_cwd": "/",
+  "proc_exe": "/usr/bin/python3.10",
+  "proc_cmdline": "python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ",
+  "runtime_import_env": {
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "PYTHONPATH": null,
+    "PYTHONHOME": null,
+    "OMP_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "find_spec_in_daemon_cwd_env": {
+    "rc": 0,
+    "out": "{\"specs\": {\"wfb_ng\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py\", \"wfb_ng.fl.service\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py\", \"wfb_ng.fl.console\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py\", \"wfb_ng.fl.client_daemon\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py\", \"wfb_ng.fl.server_daemon\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", \"wfb_ng.fl.mnist\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py\"}, \"identity\": {\"commit\": \"701963ac254261c31c56a074d06966a9217346f6\", \"schema_version\": 1}, \"hashes\": {\"wfb_ng\": \"15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232\", \"wfb_ng.fl.service\": \"c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a\", \"wfb_ng.fl.console\": \"869a85f9b1ae5df9f37244cebd8f80a0c2736a828078f3e76c2e89ec3e376cbb\", \"wfb_ng.fl.client_daemon\": \"5e11e0cf3c6d4fc7ebb9195aafedad8135422506c6ee3bedace14702635f1854\", \"wfb_ng.fl.server_daemon\": \"02831cc51b93dd1d525f38cad4625bcfc140a66075e841578b21d3c3f3885fcb\", \"wfb_ng.fl.mnist\": \"c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9\"}}\n",
+    "err": ""
+  },
+  "native": [
+    {
+      "pid": "38760",
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "cmdline": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 ",
+      "running_exe_sha256": "f7c73f41b730ddb3547e1730b5a5b7b40a55dd7a8e3e5f265dcc6563c6c432b1"
+    }
+  ],
+  "artifact_hashes": {
+    "/usr/bin/wfb_v6_uplink": "f7c73f41b730ddb3547e1730b5a5b7b40a55dd7a8e3e5f265dcc6563c6c432b1",
+    "/srv/wfb-ng-fl/deploy-701963a/source/wfb_v6_uplink": "b786e230194a5ed0cb4ce656692a01b4954f12bbb35058e28f36f34944bb5106",
+    "/srv/wfb-ng-fl/deploy-701963a/source/src/v6_uplink.cpp": "d40b14a232b90e5a6eb85f9be3638c9db97d891062bcf67f7b2497bab59c440c"
+  },
+  "backgrounds": {
+    "rc": 1,
+    "out": "",
+    "err": ""
+  },
+  "iw": {
+    "rc": 0,
+    "out": "phy#1\n\tInterface wlxfc221c300cbb\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:30:0c:bb\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:86\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm\n",
+    "err": ""
+  },
+  "compiler": {
+    "rc": 0,
+    "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "err": ""
+  },
+  "unit_state": {
+    "rc": 0,
+    "out": "active\n",
+    "err": ""
+  }
+}

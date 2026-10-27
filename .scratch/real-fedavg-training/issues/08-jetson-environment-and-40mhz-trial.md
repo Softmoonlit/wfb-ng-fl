@@ -38,3 +38,7 @@
 [69 版本数量差分](../evidence/08-jetson-preflight/formal-69a94d8/phase-analysis.md)显示单独 fl02 时未见寻频，多客户端阶段复现寻频和心跳延迟；这不是训练验收，也不能仅以结束时 READY 认定稳定。
 
 四板随后统一到 `701963a`，实际运行 native 均核对为 `f7c73f41…`，并确认从安装目录加载。[85 秒被动观测](../evidence/08-jetson-preflight/formal-701963a/native-unification/passive85s/README.md)仍复现故障：fl02 最大心跳生成间隔 5.238 秒，服务端接收间隔 13.438 秒；`pending_unauthorized_fec_due` 与 `zero_timeout_polls` 增量均为零，最长 RX batch 为 523 微秒。因此本窗口不支持 FEC 到期忙等或长 RX batch 是直接触发点，继续按 READY、grant、静默移除与寻频序列定位，不扩大超时、不凭瞬时 READY 重跑训练。采证结束无残留进程；四板版本、制品与实际加载身份均有记录。
+
+[后续三阶段 ICMP 活动对照](../evidence/08-jetson-preflight/formal-701963a/icmp-activity-diff/README.md)仅改变是否持续输入上行小包，服务、PID、构建及射频参数保持不变。fl02／fl04 在活动阶段维持授权和 READY refresh，ICMP 丢包约 1%～2%；fl01 活动阶段没有 grant、没有有效上行，175 个 ICMP 全丢，服务端整阶段未收到其心跳。停止探针后 fl01 恢复发送，约 94.6 毫秒内交付 161 个旧 ICMP。其恢复阶段首次出现 `pending_unauthorized_fec_due` 与 `zero_timeout_polls` 各增加 4952；该阳性发生在积压之后，不解释最初失联。不能将之前 85 秒窗口的零计数外推成此分支永不发生。
+
+[迟到 ACK 跨频道边界诊断](../evidence/08-jetson-preflight/diagnosis/ack-channel-identity/README.md)在真实 loopback UDP 中三次均未误锁频道：现有发送前 drain 清除了指定窗口的旧 ACK。该候选边界已被证伪，不据此修改 ACK 协议或扩大寻频期限。

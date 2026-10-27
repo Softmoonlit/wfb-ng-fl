@@ -1,0 +1,345 @@
+{
+  "scope": "independent control protocol, pre-retune local UDP receive residue",
+  "control_source": "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py",
+  "control_sha256": "4958f0e13dcf379a90588ad194afdca96dd468eaeee030a711c89e985a760154",
+  "runs": [
+    {
+      "run": 1,
+      "verdict": "NOT_REPRODUCED",
+      "server_address": [
+        "127.0.0.1",
+        55000
+      ],
+      "client_address": [
+        "0.0.0.0",
+        44351
+      ],
+      "attempt_timeout_seconds": 0.23,
+      "max_attempts_per_channel": 2,
+      "hunt_result": false,
+      "state_after_hunt": "HUNTING",
+      "locked_channel_after_hunt": null,
+      "public_send_ack": false,
+      "heartbeat_channels": [
+        157,
+        157,
+        149,
+        149,
+        149
+      ],
+      "acks_sent": 1,
+      "queued_old_ack_confirmed_before_retune_complete": true,
+      "trace": [
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 0.773,
+          "channel": 157
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 0.795,
+          "channel": 157
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 1.25,
+          "count": 1,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 231.817,
+          "count": 2,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 462.117,
+          "channel": 149
+        },
+        {
+          "event": "old157_ack_kernel_sendto_complete",
+          "elapsed_ms": 462.342,
+          "bytes": 13,
+          "origin_hb_count": 2,
+          "origin_channel": 157
+        },
+        {
+          "event": "old_ack_peeked_before_retune_complete",
+          "elapsed_ms": 462.529,
+          "payload": "{\"ack\": true}",
+          "client_current_channel": 157,
+          "retune_complete": false
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 462.564,
+          "channel": 149
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 462.806,
+          "count": 3,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 693.42,
+          "count": 4,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_hunt_return",
+          "elapsed_ms": 923.639,
+          "result": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 924.086,
+          "count": 5,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_send_heartbeat_return",
+          "elapsed_ms": 1154.328,
+          "ack": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "verdict": "NOT_REPRODUCED",
+      "server_address": [
+        "127.0.0.1",
+        38019
+      ],
+      "client_address": [
+        "0.0.0.0",
+        56360
+      ],
+      "attempt_timeout_seconds": 0.23,
+      "max_attempts_per_channel": 2,
+      "hunt_result": false,
+      "state_after_hunt": "HUNTING",
+      "locked_channel_after_hunt": null,
+      "public_send_ack": false,
+      "heartbeat_channels": [
+        157,
+        157,
+        149,
+        149,
+        149
+      ],
+      "acks_sent": 1,
+      "queued_old_ack_confirmed_before_retune_complete": true,
+      "trace": [
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 0.657,
+          "channel": 157
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 0.667,
+          "channel": 157
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 0.933,
+          "count": 1,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 231.523,
+          "count": 2,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 461.802,
+          "channel": 149
+        },
+        {
+          "event": "old157_ack_kernel_sendto_complete",
+          "elapsed_ms": 462.103,
+          "bytes": 13,
+          "origin_hb_count": 2,
+          "origin_channel": 157
+        },
+        {
+          "event": "old_ack_peeked_before_retune_complete",
+          "elapsed_ms": 462.203,
+          "payload": "{\"ack\": true}",
+          "client_current_channel": 157,
+          "retune_complete": false
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 462.242,
+          "channel": 149
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 462.503,
+          "count": 3,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 692.997,
+          "count": 4,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_hunt_return",
+          "elapsed_ms": 923.217,
+          "result": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 923.642,
+          "count": 5,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_send_heartbeat_return",
+          "elapsed_ms": 1153.883,
+          "ack": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "verdict": "NOT_REPRODUCED",
+      "server_address": [
+        "127.0.0.1",
+        51963
+      ],
+      "client_address": [
+        "0.0.0.0",
+        39079
+      ],
+      "attempt_timeout_seconds": 0.23,
+      "max_attempts_per_channel": 2,
+      "hunt_result": false,
+      "state_after_hunt": "HUNTING",
+      "locked_channel_after_hunt": null,
+      "public_send_ack": false,
+      "heartbeat_channels": [
+        157,
+        157,
+        149,
+        149,
+        149
+      ],
+      "acks_sent": 1,
+      "queued_old_ack_confirmed_before_retune_complete": true,
+      "trace": [
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 0.651,
+          "channel": 157
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 0.661,
+          "channel": 157
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 0.915,
+          "count": 1,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 231.498,
+          "count": 2,
+          "channel": 157,
+          "state": "HUNTING"
+        },
+        {
+          "event": "set_channel_enter",
+          "elapsed_ms": 461.765,
+          "channel": 149
+        },
+        {
+          "event": "old157_ack_kernel_sendto_complete",
+          "elapsed_ms": 461.984,
+          "bytes": 13,
+          "origin_hb_count": 2,
+          "origin_channel": 157
+        },
+        {
+          "event": "old_ack_peeked_before_retune_complete",
+          "elapsed_ms": 462.111,
+          "payload": "{\"ack\": true}",
+          "client_current_channel": 157,
+          "retune_complete": false
+        },
+        {
+          "event": "set_channel_return",
+          "elapsed_ms": 462.162,
+          "channel": 149
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 462.423,
+          "count": 3,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 693.012,
+          "count": 4,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_hunt_return",
+          "elapsed_ms": 923.224,
+          "result": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        },
+        {
+          "event": "server_receive_hb",
+          "elapsed_ms": 923.678,
+          "count": 5,
+          "channel": 149,
+          "state": "HUNTING"
+        },
+        {
+          "event": "public_send_heartbeat_return",
+          "elapsed_ms": 1153.894,
+          "ack": false,
+          "state": "HUNTING",
+          "locked_channel": null
+        }
+      ]
+    }
+  ],
+  "red_runs": 0,
+  "total_runs": 3
+}
