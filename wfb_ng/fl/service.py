@@ -525,10 +525,18 @@ def main(role=None):
                 artifact_dir=host['artifact_dir'], local_config=host['local_config'],
                 stop_event=stop_event, prepared_callback=notifications.prepared,
                 round_callback=notifications.round_complete)
-        algorithm = load_algorithm(args.algorithm, arity=3) if args.algorithm else None
         algorithm_config = _read_algorithm_config(args.algorithm_config)
+        if stop_event.is_set():
+            return 0
         service = load_role_service(args.config, expected_role=role)
+        if stop_event.is_set():
+            return 0
         runtime = service.start()
+        if stop_event.is_set():
+            return 0
+        algorithm = load_algorithm(args.algorithm, arity=3) if args.algorithm else None
+        if stop_event.is_set():
+            return 0
         if algorithm is not None:
             algorithm_thread = threading.Thread(
                 target=_run_algorithm,

@@ -1,0 +1,59 @@
+{
+  "launch_utc": "2026-10-27T07:16:25.733479+00:00",
+  "processes": [
+    {
+      "node": "fl00",
+      "pid": 180483,
+      "command": [
+        "sudo",
+        "-n",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "timeout",
+        "125",
+        "python3",
+        "-B",
+        "-"
+      ]
+    },
+    {
+      "node": "fl01",
+      "pid": 180484,
+      "command": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.201",
+        "sudo -n env PYTHONDONTWRITEBYTECODE=1 timeout 125 python3 -B -"
+      ]
+    },
+    {
+      "node": "fl02",
+      "pid": 180485,
+      "command": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.202",
+        "sudo -n env PYTHONDONTWRITEBYTECODE=1 timeout 125 python3 -B -"
+      ]
+    },
+    {
+      "node": "fl04",
+      "pid": 180486,
+      "command": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.204",
+        "sudo -n env PYTHONDONTWRITEBYTECODE=1 timeout 125 python3 -B -"
+      ]
+    }
+  ]
+}

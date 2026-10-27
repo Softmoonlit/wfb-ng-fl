@@ -1,0 +1,483 @@
+只读诊断 UTC 2026-10-27T07:03:50Z
+
+命令 ['date', '--iso-8601=ns']
+2026-10-27T15:03:50,614337344+08:00
+ 退出码 0
+
+命令 ['cat', '/proc/uptime']
+70133.87 399607.05
+ 退出码 0
+
+命令 ['systemctl', 'cat', 'wfb-fl-server-daemon.service']
+# /lib/systemd/system/wfb-fl-server-daemon.service
+[Unit]
+Description=WFB-ng FL server persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+ 退出码 0
+
+命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'ExecStart', '-p', 'MainPID', '-p', 'ActiveState', '-p', 'SubState', '-p', 'NRestarts', '-p', 'Environment', '-p', 'WorkingDirectory', '-p', 'DropInPaths']
+MainPID=168778
+NRestarts=0
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json ; ignore_errors=no ; start_time=[Tue 2026-10-27 11:19:22 CST] ; stop_time=[n/a] ; pid=168778 ; code=(null) ; status=0/0 }
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+WorkingDirectory=
+ActiveState=active
+SubState=running
+DropInPaths=/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf
+ 退出码 0
+
+角色进程和线程（从ps筛选）
+    PID    PPID     LWP NLWP STAT WCHAN                        COMMAND         COMMAND
+ 168778       1  168778    8 Ssl  do_select                    python3         python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  168856    8 Ssl  do_sys_poll                  python3         python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  168857    8 Ssl  futex_wait_queue_me          python3         python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  168861    8 Ssl  do_sys_poll                  python3         python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  168862    8 Ssl  do_sys_poll                  python3         python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  169377    8 Ssl  futex_wait_queue_me          pt_main_thread  python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  169378    8 Ssl  futex_wait_queue_me          pt_main_thread  python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168778       1  169379    8 Ssl  futex_wait_queue_me          pt_main_thread  python3 /usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+ 168834  168778  168834    1 S    do_sys_poll                  wfb_v6_uplink   /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+
+命令 ['ss', '-uapn']
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                  
+ESTAB  0      0          127.0.0.1:44156   127.0.0.53:53   users:(("systemd-timesyn",pid=4496,fd=14))              
+UNCONN 0      0         127.0.0.53:53         0.0.0.0:*    users:(("systemd-resolve",pid=560,fd=13))               
+UNCONN 0      0            0.0.0.0:67         0.0.0.0:*    users:(("dnsmasq",pid=698,fd=3))                        
+UNCONN 0      0            0.0.0.0:111        0.0.0.0:*    users:(("rpcbind",pid=559,fd=5),("systemd",pid=1,fd=63))
+UNCONN 0      0          10.80.0.1:9001       0.0.0.0:*    users:(("python3",pid=168778,fd=4))                     
+UNCONN 0      0            0.0.0.0:54109      0.0.0.0:*    users:(("avahi-daemon",pid=572,fd=14))                  
+UNCONN 0      0          127.0.0.1:9200       0.0.0.0:*    users:(("wfb_v6_uplink",pid=168834,fd=4))               
+UNCONN 0      0            0.0.0.0:5353       0.0.0.0:*    users:(("avahi-daemon",pid=572,fd=12))                  
+UNCONN 0      0          10.80.0.1:54742      0.0.0.0:*    users:(("python3",pid=168778,fd=5))                     
+ESTAB  0      0          127.0.0.1:55517   127.0.0.53:53   users:(("pi",pid=127109,fd=48))                         
+UNCONN 0      0                  *:36749            *:*    users:(("avahi-daemon",pid=572,fd=15))                  
+UNCONN 0      0                  *:111              *:*    users:(("rpcbind",pid=559,fd=7),("systemd",pid=1,fd=65))
+UNCONN 0      0                  *:5353             *:*    users:(("avahi-daemon",pid=572,fd=13))                  
+ 退出码 0
+
+命令 ['ss', '-ltpn']
+State  Recv-Q Send-Q   Local Address:Port Peer Address:PortProcess                                                  
+LISTEN 0      5            127.0.0.1:9090      0.0.0.0:*    users:(("python3",pid=168778,fd=6))                     
+LISTEN 0      4096     127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=560,fd=14))               
+LISTEN 0      4096           0.0.0.0:631       0.0.0.0:*    users:(("cupsd",pid=2090,fd=8))                         
+LISTEN 0      4096           0.0.0.0:111       0.0.0.0:*    users:(("rpcbind",pid=559,fd=4),("systemd",pid=1,fd=62))
+LISTEN 0      128            0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=1034,fd=3))                          
+LISTEN 0      5      192.168.108.100:8080      0.0.0.0:*    users:(("python3",pid=168778,fd=7))                     
+LISTEN 0      4096              [::]:631          [::]:*    users:(("cupsd",pid=2090,fd=9))                         
+LISTEN 0      4096              [::]:111          [::]:*    users:(("rpcbind",pid=559,fd=6),("systemd",pid=1,fd=64))
+LISTEN 0      128               [::]:22           [::]:*    users:(("sshd",pid=1034,fd=4))                          
+ 退出码 0
+
+命令 ['ip', '-brief', 'address']
+lo               UNKNOWN        127.0.0.1/8 
+wlP1p1s0         DOWN           
+can0             DOWN           
+enP8p1s0         UP             192.168.108.100/24 fe80::212d:5c5e:f4b2:9e7a/64 
+l4tbr0           DOWN           
+usb0             DOWN           
+usb1             DOWN           
+wlxfc221c100157  UP             
+fl-s             UNKNOWN        10.80.0.1/24 
+ 退出码 0
+
+命令 ['ip', 'route', 'show', 'table', 'main']
+10.80.0.0/24 dev fl-s proto kernel scope link src 10.80.0.1 
+169.254.0.0/16 dev fl-s scope link metric 1000 
+192.168.108.0/24 dev enP8p1s0 proto kernel scope link src 192.168.108.100 metric 10 
+192.168.137.0/24 via 192.168.108.154 dev enP8p1s0 proto static metric 10 
+ 退出码 0
+
+命令 ['iw', 'dev']
+phy#1
+	Interface wlxfc221c100157
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:10:01:57
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP1p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:e2:3c:48
+		type managed
+		txpower -100.00 dBm
+ 退出码 0
+
+命令 ['lsusb', '-t']
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Wireless, Driver=btusb, 12M
+    |__ Port 3: Dev 3, If 1, Class=Wireless, Driver=btusb, 12M
+ 退出码 0
+
+命令 ['lsusb']
+Bus 002 Device 003: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter
+Bus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 0bda:c822 Realtek Semiconductor Corp. Bluetooth Radio 
+Bus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+ 退出码 0
+
+命令 ['journalctl', '-k', '-n', '100', '--no-pager', '-o', 'short-unix']
+1793019636.183611 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793019723.328040 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793019810.859609 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793019853.727630 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793019868.403609 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793019978.712133 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793020025.139624 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793020093.331739 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793020118.747604 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793020193.967646 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793020222.743610 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793020389.987617 fl00 kernel: audit: type=1326 audit(1793020389.980:4): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=18999 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb4a9668 code=0x50000
+1793020487.147644 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793020510.631619 fl00 kernel: audit: type=1326 audit(1793020510.624:5): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20042 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff843b9668 code=0x50000
+1793020595.475609 fl00 kernel: audit: type=1326 audit(1793020595.468:6): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20539 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9fd59668 code=0x50000
+1793020677.323619 fl00 kernel: audit: type=1326 audit(1793020677.316:7): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20939 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91729668 code=0x50000
+1793020785.283611 fl00 kernel: audit: type=1326 audit(1793020785.276:8): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=21300 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9a5d9668 code=0x50000
+1793020860.631627 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793020875.111632 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793020939.819620 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793020953.843615 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021018.535629 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793021028.831923 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021135.471618 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793021144.483617 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021145.031617 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793021147.703824 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021185.299675 fl00 kernel: audit: type=1326 audit(1793021185.292:9): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=23702 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87f79668 code=0x50000
+1793021200.875646 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793021232.511615 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021248.027599 fl00 kernel: audit: type=1326 audit(1793021248.020:10): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=24730 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa2ce9668 code=0x50000
+1793021357.603612 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793021366.559797 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793021494.864147 fl00 kernel: audit: type=1326 audit(1793021494.856:11): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=25581 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa9e99668 code=0x50000
+1793021529.839631 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793022003.920417 fl00 kernel: audit: type=1326 audit(1793022003.912:12): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=27545 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff85f39668 code=0x50000
+1793022025.723617 fl00 kernel: audit: type=1326 audit(1793022025.716:13): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=27908 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9f149668 code=0x50000
+1793022053.316089 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793022076.611617 fl00 kernel: audit: type=1326 audit(1793022076.604:14): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=28831 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff84349668 code=0x50000
+1793022229.803622 fl00 kernel: audit: type=1326 audit(1793022229.796:15): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=29609 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaea39668 code=0x50000
+1793022317.815605 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793022328.720365 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793022513.603884 fl00 kernel: audit: type=1326 audit(1793022513.596:16): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=30946 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c419668 code=0x50000
+1793022794.443608 fl00 kernel: audit: type=1326 audit(1793022794.436:17): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=31820 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ca19668 code=0x50000
+1793023213.171615 fl00 kernel: audit: type=1326 audit(1793023213.164:18): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=33464 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbc9c9668 code=0x50000
+1793024024.023950 fl00 kernel: audit: type=1326 audit(1793024024.016:19): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=35463 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c2e9668 code=0x50000
+1793024550.935703 fl00 kernel: audit: type=1326 audit(1793024550.928:20): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=37092 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91f09668 code=0x50000
+1793025101.824370 fl00 kernel: audit: type=1326 audit(1793025101.816:21): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=38176 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87249668 code=0x50000
+1793025220.168584 fl00 kernel: audit: type=1326 audit(1793025220.160:22): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=38886 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffba819668 code=0x50000
+1793025407.535637 fl00 kernel: audit: type=1326 audit(1793025407.520:23): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=39751 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff879c9668 code=0x50000
+1793027720.903645 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793028409.299631 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793028565.031613 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793028566.663625 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793029314.551627 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793029447.371884 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793031974.939606 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793031977.007629 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793038674.951607 fl00 kernel: audit: type=1326 audit(1793038674.944:24): auid=1000 uid=1000 gid=1000 ses=3 subj=kernel pid=68874 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8cac9668 code=0x50000
+1793061246.055614 fl00 kernel: r8168: enP8p1s0: link down
+1793065871.475891 fl00 kernel: r8168: enP8p1s0: link up
+1793067734.995726 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793067736.107627 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793068059.479661 fl00 kernel: audit: type=1326 audit(1793068059.472:25): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=152007 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9ab19668 code=0x50000
+1793068103.403612 fl00 kernel: audit: type=1326 audit(1793068103.396:26): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=152600 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88a59668 code=0x50000
+1793068175.675625 fl00 kernel: audit: type=1326 audit(1793068175.664:27): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153028 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb1659668 code=0x50000
+1793068252.159607 fl00 kernel: audit: type=1326 audit(1793068252.152:28): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153477 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9cd99668 code=0x50000
+1793068263.927854 fl00 kernel: audit: type=1326 audit(1793068263.920:29): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153734 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93029668 code=0x50000
+1793068310.155601 fl00 kernel: audit: type=1326 audit(1793068310.148:30): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154103 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff7efd9668 code=0x50000
+1793068347.615614 fl00 kernel: audit: type=1326 audit(1793068347.608:31): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154394 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa9f9668 code=0x50000
+1793068362.967601 fl00 kernel: audit: type=1326 audit(1793068362.960:32): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154653 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93159668 code=0x50000
+1793068414.143602 fl00 kernel: audit: type=1326 audit(1793068414.136:33): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154967 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff7e789668 code=0x50000
+1793068441.183608 fl00 kernel: audit: type=1326 audit(1793068441.176:34): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155284 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8e319668 code=0x50000
+1793068466.223845 fl00 kernel: audit: type=1326 audit(1793068466.216:35): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155583 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff841f9668 code=0x50000
+1793068494.987661 fl00 kernel: audit: type=1326 audit(1793068494.980:36): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155912 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa749668 code=0x50000
+1793068555.367638 fl00 kernel: audit: type=1326 audit(1793068555.360:37): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156357 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff96da9668 code=0x50000
+1793068556.691602 fl00 kernel: audit: type=1326 audit(1793068556.684:38): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156617 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9beb9668 code=0x50000
+1793068590.967609 fl00 kernel: audit: type=1326 audit(1793068590.960:39): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156921 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb909668 code=0x50000
+1793068769.383671 fl00 kernel: audit: type=1326 audit(1793068769.376:40): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=158129 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91c49668 code=0x50000
+1793068880.475627 fl00 kernel: audit: type=1326 audit(1793068880.464:41): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=158613 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb46f9668 code=0x50000
+1793069039.019660 fl00 kernel: audit: type=1326 audit(1793069039.012:42): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159148 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93349668 code=0x50000
+1793069041.447685 fl00 kernel: audit: type=1326 audit(1793069041.440:43): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159441 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8b949668 code=0x50000
+1793069042.651607 fl00 kernel: audit: type=1326 audit(1793069042.644:44): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159745 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ee59668 code=0x50000
+1793069165.499679 fl00 kernel: audit: type=1326 audit(1793069165.492:45): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160238 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c369668 code=0x50000
+1793069182.511611 fl00 kernel: audit: type=1326 audit(1793069182.504:46): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160572 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb91a9668 code=0x50000
+1793069182.532332 fl00 kernel: audit: type=1326 audit(1793069182.524:47): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160579 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9a159668 code=0x50000
+1793069239.959601 fl00 kernel: audit: type=1326 audit(1793069239.952:48): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161302 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb2a59668 code=0x50000
+1793069258.571705 fl00 kernel: audit: type=1326 audit(1793069258.564:49): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161630 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8a1e9668 code=0x50000
+1793069260.207615 fl00 kernel: audit: type=1326 audit(1793069260.200:50): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161910 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbac19668 code=0x50000
+1793069261.523628 fl00 kernel: audit: type=1326 audit(1793069261.516:51): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162215 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb0209668 code=0x50000
+1793069262.987695 fl00 kernel: audit: type=1326 audit(1793069262.980:52): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162508 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffafd69668 code=0x50000
+1793069266.043764 fl00 kernel: audit: type=1326 audit(1793069266.036:53): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162827 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91e49668 code=0x50000
+1793069282.743614 fl00 kernel: audit: type=1326 audit(1793069282.736:54): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163136 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffba919668 code=0x50000
+1793069284.111610 fl00 kernel: audit: type=1326 audit(1793069284.104:55): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163415 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ed89668 code=0x50000
+1793069301.751663 fl00 kernel: audit: type=1326 audit(1793069301.744:56): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163699 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa1f9668 code=0x50000
+1793069327.547638 fl00 kernel: audit: type=1326 audit(1793069327.540:57): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=164046 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb279668 code=0x50000
+1793069553.679635 fl00 kernel: audit: type=1326 audit(1793069553.668:58): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=164464 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb3cc9668 code=0x50000
+1793070888.615615 fl00 kernel: device wlxfc221c100157 left promiscuous mode
+1793071162.947714 fl00 kernel: device wlxfc221c100157 entered promiscuous mode
+1793071863.671602 fl00 kernel: audit: type=1326 audit(1793071863.664:59): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=170527 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88079668 code=0x50000
+ 退出码 0
+
+命令 ['journalctl', '-u', 'wfb-fl-server-daemon.service', '-n', '150', '--no-pager', '-o', 'short-unix']
+1793020875.153876 fl00 wfb-fl-server-daemon[21680]: 2026-10-26 21:21:15,153 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793020875.154477 fl00 wfb-fl-server-daemon[21680]: 2026-10-26 21:21:15,154 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793020875.157484 fl00 wfb-fl-server-daemon[21680]: 2026-10-26 21:21:15,157 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793020939.724236 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793020939.724756 fl00 wfb-fl-server-daemon[21680]: 2026-10-26 21:22:19,724 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793020940.294570 fl00 wfb-fl-server-daemon[21680]: 2026-10-26 21:22:20,294 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793020940.361370 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793020940.361828 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793020953.342081 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793020953.677583 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,677 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793020953.828521 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,828 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793020953.828841 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,828 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793020953.887976 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,887 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793020953.888509 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,888 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793020953.891435 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:22:33,891 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793021018.472893 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793021018.473985 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:23:38,472 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793021019.001885 fl00 wfb-fl-server-daemon[22125]: 2026-10-26 21:23:39,001 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793021019.066129 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793021019.066603 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793021143.995786 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793021144.317849 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,317 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793021144.468300 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,468 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793021144.468605 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,468 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793021144.529511 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,529 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793021144.531644 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,531 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793021144.534682 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:25:44,534 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793021221.855544 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793021221.856263 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:27:01,855 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793021222.260949 fl00 wfb-fl-server-daemon[23340]: 2026-10-26 21:27:02,260 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793021222.332203 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793021222.332649 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793021366.072175 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793021366.394200 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,393 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793021366.543932 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,543 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793021366.544224 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,544 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793021366.603468 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,603 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793021366.604274 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,604 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793021366.607293 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:29:26,607 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793021529.795906 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793021529.796286 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:32:09,795 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793021530.453618 fl00 wfb-fl-server-daemon[25276]: 2026-10-26 21:32:10,453 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793021530.518845 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793021530.519288 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793021530.519662 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 1.012s CPU time.
+1793022328.227880 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793022328.552148 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,551 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793022328.701633 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,701 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793022328.701949 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,701 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793022328.761081 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,760 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793022328.761585 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,761 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793022328.764804 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 21:45:28,764 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793027720.827314 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793027720.827848 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 23:15:20,827 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793027721.131042 fl00 wfb-fl-server-daemon[30160]: 2026-10-26 23:15:21,130 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793027721.382722 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793027721.383242 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793027721.383648 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 16.860s CPU time.
+1793028408.661041 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793028409.132934 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,132 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793028409.282462 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,282 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793028409.282798 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,282 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793028409.341843 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,341 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793028409.342928 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,342 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793028409.346017 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:26:49,345 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793028564.986716 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793028564.988015 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:29:24,986 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793028565.386843 fl00 wfb-fl-server-daemon[51392]: 2026-10-26 23:29:25,386 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793028565.456680 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793028565.457124 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793028566.039338 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793028566.499924 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,499 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793028566.649502 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,649 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793028566.649835 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,649 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793028566.708195 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,707 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793028566.708715 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,708 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793028566.711442 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:29:26,711 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793028811.761546 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:33:31,761 [INFO] [client-daemon] 射频重配 PREPARE session=switch_19a9101b96ec4fe386f10c370770834b targets=[1, 2, 4] patch={'downlink_mcs': 4, 'uplink_mcs': 3}
+1793028820.225129 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:33:40,224 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_19a9101b96ec4fe386f10c370770834b channel=157
+1793028867.783409 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:34:27,783 [INFO] [client-daemon] 射频重配 PREPARE session=switch_d1da545cefa04096a191f8dbe90fc2e8 targets=[1, 2, 4] patch={'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uftp_rate_kbps': 4000}
+1793028875.012626 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:34:35,012 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_d1da545cefa04096a191f8dbe90fc2e8 channel=157
+1793029177.085245 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:39:37,084 [INFO] [client-daemon] 射频重配 PREPARE session=switch_00b03799a9174803a5f8e3aab97fb99f targets=[1, 2, 4] patch={'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000, 'radio_txpower_dbm': 14}
+1793029185.037612 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:39:45,037 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_00b03799a9174803a5f8e3aab97fb99f channel=157
+1793029314.482794 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793029314.483507 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:41:54,482 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793029314.882727 fl00 wfb-fl-server-daemon[51587]: 2026-10-26 23:41:54,882 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793029315.055734 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793029315.056215 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793029315.056606 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 3.728s CPU time.
+1793029446.879665 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793029447.205412 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,205 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793029447.354414 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,354 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793029447.354749 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,354 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793029447.413643 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,413 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793029447.414212 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,414 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793029447.418053 fl00 wfb-fl-server-daemon[53067]: 2026-10-26 23:44:07,417 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793031974.876854 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793031974.877217 fl00 wfb-fl-server-daemon[53067]: 2026-10-27 00:26:14,876 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793031975.193726 fl00 wfb-fl-server-daemon[53067]: 2026-10-27 00:26:15,193 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793031975.260601 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793031975.261055 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793031975.261414 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 6.819s CPU time.
+1793031976.386713 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793031976.842980 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:16,842 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793031976.992615 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:16,992 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793031976.992933 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:16,992 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793031977.051234 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:17,051 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793031977.051825 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:17,051 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793031977.054606 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 00:26:17,054 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793040419.351646 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:46:59,351 [INFO] [client-daemon] 射频重配 PREPARE session=switch_e32b12ca59e94bd9b3d047d1a15434ba targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+1793040423.279981 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:47:03,279 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_e32b12ca59e94bd9b3d047d1a15434ba channel=157
+1793040581.005202 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:49:41,004 [INFO] [client-daemon] 射频重配 PREPARE session=switch_b73e79e43a854ae29357a422672a082c targets=[1, 2, 4] patch={'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 14, 'uftp_rate_kbps': 2000}
+1793040588.320021 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:49:48,319 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_b73e79e43a854ae29357a422672a082c channel=157
+1793040739.362996 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:52:19,362 [INFO] [client-daemon] 射频重配 PREPARE session=switch_fb60ea21bdf84c5e98168bc424da59ac targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+1793040746.696629 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 02:52:26,696 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_fb60ea21bdf84c5e98168bc424da59ac channel=157
+1793041696.635597 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 03:08:16,635 [INFO] [client-daemon] 射频重配 PREPARE session=switch_d80789b5ddda438e9d12824c11727ee8 targets=[1, 2, 4] patch={'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 14, 'uftp_rate_kbps': 2000}
+1793041704.117615 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 03:08:24,117 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_d80789b5ddda438e9d12824c11727ee8 channel=157
+1793066498.244702 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:01:38,244 [INFO] [client-daemon] 射频重配 PREPARE session=switch_00d177f53eea413ea2517b5d8fb81478 targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+1793066501.498974 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:01:41,498 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_00d177f53eea413ea2517b5d8fb81478 channel=157
+1793066608.015505 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:03:28,015 [INFO] [client-daemon] 射频重配 PREPARE session=switch_022ad1f2965c41969826ac1cbb815935 targets=[1, 2, 4] patch={'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 14, 'uftp_rate_kbps': 2000}
+1793066615.245191 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:03:35,244 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_022ad1f2965c41969826ac1cbb815935 channel=157
+1793067469.892195 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:49,891 [INFO] [client-daemon] 射频重配 PREPARE session=switch_3d2aa070ac844ac48587fe2cede62e92 targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+1793067474.892762 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:54,892 [WARNING] [client-daemon] 射频重配 PREPARE 失败 session=switch_3d2aa070ac844ac48587fe2cede62e92: 节点缺失或准备失败: [2]
+1793067475.041807 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:55,041 [WARNING] [client-daemon] 射频重配回退至 Channel 157 session=switch_3d2aa070ac844ac48587fe2cede62e92
+1793067734.949872 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793067734.950348 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:22:14,949 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793067735.334050 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:22:15,333 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793067735.401097 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793067735.401598 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793067735.401686 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 2min 636ms CPU time.
+1793067735.404762 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793067735.753906 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:15,753 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793067736.090532 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,090 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793067736.090831 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,090 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793067736.149290 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,149 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793067736.151047 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,150 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793067736.153696 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,153 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+1793070888.544927 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+1793070888.546244 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 11:14:48,544 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+1793070888.994473 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 11:14:48,994 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+1793070889.058383 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+1793070889.058890 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+1793070889.059251 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 13.042s CPU time.
+1793071162.261147 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+1793071162.766875 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,766 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+1793071162.920314 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,920 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+1793071162.920691 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,920 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+1793071162.979934 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,979 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+1793071162.980700 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,980 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+1793071162.983772 fl00 wfb-fl-server-daemon[168778]: 2026-10-27 11:19:22,983 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+ 退出码 0
+
+Drop-in目录 /etc/systemd/system/wfb-fl-server-daemon.service.d 存在 True
+/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf [Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+
+
+Drop-in目录 /run/systemd/system/wfb-fl-server-daemon.service.d 存在 False
+
+Drop-in目录 /usr/lib/systemd/system/wfb-fl-server-daemon.service.d 存在 False
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/build_identity.json sha256 29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842
+{"commit": "e53de0076c6ed118d824a2d31261e75de3223333", "schema_version": 1}
+
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py sha256 2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py sha256 cc60a0fb14cb2694f2ff000e4e14d4274957c6211089ce6804bd872ca96ddb72
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py sha256 f3ab9b6c99aca3ba805387f7c564d650befae6a83b8be153aece6c9412b83e28
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py sha256 5f5bd03330ebb1dc6bb33cb633fbde79ce22d9418b9bd2bd7d2e5c2eac96e3e4
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py sha256 28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist_data.py sha256 6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c
+
+失败作业小文件归档 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1 存在 False
+
+失败作业小文件归档 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622 存在 False
+
+官方数据manifest {
+  "created_utc": "2026-10-26T18:24:51Z",
+  "provenance": "torchvision MNIST resources; HTTPS OSSCI mirror; gzip MD5 matched maintenance metadata",
+  "files": [
+    {
+      "raw_name": "train-images-idx3-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:24:56Z",
+      "gz_bytes": 9912422,
+      "gz_md5": "f68b3c2dcbeaaa9fbdd348bbdeb94873",
+      "gz_sha256": "440fcabf73cc546fa21475e81ea370265605f56be210a4024d2ca8f203523609",
+      "raw_bytes": 47040016,
+      "raw_sha256": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+      "magic": 2051,
+      "sample_count": 60000
+    },
+    {
+      "raw_name": "train-labels-idx1-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:24:58Z",
+      "gz_bytes": 28881,
+      "gz_md5": "d53e105ee54ea40749a09fcbcd1e9432",
+      "gz_sha256": "3552534a0a558bbed6aed32b30c495cca23d567ec52cac8be1a0730e8010255c",
+      "raw_bytes": 60008,
+      "raw_sha256": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5",
+      "magic": 2049,
+      "sample_count": 60000
+    },
+    {
+      "raw_name": "t10k-images-idx3-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:25:01Z",
+      "gz_bytes": 1648877,
+      "gz_md5": "9fb629c4189551a2d022fa330f9573f3",
+      "gz_sha256": "8d422c7b0a1c1c79245a5bcf07fe86e33eeafee792b84584aec276f5a2dbc4e6",
+      "raw_bytes": 7840016,
+      "raw_sha256": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+      "magic": 2051,
+      "sample_count": 10000
+    },
+    {
+      "raw_name": "t10k-labels-idx1-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:25:03Z",
+      "gz_bytes": 4542,
+      "gz_md5": "ec29112dd5afa0611ce80d1b7f02629c",
+      "gz_sha256": "f7ae60f92e00ec6debd23a6088c31dbd2371eca3ffa0defaefb259924204aec6",
+      "raw_bytes": 10008,
+      "raw_sha256": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2",
+      "magic": 2049,
+      "sample_count": 10000
+    }
+  ]
+}
+
+
+整体退出码 0

@@ -1,0 +1,9 @@
+节点 fl04 角色 client 阶段 start
+UTC 2026-10-27T03:19:28Z 命令 ['systemctl', 'start', 'wfb-fl-client-daemon.service']
+退出码 0
+UTC 2026-10-27T03:19:28Z 命令 ['systemctl', 'is-active', 'wfb-fl-client-daemon.service']
+active
+退出码 0
+NODE_PHASE_PASS client start
+
+退出码 0

@@ -1,0 +1,68 @@
+命令 ['timedatectl', 'show', '-p', 'NTPSynchronized', '-p', 'Timezone', '-p', 'TimeUSec']
+Timezone=Asia/Shanghai
+NTPSynchronized=no
+TimeUSec=Tue 2026-10-27 15:07:46 CST
+ 退出码 0
+命令 ['journalctl', '-k', '--since', '@1793071770', '--until', '@1793071900', '--no-pager', '-o', 'short-unix']
+1793071863.671602 fl00 kernel: audit: type=1326 audit(1793071863.664:59): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=170527 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88079668 code=0x50000
+ 退出码 0
+命令 ['journalctl', '-u', 'wfb-fl-server-daemon.service', '--since', '@1793071770', '--until', '@1793071900', '--no-pager', '-o', 'short-unix']
+-- No entries --
+ 退出码 0
+当前链路日志尾部 /srv/wfb-ng-fl/server/wfb_uplink.log
+70367478	PKT_SRC	8:0:0:0:0:0:0
+70367478	PKT_SRC	9:0:0:0:0:0:0
+70367478	PKT_SRC	10:0:0:0:0:0:0
+70367478	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+70367478	READY_FILTER	6570:6570:0:0:0
+70367478	REASSEMBLY	0:40
+5 packets lost
+grant seq=105274 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105275 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105276 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105277 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105278 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105279 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105280 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+70368478	PKT	0:0:0:0:0:0:0:0:0:0:0
+70368478	PKT_SRC	1:0:0:0:0:0:0
+70368478	PKT_SRC	2:0:0:0:0:0:0
+70368478	PKT_SRC	3:0:0:0:0:0:0
+70368478	PKT_SRC	4:0:0:0:0:0:0
+70368478	PKT_SRC	5:0:0:0:0:0:0
+70368478	PKT_SRC	6:0:0:0:0:0:0
+70368478	PKT_SRC	7:0:0:0:0:0:0
+70368478	PKT_SRC	8:0:0:0:0:0:0
+70368478	PKT_SRC	9:0:0:0:0:0:0
+70368478	PKT_SRC	10:0:0:0:0:0:0
+70368478	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+70368478	READY_FILTER	6570:6570:0:0:0
+70368478	REASSEMBLY	0:40
+grant seq=105281 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105282 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105283 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105284 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105285 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105286 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105287 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105288 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+70369478	PKT	0:0:0:0:0:0:0:0:0:0:0
+70369478	PKT_SRC	1:0:0:0:0:0:0
+70369478	PKT_SRC	2:0:0:0:0:0:0
+70369478	PKT_SRC	3:0:0:0:0:0:0
+70369478	PKT_SRC	4:0:0:0:0:0:0
+70369478	PKT_SRC	5:0:0:0:0:0:0
+70369478	PKT_SRC	6:0:0:0:0:0:0
+70369478	PKT_SRC	7:0:0:0:0:0:0
+70369478	PKT_SRC	8:0:0:0:0:0:0
+70369478	PKT_SRC	9:0:0:0:0:0:0
+70369478	PKT_SRC	10:0:0:0:0:0:0
+70369478	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+70369478	READY_FILTER	6570:6570:0:0:0
+70369478	REASSEMBLY	0:40
+grant seq=105289 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105290 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105291 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105292 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=105293 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+

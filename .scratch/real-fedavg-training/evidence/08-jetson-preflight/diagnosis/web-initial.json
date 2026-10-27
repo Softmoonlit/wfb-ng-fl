@@ -1,0 +1,1308 @@
+{
+  "schema_version": 1,
+  "instance_id": "c74f8f4c-6d5a-4e0d-9ed0-cf61ef3ee7ac",
+  "server": {
+    "state": "idle",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "can_start_job": true,
+    "start_blockers": [],
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "link_process": {
+      "running": true,
+      "pid": 168834
+    },
+    "air_interface": "wlxfc221c100157"
+  },
+  "nodes": [
+    {
+      "node_id": 1,
+      "tun_ip": "10.80.0.11",
+      "reported_state": "IDLE",
+      "readiness": "OFFLINE",
+      "elapsed_ms": 5008,
+      "current_channel": 157,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 70074.601993664,
+      "last_heartbeat_timestamp_ms": 1793084571345,
+      "last_heartbeat_ago_seconds": 59.19,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 2,
+      "tun_ip": "10.80.0.12",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 5030,
+      "current_channel": 157,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 70132.125598528,
+      "last_heartbeat_timestamp_ms": 1793084628869,
+      "last_heartbeat_ago_seconds": 1.67,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": [],
+      "state": "idle",
+      "online": true
+    },
+    {
+      "node_id": 3,
+      "tun_ip": "10.80.0.13",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 4,
+      "tun_ip": "10.80.0.14",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 10054,
+      "current_channel": 157,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 70128.871720064,
+      "last_heartbeat_timestamp_ms": 1793084625615,
+      "last_heartbeat_ago_seconds": 4.92,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": [],
+      "state": "idle",
+      "online": true
+    },
+    {
+      "node_id": 5,
+      "tun_ip": "10.80.0.15",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 6,
+      "tun_ip": "10.80.0.16",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 7,
+      "tun_ip": "10.80.0.17",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 8,
+      "tun_ip": "10.80.0.18",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 9,
+      "tun_ip": "10.80.0.19",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 10,
+      "tun_ip": "10.80.0.20",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    }
+  ],
+  "job": {
+    "job_id": "web-f317d54238864f64ab66164f151d3622",
+    "run_id": "web-b7a96f0f69e5428382d339a5b001ccf3",
+    "target_nodes": [
+      1,
+      2,
+      4
+    ],
+    "model_size_bytes": 38792,
+    "rounds": 2,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "started_at": 1793071837.407416,
+    "preparation_timeout_seconds": 300.0,
+    "current_round": 0,
+    "rounds_completed": 0,
+    "server_phase": "ready",
+    "phase_started_at": 1793071840.0604517,
+    "execution_result": "failed",
+    "recovery_state": "ready",
+    "reason": "participant_offline",
+    "error": "固定参与者 2 心跳失联",
+    "participants": [
+      {
+        "node_id": 1,
+        "online": false,
+        "state": "offline",
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ],
+        "disconnection_events": []
+      },
+      {
+        "node_id": 2,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": [
+          {
+            "type": "NODE_OFFLINE",
+            "job_id": "web-f317d54238864f64ab66164f151d3622",
+            "node_id": 2,
+            "message": "节点 2 离线",
+            "timestamp": "2026-10-27T03:30:40.061463+00:00"
+          }
+        ]
+      },
+      {
+        "node_id": 4,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": []
+      }
+    ]
+  },
+  "current_job": null,
+  "recent_job": {
+    "job_id": "web-f317d54238864f64ab66164f151d3622",
+    "run_id": "web-b7a96f0f69e5428382d339a5b001ccf3",
+    "target_nodes": [
+      1,
+      2,
+      4
+    ],
+    "model_size_bytes": 38792,
+    "rounds": 2,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "started_at": 1793071837.407416,
+    "preparation_timeout_seconds": 300.0,
+    "current_round": 0,
+    "rounds_completed": 0,
+    "server_phase": "ready",
+    "phase_started_at": 1793071840.0604517,
+    "execution_result": "failed",
+    "recovery_state": "ready",
+    "reason": "participant_offline",
+    "error": "固定参与者 2 心跳失联",
+    "participants": [
+      {
+        "node_id": 1,
+        "online": false,
+        "state": "offline",
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ],
+        "disconnection_events": []
+      },
+      {
+        "node_id": 2,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": [
+          {
+            "type": "NODE_OFFLINE",
+            "job_id": "web-f317d54238864f64ab66164f151d3622",
+            "node_id": 2,
+            "message": "节点 2 离线",
+            "timestamp": "2026-10-27T03:30:40.061463+00:00"
+          }
+        ]
+      },
+      {
+        "node_id": 4,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": []
+      }
+    ]
+  },
+  "execution_result": "failed",
+  "recovery_state": "ready",
+  "events": [
+    {
+      "sequence": 13,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:30:40.061522+00:00",
+      "job_id": "web-f317d54238864f64ab66164f151d3622",
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 14,
+      "type": "RECOVERY_STARTED",
+      "timestamp": "2026-10-27T03:30:40.063374+00:00",
+      "job_id": "web-f317d54238864f64ab66164f151d3622",
+      "round_id": null,
+      "node_id": null,
+      "message": "RECOVERY_STARTED"
+    },
+    {
+      "sequence": 15,
+      "type": "RECOVERY_COMPLETED",
+      "timestamp": "2026-10-27T03:30:42.871092+00:00",
+      "job_id": "web-f317d54238864f64ab66164f151d3622",
+      "round_id": null,
+      "node_id": null,
+      "message": "RECOVERY_COMPLETED"
+    },
+    {
+      "sequence": 16,
+      "type": "JOB_FAILED",
+      "timestamp": "2026-10-27T03:30:42.871153+00:00",
+      "job_id": "web-f317d54238864f64ab66164f151d3622",
+      "round_id": null,
+      "node_id": null,
+      "message": "participant_offline"
+    },
+    {
+      "sequence": 17,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:33:23.682485+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 18,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:33:24.469568+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 19,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:35:19.010372+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 20,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:36:13.345917+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 21,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:36:53.773493+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 22,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:37:50.246618+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 23,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:38:04.824046+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 24,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:39:27.458650+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 25,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:39:53.896640+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 26,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:40:34.694821+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 27,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:43:42.080798+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 28,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:43:42.080863+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 29,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:44:32.235675+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 30,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:46:31.836556+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 31,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:47:24.034930+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 32,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:49:02.404927+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 33,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:53:36.715671+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 34,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T03:58:33.878185+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 35,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:05:19.418707+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 36,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:06:35.944627+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 37,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:06:56.762039+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 38,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:09:56.992078+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 39,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:18:58.214687+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 40,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:21:34.255233+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 41,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:22:42.265180+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 42,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:28:30.028599+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 43,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:45:41.477099+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 44,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:46:30.796467+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 45,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:46:51.699296+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 46,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:51:26.194017+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 47,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:57:24.701063+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 48,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:57:55.926740+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 49,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:58:01.132222+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 50,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T04:59:08.803005+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 51,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:01:12.700391+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 52,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:11:54.005979+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 53,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:12:59.854162+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 54,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:23:23.291525+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 55,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:25:16.895779+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 56,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:26:36.919930+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 57,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:27:26.331209+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 58,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:27:31.452874+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 59,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:29:27.021064+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 60,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:30:22.799705+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 61,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:37:37.869971+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 62,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:39:18.466711+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 63,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:40:05.705657+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 64,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:40:48.123782+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 65,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:43:21.166638+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 66,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:45:59.221615+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 67,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:46:03.184053+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 68,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:48:16.821997+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 69,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:51:23.955058+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 70,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:52:51.272679+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 71,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:54:45.387317+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 72,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:55:20.326945+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 73,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:55:51.367644+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 74,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:56:13.748505+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 75,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:56:18.940690+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 76,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T05:58:17.109027+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 77,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:04:15.973728+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 78,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:04:21.003252+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 79,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:05:06.768348+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 80,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:08:11.833166+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 81,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:09:55.147115+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 82,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:21:58.667908+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 83,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:22:34.610957+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 84,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:24:31.314895+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 85,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:26:23.082874+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 86,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:27:55.462877+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 87,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:28:21.224461+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 88,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:29:28.630440+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 89,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:30:20.420169+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 90,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:31:13.513353+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 91,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:31:33.981934+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 92,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:33:49.018224+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 93,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:34:53.437246+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 94,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:35:58.625119+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 95,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:37:50.676434+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 96,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:38:37.345859+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 97,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:40:10.699066+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 98,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:40:22.166022+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 99,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:40:50.262033+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 100,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:41:38.809812+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 101,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:48:38.058919+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 102,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:51:18.124824+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 103,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:53:04.451717+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 104,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:54:27.385354+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 105,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T06:55:33.369681+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 106,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:00:23.770137+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 107,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:00:44.590771+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 108,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:01:16.208822+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 109,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:02:17.640017+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 110,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:02:33.075921+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 111,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:03:03.975325+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 112,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-27T07:03:03.975468+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    }
+  ],
+  "state_version": 5183,
+  "generated_at": "2026-10-27T07:03:50.536117+00:00"
+}

@@ -1,0 +1,287 @@
+来源 https://docs.nvidia.com/jetson/jetpack/6.2/release-notes/index.html
+退出码 0
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript"
+  data-document-language="true" charset="UTF-8" data-domain-script="3e2b62ff-7ae7-4ac5-87c8-d5949ecafff5">
+</script>
+<script type="text/javascript">
+  function OptanonWrapper() {
+    var event = new Event('bannerLoaded');
+    window.dispatchEvent(event);
+  }
+</script>
+<script src="https://images.nvidia.com/aem-dam/Solutions/ot-js/ot-custom.js" type="text/javascript">
+</script>
+
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JetPack 6.2 Release Notes &mdash; JetPack 6.2 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/omni-style.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/api-styles.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/mermaid-init.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+        <script src="../_static/geoip/geoip.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to Install and Configure JetPack SDK" href="../install-setup/index.html" />
+    <link rel="prev" title="Introduction to NVIDIA JetPack SDK" href="../introduction/index.html" />
+ 
+
+
+<link rel="stylesheet" href="/common-libs/common.css">
+<script src="/common-libs/common.js"></script>
+<script src="//assets.adobedtm.com/5d4962a43b79/c1061d2c5e7b/launch-191c2462b890.min.js"></script>
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+<a href="../index.html">
+  <img src="../_static/Logo-JetPack.png" class="logo" alt="Logo"/>
+</a>
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">NVIDIA JetPack SDK</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">Introduction to NVIDIA JetPack SDK</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">JetPack 6.2 Release Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#new-features">New Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-release-details">Additional Release Details</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#os">OS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#libraries-and-apis">Libraries and APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#developer-tools">Developer Tools</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation and Setup</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install-setup/index.html">How to Install and Configure JetPack SDK</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Copyright and License Notices</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../eula/index.html">EULA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">JetPack</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+
+
+  
+
+<li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+  
+<li>JetPack 6.2 Release Notes</li>
+
+      <li class="wy-breadcrumbs-aside">
+      </li>
+<li class="wy-breadcrumbs-aside">
+
+
+  <span>v6.2</span>
+
+
+  <span>&nbsp;</span>
+</li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="jetpack-6-2-release-notes">
+<h1>JetPack 6.2 Release Notes<a class="headerlink" href="#jetpack-6-2-release-notes" title="Permalink to this headline"></a></h1>
+<section id="new-features">
+<h2>New Features<a class="headerlink" href="#new-features" title="Permalink to this headline"></a></h2>
+<p>NVIDIA® Jetson™ Linux 36.4.3 supports new high-power Super Mode for NVIDIA Jetson Orin Nano and Jetson Orin NX production modules. With Super Modes, the Jetson Orin NX series achieves up to a 70% increase in AI TOPS, while the Jetson Orin Nano series delivers comparable AI TOPS improvements alongside a 50% boost in memory bandwidth. The improved performance delivers up to 2x higher generative AI inference performance on Jetson Orin modules.</p>
+<p>Support for new reference power modes on Jetson Orin Nano and Jetson Orin NX production modules, delivering up to 2x generative AI performance (available with a new flashing configuration: <code class="docutils literal notranslate"><span class="pre">jetson-orin-nano-devkit-super.conf</span></code>).</p>
+<ul class="simple">
+<li><p>NVIDIA Jetson Orin Nano 4GB: Supports <code class="docutils literal notranslate"><span class="pre">10W</span></code>, <code class="docutils literal notranslate"><span class="pre">25W</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAXN</span> <span class="pre">SUPER</span></code>.</p></li>
+<li><p>NVIDIA Jetson Orin Nano 8GB: Supports <code class="docutils literal notranslate"><span class="pre">15W</span></code>, <code class="docutils literal notranslate"><span class="pre">25W</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAXN</span> <span class="pre">SUPER</span></code>.</p></li>
+<li><p>NVIDIA Jetson Orin NX 8GB: Supports <code class="docutils literal notranslate"><span class="pre">10W</span></code>, <code class="docutils literal notranslate"><span class="pre">15W</span></code>, <code class="docutils literal notranslate"><span class="pre">20W</span></code>, <code class="docutils literal notranslate"><span class="pre">40W</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAXN</span> <span class="pre">SUPER</span></code>.</p></li>
+<li><p>NVIDIA Jetson Orin NX 16GB: Supports <code class="docutils literal notranslate"><span class="pre">10W</span></code>, <code class="docutils literal notranslate"><span class="pre">15W</span></code>, <code class="docutils literal notranslate"><span class="pre">25W</span></code>, <code class="docutils literal notranslate"><span class="pre">40W</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAXN</span> <span class="pre">SUPER</span></code>.</p></li>
+</ul>
+<p>NVIDIA® Jetson™ Linux 36.4.3 supports all NVIDIA Jetson Orin modules and developer kits and introduces novel features, such as the flexibility to run any upstream Linux Kernel greater than 5.14, and expanded choices of Linux distro options on Jetson.</p>
+</section>
+<section id="additional-release-details">
+<h2>Additional Release Details<a class="headerlink" href="#additional-release-details" title="Permalink to this headline"></a></h2>
+<section id="os">
+<h3>OS<a class="headerlink" href="#os" title="Permalink to this headline"></a></h3>
+<p><strong>L4T 36.4.3</strong></p>
+<p>Refer to <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r36.4.3/ReleaseNotes/Jetson_Linux_Release_Notes_r36.4.3.pdf">Jetson Linux release notes</a> of L4T 36.4.3 for details.</p>
+<p>Highlights:</p>
+<ul>
+<li><p>Compute stack with <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html">CUDA 12.6</a>, <a class="reference external" href="https://docs.nvidia.com/deeplearning/tensorrt/release-notes/#rel-10-3-0">TensorRT 10.3</a>, <a class="reference external" href="https://docs.nvidia.com/deeplearning/cudnn/latest/release-notes.html#cudnn-9-3-0">cuDNN 9.3</a>, <a class="reference external" href="https://docs.nvidia.com/vpi/release_notes.html">VPI 3.2</a>, DLA 3.1, and DLFW 24.0.</p></li>
+<li><p><strong>Camera</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Enhanced the Argus library, reducing CPU utilization by up to 40%.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Security</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Support for Firmware-based Trusted Platform Module (fTPM) on the Orin platform. For a full list of security features, refer to <a class="reference external" href="https://docs.nvidia.com/jetson/archives/r36.4.3/DeveloperGuide/SD/Security.html">Security</a> in the Jetson Linux Developer Guide.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>Multimedia</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added GStreamer <code class="docutils literal notranslate"><span class="pre">nvunixfdsink</span></code> and <code class="docutils literal notranslate"><span class="pre">nvunixfdsrc</span></code> IPC plugins for cross-process use cases.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Fixes for known security vulnerabilities.</p></li>
+</ul>
+</section>
+<section id="libraries-and-apis">
+<h3>Libraries and APIs<a class="headerlink" href="#libraries-and-apis" title="Permalink to this headline"></a></h3>
+<ul>
+<li><p><strong>CUDA 12.6.10</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Refer to <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html">release notes for CUDA 12.6</a> for details.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>TensorRT 10.3.0</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Refer to <a class="reference external" href="https://docs.nvidia.com/deeplearning/tensorrt/release-notes/index.html#rel-10-3-0">release notes for TensorRT 10.3.0</a> for details.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>cuDNN 9.3.0</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Refer to the <a class="reference external" href="https://docs.nvidia.com/deeplearning/cudnn/latest/release-notes.html#cudnn-9-3-0">release notes for cuDNN 9.3.0</a> for details.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt><strong>VPI 3.2</strong></dt><dd><ul class="simple">
+<li><p>Refer to the <a class="reference external" href="https://docs.nvidia.com/vpi/release_notes.html">release notes for VPI 3.2</a> for details.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="developer-tools">
+<h3>Developer Tools<a class="headerlink" href="#developer-tools" title="Permalink to this headline"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://developer.nvidia.com/nsight-systems">NVIDIA Nsight Systems 2024.5</a> for application profiling across GPU and CPU.</p>
+<ul>
+<li><p>Check the release notes for the <a class="reference external" href="https://docs.nvidia.com/nsight-systems/2024.5/ReleaseNotes/index.html">Nsight Systems 2024.5 release</a>.</p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://developer.nvidia.com/nsight-graphics">NVIDIA Nsight Graphics 2024.2</a> for graphics application debugging and profiling.</p>
+<ul>
+<li><p>Check the release notes for the <a class="reference external" href="https://docs.nvidia.com/nsight-graphics/2024.2/ReleaseNotes/index.html">Nsight Graphics 2024.2 release</a>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+<img src="../_static/NVIDIA-LogoBlack.svg" class="only-light"/>
+<img src="../_static/NVIDIA-LogoWhite.svg" class="only-dark"/>
+
+<p class="notices">
+<a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank">Privacy Policy</a>
+|
+<a href="https://www.nvidia.com/en-us/about-nvidia/privacy-center/" target="_blank">Manage My Privacy</a>
+|
+<a href="https://www.nvidia.com/en-us/preferences/start/" target="_blank">Do Not Sell or Share My Data</a>
+|
+<a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank">Terms of Service</a>
+|
+<a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank">Accessibility</a>
+|
+<a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank">Corporate Policies</a>
+|
+<a href="https://www.nvidia.com/en-us/product-security/" target="_blank">Product Security</a>
+|
+<a href="https://www.nvidia.com/en-us/contact/" target="_blank">Contact</a>
+</p>
+
+<p>
+  Copyright &#169; 2018-2025, NVIDIA Corporation.
+</p>
+
+    <p>
+      <span class="lastupdated">Last updated on Jan 15, 2025.
+      </span></p>
+
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+ 
+
+
+
+<script type="text/javascript">_satellite.pageBottom();</script>
+</body>
+</html>

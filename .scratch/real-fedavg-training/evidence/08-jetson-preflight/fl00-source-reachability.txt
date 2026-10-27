@@ -1,0 +1,59 @@
+采集 UTC: 2026-10-26T18:16:28Z
+
+来源: 作者官方网页 https://yann.lecun.com/exdb/mnist/ 仅 HEAD，不下载数据
+curl: (28) SSL connection timeout
+HTTP/1.1 200 Connection established
+
+ 退出码: 28
+
+来源: 作者历史官方网页 http://yann.lecun.com/exdb/mnist/ 仅 HEAD，不下载数据
+失败: TimeoutExpired(['curl', '--head', '--location', '--connect-timeout', '4', '--max-time', '8', '--silent', '--show-error', 'http://yann.lecun.com/exdb/mnist/'], 10)
+
+来源: 作者主源训练图像 https://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz 仅 HEAD，不下载数据
+curl: (28) SSL connection timeout
+HTTP/1.1 200 Connection established
+
+ 退出码: 28
+
+来源: PyTorch 维护镜像训练图像 https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz 仅 HEAD，不下载数据
+HTTP/1.1 200 Connection established
+
+HTTP/1.1 200 OK
+x-amz-id-2: zKr4n/d8ai0f6trM4T4vwg0/uvYArG9DzlHFxvpm3ydgBxG1WGhUbSW/pUrQb/SA3wuQjHztE9A=
+x-amz-request-id: 882B95KYEAQ7AS6Y
+Server: AmazonS3
+Date: Mon, 26 Oct 2026 18:16:50 GMT
+Last-Modified: Wed, 04 Mar 2020 15:46:30 GMT
+ETag: "f68b3c2dcbeaaa9fbdd348bbdeb94873"
+x-amz-version-id: null
+Accept-Ranges: bytes
+Content-Length: 9912422
+Content-Type: application/x-gzip
+
+ 退出码: 0
+
+来源: Google 维护镜像训练图像 https://storage.googleapis.com/cvdf-datasets/mnist/train-images-idx3-ubyte.gz 仅 HEAD，不下载数据
+HTTP/1.1 200 Connection established
+
+HTTP/2 200 
+x-guploader-uploadid: AP6rU819jpM6DBkcA42NkmntU968BmZxnn1L1FWI0mr-Oc83bH1pbUu7tq9QRfNL-PT1J84
+x-goog-generation: 1491507071496546
+x-goog-metageneration: 2
+x-goog-stored-content-encoding: identity
+x-goog-stored-content-length: 9912422
+x-goog-hash: crc32c=BRCrLw==
+x-goog-hash: md5=9os8Lcvqqp+900i73rlIcw==
+x-goog-storage-class: REGIONAL
+accept-ranges: bytes
+content-length: 9912422
+server: UploadServer
+date: Mon, 26 Oct 2026 18:15:27 GMT
+expires: Mon, 26 Oct 2026 19:15:27 GMT
+cache-control: public, max-age=3600
+age: 84
+last-modified: Thu, 06 Apr 2017 19:31:11 GMT
+etag: "f68b3c2dcbeaaa9fbdd348bbdeb94873"
+content-type: application/x-gzip
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+
+ 退出码: 0

@@ -1,0 +1,10 @@
+['ssh', '-o', 'BatchMode=yes', 'fl@192.168.108.204', 'sudo -n python3 -m pip install --no-cache-dir --no-index /home/fl/wfb-ng-08-environment-cache-20261026/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl']
+Processing ./wfb-ng-08-environment-cache-20261026/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl
+Installing collected packages: numpy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.21.5
+    Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'numpy'. No files were found to uninstall.
+Successfully installed numpy-1.23.5
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+退出码 0

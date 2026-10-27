@@ -1,0 +1,654 @@
+采集 UTC: 2026-10-26T18:15:42Z
+
+命令: hostname
+fl02
+退出码: 0
+
+命令: id
+uid=1000(fl) gid=1000(fl) groups=1000(fl),4(adm),24(cdrom),27(sudo),29(audio),30(dip),44(video),46(plugdev),104(render),116(i2c),120(lpadmin),135(gdm),136(sambashare),996(weston-launch),999(gpio)
+退出码: 0
+
+命令: uname -a
+Linux fl02 5.15.148-tegra #1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025 aarch64 aarch64 aarch64 GNU/Linux
+退出码: 0
+
+命令: cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.5 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+退出码: 0
+
+命令: cat /etc/nv_tegra_release
+# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025
+# KERNEL_VARIANT: oot
+TARGET_USERSPACE_LIB_DIR=nvidia
+TARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia
+退出码: 0
+
+命令: sudo -n true
+
+退出码: 0
+
+命令: ip -brief address
+lo               UNKNOWN        127.0.0.1/8 
+can0             DOWN           
+enP8p1s0         DOWN           
+wlP4p1s0         UP             192.168.137.63/24 fe80::c842:b25c:53bc:24b7/64 
+l4tbr0           DOWN           
+usb0             DOWN           
+usb1             DOWN           
+wlxfc221c300cbb  UP             
+docker0          DOWN           172.17.0.1/16 
+fl-c2            UNKNOWN        10.80.0.12/24 
+退出码: 0
+
+命令: iw dev
+phy#1
+	Interface wlxfc221c300cbb
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:30:0c:bb
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 4
+		wdev 0x1
+		addr dc:4a:9e:31:89:86
+		ssid HONOR 500
+		type managed
+		channel 44 (5220 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+退出码: 0
+
+命令: lsusb
+Bus 002 Device 003: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter
+Bus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 349c:0418 Generic USB2.0 Device
+Bus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+退出码: 0
+
+命令: lsusb -t
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 3: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M
+退出码: 0
+
+命令: dpkg-query -W nvidia-jetpack nvidia-l4t-core cuda-toolkit-12-6 libcudnn9-cuda-12
+dpkg-query: no packages found matching nvidia-jetpack
+cuda-toolkit-12-6	12.6.11-1
+libcudnn9-cuda-12	9.3.0.75-1
+nvidia-l4t-core	36.4.3-20250107174145
+退出码: 1
+
+命令: systemctl show wfb-fl-server-daemon.service wfb-fl-client-daemon.service -p Id -p ActiveState -p ExecStart -p FragmentPath -p User -p WorkingDirectory
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+WorkingDirectory=
+User=
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive
+FragmentPath=/lib/systemd/system/wfb-fl-server-daemon.service
+
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14 ; ignore_errors=no ; start_time=[Tue 2026-10-27 00:26:16 CST] ; stop_time=[n/a] ; pid=8576 ; code=(null) ; status=0/0 }
+WorkingDirectory=
+User=
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+FragmentPath=/lib/systemd/system/wfb-fl-client-daemon.service
+退出码: 0
+
+命令: systemctl cat wfb-fl-server-daemon.service wfb-fl-client-daemon.service
+# /lib/systemd/system/wfb-fl-server-daemon.service
+[Unit]
+Description=WFB-ng FL server persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /lib/systemd/system/wfb-fl-client-daemon.service
+[Unit]
+Description=WFB-ng FL client persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /run/systemd/system/wfb-fl-client-daemon.service.d/radio.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14
+退出码: 0
+
+命令: sudo -n cat /etc/wfb-ng-fl/node.json
+{
+  "node_id": 2,
+  "tun_ip": "10.80.0.12/24"
+}
+退出码: 0
+
+命令: sudo -n cat /etc/wfb-ng-fl/server.json
+{
+  "ipc_host": "127.0.0.1",
+  "ipc_port": 9090,
+  "web_host": null,
+  "web_port": 8080,
+  "model_library_dir": "/var/lib/wfb-ng-fl/models",
+  "channel": 157,
+  "radio_txpower_dbm": 12,
+  "downlink_mcs": 3,
+  "uplink_mcs": 6,
+  "tun_name": "fl-s",
+  "tun_ip": "10.80.0.1",
+  "tun_cidr": "10.80.0.1/24",
+  "tun_txqueuelen": 5000,
+  "known_clients": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+}
+退出码: 0
+
+命令: sudo -n cat /etc/wfb-ng/fl-client.json
+{
+  "schema_version": 1,
+  "role": "client",
+  "work_dir": "/var/lib/wfb-ng/fl-client",
+  "node_id": 1,
+  "uftp_uid": 1,
+  "uftp_port": 1044,
+  "server_http_host": "10.0.0.1",
+  "server_http_port": 8080,
+  "uftp_bind_host": "10.0.0.2",
+  "uftp_multicast_host": "239.80.41.1",
+  "uftp_private_multicast_host": "239.80.41.2",
+  "channel": 157,
+  "channel_width": "HT40+",
+  "live_observation": false,
+  "observation_path": null,
+  "io_timeout_seconds": 300,
+  "max_update_size_bytes": 1073741824,
+  "link_args": [
+    "--tun-name", "wfb-fl0",
+    "--tun-addr", "10.0.0.2/24",
+    "--link-id", "1",
+    "--uplink-stream", "32",
+    "--downlink-stream", "160",
+    "--air-interface", "wlan0",
+    "--radio-bandwidth", "40",
+    "--radio-mcs-index", "3"
+  ]
+}
+退出码: 0
+
+命令: sudo -n cat /etc/wfb-ng/fl-server.json
+{
+  "schema_version": 1,
+  "role": "server",
+  "work_dir": "/var/lib/wfb-ng/fl-server",
+  "node_id": 255,
+  "participant_node_ids": [1],
+  "participant_uftp_uids": [1],
+  "server_uftp_uid": 255,
+  "uftp_port": 1044,
+  "uftp_rate_kbps": 15000,
+  "http_host": "10.0.0.1",
+  "http_port": 8080,
+  "uftp_bind_host": "10.0.0.1",
+  "uftp_multicast_host": "239.80.41.1",
+  "uftp_private_multicast_host": "239.80.41.2",
+  "channel": 157,
+  "channel_width": "HT40+",
+  "live_observation": false,
+  "observation_path": null,
+  "io_timeout_seconds": 300,
+  "max_update_size_bytes": 1073741824,
+  "link_args": [
+    "--tun-name", "wfb-fl0",
+    "--tun-addr", "10.0.0.1/24",
+    "--link-id", "1",
+    "--uplink-stream", "32",
+    "--downlink-stream", "160",
+    "--air-interface", "wlan0",
+    "--radio-bandwidth", "40",
+    "--radio-mcs-index", "3",
+    "--known-clients", "1",
+    "--client-target", "1:10.0.0.2:127.0.0.1:10001"
+  ]
+}
+退出码: 0
+
+命令: sudo -n cat /usr/local/cuda/version.json
+{
+   "cuda" : {
+      "name" : "CUDA SDK",
+      "version" : "12.6.11"
+   },
+   "cuda_cccl" : {
+      "name" : "CUDA C++ Core Compute Libraries",
+      "version" : "12.6.37"
+   },
+   "cuda_compat" : {
+      "name" : "CUDA Specific Libraries",
+      "version" : "12.6.36890662"
+   },
+   "cuda_cudart" : {
+      "name" : "CUDA Runtime (cudart)",
+      "version" : "12.6.68"
+   },
+   "cuda_cuobjdump" : {
+      "name" : "cuobjdump",
+      "version" : "12.6.68"
+   },
+   "cuda_cupti" : {
+      "name" : "CUPTI",
+      "version" : "12.6.68"
+   },
+   "cuda_cuxxfilt" : {
+      "name" : "CUDA cu++ filt",
+      "version" : "12.6.68"
+   },
+   "cuda_gdb" : {
+      "name" : "CUDA GDB",
+      "version" : "12.6.68"
+   },
+   "cuda_nvcc" : {
+      "name" : "CUDA NVCC",
+      "version" : "12.6.68"
+   },
+   "cuda_nvdisasm" : {
+      "name" : "CUDA nvdisasm",
+      "version" : "12.6.68"
+   },
+   "cuda_nvml_dev" : {
+      "name" : "CUDA NVML Headers",
+      "version" : "12.6.68"
+   },
+   "cuda_nvprune" : {
+      "name" : "CUDA nvprune",
+      "version" : "12.6.68"
+   },
+   "cuda_nvrtc" : {
+      "name" : "CUDA NVRTC",
+      "version" : "12.6.68"
+   },
+   "cuda_nvtx" : {
+      "name" : "CUDA NVTX",
+      "version" : "12.6.68"
+   },
+   "cuda_sanitizer_api" : {
+      "name" : "CUDA Compute Sanitizer API",
+      "version" : "12.6.68"
+   },
+   "libcublas" : {
+      "name" : "CUDA cuBLAS",
+      "version" : "12.6.1.4"
+   },
+   "libcudla" : {
+      "name" : "CUDA cuDLA",
+      "version" : "12.6.68"
+   },
+   "libcufft" : {
+      "name" : "CUDA cuFFT",
+      "version" : "11.2.6.59"
+   },
+   "libcufile" : {
+      "name" : "GPUDirect Storage (cufile)",
+      "version" : "1.11.1.6"
+   },
+   "libcurand" : {
+      "name" : "CUDA cuRAND",
+      "version" : "10.3.7.68"
+   },
+   "libcusolver" : {
+      "name" : "CUDA cuSOLVER",
+      "version" : "11.6.4.69"
+   },
+   "libcusparse" : {
+      "name" : "CUDA cuSPARSE",
+      "version" : "12.5.3.3"
+   },
+   "libnpp" : {
+      "name" : "CUDA NPP",
+      "version" : "12.3.1.54"
+   },
+   "libnvfatbin" : {
+      "name" : "Fatbin interaction library",
+      "version" : "12.6.68"
+   },
+   "libnvjitlink" : {
+      "name" : "JIT Linker Library",
+      "version" : "12.6.68"
+   },
+   "libnvjpeg" : {
+      "name" : "CUDA nvJPEG",
+      "version" : "12.3.3.54"
+   },
+   "nsight_compute" : {
+      "name" : "Nsight Compute",
+      "version" : "2024.3.1.2"
+   },
+   "nvidia_fs" : {
+      "name" : "NVIDIA file-system",
+      "version" : "2.22.3"
+   }
+}
+退出码: 0
+
+命令: bash -c command -v "$1" probe python3
+/usr/bin/python3
+退出码: 0
+
+命令: bash -c command -v "$1" probe wfb-fl-server
+/usr/bin/wfb-fl-server
+退出码: 0
+
+命令: bash -c command -v "$1" probe wfb-fl-client
+/usr/bin/wfb-fl-client
+退出码: 0
+
+命令: bash -c command -v "$1" probe wfb-fl-server-daemon
+/usr/bin/wfb-fl-server-daemon
+退出码: 0
+
+命令: bash -c command -v "$1" probe wfb-fl-client-daemon
+/usr/bin/wfb-fl-client-daemon
+退出码: 0
+
+命令: bash -c command -v "$1" probe wfb_v6_uplink
+/usr/bin/wfb_v6_uplink
+退出码: 0
+
+命令: bash -c command -v "$1" probe uftp
+/usr/bin/uftp
+退出码: 0
+
+命令: bash -c command -v "$1" probe uftpd
+/usr/bin/uftpd
+退出码: 0
+
+命令: bash -c command -v "$1" probe nvcc
+
+退出码: 1
+
+命令: bash -c command -v "$1" probe nvidia-smi
+/usr/sbin/nvidia-smi
+退出码: 0
+
+命令: nvidia-smi
+Tue Oct 27 02:15:42 2026       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 540.4.0                Driver Version: 540.4.0      CUDA Version: 12.6     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  Orin (nvgpu)                  N/A  | N/A              N/A |                  N/A |
+| N/A   N/A  N/A               N/A /  N/A | Not Supported        |     N/A          N/A |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+退出码: 0
+
+命令: /usr/local/cuda/bin/nvcc --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2024 NVIDIA Corporation
+Built on Wed_Aug_14_10:14:07_PDT_2024
+Cuda compilation tools, release 12.6, V12.6.68
+Build cuda_12.6.r12.6/compiler.34714021_0
+退出码: 0
+
+命令: modinfo 88XXau_wfb
+filename:       /lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko
+version:        v5.2.20.2_28373.20190919
+author:         Realtek Semiconductor Corp.
+description:    Realtek Wireless Lan Driver
+license:        GPL
+srcversion:     08BBAE7FE71F25B7F0ED54C
+alias:          usb:v2357p0120d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p0122d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p011Ed*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v3823p6249d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDApA811d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v056Ep4007d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0411p029Bd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0846p9052d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2019pAB32d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0411p0242d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v056Ep400Fd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v056Ep400Ed*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0E66p0023d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3318d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3314d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v04BBp0953d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v7392pA813d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v7392pA812d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v7392pA811d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp0823d*dc*dsc*dp*icFFiscFFipFFin*
+alias:          usb:v0BDAp0820d*dc*dsc*dp*icFFiscFFipFFin*
+alias:          usb:v0BDApA811d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp8822d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp0821d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp0811d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp881Ad*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2604p0012d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp8812d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v148Fp9097d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v050Dp1109d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0411p025Dd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v20F4p805Bd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p0122d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p010Fd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p010Ed*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p0115d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p010Dd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p0103d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2357p0101d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v13B1p003Fd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3316d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3315d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3313d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p330Ed*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0846p9051d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v07B8p8812d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2019pAB30d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v1740p0100d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v1058p0632d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v2001p3313d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0586p3426d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0E66p0022d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0B05p17D2d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0409p0408d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0789p016Ed*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v04BBp0952d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0DF6p0074d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v7392pA822d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v050Dp1106d*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp881Cd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp881Bd*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp881Ad*dc*dsc*dp*ic*isc*ip*in*
+alias:          usb:v0BDAp8812d*dc*dsc*dp*ic*isc*ip*in*
+depends:        cfg80211
+name:           88XXau_wfb
+vermagic:       5.15.148-tegra SMP preempt mod_unload modversions aarch64
+parm:           rtw_ips_mode:The default IPS mode (int)
+parm:           rtw_lps_level:The default LPS level (int)
+parm:           rtw_usb_rxagg_mode:int
+parm:           rtw_dynamic_agg_enable:int
+parm:           rtw_drv_log_level:set log level when insert driver module, default log level is _DRV_INFO_ = 4 (uint)
+parm:           rtw_tx_bw_mode:The max tx bw for 2.4G and 5G. format is the same as rtw_bw_mode (uint)
+parm:           rtw_rx_ampdu_sz_limit_1ss:RX AMPDU size limit for 1SS link of each BW, 0xFF: no limitation (array of uint)
+parm:           rtw_rx_ampdu_sz_limit_2ss:RX AMPDU size limit for 2SS link of each BW, 0xFF: no limitation (array of uint)
+parm:           rtw_rx_ampdu_sz_limit_3ss:RX AMPDU size limit for 3SS link of each BW, 0xFF: no limitation (array of uint)
+parm:           rtw_rx_ampdu_sz_limit_4ss:RX AMPDU size limit for 4SS link of each BW, 0xFF: no limitation (array of uint)
+parm:           rtw_vht_enable:int
+parm:           rtw_vht_rx_mcs_map:VHT RX MCS map (uint)
+parm:           rtw_rf_config:int
+parm:           rtw_country_code:The default country code (in alpha2) (charp)
+parm:           rtw_channel_plan:The default chplan ID when rtw_alpha2 is not specified or valid (int)
+parm:           rtw_excl_chs:exclusive channel array (array of uint)
+parm:           rtw_qos_opt_enable:int
+parm:           ifname:The default name to allocate for first interface (charp)
+parm:           if2name:The default name to allocate for second interface (charp)
+parm:           rtw_pwrtrim_enable:int
+parm:           rtw_initmac:charp
+parm:           rtw_special_rf_path:int
+parm:           rtw_chip_version:int
+parm:           rtw_rfintfs:int
+parm:           rtw_lbkmode:int
+parm:           rtw_network_mode:int
+parm:           rtw_channel:int
+parm:           rtw_mp_mode:int
+parm:           rtw_wmm_enable:int
+parm:           rtw_vrtl_carrier_sense:int
+parm:           rtw_vcs_type:int
+parm:           rtw_busy_thresh:int
+parm:           rtw_ht_enable:int
+parm:           rtw_bw_mode:int
+parm:           rtw_ampdu_enable:int
+parm:           rtw_rx_stbc:int
+parm:           rtw_rx_ampdu_amsdu:int
+parm:           rtw_tx_ampdu_amsdu:int
+parm:           rtw_beamform_cap:int
+parm:           rtw_lowrate_two_xmit:int
+parm:           rtw_power_mgnt:int
+parm:           rtw_smart_ps:int
+parm:           rtw_low_power:int
+parm:           rtw_wifi_spec:int
+parm:           rtw_full_ch_in_p2p_handshake:int
+parm:           rtw_antdiv_cfg:int
+parm:           rtw_antdiv_type:int
+parm:           rtw_drv_ant_band_switch:int
+parm:           rtw_single_ant_path:int
+parm:           rtw_switch_usb_mode:int
+parm:           rtw_enusbss:int
+parm:           rtw_hwpdn_mode:int
+parm:           rtw_hwpwrp_detect:int
+parm:           rtw_hw_wps_pbc:int
+parm:           rtw_check_hw_status:int
+parm:           rtw_max_roaming_times:The max roaming times to try (uint)
+parm:           rtw_mc2u_disable:int
+parm:           rtw_80211d:Enable 802.11d mechanism (int)
+parm:           rtw_notch_filter:0:Disable, 1:Enable, 2:Enable only for P2P (uint)
+parm:           rtw_hiq_filter:0:allow all, 1:allow special, 2:deny all (uint)
+parm:           rtw_adaptivity_en:0:disable, 1:enable (uint)
+parm:           rtw_adaptivity_mode:0:normal, 1:carrier sense (uint)
+parm:           rtw_adaptivity_dml:0:disable, 1:enable (uint)
+parm:           rtw_adaptivity_dc_backoff:DC backoff for Adaptivity (uint)
+parm:           rtw_adaptivity_th_l2h_ini:th_l2h_ini for Adaptivity (int)
+parm:           rtw_adaptivity_th_edcca_hl_diff:th_edcca_hl_diff for Adaptivity (int)
+parm:           rtw_amplifier_type_2g:BIT3:2G ext-PA, BIT4:2G ext-LNA (uint)
+parm:           rtw_amplifier_type_5g:BIT6:5G ext-PA, BIT7:5G ext-LNA (uint)
+parm:           rtw_RFE_type:default init value:64 (uint)
+parm:           rtw_powertracking_type:default init value:64 (uint)
+parm:           rtw_GLNA_type:default init value:0 (uint)
+parm:           rtw_TxBBSwing_2G:default init value:0xFF (uint)
+parm:           rtw_TxBBSwing_5G:default init value:0xFF (uint)
+parm:           rtw_OffEfuseMask:default open Efuse Mask value:0 (uint)
+parm:           rtw_FileMaskEfuse:default drv Mask Efuse value:0 (uint)
+parm:           rtw_rxgain_offset_2g:default RF Gain 2G Offset value:0 (uint)
+parm:           rtw_rxgain_offset_5gl:default RF Gain 5GL Offset value:0 (uint)
+parm:           rtw_rxgain_offset_5gh:uint
+parm:           rtw_rxgain_offset_5gm:default RF Gain 5GM Offset value:0 (uint)
+parm:           rtw_pll_ref_clk_sel:force pll_ref_clk_sel, 0xF:use autoload value (uint)
+parm:           rtw_tx_pwr_idx_override:0-63 int value to force-set all power index values to (int)
+parm:           rtw_tx_pwr_by_rate:0:Disable, 1:Enable, 2: Depend on efuse (int)
+parm:           rtw_target_tx_pwr_2g_a:2.4G target tx power (unit:dBm) of RF path A for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_2g_b:2.4G target tx power (unit:dBm) of RF path B for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_2g_c:2.4G target tx power (unit:dBm) of RF path C for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_2g_d:2.4G target tx power (unit:dBm) of RF path D for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_5g_a:5G target tx power (unit:dBm) of RF path A for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_5g_b:5G target tx power (unit:dBm) of RF path B for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_5g_c:5G target tx power (unit:dBm) of RF path C for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_target_tx_pwr_5g_d:5G target tx power (unit:dBm) of RF path D for each rate section, should match the real calibrate power, -1: undefined (array of int)
+parm:           rtw_en_napi:int
+parm:           rtw_en_gro:int
+parm:           rtw_iqk_fw_offload:int
+parm:           rtw_led_enable:Enable status LED (int)
+parm:           MaxTxBufLen:Max TX buffer size taken before returning NETDEV_TX_BUSY (int)
+退出码: 0
+
+命令: modinfo rtl88xxau_wfb
+modinfo: ERROR: Module rtl88xxau_wfb not found.
+退出码: 1
+
+Python: 3.10.12 (main, Nov  6 2024, 20:22:13) [GCC 11.4.0] 解释器: /usr/bin/python3
+发行版查询失败 wfb-ng PackageNotFoundError('wfb-ng')
+发行版查询失败 torch PackageNotFoundError('torch')
+发行版查询失败 torchvision PackageNotFoundError('torchvision')
+安装发行版 numpy 1.21.5
+安装发行版 pyroute2 0.post0
+wfb_ng 安装位置: /usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py
+安装文件: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/build_identity.json 字节: 76 sha256: a27b0792cd8d7a885a591b90e0ce09f0bfe57e5476c8af17df587ae1b0ccd6f4
+{"commit": "99865efe224a9ad35fefd13ae1340721f374b521", "schema_version": 1}
+
+安装文件失败: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py FileNotFoundError(2, 'No such file or directory')
+安装文件失败: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist_data.py FileNotFoundError(2, 'No such file or directory')
+安装文件: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/reference_model.py 字节: 7259 sha256: 86963f19190aa27d249e2b91fa07eddfbb4090fa8d4dafd9c58639311961be37
+安装文件: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py 字节: 65591 sha256: 29ab16b9f2a10269d04cc72098d0fb86de5b28a644fd1766022da6b77e86c26e
+安装文件: /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py 字节: 87886 sha256: 8a22952ccbaee6d38f4150f55c62097f5c61c0ee8ec7b1c29da7e9f84cced609
+
+GPU 加法子进程（限时 45 秒，无训练）
+
+命令: /usr/bin/python3 -B -c import sys,json,time,torch
+print('python',sys.version,'executable',sys.executable,flush=True)
+print('torch',torch.__version__,'path',torch.__file__,'cuda',torch.version.cuda,'cudnn',torch.backends.cudnn.version(),flush=True)
+print('cuda_available',torch.cuda.is_available(),'device_count',torch.cuda.device_count(),flush=True)
+assert torch.cuda.is_available(), 'CUDA unavailable; no CPU fallback'
+p=torch.cuda.get_device_properties(0)
+print('device',p,'total_memory_bytes',p.total_memory,'capability',torch.cuda.get_device_capability(0),flush=True)
+t=time.monotonic(); a=torch.tensor([1.,2.,3.],device='cuda'); b=a+torch.tensor([4.,5.,6.],device='cuda'); torch.cuda.synchronize()
+print('actual_device',b.device,'addition_result',b.cpu().tolist(),'elapsed_s',time.monotonic()-t,flush=True)
+assert b.cpu().tolist()==[5.,7.,9.]
+print('GPU_ADDITION_PASS',flush=True)
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'torch'
+退出码: 1
+
+限定数据检索：/var/lib/wfb-ng、/home/fl、/srv/wfb-ng-fl；不跟随目录符号链接，排除 .git/.cache/node_modules
+目录不存在: /srv/wfb-ng-fl
+候选数量: 0 检索耗时秒: 0.09983516700231121

@@ -1,0 +1,4987 @@
+{
+  "fl00": {
+    "begin_mono": 70889.122256032,
+    "end_mono": 70999.1762552,
+    "start_wall_utc": "2026-10-27T07:16:25.865833+00:00",
+    "end_wall_utc": "2026-10-27T07:18:15.919832+00:00",
+    "socket_packets": 554,
+    "socket_drops": 0,
+    "snapshots": [
+      {
+        "relative_s": 0.20183145599730778,
+        "mono": 70889.324087488,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19252,
+          "tx_packets": 17715,
+          "rx_bytes": 5402348,
+          "tx_bytes": 732476,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 5.040665184002137,
+        "mono": 70894.162921216,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19253,
+          "tx_packets": 17716,
+          "rx_bytes": 5402627,
+          "tx_bytes": 732517,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 10.066359167991322,
+        "mono": 70899.1886152,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19254,
+          "tx_packets": 17717,
+          "rx_bytes": 5402906,
+          "tx_bytes": 732558,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 15.04101923199778,
+        "mono": 70904.163275264,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19255,
+          "tx_packets": 17718,
+          "rx_bytes": 5403185,
+          "tx_bytes": 732599,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 20.122745183994994,
+        "mono": 70909.245001216,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19256,
+          "tx_packets": 17719,
+          "rx_bytes": 5403464,
+          "tx_bytes": 732640,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 25.151733279999462,
+        "mono": 70914.273989312,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19257,
+          "tx_packets": 17720,
+          "rx_bytes": 5403743,
+          "tx_bytes": 732681,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 30.03219340799842,
+        "mono": 70919.15444944,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "0"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19258,
+          "tx_packets": 17721,
+          "rx_bytes": 5404022,
+          "tx_bytes": 732722,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 35.05626620800467,
+        "mono": 70924.17852224,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19259,
+          "tx_packets": 17722,
+          "rx_bytes": 5404301,
+          "tx_bytes": 732763,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 40.13283132799552,
+        "mono": 70929.25508736,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19313,
+          "tx_packets": 17776,
+          "rx_bytes": 5419480,
+          "tx_bytes": 734977,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 45.0603241600038,
+        "mono": 70934.182580192,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19316,
+          "tx_packets": 17779,
+          "rx_bytes": 5420316,
+          "tx_bytes": 735100,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 50.074386047999724,
+        "mono": 70939.19664208,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19318,
+          "tx_packets": 17781,
+          "rx_bytes": 5420874,
+          "tx_bytes": 735182,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 55.017392512003426,
+        "mono": 70944.139648544,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19320,
+          "tx_packets": 17783,
+          "rx_bytes": 5421432,
+          "tx_bytes": 735264,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 60.0589724159945,
+        "mono": 70949.181228448,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19412,
+          "tx_packets": 17875,
+          "rx_bytes": 5447350,
+          "tx_bytes": 739036,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 65.12918838400219,
+        "mono": 70954.251444416,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19413,
+          "tx_packets": 17876,
+          "rx_bytes": 5447629,
+          "tx_bytes": 739077,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 70.0806542079954,
+        "mono": 70959.20291024,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19415,
+          "tx_packets": 17878,
+          "rx_bytes": 5448190,
+          "tx_bytes": 739159,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 75.09171731199604,
+        "mono": 70964.213973344,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19418,
+          "tx_packets": 17881,
+          "rx_bytes": 5449027,
+          "tx_bytes": 739282,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 80.16310131199134,
+        "mono": 70969.285357344,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19419,
+          "tx_packets": 17882,
+          "rx_bytes": 5449306,
+          "tx_bytes": 739323,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 85.07370137599355,
+        "mono": 70974.195957408,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19421,
+          "tx_packets": 17884,
+          "rx_bytes": 5449864,
+          "tx_bytes": 739405,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 90.07546239999647,
+        "mono": 70979.197718432,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19422,
+          "tx_packets": 17885,
+          "rx_bytes": 5450144,
+          "tx_bytes": 739446,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 95.09638166399964,
+        "mono": 70984.218637696,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19424,
+          "tx_packets": 17887,
+          "rx_bytes": 5450703,
+          "tx_bytes": 739528,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 100.00806095999724,
+        "mono": 70989.130316992,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19426,
+          "tx_packets": 17889,
+          "rx_bytes": 5451262,
+          "tx_bytes": 739610,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 105.05949747200066,
+        "mono": 70994.181753504,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19526,
+          "tx_packets": 17989,
+          "rx_bytes": 5479411,
+          "tx_bytes": 743710,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 110.00476611200429,
+        "mono": 70999.127022144,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 168778,
+            "comm": "python3",
+            "wchan": "do_select"
+          },
+          {
+            "tid": 168856,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168857,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 168861,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 168862,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 169377,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169378,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 169379,
+            "comm": "pt_main_thread",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 19529,
+          "tx_packets": 17992,
+          "rx_bytes": 5480244,
+          "tx_bytes": 743833,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "grant_filter": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "fl01": {
+    "begin_mono": 70279.944359963,
+    "end_mono": 70390.022021241,
+    "start_wall_utc": "2026-10-27T07:16:30.264728+00:00",
+    "end_wall_utc": "2026-10-27T07:18:20.342388+00:00",
+    "socket_packets": 450,
+    "socket_drops": 0,
+    "snapshots": [
+      {
+        "relative_s": 0.2290595439990284,
+        "mono": 70280.173419507,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14911,
+          "tx_packets": 5995,
+          "rx_bytes": 612774,
+          "tx_bytes": 1681484,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718517
+        ],
+        "grant_filter": [
+          89181,
+          36776,
+          0,
+          52405,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 5.044363526001689,
+        "mono": 70284.988723489,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14912,
+          "tx_packets": 5996,
+          "rx_bytes": 612815,
+          "tx_bytes": 1681763,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718543
+        ],
+        "grant_filter": [
+          89201,
+          36776,
+          0,
+          52425,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 10.10680740699172,
+        "mono": 70290.05116737,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14913,
+          "tx_packets": 6010,
+          "rx_bytes": 612856,
+          "tx_bytes": 1685691,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718575
+        ],
+        "grant_filter": [
+          89211,
+          36776,
+          0,
+          52435,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 15.027706331995432,
+        "mono": 70294.972066295,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14913,
+          "tx_packets": 6025,
+          "rx_bytes": 612856,
+          "tx_bytes": 1689906,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718604
+        ],
+        "grant_filter": [
+          89220,
+          36776,
+          0,
+          52444,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 20.106064808991505,
+        "mono": 70300.050424772,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14914,
+          "tx_packets": 6040,
+          "rx_bytes": 612897,
+          "tx_bytes": 1694135,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718634
+        ],
+        "grant_filter": [
+          89228,
+          36776,
+          0,
+          52452,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 25.116472604990122,
+        "mono": 70305.060832568,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14914,
+          "tx_packets": 6055,
+          "rx_bytes": 612897,
+          "tx_bytes": 1698365,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718662
+        ],
+        "grant_filter": [
+          89236,
+          36776,
+          0,
+          52460,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 30.018971183992107,
+        "mono": 70309.963331147,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14915,
+          "tx_packets": 6058,
+          "rx_bytes": 612938,
+          "tx_bytes": 1699211,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36776,
+          0,
+          5994,
+          3718681
+        ],
+        "grant_filter": [
+          89242,
+          36776,
+          0,
+          52466,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 35.14242433499021,
+        "mono": 70315.086784298,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14960,
+          "tx_packets": 6082,
+          "rx_bytes": 614783,
+          "tx_bytes": 1705972,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36780,
+          0,
+          6082,
+          3718693
+        ],
+        "grant_filter": [
+          89253,
+          36780,
+          0,
+          52473,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 40.07518178600003,
+        "mono": 70320.019541749,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14961,
+          "tx_packets": 6083,
+          "rx_bytes": 614824,
+          "tx_bytes": 1706250,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36809,
+          0,
+          6083,
+          3718693
+        ],
+        "grant_filter": [
+          89282,
+          36809,
+          0,
+          52473,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 45.096135066996794,
+        "mono": 70325.04049503,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14963,
+          "tx_packets": 6084,
+          "rx_bytes": 614906,
+          "tx_bytes": 1706529,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36813,
+          0,
+          6083,
+          3718696
+        ],
+        "grant_filter": [
+          89311,
+          36813,
+          0,
+          52498,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 50.0325327229948,
+        "mono": 70329.976892686,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14966,
+          "tx_packets": 6085,
+          "rx_bytes": 615029,
+          "tx_bytes": 1706808,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36815,
+          0,
+          6084,
+          3718725
+        ],
+        "grant_filter": [
+          89333,
+          36815,
+          0,
+          52518,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 55.02643357499619,
+        "mono": 70334.970793538,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15010,
+          "tx_packets": 6086,
+          "rx_bytes": 616874,
+          "tx_bytes": 1707087,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3718726
+        ],
+        "grant_filter": [
+          89357,
+          36825,
+          0,
+          52532,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 60.07542792300228,
+        "mono": 70340.019787886,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15046,
+          "tx_packets": 6088,
+          "rx_bytes": 618309,
+          "tx_bytes": 1707644,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3718978
+        ],
+        "grant_filter": [
+          89381,
+          36825,
+          0,
+          52556,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 65.06158602099458,
+        "mono": 70345.005945984,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15046,
+          "tx_packets": 6102,
+          "rx_bytes": 618309,
+          "tx_bytes": 1711575,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719008
+        ],
+        "grant_filter": [
+          89391,
+          36825,
+          0,
+          52566,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 70.02862642800028,
+        "mono": 70349.972986391,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15046,
+          "tx_packets": 6117,
+          "rx_bytes": 618309,
+          "tx_bytes": 1715790,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719037
+        ],
+        "grant_filter": [
+          89401,
+          36825,
+          0,
+          52576,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 75.12973582200357,
+        "mono": 70355.074095785,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15046,
+          "tx_packets": 6131,
+          "rx_bytes": 618309,
+          "tx_bytes": 1719738,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719063
+        ],
+        "grant_filter": [
+          89408,
+          36825,
+          0,
+          52583,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 80.06458420099807,
+        "mono": 70360.008944164,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15046,
+          "tx_packets": 6146,
+          "rx_bytes": 618309,
+          "tx_bytes": 1723968,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719092
+        ],
+        "grant_filter": [
+          89417,
+          36825,
+          0,
+          52592,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 85.1547640189965,
+        "mono": 70365.099123982,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15048,
+          "tx_packets": 6149,
+          "rx_bytes": 618391,
+          "tx_bytes": 1724814,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719115
+        ],
+        "grant_filter": [
+          89424,
+          36825,
+          0,
+          52599,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 90.08487816900015,
+        "mono": 70370.029238132,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15048,
+          "tx_packets": 6149,
+          "rx_bytes": 618391,
+          "tx_bytes": 1724814,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719133
+        ],
+        "grant_filter": [
+          89437,
+          36825,
+          0,
+          52612,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 95.13491292599065,
+        "mono": 70375.079272889,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15049,
+          "tx_packets": 6149,
+          "rx_bytes": 618432,
+          "tx_bytes": 1724814,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719146
+        ],
+        "grant_filter": [
+          89443,
+          36825,
+          0,
+          52618,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 100.09669537999434,
+        "mono": 70380.041055343,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15049,
+          "tx_packets": 6149,
+          "rx_bytes": 618432,
+          "tx_bytes": 1724814,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36825,
+          0,
+          6085,
+          3719160
+        ],
+        "grant_filter": [
+          89452,
+          36825,
+          0,
+          52627,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 105.0301765799959,
+        "mono": 70384.974536543,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15143,
+          "tx_packets": 6209,
+          "rx_bytes": 622286,
+          "tx_bytes": 1741727,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36835,
+          0,
+          6209,
+          3719316
+        ],
+        "grant_filter": [
+          89467,
+          36835,
+          0,
+          52632,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 110.02056566799001,
+        "mono": 70389.964925631,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 24102,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 24128,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 24129,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15146,
+          "tx_packets": 6210,
+          "rx_bytes": 622409,
+          "tx_bytes": 1742005,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          36835,
+          0,
+          6209,
+          3719340
+        ],
+        "grant_filter": [
+          89491,
+          36835,
+          0,
+          52656,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "fl02": {
+    "begin_mono": 63510.656518933,
+    "end_mono": 63620.746015552,
+    "start_wall_utc": "2026-10-27T07:16:29.771302+00:00",
+    "end_wall_utc": "2026-10-27T07:18:19.860798+00:00",
+    "socket_packets": 377,
+    "socket_drops": 0,
+    "snapshots": [
+      {
+        "relative_s": 0.19805694700335152,
+        "mono": 63510.85457588,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7407,
+          "rx_bytes": 610709,
+          "tx_bytes": 2079296,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943612
+        ],
+        "grant_filter": [
+          88733,
+          30827,
+          0,
+          57906,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 5.094821134000085,
+        "mono": 63515.751340067,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7422,
+          "rx_bytes": 610709,
+          "tx_bytes": 2083511,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943638
+        ],
+        "grant_filter": [
+          88739,
+          30827,
+          0,
+          57912,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 10.106409159001487,
+        "mono": 63520.762928092,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7436,
+          "rx_bytes": 610709,
+          "tx_bytes": 2087457,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943664
+        ],
+        "grant_filter": [
+          88742,
+          30827,
+          0,
+          57915,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 15.036655449002865,
+        "mono": 63525.693174382,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7451,
+          "rx_bytes": 610709,
+          "tx_bytes": 2091687,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943689
+        ],
+        "grant_filter": [
+          88748,
+          30827,
+          0,
+          57921,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 20.32161544900009,
+        "mono": 63530.978134382,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7460,
+          "rx_bytes": 610709,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943721
+        ],
+        "grant_filter": [
+          88760,
+          30827,
+          0,
+          57933,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 25.099982790001377,
+        "mono": 63535.756501723,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7460,
+          "rx_bytes": 610709,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943733
+        ],
+        "grant_filter": [
+          88767,
+          30827,
+          0,
+          57940,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 30.068759282003157,
+        "mono": 63540.725278215,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14870,
+          "tx_packets": 7460,
+          "rx_bytes": 610709,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943746
+        ],
+        "grant_filter": [
+          88775,
+          30827,
+          0,
+          57948,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 35.12261235200276,
+        "mono": 63545.779131285,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14887,
+          "tx_packets": 7460,
+          "rx_bytes": 611406,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943759
+        ],
+        "grant_filter": [
+          88783,
+          30827,
+          0,
+          57956,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 40.102771425001265,
+        "mono": 63550.759290358,
+        "channel": 153,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14887,
+          "tx_packets": 7460,
+          "rx_bytes": 611406,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943825
+        ],
+        "grant_filter": [
+          88793,
+          30827,
+          0,
+          57966,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 45.10362672199699,
+        "mono": 63555.760145655,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14887,
+          "tx_packets": 7460,
+          "rx_bytes": 611406,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943838
+        ],
+        "grant_filter": [
+          88801,
+          30827,
+          0,
+          57974,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 50.06025858099747,
+        "mono": 63560.716777514,
+        "channel": 149,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14888,
+          "tx_packets": 7460,
+          "rx_bytes": 611447,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943853
+        ],
+        "grant_filter": [
+          88808,
+          30827,
+          0,
+          57981,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 55.101595849999285,
+        "mono": 63565.758114783,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14888,
+          "tx_packets": 7460,
+          "rx_bytes": 611447,
+          "tx_bytes": 2094225,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30827,
+          0,
+          7396,
+          20943865
+        ],
+        "grant_filter": [
+          88815,
+          30827,
+          0,
+          57988,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 60.13306566599931,
+        "mono": 63570.789584599,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14964,
+          "tx_packets": 7570,
+          "rx_bytes": 614563,
+          "tx_bytes": 2125238,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30839,
+          0,
+          7570,
+          20943866
+        ],
+        "grant_filter": [
+          88838,
+          30839,
+          0,
+          57999,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 65.06386500199733,
+        "mono": 63575.720383935,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14965,
+          "tx_packets": 7571,
+          "rx_bytes": 614604,
+          "tx_bytes": 2125516,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30839,
+          0,
+          7570,
+          20943888
+        ],
+        "grant_filter": [
+          88856,
+          30839,
+          0,
+          58017,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 70.16178148600011,
+        "mono": 63580.818300419,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14966,
+          "tx_packets": 7572,
+          "rx_bytes": 614645,
+          "tx_bytes": 2125795,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30864,
+          0,
+          7572,
+          20943890
+        ],
+        "grant_filter": [
+          88882,
+          30864,
+          0,
+          58018,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 75.17498160700052,
+        "mono": 63585.83150054,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14969,
+          "tx_packets": 7573,
+          "rx_bytes": 614768,
+          "tx_bytes": 2126074,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30874,
+          0,
+          7573,
+          20943891
+        ],
+        "grant_filter": [
+          88907,
+          30874,
+          0,
+          58033,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 80.05231474400352,
+        "mono": 63590.708833677,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14970,
+          "tx_packets": 7574,
+          "rx_bytes": 614809,
+          "tx_bytes": 2126353,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30874,
+          0,
+          7573,
+          20943914
+        ],
+        "grant_filter": [
+          88932,
+          30874,
+          0,
+          58058,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 85.15789189399948,
+        "mono": 63595.814410827,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14972,
+          "tx_packets": 7575,
+          "rx_bytes": 614891,
+          "tx_bytes": 2126632,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30886,
+          0,
+          7575,
+          20943919
+        ],
+        "grant_filter": [
+          88952,
+          30886,
+          0,
+          58066,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 90.15871976200287,
+        "mono": 63600.815238695,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14973,
+          "tx_packets": 7576,
+          "rx_bytes": 614932,
+          "tx_bytes": 2126911,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30886,
+          0,
+          7575,
+          20943946
+        ],
+        "grant_filter": [
+          88981,
+          30886,
+          0,
+          58095,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 95.14878846800275,
+        "mono": 63605.805307401,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14974,
+          "tx_packets": 7577,
+          "rx_bytes": 614973,
+          "tx_bytes": 2127190,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30898,
+          0,
+          7577,
+          20943952
+        ],
+        "grant_filter": [
+          89003,
+          30898,
+          0,
+          58105,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 100.09350933400128,
+        "mono": 63610.750028267,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 14976,
+          "tx_packets": 7578,
+          "rx_bytes": 615055,
+          "tx_bytes": 2127469,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30908,
+          0,
+          7578,
+          20943955
+        ],
+        "grant_filter": [
+          89025,
+          30908,
+          0,
+          58117,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 105.14906845799851,
+        "mono": 63615.805587391,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15069,
+          "tx_packets": 7579,
+          "rx_bytes": 618868,
+          "tx_bytes": 2127748,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30908,
+          0,
+          7578,
+          20944176
+        ],
+        "grant_filter": [
+          89049,
+          30908,
+          0,
+          58141,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 110.02259603600396,
+        "mono": 63620.679114969,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 15784,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 15817,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 15818,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15072,
+          "tx_packets": 7582,
+          "rx_bytes": 618991,
+          "tx_bytes": 2128580,
+          "rx_dropped": 0,
+          "tx_dropped": 0,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          30923,
+          0,
+          7582,
+          20944189
+        ],
+        "grant_filter": [
+          89073,
+          30923,
+          0,
+          58150,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "fl04": {
+    "begin_mono": 69110.024047449,
+    "end_mono": 69220.067317465,
+    "start_wall_utc": "2026-10-27T07:16:30.012978+00:00",
+    "end_wall_utc": "2026-10-27T07:18:20.056247+00:00",
+    "socket_packets": 269,
+    "socket_drops": 0,
+    "snapshots": [
+      {
+        "relative_s": 0.20640546099457424,
+        "mono": 69110.23045291,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15194,
+          "tx_packets": 7303,
+          "rx_bytes": 624630,
+          "tx_bytes": 2053421,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27678,
+          0,
+          7303,
+          571352
+        ],
+        "grant_filter": [
+          90148,
+          27678,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 5.026584772000206,
+        "mono": 69115.050632221,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15195,
+          "tx_packets": 7304,
+          "rx_bytes": 624671,
+          "tx_bytes": 2053700,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27701,
+          0,
+          7304,
+          571353
+        ],
+        "grant_filter": [
+          90171,
+          27701,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 10.055165975994896,
+        "mono": 69120.079213425,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15196,
+          "tx_packets": 7305,
+          "rx_bytes": 624712,
+          "tx_bytes": 2053979,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27720,
+          0,
+          7305,
+          571353
+        ],
+        "grant_filter": [
+          90190,
+          27720,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 15.031136350997258,
+        "mono": 69125.0551838,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15197,
+          "tx_packets": 7306,
+          "rx_bytes": 624753,
+          "tx_bytes": 2054258,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27745,
+          0,
+          7306,
+          571355
+        ],
+        "grant_filter": [
+          90215,
+          27745,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 20.112600933003705,
+        "mono": 69130.136648382,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15198,
+          "tx_packets": 7307,
+          "rx_bytes": 624794,
+          "tx_bytes": 2054537,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27768,
+          0,
+          7307,
+          571356
+        ],
+        "grant_filter": [
+          90238,
+          27768,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 25.142104366008425,
+        "mono": 69135.166151815,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15199,
+          "tx_packets": 7308,
+          "rx_bytes": 624835,
+          "tx_bytes": 2054816,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27790,
+          0,
+          7308,
+          571356
+        ],
+        "grant_filter": [
+          90260,
+          27790,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 30.01884415000677,
+        "mono": 69140.042891599,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15200,
+          "tx_packets": 7309,
+          "rx_bytes": 624876,
+          "tx_bytes": 2055095,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27820,
+          0,
+          7309,
+          571356
+        ],
+        "grant_filter": [
+          90290,
+          27820,
+          0,
+          62470,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 35.01110904300003,
+        "mono": 69145.035156492,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15243,
+          "tx_packets": 7310,
+          "rx_bytes": 626639,
+          "tx_bytes": 2055374,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27835,
+          0,
+          7310,
+          571356
+        ],
+        "grant_filter": [
+          90316,
+          27835,
+          0,
+          62481,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 40.09390044500469,
+        "mono": 69150.117947894,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15244,
+          "tx_packets": 7311,
+          "rx_bytes": 626680,
+          "tx_bytes": 2055653,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27835,
+          0,
+          7310,
+          571381
+        ],
+        "grant_filter": [
+          90340,
+          27835,
+          0,
+          62505,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 45.050044267001795,
+        "mono": 69155.074091716,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15246,
+          "tx_packets": 7312,
+          "rx_bytes": 626762,
+          "tx_bytes": 2055932,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27860,
+          0,
+          7312,
+          571386
+        ],
+        "grant_filter": [
+          90368,
+          27860,
+          0,
+          62508,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 50.05655918299453,
+        "mono": 69160.080606632,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15249,
+          "tx_packets": 7313,
+          "rx_bytes": 626885,
+          "tx_bytes": 2056211,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27873,
+          0,
+          7313,
+          571387
+        ],
+        "grant_filter": [
+          90388,
+          27873,
+          0,
+          62515,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 55.01650470700406,
+        "mono": 69165.040552156,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15258,
+          "tx_packets": 7314,
+          "rx_bytes": 627254,
+          "tx_bytes": 2056490,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27883,
+          0,
+          7314,
+          571389
+        ],
+        "grant_filter": [
+          90411,
+          27883,
+          0,
+          62528,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 60.028607993997866,
+        "mono": 69170.052655443,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15332,
+          "tx_packets": 7315,
+          "rx_bytes": 630288,
+          "tx_bytes": 2056769,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27896,
+          0,
+          7315,
+          571392
+        ],
+        "grant_filter": [
+          90437,
+          27896,
+          0,
+          62541,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 65.12239232100546,
+        "mono": 69175.14643977,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15333,
+          "tx_packets": 7316,
+          "rx_bytes": 630329,
+          "tx_bytes": 2057048,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27916,
+          0,
+          7316,
+          571393
+        ],
+        "grant_filter": [
+          90458,
+          27916,
+          0,
+          62542,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 70.14278206000745,
+        "mono": 69180.166829509,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15335,
+          "tx_packets": 7317,
+          "rx_bytes": 630411,
+          "tx_bytes": 2057327,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27916,
+          0,
+          7316,
+          571408
+        ],
+        "grant_filter": [
+          90484,
+          27916,
+          0,
+          62568,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 75.07967267899949,
+        "mono": 69185.103720128,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15338,
+          "tx_packets": 7318,
+          "rx_bytes": 630534,
+          "tx_bytes": 2057606,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27935,
+          0,
+          7318,
+          571421
+        ],
+        "grant_filter": [
+          90511,
+          27935,
+          0,
+          62576,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 80.10887624700263,
+        "mono": 69190.132923696,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15339,
+          "tx_packets": 7319,
+          "rx_bytes": 630575,
+          "tx_bytes": 2057885,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27960,
+          0,
+          7319,
+          571421
+        ],
+        "grant_filter": [
+          90538,
+          27960,
+          0,
+          62578,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 85.06614648400864,
+        "mono": 69195.090193933,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15341,
+          "tx_packets": 7320,
+          "rx_bytes": 630657,
+          "tx_bytes": 2058164,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          27970,
+          0,
+          7320,
+          571423
+        ],
+        "grant_filter": [
+          90560,
+          27970,
+          0,
+          62590,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 90.06562940799631,
+        "mono": 69200.089676857,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15342,
+          "tx_packets": 7321,
+          "rx_bytes": 630698,
+          "tx_bytes": 2058444,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          28002,
+          0,
+          7321,
+          571423
+        ],
+        "grant_filter": [
+          90592,
+          28002,
+          0,
+          62590,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 95.09026034500857,
+        "mono": 69205.114307794,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15344,
+          "tx_packets": 7322,
+          "rx_bytes": 630780,
+          "tx_bytes": 2058724,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          28012,
+          0,
+          7322,
+          571425
+        ],
+        "grant_filter": [
+          90615,
+          28012,
+          0,
+          62603,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 100.1522331610031,
+        "mono": 69210.17628061,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15346,
+          "tx_packets": 7323,
+          "rx_bytes": 630862,
+          "tx_bytes": 2059004,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          28025,
+          0,
+          7323,
+          571427
+        ],
+        "grant_filter": [
+          90638,
+          28025,
+          0,
+          62613,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 105.05688698700396,
+        "mono": 69215.080934436,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15438,
+          "tx_packets": 7324,
+          "rx_bytes": 634634,
+          "tx_bytes": 2059284,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          28034,
+          0,
+          7324,
+          571428
+        ],
+        "grant_filter": [
+          90665,
+          28034,
+          0,
+          62631,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "relative_s": 110.00609400699614,
+        "mono": 69220.030141456,
+        "channel": 157,
+        "threads": [
+          {
+            "tid": 23591,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          },
+          {
+            "tid": 23639,
+            "comm": "python3",
+            "wchan": "do_sys_poll"
+          },
+          {
+            "tid": 23640,
+            "comm": "python3",
+            "wchan": "futex_wait_queue_me"
+          }
+        ],
+        "tun_stats": {
+          "rx_packets": 15441,
+          "tx_packets": 7325,
+          "rx_bytes": 634757,
+          "tx_bytes": 2059564,
+          "rx_dropped": 0,
+          "tx_dropped": 431,
+          "rx_errors": 0,
+          "tx_errors": 0
+        },
+        "token_auth": [
+          28039,
+          0,
+          7324,
+          571434
+        ],
+        "grant_filter": [
+          90687,
+          28039,
+          0,
+          62648,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}

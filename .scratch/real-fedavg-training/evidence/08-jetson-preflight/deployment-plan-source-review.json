@@ -1,0 +1,59 @@
+{
+  "utc": "2026-10-27T02:07:12Z",
+  "head": "d9386f99dbb78197562edaa322eefb6211e79602",
+  "scope": "仅本地静态审查；06工作区未提交且可继续变化；未SSH连接节点",
+  "reviewed_files": [
+    {
+      "path": "scripts/deploy/deploy_cluster.sh",
+      "sha256": "9ecab0c55ad279261be498340a45aabef232b66e1431231faaa31a15e32784c7"
+    },
+    {
+      "path": "scripts/deploy/deploy_node.sh",
+      "sha256": "b75a1fa07efce2e92a89b74028e01cf4249e40a25d38ebc1ac624b45d36038c8"
+    },
+    {
+      "path": "scripts/install/install-v8.sh",
+      "sha256": "ad552ba69704214cfa169f8bbf05cee893e15c0a12d93e86a3f0e12d602219a1"
+    },
+    {
+      "path": "scripts/default/server.json",
+      "sha256": "6d468b8331814277f5d7b192fb7eb010e6851e2c905ce6398216065a0ecdf641"
+    },
+    {
+      "path": "scripts/default/node.json",
+      "sha256": "1a3857acafb5bce615bcccadb326e7780d683e99f3d529bc76238795e2ad3a0d"
+    },
+    {
+      "path": "scripts/systemd/wfb-fl-server-daemon.service",
+      "sha256": "1163486bdbae229b912d3c49b6e6696498c446219019c73e98f9c320b55aeb10"
+    },
+    {
+      "path": "scripts/systemd/wfb-fl-client-daemon.service",
+      "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+    },
+    {
+      "path": "wfb_ng/fl/server_daemon.py",
+      "sha256": "54eef8b440efcb2593cb4f2f6d76b2028a3009592f05c3257613bfdeeeac9acd"
+    },
+    {
+      "path": "wfb_ng/fl/client_daemon.py",
+      "sha256": "2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3"
+    },
+    {
+      "path": "wfb_ng/fl/console.py",
+      "sha256": "345a6b6ec8f80572d35b76679ae03f1a68b097a5cd086bfe3c9e8eedcd419555"
+    },
+    {
+      "path": "wfb_ng/fl/console_http.py",
+      "sha256": "52fbc6b7990983bbec1488d04f46da9ac3406971944167477a40e36f0d9bf3e9"
+    },
+    {
+      "path": "Makefile",
+      "sha256": "07ea735677ac4a18c95c5ed13f85aaa54f0bfbc91ea2a528662ca5e625660b5f"
+    },
+    {
+      "path": "setup.py",
+      "sha256": "0c514cbd5e29d673ca82896cb77b6cd479d8ff5e789f9d502fb28dfff15725d2"
+    }
+  ]
+}

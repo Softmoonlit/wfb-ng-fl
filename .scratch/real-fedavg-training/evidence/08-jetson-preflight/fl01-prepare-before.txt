@@ -1,0 +1,55 @@
+准备前环境 UTC 2026-10-26T18:23:05Z
+命令 ['hostname']
+fl01
+ 退出码 0
+命令 ['df', '-h', '/', '/srv', '/home/fl']
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        28G   21G  6.3G  77% /
+/dev/sda1        28G   21G  6.3G  77% /
+/dev/sda1        28G   21G  6.3G  77% /
+ 退出码 0
+命令 ['cat', '/etc/nv_tegra_release']
+# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025
+# KERNEL_VARIANT: oot
+TARGET_USERSPACE_LIB_DIR=nvidia
+TARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia
+ 退出码 0
+命令 ['dpkg-query', '-W', 'nvidia-l4t-core', 'cuda-toolkit-12-6', 'libcudnn9-cuda-12', 'libcusparselt0', 'libopenblas0-pthread']
+cuda-toolkit-12-6	12.6.11-1
+libcudnn9-cuda-12	9.3.0.75-1
+libopenblas0-pthread:arm64	0.3.20+ds-1
+nvidia-l4t-core	36.4.3-20250107174145
+dpkg-query: no packages found matching libcusparselt0
+ 退出码 1
+命令 ['python3', '-m', 'pip', '--version']
+pip 22.0.2 from /usr/lib/python3/dist-packages/pip (python 3.10)
+ 退出码 0
+命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', 'wfb-fl-client-daemon.service', '-p', 'Id', '-p', 'MainPID', '-p', 'ActiveState']
+MainPID=0
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive
+
+MainPID=17507
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+ 退出码 0
+命令 ['bash', '-c', "ldconfig -p | rg 'cusparseLt|openblas|libcudnn.so'"]
+bash: line 1: rg: command not found
+ 退出码 127
+命令 ['sudo', '-n', 'find', '/home/fl', '/var/cache', '-maxdepth', '5', '-type', 'f', '-name', '*.whl']
+ 退出码 0
+命令 ['sudo', '-n', 'ls', '-ld', '/srv/wfb-ng-fl/mnist']
+ls: cannot access '/srv/wfb-ng-fl/mnist': No such file or directory
+ 退出码 2
+依赖 numpy 1.21.5
+依赖缺失 torch PackageNotFoundError('torch')
+依赖缺失 filelock PackageNotFoundError('filelock')
+依赖缺失 typing_extensions PackageNotFoundError('typing_extensions')
+依赖缺失 networkx PackageNotFoundError('networkx')
+依赖 jinja2 3.0.3
+依赖缺失 fsspec PackageNotFoundError('fsspec')
+依赖 sympy 1.9
+依赖 mpmath 0.0.0
+依赖 MarkupSafe 2.0.1
+依赖 pip 22.0.2
+依赖 setuptools 59.6.0

@@ -1,0 +1,41 @@
+MainPID=148891
+Id=wfb-fl-server-daemon.service
+ActiveState=active
+
+MainPID=0
+Id=wfb-fl-client-daemon.service
+ActiveState=inactive
+
+MainPID=0
+Id=wfb-fl-server.service
+ActiveState=inactive
+
+MainPID=0
+Id=wfb-fl-client.service
+ActiveState=inactive
+10月 27 10:01:38 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:01:38,244 [INFO] [client-daemon] 射频重配 PREPARE session=switch_00d177f53eea413ea2517b5d8fb81478 targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+10月 27 10:01:41 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:01:41,498 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_00d177f53eea413ea2517b5d8fb81478 channel=157
+10月 27 10:03:28 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:03:28,015 [INFO] [client-daemon] 射频重配 PREPARE session=switch_022ad1f2965c41969826ac1cbb815935 targets=[1, 2, 4] patch={'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 14, 'uftp_rate_kbps': 2000}
+10月 27 10:03:35 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:03:35,244 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_022ad1f2965c41969826ac1cbb815935 channel=157
+10月 27 10:17:49 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:49,891 [INFO] [client-daemon] 射频重配 PREPARE session=switch_3d2aa070ac844ac48587fe2cede62e92 targets=[1, 2, 4] patch={'channel': 157, 'bandwidth_mhz': 40, 'radio_txpower_dbm': 14, 'downlink_mcs': 3, 'uplink_mcs': 4, 'uftp_rate_kbps': 15000}
+10月 27 10:17:54 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:54,892 [WARNING] [client-daemon] 射频重配 PREPARE 失败 session=switch_3d2aa070ac844ac48587fe2cede62e92: 节点缺失或准备失败: [2]
+10月 27 10:17:55 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:17:55,041 [WARNING] [client-daemon] 射频重配回退至 Channel 157 session=switch_3d2aa070ac844ac48587fe2cede62e92
+10月 27 10:22:14 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+10月 27 10:22:14 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:22:14,949 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+10月 27 10:22:15 fl00 wfb-fl-server-daemon[54188]: 2026-10-27 10:22:15,333 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+10月 27 10:22:15 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+10月 27 10:22:15 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+10月 27 10:22:15 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 2min 636ms CPU time.
+10月 27 10:22:15 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+10月 27 10:22:15 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:15,753 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+10月 27 10:22:16 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,090 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+10月 27 10:22:16 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,090 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+10月 27 10:22:16 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,149 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 27 10:22:16 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,150 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 27 10:22:16 fl00 wfb-fl-server-daemon[148891]: 2026-10-27 10:22:16,153 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+文件系统        大小  已用  可用 已用% 挂载点
+/dev/nvme0n1p1  116G   38G   73G   35% /
+{
+  "node_id": 1,
+  "tun_ip": "10.80.0.11/24"
+}

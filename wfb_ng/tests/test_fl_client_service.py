@@ -137,11 +137,31 @@ def test_service_rejects_legacy_two_argument_entry_and_reports_error(tmp_path, m
     import types
     from wfb_ng.fl import service
     module = types.ModuleType('legacy_client_entry')
-    module.run = lambda runtime, config: None
+    setattr(module, 'run', lambda runtime, config: None)
     monkeypatch.setitem(sys.modules, 'legacy_client_entry', module)
     role_path = tmp_path / 'role.json'
-    # 角色 JSON 读取已有独立覆盖，此处从 CLI 与算法入口接缝验证。
-    monkeypatch.setattr(service, '_read_config', lambda path: {'role': 'client'})
+    role_path.write_text(json.dumps(dict(
+        schema_version=1, role='client', node_id=1,
+        work_dir=str(tmp_path / 'role'), channel=157, channel_width='HT40+',
+        link_args=['--tun-name', 'fl-client-test'],
+        uftp_uid=1, uftp_port=1044, server_http_host='10.80.0.1', server_http_port=8080,
+        uftp_bind_host='10.80.0.11', uftp_multicast_host='239.80.41.1',
+        uftp_private_multicast_host='239.80.41.2', max_update_size_bytes=1024,
+        live_observation=False, observation_path=None, io_timeout_seconds=1)))
+    lifecycle = []
+
+    class Role:
+        def start(self):
+            lifecycle.append('start')
+            return object()
+
+        def wait(self, interval):
+            pytest.fail('旧二参数入口应在进入运行等待前拒绝')
+
+        def close(self):
+            lifecycle.append('close')
+
+    monkeypatch.setattr(service, 'load_role_service', lambda *args, **kwargs: Role())
     context_path = tmp_path / 'context.json'
     context_path.write_text(json.dumps(dict(job_id='job1', node_id=1, target_nodes=[1], rounds=1,
         artifact_dir=str(tmp_path / 'artifacts'), local_config={'mnist_data_dir': '/local/mnist'},
@@ -170,6 +190,9 @@ def test_service_rejects_legacy_two_argument_entry_and_reports_error(tmp_path, m
         worker.join(2)
         assert received[0]['event'] == 'error'
         assert received[0]['code'] == 'invalid_configuration'
+        assert received[0]['phase'] == 'prepare'
+        assert lifecycle == ['start', 'close']
+        assert not worker.is_alive()
     finally:
         daemon.close()
 

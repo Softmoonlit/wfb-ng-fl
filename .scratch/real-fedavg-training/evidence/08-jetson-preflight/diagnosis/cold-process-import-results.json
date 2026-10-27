@@ -1,0 +1,82 @@
+[
+  {
+    "hostname": "fl00",
+    "utc_start": "2026-10-27T07:07:04.047484+00:00",
+    "utc_end": "2026-10-27T07:07:06.484053+00:00",
+    "python": "3.10.12 (main, Nov  4 2025, 08:48:33) [GCC 11.4.0]",
+    "executable": "/usr/bin/python3",
+    "before": {
+      "torch_in_sys_modules": false,
+      "mnist_in_sys_modules": false
+    },
+    "mnist_module_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py",
+    "mnist_module_sha256": "28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7",
+    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+    "torch_path": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py",
+    "cuda_initialized": false,
+    "direct_mnist_import_seconds": 2.4364867199910805,
+    "total_probe_seconds": 2.436842720009736,
+    "meaning": "new process import; OS cache not flushed; no GPU initialization/training",
+    "status": "pass"
+  },
+  {
+    "hostname": "fl01",
+    "utc_start": "2026-10-27T07:07:11.345886+00:00",
+    "utc_end": "2026-10-27T07:07:13.525363+00:00",
+    "python": "3.10.12 (main, Nov  6 2024, 20:22:13) [GCC 11.4.0]",
+    "executable": "/usr/bin/python3",
+    "before": {
+      "torch_in_sys_modules": false,
+      "mnist_in_sys_modules": false
+    },
+    "mnist_module_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py",
+    "mnist_module_sha256": "28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7",
+    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+    "torch_path": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py",
+    "cuda_initialized": false,
+    "direct_mnist_import_seconds": 2.179403957008617,
+    "total_probe_seconds": 2.1797597520053387,
+    "meaning": "new process import; OS cache not flushed; no GPU initialization/training",
+    "status": "pass"
+  },
+  {
+    "hostname": "fl02",
+    "utc_start": "2026-10-27T07:07:14.962576+00:00",
+    "utc_end": "2026-10-27T07:07:17.166091+00:00",
+    "python": "3.10.12 (main, Nov  6 2024, 20:22:13) [GCC 11.4.0]",
+    "executable": "/usr/bin/python3",
+    "before": {
+      "torch_in_sys_modules": false,
+      "mnist_in_sys_modules": false
+    },
+    "mnist_module_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py",
+    "mnist_module_sha256": "28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7",
+    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+    "torch_path": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py",
+    "cuda_initialized": false,
+    "direct_mnist_import_seconds": 2.2034487150012865,
+    "total_probe_seconds": 2.203807053003402,
+    "meaning": "new process import; OS cache not flushed; no GPU initialization/training",
+    "status": "pass"
+  },
+  {
+    "hostname": "fl04",
+    "utc_start": "2026-10-27T07:07:18.941618+00:00",
+    "utc_end": "2026-10-27T07:07:21.101135+00:00",
+    "python": "3.10.12 (main, Nov  6 2024, 20:22:13) [GCC 11.4.0]",
+    "executable": "/usr/bin/python3",
+    "before": {
+      "torch_in_sys_modules": false,
+      "mnist_in_sys_modules": false
+    },
+    "mnist_module_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py",
+    "mnist_module_sha256": "28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7",
+    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+    "torch_path": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py",
+    "cuda_initialized": false,
+    "direct_mnist_import_seconds": 2.15945407601248,
+    "total_probe_seconds": 2.1597578289947705,
+    "meaning": "new process import; OS cache not flushed; no GPU initialization/training",
+    "status": "pass"
+  }
+]

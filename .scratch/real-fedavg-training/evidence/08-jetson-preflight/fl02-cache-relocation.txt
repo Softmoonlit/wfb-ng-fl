@@ -1,0 +1,5 @@
+['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', 'fl@192.168.108.202', 'sudo -n mv /home/fl/wfb-ng-08-environment-cache-20261026 /srv/wfb-ng-fl/install-cache && sudo -n mv /home/fl/wfb-ng-08-mnist-cache-20261026 /srv/wfb-ng-fl/mnist-downloads && df -B1 /']
+Filesystem       1B-blocks        Used  Available Use% Mounted on
+/dev/sda1      29692346368 23848472576 4393852928  85% /
+
+退出码 0

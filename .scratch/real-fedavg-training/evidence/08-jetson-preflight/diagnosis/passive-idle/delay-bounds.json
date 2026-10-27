@@ -1,0 +1,4278 @@
+{
+  "fl01": {
+    "summary": {
+      "timing_assumption": "userspace capture plus 20ms per-side margin; not rigorous kernel timestamp bounds",
+      "raw_offset_intersection_width_ms": -0.6337309896480292,
+      "server_minus_client_monotonic_offset_lower_s": 610.4116399259988,
+      "offset_upper_s": 610.4510061950091,
+      "offset_bound_width_ms": 39.36626901031559,
+      "matched_upstream_packets": 146,
+      "upstream_delay_lower_max_s": 46.35613471900115,
+      "upstream_delay_upper_max_s": 46.39550098801146,
+      "matched_downstream_acks": 141,
+      "downstream_delay_lower_max_s": 0,
+      "downstream_delay_upper_max_s": 0.03632751300347081,
+      "timestamp_ahead_of_own_send_max_ms": -0.45907700061798096,
+      "server_ack_within_200ms_ingress_count": 156,
+      "server_nearest_ack_delay_max_ms": 6.036447986843996,
+      "bursts": [
+        {
+          "first_server_receive_mono": 70924.289947488,
+          "last_server_receive_mono": 70924.4614888,
+          "packets_in_1s": 54,
+          "source_timestamp_span_s": 43.874
+        },
+        {
+          "first_server_receive_mono": 70991.320217408,
+          "last_server_receive_mono": 70991.716294688,
+          "packets_in_1s": 99,
+          "source_timestamp_span_s": 46.509
+        }
+      ],
+      "worst_upstream": [
+        {
+          "timestamp_ms": 70334511,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 70334.513076494,
+          "server_receive_mono": 70991.320217408,
+          "up_delay_lower_s": 46.35613471900115,
+          "up_delay_upper_s": 46.39550098801146
+        },
+        {
+          "timestamp_ms": 70339742,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 70339.743789874,
+          "server_receive_mono": 70991.321004448,
+          "up_delay_lower_s": 41.12620837898112,
+          "up_delay_upper_s": 41.165574647991434
+        },
+        {
+          "timestamp_ms": 70339982,
+          "state": "HUNTING",
+          "channel": 157,
+          "client_send_mono": 70339.983530461,
+          "server_receive_mono": 70991.321143552,
+          "up_delay_lower_s": 40.886606895994646,
+          "up_delay_upper_s": 40.92597316500496
+        },
+        {
+          "timestamp_ms": 70340214,
+          "state": "HUNTING",
+          "channel": 157,
+          "client_send_mono": 70340.215833525,
+          "server_receive_mono": 70991.321251712,
+          "up_delay_lower_s": 40.65441199198949,
+          "up_delay_upper_s": 40.69377826099981
+        },
+        {
+          "timestamp_ms": 70340645,
+          "state": "HUNTING",
+          "channel": 149,
+          "client_send_mono": 70340.645966423,
+          "server_receive_mono": 70991.321352096,
+          "up_delay_lower_s": 40.22437947798289,
+          "up_delay_upper_s": 40.26374574699321
+        }
+      ]
+    },
+    "upstream_delays": [
+      {
+        "timestamp_ms": 70284949,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70284.951391269,
+        "server_receive_mono": 70924.291054624,
+        "up_delay_lower_s": 28.888657159991,
+        "up_delay_upper_s": 28.928023429001314
+      },
+      {
+        "timestamp_ms": 70285187,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70285.189257503,
+        "server_receive_mono": 70924.291153056,
+        "up_delay_lower_s": 28.65088935797803,
+        "up_delay_upper_s": 28.690255626988346
+      },
+      {
+        "timestamp_ms": 70285418,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70285.419482264,
+        "server_receive_mono": 70924.291235328,
+        "up_delay_lower_s": 28.42074686898968,
+        "up_delay_upper_s": 28.460113137999997
+      },
+      {
+        "timestamp_ms": 70285845,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70285.846105685,
+        "server_receive_mono": 70924.291315072,
+        "up_delay_lower_s": 27.99420319198225,
+        "up_delay_upper_s": 28.033569460992567
+      },
+      {
+        "timestamp_ms": 70286076,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70286.07673107,
+        "server_receive_mono": 70924.291392608,
+        "up_delay_lower_s": 27.763655342980655,
+        "up_delay_upper_s": 27.80302161199097
+      },
+      {
+        "timestamp_ms": 70286477,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70286.478298664,
+        "server_receive_mono": 70924.291470304,
+        "up_delay_lower_s": 27.36216544498575,
+        "up_delay_upper_s": 27.401531713996064
+      },
+      {
+        "timestamp_ms": 70286708,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70286.708872636,
+        "server_receive_mono": 70924.291548672,
+        "up_delay_lower_s": 27.1316698409978,
+        "up_delay_upper_s": 27.171036110008117
+      },
+      {
+        "timestamp_ms": 70287477,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70287.477504489,
+        "server_receive_mono": 70924.294150528,
+        "up_delay_lower_s": 26.365639843996632,
+        "up_delay_upper_s": 26.405006113006948
+      },
+      {
+        "timestamp_ms": 70287898,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70287.898788118,
+        "server_receive_mono": 70924.294351712,
+        "up_delay_lower_s": 25.944557398998313,
+        "up_delay_upper_s": 25.98392366800863
+      },
+      {
+        "timestamp_ms": 70288544,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70288.54467594,
+        "server_receive_mono": 70924.29446528,
+        "up_delay_lower_s": 25.298783145005018,
+        "up_delay_upper_s": 25.338149414015334
+      },
+      {
+        "timestamp_ms": 70288775,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70288.776151549,
+        "server_receive_mono": 70924.294567168,
+        "up_delay_lower_s": 25.067409423998924,
+        "up_delay_upper_s": 25.10677569300924
+      },
+      {
+        "timestamp_ms": 70290027,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70290.051606463,
+        "server_receive_mono": 70924.294662336,
+        "up_delay_lower_s": 23.792049677988416,
+        "up_delay_upper_s": 23.83141594699873
+      },
+      {
+        "timestamp_ms": 70290258,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70290.259831827,
+        "server_receive_mono": 70924.294754752,
+        "up_delay_lower_s": 23.583916729989596,
+        "up_delay_upper_s": 23.623282998999912
+      },
+      {
+        "timestamp_ms": 70290704,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70290.705105013,
+        "server_receive_mono": 70924.294842592,
+        "up_delay_lower_s": 23.13873138399913,
+        "up_delay_upper_s": 23.178097653009445
+      },
+      {
+        "timestamp_ms": 70290935,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70290.936276604,
+        "server_receive_mono": 70924.294927328,
+        "up_delay_lower_s": 22.90764452898702,
+        "up_delay_upper_s": 22.947010797997336
+      },
+      {
+        "timestamp_ms": 70291459,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70291.460224348,
+        "server_receive_mono": 70924.295028192,
+        "up_delay_lower_s": 22.38379764899264,
+        "up_delay_upper_s": 22.423163918002956
+      },
+      {
+        "timestamp_ms": 70291690,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70291.691597297,
+        "server_receive_mono": 70924.295113856,
+        "up_delay_lower_s": 22.15251036399104,
+        "up_delay_upper_s": 22.191876633001357
+      },
+      {
+        "timestamp_ms": 70292113,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70292.114690896,
+        "server_receive_mono": 70924.295197504,
+        "up_delay_lower_s": 21.729500412988727,
+        "up_delay_upper_s": 21.768866681999043
+      },
+      {
+        "timestamp_ms": 70292345,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70292.346005473,
+        "server_receive_mono": 70924.29527808,
+        "up_delay_lower_s": 21.498266411992972,
+        "up_delay_upper_s": 21.537632681003288
+      },
+      {
+        "timestamp_ms": 70292742,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70292.742730169,
+        "server_receive_mono": 70924.29573728,
+        "up_delay_lower_s": 21.1020009159879,
+        "up_delay_upper_s": 21.141367184998217
+      },
+      {
+        "timestamp_ms": 70294148,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70294.148914827,
+        "server_receive_mono": 70924.459187392,
+        "up_delay_lower_s": 19.859266369986017,
+        "up_delay_upper_s": 19.898632638996332
+      },
+      {
+        "timestamp_ms": 70294379,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70294.379633316,
+        "server_receive_mono": 70924.459382944,
+        "up_delay_lower_s": 19.628743432990177,
+        "up_delay_upper_s": 19.668109702000493
+      },
+      {
+        "timestamp_ms": 70295015,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70295.016605611,
+        "server_receive_mono": 70924.45949584,
+        "up_delay_lower_s": 18.99188403398557,
+        "up_delay_upper_s": 19.031250302995886
+      },
+      {
+        "timestamp_ms": 70295546,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70295.547270283,
+        "server_receive_mono": 70924.459605696,
+        "up_delay_lower_s": 18.461329217989714,
+        "up_delay_upper_s": 18.50069548700003
+      },
+      {
+        "timestamp_ms": 70296213,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70296.213937209,
+        "server_receive_mono": 70924.459704544,
+        "up_delay_lower_s": 17.794761139990896,
+        "up_delay_upper_s": 17.834127409001212
+      },
+      {
+        "timestamp_ms": 70296443,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70296.445005693,
+        "server_receive_mono": 70924.45979696,
+        "up_delay_lower_s": 17.563785071983602,
+        "up_delay_upper_s": 17.603151340993918
+      },
+      {
+        "timestamp_ms": 70297070,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70297.071424838,
+        "server_receive_mono": 70924.459886592,
+        "up_delay_lower_s": 16.937455558993406,
+        "up_delay_upper_s": 16.97682182800372
+      },
+      {
+        "timestamp_ms": 70297829,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70297.830361999,
+        "server_receive_mono": 70924.459995296,
+        "up_delay_lower_s": 16.178627101985057,
+        "up_delay_upper_s": 16.217993370995373
+      },
+      {
+        "timestamp_ms": 70298483,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70298.483498717,
+        "server_receive_mono": 70924.46011664,
+        "up_delay_lower_s": 15.525611727982778,
+        "up_delay_upper_s": 15.564977996993093
+      },
+      {
+        "timestamp_ms": 70298878,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70298.878724155,
+        "server_receive_mono": 70924.460200832,
+        "up_delay_lower_s": 15.130470481996326,
+        "up_delay_upper_s": 15.169836751006642
+      },
+      {
+        "timestamp_ms": 70299108,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70299.109737896,
+        "server_receive_mono": 70924.460284288,
+        "up_delay_lower_s": 14.899540196991893,
+        "up_delay_upper_s": 14.938906466002209
+      },
+      {
+        "timestamp_ms": 70300926,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70300.927313248,
+        "server_receive_mono": 70924.460363456,
+        "up_delay_lower_s": 13.082044012994174,
+        "up_delay_upper_s": 13.12141028200449
+      },
+      {
+        "timestamp_ms": 70303735,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70303.736435874,
+        "server_receive_mono": 70924.460441184,
+        "up_delay_lower_s": 10.27299911498676,
+        "up_delay_upper_s": 10.312365383997076
+      },
+      {
+        "timestamp_ms": 70305259,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70305.260958163,
+        "server_receive_mono": 70924.460518816,
+        "up_delay_lower_s": 8.748554458001763,
+        "up_delay_upper_s": 8.787920727012079
+      },
+      {
+        "timestamp_ms": 70305784,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70305.78545439,
+        "server_receive_mono": 70924.460614336,
+        "up_delay_lower_s": 8.224153750987625,
+        "up_delay_upper_s": 8.26352001999794
+      },
+      {
+        "timestamp_ms": 70306438,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70306.439235596,
+        "server_receive_mono": 70924.460694752,
+        "up_delay_lower_s": 7.570452960983403,
+        "up_delay_upper_s": 7.609819229993718
+      },
+      {
+        "timestamp_ms": 70307295,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70307.29572845,
+        "server_receive_mono": 70924.460772736,
+        "up_delay_lower_s": 6.714038090988197,
+        "up_delay_upper_s": 6.7534043599985125
+      },
+      {
+        "timestamp_ms": 70307894,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70307.894622632,
+        "server_receive_mono": 70924.46085152,
+        "up_delay_lower_s": 6.115222692988482,
+        "up_delay_upper_s": 6.1545889619987975
+      },
+      {
+        "timestamp_ms": 70308778,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70308.779919205,
+        "server_receive_mono": 70924.460928448,
+        "up_delay_lower_s": 5.230003047985974,
+        "up_delay_upper_s": 5.26936931699629
+      },
+      {
+        "timestamp_ms": 70310160,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70310.161902337,
+        "server_receive_mono": 70924.461004544,
+        "up_delay_lower_s": 3.848096011996404,
+        "up_delay_upper_s": 3.8874622810067194
+      },
+      {
+        "timestamp_ms": 70311209,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70311.210344738,
+        "server_receive_mono": 70924.46108064,
+        "up_delay_lower_s": 2.799729706985545,
+        "up_delay_upper_s": 2.8390959759958605
+      },
+      {
+        "timestamp_ms": 70311440,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70311.4413014,
+        "server_receive_mono": 70924.461324256,
+        "up_delay_lower_s": 2.569016660989746,
+        "up_delay_upper_s": 2.6083829300000616
+      },
+      {
+        "timestamp_ms": 70312194,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70312.195529498,
+        "server_receive_mono": 70924.46140928,
+        "up_delay_lower_s": 1.8148735869949633,
+        "up_delay_upper_s": 1.8542398560052789
+      },
+      {
+        "timestamp_ms": 70314029,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70314.029459077,
+        "server_receive_mono": 70924.4614888,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.020389797001826082
+      },
+      {
+        "timestamp_ms": 70319054,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70319.056049101,
+        "server_receive_mono": 70929.487055296,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.01936626901033378
+      },
+      {
+        "timestamp_ms": 70324099,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70324.101126514,
+        "server_receive_mono": 70938.868454688,
+        "up_delay_lower_s": 4.31632197898989,
+        "up_delay_upper_s": 4.355688248000206
+      },
+      {
+        "timestamp_ms": 70329331,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70329.333093185,
+        "server_receive_mono": 70939.911786368,
+        "up_delay_lower_s": 0.12768698798436162,
+        "up_delay_upper_s": 0.1670532569946772
+      },
+      {
+        "timestamp_ms": 70334511,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70334.513076494,
+        "server_receive_mono": 70991.320217408,
+        "up_delay_lower_s": 46.35613471900115,
+        "up_delay_upper_s": 46.39550098801146
+      },
+      {
+        "timestamp_ms": 70339742,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70339.743789874,
+        "server_receive_mono": 70991.321004448,
+        "up_delay_lower_s": 41.12620837898112,
+        "up_delay_upper_s": 41.165574647991434
+      },
+      {
+        "timestamp_ms": 70339982,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70339.983530461,
+        "server_receive_mono": 70991.321143552,
+        "up_delay_lower_s": 40.886606895994646,
+        "up_delay_upper_s": 40.92597316500496
+      },
+      {
+        "timestamp_ms": 70340214,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70340.215833525,
+        "server_receive_mono": 70991.321251712,
+        "up_delay_lower_s": 40.65441199198949,
+        "up_delay_upper_s": 40.69377826099981
+      },
+      {
+        "timestamp_ms": 70340645,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70340.645966423,
+        "server_receive_mono": 70991.321352096,
+        "up_delay_lower_s": 40.22437947798289,
+        "up_delay_upper_s": 40.26374574699321
+      },
+      {
+        "timestamp_ms": 70340875,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70340.876933742,
+        "server_receive_mono": 70991.321444288,
+        "up_delay_lower_s": 39.9935043509945,
+        "up_delay_upper_s": 40.032870620004815
+      },
+      {
+        "timestamp_ms": 70341286,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70341.287143582,
+        "server_receive_mono": 70991.321563136,
+        "up_delay_lower_s": 39.58341335900013,
+        "up_delay_upper_s": 39.62277962801045
+      },
+      {
+        "timestamp_ms": 70341517,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70341.517853716,
+        "server_receive_mono": 70991.3216544,
+        "up_delay_lower_s": 39.352794488997915,
+        "up_delay_upper_s": 39.39216075800823
+      },
+      {
+        "timestamp_ms": 70342043,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70342.044218935,
+        "server_receive_mono": 70991.321810208,
+        "up_delay_lower_s": 38.82658507799033,
+        "up_delay_upper_s": 38.865951347000646
+      },
+      {
+        "timestamp_ms": 70342274,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70342.275145708,
+        "server_receive_mono": 70991.32356288,
+        "up_delay_lower_s": 38.597410976992705,
+        "up_delay_upper_s": 38.63677724600302
+      },
+      {
+        "timestamp_ms": 70342711,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70342.712156181,
+        "server_receive_mono": 70991.323669888,
+        "up_delay_lower_s": 38.16050751199191,
+        "up_delay_upper_s": 38.199873781002225
+      },
+      {
+        "timestamp_ms": 70342942,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70342.942846769,
+        "server_receive_mono": 70991.32375936,
+        "up_delay_lower_s": 37.92990639599566,
+        "up_delay_upper_s": 37.969272665005974
+      },
+      {
+        "timestamp_ms": 70343337,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70343.337889532,
+        "server_receive_mono": 70991.323846144,
+        "up_delay_lower_s": 37.53495041699034,
+        "up_delay_upper_s": 37.57431668600066
+      },
+      {
+        "timestamp_ms": 70343568,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70343.568701964,
+        "server_receive_mono": 70991.32395296,
+        "up_delay_lower_s": 37.30424480098418,
+        "up_delay_upper_s": 37.343611069994495
+      },
+      {
+        "timestamp_ms": 70344165,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70344.166382759,
+        "server_receive_mono": 70991.324060384,
+        "up_delay_lower_s": 36.706671429991275,
+        "up_delay_upper_s": 36.74603769900159
+      },
+      {
+        "timestamp_ms": 70344396,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70344.397289665,
+        "server_receive_mono": 70991.324149568,
+        "up_delay_lower_s": 36.4758537079947,
+        "up_delay_upper_s": 36.51521997700502
+      },
+      {
+        "timestamp_ms": 70344817,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70344.818408356,
+        "server_receive_mono": 70991.32423152,
+        "up_delay_lower_s": 36.05481696899051,
+        "up_delay_upper_s": 36.094183238000824
+      },
+      {
+        "timestamp_ms": 70345048,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70345.049397416,
+        "server_receive_mono": 70991.325625536,
+        "up_delay_lower_s": 35.825221924988455,
+        "up_delay_upper_s": 35.86458819399877
+      },
+      {
+        "timestamp_ms": 70345443,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70345.444349189,
+        "server_receive_mono": 70991.325730528,
+        "up_delay_lower_s": 35.43037514399157,
+        "up_delay_upper_s": 35.469741413001884
+      },
+      {
+        "timestamp_ms": 70345674,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70345.676127302,
+        "server_receive_mono": 70991.325817312,
+        "up_delay_lower_s": 35.19868381499373,
+        "up_delay_upper_s": 35.238050084004044
+      },
+      {
+        "timestamp_ms": 70346196,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70346.196954383,
+        "server_receive_mono": 70991.325901248,
+        "up_delay_lower_s": 34.677940669982945,
+        "up_delay_upper_s": 34.71730693899326
+      },
+      {
+        "timestamp_ms": 70346427,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70346.428341923,
+        "server_receive_mono": 70991.326010304,
+        "up_delay_lower_s": 34.446662185979676,
+        "up_delay_upper_s": 34.48602845498999
+      },
+      {
+        "timestamp_ms": 70346884,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70346.885017125,
+        "server_receive_mono": 70991.326096128,
+        "up_delay_lower_s": 33.990072807999695,
+        "up_delay_upper_s": 34.02943907701001
+      },
+      {
+        "timestamp_ms": 70347115,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70347.116433544,
+        "server_receive_mono": 70991.326177056,
+        "up_delay_lower_s": 33.758737316999486,
+        "up_delay_upper_s": 33.7981035860098
+      },
+      {
+        "timestamp_ms": 70347518,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70347.519395676,
+        "server_receive_mono": 70991.327635712,
+        "up_delay_lower_s": 33.35723384099083,
+        "up_delay_upper_s": 33.396600110001145
+      },
+      {
+        "timestamp_ms": 70347749,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70347.751070903,
+        "server_receive_mono": 70991.327732384,
+        "up_delay_lower_s": 33.12565528598907,
+        "up_delay_upper_s": 33.165021554999385
+      },
+      {
+        "timestamp_ms": 70348273,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70348.273765376,
+        "server_receive_mono": 70991.327816928,
+        "up_delay_lower_s": 32.60304535698788,
+        "up_delay_upper_s": 32.64241162599819
+      },
+      {
+        "timestamp_ms": 70348503,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70348.504918155,
+        "server_receive_mono": 70991.327918176,
+        "up_delay_lower_s": 32.371993825993286,
+        "up_delay_upper_s": 32.4113600950036
+      },
+      {
+        "timestamp_ms": 70348925,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70348.92571233,
+        "server_receive_mono": 70991.328020096,
+        "up_delay_lower_s": 31.951301570985834,
+        "up_delay_upper_s": 31.99066783999615
+      },
+      {
+        "timestamp_ms": 70349155,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70349.156648729,
+        "server_receive_mono": 70991.328108128,
+        "up_delay_lower_s": 31.720453203994566,
+        "up_delay_upper_s": 31.75981947300488
+      },
+      {
+        "timestamp_ms": 70349554,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70349.555176149,
+        "server_receive_mono": 70991.328189856,
+        "up_delay_lower_s": 31.322007511979336,
+        "up_delay_upper_s": 31.361373780989652
+      },
+      {
+        "timestamp_ms": 70349785,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70349.786255022,
+        "server_receive_mono": 70991.328269664,
+        "up_delay_lower_s": 31.09100844698378,
+        "up_delay_upper_s": 31.130374715994094
+      },
+      {
+        "timestamp_ms": 70350540,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70350.542002433,
+        "server_receive_mono": 70991.331814912,
+        "up_delay_lower_s": 30.33880628399902,
+        "up_delay_upper_s": 30.378172553009335
+      },
+      {
+        "timestamp_ms": 70350983,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70350.984568535,
+        "server_receive_mono": 70991.331926432,
+        "up_delay_lower_s": 29.896351701991534,
+        "up_delay_upper_s": 29.93571797100185
+      },
+      {
+        "timestamp_ms": 70351214,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70351.215563395,
+        "server_receive_mono": 70991.332050592,
+        "up_delay_lower_s": 29.66548100198679,
+        "up_delay_upper_s": 29.704847270997107
+      },
+      {
+        "timestamp_ms": 70351611,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70351.612341982,
+        "server_receive_mono": 70991.332143168,
+        "up_delay_lower_s": 29.268794990978222,
+        "up_delay_upper_s": 29.308161259988537
+      },
+      {
+        "timestamp_ms": 70353016,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70353.017110532,
+        "server_receive_mono": 70991.332226528,
+        "up_delay_lower_s": 27.86410980098708,
+        "up_delay_upper_s": 27.903476069997396
+      },
+      {
+        "timestamp_ms": 70353247,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70353.248150863,
+        "server_receive_mono": 70991.332315872,
+        "up_delay_lower_s": 27.633158813991486,
+        "up_delay_upper_s": 27.6725250830018
+      },
+      {
+        "timestamp_ms": 70353659,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70353.660211775,
+        "server_receive_mono": 70991.332399936,
+        "up_delay_lower_s": 27.221181965990127,
+        "up_delay_upper_s": 27.260548235000442
+      },
+      {
+        "timestamp_ms": 70353890,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70353.891105474,
+        "server_receive_mono": 70991.33248048,
+        "up_delay_lower_s": 26.990368810995733,
+        "up_delay_upper_s": 27.02973508000605
+      },
+      {
+        "timestamp_ms": 70354421,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70354.422292693,
+        "server_receive_mono": 70991.332559232,
+        "up_delay_lower_s": 26.459260344000086,
+        "up_delay_upper_s": 26.4986266130104
+      },
+      {
+        "timestamp_ms": 70354652,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70354.653116515,
+        "server_receive_mono": 70991.332654048,
+        "up_delay_lower_s": 26.228531338002085,
+        "up_delay_upper_s": 26.2678976070124
+      },
+      {
+        "timestamp_ms": 70355074,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70355.075462101,
+        "server_receive_mono": 70991.332735456,
+        "up_delay_lower_s": 25.80626715999506,
+        "up_delay_upper_s": 25.845633429005375
+      },
+      {
+        "timestamp_ms": 70355305,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70355.306168126,
+        "server_receive_mono": 70991.332813696,
+        "up_delay_lower_s": 25.575639374994807,
+        "up_delay_upper_s": 25.615005644005123
+      },
+      {
+        "timestamp_ms": 70355700,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70355.701042445,
+        "server_receive_mono": 70991.332890304,
+        "up_delay_lower_s": 25.180841663987394,
+        "up_delay_upper_s": 25.22020793299771
+      },
+      {
+        "timestamp_ms": 70355931,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70355.931665229,
+        "server_receive_mono": 70991.33296624,
+        "up_delay_lower_s": 24.950294815997495,
+        "up_delay_upper_s": 24.98966108500781
+      },
+      {
+        "timestamp_ms": 70356455,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70356.455731001,
+        "server_receive_mono": 70991.33304368,
+        "up_delay_lower_s": 24.426306483994722,
+        "up_delay_upper_s": 24.465672753005038
+      },
+      {
+        "timestamp_ms": 70356685,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70356.686319325,
+        "server_receive_mono": 70991.333787552,
+        "up_delay_lower_s": 24.19646203198181,
+        "up_delay_upper_s": 24.235828300992125
+      },
+      {
+        "timestamp_ms": 70357109,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70357.110241602,
+        "server_receive_mono": 70991.33388,
+        "up_delay_lower_s": 23.772632202996192,
+        "up_delay_upper_s": 23.811998472006508
+      },
+      {
+        "timestamp_ms": 70357340,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70357.340773434,
+        "server_receive_mono": 70991.333980736,
+        "up_delay_lower_s": 23.542201106993616,
+        "up_delay_upper_s": 23.58156737600393
+      },
+      {
+        "timestamp_ms": 70357736,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70357.736842771,
+        "server_receive_mono": 70991.334064288,
+        "up_delay_lower_s": 23.146215321994987,
+        "up_delay_upper_s": 23.185581591005302
+      },
+      {
+        "timestamp_ms": 70357966,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70357.967893328,
+        "server_receive_mono": 70991.334144736,
+        "up_delay_lower_s": 22.91524521299698,
+        "up_delay_upper_s": 22.954611482007294
+      },
+      {
+        "timestamp_ms": 70360050,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70360.051874179,
+        "server_receive_mono": 70991.350763872,
+        "up_delay_lower_s": 20.847883497994644,
+        "up_delay_upper_s": 20.88724976700496
+      },
+      {
+        "timestamp_ms": 70361230,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70361.231436602,
+        "server_receive_mono": 70991.350915456,
+        "up_delay_lower_s": 19.668472658992414,
+        "up_delay_upper_s": 19.70783892800273
+      },
+      {
+        "timestamp_ms": 70361461,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70361.462429068,
+        "server_receive_mono": 70991.351011648,
+        "up_delay_lower_s": 19.43757638500074,
+        "up_delay_upper_s": 19.476942654011054
+      },
+      {
+        "timestamp_ms": 70361874,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70361.874704582,
+        "server_receive_mono": 70991.3511,
+        "up_delay_lower_s": 19.025389222985268,
+        "up_delay_upper_s": 19.064755491995584
+      },
+      {
+        "timestamp_ms": 70363925,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70363.926087747,
+        "server_receive_mono": 70991.351184192,
+        "up_delay_lower_s": 16.974090249994788,
+        "up_delay_upper_s": 17.013456519005103
+      },
+      {
+        "timestamp_ms": 70364156,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70364.156744193,
+        "server_receive_mono": 70991.35126816,
+        "up_delay_lower_s": 16.743517771993083,
+        "up_delay_upper_s": 16.7828840410034
+      },
+      {
+        "timestamp_ms": 70364678,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70364.679090759,
+        "server_receive_mono": 70991.35135152,
+        "up_delay_lower_s": 16.221254565989966,
+        "up_delay_upper_s": 16.26062083500028
+      },
+      {
+        "timestamp_ms": 70364909,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70364.910287687,
+        "server_receive_mono": 70991.35143456,
+        "up_delay_lower_s": 15.990140677986801,
+        "up_delay_upper_s": 16.029506946997117
+      },
+      {
+        "timestamp_ms": 70365341,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70365.342014987,
+        "server_receive_mono": 70991.351518656,
+        "up_delay_lower_s": 15.558497473979969,
+        "up_delay_upper_s": 15.597863742990285
+      },
+      {
+        "timestamp_ms": 70365571,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70365.572466346,
+        "server_receive_mono": 70991.351622272,
+        "up_delay_lower_s": 15.328149730998575,
+        "up_delay_upper_s": 15.36751600000889
+      },
+      {
+        "timestamp_ms": 70365967,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70365.968724695,
+        "server_receive_mono": 70991.3517064,
+        "up_delay_lower_s": 14.931975509990025,
+        "up_delay_upper_s": 14.97134177900034
+      },
+      {
+        "timestamp_ms": 70366198,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70366.199023602,
+        "server_receive_mono": 70991.35178752,
+        "up_delay_lower_s": 14.701757722989441,
+        "up_delay_upper_s": 14.741123991999757
+      },
+      {
+        "timestamp_ms": 70366719,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70366.720989494,
+        "server_receive_mono": 70991.351939104,
+        "up_delay_lower_s": 14.179943414991158,
+        "up_delay_upper_s": 14.219309684001473
+      },
+      {
+        "timestamp_ms": 70366950,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70366.951566857,
+        "server_receive_mono": 70991.361904544,
+        "up_delay_lower_s": 13.959331491995272,
+        "up_delay_upper_s": 13.998697761005587
+      },
+      {
+        "timestamp_ms": 70367371,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70367.372939506,
+        "server_receive_mono": 70991.362044288,
+        "up_delay_lower_s": 13.538098586989236,
+        "up_delay_upper_s": 13.577464855999551
+      },
+      {
+        "timestamp_ms": 70367602,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70367.603418061,
+        "server_receive_mono": 70991.36213536,
+        "up_delay_lower_s": 13.30771110399337,
+        "up_delay_upper_s": 13.347077373003685
+      },
+      {
+        "timestamp_ms": 70367997,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70367.997854074,
+        "server_receive_mono": 70991.362220896,
+        "up_delay_lower_s": 12.913360626993835,
+        "up_delay_upper_s": 12.952726896004151
+      },
+      {
+        "timestamp_ms": 70368227,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70368.229014061,
+        "server_receive_mono": 70991.362301792,
+        "up_delay_lower_s": 12.682281535996026,
+        "up_delay_upper_s": 12.721647805006342
+      },
+      {
+        "timestamp_ms": 70368751,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70368.752164462,
+        "server_receive_mono": 70991.362381088,
+        "up_delay_lower_s": 12.15921043098615,
+        "up_delay_upper_s": 12.198576699996465
+      },
+      {
+        "timestamp_ms": 70368982,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70368.983077349,
+        "server_receive_mono": 70991.362460992,
+        "up_delay_lower_s": 11.928377447988623,
+        "up_delay_upper_s": 11.967743716998939
+      },
+      {
+        "timestamp_ms": 70369403,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70369.40439843,
+        "server_receive_mono": 70991.362960256,
+        "up_delay_lower_s": 11.507555630993465,
+        "up_delay_upper_s": 11.546921900003781
+      },
+      {
+        "timestamp_ms": 70369634,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70369.635408973,
+        "server_receive_mono": 70991.37362608,
+        "up_delay_lower_s": 11.28721091199668,
+        "up_delay_upper_s": 11.326577181006996
+      },
+      {
+        "timestamp_ms": 70370029,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70370.030478159,
+        "server_receive_mono": 70991.373778592,
+        "up_delay_lower_s": 10.892294237990882,
+        "up_delay_upper_s": 10.931660507001197
+      },
+      {
+        "timestamp_ms": 70370260,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70370.261806995,
+        "server_receive_mono": 70991.373890656,
+        "up_delay_lower_s": 10.661077465997096,
+        "up_delay_upper_s": 10.700443735007411
+      },
+      {
+        "timestamp_ms": 70370791,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70370.792631042,
+        "server_receive_mono": 70991.3739936,
+        "up_delay_lower_s": 10.130356362995826,
+        "up_delay_upper_s": 10.169722632006142
+      },
+      {
+        "timestamp_ms": 70371022,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70371.023147224,
+        "server_receive_mono": 70991.37409152,
+        "up_delay_lower_s": 9.899938100996678,
+        "up_delay_upper_s": 9.939304370006994
+      },
+      {
+        "timestamp_ms": 70371444,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70371.444848383,
+        "server_receive_mono": 70991.374187616,
+        "up_delay_lower_s": 9.478333037990978,
+        "up_delay_upper_s": 9.517699307001294
+      },
+      {
+        "timestamp_ms": 70371674,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70371.675454157,
+        "server_receive_mono": 70991.374369856,
+        "up_delay_lower_s": 9.247909503993014,
+        "up_delay_upper_s": 9.28727577300333
+      },
+      {
+        "timestamp_ms": 70372306,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70372.306782539,
+        "server_receive_mono": 70991.401459488,
+        "up_delay_lower_s": 8.643670753987408,
+        "up_delay_upper_s": 8.683037022997723
+      },
+      {
+        "timestamp_ms": 70373740,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70373.740703827,
+        "server_receive_mono": 70991.40178608,
+        "up_delay_lower_s": 7.210076057981951,
+        "up_delay_upper_s": 7.249442326992266
+      },
+      {
+        "timestamp_ms": 70374138,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70374.139157134,
+        "server_receive_mono": 70991.402043808,
+        "up_delay_lower_s": 6.811880478988769,
+        "up_delay_upper_s": 6.851246747999085
+      },
+      {
+        "timestamp_ms": 70374892,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70374.892898984,
+        "server_receive_mono": 70991.402356416,
+        "up_delay_lower_s": 6.058451236986457,
+        "up_delay_upper_s": 6.0978175059967725
+      },
+      {
+        "timestamp_ms": 70375123,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70375.124088676,
+        "server_receive_mono": 70991.40260048,
+        "up_delay_lower_s": 5.827505608981028,
+        "up_delay_upper_s": 5.866871877991343
+      },
+      {
+        "timestamp_ms": 70375545,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70375.546467307,
+        "server_receive_mono": 70991.40283632,
+        "up_delay_lower_s": 5.405362818001322,
+        "up_delay_upper_s": 5.444729087011638
+      },
+      {
+        "timestamp_ms": 70375776,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70375.777398254,
+        "server_receive_mono": 70991.403061408,
+        "up_delay_lower_s": 5.174656958992728,
+        "up_delay_upper_s": 5.214023228003043
+      },
+      {
+        "timestamp_ms": 70376171,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70376.1722028,
+        "server_receive_mono": 70991.403296608,
+        "up_delay_lower_s": 4.78008761299543,
+        "up_delay_upper_s": 4.819453882005746
+      },
+      {
+        "timestamp_ms": 70376402,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70376.403196266,
+        "server_receive_mono": 70991.403528352,
+        "up_delay_lower_s": 4.549325891003264,
+        "up_delay_upper_s": 4.588692160013579
+      },
+      {
+        "timestamp_ms": 70376923,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70376.924328772,
+        "server_receive_mono": 70991.403823424,
+        "up_delay_lower_s": 4.028488456988725,
+        "up_delay_upper_s": 4.067854725999041
+      },
+      {
+        "timestamp_ms": 70377154,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70377.155237107,
+        "server_receive_mono": 70991.404088192,
+        "up_delay_lower_s": 3.7978448899852992,
+        "up_delay_upper_s": 3.837211158995615
+      },
+      {
+        "timestamp_ms": 70377574,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70377.575820917,
+        "server_receive_mono": 70991.404318368,
+        "up_delay_lower_s": 3.377491255993391,
+        "up_delay_upper_s": 3.4168575250037065
+      },
+      {
+        "timestamp_ms": 70377805,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70377.806370202,
+        "server_receive_mono": 70991.40453888,
+        "up_delay_lower_s": 3.1471624829905522,
+        "up_delay_upper_s": 3.186528752000868
+      },
+      {
+        "timestamp_ms": 70378440,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70378.441310264,
+        "server_receive_mono": 70991.409755904,
+        "up_delay_lower_s": 2.517439444990032,
+        "up_delay_upper_s": 2.5568057140003475
+      },
+      {
+        "timestamp_ms": 70379852,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 70379.852933006,
+        "server_receive_mono": 70991.410028128,
+        "up_delay_lower_s": 1.106088926990651,
+        "up_delay_upper_s": 1.1454551960009667
+      },
+      {
+        "timestamp_ms": 70380250,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70380.252422522,
+        "server_receive_mono": 70991.410369152,
+        "up_delay_lower_s": 0.7069404349936121,
+        "up_delay_upper_s": 0.7463067040039277
+      },
+      {
+        "timestamp_ms": 70380481,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 70380.483064073,
+        "server_receive_mono": 70991.410571072,
+        "up_delay_lower_s": 0.47650080398716455,
+        "up_delay_upper_s": 0.5158670729974801
+      },
+      {
+        "timestamp_ms": 70381006,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 70381.006782826,
+        "server_receive_mono": 70991.710843008,
+        "up_delay_lower_s": 0.2530539869808308,
+        "up_delay_upper_s": 0.2924202559911464
+      },
+      {
+        "timestamp_ms": 70381020,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 70381.021043744,
+        "server_receive_mono": 70991.716294688,
+        "up_delay_lower_s": 0.24424474899251436,
+        "up_delay_upper_s": 0.28361101800282995
+      }
+    ],
+    "downstream_delays": [
+      {
+        "ip_id": 10824,
+        "server_send_mono": 70924.30083264,
+        "client_receive_mono": 70313.879390431,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02956398600827015
+      },
+      {
+        "ip_id": 10825,
+        "server_send_mono": 70924.305868352,
+        "client_receive_mono": 70313.88053042,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025668263009265502
+      },
+      {
+        "ip_id": 10826,
+        "server_send_mono": 70924.310962272,
+        "client_receive_mono": 70313.888858953,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02890287601212549
+      },
+      {
+        "ip_id": 10828,
+        "server_send_mono": 70924.3195384,
+        "client_receive_mono": 70313.897577689,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.029045484010111977
+      },
+      {
+        "ip_id": 10829,
+        "server_send_mono": 70924.323356608,
+        "client_receive_mono": 70313.897724363,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02537395001445475
+      },
+      {
+        "ip_id": 10831,
+        "server_send_mono": 70924.328501408,
+        "client_receive_mono": 70313.902569286,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02507407300754494
+      },
+      {
+        "ip_id": 10832,
+        "server_send_mono": 70924.333513504,
+        "client_receive_mono": 70313.909290801,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02678349201914898
+      },
+      {
+        "ip_id": 10833,
+        "server_send_mono": 70924.33694096,
+        "client_receive_mono": 70313.912073388,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026138623008137074
+      },
+      {
+        "ip_id": 10834,
+        "server_send_mono": 70924.340413184,
+        "client_receive_mono": 70313.91553572,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02612873100906654
+      },
+      {
+        "ip_id": 10836,
+        "server_send_mono": 70924.349053504,
+        "client_receive_mono": 70313.934374822,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03632751300347081
+      },
+      {
+        "ip_id": 10837,
+        "server_send_mono": 70924.354240928,
+        "client_receive_mono": 70313.935460032,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03222529899676374
+      },
+      {
+        "ip_id": 10840,
+        "server_send_mono": 70924.366352,
+        "client_receive_mono": 70313.945935084,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.030589279016112414
+      },
+      {
+        "ip_id": 10841,
+        "server_send_mono": 70924.3714016,
+        "client_receive_mono": 70313.955427476,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03503207100902728
+      },
+      {
+        "ip_id": 10842,
+        "server_send_mono": 70924.3764312,
+        "client_receive_mono": 70313.955560999,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03013599401629108
+      },
+      {
+        "ip_id": 10843,
+        "server_send_mono": 70924.381484832,
+        "client_receive_mono": 70313.959343077,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028864440009328973
+      },
+      {
+        "ip_id": 10845,
+        "server_send_mono": 70924.389990112,
+        "client_receive_mono": 70313.968053302,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02906938500700562
+      },
+      {
+        "ip_id": 10846,
+        "server_send_mono": 70924.393499104,
+        "client_receive_mono": 70313.968183754,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02569084500601093
+      },
+      {
+        "ip_id": 10848,
+        "server_send_mono": 70924.402998048,
+        "client_receive_mono": 70313.981009018,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.029017165008099255
+      },
+      {
+        "ip_id": 10849,
+        "server_send_mono": 70924.408293248,
+        "client_receive_mono": 70313.983173712,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02588665901157583
+      },
+      {
+        "ip_id": 10850,
+        "server_send_mono": 70924.41180512,
+        "client_receive_mono": 70313.986122844,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025323919001948525
+      },
+      {
+        "ip_id": 10851,
+        "server_send_mono": 70924.416874176,
+        "client_receive_mono": 70313.991723856,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02585587501698683
+      },
+      {
+        "ip_id": 10852,
+        "server_send_mono": 70924.420393024,
+        "client_receive_mono": 70313.995224424,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02583759500294036
+      },
+      {
+        "ip_id": 10853,
+        "server_send_mono": 70924.425440064,
+        "client_receive_mono": 70313.999870805,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025436936000460264
+      },
+      {
+        "ip_id": 10855,
+        "server_send_mono": 70924.464744576,
+        "client_receive_mono": 70314.039486394,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02574801300534091
+      },
+      {
+        "ip_id": 10856,
+        "server_send_mono": 70924.468417952,
+        "client_receive_mono": 70314.043081898,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0256701410066853
+      },
+      {
+        "ip_id": 10857,
+        "server_send_mono": 70924.473504224,
+        "client_receive_mono": 70314.051250734,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028752705005445023
+      },
+      {
+        "ip_id": 10858,
+        "server_send_mono": 70924.479395968,
+        "client_receive_mono": 70314.053715431,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025325658014025976
+      },
+      {
+        "ip_id": 10859,
+        "server_send_mono": 70924.484623488,
+        "client_receive_mono": 70314.062036924,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02841963101991496
+      },
+      {
+        "ip_id": 10860,
+        "server_send_mono": 70924.488167904,
+        "client_receive_mono": 70314.066138429,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028976720011542056
+      },
+      {
+        "ip_id": 10861,
+        "server_send_mono": 70924.493244256,
+        "client_receive_mono": 70314.068126083,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025888022016715695
+      },
+      {
+        "ip_id": 10862,
+        "server_send_mono": 70924.498381312,
+        "client_receive_mono": 70314.076861777,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.029486659997473907
+      },
+      {
+        "ip_id": 10864,
+        "server_send_mono": 70924.510871328,
+        "client_receive_mono": 70314.088337055,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02847192200306381
+      },
+      {
+        "ip_id": 10865,
+        "server_send_mono": 70924.514514208,
+        "client_receive_mono": 70314.089104536,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025596523013064143
+      },
+      {
+        "ip_id": 10866,
+        "server_send_mono": 70924.518063744,
+        "client_receive_mono": 70314.092655755,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025598206000267965
+      },
+      {
+        "ip_id": 10867,
+        "server_send_mono": 70924.523202784,
+        "client_receive_mono": 70314.101211627,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.029015038012857985
+      },
+      {
+        "ip_id": 10868,
+        "server_send_mono": 70924.528301184,
+        "client_receive_mono": 70314.103128887,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02583389801611702
+      },
+      {
+        "ip_id": 10869,
+        "server_send_mono": 70924.53335456,
+        "client_receive_mono": 70314.108206972,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025858607008103718
+      },
+      {
+        "ip_id": 10870,
+        "server_send_mono": 70924.538429216,
+        "client_receive_mono": 70314.113897896,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026474875000985776
+      },
+      {
+        "ip_id": 10871,
+        "server_send_mono": 70924.54349264,
+        "client_receive_mono": 70314.118321482,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025835037009073858
+      },
+      {
+        "ip_id": 10873,
+        "server_send_mono": 70924.548583872,
+        "client_receive_mono": 70314.123433931,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025856254007067037
+      },
+      {
+        "ip_id": 10874,
+        "server_send_mono": 70924.55365232,
+        "client_receive_mono": 70314.128499473,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025853348004147847
+      },
+      {
+        "ip_id": 10875,
+        "server_send_mono": 70924.558718688,
+        "client_receive_mono": 70314.135800518,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028088025002489303
+      },
+      {
+        "ip_id": 10876,
+        "server_send_mono": 70924.563802784,
+        "client_receive_mono": 70314.141963398,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02916680900261781
+      },
+      {
+        "ip_id": 10877,
+        "server_send_mono": 70924.567292736,
+        "client_receive_mono": 70314.145123902,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02883736100511669
+      },
+      {
+        "ip_id": 10879,
+        "server_send_mono": 70924.57234992,
+        "client_receive_mono": 70314.147337199,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02599347401292107
+      },
+      {
+        "ip_id": 11417,
+        "server_send_mono": 70929.492677184,
+        "client_receive_mono": 70319.077721369,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.036050380014330585
+      },
+      {
+        "ip_id": 13399,
+        "server_send_mono": 70938.872657408,
+        "client_receive_mono": 70328.447585585,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025934372005849582
+      },
+      {
+        "ip_id": 13626,
+        "server_send_mono": 70939.91588928,
+        "client_receive_mono": 70329.490038869,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025155784005164605
+      },
+      {
+        "ip_id": 15599,
+        "server_send_mono": 70991.326253856,
+        "client_receive_mono": 70380.902467027,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027219366016197455
+      },
+      {
+        "ip_id": 15600,
+        "server_send_mono": 70991.329290976,
+        "client_receive_mono": 70380.902831383,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02454660200919534
+      },
+      {
+        "ip_id": 15601,
+        "server_send_mono": 70991.334352032,
+        "client_receive_mono": 70380.906444568,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023098731001937267
+      },
+      {
+        "ip_id": 15602,
+        "server_send_mono": 70991.33791312,
+        "client_receive_mono": 70380.90722521,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02031828500503252
+      },
+      {
+        "ip_id": 15603,
+        "server_send_mono": 70991.342939776,
+        "client_receive_mono": 70380.912087993,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020154412002284516
+      },
+      {
+        "ip_id": 15604,
+        "server_send_mono": 70991.346420224,
+        "client_receive_mono": 70380.915559398,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020145369005604152
+      },
+      {
+        "ip_id": 15605,
+        "server_send_mono": 70991.351862848,
+        "client_receive_mono": 70380.92055721,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0197005570184956
+      },
+      {
+        "ip_id": 15606,
+        "server_send_mono": 70991.354911008,
+        "client_receive_mono": 70380.924148734,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020243921007477184
+      },
+      {
+        "ip_id": 15607,
+        "server_send_mono": 70991.359908384,
+        "client_receive_mono": 70380.929156081,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02025389200889549
+      },
+      {
+        "ip_id": 15608,
+        "server_send_mono": 70991.363359776,
+        "client_receive_mono": 70380.932130277,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019776696000462834
+      },
+      {
+        "ip_id": 15610,
+        "server_send_mono": 70991.368730016,
+        "client_receive_mono": 70380.937264622,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019540801014500175
+      },
+      {
+        "ip_id": 15612,
+        "server_send_mono": 70991.377540096,
+        "client_receive_mono": 70380.950175631,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023641730014333007
+      },
+      {
+        "ip_id": 15613,
+        "server_send_mono": 70991.381078688,
+        "client_receive_mono": 70380.955055725,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02498323200734376
+      },
+      {
+        "ip_id": 15614,
+        "server_send_mono": 70991.38632592,
+        "client_receive_mono": 70380.955193186,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019873461012593907
+      },
+      {
+        "ip_id": 15616,
+        "server_send_mono": 70991.395210816,
+        "client_receive_mono": 70380.97311519,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028910569013078202
+      },
+      {
+        "ip_id": 15617,
+        "server_send_mono": 70991.39868512,
+        "client_receive_mono": 70380.973252075,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02557315000331073
+      },
+      {
+        "ip_id": 15618,
+        "server_send_mono": 70991.404755232,
+        "client_receive_mono": 70380.974773266,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.021024229015438323
+      },
+      {
+        "ip_id": 15620,
+        "server_send_mono": 70991.41220944,
+        "client_receive_mono": 70380.984393592,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023190347022591595
+      },
+      {
+        "ip_id": 15621,
+        "server_send_mono": 70991.415622528,
+        "client_receive_mono": 70380.986948014,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02233168101111005
+      },
+      {
+        "ip_id": 15622,
+        "server_send_mono": 70991.420599328,
+        "client_receive_mono": 70380.989634105,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02004097200870092
+      },
+      {
+        "ip_id": 15623,
+        "server_send_mono": 70991.424104096,
+        "client_receive_mono": 70380.995429102,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022331201001634327
+      },
+      {
+        "ip_id": 15625,
+        "server_send_mono": 70991.429495808,
+        "client_receive_mono": 70380.998906458,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02041684501045893
+      },
+      {
+        "ip_id": 15627,
+        "server_send_mono": 70991.439139072,
+        "client_receive_mono": 70381.019927705,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.031794828009424236
+      },
+      {
+        "ip_id": 15628,
+        "server_send_mono": 70991.44259264,
+        "client_receive_mono": 70381.020755095,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.029168650009069097
+      },
+      {
+        "ip_id": 15629,
+        "server_send_mono": 70991.44777088,
+        "client_receive_mono": 70381.023313517,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026548832010576007
+      },
+      {
+        "ip_id": 15630,
+        "server_send_mono": 70991.4512856,
+        "client_receive_mono": 70381.02422858,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023949175021243718
+      },
+      {
+        "ip_id": 15631,
+        "server_send_mono": 70991.456323712,
+        "client_receive_mono": 70381.025985401,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020667883999976766
+      },
+      {
+        "ip_id": 15632,
+        "server_send_mono": 70991.459770624,
+        "client_receive_mono": 70381.029741039,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02097661001198503
+      },
+      {
+        "ip_id": 15634,
+        "server_send_mono": 70991.464821984,
+        "client_receive_mono": 70381.033925668,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02010987900894179
+      },
+      {
+        "ip_id": 15636,
+        "server_send_mono": 70991.473461792,
+        "client_receive_mono": 70381.047243397,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02478780000410552
+      },
+      {
+        "ip_id": 15637,
+        "server_send_mono": 70991.478717024,
+        "client_receive_mono": 70381.048079426,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02036859700046989
+      },
+      {
+        "ip_id": 15638,
+        "server_send_mono": 70991.483835584,
+        "client_receive_mono": 70381.053237226,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02040783701113469
+      },
+      {
+        "ip_id": 15639,
+        "server_send_mono": 70991.487317888,
+        "client_receive_mono": 70381.0569952,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020683507008925517
+      },
+      {
+        "ip_id": 15640,
+        "server_send_mono": 70991.492344928,
+        "client_receive_mono": 70381.061404899,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020066166001470265
+      },
+      {
+        "ip_id": 15641,
+        "server_send_mono": 70991.495777856,
+        "client_receive_mono": 70381.068744573,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023972912003500824
+      },
+      {
+        "ip_id": 15643,
+        "server_send_mono": 70991.500766816,
+        "client_receive_mono": 70381.070380123,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02061950201050422
+      },
+      {
+        "ip_id": 15644,
+        "server_send_mono": 70991.504201472,
+        "client_receive_mono": 70381.076373025,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02317774801804262
+      },
+      {
+        "ip_id": 15645,
+        "server_send_mono": 70991.50918448,
+        "client_receive_mono": 70381.078290153,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020111868008370948
+      },
+      {
+        "ip_id": 15646,
+        "server_send_mono": 70991.512613344,
+        "client_receive_mono": 70381.084856864,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023249715009569627
+      },
+      {
+        "ip_id": 15647,
+        "server_send_mono": 70991.517563296,
+        "client_receive_mono": 70381.086663121,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020106020001094294
+      },
+      {
+        "ip_id": 15648,
+        "server_send_mono": 70991.521002528,
+        "client_receive_mono": 70381.08967885,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019682517009186995
+      },
+      {
+        "ip_id": 15649,
+        "server_send_mono": 70991.52604944,
+        "client_receive_mono": 70381.101092986,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026049741015867767
+      },
+      {
+        "ip_id": 15650,
+        "server_send_mono": 70991.529909408,
+        "client_receive_mono": 70381.102137511,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023234298012084764
+      },
+      {
+        "ip_id": 15652,
+        "server_send_mono": 70991.536303424,
+        "client_receive_mono": 70381.105220979,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019923750016005215
+      },
+      {
+        "ip_id": 15653,
+        "server_send_mono": 70991.540617408,
+        "client_receive_mono": 70381.112079764,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02246855101429901
+      },
+      {
+        "ip_id": 15654,
+        "server_send_mono": 70991.54606288,
+        "client_receive_mono": 70381.114686693,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019630008009244193
+      },
+      {
+        "ip_id": 15655,
+        "server_send_mono": 70991.549707456,
+        "client_receive_mono": 70381.118748739,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020047478009928454
+      },
+      {
+        "ip_id": 15656,
+        "server_send_mono": 70991.553254688,
+        "client_receive_mono": 70381.124937081,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02268858800698581
+      },
+      {
+        "ip_id": 15657,
+        "server_send_mono": 70991.558272128,
+        "client_receive_mono": 70381.12954606,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02228012700970794
+      },
+      {
+        "ip_id": 15658,
+        "server_send_mono": 70991.561780128,
+        "client_receive_mono": 70381.133342367,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022568434007098404
+      },
+      {
+        "ip_id": 15659,
+        "server_send_mono": 70991.566820896,
+        "client_receive_mono": 70381.135964239,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020149538012901758
+      },
+      {
+        "ip_id": 15660,
+        "server_send_mono": 70991.570324672,
+        "client_receive_mono": 70381.139022909,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019704432018897933
+      },
+      {
+        "ip_id": 15661,
+        "server_send_mono": 70991.57384448,
+        "client_receive_mono": 70381.145112218,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022273933016094816
+      },
+      {
+        "ip_id": 15662,
+        "server_send_mono": 70991.578829568,
+        "client_receive_mono": 70381.156404252,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028580879017226835
+      },
+      {
+        "ip_id": 15663,
+        "server_send_mono": 70991.582270528,
+        "client_receive_mono": 70381.156550256,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02528592300541277
+      },
+      {
+        "ip_id": 15664,
+        "server_send_mono": 70991.587239232,
+        "client_receive_mono": 70381.158095478,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02186244100039403
+      },
+      {
+        "ip_id": 15665,
+        "server_send_mono": 70991.590669024,
+        "client_receive_mono": 70381.159804718,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020141889016940695
+      },
+      {
+        "ip_id": 15666,
+        "server_send_mono": 70991.595696192,
+        "client_receive_mono": 70381.164831392,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020141395008522522
+      },
+      {
+        "ip_id": 15667,
+        "server_send_mono": 70991.5992096,
+        "client_receive_mono": 70381.167928683,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019725278015812364
+      },
+      {
+        "ip_id": 15668,
+        "server_send_mono": 70991.60424736,
+        "client_receive_mono": 70381.173346237,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02010507201657674
+      },
+      {
+        "ip_id": 15669,
+        "server_send_mono": 70991.607740608,
+        "client_receive_mono": 70381.17786172,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02112730701219334
+      },
+      {
+        "ip_id": 15670,
+        "server_send_mono": 70991.61275856,
+        "client_receive_mono": 70381.184489578,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022737212998890755
+      },
+      {
+        "ip_id": 15671,
+        "server_send_mono": 70991.616205344,
+        "client_receive_mono": 70381.185310121,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02011097200329459
+      },
+      {
+        "ip_id": 15672,
+        "server_send_mono": 70991.621175456,
+        "client_receive_mono": 70381.190273504,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020104243008518097
+      },
+      {
+        "ip_id": 15674,
+        "server_send_mono": 70991.62984608,
+        "client_receive_mono": 70381.201163425,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0223235400003432
+      },
+      {
+        "ip_id": 15675,
+        "server_send_mono": 70991.63360464,
+        "client_receive_mono": 70381.204868572,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022270127006322582
+      },
+      {
+        "ip_id": 15676,
+        "server_send_mono": 70991.639073632,
+        "client_receive_mono": 70381.208161239,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020093802009341744
+      },
+      {
+        "ip_id": 15677,
+        "server_send_mono": 70991.642951808,
+        "client_receive_mono": 70381.212344235,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020398622010816325
+      },
+      {
+        "ip_id": 15679,
+        "server_send_mono": 70991.648327168,
+        "client_receive_mono": 70381.217365694,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020044721004069288
+      },
+      {
+        "ip_id": 15680,
+        "server_send_mono": 70991.651893632,
+        "client_receive_mono": 70381.220612028,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019724591005342518
+      },
+      {
+        "ip_id": 15682,
+        "server_send_mono": 70991.656933216,
+        "client_receive_mono": 70381.228847888,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022920867002085288
+      },
+      {
+        "ip_id": 15683,
+        "server_send_mono": 70991.660407904,
+        "client_receive_mono": 70381.229227986,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019826277009542537
+      },
+      {
+        "ip_id": 15684,
+        "server_send_mono": 70991.665410496,
+        "client_receive_mono": 70381.23377057,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.01936626901033378
+      },
+      {
+        "ip_id": 15685,
+        "server_send_mono": 70991.66883056,
+        "client_receive_mono": 70381.237786188,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019961823006724444
+      },
+      {
+        "ip_id": 15686,
+        "server_send_mono": 70991.673830432,
+        "client_receive_mono": 70381.242798111,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019973874000697833
+      },
+      {
+        "ip_id": 15687,
+        "server_send_mono": 70991.678778688,
+        "client_receive_mono": 70381.251643138,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023870645014085312
+      },
+      {
+        "ip_id": 15688,
+        "server_send_mono": 70991.683828896,
+        "client_receive_mono": 70381.252907742,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02008504101422659
+      },
+      {
+        "ip_id": 15689,
+        "server_send_mono": 70991.6887816,
+        "client_receive_mono": 70381.258256854,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02048144900936677
+      },
+      {
+        "ip_id": 15690,
+        "server_send_mono": 70991.692231264,
+        "client_receive_mono": 70381.263530708,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022305639020032686
+      },
+      {
+        "ip_id": 15691,
+        "server_send_mono": 70991.697195072,
+        "client_receive_mono": 70381.266129766,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.01994088899982671
+      },
+      {
+        "ip_id": 15692,
+        "server_send_mono": 70991.700618784,
+        "client_receive_mono": 70381.269560982,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.01994839300050444
+      },
+      {
+        "ip_id": 15693,
+        "server_send_mono": 70991.705630016,
+        "client_receive_mono": 70381.274730397,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02010657600067134
+      },
+      {
+        "ip_id": 15694,
+        "server_send_mono": 70991.709075904,
+        "client_receive_mono": 70381.278316128,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0202464190037972
+      },
+      {
+        "ip_id": 15695,
+        "server_send_mono": 70991.714065568,
+        "client_receive_mono": 70381.286861723,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023802350009191287
+      },
+      {
+        "ip_id": 15696,
+        "server_send_mono": 70991.717530208,
+        "client_receive_mono": 70381.287007728,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0204837150045023
+      },
+      {
+        "ip_id": 15697,
+        "server_send_mono": 70991.722671264,
+        "client_receive_mono": 70381.291536617,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019871548017817986
+      },
+      {
+        "ip_id": 15698,
+        "server_send_mono": 70991.726120768,
+        "client_receive_mono": 70381.295143627,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020029054004680802
+      },
+      {
+        "ip_id": 15699,
+        "server_send_mono": 70991.7311328,
+        "client_receive_mono": 70381.299532591,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019405986003675935
+      },
+      {
+        "ip_id": 15700,
+        "server_send_mono": 70991.736351776,
+        "client_receive_mono": 70381.305098518,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.019752937015709904
+      },
+      {
+        "ip_id": 15701,
+        "server_send_mono": 70991.741739712,
+        "client_receive_mono": 70381.314350169,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023616652014879946
+      },
+      {
+        "ip_id": 15702,
+        "server_send_mono": 70991.745479456,
+        "client_receive_mono": 70381.314487183,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020013922006455687
+      },
+      {
+        "ip_id": 15703,
+        "server_send_mono": 70991.750708896,
+        "client_receive_mono": 70381.319695986,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.01999328501869968
+      },
+      {
+        "ip_id": 15704,
+        "server_send_mono": 70991.755625056,
+        "client_receive_mono": 70381.327864139,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023245278014201176
+      }
+    ]
+  },
+  "fl02": {
+    "summary": {
+      "timing_assumption": "userspace capture plus 20ms per-side margin; not rigorous kernel timestamp bounds",
+      "raw_offset_intersection_width_ms": 4.101393999007996,
+      "server_minus_client_monotonic_offset_lower_s": 7379.279697598005,
+      "offset_upper_s": 7379.323798992005,
+      "offset_bound_width_ms": 44.10139399988111,
+      "matched_upstream_packets": 92,
+      "upstream_delay_lower_max_s": 54.939165170002525,
+      "upstream_delay_upper_max_s": 54.983266564002406,
+      "matched_downstream_acks": 84,
+      "downstream_delay_lower_max_s": 0.008417141001700656,
+      "downstream_delay_upper_max_s": 0.05251853500158177,
+      "timestamp_ahead_of_own_send_max_ms": -0.4214459955692291,
+      "server_ack_within_200ms_ingress_count": 100,
+      "server_nearest_ack_delay_max_ms": 7.634688008693047,
+      "bursts": [
+        {
+          "first_server_receive_mono": 70945.117481696,
+          "last_server_receive_mono": 70945.202868128,
+          "packets_in_1s": 91,
+          "source_timestamp_span_s": 58.076
+        }
+      ],
+      "worst_upstream": [
+        {
+          "timestamp_ms": 63510855,
+          "state": "HUNTING",
+          "channel": 157,
+          "client_send_mono": 63510.85612819,
+          "server_receive_mono": 70945.119092352,
+          "up_delay_lower_s": 54.939165170002525,
+          "up_delay_upper_s": 54.983266564002406
+        },
+        {
+          "timestamp_ms": 63511276,
+          "state": "HUNTING",
+          "channel": 149,
+          "client_send_mono": 63511.277682033,
+          "server_receive_mono": 70945.119205664,
+          "up_delay_lower_s": 54.517724638997606,
+          "up_delay_upper_s": 54.56182603299749
+        },
+        {
+          "timestamp_ms": 63511507,
+          "state": "HUNTING",
+          "channel": 149,
+          "client_send_mono": 63511.508213459,
+          "server_receive_mono": 70945.119314976,
+          "up_delay_lower_s": 54.28730252499008,
+          "up_delay_upper_s": 54.33140391898996
+        },
+        {
+          "timestamp_ms": 63511902,
+          "state": "HUNTING",
+          "channel": 153,
+          "client_send_mono": 63511.902522276,
+          "server_receive_mono": 70945.119552512,
+          "up_delay_lower_s": 53.89323124399016,
+          "up_delay_upper_s": 53.93733263799004
+        },
+        {
+          "timestamp_ms": 63512132,
+          "state": "HUNTING",
+          "channel": 153,
+          "client_send_mono": 63512.133040391,
+          "server_receive_mono": 70945.11966944,
+          "up_delay_lower_s": 53.66283005699006,
+          "up_delay_upper_s": 53.70693145098994
+        }
+      ]
+    },
+    "upstream_delays": [
+      {
+        "timestamp_ms": 63510855,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63510.85612819,
+        "server_receive_mono": 70945.119092352,
+        "up_delay_lower_s": 54.939165170002525,
+        "up_delay_upper_s": 54.983266564002406
+      },
+      {
+        "timestamp_ms": 63511276,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63511.277682033,
+        "server_receive_mono": 70945.119205664,
+        "up_delay_lower_s": 54.517724638997606,
+        "up_delay_upper_s": 54.56182603299749
+      },
+      {
+        "timestamp_ms": 63511507,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63511.508213459,
+        "server_receive_mono": 70945.119314976,
+        "up_delay_lower_s": 54.28730252499008,
+        "up_delay_upper_s": 54.33140391898996
+      },
+      {
+        "timestamp_ms": 63511902,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63511.902522276,
+        "server_receive_mono": 70945.119552512,
+        "up_delay_lower_s": 53.89323124399016,
+        "up_delay_upper_s": 53.93733263799004
+      },
+      {
+        "timestamp_ms": 63512132,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63512.133040391,
+        "server_receive_mono": 70945.11966944,
+        "up_delay_lower_s": 53.66283005699006,
+        "up_delay_upper_s": 53.70693145098994
+      },
+      {
+        "timestamp_ms": 63512884,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63512.885835444,
+        "server_receive_mono": 70945.14151376,
+        "up_delay_lower_s": 52.93187932399087,
+        "up_delay_upper_s": 52.97598071799075
+      },
+      {
+        "timestamp_ms": 63513305,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63513.305894553,
+        "server_receive_mono": 70945.141809856,
+        "up_delay_lower_s": 52.51211631099068,
+        "up_delay_upper_s": 52.55621770499056
+      },
+      {
+        "timestamp_ms": 63513931,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63513.932253259,
+        "server_receive_mono": 70945.142071712,
+        "up_delay_lower_s": 51.886019460998796,
+        "up_delay_upper_s": 51.93012085499868
+      },
+      {
+        "timestamp_ms": 63514161,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63514.162840659,
+        "server_receive_mono": 70945.14230912,
+        "up_delay_lower_s": 51.6556694689898,
+        "up_delay_upper_s": 51.69977086298968
+      },
+      {
+        "timestamp_ms": 63518215,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63518.215500264,
+        "server_receive_mono": 70945.142457536,
+        "up_delay_lower_s": 47.603158279995114,
+        "up_delay_upper_s": 47.647259673994995
+      },
+      {
+        "timestamp_ms": 63518735,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63518.736204052,
+        "server_receive_mono": 70945.142617472,
+        "up_delay_lower_s": 47.08261442798903,
+        "up_delay_upper_s": 47.12671582198891
+      },
+      {
+        "timestamp_ms": 63518965,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63518.966888837,
+        "server_receive_mono": 70945.142778912,
+        "up_delay_lower_s": 46.85209108300114,
+        "up_delay_upper_s": 46.89619247700102
+      },
+      {
+        "timestamp_ms": 63519616,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63519.617109288,
+        "server_receive_mono": 70945.142881824,
+        "up_delay_lower_s": 46.20197354398624,
+        "up_delay_upper_s": 46.24607493798612
+      },
+      {
+        "timestamp_ms": 63520240,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63520.241862371,
+        "server_receive_mono": 70945.143101024,
+        "up_delay_lower_s": 45.577439661003154,
+        "up_delay_upper_s": 45.621541055003036
+      },
+      {
+        "timestamp_ms": 63520995,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63520.99635116,
+        "server_receive_mono": 70945.14323696,
+        "up_delay_lower_s": 44.82308680798815,
+        "up_delay_upper_s": 44.86718820198803
+      },
+      {
+        "timestamp_ms": 63521420,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63521.421241403,
+        "server_receive_mono": 70945.1433528,
+        "up_delay_lower_s": 44.3983124050028,
+        "up_delay_upper_s": 44.44241379900268
+      },
+      {
+        "timestamp_ms": 63522278,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63522.278938742,
+        "server_receive_mono": 70945.143513472,
+        "up_delay_lower_s": 43.54077573799077,
+        "up_delay_upper_s": 43.58487713199065
+      },
+      {
+        "timestamp_ms": 63522799,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63522.799584593,
+        "server_receive_mono": 70945.143682944,
+        "up_delay_lower_s": 43.02029935900282,
+        "up_delay_upper_s": 43.0644007530027
+      },
+      {
+        "timestamp_ms": 63523029,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63523.030160232,
+        "server_receive_mono": 70945.143790848,
+        "up_delay_lower_s": 42.78983162399163,
+        "up_delay_upper_s": 42.83393301799151
+      },
+      {
+        "timestamp_ms": 63524850,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63524.850950649,
+        "server_receive_mono": 70945.143924,
+        "up_delay_lower_s": 40.96917435899741,
+        "up_delay_upper_s": 41.01327575299729
+      },
+      {
+        "timestamp_ms": 63525503,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63525.504182052,
+        "server_receive_mono": 70945.144044512,
+        "up_delay_lower_s": 40.316063467991626,
+        "up_delay_upper_s": 40.36016486199151
+      },
+      {
+        "timestamp_ms": 63525734,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63525.735483625,
+        "server_receive_mono": 70945.144270304,
+        "up_delay_lower_s": 40.084987686987006,
+        "up_delay_upper_s": 40.12908908098689
+      },
+      {
+        "timestamp_ms": 63528400,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63528.400499299,
+        "server_receive_mono": 70945.144399936,
+        "up_delay_lower_s": 37.420101644998795,
+        "up_delay_upper_s": 37.464203038998676
+      },
+      {
+        "timestamp_ms": 63529592,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63529.592815454,
+        "server_receive_mono": 70945.144509664,
+        "up_delay_lower_s": 36.22789521798768,
+        "up_delay_upper_s": 36.27199661198756
+      },
+      {
+        "timestamp_ms": 63529823,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63529.82353133,
+        "server_receive_mono": 70945.144648032,
+        "up_delay_lower_s": 35.997317709992785,
+        "up_delay_upper_s": 36.041419103992666
+      },
+      {
+        "timestamp_ms": 63530226,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63530.227391797,
+        "server_receive_mono": 70945.144758752,
+        "up_delay_lower_s": 35.593567962987436,
+        "up_delay_upper_s": 35.63766935698732
+      },
+      {
+        "timestamp_ms": 63530978,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63530.979725413,
+        "server_receive_mono": 70945.144845664,
+        "up_delay_lower_s": 34.841321258998505,
+        "up_delay_upper_s": 34.885422652998386
+      },
+      {
+        "timestamp_ms": 63531633,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63531.634449188,
+        "server_receive_mono": 70945.145049472,
+        "up_delay_lower_s": 34.18680129199856,
+        "up_delay_upper_s": 34.230902685998444
+      },
+      {
+        "timestamp_ms": 63531864,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63531.865110859,
+        "server_receive_mono": 70945.145166624,
+        "up_delay_lower_s": 33.95625677299904,
+        "up_delay_upper_s": 34.00035816699892
+      },
+      {
+        "timestamp_ms": 63533012,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63533.012837478,
+        "server_receive_mono": 70945.14527472,
+        "up_delay_lower_s": 32.80863824998596,
+        "up_delay_upper_s": 32.85273964398584
+      },
+      {
+        "timestamp_ms": 63533894,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63533.894928523,
+        "server_receive_mono": 70945.145391456,
+        "up_delay_lower_s": 31.92666394099433,
+        "up_delay_upper_s": 31.970765334994212
+      },
+      {
+        "timestamp_ms": 63534307,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63534.308318355,
+        "server_receive_mono": 70945.145500032,
+        "up_delay_lower_s": 31.51338268499603,
+        "up_delay_upper_s": 31.557484078995913
+      },
+      {
+        "timestamp_ms": 63534538,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63534.539517063,
+        "server_receive_mono": 70945.14574384,
+        "up_delay_lower_s": 31.282427784990432,
+        "up_delay_upper_s": 31.326529178990313
+      },
+      {
+        "timestamp_ms": 63536580,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63536.581390621,
+        "server_receive_mono": 70945.145888512,
+        "up_delay_lower_s": 29.24069889898601,
+        "up_delay_upper_s": 29.284800292985892
+      },
+      {
+        "timestamp_ms": 63537108,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63537.108765714,
+        "server_receive_mono": 70945.145998496,
+        "up_delay_lower_s": 28.713433789987903,
+        "up_delay_upper_s": 28.757535183987784
+      },
+      {
+        "timestamp_ms": 63537774,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63537.774844369,
+        "server_receive_mono": 70945.146102976,
+        "up_delay_lower_s": 28.047459614990657,
+        "up_delay_upper_s": 28.09156100899054
+      },
+      {
+        "timestamp_ms": 63538005,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63538.005505507,
+        "server_receive_mono": 70945.146234944,
+        "up_delay_lower_s": 27.816930444994796,
+        "up_delay_upper_s": 27.861031838994677
+      },
+      {
+        "timestamp_ms": 63538634,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63538.634618357,
+        "server_receive_mono": 70945.146321728,
+        "up_delay_lower_s": 27.187904378992243,
+        "up_delay_upper_s": 27.232005772992125
+      },
+      {
+        "timestamp_ms": 63539828,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63539.829057802,
+        "server_receive_mono": 70945.146472448,
+        "up_delay_lower_s": 25.99361565399522,
+        "up_delay_upper_s": 26.037717047995102
+      },
+      {
+        "timestamp_ms": 63540059,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63540.059724832,
+        "server_receive_mono": 70945.146623872,
+        "up_delay_lower_s": 25.763100047999615,
+        "up_delay_upper_s": 25.807201441999496
+      },
+      {
+        "timestamp_ms": 63540456,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63540.456754928,
+        "server_receive_mono": 70945.14679648,
+        "up_delay_lower_s": 25.366242559994134,
+        "up_delay_upper_s": 25.410343953994015
+      },
+      {
+        "timestamp_ms": 63540687,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63540.687421446,
+        "server_receive_mono": 70945.146937056,
+        "up_delay_lower_s": 25.13571661799142,
+        "up_delay_upper_s": 25.1798180119913
+      },
+      {
+        "timestamp_ms": 63541218,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63541.219712434,
+        "server_receive_mono": 70945.147046464,
+        "up_delay_lower_s": 24.603535037993424,
+        "up_delay_upper_s": 24.647636431993305
+      },
+      {
+        "timestamp_ms": 63541449,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63541.450601614,
+        "server_receive_mono": 70945.147178464,
+        "up_delay_lower_s": 24.37277785799597,
+        "up_delay_upper_s": 24.41687925199585
+      },
+      {
+        "timestamp_ms": 63541877,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63541.877948213,
+        "server_receive_mono": 70945.147280896,
+        "up_delay_lower_s": 23.945533690992306,
+        "up_delay_upper_s": 23.989635084992187
+      },
+      {
+        "timestamp_ms": 63542107,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63542.108605551,
+        "server_receive_mono": 70945.147410848,
+        "up_delay_lower_s": 23.715006304995768,
+        "up_delay_upper_s": 23.75910769899565
+      },
+      {
+        "timestamp_ms": 63542504,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63542.505374721,
+        "server_receive_mono": 70945.147532512,
+        "up_delay_lower_s": 23.318358798995177,
+        "up_delay_upper_s": 23.36246019299506
+      },
+      {
+        "timestamp_ms": 63542735,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63542.736371199,
+        "server_receive_mono": 70945.147756032,
+        "up_delay_lower_s": 23.0875858410036,
+        "up_delay_upper_s": 23.131687235003483
+      },
+      {
+        "timestamp_ms": 63543257,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63543.258680484,
+        "server_receive_mono": 70945.147895936,
+        "up_delay_lower_s": 22.56541645998732,
+        "up_delay_upper_s": 22.6095178539872
+      },
+      {
+        "timestamp_ms": 63543488,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63543.489494146,
+        "server_receive_mono": 70945.148020768,
+        "up_delay_lower_s": 22.334727629993722,
+        "up_delay_upper_s": 22.378829023993603
+      },
+      {
+        "timestamp_ms": 63543972,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63543.972840663,
+        "server_receive_mono": 70945.148633408,
+        "up_delay_lower_s": 21.851993752989074,
+        "up_delay_upper_s": 21.896095146988955
+      },
+      {
+        "timestamp_ms": 63544202,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63544.203852185,
+        "server_receive_mono": 70945.148770336,
+        "up_delay_lower_s": 21.621119159000955,
+        "up_delay_upper_s": 21.665220553000836
+      },
+      {
+        "timestamp_ms": 63544608,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63544.608904328,
+        "server_receive_mono": 70945.148896032,
+        "up_delay_lower_s": 21.216192711992335,
+        "up_delay_upper_s": 21.260294105992216
+      },
+      {
+        "timestamp_ms": 63544839,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63544.840068845,
+        "server_receive_mono": 70945.1490568,
+        "up_delay_lower_s": 20.9851889629972,
+        "up_delay_upper_s": 21.02929035699708
+      },
+      {
+        "timestamp_ms": 63546242,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63546.244188811,
+        "server_receive_mono": 70945.149254592,
+        "up_delay_lower_s": 19.581266789002257,
+        "up_delay_upper_s": 19.625368183002138
+      },
+      {
+        "timestamp_ms": 63548061,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63548.061723466,
+        "server_receive_mono": 70945.149389248,
+        "up_delay_lower_s": 17.763866789999156,
+        "up_delay_upper_s": 17.807968183999037
+      },
+      {
+        "timestamp_ms": 63548291,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63548.292846901,
+        "server_receive_mono": 70945.149495232,
+        "up_delay_lower_s": 17.532849339000677,
+        "up_delay_upper_s": 17.576950733000558
+      },
+      {
+        "timestamp_ms": 63548692,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63548.69309857,
+        "server_receive_mono": 70945.14960608,
+        "up_delay_lower_s": 17.132708517990977,
+        "up_delay_upper_s": 17.17680991199086
+      },
+      {
+        "timestamp_ms": 63548923,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63548.924150292,
+        "server_receive_mono": 70945.149708096,
+        "up_delay_lower_s": 16.901758811993204,
+        "up_delay_upper_s": 16.945860205993085
+      },
+      {
+        "timestamp_ms": 63549444,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63549.445637093,
+        "server_receive_mono": 70945.149838624,
+        "up_delay_lower_s": 16.38040253899453,
+        "up_delay_upper_s": 16.424503932994412
+      },
+      {
+        "timestamp_ms": 63549675,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63549.67664408,
+        "server_receive_mono": 70945.1499624,
+        "up_delay_lower_s": 16.149519327995222,
+        "up_delay_upper_s": 16.193620721995103
+      },
+      {
+        "timestamp_ms": 63550096,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63550.09667108,
+        "server_receive_mono": 70945.15007616,
+        "up_delay_lower_s": 15.729606087999855,
+        "up_delay_upper_s": 15.773707481999736
+      },
+      {
+        "timestamp_ms": 63550326,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63550.327392912,
+        "server_receive_mono": 70945.150181792,
+        "up_delay_lower_s": 15.498989888004871,
+        "up_delay_upper_s": 15.543091282004752
+      },
+      {
+        "timestamp_ms": 63550954,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63550.955756399,
+        "server_receive_mono": 70945.200462176,
+        "up_delay_lower_s": 14.92090678499153,
+        "up_delay_upper_s": 14.965008178991411
+      },
+      {
+        "timestamp_ms": 63552370,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63552.371730584,
+        "server_receive_mono": 70945.200623552,
+        "up_delay_lower_s": 13.505093975993077,
+        "up_delay_upper_s": 13.549195369992958
+      },
+      {
+        "timestamp_ms": 63554181,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63554.182426757,
+        "server_receive_mono": 70945.200731328,
+        "up_delay_lower_s": 11.694505579001998,
+        "up_delay_upper_s": 11.738606973001879
+      },
+      {
+        "timestamp_ms": 63554412,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63554.413388855,
+        "server_receive_mono": 70945.20083344,
+        "up_delay_lower_s": 11.463645592997636,
+        "up_delay_upper_s": 11.507746986997518
+      },
+      {
+        "timestamp_ms": 63554811,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63554.811831108,
+        "server_receive_mono": 70945.200933632,
+        "up_delay_lower_s": 11.065303531995596,
+        "up_delay_upper_s": 11.109404925995477
+      },
+      {
+        "timestamp_ms": 63555571,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63555.572621305,
+        "server_receive_mono": 70945.20106064,
+        "up_delay_lower_s": 10.30464034299439,
+        "up_delay_upper_s": 10.34874173699427
+      },
+      {
+        "timestamp_ms": 63557083,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63557.083805237,
+        "server_receive_mono": 70945.20115392,
+        "up_delay_lower_s": 8.79354969099586,
+        "up_delay_upper_s": 8.837651084995741
+      },
+      {
+        "timestamp_ms": 63560298,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63560.299304087,
+        "server_receive_mono": 70945.201244608,
+        "up_delay_lower_s": 5.578141529000277,
+        "up_delay_upper_s": 5.622242923000158
+      },
+      {
+        "timestamp_ms": 63560925,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63560.926206702,
+        "server_receive_mono": 70945.201332672,
+        "up_delay_lower_s": 4.951326977996359,
+        "up_delay_upper_s": 4.9954283719962405
+      },
+      {
+        "timestamp_ms": 63561156,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63561.156691301,
+        "server_receive_mono": 70945.201417792,
+        "up_delay_lower_s": 4.720927498998208,
+        "up_delay_upper_s": 4.765028892998089
+      },
+      {
+        "timestamp_ms": 63561679,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63561.680293218,
+        "server_receive_mono": 70945.201501888,
+        "up_delay_lower_s": 4.197409677999531,
+        "up_delay_upper_s": 4.241511071999412
+      },
+      {
+        "timestamp_ms": 63561910,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63561.911037405,
+        "server_receive_mono": 70945.201582944,
+        "up_delay_lower_s": 3.966746547001094,
+        "up_delay_upper_s": 4.010847941000975
+      },
+      {
+        "timestamp_ms": 63562334,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63562.334542733,
+        "server_receive_mono": 70945.201687616,
+        "up_delay_lower_s": 3.5433458910010813,
+        "up_delay_upper_s": 3.5874472850009624
+      },
+      {
+        "timestamp_ms": 63562564,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63562.565185288,
+        "server_receive_mono": 70945.201768896,
+        "up_delay_lower_s": 3.312784616002318,
+        "up_delay_upper_s": 3.3568860100021993
+      },
+      {
+        "timestamp_ms": 63562970,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63562.971649666,
+        "server_receive_mono": 70945.20184848,
+        "up_delay_lower_s": 2.9063998220044596,
+        "up_delay_upper_s": 2.9505012160043407
+      },
+      {
+        "timestamp_ms": 63563201,
+        "state": "HUNTING",
+        "channel": 153,
+        "client_send_mono": 63563.202222909,
+        "server_receive_mono": 70945.201927392,
+        "up_delay_lower_s": 2.6759054909962288,
+        "up_delay_upper_s": 2.72000688499611
+      },
+      {
+        "timestamp_ms": 63563723,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63563.724079304,
+        "server_receive_mono": 70945.202006112,
+        "up_delay_lower_s": 2.154127815996617,
+        "up_delay_upper_s": 2.198229209996498
+      },
+      {
+        "timestamp_ms": 63563954,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63563.954710789,
+        "server_receive_mono": 70945.202084352,
+        "up_delay_lower_s": 1.9235745709920593,
+        "up_delay_upper_s": 1.9676759649919404
+      },
+      {
+        "timestamp_ms": 63564380,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63564.381231944,
+        "server_receive_mono": 70945.202161888,
+        "up_delay_lower_s": 1.497130951993313,
+        "up_delay_upper_s": 1.541232345993194
+      },
+      {
+        "timestamp_ms": 63564611,
+        "state": "HUNTING",
+        "channel": 149,
+        "client_send_mono": 63564.611791205,
+        "server_receive_mono": 70945.202868128,
+        "up_delay_lower_s": 1.2672779309978068,
+        "up_delay_upper_s": 1.311379324997688
+      },
+      {
+        "timestamp_ms": 63565759,
+        "state": "HUNTING",
+        "channel": 157,
+        "client_send_mono": 63565.759930873,
+        "server_receive_mono": 70955.414765952,
+        "up_delay_lower_s": 10.331036086990935,
+        "up_delay_upper_s": 10.375137480990816
+      },
+      {
+        "timestamp_ms": 63576109,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63576.110405165,
+        "server_receive_mono": 70955.41498176,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.02487899698826368
+      },
+      {
+        "timestamp_ms": 63581145,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63581.147183166,
+        "server_receive_mono": 70960.473285952,
+        "up_delay_lower_s": 0.0023037939936330076,
+        "up_delay_upper_s": 0.04640518799351412
+      },
+      {
+        "timestamp_ms": 63591434,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63591.43615653,
+        "server_receive_mono": 70970.88834656,
+        "up_delay_lower_s": 0.12839103798978613,
+        "up_delay_upper_s": 0.17249243198966724
+      },
+      {
+        "timestamp_ms": 63601847,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63601.84839496,
+        "server_receive_mono": 70981.152193952,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.024101393999444554
+      },
+      {
+        "timestamp_ms": 63606882,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63606.883456015,
+        "server_receive_mono": 70986.373393984,
+        "up_delay_lower_s": 0.1661389769978996,
+        "up_delay_upper_s": 0.2102403709977807
+      },
+      {
+        "timestamp_ms": 63612102,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63612.103119696,
+        "server_receive_mono": 70995.747916,
+        "up_delay_lower_s": 4.320997311984684,
+        "up_delay_upper_s": 4.365098705984565
+      },
+      {
+        "timestamp_ms": 63617334,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63617.335163578,
+        "server_receive_mono": 70997.04473552,
+        "up_delay_lower_s": 0.38577294999777223,
+        "up_delay_upper_s": 0.42987434399765334
+      },
+      {
+        "timestamp_ms": 63617771,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 63617.77198011,
+        "server_receive_mono": 70997.075863744,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.024186035992897814
+      }
+    ],
+    "downstream_delays": [
+      {
+        "ip_id": 20668,
+        "server_send_mono": 70945.123334944,
+        "client_receive_mono": 63565.852054487,
+        "down_delay_lower_s": 0.008417141001700656,
+        "down_delay_upper_s": 0.05251853500158177
+      },
+      {
+        "ip_id": 20669,
+        "server_send_mono": 70945.128241728,
+        "client_receive_mono": 63565.852337307,
+        "down_delay_lower_s": 0.0037931770020804834,
+        "down_delay_upper_s": 0.047894571001961594
+      },
+      {
+        "ip_id": 20672,
+        "server_send_mono": 70945.149148448,
+        "client_receive_mono": 63565.852494301,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027144844996655593
+      },
+      {
+        "ip_id": 20675,
+        "server_send_mono": 70945.160409696,
+        "client_receive_mono": 63565.863473085,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026862381000682944
+      },
+      {
+        "ip_id": 20677,
+        "server_send_mono": 70945.169382912,
+        "client_receive_mono": 63565.876548092,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.030964171997766243
+      },
+      {
+        "ip_id": 20678,
+        "server_send_mono": 70945.172981664,
+        "client_receive_mono": 63565.876740031,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027557359007914783
+      },
+      {
+        "ip_id": 20679,
+        "server_send_mono": 70945.178295776,
+        "client_receive_mono": 63565.882130733,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027633949004666647
+      },
+      {
+        "ip_id": 20681,
+        "server_send_mono": 70945.188092768,
+        "client_receive_mono": 63565.891034767,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026740991004771786
+      },
+      {
+        "ip_id": 20683,
+        "server_send_mono": 70945.192934976,
+        "client_receive_mono": 63565.8938622,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024726216000999557
+      },
+      {
+        "ip_id": 20684,
+        "server_send_mono": 70945.198582272,
+        "client_receive_mono": 63565.899600876,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024817596004140796
+      },
+      {
+        "ip_id": 20685,
+        "server_send_mono": 70945.20254704,
+        "client_receive_mono": 63565.903540229,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024792181011434877
+      },
+      {
+        "ip_id": 20686,
+        "server_send_mono": 70945.20655904,
+        "client_receive_mono": 63565.907223291,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02446324300035485
+      },
+      {
+        "ip_id": 20687,
+        "server_send_mono": 70945.211774624,
+        "client_receive_mono": 63565.916761862,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028786230006517144
+      },
+      {
+        "ip_id": 20688,
+        "server_send_mono": 70945.21556704,
+        "client_receive_mono": 63565.917651347,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025883299011184135
+      },
+      {
+        "ip_id": 20690,
+        "server_send_mono": 70945.2210736,
+        "client_receive_mono": 63565.922438873,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025164265007333597
+      },
+      {
+        "ip_id": 20691,
+        "server_send_mono": 70945.226333216,
+        "client_receive_mono": 63565.927146013,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02461178900921368
+      },
+      {
+        "ip_id": 20692,
+        "server_send_mono": 70945.232448512,
+        "client_receive_mono": 63565.933758046,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02510852599880309
+      },
+      {
+        "ip_id": 20694,
+        "server_send_mono": 70945.239904704,
+        "client_receive_mono": 63565.960214879,
+        "down_delay_lower_s": 7.77301102061756e-06,
+        "down_delay_upper_s": 0.04410916701090173
+      },
+      {
+        "ip_id": 20696,
+        "server_send_mono": 70945.251158272,
+        "client_receive_mono": 63565.9640974,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03673812000124599
+      },
+      {
+        "ip_id": 20697,
+        "server_send_mono": 70945.255323904,
+        "client_receive_mono": 63565.96422505,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.032700138002837775
+      },
+      {
+        "ip_id": 20698,
+        "server_send_mono": 70945.2587464,
+        "client_receive_mono": 63565.96660054,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03165313200952369
+      },
+      {
+        "ip_id": 20699,
+        "server_send_mono": 70945.263935008,
+        "client_receive_mono": 63565.967532746,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027396730005420977
+      },
+      {
+        "ip_id": 20700,
+        "server_send_mono": 70945.267667136,
+        "client_receive_mono": 63565.969241283,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02537313900756999
+      },
+      {
+        "ip_id": 20701,
+        "server_send_mono": 70945.272818528,
+        "client_receive_mono": 63565.977912161,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028892625003209105
+      },
+      {
+        "ip_id": 20702,
+        "server_send_mono": 70945.277947328,
+        "client_receive_mono": 63565.978757005,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0246086690131051
+      },
+      {
+        "ip_id": 20703,
+        "server_send_mono": 70945.281542752,
+        "client_receive_mono": 63565.990644571,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03290081100931275
+      },
+      {
+        "ip_id": 20704,
+        "server_send_mono": 70945.286714496,
+        "client_receive_mono": 63565.990775005,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027859500998602016
+      },
+      {
+        "ip_id": 20705,
+        "server_send_mono": 70945.291842848,
+        "client_receive_mono": 63565.992993981,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02495012500367011
+      },
+      {
+        "ip_id": 20707,
+        "server_send_mono": 70945.297031264,
+        "client_receive_mono": 63566.001504153,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028271881008549826
+      },
+      {
+        "ip_id": 20708,
+        "server_send_mono": 70945.30067584,
+        "client_receive_mono": 63566.001632891,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02475604300343548
+      },
+      {
+        "ip_id": 20709,
+        "server_send_mono": 70945.305829248,
+        "client_receive_mono": 63566.006225534,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0241952780088468
+      },
+      {
+        "ip_id": 20710,
+        "server_send_mono": 70945.311190464,
+        "client_receive_mono": 63566.012774653,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025383181007782696
+      },
+      {
+        "ip_id": 20711,
+        "server_send_mono": 70945.316361792,
+        "client_receive_mono": 63566.017107484,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024544683994463412
+      },
+      {
+        "ip_id": 20712,
+        "server_send_mono": 70945.319967488,
+        "client_receive_mono": 63566.020795698,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024627202004921855
+      },
+      {
+        "ip_id": 20713,
+        "server_send_mono": 70945.323480736,
+        "client_receive_mono": 63566.026760297,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02707855300468509
+      },
+      {
+        "ip_id": 20714,
+        "server_send_mono": 70945.328829856,
+        "client_receive_mono": 63566.030078425,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02504756101188832
+      },
+      {
+        "ip_id": 20715,
+        "server_send_mono": 70945.334196576,
+        "client_receive_mono": 63566.037969068,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02757148399905418
+      },
+      {
+        "ip_id": 20716,
+        "server_send_mono": 70945.338008992,
+        "client_receive_mono": 63566.038689463,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024479463008901803
+      },
+      {
+        "ip_id": 20719,
+        "server_send_mono": 70945.34840752,
+        "client_receive_mono": 63566.052146427,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027537899008166278
+      },
+      {
+        "ip_id": 20720,
+        "server_send_mono": 70945.351885504,
+        "client_receive_mono": 63566.053022408,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024935896002716618
+      },
+      {
+        "ip_id": 20721,
+        "server_send_mono": 70945.356931104,
+        "client_receive_mono": 63566.057900015,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024767903003521496
+      },
+      {
+        "ip_id": 20722,
+        "server_send_mono": 70945.360418432,
+        "client_receive_mono": 63566.061904361,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025284921004640637
+      },
+      {
+        "ip_id": 20723,
+        "server_send_mono": 70945.36549408,
+        "client_receive_mono": 63566.065796482,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024101393999444554
+      },
+      {
+        "ip_id": 20724,
+        "server_send_mono": 70945.369037952,
+        "client_receive_mono": 63566.069415127,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024176167007681215
+      },
+      {
+        "ip_id": 20725,
+        "server_send_mono": 70945.374130912,
+        "client_receive_mono": 63566.07811519,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02778327001215075
+      },
+      {
+        "ip_id": 20726,
+        "server_send_mono": 70945.37767264,
+        "client_receive_mono": 63566.078236471,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0243628230127797
+      },
+      {
+        "ip_id": 20728,
+        "server_send_mono": 70945.386329888,
+        "client_receive_mono": 63566.089993795,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02746289900460397
+      },
+      {
+        "ip_id": 20729,
+        "server_send_mono": 70945.391528128,
+        "client_receive_mono": 63566.099653296,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03192415999728837
+      },
+      {
+        "ip_id": 20730,
+        "server_send_mono": 70945.395117824,
+        "client_receive_mono": 63566.099776433,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02845760101263295
+      },
+      {
+        "ip_id": 20732,
+        "server_send_mono": 70945.40018608,
+        "client_receive_mono": 63566.101439018,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02505192999888095
+      },
+      {
+        "ip_id": 20735,
+        "server_send_mono": 70945.40882896,
+        "client_receive_mono": 63566.112243047,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02721307899992098
+      },
+      {
+        "ip_id": 20736,
+        "server_send_mono": 70945.412518368,
+        "client_receive_mono": 63566.113878431,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025159055006952258
+      },
+      {
+        "ip_id": 20737,
+        "server_send_mono": 70945.417756,
+        "client_receive_mono": 63566.119006762,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025049754007341107
+      },
+      {
+        "ip_id": 20738,
+        "server_send_mono": 70945.421337696,
+        "client_receive_mono": 63566.122071094,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02453239001260954
+      },
+      {
+        "ip_id": 20739,
+        "server_send_mono": 70945.4248616,
+        "client_receive_mono": 63566.128251088,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027188480005861493
+      },
+      {
+        "ip_id": 20740,
+        "server_send_mono": 70945.429963456,
+        "client_receive_mono": 63566.13095772,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024793256005068542
+      },
+      {
+        "ip_id": 20741,
+        "server_send_mono": 70945.433675968,
+        "client_receive_mono": 63566.134482027,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02460505100680166
+      },
+      {
+        "ip_id": 20742,
+        "server_send_mono": 70945.439042432,
+        "client_receive_mono": 63566.140344449,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025101009003265062
+      },
+      {
+        "ip_id": 20743,
+        "server_send_mono": 70945.442834272,
+        "client_receive_mono": 63566.143454158,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024418878001597477
+      },
+      {
+        "ip_id": 20744,
+        "server_send_mono": 70945.448037664,
+        "client_receive_mono": 63566.149046079,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02480740700775641
+      },
+      {
+        "ip_id": 20745,
+        "server_send_mono": 70945.451629184,
+        "client_receive_mono": 63566.151982794,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024152602007234236
+      },
+      {
+        "ip_id": 20747,
+        "server_send_mono": 70945.456755616,
+        "client_receive_mono": 63566.161454676,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028498052004579222
+      },
+      {
+        "ip_id": 20748,
+        "server_send_mono": 70945.461831136,
+        "client_receive_mono": 63566.165145322,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02711317800640245
+      },
+      {
+        "ip_id": 20749,
+        "server_send_mono": 70945.465354432,
+        "client_receive_mono": 63566.166057271,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024501831005181884
+      },
+      {
+        "ip_id": 20750,
+        "server_send_mono": 70945.468881472,
+        "client_receive_mono": 63566.172710072,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027627592007775092
+      },
+      {
+        "ip_id": 20751,
+        "server_send_mono": 70945.474019808,
+        "client_receive_mono": 63566.177448413,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027227597009186866
+      },
+      {
+        "ip_id": 20752,
+        "server_send_mono": 70945.4791504,
+        "client_receive_mono": 63566.18038068,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02502927200475824
+      },
+      {
+        "ip_id": 20755,
+        "server_send_mono": 70945.4893984,
+        "client_receive_mono": 63566.200227593,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.03462818501066067
+      },
+      {
+        "ip_id": 20756,
+        "server_send_mono": 70945.49456848,
+        "client_receive_mono": 63566.200361707,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02959221900164266
+      },
+      {
+        "ip_id": 20758,
+        "server_send_mono": 70945.503413568,
+        "client_receive_mono": 63566.20961237,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02999779400488478
+      },
+      {
+        "ip_id": 20759,
+        "server_send_mono": 70945.507147584,
+        "client_receive_mono": 63566.211948468,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02859987601186731
+      },
+      {
+        "ip_id": 20761,
+        "server_send_mono": 70945.51260736,
+        "client_receive_mono": 63566.217502309,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028693941010715207
+      },
+      {
+        "ip_id": 20762,
+        "server_send_mono": 70945.516404768,
+        "client_receive_mono": 63566.217626951,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025021175006259
+      },
+      {
+        "ip_id": 20766,
+        "server_send_mono": 70945.53466496,
+        "client_receive_mono": 63566.238813372,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027947404010774335
+      },
+      {
+        "ip_id": 20767,
+        "server_send_mono": 70945.540130112,
+        "client_receive_mono": 63566.24045714,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024126020001858706
+      },
+      {
+        "ip_id": 20768,
+        "server_send_mono": 70945.54395904,
+        "client_receive_mono": 63566.244284204,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02412415600338136
+      },
+      {
+        "ip_id": 21025,
+        "server_send_mono": 70955.420347328,
+        "client_receive_mono": 63576.124751295,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0282029589980084
+      },
+      {
+        "ip_id": 21145,
+        "server_send_mono": 70960.477650528,
+        "client_receive_mono": 63581.182629607,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.028778071002307115
+      },
+      {
+        "ip_id": 21739,
+        "server_send_mono": 70970.892500448,
+        "client_receive_mono": 63591.594487953,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025786497008084552
+      },
+      {
+        "ip_id": 23539,
+        "server_send_mono": 70981.15626512,
+        "client_receive_mono": 63601.861463921,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02899779301151284
+      },
+      {
+        "ip_id": 24131,
+        "server_send_mono": 70986.377711712,
+        "client_receive_mono": 63607.081670767,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02775804700286244
+      },
+      {
+        "ip_id": 26289,
+        "server_send_mono": 70995.751863744,
+        "client_receive_mono": 63616.455202869,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.027138117013237206
+      },
+      {
+        "ip_id": 26311,
+        "server_send_mono": 70997.048690976,
+        "client_receive_mono": 63617.751149911,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.026257927009282866
+      },
+      {
+        "ip_id": 26317,
+        "server_send_mono": 70997.080676256,
+        "client_receive_mono": 63617.782346569,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02546930501193856
+      }
+    ]
+  },
+  "fl04": {
+    "summary": {
+      "timing_assumption": "userspace capture plus 20ms per-side margin; not rigorous kernel timestamp bounds",
+      "raw_offset_intersection_width_ms": 0.051673996495082974,
+      "server_minus_client_monotonic_offset_lower_s": 1780.1362884160085,
+      "offset_upper_s": 1780.176340090005,
+      "offset_bound_width_ms": 40.0516739964587,
+      "matched_upstream_packets": 21,
+      "upstream_delay_lower_max_s": 5.252056649992028,
+      "upstream_delay_upper_max_s": 5.2921083239884865,
+      "matched_downstream_acks": 20,
+      "downstream_delay_lower_max_s": 0,
+      "downstream_delay_upper_max_s": 0.02651706100323281,
+      "timestamp_ahead_of_own_send_max_ms": -0.2876860052347183,
+      "server_ack_within_200ms_ingress_count": 21,
+      "server_nearest_ack_delay_max_ms": 5.961696006124839,
+      "bursts": [],
+      "worst_upstream": [
+        {
+          "timestamp_ms": 69146019,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 69146.020205116,
+          "server_receive_mono": 70931.448601856,
+          "up_delay_lower_s": 5.252056649992028,
+          "up_delay_upper_s": 5.2921083239884865
+        },
+        {
+          "timestamp_ms": 69177143,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 69177.143892199,
+          "server_receive_mono": 70961.77349264,
+          "up_delay_lower_s": 4.453260350991059,
+          "up_delay_upper_s": 4.493312024987517
+        },
+        {
+          "timestamp_ms": 69192430,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 69192.430715545,
+          "server_receive_mono": 70972.968149856,
+          "up_delay_lower_s": 0.3610942209966197,
+          "up_delay_upper_s": 0.4011458949930784
+        },
+        {
+          "timestamp_ms": 69166729,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 69166.729557247,
+          "server_receive_mono": 70947.198586912,
+          "up_delay_lower_s": 0.29268957498834425,
+          "up_delay_upper_s": 0.33274124898480295
+        },
+        {
+          "timestamp_ms": 69156300,
+          "state": "IDLE",
+          "channel": 157,
+          "client_send_mono": 69156.300726454,
+          "server_receive_mono": 70936.655144064,
+          "up_delay_lower_s": 0.17807751999180255,
+          "up_delay_upper_s": 0.21812919398826125
+        }
+      ]
+    },
+    "upstream_delays": [
+      {
+        "timestamp_ms": 69110607,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69110.607990197,
+        "server_receive_mono": 70890.826427392,
+        "up_delay_lower_s": 0.04209710500845176,
+        "up_delay_upper_s": 0.08214877900491047
+      },
+      {
+        "timestamp_ms": 69115696,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69115.696612359,
+        "server_receive_mono": 70895.85507712,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.022176344991294172
+      },
+      {
+        "timestamp_ms": 69120724,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69120.725092304,
+        "server_receive_mono": 70900.98081856,
+        "up_delay_lower_s": 0.07938616599540183,
+        "up_delay_upper_s": 0.11943783999186053
+      },
+      {
+        "timestamp_ms": 69125851,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69125.851559935,
+        "server_receive_mono": 70906.06425248,
+        "up_delay_lower_s": 0.036352454994357686,
+        "up_delay_upper_s": 0.07640412899081639
+      },
+      {
+        "timestamp_ms": 69130932,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69130.932929816,
+        "server_receive_mono": 70911.090942336,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.021724103989527066
+      },
+      {
+        "timestamp_ms": 69135962,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69135.962359542,
+        "server_receive_mono": 70916.120169856,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.021521897996990447
+      },
+      {
+        "timestamp_ms": 69140988,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69140.989062578,
+        "server_receive_mono": 70921.148218784,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.022867789997235377
+      },
+      {
+        "timestamp_ms": 69146019,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69146.020205116,
+        "server_receive_mono": 70931.448601856,
+        "up_delay_lower_s": 5.252056649992028,
+        "up_delay_upper_s": 5.2921083239884865
+      },
+      {
+        "timestamp_ms": 69151250,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69151.250773981,
+        "server_receive_mono": 70931.44881072,
+        "up_delay_lower_s": 0.021696649001114565,
+        "up_delay_upper_s": 0.06174832299757327
+      },
+      {
+        "timestamp_ms": 69156300,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69156.300726454,
+        "server_receive_mono": 70936.655144064,
+        "up_delay_lower_s": 0.17807751999180255,
+        "up_delay_upper_s": 0.21812919398826125
+      },
+      {
+        "timestamp_ms": 69161524,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69161.524524497,
+        "server_receive_mono": 70941.860334048,
+        "up_delay_lower_s": 0.15946946099984416,
+        "up_delay_upper_s": 0.19952113499630286
+      },
+      {
+        "timestamp_ms": 69166729,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69166.729557247,
+        "server_receive_mono": 70947.198586912,
+        "up_delay_lower_s": 0.29268957498834425,
+        "up_delay_upper_s": 0.33274124898480295
+      },
+      {
+        "timestamp_ms": 69171959,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69171.960164672,
+        "server_receive_mono": 70952.270026528,
+        "up_delay_lower_s": 0.13352176599846644,
+        "up_delay_upper_s": 0.17357343999492514
+      },
+      {
+        "timestamp_ms": 69177143,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69177.143892199,
+        "server_receive_mono": 70961.77349264,
+        "up_delay_lower_s": 4.453260350991059,
+        "up_delay_upper_s": 4.493312024987517
+      },
+      {
+        "timestamp_ms": 69182374,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69182.374413095,
+        "server_receive_mono": 70962.5311248,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.02042328899142376
+      },
+      {
+        "timestamp_ms": 69187401,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69187.401355583,
+        "server_receive_mono": 70967.557918656,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.020274656995297846
+      },
+      {
+        "timestamp_ms": 69192430,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69192.430715545,
+        "server_receive_mono": 70972.968149856,
+        "up_delay_lower_s": 0.3610942209966197,
+        "up_delay_upper_s": 0.4011458949930784
+      },
+      {
+        "timestamp_ms": 69197661,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69197.661287686,
+        "server_receive_mono": 70977.817627776,
+        "up_delay_lower_s": 0,
+        "up_delay_upper_s": 0.020051673996476893
+      },
+      {
+        "timestamp_ms": 69202687,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69202.688181425,
+        "server_receive_mono": 70982.98998704,
+        "up_delay_lower_s": 0.12546552499816244,
+        "up_delay_upper_s": 0.16551719899462114
+      },
+      {
+        "timestamp_ms": 69207862,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69207.862644337,
+        "server_receive_mono": 70988.200579712,
+        "up_delay_lower_s": 0.16159528498656073,
+        "up_delay_upper_s": 0.20164695898301943
+      },
+      {
+        "timestamp_ms": 69213074,
+        "state": "IDLE",
+        "channel": 157,
+        "client_send_mono": 69213.074638697,
+        "server_receive_mono": 70993.404166016,
+        "up_delay_lower_s": 0.15318722899655768,
+        "up_delay_upper_s": 0.19323890299301638
+      }
+    ],
+    "downstream_delays": [
+      {
+        "ip_id": 2405,
+        "server_send_mono": 70890.832373632,
+        "client_receive_mono": 69110.676085216,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020051673996476893
+      },
+      {
+        "ip_id": 3550,
+        "server_send_mono": 70895.860837728,
+        "client_receive_mono": 69115.704581323,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02008368500855795
+      },
+      {
+        "ip_id": 3936,
+        "server_send_mono": 70900.984977856,
+        "client_receive_mono": 69120.83106262,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02242485399938232
+      },
+      {
+        "ip_id": 4985,
+        "server_send_mono": 70906.068318144,
+        "client_receive_mono": 69125.912413814,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.0204357600118783
+      },
+      {
+        "ip_id": 5745,
+        "server_send_mono": 70911.0950008,
+        "client_receive_mono": 69130.941858611,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023197900994546217
+      },
+      {
+        "ip_id": 6180,
+        "server_send_mono": 70916.124242688,
+        "client_receive_mono": 69135.968535502,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02063290400428741
+      },
+      {
+        "ip_id": 7380,
+        "server_send_mono": 70921.15230736,
+        "client_receive_mono": 69140.999687606,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023720336011592735
+      },
+      {
+        "ip_id": 8757,
+        "server_send_mono": 70931.452625344,
+        "client_receive_mono": 69151.299522983,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023237729004449648
+      },
+      {
+        "ip_id": 8758,
+        "server_send_mono": 70931.456130688,
+        "client_receive_mono": 69151.300331867,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02054126899338371
+      },
+      {
+        "ip_id": 9781,
+        "server_send_mono": 70936.659477248,
+        "client_receive_mono": 69156.504044552,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020907394001824287
+      },
+      {
+        "ip_id": 10049,
+        "server_send_mono": 70941.86443472,
+        "client_receive_mono": 69161.709063604,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.020968973996332352
+      },
+      {
+        "ip_id": 10992,
+        "server_send_mono": 70952.275988224,
+        "client_receive_mono": 69172.123405942,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.023757807993661118
+      },
+      {
+        "ip_id": 11773,
+        "server_send_mono": 70961.777589024,
+        "client_receive_mono": 69181.623104473,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.021855538997897384
+      },
+      {
+        "ip_id": 11960,
+        "server_send_mono": 70962.535406496,
+        "client_receive_mono": 69182.380854084,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.021787678003875044
+      },
+      {
+        "ip_id": 12740,
+        "server_send_mono": 70967.56206128,
+        "client_receive_mono": 69187.410212439,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024491249012044136
+      },
+      {
+        "ip_id": 13202,
+        "server_send_mono": 70972.972286176,
+        "client_receive_mono": 69192.818025731,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022079645011672255
+      },
+      {
+        "ip_id": 13927,
+        "server_send_mono": 70977.821873824,
+        "client_receive_mono": 69197.667669409,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.022135675007575628
+      },
+      {
+        "ip_id": 15131,
+        "server_send_mono": 70982.994009568,
+        "client_receive_mono": 69202.842155771,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.024486292993515235
+      },
+      {
+        "ip_id": 15678,
+        "server_send_mono": 70988.204913056,
+        "client_receive_mono": 69208.054126827,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.025553861003118072
+      },
+      {
+        "ip_id": 15689,
+        "server_send_mono": 70993.408508256,
+        "client_receive_mono": 69213.258685227,
+        "down_delay_lower_s": 0,
+        "down_delay_upper_s": 0.02651706100323281
+      }
+    ]
+  }
+}

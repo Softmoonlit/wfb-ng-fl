@@ -1,0 +1,17 @@
+fl00 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'server', 'backup-build']
+fl01 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'backup-build']
+fl02 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'backup-build']
+fl04 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'backup-build']
+fl00 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'server', 'stop']
+fl01 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'stop']
+fl02 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'stop']
+fl04 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'client', 'stop']
+fl00 ['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'server', 'install-config']
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/formal-e53de00/deploy-four.py", line 22, in <module>
+    call(node,ip,['sudo','-n','env','PYTHONDONTWRITEBYTECODE=1','python3','-B','-',role,phase],log,input=(P/'deploy-node.py').read_bytes())
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/formal-e53de00/deploy-four.py", line 9, in call
+    r=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,input=input,timeout=timeout);r.check_returncode()
+  File "/usr/lib/python3.10/subprocess.py", line 457, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['sudo', '-n', 'env', 'PYTHONDONTWRITEBYTECODE=1', 'python3', '-B', '-', 'server', 'install-config']' returned non-zero exit status 1.

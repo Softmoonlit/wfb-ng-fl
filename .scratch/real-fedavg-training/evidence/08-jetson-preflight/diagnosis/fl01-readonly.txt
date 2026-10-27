@@ -1,0 +1,630 @@
+只读诊断 UTC 2026-10-27T07:03:54Z
+
+命令 ['date', '--iso-8601=ns']
+2026-10-27T15:03:55,005245850+08:00
+ 退出码 0
+
+命令 ['cat', '/proc/uptime']
+69524.68 410327.46
+ 退出码 0
+
+命令 ['systemctl', 'cat', 'wfb-fl-client-daemon.service']
+# /lib/systemd/system/wfb-fl-client-daemon.service
+[Unit]
+Description=WFB-ng FL client persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+ 退出码 0
+
+命令 ['systemctl', 'show', 'wfb-fl-client-daemon.service', '-p', 'ExecStart', '-p', 'MainPID', '-p', 'ActiveState', '-p', 'SubState', '-p', 'NRestarts', '-p', 'Environment', '-p', 'WorkingDirectory', '-p', 'DropInPaths']
+MainPID=24102
+NRestarts=0
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Tue 2026-10-27 11:29:37 CST] ; stop_time=[n/a] ; pid=24102 ; code=(null) ; status=0/0 }
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+WorkingDirectory=
+ActiveState=active
+SubState=running
+DropInPaths=/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf
+ 退出码 0
+
+角色进程和线程（从ps筛选）
+    PID    PPID     LWP NLWP STAT WCHAN                        COMMAND         COMMAND
+  24102       1   24102    3 Ssl  futex_wait_queue_me          python3         python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+  24102       1   24128    3 Ssl  do_sys_poll                  python3         python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+  24102       1   24129    3 Ssl  do_sys_poll                  python3         python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+  24227   24102   24227    1 S    do_sys_poll                  wfb_v6_uplink   /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+
+命令 ['ss', '-uapn']
+State  Recv-Q Send-Q   Local Address:Port   Peer Address:PortProcess                                                   
+UNCONN 0      0              0.0.0.0:9000        0.0.0.0:*    users:(("python3",pid=24102,fd=4))                       
+UNCONN 0      0            127.0.0.1:9200        0.0.0.0:*    users:(("wfb_v6_uplink",pid=24227,fd=4))                 
+UNCONN 0      0              0.0.0.0:5353        0.0.0.0:*    users:(("avahi-daemon",pid=459,fd=12))                   
+UNCONN 0      0              0.0.0.0:40538       0.0.0.0:*    users:(("python3",pid=24102,fd=5))                       
+UNCONN 0      0           127.0.0.53:53          0.0.0.0:*    users:(("systemd-resolve",pid=450,fd=13))                
+ESTAB  0      0      192.168.137.121:68    192.168.137.2:67   users:(("NetworkManager",pid=461,fd=26))                 
+UNCONN 0      0              0.0.0.0:111         0.0.0.0:*    users:(("rpcbind",pid=449,fd=5),("systemd",pid=1,fd=312))
+UNCONN 0      0              0.0.0.0:57691       0.0.0.0:*    users:(("avahi-daemon",pid=459,fd=14))                   
+UNCONN 0      0                    *:5353              *:*    users:(("avahi-daemon",pid=459,fd=13))                   
+UNCONN 0      0                    *:51392             *:*    users:(("avahi-daemon",pid=459,fd=15))                   
+UNCONN 0      0                    *:111               *:*    users:(("rpcbind",pid=449,fd=7),("systemd",pid=1,fd=314))
+ 退出码 0
+
+命令 ['ss', '-ltpn']
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess                                                   
+LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=450,fd=14))                
+LISTEN 0      4096         0.0.0.0:111       0.0.0.0:*    users:(("rpcbind",pid=449,fd=4),("systemd",pid=1,fd=307))
+LISTEN 0      128          0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=1014,fd=3))                           
+LISTEN 0      4096            [::]:111          [::]:*    users:(("rpcbind",pid=449,fd=6),("systemd",pid=1,fd=313))
+LISTEN 0      128             [::]:22           [::]:*    users:(("sshd",pid=1014,fd=4))                           
+ 退出码 0
+
+命令 ['ip', '-brief', 'address']
+lo               UNKNOWN        127.0.0.1/8 
+wlP4p1s0         UP             192.168.137.121/24 fe80::f705:66c4:cd7a:a952/64 
+can0             DOWN           
+enP8p1s0         DOWN           
+l4tbr0           DOWN           
+usb0             DOWN           
+usb1             DOWN           
+docker0          DOWN           172.17.0.1/16 
+wlxfc221c300e99  UP             
+fl-c1            UNKNOWN        10.80.0.11/24 
+ 退出码 0
+
+命令 ['ip', 'route', 'show', 'table', 'main']
+default via 192.168.137.2 dev wlP4p1s0 proto dhcp metric 600 
+10.80.0.0/24 dev fl-c1 proto kernel scope link src 10.80.0.11 
+169.254.0.0/16 dev fl-c1 scope link metric 1000 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+192.168.137.0/24 dev wlP4p1s0 proto kernel scope link src 192.168.137.121 metric 600 
+ 退出码 0
+
+命令 ['iw', 'dev']
+phy#2
+	Interface wlxfc221c300e99
+		ifindex 25
+		wdev 0x200000001
+		addr fc:22:1c:30:0e:99
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:31:89:a6
+		ssid HONOR 500
+		type managed
+		channel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+ 退出码 0
+
+命令 ['lsusb', '-t']
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 1: Dev 4, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M
+ 退出码 0
+
+命令 ['lsusb']
+Bus 002 Device 004: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter
+Bus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 003: ID 349c:0418 Generic USB2.0 Device
+Bus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+ 退出码 0
+
+命令 ['journalctl', '-k', '-n', '100', '--no-pager', '-o', 'short-unix']
+1792817207.248471 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1792817207.483291 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1792817214.980471 fl01 kernel: rfkill: input handler disabled
+1792817250.428469 fl01 kernel: ACK 04 d4
+1792817250.435601 fl01 kernel: ACK 04 d4
+1792817250.584479 fl01 kernel: ACK 04 d4
+1792817250.677810 fl01 kernel: ACK 04 d4
+1792817250.922451 fl01 kernel: ACK 04 d4
+1792817251.166319 fl01 kernel: ACK 04 d4
+1792817251.412448 fl01 kernel: ACK 04 d4
+1792817256.060471 fl01 kernel: ACK 04 d4
+1792817256.068418 fl01 kernel: ACK 04 d4
+1792817284.702831 fl01 kernel: loop1: detected capacity change from 0 to 8
+1792817314.744468 fl01 kernel: ACK 04 d4
+1792817314.752421 fl01 kernel: ACK 04 d4
+1792817314.777742 fl01 kernel: IPv6: ADDRCONF(NETDEV_CHANGE): wlP4p1s0: link becomes ready
+1793015302.717433 fl01 kernel: loop1: detected capacity change from 0 to 8
+1793015313.132937 fl01 kernel: loop1: detected capacity change from 0 to 8
+1793015705.700556 fl01 kernel: loop1: detected capacity change from 0 to 8
+1793015905.516613 fl01 kernel: loop1: detected capacity change from 0 to 8
+1793018562.668486 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793018577.204469 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793018699.984471 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793018703.205424 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793018758.904534 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793018759.080422 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019181.284544 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019198.544421 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019208.860451 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019375.372549 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019420.604405 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019590.884420 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019720.476444 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019726.196701 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019851.100407 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019856.364453 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793019974.352399 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793019981.090831 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793020089.256420 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793020096.216593 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793020190.288396 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793020196.043958 fl01 kernel: device wlxfc221c100119 entered promiscuous mode
+1793020278.648412 fl01 kernel: device wlxfc221c100119 left promiscuous mode
+1793020374.528528 fl01 kernel: usb 2-1.3: USB disconnect, device number 3
+1793020378.480516 fl01 kernel: usb 1-2.1: new high-speed USB device number 5 using tegra-xusb
+1793020381.604481 fl01 kernel: usb 1-2.1: USB disconnect, device number 5
+1793020381.688882 fl01 kernel: usb 2-1.1: new SuperSpeed USB device number 4 using tegra-xusb
+1793020381.712463 fl01 kernel: usb 2-1.1: Int endpoint with wBytesPerInterval of 512 in config 1 interface 0 altsetting 0 ep 133: setting to 64
+1793020384.868498 fl01 kernel: rtl88xxau_wfb 2-1.1:1.0 wlxfc221c300e99: renamed from wlan0
+1793020489.420262 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793020863.280453 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793020870.486426 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793020878.840567 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793020879.020575 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793020942.676416 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793020949.664480 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793020958.249116 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793020958.436483 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793021021.708444 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793021141.724421 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793021142.246657 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793021206.872428 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793021224.379791 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793021363.480431 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793021371.848543 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793021372.100447 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793021532.516455 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793021781.859900 fl01 kernel: ACK 04 d4
+1793021781.868423 fl01 kernel: ACK 04 d4
+1793022056.312692 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793022320.356423 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793022325.928457 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793022334.508579 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793022334.692459 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793028407.708406 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793028409.604453 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793028562.736440 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793028614.864478 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793028717.168420 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793028717.980432 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793031975.124567 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793031977.168449 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793054839.201500 fl01 kernel: loop1: detected capacity change from 0 to 8
+1793066051.060416 fl01 kernel: ACK 04 d4
+1793066051.068387 fl01 kernel: ACK 04 d4
+1793066051.084399 fl01 kernel: IPv6: ADDRCONF(NETDEV_CHANGE): wlP4p1s0: link becomes ready
+1793067829.842445 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793067830.832482 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793070893.624460 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071167.204469 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071307.132546 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071309.612893 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071310.708415 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071312.160439 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071776.756417 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071777.932440 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071840.160495 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071842.633886 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071842.832425 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071845.148484 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+ 退出码 0
+
+命令 ['journalctl', '-u', 'wfb-fl-client-daemon.service', '-n', '150', '--no-pager', '-o', 'short-unix']
+1793067830.763967 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:23:50,763 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c1)
+1793067830.807888 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:23:50,806 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793067841.606097 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:24:01,604 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793069245.740866 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:47:25,739 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793069645.946189 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:54:05,945 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793069923.329809 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 10:58:43,328 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070068.969345 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:01:08,968 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070114.583305 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:01:54,581 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070208.626655 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:03:28,624 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070229.579989 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:03:49,578 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070359.670305 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:05:59,668 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793070893.621096 fl01 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+1793070893.621719 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:14:53,620 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+1793070893.797484 fl01 wfb-fl-client-daemon[22785]: 2026-10-27 11:14:53,796 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+1793070893.900615 fl01 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+1793070893.901429 fl01 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+1793070893.901890 fl01 systemd[1]: wfb-fl-client-daemon.service: Consumed 1min 9.685s CPU time.
+1793071166.575448 fl01 systemd[1]: Started WFB-ng FL client persistent daemon.
+1793071166.967457 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:19:26,967 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=1, TUN IP=10.80.0.11)
+1793071166.968485 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:19:26,968 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300e99，开始接管配置...
+1793071167.138271 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:19:27,138 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c1)
+1793071167.179014 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:19:27,178 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071230.196539 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:20:30,194 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071306.894011 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:46,892 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+1793071307.297791 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:47,297 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /tmp/wfb-ng-fl/client/job_web-6727da200d4e49b992134ea35989a4a1/client_role.json --job-context /tmp/wfb-ng-fl/client/job_web-6727da200d4e49b992134ea35989a4a1/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /tmp/wfb-ng-fl/client/job_web-6727da200d4e49b992134ea35989a4a1/algorithm_config.json
+1793071310.705032 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:50,704 [INFO] [client-daemon] 终止子进程组 PGID=23719 (PID=23719)
+1793071312.128512 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:52,127 [INFO] [client-daemon] 回收作业 web-6727da200d4e49b992134ea35989a4a1 资源 (exit_code=0)
+1793071312.131964 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:52,131 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071312.197718 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:52,197 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> ABORTING (0 延迟即刻抢跑)
+1793071312.567739 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:52,565 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=cbbf85d4a06e4ed2a76e6ee467625f19 job_id=web-6727da200d4e49b992134ea35989a4a1 node_id=1 server=10.80.0.1:9001
+1793071312.567739 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:52,566 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+1793071313.294676 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:21:53,294 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=cbbf85d4a06e4ed2a76e6ee467625f19 job_id=web-6727da200d4e49b992134ea35989a4a1 node_id=1 server=10.80.0.1:9001
+1793071333.315662 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:22:13,314 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071411.327962 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:23:31,326 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071604.140312 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:26:44,138 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071698.246203 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:28:18,244 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071776.687969 fl01 systemd[1]: wfb-fl-client-daemon.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+1793071776.753383 fl01 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+1793071776.753789 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:29:36,753 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+1793071777.110081 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:29:37,109 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+1793071777.259295 fl01 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+1793071777.260183 fl01 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+1793071777.260315 fl01 systemd[1]: wfb-fl-client-daemon.service: Consumed 19.718s CPU time.
+1793071777.265136 fl01 systemd[1]: Started WFB-ng FL client persistent daemon.
+1793071777.673418 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,672 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=1, TUN IP=10.80.0.11)
+1793071777.674084 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,673 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300e99，开始接管配置...
+1793071777.862600 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,862 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c1)
+1793071777.909714 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,908 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071819.813798 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:19,812 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071840.122999 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:40,121 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+1793071840.322459 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:40,322 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/client_role.json --job-context /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/algorithm_config.json
+1793071842.829032 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:42,828 [INFO] [client-daemon] 终止子进程组 PGID=24169 (PID=24169)
+1793071845.121343 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,119 [INFO] [client-daemon] 回收作业 web-f317d54238864f64ab66164f151d3622 资源 (exit_code=0)
+1793071845.124333 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,124 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071845.194398 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,193 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> ABORTING (0 延迟即刻抢跑)
+1793071845.458878 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,458 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+1793071845.459884 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,459 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+1793071845.774582 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,774 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+1793071845.778736 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,778 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+1793072006.847835 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:33:26,846 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072028.068577 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:33:48,067 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072173.704743 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:36:13,703 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072216.685331 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:36:56,683 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072272.898232 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:37:52,896 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072344.719592 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:39:04,718 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072355.316445 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:39:15,315 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072624.660643 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:43:44,659 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072774.722700 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:46:14,721 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793072790.466465 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:46:30,465 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073163.699109 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:52:43,697 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073266.898003 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:54:26,896 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073428.259870 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:57:08,258 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073802.536570 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:03:22,534 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073896.108405 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:04:56,107 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073974.586803 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:06:14,585 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793073989.281936 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:06:29,280 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793074300.194312 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:11:40,193 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793074628.136756 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:17:08,135 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793074746.941096 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:19:06,939 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793074762.684815 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:19:22,683 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793074834.919493 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:20:34,918 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793075048.343985 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:24:08,342 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076078.920270 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:41:18,919 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076239.374604 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:43:59,373 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076249.914972 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:44:09,914 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076306.281268 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:45:06,280 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076342.854815 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:45:42,853 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076414.565968 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:46:54,564 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076566.417219 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:49:26,416 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076721.297807 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:52:01,296 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793076960.623716 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 12:56:00,622 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793077693.217024 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:08:13,215 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793077979.650111 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:12:59,648 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793078305.193880 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:18:25,192 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793078320.018077 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:18:40,017 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793078673.927436 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:24:33,925 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793078870.167556 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:27:50,166 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793078968.038217 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:29:28,036 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079072.485971 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:31:12,484 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079227.227863 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:33:47,226 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079460.627719 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:37:40,626 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079608.314488 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:40:08,313 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079675.072203 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:41:15,070 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079897.589521 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:44:57,588 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079918.522563 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:45:18,521 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793079959.247358 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:45:59,246 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080365.420881 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:52:45,419 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080495.165298 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:54:55,163 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080505.896435 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:55:05,895 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080521.975562 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:55:21,974 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080567.387800 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:56:07,386 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793080706.372458 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 13:58:26,370 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081291.581353 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:08:11,580 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081359.522761 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:09:19,521 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081395.044541 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:09:55,043 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081551.603697 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:12:31,602 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081841.924637 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:17:21,923 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793081929.504363 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:18:49,502 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082112.082418 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:21:52,081 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082259.649053 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:24:19,648 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082274.346250 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:24:34,344 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082297.284347 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:24:57,283 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082318.294613 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:25:18,293 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082386.262713 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:26:26,261 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082477.195834 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:27:57,194 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082545.520274 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:29:05,518 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082571.674095 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:29:31,672 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082621.773909 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:30:21,772 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082693.731649 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:31:33,730 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082712.757210 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:31:52,755 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082744.327078 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:32:24,326 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082780.768252 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:33:00,767 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082796.536204 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:33:16,535 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793082961.412256 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:36:01,411 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083071.642560 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:37:51,641 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083108.471106 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:38:28,470 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083160.518029 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:39:20,516 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083202.417647 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:40:02,416 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083240.816318 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:40:40,814 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083322.334701 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:42:02,333 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083676.034014 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:47:56,032 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083727.307529 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:48:47,305 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793083774.296659 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:49:34,295 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084224.601798 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:57:04,600 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084235.141700 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:57:15,140 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084317.523539 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:58:37,522 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084369.839497 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 14:59:29,838 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084427.359558 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 15:00:27,357 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084536.412423 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 15:02:16,411 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084579.612823 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 15:02:59,611 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+ 退出码 0
+
+Drop-in目录 /etc/systemd/system/wfb-fl-client-daemon.service.d 存在 True
+/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf [Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+
+
+Drop-in目录 /run/systemd/system/wfb-fl-client-daemon.service.d 存在 True
+
+Drop-in目录 /usr/lib/systemd/system/wfb-fl-client-daemon.service.d 存在 False
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/build_identity.json sha256 29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842
+{"commit": "e53de0076c6ed118d824a2d31261e75de3223333", "schema_version": 1}
+
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py sha256 2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py sha256 cc60a0fb14cb2694f2ff000e4e14d4274957c6211089ce6804bd872ca96ddb72
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py sha256 f3ab9b6c99aca3ba805387f7c564d650befae6a83b8be153aece6c9412b83e28
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/service.py sha256 5f5bd03330ebb1dc6bb33cb633fbde79ce22d9418b9bd2bd7d2e5c2eac96e3e4
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist.py sha256 28c5e1a545f5bf5333f8e52b1bdbeb89a5eee8ac7614f334c71a037c3b904dd7
+安装文件 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/mnist_data.py sha256 6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c
+
+失败作业小文件归档 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1 存在 True
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/algorithm_config.json 23
+---内容--- {
+  "data_seed": 2026
+}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/build_identity.json 76
+---内容--- {"commit": "e53de0076c6ed118d824a2d31261e75de3223333", "schema_version": 1}
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/client_role.json 941
+---内容--- {
+  "schema_version": 1,
+  "role": "client",
+  "work_dir": "/tmp/wfb-ng-fl/client/job_web-6727da200d4e49b992134ea35989a4a1",
+  "node_id": 1,
+  "uftp_uid": 1,
+  "uftp_port": 1044,
+  "server_http_host": "10.80.0.1",
+  "server_http_port": 8080,
+  "uftp_bind_host": "10.80.0.11",
+  "uftp_multicast_host": "239.80.41.1",
+  "uftp_private_multicast_host": "239.80.41.2",
+  "channel": 157,
+  "channel_width": "HT40+",
+  "radio_txpower_dbm": 14,
+  "max_update_size_bytes": 1073741824,
+  "live_observation": false,
+  "observation_path": null,
+  "io_timeout_seconds": 120.0,
+  "link_args": [
+    "--tun-name",
+    "fl-c1",
+    "--tun-addr",
+    "10.80.0.11/24",
+    "--link-id",
+    "7669206",
+    "--uplink-stream",
+    "1",
+    "--downlink-stream",
+    "2",
+    "--fec-k",
+    "8",
+    "--fec-n",
+    "14",
+    "--radio-bandwidth",
+    "40",
+    "--radio-mcs-index",
+    "4",
+    "--radio-short-gi",
+    "--air-interface",
+    "wlxfc221c300e99"
+  ]
+}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/evidence_manifest.json 1018
+---内容--- {"build_identity_sha256":"29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842","files":{"algorithm_config.json":{"sha256":"457fa83a60ae70cff24615d9dd45f18e46dff4f52ca016cd695ea998832a41f8","size_bytes":23},"build_identity.json":{"sha256":"29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842","size_bytes":76},"client_role.json":{"sha256":"c840fd6199eb9aaa96ee60d60e789cabff51aaf38966e6c2ade84861f3843ecf","size_bytes":941},"job_context.json":{"sha256":"031d23739043f852f45dc00b79d1bf46ce1c060068f46ff51134388619989f39","size_bytes":276},"role_service.log":{"sha256":"52883922d735b59ab8e39ff555caea2d96a6e0306e499f7047fb9d56763d88b3","size_bytes":862},"uftpd.log":{"sha256":"801485f1153ed011ed01413d3cabc30798a8e72acddcfd8a56cb88d6db0532ff","size_bytes":280}},"job_id":"web-6727da200d4e49b992134ea35989a4a1","lifecycle_outcome":"aborted","node_id":1,"returncode":0,"run_id":"web-9876cf14b9bf4a658ee0fe27be17c3cc","runtime_commit":"e53de0076c6ed118d824a2d31261e75de3223333","schema_version":1}
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/job_context.json 276
+---内容--- {"job_id": "web-6727da200d4e49b992134ea35989a4a1", "node_id": 1, "target_nodes": [1, 2, 4], "rounds": 2, "artifact_dir": "/tmp/wfb-ng-fl/client/job_web-6727da200d4e49b992134ea35989a4a1/algorithm", "local_config": {"mnist_data_dir": null}, "preparation_timeout_seconds": 300.0}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/role_service.log 862
+---内容--- v6_session session_id=17525665668606054713
+v6_uplink role=client node_id=1 link_id=0x7505d6 uplink_stream=1 downlink_stream=2 trusted_plaintext fec=8/14 risk=受信任环境/无链路机密性
+v6_config radio_bandwidth=40 radio_mcs_index=4 radio_short_gi=1 fec_k=8 fec_n=14 grant_duration_ms=120 guard_interval_ms=10
+LISTEN_UDP_CONTROL 50381
+v6 radio control loopback port=50381
+56199312	PKT	0:0:0:0:0:0:0:0:0:0:0
+56199312	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+56199312	READY_FILTER	0:0:0:0:0
+56199312	REASSEMBLY	0:40
+56199312	TOKEN_AUTH	0:0:0:0
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=4 short_gi=1
+first_declare node_id=1 state=undeclared->declared_waiting_for_grant at_ms=56199324
+56200312	PKT	8:224:0:0:0:0:0:0:0:0:0
+56200312	GRANT_FILTER	8:0:0:8:0:0:0:0:0
+56200312	READY_FILTER	0:0:0:0:0
+56200312	REASSEMBLY	0:40
+56200312	TOKEN_AUTH	0:0:0:9
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-6727da200d4e49b992134ea35989a4a1/uftpd.log 280
+---内容--- 2026/10/27 11:21:49.633195: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush
+2026/10/27 11:21:49.633603: Loaded ECDSA key with curve prime256v1 and fingerprint F2:A8:88:77:B4:25:6F:EF:0F:3E:4D:7E:0E:08:B0:BE:59:59:60:FD
+2026/10/27 11:21:50.705104: Exiting on signal 15
+
+
+失败作业小文件归档 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622 存在 True
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/algorithm_config.json 23
+---内容--- {
+  "data_seed": 2026
+}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/build_identity.json 76
+---内容--- {"commit": "e53de0076c6ed118d824a2d31261e75de3223333", "schema_version": 1}
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/client_role.json 941
+---内容--- {
+  "schema_version": 1,
+  "role": "client",
+  "work_dir": "/srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622",
+  "node_id": 1,
+  "uftp_uid": 1,
+  "uftp_port": 1044,
+  "server_http_host": "10.80.0.1",
+  "server_http_port": 8080,
+  "uftp_bind_host": "10.80.0.11",
+  "uftp_multicast_host": "239.80.41.1",
+  "uftp_private_multicast_host": "239.80.41.2",
+  "channel": 157,
+  "channel_width": "HT40+",
+  "radio_txpower_dbm": 14,
+  "max_update_size_bytes": 1073741824,
+  "live_observation": false,
+  "observation_path": null,
+  "io_timeout_seconds": 120.0,
+  "link_args": [
+    "--tun-name",
+    "fl-c1",
+    "--tun-addr",
+    "10.80.0.11/24",
+    "--link-id",
+    "7669206",
+    "--uplink-stream",
+    "1",
+    "--downlink-stream",
+    "2",
+    "--fec-k",
+    "8",
+    "--fec-n",
+    "14",
+    "--radio-bandwidth",
+    "40",
+    "--radio-mcs-index",
+    "4",
+    "--radio-short-gi",
+    "--air-interface",
+    "wlxfc221c300e99"
+  ]
+}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/evidence_manifest.json 1018
+---内容--- {"build_identity_sha256":"29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842","files":{"algorithm_config.json":{"sha256":"457fa83a60ae70cff24615d9dd45f18e46dff4f52ca016cd695ea998832a41f8","size_bytes":23},"build_identity.json":{"sha256":"29cb19f88c5fe23909dccc6bbfc999287afbdadc1d41a8129082f8152cf3f842","size_bytes":76},"client_role.json":{"sha256":"9764960acdbcc1272d9102d30ab95e19bb5896c8ab29914a95d24ace04f16ca0","size_bytes":941},"job_context.json":{"sha256":"40927e8f7b32de34516d496354ec3547c1afac40d0ac0a56fa0a7b9f26c23278","size_bytes":294},"role_service.log":{"sha256":"c2e05d16ebe4f5762273bb44448ec0dd3226a0727144c4e3262bbf55fe4c9f10","size_bytes":699},"uftpd.log":{"sha256":"7ce31db1e8ddb03d59621d1ff8e506b03df6688ba6f6ce322d59f40e9d2f5c95","size_bytes":280}},"job_id":"web-f317d54238864f64ab66164f151d3622","lifecycle_outcome":"aborted","node_id":1,"returncode":0,"run_id":"web-b7a96f0f69e5428382d339a5b001ccf3","runtime_commit":"e53de0076c6ed118d824a2d31261e75de3223333","schema_version":1}
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/job_context.json 294
+---内容--- {"job_id": "web-f317d54238864f64ab66164f151d3622", "node_id": 1, "target_nodes": [1, 2, 4], "rounds": 2, "artifact_dir": "/srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/algorithm", "local_config": {"mnist_data_dir": "/srv/wfb-ng-fl/mnist"}, "preparation_timeout_seconds": 300.0}
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/role_service.log 699
+---内容--- v6_session session_id=4319147527254897257
+v6_uplink role=client node_id=1 link_id=0x7505d6 uplink_stream=1 downlink_stream=2 trusted_plaintext fec=8/14 risk=受信任环境/无链路机密性
+v6_config radio_bandwidth=40 radio_mcs_index=4 radio_short_gi=1 fec_k=8 fec_n=14 grant_duration_ms=120 guard_interval_ms=10
+LISTEN_UDP_CONTROL 51501
+v6 radio control loopback port=51501
+56732337	PKT	0:0:0:0:0:0:0:0:0:0:0
+56732337	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+56732337	READY_FILTER	0:0:0:0:0
+56732337	REASSEMBLY	0:40
+56732337	TOKEN_AUTH	0:0:0:0
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=4 short_gi=1
+first_declare node_id=1 state=undeclared->declared_waiting_for_grant at_ms=56732344
+
+归档文件 /var/lib/wfb-ng-fl/evidence/web-f317d54238864f64ab66164f151d3622/uftpd.log 280
+---内容--- 2026/10/27 11:30:42.659568: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush
+2026/10/27 11:30:42.660112: Loaded ECDSA key with curve prime256v1 and fingerprint 1E:36:55:59:D0:54:CF:18:24:00:48:49:89:97:02:6A:ED:A9:3D:44
+2026/10/27 11:30:42.829101: Exiting on signal 15
+
+
+官方数据manifest {
+  "created_utc": "2026-10-26T18:24:51Z",
+  "provenance": "torchvision MNIST resources; HTTPS OSSCI mirror; gzip MD5 matched maintenance metadata",
+  "files": [
+    {
+      "raw_name": "train-images-idx3-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:24:56Z",
+      "gz_bytes": 9912422,
+      "gz_md5": "f68b3c2dcbeaaa9fbdd348bbdeb94873",
+      "gz_sha256": "440fcabf73cc546fa21475e81ea370265605f56be210a4024d2ca8f203523609",
+      "raw_bytes": 47040016,
+      "raw_sha256": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+      "magic": 2051,
+      "sample_count": 60000
+    },
+    {
+      "raw_name": "train-labels-idx1-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:24:58Z",
+      "gz_bytes": 28881,
+      "gz_md5": "d53e105ee54ea40749a09fcbcd1e9432",
+      "gz_sha256": "3552534a0a558bbed6aed32b30c495cca23d567ec52cac8be1a0730e8010255c",
+      "raw_bytes": 60008,
+      "raw_sha256": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5",
+      "magic": 2049,
+      "sample_count": 60000
+    },
+    {
+      "raw_name": "t10k-images-idx3-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:25:01Z",
+      "gz_bytes": 1648877,
+      "gz_md5": "9fb629c4189551a2d022fa330f9573f3",
+      "gz_sha256": "8d422c7b0a1c1c79245a5bcf07fe86e33eeafee792b84584aec276f5a2dbc4e6",
+      "raw_bytes": 7840016,
+      "raw_sha256": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+      "magic": 2051,
+      "sample_count": 10000
+    },
+    {
+      "raw_name": "t10k-labels-idx1-ubyte",
+      "source_url": "https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz",
+      "obtained_utc": "2026-10-26T18:25:03Z",
+      "gz_bytes": 4542,
+      "gz_md5": "ec29112dd5afa0611ce80d1b7f02629c",
+      "gz_sha256": "f7ae60f92e00ec6debd23a6088c31dbd2371eca3ffa0defaefb259924204aec6",
+      "raw_bytes": 10008,
+      "raw_sha256": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2",
+      "magic": 2049,
+      "sample_count": 10000
+    }
+  ]
+}
+
+
+整体退出码 0

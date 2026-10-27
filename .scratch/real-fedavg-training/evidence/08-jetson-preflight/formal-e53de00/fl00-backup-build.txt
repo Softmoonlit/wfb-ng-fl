@@ -1,0 +1,91 @@
+节点 fl00 角色 server 阶段 backup-build
+UTC 2026-10-27T03:13:17Z 命令 ['systemctl', 'cat', 'wfb-fl-server-daemon.service']
+# /lib/systemd/system/wfb-fl-server-daemon.service
+[Unit]
+Description=WFB-ng FL server persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'ExecStart', '-p', 'User', '-p', 'Group', '-p', 'MainPID', '-p', 'KillMode']
+MainPID=148891
+ExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090 ; ignore_errors=no ; start_time=[Tue 2026-10-27 10:22:15 CST] ; stop_time=[n/a] ; pid=148891 ; code=(null) ; status=0/0 }
+User=
+Group=
+KillMode=control-group
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['iw', 'dev']
+phy#1
+	Interface wlxfc221c100157
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:10:01:57
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP1p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:e2:3c:48
+		type managed
+		txpower -100.00 dBm
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['lsusb', '-t']
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Wireless, Driver=btusb, 12M
+    |__ Port 3: Dev 3, If 1, Class=Wireless, Driver=btusb, 12M
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['df', '-h', '/']
+文件系统        大小  已用  可用 已用% 挂载点
+/dev/nvme0n1p1  116G   38G   73G   35% /
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['cat', '/etc/wfb-ng-fl/server.json']
+{"bandwidth_mhz":40,"channel":157,"downlink_mcs":3,"ipc_host":"127.0.0.1","ipc_port":9090,"known_clients":[1,2,3,4,5,6,7,8,9,10],"model_library_dir":"/var/lib/wfb-ng-fl/models","radio_txpower_dbm":14,"tun_cidr":"10.80.0.1/24","tun_ip":"10.80.0.1","tun_name":"fl-s","tun_txqueuelen":5000,"uftp_rate_kbps":15000,"uplink_mcs":4,"web_host":"192.168.108.100","web_port":8080}
+退出码 0
+源码归档sha256 245c20500fab8a0dbbc1fcf643dd6d0498b7e962640b699a6ef82e787d96f4a3
+UTC 2026-10-27T03:13:17Z 命令 ['tar', '-xf', '/tmp/wfb08-e53de00.tar', '-C', '/srv/wfb-ng-fl/deploy-e53de00/source']
+退出码 0
+UTC 2026-10-27T03:13:17Z 命令 ['make', '-C', '/srv/wfb-ng-fl/deploy-e53de00/source', 'build_v6', 'COMMIT=e53de0076c6ed118d824a2d31261e75de3223333', 'VERSION=0.0.0', 'PYTHON=/usr/bin/python3']
+make: 进入目录“/srv/wfb-ng-fl/deploy-e53de00/source”
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/v6_uplink.o src/v6_uplink.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/v6_radio_control.o src/v6_radio_control.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/v6_plaintext_fec_tx.o src/v6_plaintext_fec_tx.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -D__WFB_TX_SHARED_LIBRARY__ -c -o src/tx.link.o src/tx.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -D__WFB_RX_SHARED_LIBRARY__ -c -o src/rx.link.o src/rx.cpp
+cc  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu99 -c -o src/radiotap.o src/radiotap.c
+src/radiotap.c: In function ‘ieee80211_radiotap_iterator_init’:
+src/radiotap.c:116:34: warning: taking address of packed member of ‘struct ieee80211_radiotap_header’ may result in an unaligned pointer value [-Waddress-of-packed-member]
+  116 |         iterator->_next_bitmap = &radiotap_header->it_present; // NOLINT(clang-diagnostic-address-of-packed-member)
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu99 -c -o src/zfex.o src/zfex.c
+src/zfex.c:20:9: note: ‘#pragma message: Using NEON-accelerated FEC’
+   20 | #pragma message "Using NEON-accelerated FEC"
+      |         ^~~~~~~
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/wifibroadcast.o src/wifibroadcast.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/control_envelope.o src/control_envelope.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/token_scheduler.o src/token_scheduler.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/token_authorization.o src/token_authorization.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/token_authorization_ipc.o src/token_authorization_ipc.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/token_event_ipc.o src/token_event_ipc.cpp
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"0.0.0-e53de007"' -std=gnu++11 -c -o src/tx_token_gate.o src/tx_token_gate.cpp
+g++ -o wfb_v6_uplink src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap
+make: 离开目录“/srv/wfb-ng-fl/deploy-e53de00/source”
+退出码 0
+NODE_PHASE_PASS server backup-build

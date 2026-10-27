@@ -1,0 +1,46 @@
+节点 fl02 角色 client 阶段 install-config
+安装env {'COMMIT': 'e53de0076c6ed118d824a2d31261e75de3223333', 'VERSION': '0.0.0', 'PREFIX': '/usr'}
+/usr/bin/python3 setup.py --name >/dev/null
+UTC 2026-10-27T03:18:28Z 命令 ['systemctl', 'daemon-reload']
+退出码 0
+UTC 2026-10-27T03:18:29Z 命令 ['systemctl', 'cat', 'wfb-fl-client-daemon.service']
+# /lib/systemd/system/wfb-fl-client-daemon.service
+[Unit]
+Description=WFB-ng FL client persistent daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json
+KillMode=control-group
+TimeoutStopSec=15s
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+# /etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client
+Environment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+
+# /run/systemd/system/wfb-fl-client-daemon.service.d/radio.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14
+退出码 0
+UTC 2026-10-27T03:18:29Z 命令 ['systemctl', 'show', 'wfb-fl-client-daemon.service', '-p', 'ExecStart', '-p', 'User', '-p', 'Group', '-p', 'KillMode']
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --uplink-mcs 4 --radio-txpower-dbm 14 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+User=
+Group=
+KillMode=control-group
+退出码 0
+/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py {'commit': 'e53de0076c6ed118d824a2d31261e75de3223333', 'schema_version': 1}
+NODE_PHASE_PASS client install-config
+
+退出码 0

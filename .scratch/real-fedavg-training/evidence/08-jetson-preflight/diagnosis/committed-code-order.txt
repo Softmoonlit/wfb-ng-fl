@@ -1,0 +1,128 @@
+/srv/wfb-ng-fl/deploy-e53de00/source/wfb_ng/fl/service.py SHA256 5f5bd03330ebb1dc6bb33cb633fbde79ce22d9418b9bd2bd7d2e5c2eac96e3e4
+490:     parser.add_argument('--algorithm', help='算法入口，格式为 package.module:callable')
+491:     parser.add_argument('--algorithm-config', help='算法 JSON object 配置')
+492:     parser.add_argument('--job-context', help='Daemon 生成的本机作业上下文 JSON')
+493:     args = parser.parse_args()
+494:     service = None
+495:     algorithm_thread = None
+496:     algorithm_error: List[FLRuntimeError] = []
+497:     stop_event = threading.Event()
+498:     signal_received = threading.Event()
+499:     notifications = None
+500:     context = None
+501: 
+502:     def stop(signum, frame):
+503:         signal_received.set()
+504:         stop_event.set()
+505: 
+506:     previous_sigterm = signal.getsignal(signal.SIGTERM)
+507:     previous_sigint = signal.getsignal(signal.SIGINT)
+508:     signal.signal(signal.SIGTERM, stop)
+509:     signal.signal(signal.SIGINT, stop)
+510:     try:
+511:         from .algorithm import AlgorithmContext, load_algorithm
+512:         role_config = _read_config(args.config)
+513:         role_name = role or role_config['role']
+514:         if role_name == 'client' and (not args.algorithm or not args.algorithm_config or not args.job_context):
+515:             raise FLRuntimeError('invalid_configuration', '客户端必须显式指定算法、配置及作业上下文')
+516:         if role_name == 'client':
+517:             host = _read_algorithm_config(args.job_context)
+518:             notifications = AlgorithmNotifications(os.environ.get('WFB_FL_NOTIFY_SOCKET'),
+519:                                                   host['job_id'], stop_event,
+520:                                                   timeout=host['preparation_timeout_seconds'])
+521:             os.makedirs(host['artifact_dir'], exist_ok=True)
+522:             context = AlgorithmContext(
+523:                 job_id=host['job_id'], node_id=host['node_id'],
+524:                 target_nodes=tuple(host['target_nodes']), rounds=host['rounds'],
+525:                 artifact_dir=host['artifact_dir'], local_config=host['local_config'],
+526:                 stop_event=stop_event, prepared_callback=notifications.prepared,
+527:                 round_callback=notifications.round_complete)
+528:         algorithm = load_algorithm(args.algorithm, arity=3) if args.algorithm else None
+529:         algorithm_config = _read_algorithm_config(args.algorithm_config)
+530:         service = load_role_service(args.config, expected_role=role)
+531:         runtime = service.start()
+532:         if algorithm is not None:
+533:             algorithm_thread = threading.Thread(
+534:                 target=_run_algorithm,
+535:                 args=(algorithm, runtime, algorithm_config, context, notifications, algorithm_error, stop_event),
+536:                 name='fl-algorithm', daemon=True)
+537:             algorithm_thread.start()
+538:         while not stop_event.is_set():
+539:             if algorithm_thread is not None and not algorithm_thread.is_alive():
+540:                 stop_event.set()
+/srv/wfb-ng-fl/deploy-e53de00/source/wfb_ng/fl/client_daemon.py SHA256 2d00588e97aed92f0983e4aad784755b1b445ba0b6c25c770f46711205b51eb3
+1318:                 job_config = replace(
+1319:                     job_config,
+1320:                     channel=channel,
+1321:                     bandwidth_mhz=self._effective_radio.bandwidth_mhz,
+1322:                     radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
+1323:                     uplink_mcs=self._effective_radio.uplink_mcs,
+1324:                 )
+1325:                 self._current_job_id = job_config.job_id
+1326:                 self._last_accepted_job_id = job_config.job_id
+1327:             self._stop_idle_link()
+1328:             try:
+1329:                 proc = self.sandbox.start(job_config, air_interface=self.current_interface)
+1330:                 return proc
+1331:             except Exception:
+1332:                 self._ensure_idle_transport()
+1333:                 raise
+1334: 
+1335:     def _handle_job_terminal(self, msg: Dict[str, Any], aborted: bool) -> None:
+/srv/wfb-ng-fl/deploy-e53de00/source/wfb_ng/fl/control.py SHA256 f3ab9b6c99aca3ba805387f7c564d650befae6a83b8be153aece6c9412b83e28
+1225:     def _liveness_loop(self) -> None:
+1226:         while not self._stop_event.is_set():
+1227:             callbacks: List[Tuple[Callable[[Dict[str, Any]], None], Dict[str, Any]]] = []
+1228:             with self._liveness_condition:
+1229:                 now = time.monotonic()
+1230:                 next_deadline: Optional[float] = None
+1231:                 for job_id, watch in list(self._liveness_watches.items()):
+1232:                     target_nodes = watch["target_nodes"]
+1233:                     states = watch["states"]
+1234:                     lease_deadline = self._active_liveness_lease_deadline_locked(job_id, now)
+1235:                     if lease_deadline is not None:
+1236:                         next_deadline = (
+1237:                             lease_deadline if next_deadline is None
+1238:                             else min(next_deadline, lease_deadline)
+1239:                         )
+1240:                     for node_id in target_nodes:
+1241:                         record = self.registry.get_node(node_id)
+1242:                         online = record is not None and record.readiness != NodeReadiness.OFFLINE
+1243:                         previous = states.get(node_id)
+1244:                         if online and previous is False:
+1245:                             states[node_id] = True
+1246:                             callbacks.append((watch["on_change"], {
+1247:                                 "job_id": job_id,
+1248:                                 "node_id": node_id,
+1249:                                 "state": "online",
+1250:                                 "reason": "heartbeat_received",
+1251:                                 "observed_at": now,
+1252:                                 "last_heartbeat_at": record.last_heartbeat_time if record else None,
+1253:                             }))
+1254:                         elif not online and previous is True and lease_deadline is None:
+1255:                             states[node_id] = False
+1256:                             callbacks.append((watch["on_change"], {
+1257:                                 "job_id": job_id,
+1258:                                 "node_id": node_id,
+1259:                                 "state": "offline",
+1260:                                 "reason": "heartbeat_timeout",
+1261:                                 "observed_at": now,
+1262:                                 "last_heartbeat_at": record.last_heartbeat_time if record else None,
+1263:                             }))
+1264:                         if online and lease_deadline is None and record is not None:
+1265:                             heartbeat_deadline = (
+1266:                                 record.last_heartbeat_time + self.offline_threshold_seconds
+1267:                             )
+1268:                             next_deadline = (
+1269:                                 heartbeat_deadline if next_deadline is None
+1270:                                 else min(next_deadline, heartbeat_deadline)
+1271:                             )
+1272:                 if callbacks:
+1273:                     wait_timeout = 0.0
+1274:                 elif next_deadline is None:
+1275:                     wait_timeout = None
+1276:                 else:
+1277:                     wait_timeout = max(0.0, next_deadline - time.monotonic())
+1278:                 if not callbacks:
+1279:                     self._liveness_condition.wait(wait_timeout)
+1280:             for callback, event in callbacks:

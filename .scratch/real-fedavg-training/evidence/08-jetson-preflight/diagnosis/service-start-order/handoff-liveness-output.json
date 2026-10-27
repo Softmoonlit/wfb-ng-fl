@@ -1,0 +1,23 @@
+{
+  "arithmetic": {
+    "fl02_wall_clock_lead_seconds": 3.064,
+    "gap_end_monotonic": 57335.76,
+    "native_gap_seconds": 2.444,
+    "remaining_to_offline_seconds": 7.556,
+    "server_last_hb_monotonic": 57333.316,
+    "server_offline_monotonic": 57343.316
+  },
+  "handoff_events_before_idle_silence": [],
+  "pure_idle_events": [
+    {
+      "job_id": "handoff",
+      "last_heartbeat_at": 70835.057374592,
+      "node_id": 2,
+      "observed_at": 70835.157509088,
+      "reason": "heartbeat_timeout",
+      "state": "offline"
+    }
+  ],
+  "scaled_native_gap_seconds": 0.02444,
+  "scaled_threshold_seconds": 0.1
+}

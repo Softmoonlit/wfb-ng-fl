@@ -1,0 +1,21 @@
+10月 27 11:29:39 fl02 systemd[1]: wfb-fl-client-daemon.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+10月 27 11:29:39 fl02 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 27 11:29:39 fl02 wfb-fl-client-daemon[15216]: 2026-10-27 11:29:39,869 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 27 11:29:40 fl02 wfb-fl-client-daemon[15216]: 2026-10-27 11:29:40,067 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 27 11:29:40 fl02 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 27 11:29:40 fl02 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 27 11:29:40 fl02 systemd[1]: wfb-fl-client-daemon.service: Consumed 19.723s CPU time.
+10月 27 11:29:40 fl02 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 27 11:29:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:29:40,548 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=2, TUN IP=10.80.0.12)
+10月 27 11:29:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:29:40,549 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300cbb，开始接管配置...
+10月 27 11:29:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:29:40,715 [INFO] [client-daemon] 网卡 wlxfc221c300cbb 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c2)
+10月 27 11:29:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:29:40,762 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 27 11:30:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:40,224 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+10月 27 11:30:40 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:40,632 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/client_role.json --job-context /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/algorithm_config.json
+10月 27 11:30:43 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:43,140 [INFO] [client-daemon] 终止子进程组 PGID=15838 (PID=15838)
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,374 [INFO] [client-daemon] 回收作业 web-f317d54238864f64ab66164f151d3622 资源 (exit_code=0)
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,376 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,439 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> ABORTING (0 延迟即刻抢跑)
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,672 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=fa116bbcdad9434e96c45575fa2b8f8c job_id=web-f317d54238864f64ab66164f151d3622 node_id=2 server=10.80.0.1:9001
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,673 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+10月 27 11:30:45 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 11:30:45,704 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=fa116bbcdad9434e96c45575fa2b8f8c job_id=web-f317d54238864f64ab66164f151d3622 node_id=2 server=10.80.0.1:9001

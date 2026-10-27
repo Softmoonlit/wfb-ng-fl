@@ -1,0 +1,63 @@
+最终环境核验 UTC 2026-10-26T18:35:05Z
+命令 ['hostname']
+fl01
+ 退出码 0
+命令 ['df', '-B1', '/']
+Filesystem       1B-blocks        Used  Available Use% Mounted on
+/dev/sda1      29692346368 24087515136 4154810368  86% /
+ 退出码 0
+命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', 'wfb-fl-client-daemon.service', '-p', 'Id', '-p', 'MainPID', '-p', 'ActiveState']
+MainPID=0
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive
+
+MainPID=17507
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+ 退出码 0
+命令 ['iw', 'dev']
+phy#2
+	Interface wlxfc221c300e99
+		ifindex 25
+		wdev 0x200000001
+		addr fc:22:1c:30:0e:99
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:31:89:a6
+		ssid HONOR 500
+		type managed
+		channel 44 (5220 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+ 退出码 0
+命令 ['lsusb', '-t']
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 1: Dev 4, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M
+ 退出码 0
+命令 ['dpkg-query', '-W', 'nvidia-l4t-core', 'cuda-toolkit-12-6', 'libcudnn9-cuda-12', 'libcusparselt0']
+cuda-toolkit-12-6	12.6.11-1
+libcudnn9-cuda-12	9.3.0.75-1
+libcusparselt0	0.7.1.0-1
+nvidia-l4t-core	36.4.3-20250107174145
+ 退出码 0
+命令 ['python3', '-m', 'pip', 'check']
+pynacl 1.5.0 requires cffi, which is not installed.
+ 退出码 1
+MNIST_FINAL_RESULT {"hostname": "fl01", "directory": "/srv/wfb-ng-fl/mnist", "files": [{"name": "train-images-idx3-ubyte", "bytes": 47040016, "sha256": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db", "mode": "0o644", "uid": 0, "gid": 0}, {"name": "train-labels-idx1-ubyte", "bytes": 60008, "sha256": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5", "mode": "0o644", "uid": 0, "gid": 0}, {"name": "t10k-images-idx3-ubyte", "bytes": 7840016, "sha256": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7", "mode": "0o644", "uid": 0, "gid": 0}, {"name": "t10k-labels-idx1-ubyte", "bytes": 10008, "sha256": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2", "mode": "0o644", "uid": 0, "gid": 0}], "manifest_sha256": "1f3fe3cb6a3cc8aff941dec86286d1710eb832f034ef3dbca339ee68f5404b7a", "status": "pass"}
+安装产物 build_identity.json sha256 a27b0792cd8d7a885a591b90e0ce09f0bfe57e5476c8af17df587ae1b0ccd6f4
+安装产物 client_daemon.py sha256 29ab16b9f2a10269d04cc72098d0fb86de5b28a644fd1766022da6b77e86c26e
+安装产物 server_daemon.py sha256 8a22952ccbaee6d38f4150f55c62097f5c61c0ee8ec7b1c29da7e9f84cced609
+安装产物 reference_model.py sha256 86963f19190aa27d249e2b91fa07eddfbb4090fa8d4dafd9c58639311961be37
+安装产物仍未部署 mnist.py
+安装产物仍未部署 mnist_data.py
+FINAL_DATA_AND_IDENTITY_CHECK_PASS
+
+退出码 0

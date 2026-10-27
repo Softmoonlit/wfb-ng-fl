@@ -1,0 +1,41 @@
+MainPID=0
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive
+
+MainPID=22290
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+
+MainPID=0
+Id=wfb-fl-server.service
+ActiveState=inactive
+
+MainPID=0
+Id=wfb-fl-client.service
+ActiveState=inactive
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]:     self.network_adapter.set_channel(
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py", line 331, in set_channel
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]:     self._run_cmd(["iw", "dev", iface, "set", "channel", str(channel), channel_width])
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py", line 294, in _run_cmd
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]:     raise FLRuntimeError(
+10月 27 10:24:19 fl04 wfb-fl-client-daemon[17711]: wfb_ng.fl.errors.FLRuntimeError: 执行命令 iw dev wlxfc221c500a88 set channel 165 HT20 失败:
+10月 27 10:24:20 fl04 wfb-fl-client-daemon[17711]: 2026-10-27 10:24:20,000 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 27 10:24:20 fl04 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 27 10:24:20 fl04 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 27 10:24:20 fl04 systemd[1]: wfb-fl-client-daemon.service: Consumed 5min 22.521s CPU time.
+10月 27 10:24:20 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 27 10:24:20 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:24:20,339 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 27 10:24:20 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:24:20,340 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500a88，开始接管配置...
+10月 27 10:24:20 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:24:20,681 [INFO] [client-daemon] 网卡 wlxfc221c500a88 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 27 10:24:20 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:24:20,729 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 27 10:40:54 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:40:54,795 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:45:08 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:45:08,866 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:52:55 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 10:52:55,796 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 11:02:05 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 11:02:05,553 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 11:02:31 fl04 wfb-fl-client-daemon[22290]: 2026-10-27 11:02:31,713 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        28G   23G  3.6G  87% /
+{
+  "node_id": 4,
+  "tun_ip": "10.80.0.14/24"
+}

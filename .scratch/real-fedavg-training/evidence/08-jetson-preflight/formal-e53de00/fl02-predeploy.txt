@@ -1,0 +1,41 @@
+MainPID=0
+Id=wfb-fl-server-daemon.service
+ActiveState=inactive
+
+MainPID=14283
+Id=wfb-fl-client-daemon.service
+ActiveState=active
+
+MainPID=0
+Id=wfb-fl-server.service
+ActiveState=inactive
+
+MainPID=0
+Id=wfb-fl-client.service
+ActiveState=inactive
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[8576]: 2026-10-27 10:24:07,027 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[8576]: 2026-10-27 10:24:07,154 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 27 10:24:07 fl02 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 27 10:24:07 fl02 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 27 10:24:07 fl02 systemd[1]: wfb-fl-client-daemon.service: Consumed 14min 18.819s CPU time.
+10月 27 10:24:07 fl02 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:24:07,533 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=2, TUN IP=10.80.0.12)
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:24:07,534 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300cbb，开始接管配置...
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:24:07,890 [INFO] [client-daemon] 网卡 wlxfc221c300cbb 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c2)
+10月 27 10:24:07 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:24:07,924 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 27 10:25:05 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:25:05,607 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:26:09 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:26:09,190 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:38:22 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:38:22,703 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:48:57 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:48:57,919 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:54:44 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:54:44,802 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:56:03 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:56:03,023 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:57:02 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:57:02,427 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:57:18 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:57:18,120 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 10:58:57 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 10:58:57,008 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 27 11:01:22 fl02 wfb-fl-client-daemon[14283]: 2026-10-27 11:01:22,631 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        28G   23G  4.0G  86% /
+{
+  "node_id": 2,
+  "tun_ip": "10.80.0.12/24"
+}

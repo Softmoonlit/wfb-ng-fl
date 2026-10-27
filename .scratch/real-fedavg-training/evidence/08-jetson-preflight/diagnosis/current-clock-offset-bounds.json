@@ -1,0 +1,182 @@
+[
+  {
+    "node": "fl01",
+    "samples": [
+      {
+        "server_send_ns": 1793084966114686880,
+        "server_receive_ns": 1793084966116786976,
+        "client": {
+          "wall_ns": 1793084969263341611,
+          "mono_ns": 69858942992700
+        },
+        "rtt_ms": 2.100096,
+        "client_minus_server_lower_ms": 3146.554635,
+        "client_minus_server_upper_ms": 3148.654731
+      },
+      {
+        "server_send_ns": 1793084966116801728,
+        "server_receive_ns": 1793084966119431616,
+        "client": {
+          "wall_ns": 1793084969265832167,
+          "mono_ns": 69858945467639
+        },
+        "rtt_ms": 2.629888,
+        "client_minus_server_lower_ms": 3146.400551,
+        "client_minus_server_upper_ms": 3149.030439
+      },
+      {
+        "server_send_ns": 1793084966119444640,
+        "server_receive_ns": 1793084966121958304,
+        "client": {
+          "wall_ns": 1793084969268124537,
+          "mono_ns": 69858947760169
+        },
+        "rtt_ms": 2.513664,
+        "client_minus_server_lower_ms": 3146.166233,
+        "client_minus_server_upper_ms": 3148.679897
+      },
+      {
+        "server_send_ns": 1793084966121968288,
+        "server_receive_ns": 1793084966126437376,
+        "client": {
+          "wall_ns": 1793084969271752685,
+          "mono_ns": 69858951387677
+        },
+        "rtt_ms": 4.469088,
+        "client_minus_server_lower_ms": 3145.315309,
+        "client_minus_server_upper_ms": 3149.784397
+      },
+      {
+        "server_send_ns": 1793084966126450880,
+        "server_receive_ns": 1793084966128796064,
+        "client": {
+          "wall_ns": 1793084969275429891,
+          "mono_ns": 69858955064819
+        },
+        "rtt_ms": 2.345184,
+        "client_minus_server_lower_ms": 3146.633827,
+        "client_minus_server_upper_ms": 3148.979011
+      }
+    ]
+  },
+  {
+    "node": "fl02",
+    "samples": [
+      {
+        "server_send_ns": 1793084967221829920,
+        "server_receive_ns": 1793084967223825888,
+        "client": {
+          "wall_ns": 1793084970287588092,
+          "mono_ns": 63091172821434
+        },
+        "rtt_ms": 1.995968,
+        "client_minus_server_lower_ms": 3063.762204,
+        "client_minus_server_upper_ms": 3065.758172
+      },
+      {
+        "server_send_ns": 1793084967223838976,
+        "server_receive_ns": 1793084967225921728,
+        "client": {
+          "wall_ns": 1793084970289802032,
+          "mono_ns": 63091175022254
+        },
+        "rtt_ms": 2.082752,
+        "client_minus_server_lower_ms": 3063.880304,
+        "client_minus_server_upper_ms": 3065.963056
+      },
+      {
+        "server_send_ns": 1793084967225935328,
+        "server_receive_ns": 1793084967228032704,
+        "client": {
+          "wall_ns": 1793084970291885987,
+          "mono_ns": 63091177106049
+        },
+        "rtt_ms": 2.097376,
+        "client_minus_server_lower_ms": 3063.853283,
+        "client_minus_server_upper_ms": 3065.950659
+      },
+      {
+        "server_send_ns": 1793084967228038016,
+        "server_receive_ns": 1793084967230047072,
+        "client": {
+          "wall_ns": 1793084970293954421,
+          "mono_ns": 63091179174291
+        },
+        "rtt_ms": 2.009056,
+        "client_minus_server_lower_ms": 3063.907349,
+        "client_minus_server_upper_ms": 3065.916405
+      },
+      {
+        "server_send_ns": 1793084967230050176,
+        "server_receive_ns": 1793084967232682496,
+        "client": {
+          "wall_ns": 1793084970296552973,
+          "mono_ns": 63091181773099
+        },
+        "rtt_ms": 2.63232,
+        "client_minus_server_lower_ms": 3063.870477,
+        "client_minus_server_upper_ms": 3066.502797
+      }
+    ]
+  },
+  {
+    "node": "fl04",
+    "samples": [
+      {
+        "server_send_ns": 1793084968459992832,
+        "server_receive_ns": 1793084968461959840,
+        "client": {
+          "wall_ns": 1793084971537813452,
+          "mono_ns": 68691548896725
+        },
+        "rtt_ms": 1.967008,
+        "client_minus_server_lower_ms": 3075.853612,
+        "client_minus_server_upper_ms": 3077.82062
+      },
+      {
+        "server_send_ns": 1793084968461973984,
+        "server_receive_ns": 1793084968464277088,
+        "client": {
+          "wall_ns": 1793084971540196587,
+          "mono_ns": 68691551268243
+        },
+        "rtt_ms": 2.303104,
+        "client_minus_server_lower_ms": 3075.919499,
+        "client_minus_server_upper_ms": 3078.222603
+      },
+      {
+        "server_send_ns": 1793084968464280288,
+        "server_receive_ns": 1793084968465909120,
+        "client": {
+          "wall_ns": 1793084971541898168,
+          "mono_ns": 68691552969696
+        },
+        "rtt_ms": 1.628832,
+        "client_minus_server_lower_ms": 3075.989048,
+        "client_minus_server_upper_ms": 3077.61788
+      },
+      {
+        "server_send_ns": 1793084968465911648,
+        "server_receive_ns": 1793084968467701952,
+        "client": {
+          "wall_ns": 1793084971543711399,
+          "mono_ns": 68691554782863
+        },
+        "rtt_ms": 1.790304,
+        "client_minus_server_lower_ms": 3076.009447,
+        "client_minus_server_upper_ms": 3077.799751
+      },
+      {
+        "server_send_ns": 1793084968467708064,
+        "server_receive_ns": 1793084968469330048,
+        "client": {
+          "wall_ns": 1793084971545339506,
+          "mono_ns": 68691556411034
+        },
+        "rtt_ms": 1.621984,
+        "client_minus_server_lower_ms": 3076.009458,
+        "client_minus_server_upper_ms": 3077.631442
+      }
+    ]
+  }
+]

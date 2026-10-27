@@ -1,0 +1,63 @@
+准备前环境 UTC 2026-10-26T18:23:01Z
+命令 ['hostname']
+fl00
+ 退出码 0
+命令 ['df', '-h', '/', '/srv', '/home/fl']
+文件系统        大小  已用  可用 已用% 挂载点
+/dev/nvme0n1p1  116G   37G   73G   34% /
+/dev/nvme0n1p1  116G   37G   73G   34% /
+/dev/nvme0n1p1  116G   37G   73G   34% /
+ 退出码 0
+命令 ['cat', '/etc/nv_tegra_release']
+# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025
+# KERNEL_VARIANT: oot
+TARGET_USERSPACE_LIB_DIR=nvidia
+TARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia
+ 退出码 0
+命令 ['dpkg-query', '-W', 'nvidia-l4t-core', 'cuda-toolkit-12-6', 'libcudnn9-cuda-12', 'libcusparselt0', 'libopenblas0-pthread']
+cuda-toolkit-12-6	12.6.11-1
+libcudnn9-cuda-12	9.3.0.75-1
+libcusparselt0	0.7.1.0-1
+libopenblas0-pthread:arm64	0.3.20+ds-1
+nvidia-l4t-core	36.4.3-20250107174145
+ 退出码 0
+命令 ['python3', '-m', 'pip', '--version']
+pip 26.0.1 from /home/fl/.local/lib/python3.10/site-packages/pip (python 3.10)
+ 退出码 0
+命令 ['systemctl', 'show', 'wfb-fl-server-daemon.service', 'wfb-fl-client-daemon.service', '-p', 'Id', '-p', 'MainPID', '-p', 'ActiveState']
+MainPID=54188
+Id=wfb-fl-server-daemon.service
+ActiveState=active
+
+MainPID=0
+Id=wfb-fl-client-daemon.service
+ActiveState=inactive
+ 退出码 0
+命令 ['bash', '-c', "ldconfig -p | rg 'cusparseLt|openblas|libcudnn.so'"]
+	libopenblas.so.0 (libc6,AArch64) => /lib/aarch64-linux-gnu/libopenblas.so.0
+	libopenblas.so (libc6,AArch64) => /lib/aarch64-linux-gnu/libopenblas.so
+	libcusparseLt.so.0 (libc6,AArch64) => /lib/aarch64-linux-gnu/libcusparseLt.so.0
+	libcusparseLt.so (libc6,AArch64) => /lib/aarch64-linux-gnu/libcusparseLt.so
+	libcudnn.so.9 (libc6,AArch64) => /lib/aarch64-linux-gnu/libcudnn.so.9
+	libcudnn.so (libc6,AArch64) => /lib/aarch64-linux-gnu/libcudnn.so
+ 退出码 0
+命令 ['sudo', '-n', 'find', '/home/fl', '/var/cache', '-maxdepth', '5', '-type', 'f', '-name', '*.whl']
+/home/fl/onnxruntime_gpu-1.23.0-cp310-cp310-linux_aarch64.whl
+/home/fl/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl
+/home/fl/torchvision-0.20.0a0+afc54f7-cp310-cp310-linux_aarch64.whl
+ 退出码 0
+命令 ['sudo', '-n', 'ls', '-ld', '/srv/wfb-ng-fl/mnist']
+ls: 无法访问 '/srv/wfb-ng-fl/mnist': 没有那个文件或目录
+ 退出码 2
+依赖 numpy 1.23.5
+依赖 torch 2.5.0a0+872d972e41.nv24.8
+依赖 filelock 3.20.0
+依赖 typing_extensions 4.15.0
+依赖 networkx 3.4.2
+依赖 jinja2 3.1.6
+依赖 fsspec 2025.12.0
+依赖 sympy 1.13.1
+依赖 mpmath 1.3.0
+依赖 MarkupSafe 3.0.3
+依赖 pip 26.0.1
+依赖 setuptools 59.6.0

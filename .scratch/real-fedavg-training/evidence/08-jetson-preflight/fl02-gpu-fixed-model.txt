@@ -1,0 +1,39 @@
+固定模型 GPU 检查 UTC 2026-10-26T18:34:07Z
+用途：本地环境单批次前向/反向/SGD检查；不启动daemon作业，不写模型或update
+解释器 /usr/bin/python3 torch路径 /usr/local/lib/python3.10/dist-packages/torch/__init__.py torch 2.5.0a0+872d972e41.nv24.08 CUDA 12.6 cuDNN 90300 numpy 1.23.5
+固定模型来源 /usr/local/lib/python3.10/dist-packages/wfb_ng/fl/reference_model.py 源文件sha256 86963f19190aa27d249e2b91fa07eddfbb4090fa8d4dafd9c58639311961be37
+固定模型类代码
+class MNISTReferenceModel(nn.Module):
+    """输入为 [0, 1] 的 FP32 灰度图，输出十类 logits。"""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 8, 3, padding=1, device='cpu', dtype=torch.float32)
+        self.conv2 = nn.Conv2d(8, 16, 3, padding=1, device='cpu', dtype=torch.float32)
+        self.classifier = nn.Linear(16 * 7 * 7, 10, device='cpu', dtype=torch.float32)
+
+    def forward(self, images: torch.Tensor) -> torch.Tensor:
+        images = F.max_pool2d(F.relu(self.conv1(images)), 2)
+        images = F.max_pool2d(F.relu(self.conv2(images)), 2)
+        return self.classifier(images.flatten(1))
+
+依赖 numpy 1.23.5
+依赖 torch 2.5.0a0+872d972e41.nv24.8
+依赖 filelock 3.20.0
+依赖 typing_extensions 4.15.0
+依赖 networkx 3.4.2
+依赖 jinja2 3.0.3
+依赖 fsspec 2025.12.0
+依赖 sympy 1.13.1
+依赖 mpmath 1.3.0
+GPU Orin total_memory_bytes 7990071296 capability (8, 7) SM_count 8 cudnn_enabled True cudnn_available True
+参数 conv1.weight device cuda:0 shape [8, 1, 3, 3] grad_max_abs 0.050387248396873474 step_max_abs_change 0.0005038753151893616 sgd_max_abs_error 0.0
+参数 conv1.bias device cuda:0 shape [8] grad_max_abs 0.06729067116975784 step_max_abs_change 0.0006729066953994334 sgd_max_abs_error 0.0
+参数 conv2.weight device cuda:0 shape [16, 8, 3, 3] grad_max_abs 0.028958383947610855 step_max_abs_change 0.00028958171606063843 sgd_max_abs_error 0.0
+参数 conv2.bias device cuda:0 shape [16] grad_max_abs 0.08405522257089615 step_max_abs_change 0.0008405522094108164 sgd_max_abs_error 0.0
+参数 classifier.weight device cuda:0 shape [10, 784] grad_max_abs 0.023874344304203987 step_max_abs_change 0.0002387426793575287 sgd_max_abs_error 7.450580596923828e-09
+参数 classifier.bias device cuda:0 shape [10] grad_max_abs 0.04319185018539429 step_max_abs_change 0.00043191848089918494 sgd_max_abs_error 0.0
+GPU_FIXED_MODEL_RESULT {"hostname": "fl02", "torch": "2.5.0a0+872d972e41.nv24.08", "torch_path": "/usr/local/lib/python3.10/dist-packages/torch/__init__.py", "cuda": "12.6", "cudnn": 90300, "device": "cuda:0", "gpu_name": "Orin", "model_parameter_count": 9098, "batch_size": 64, "optimizer_steps": 1, "sample_scope": "official training first 64; environment probe only", "loss": 2.292933702468872, "elapsed_s": 11.784192445000372, "changed_parameter_tensors": 6, "max_parameter_change": 0.0008405522094108164, "max_sgd_error": 7.450580596923828e-09, "status": "pass"}
+GPU_FORWARD_BACKWARD_OPTIMIZER_PASS
+
+退出码 0

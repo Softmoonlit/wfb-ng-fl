@@ -1,0 +1,95 @@
+命令 ['timedatectl', 'show', '-p', 'NTPSynchronized', '-p', 'Timezone', '-p', 'TimeUSec']
+Timezone=Asia/Shanghai
+NTPSynchronized=yes
+TimeUSec=Tue 2026-10-27 15:07:51 CST
+ 退出码 0
+命令 ['journalctl', '-k', '--since', '@1793071770', '--until', '@1793071900', '--no-pager', '-o', 'short-unix']
+1793071776.756417 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071777.932440 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071840.160495 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071842.633886 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+1793071842.832425 fl01 kernel: device wlxfc221c300e99 left promiscuous mode
+1793071845.148484 fl01 kernel: device wlxfc221c300e99 entered promiscuous mode
+ 退出码 0
+命令 ['journalctl', '-u', 'wfb-fl-client-daemon.service', '--since', '@1793071770', '--until', '@1793071900', '--no-pager', '-o', 'short-unix']
+1793071776.687969 fl01 systemd[1]: wfb-fl-client-daemon.service: Current command vanished from the unit file, execution of the command list won't be resumed.
+1793071776.753383 fl01 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+1793071776.753789 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:29:36,753 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+1793071777.110081 fl01 wfb-fl-client-daemon[23552]: 2026-10-27 11:29:37,109 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+1793071777.259295 fl01 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+1793071777.260183 fl01 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+1793071777.260315 fl01 systemd[1]: wfb-fl-client-daemon.service: Consumed 19.718s CPU time.
+1793071777.265136 fl01 systemd[1]: Started WFB-ng FL client persistent daemon.
+1793071777.673418 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,672 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=1, TUN IP=10.80.0.11)
+1793071777.674084 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,673 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300e99，开始接管配置...
+1793071777.862600 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,862 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c1)
+1793071777.909714 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:29:37,908 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071819.813798 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:19,812 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793071840.122999 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:40,121 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+1793071840.322459 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:40,322 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/client_role.json --job-context /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /srv/wfb-ng-fl/client/job_web-f317d54238864f64ab66164f151d3622/algorithm_config.json
+1793071842.829032 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:42,828 [INFO] [client-daemon] 终止子进程组 PGID=24169 (PID=24169)
+1793071845.121343 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,119 [INFO] [client-daemon] 回收作业 web-f317d54238864f64ab66164f151d3622 资源 (exit_code=0)
+1793071845.124333 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,124 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+1793071845.194398 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,193 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> ABORTING (0 延迟即刻抢跑)
+1793071845.458878 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,458 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+1793071845.459884 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,459 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+1793071845.774582 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,774 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+1793071845.778736 fl01 wfb-fl-client-daemon[24102]: 2026-10-27 11:30:45,778 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=63bc44ff293d4b079e077b5ef1a282b3 job_id=web-f317d54238864f64ab66164f151d3622 node_id=1 server=10.80.0.1:9001
+ 退出码 0
+当前链路日志尾部 /srv/wfb-ng-fl/client/wfb_uplink.log
+69754264	REASSEMBLY	5:40
+69754264	TOKEN_AUTH	36040:0:5378:3716820
+grant_accept node_id=1 sequence=105252 duration_ms=120 expires_at_ms=69754390
+grant_accept node_id=1 sequence=105253 duration_ms=120 expires_at_ms=69754521
+grant_accept node_id=1 sequence=105254 duration_ms=120 expires_at_ms=69754651
+grant_accept node_id=1 sequence=105255 duration_ms=120 expires_at_ms=69754781
+grant_accept node_id=1 sequence=105256 duration_ms=120 expires_at_ms=69754912
+grant_accept node_id=1 sequence=105257 duration_ms=120 expires_at_ms=69755041
+grant_accept node_id=1 sequence=105258 duration_ms=120 expires_at_ms=69755172
+grant_accept node_id=1 sequence=105259 duration_ms=120 expires_at_ms=69755303
+69755264	PKT	8:224:0:0:0:0:0:0:0:0:0
+69755264	PKT_SRC	255:0:0:0:0:0:0
+69755264	GRANT_FILTER	86852:36048:0:50804:0:0:0:0:0
+69755264	READY_FILTER	0:0:0:0:0
+69755264	REASSEMBLY	5:40
+69755264	TOKEN_AUTH	36048:0:5378:3716820
+grant_accept node_id=1 sequence=105261 duration_ms=120 expires_at_ms=69755563
+grant_accept node_id=1 sequence=105262 duration_ms=120 expires_at_ms=69755693
+grant_accept node_id=1 sequence=105263 duration_ms=120 expires_at_ms=69755823
+grant_accept node_id=1 sequence=105264 duration_ms=120 expires_at_ms=69755954
+69756264	PKT	7:196:0:0:0:0:0:0:0:0:0
+69756264	PKT_SRC	255:0:0:0:0:0:0
+69756264	GRANT_FILTER	86859:36052:0:50807:0:0:0:0:0
+69756264	READY_FILTER	0:0:0:0:0
+69756264	REASSEMBLY	5:40
+69756264	TOKEN_AUTH	36052:0:5378:3716820
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=69756826
+69757265	RX_ANT	5785:3:40	1	14:-50:-49:-48:12:18:23
+69757265	RX_ANT	5785:3:40	0	14:-52:-51:-50:12:17:22
+69757265	PKT	20:777:0:0:14:14:0:0:0:1:41
+69757265	PKT_SRC	255:14:609:0:0:1:41
+69757265	GRANT_FILTER	86865:36052:0:50813:0:0:0:0:0
+69757265	READY_FILTER	0:0:0:0:0
+69757265	REASSEMBLY	5:40
+69757265	TOKEN_AUTH	36052:0:5378:3716827
+69758265	PKT	7:196:0:0:0:0:0:0:0:0:0
+69758265	PKT_SRC	255:0:0:0:0:0:0
+69758265	GRANT_FILTER	86872:36052:0:50820:0:0:0:0:0
+69758265	READY_FILTER	0:0:0:0:0
+69758265	REASSEMBLY	5:40
+69758265	TOKEN_AUTH	36052:0:5378:3716835
+69759265	PKT	7:196:0:0:0:0:0:0:0:0:0
+69759265	PKT_SRC	255:0:0:0:0:0:0
+69759265	GRANT_FILTER	86879:36052:0:50827:0:0:0:0:0
+69759265	READY_FILTER	0:0:0:0:0
+69759265	REASSEMBLY	5:40
+69759265	TOKEN_AUTH	36052:0:5378:3716843
+69760265	PKT	8:224:0:0:0:0:0:0:0:0:0
+69760265	PKT_SRC	255:0:0:0:0:0:0
+69760265	GRANT_FILTER	86887:36052:0:50835:0:0:0:0:0
+69760265	READY_FILTER	0:0:0:0:0
+69760265	REASSEMBLY	5:40
+69760265	TOKEN_AUTH	36052:0:5378:3716852
+redeclare node_id=1 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=69760910
+grant_accept node_id=1 sequence=105305 duration_ms=120 expires_at_ms=69761291
+

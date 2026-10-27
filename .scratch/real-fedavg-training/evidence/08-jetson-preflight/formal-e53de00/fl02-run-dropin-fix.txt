@@ -1,0 +1,3 @@
+MainPID=15784
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Tue 2026-10-27 11:29:40 CST] ; stop_time=[n/a] ; pid=15784 ; code=(null) ; status=0/0 }
+ActiveState=active

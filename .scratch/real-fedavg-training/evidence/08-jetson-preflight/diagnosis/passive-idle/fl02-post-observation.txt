@@ -1,0 +1,46 @@
+MainPID=15784
+NRestarts=0
+ExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --channel 157 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 --mnist-data-dir /srv/wfb-ng-fl/mnist --work-dir /srv/wfb-ng-fl/client ; ignore_errors=no ; start_time=[Tue 2026-10-27 11:29:40 CST] ; stop_time=[n/a] ; pid=15784 ; code=(null) ; status=0/0 }
+ActiveState=active
+1793084738.825099 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:05:38,823 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084758.785417 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:05:58,784 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084780.122001 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:06:20,120 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084838.968705 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:07:18,967 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084895.040712 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:08:15,039 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084907.613400 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:08:27,612 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084972.745123 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:09:32,743 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793084998.738726 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:09:58,737 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085058.400963 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:10:58,399 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085107.210777 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:11:47,209 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085201.592152 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:13:21,590 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085216.578992 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:13:36,577 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085241.666351 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:14:01,665 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085272.009347 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:14:32,007 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085282.828494 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:14:42,827 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085324.568894 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:15:24,567 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085335.098499 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:15:35,097 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085349.846304 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:15:49,844 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085372.939043 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:16:12,937 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085385.644785 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:16:25,643 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085496.681150 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:18:16,680 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085507.382119 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:18:27,380 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085603.539878 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:20:03,538 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085634.415307 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:20:34,413 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085668.606605 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:21:08,605 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085679.339835 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:21:19,338 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085689.874865 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:21:29,873 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085786.284360 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:23:06,282 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085796.815339 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:23:16,814 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+1793085811.563944 fl02 wfb-fl-client-daemon[15784]: 2026-10-27 15:23:31,562 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+State  Recv-Q Send-Q  Local Address:Port   Peer Address:PortProcess                                                  
+UNCONN 0      0          127.0.0.53:53          0.0.0.0:*    users:(("systemd-resolve",pid=448,fd=13))               
+ESTAB  0      0      192.168.137.63:68    192.168.137.2:67   users:(("NetworkManager",pid=460,fd=26))                
+UNCONN 0      0             0.0.0.0:111         0.0.0.0:*    users:(("rpcbind",pid=447,fd=5),("systemd",pid=1,fd=57))
+UNCONN 0      0             0.0.0.0:9000        0.0.0.0:*    users:(("python3",pid=15784,fd=4))                      
+UNCONN 0      0           127.0.0.1:9200        0.0.0.0:*    users:(("wfb_v6_uplink",pid=15900,fd=4))                
+UNCONN 0      0             0.0.0.0:5353        0.0.0.0:*    users:(("avahi-daemon",pid=458,fd=12))                  
+UNCONN 768    0             0.0.0.0:34070       0.0.0.0:*    users:(("python3",pid=15784,fd=5))                      
+UNCONN 0      0             0.0.0.0:35986       0.0.0.0:*    users:(("avahi-daemon",pid=458,fd=14))                  
+UNCONN 0      0                   *:111               *:*    users:(("rpcbind",pid=447,fd=7),("systemd",pid=1,fd=59))
+UNCONN 0      0                   *:45525             *:*    users:(("avahi-daemon",pid=458,fd=15))                  
+UNCONN 0      0                   *:5353              *:*    users:(("avahi-daemon",pid=458,fd=13))                  

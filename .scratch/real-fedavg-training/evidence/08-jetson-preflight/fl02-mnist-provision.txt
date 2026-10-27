@@ -1,0 +1,15 @@
+命令 ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', 'fl@192.168.108.202', 'mkdir /home/fl/wfb-ng-08-mnist-cache-20261026']
+
+退出码 0
+命令 ['scp', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/mnist-downloads/t10k-labels-idx1-ubyte.gz', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/mnist-downloads/train-images-idx3-ubyte.gz', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/mnist-downloads/train-labels-idx1-ubyte.gz', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/mnist-downloads/t10k-images-idx3-ubyte.gz', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/mnist-downloads/mnist-source-manifest.json', '/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/provision-mnist.py', 'fl@192.168.108.202:/home/fl/wfb-ng-08-mnist-cache-20261026/']
+
+退出码 0
+命令 ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', 'fl@192.168.108.202', 'sudo -n python3 -B /home/fl/wfb-ng-08-mnist-cache-20261026/provision-mnist.py /home/fl/wfb-ng-08-mnist-cache-20261026']
+官方数据预置 UTC 2026-10-26T18:27:35Z 目标 /srv/wfb-ng-fl/mnist
+已创建 /srv/wfb-ng-fl/mnist/train-images-idx3-ubyte 字节 47040016 sha256 ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db
+已创建 /srv/wfb-ng-fl/mnist/train-labels-idx1-ubyte 字节 60008 sha256 65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5
+已创建 /srv/wfb-ng-fl/mnist/t10k-images-idx3-ubyte 字节 7840016 sha256 0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7
+已创建 /srv/wfb-ng-fl/mnist/t10k-labels-idx1-ubyte 字节 10008 sha256 ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2
+MNIST_PROVISION_PASS
+
+退出码 0
