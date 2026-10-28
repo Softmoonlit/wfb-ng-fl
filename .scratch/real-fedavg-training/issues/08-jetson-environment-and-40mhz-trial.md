@@ -66,3 +66,5 @@
 [三客户端新 fl02 网卡 smoke test](../evidence/08-jetson-preflight/three-client-new-fl02-nic-smoke/README.md)完成了仅替换 fl02 网卡后的通信验证：三客户端下行均成功；fl02 新网卡 `fc:22:1c:50:0a:88` 上行 4 MiB 成功，约 1.76 Mbps；fl04 上行超过 120 秒超时，实际 MAC 仍为原 fl02 网卡 `fc:22:1c:30:0c:bb`。该结果确认新 fl02 网卡已改善 node 2，当前三客户端失败点转移到 fl04；需先核对/更换 fl04 网卡，再进行三客户端 smoke test，不进入完整 FedAvg。
 
 后续天线、馈线、USB、供电负载和逐链 RSSI 检查统一记录在[工单 08 后续硬件与射频诊断计划](../evidence/08-jetson-preflight/pending-hardware-diagnostics.md)。这些检查暂不阻塞其余软件工单，但在进入三客户端完整 FedAvg 实训前仍必须完成；当前 08 不能标记为通过。
+
+[三客户端双新网卡 smoke test](../evidence/08-jetson-preflight/three-client-new-nics-smoke/README.md)确认 fl02 `fc:22:1c:50:0a:88` 与 fl04 `fc:22:1c:30:0f:04` 均已更换。r2 中三端 HTTP 201、4 MiB 和 SHA-256 全部成功，但 r3 在下行注册阶段因 fl01 掉出退出码 7，r4 又因 fl01 多轮 NAK 后超时退出码 9；fl01 日志出现约 `-76 dBm` 接收链和大量 `PACKET_LOSS`。因此双新网卡已改善 fl02/fl04 的已知硬件变量，但三客户端整体仍未稳定，当前必须处理 fl01 的位置/天线/USB/供电或链路环境，不进入完整 FedAvg。r4 后通过 fl01、fl04 顺序重启恢复 Server `IDLE`、三客户端 `READY`。
