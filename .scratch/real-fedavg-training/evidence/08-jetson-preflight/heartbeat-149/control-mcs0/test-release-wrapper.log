@@ -1,0 +1,28 @@
+PASS valid current 607c064 wrapper and fake /proc
+PASS root-owned frozen source 0664 under source 0700
+PASS reject source root is not 0700 : source root must be private 0700
+PASS reject non-root source file : source component must be root owned: /srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z/source/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-node.py
+PASS reject source file symlink : unexpected source path type: /srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z/source/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-node.py
+PASS root-owned native source 0755 under source 0700
+PASS reject wrong loaded PID : previous pythonLoaded does not belong to current daemon
+PASS reject wrong loaded host : previous loaded host/commit mismatch
+PASS reject stale tick : previous pythonLoaded does not belong to current daemon
+PASS reject wrong loaded commit : previous loaded host/commit mismatch
+PASS reject wrong loaded args : previous loaded args/cwd mismatch
+PASS reject wrong argv host : current wrapper host mismatch
+PASS reject wrong MainPID : previous pythonLoaded does not belong to current daemon
+PASS reject legacy launcher : unexpected protected daemon argv
+PASS reject root commit mismatch : invalid current wrapper root
+PASS reject expected args mutation : current wrapper args differ from expected args
+PASS reject live proc cmdline mutation : current wrapper changed during preflight
+PASS reject stale process tick : previous pythonLoaded does not belong to current daemon
+PASS reject wrapper mutation : current wrapper differs from frozen source
+PASS reject loaded file mutation : previous loaded file changed after import
+PASS reject non-root owned root : unprotected release path: /srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z
+PASS reject writable wrapper : unprotected release path: /srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z/release-node.py
+PASS reject symlink wrapper : unprotected release path: /srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z/release-node.py
+PASS existing owned drop-in accepted for replacement
+PASS reject drop-in mutation : release drop-in differs from owned wrapper command
+PASS reject foreign drop-in : release drop-in differs from owned wrapper command
+PASS reject missing drop-in : [Errno 2] No such file or directory: '/tmp/release-wrapper-test-mxny9bla/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzz-release-149.conf'
+PASS valid wrapper remains accepted after restorations

@@ -78,6 +78,48 @@ static void test_udp_debug_radio_update()
     close(receive_fd);
 }
 
+static void test_udp_control_and_data_mcs()
+{
+    uint16_t port;
+    const int receive_fd = rearm_udp(&port);
+    V6RadioConfig radio = {};
+    radio.bandwidth = 40;
+    radio.mcs_index = 3;
+    radio.short_gi = true;
+    AirTransmitter transmitter("127.0.0.1", port, 0, 1, radio, 1, 1, 42);
+    const auto receive_header = [&](uint8_t bandwidth, uint8_t mcs, int type, bool control) {
+        pollfd pending = {receive_fd, POLLIN, 0};
+        assert(poll(&pending, 1, 500) == 1);
+        uint8_t packet[4096] = {};
+        assert(recv(receive_fd, packet, sizeof(packet), 0) > static_cast<ssize_t>(sizeof(wrxfwd_t)));
+        const auto *header = reinterpret_cast<const wrxfwd_t *>(packet);
+        assert(header->bandwidth == bandwidth);
+        assert(header->mcs_index == mcs);
+        const auto *envelope = reinterpret_cast<const wcontrol_envelope_hdr_t *>(packet + sizeof(wrxfwd_t));
+        assert(envelope->packet_type == (control ? WFB_PACKET_CONTROL : WFB_PACKET_DATA));
+        if (control) assert(envelope->control_type == type);
+    };
+    const uint8_t payload = 0x45;
+    // 普通 TUN 数据（含心跳与 ACK）沿用方向 MCS，调度帧使用 MCS0。
+    for (int generation = 0; generation < 2; ++generation)
+    {
+        transmitter.send_data(&payload, sizeof(payload));
+        receive_header(generation == 0 ? 40 : 20, generation == 0 ? 3 : 5, WFB_PACKET_DATA, false);
+        transmitter.send_ready(1);
+        receive_header(generation == 0 ? 40 : 20, 0, WFB_CONTROL_TYPE_READY, true);
+        transmitter.send_grant(1, 9, 7, 3000);
+        receive_header(generation == 0 ? 40 : 20, 0, WFB_CONTROL_TYPE_GRANT, true);
+        if (generation == 0)
+        {
+            radio.bandwidth = 20;
+            radio.mcs_index = 5;
+            radio.short_gi = false;
+            transmitter.apply_radio_config(radio);
+        }
+    }
+    close(receive_fd);
+}
+
 int main()
 {
     V6RadioConfig current = {};
@@ -152,10 +194,11 @@ int main()
     assert(ntohl(rejected_fec.response.rc) == ENOTSUP);
 
     const V6RadioTarget headers = build_v6_radio_target(target);
-    assert(headers.control_radiotap == headers.data_radiotap);
+    assert(headers.data_radiotap[MCS_IDX_OFF] == 5);
+    assert(headers.data_radiotap[MCS_FLAGS_OFF] == headers.control_radiotap[MCS_FLAGS_OFF]);
     assert(headers.control_radiotap[MCS_FLAGS_OFF] ==
            (IEEE80211_RADIOTAP_MCS_BW_20 | IEEE80211_RADIOTAP_MCS_SGI));
-    assert(headers.control_radiotap[MCS_IDX_OFF] == 5);
+    assert(headers.control_radiotap[MCS_IDX_OFF] == 0);
 
     cmd_req_t invalid = request;
     invalid.u.cmd_set_radio.short_gi = false;
@@ -177,12 +220,23 @@ int main()
     assert(!validate_v6_radio_request(invalid, current, &target));
 
     const V6RadioTarget forty_headers = build_v6_radio_target(current);
-    assert(forty_headers.control_radiotap == forty_headers.data_radiotap);
+    assert(forty_headers.data_radiotap[MCS_IDX_OFF] == 3);
+    assert(forty_headers.data_radiotap[MCS_FLAGS_OFF] == forty_headers.control_radiotap[MCS_FLAGS_OFF]);
     assert(forty_headers.control_radiotap[MCS_FLAGS_OFF] ==
            (IEEE80211_RADIOTAP_MCS_BW_40 | IEEE80211_RADIOTAP_MCS_SGI));
-    assert(forty_headers.control_radiotap[MCS_IDX_OFF] == 3);
+    assert(forty_headers.control_radiotap[MCS_IDX_OFF] == 0);
+
+    // 控制帧固定 MCS0，带宽与长短 GI 仍跟随目标配置。
+    V6RadioConfig long_gi = current;
+    long_gi.short_gi = false;
+    const V6RadioTarget long_headers = build_v6_radio_target(long_gi);
+    assert(long_headers.data_radiotap[MCS_IDX_OFF] == 3);
+    assert(long_headers.control_radiotap[MCS_IDX_OFF] == 0);
+    assert(long_headers.control_radiotap[MCS_FLAGS_OFF] == IEEE80211_RADIOTAP_MCS_BW_40);
+    assert(long_headers.data_radiotap[MCS_FLAGS_OFF] == IEEE80211_RADIOTAP_MCS_BW_40);
 
     test_udp_debug_radio_update();
+    test_udp_control_and_data_mcs();
     test_native_rearm();
     std::cout << "v6 radio command validation and control/data radiotap sync: PASS\n";
     return 0;

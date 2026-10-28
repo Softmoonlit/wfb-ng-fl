@@ -1,0 +1,12 @@
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.28.45127-4002fdb9"' -std=gnu++11 -Isrc -o v6_radio_update_test tests/cpp/v6_radio_update_test.cpp src/rx.link.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o  -lrt -lsodium -lpcap
+In file included from tests/cpp/v6_uplink_rearm_test.hpp:29,
+                 from tests/cpp/v6_radio_update_test.cpp:1:
+tests/cpp/../../src/v6_uplink.cpp:1902:6: warning: ‘void {anonymous}::run_server({anonymous}::Config, uint64_t)’ defined but not used [-Wunused-function]
+ 1902 | void run_server(Config config, uint64_t session_id)
+      |      ^~~~~~~~~~
+tests/cpp/../../src/v6_uplink.cpp:844:8: warning: ‘{anonymous}::Config {anonymous}::parse_args(int, char**)’ defined but not used [-Wunused-function]
+  844 | Config parse_args(int argc, char **argv)
+      |        ^~~~~~~~~~
+./v6_radio_update_test
+v6_radio_update_test: tests/cpp/v6_radio_update_test.cpp:201: int main(): Assertion `headers.control_radiotap[MCS_IDX_OFF] == 0' failed.
+make: *** [Makefile:136: test_v6_radio_update] 已中止 (核心已转储)

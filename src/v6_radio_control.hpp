@@ -16,6 +16,9 @@ struct V6RadioConfig {
     bool short_gi = false;
 };
 
+// 仅 READY/GRANT 调度控制帧固定使用 MCS0，TUN 心跳与 ACK 仍属于数据面。
+constexpr uint8_t V6_CONTROL_MCS_INDEX = 0;
+
 struct V6RadioTarget {
     V6RadioConfig config;
     std::vector<uint8_t> data_radiotap;
@@ -27,8 +30,8 @@ struct V6RadioCommandResponse {
     size_t payload_size;
 };
 
-// 从同一目标配置生成两条独立 TX 路径的描述。两个字节向量必须相同，
-// 以保证控制帧和数据帧使用一致的 HT/GI/MCS。
+// 从同一目标配置生成两条 TX 路径：带宽和 GI 一致，
+// 数据帧沿用方向 MCS，READY/GRANT 控制帧固定 MCS0。
 V6RadioTarget build_v6_radio_target(const V6RadioConfig &config);
 
 // 校验完整的 tx_cmd CMD_SET_RADIO 请求，保持当前 v6 不可变字段不变。

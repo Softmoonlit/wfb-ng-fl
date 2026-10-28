@@ -1,0 +1,10 @@
+PASS previous artifact == installed native == running proc exe digest; protected path checked
+PASS reject installed native replaced : current native differs from previous protected release
+PASS reject running native replaced : current native differs from previous protected release
+PASS reject previous artifact replaced : current native differs from previous protected release
+PASS reject running native path changed : current native differs from previous protected release
+PASS reject missing native : need exactly one current native
+PASS reject duplicate native : need exactly one current native
+PASS reject native tick changed at completion : process changed during preflight
+PASS reject daemon tick changed at completion : process changed during preflight
+PASS restored valid native and ticks

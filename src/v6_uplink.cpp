@@ -189,11 +189,11 @@ struct AirTransmitter {
         if (!raw_sockfds.empty())
         {
             send_raw_air_datagram(packet, packet_size);
-            log_radio_frame_once("control", &control_frame_logged);
+            log_radio_frame_once("control", V6_CONTROL_MCS_INDEX, &control_frame_logged);
             return;
         }
         send_udp_air_datagram(packet, packet_size);
-        log_radio_frame_once("control", &control_frame_logged);
+        log_radio_frame_once("control", V6_CONTROL_MCS_INDEX, &control_frame_logged);
     }
 
     void send_data(const uint8_t *payload, size_t payload_size)
@@ -206,7 +206,7 @@ struct AirTransmitter {
         {
             throw runtime_error("发送数据面 payload 失败");
         }
-        log_radio_frame_once("data", &data_frame_logged);
+        log_radio_frame_once("data", radio_config.mcs_index, &data_frame_logged);
         if (plaintext_fec_k > 1)
         {
             fec_flush_deadline_ms = get_time_ms() + kFecFlushIdleMs;
@@ -264,10 +264,11 @@ struct AirTransmitter {
         radio_generation += 1;
         data_frame_logged = false;
         control_frame_logged = false;
-        WFB_INFO("v6_radio_update generation=%" PRIu64 " bandwidth=%u mcs_index=%u short_gi=%u radiotap_flags=0x%02x sync=data+control fec=%d/%d\n",
+        WFB_INFO("v6_radio_update generation=%" PRIu64 " bandwidth=%u data_mcs_index=%u control_mcs_index=%u short_gi=%u radiotap_flags=0x%02x sync=data+control fec=%d/%d\n",
                  radio_generation,
                  static_cast<unsigned>(radio_config.bandwidth),
                  static_cast<unsigned>(radio_config.mcs_index),
+                 static_cast<unsigned>(V6_CONTROL_MCS_INDEX),
                  static_cast<unsigned>(radio_config.short_gi),
                  static_cast<unsigned>(target.control_radiotap[MCS_FLAGS_OFF]),
                  plaintext_fec_k,
@@ -313,7 +314,7 @@ struct AirTransmitter {
     }
 
 private:
-    void log_radio_frame_once(const char *kind, bool *logged)
+    void log_radio_frame_once(const char *kind, uint8_t frame_mcs_index, bool *logged)
     {
         if (*logged)
         {
@@ -323,7 +324,7 @@ private:
                 kind,
                 radio_generation,
                 static_cast<unsigned>(radio_config.bandwidth),
-                static_cast<unsigned>(radio_config.mcs_index),
+                static_cast<unsigned>(frame_mcs_index),
                 static_cast<unsigned>(radio_config.short_gi));
         IPC_MSG_SEND();
         *logged = true;
@@ -377,7 +378,7 @@ private:
         memset(header->rssi, SCHAR_MIN, sizeof(header->rssi));
         memset(header->noise, SCHAR_MAX, sizeof(header->noise));
         header->wlan_idx = 0;
-        header->mcs_index = radio_config.mcs_index;
+        header->mcs_index = V6_CONTROL_MCS_INDEX;
         header->bandwidth = radio_config.bandwidth;
         header->freq = htons(4321);
         header->antenna[0] = 0;
@@ -2212,9 +2213,10 @@ int main(int argc, char **argv)
                  static_cast<unsigned>(config.downlink_stream),
                  config.plaintext_fec_k,
                  config.plaintext_fec_n);
-        WFB_INFO("v6_config radio_bandwidth=%u radio_mcs_index=%u radio_short_gi=%u fec_k=%d fec_n=%d grant_duration_ms=%u guard_interval_ms=%u\n",
+        WFB_INFO("v6_config radio_bandwidth=%u radio_mcs_index=%u control_mcs_index=%u radio_short_gi=%u fec_k=%d fec_n=%d grant_duration_ms=%u guard_interval_ms=%u\n",
                  static_cast<unsigned>(config.raw_air_radio.bandwidth),
                  static_cast<unsigned>(config.raw_air_radio.mcs_index),
+                 static_cast<unsigned>(V6_CONTROL_MCS_INDEX),
                  static_cast<unsigned>(config.raw_air_radio.short_gi),
                  config.plaintext_fec_k, config.plaintext_fec_n,
                  config.grant_duration_ms, config.guard_interval_ms);

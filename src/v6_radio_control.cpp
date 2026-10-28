@@ -55,6 +55,7 @@ V6RadioTarget build_v6_radio_target(const V6RadioConfig &config)
                                                                1);
     target.data_radiotap = target_radiotap.header;
     target.control_radiotap = target.data_radiotap;
+    target.control_radiotap[MCS_IDX_OFF] = V6_CONTROL_MCS_INDEX;
     return target;
 }
 

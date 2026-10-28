@@ -1,0 +1,202 @@
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.28.45127-4002fdb9"' -std=gnu++11 -Isrc -o v6_radio_update_test tests/cpp/v6_radio_update_test.cpp src/rx.link.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o  -lrt -lsodium -lpcap
+In file included from tests/cpp/v6_uplink_rearm_test.hpp:29,
+                 from tests/cpp/v6_radio_update_test.cpp:1:
+tests/cpp/../../src/v6_uplink.cpp:1903:6: warning: ‘void {anonymous}::run_server({anonymous}::Config, uint64_t)’ defined but not used [-Wunused-function]
+ 1903 | void run_server(Config config, uint64_t session_id)
+      |      ^~~~~~~~~~
+tests/cpp/../../src/v6_uplink.cpp:845:8: warning: ‘{anonymous}::Config {anonymous}::parse_args(int, char**)’ defined but not used [-Wunused-function]
+  845 | Config parse_args(int argc, char **argv)
+      |        ^~~~~~~~~~
+./v6_radio_update_test
+v6_radio_frame kind=data generation=0 bandwidth=40 mcs_index=3 short_gi=1
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=0 short_gi=1
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_frame kind=data generation=1 bandwidth=20 mcs_index=5 short_gi=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+v6 radio control loopback port=60294
+176681459	PKT	0:0:0:0:0:0:0:0:0:0:0
+176681459	RX_BATCH	0:0:0:0:0
+176681459	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+176681459	READY_FILTER	0:0:0:0:0
+176681459	REASSEMBLY	0:40
+176681459	TOKEN_AUTH	0:0:0:0
+176681459	GRANT_SEQ	0:0
+176681459	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=176681459
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=3 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=176681539
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_update generation=2 bandwidth=20 data_mcs_index=4 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=2 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=176681700
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=116 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+grant_accept node_id=9 sequence=10 duration_ms=3000 expires_at_ms=176684861
+v6_radio_frame kind=data generation=2 bandwidth=20 mcs_index=4 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=176681861
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=176681941
+grant_accept node_id=9 sequence=11 duration_ms=3000 expires_at_ms=176685021
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=176682021
+grant_accept node_id=9 sequence=0 duration_ms=3000 expires_at_ms=176685021
+v6_radio_update generation=3 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_frame kind=control generation=3 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=176682022
+grant_accept node_id=9 sequence=1 duration_ms=3000 expires_at_ms=176685102
+v6_radio_frame kind=data generation=3 bandwidth=20 mcs_index=5 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=176682102
+native run_client UDP rearm, READY, authorization and sequence: PASS
+v6 radio command validation and control/data radiotap sync: PASS
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.28.45127-4002fdb9"' -std=gnu++11 -Isrc -o session_recovery_test tests/cpp/session_recovery_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o  -lrt -lsodium -lpcap
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.28.45127-4002fdb9"' -std=gnu++11 -Isrc -o encrypted_session_test tests/cpp/encrypted_session_test.cpp src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap
+./session_recovery_test
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x0 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x0 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x0 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x2 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x2 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x2 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x3 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x3 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x3 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x4 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x4 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x4 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x5 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x5 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x5 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x6 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x6 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x6 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x7 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x7 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x7 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x8 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x8 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x8 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x9 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x9 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x9 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xa session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xa session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xa session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xb session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xb session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xb session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xc session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xc session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xc session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xd session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xd session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xd session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xe session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xe session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xe session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xf session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xf session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0xf session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x10 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x10 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x10 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x11 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x11 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x11 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x12 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x12 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x12 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x13 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x13 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x13 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x14 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x14 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x14 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x15 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x15 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x15 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x16 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x16 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x16 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x17 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x17 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x17 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x18 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x18 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x18 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x19 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x19 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x19 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1a session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1a session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1a session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1b session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1b session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1b session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1c session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1c session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1c session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1d session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1d session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1d session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1e session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1e session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1e session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1f session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1f session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x1f session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x20 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x20 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x20 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x21 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x21 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x21 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x22 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x22 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x22 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x23 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x23 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x23 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x24 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x24 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x24 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x25 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x25 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x25 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x26 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x26 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x26 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x27 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x27 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x27 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=retired_session source_node=1 source_local_block_idx=0x28 session_id=0x3b0c5eefe68c57ae
+DATA_REJECT reason=invalid_protocol_or_session
+DATA_REJECT reason=invalid_protocol_or_session
+DATA_REJECT reason=invalid_protocol_or_session
+DATA_REJECT reason=invalid_protocol_or_session
+Invalid control envelope
+Invalid control envelope
+DATA TX->RX restart, FEC isolation, retired/legacy rejection: PASS
+GRANT RX->IPC->authorization restart, replay rejection and session telemetry: PASS
+first_declare node_id=9 state=undeclared->declared_waiting_for_token at_ms=100
+Standalone scheduler GRANT and TX READY session propagation: PASS
+Expired novel session preserves current authorization: PASS
+./encrypted_session_test
+176685838	SESSION	7:1:2:3
+Unable to decrypt packet #0x100000000000000
+Unable to decrypt packet #0x100000000000000
+176685839	SESSION	7:1:2:3
+Encrypted keypair/session-key/DATA/FEC roundtrip and header authentication: PASS
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.28.45127-4002fdb9"' -std=gnu++11 -c -o src/v6_uplink.o src/v6_uplink.cpp
+g++ -o wfb_v6_uplink src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap
