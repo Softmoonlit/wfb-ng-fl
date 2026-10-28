@@ -44,3 +44,5 @@
 [迟到 ACK 跨频道边界诊断](../evidence/08-jetson-preflight/diagnosis/ack-channel-identity/README.md)在真实 loopback UDP 中三次均未误锁频道：现有发送前 drain 清除了指定窗口的旧 ACK。该候选边界已被证伪，不据此修改 ACK 协议或扩大寻频期限。
 
 [固定信道 157 standalone 64 KiB 对照](../evidence/08-jetson-preflight/standalone157-runner/README.md)已完成：四端在 `701963a` 与统一 native SHA `f7c73f41…` 下，停止完整 daemon 后用固定 157／HT40+ native 路径完成 fl01、fl02、fl04 三端 64 KiB 下行和回传，六份文件摘要全部一致，服务恢复无错误。fl02 回传仅约 0.14 Mbps，fl01 约 2.65 Mbps，fl04 约 17.06 Mbps，表明固定信道路径可用但链路质量差异明显。该结果支持“动态 HUNTING／控制宿主路径是进一步排查重点”，不能替代完整 daemon 心跳、真实训练或最终验收，也不证明已经修复 08。完整事实见该证据目录的 run 记录。
+
+随后执行了 fl02 的较大文件参数对照，所有组均保持信道 157／HT40+、FEC 8/14、Server 下行 MCS 3、四板代码与 native 制品一致，并在每组结束恢复 daemon：上行 MCS 4、3、2 均无法在 120 秒内完成 4 MiB 回传；实际功率从 -14 dBm 提高到 -10 dBm 后仍无法完成。fl01、fl04 同期均可完成回传，已完成文件 SHA-256 一致。结果不支持仅通过降低 MCS 或提高 fl02 发射功率修复问题，说明还需检查控制帧路径、网卡/驱动、天线和 USB 环境。详情见 [MCS 与功率对照](../evidence/08-jetson-preflight/mcs-power-matrix/README.md)。
