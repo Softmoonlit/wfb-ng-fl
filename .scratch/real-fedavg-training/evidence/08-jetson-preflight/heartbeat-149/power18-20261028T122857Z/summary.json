@@ -1,0 +1,32 @@
+{
+  "observed_seconds": 120.20974358401145,
+  "samples": 102,
+  "non_ready_samples": 1,
+  "offline_samples": 0,
+  "max_heartbeat_age": 7.74,
+  "power18_readbacks": 22,
+  "restored_power": 14,
+  "transitions": [
+    {
+      "elapsed": 0.00010633599595166743,
+      "readiness": "READY",
+      "state": "IDLE",
+      "heartbeat_age": 2.12,
+      "channel": 149
+    },
+    {
+      "elapsed": 35.905187903990736,
+      "readiness": "CONNECTING",
+      "state": "HUNTING",
+      "heartbeat_age": 0.11,
+      "channel": 153
+    },
+    {
+      "elapsed": 36.908634335995885,
+      "readiness": "READY",
+      "state": "IDLE",
+      "heartbeat_age": 0.35,
+      "channel": 149
+    }
+  ]
+}

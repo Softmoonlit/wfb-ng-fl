@@ -1,0 +1,235 @@
+{
+  "duration_seconds": 85,
+  "requests": 25,
+  "acks": 25,
+  "server_received": 25,
+  "above230ms": 8,
+  "max_rtt": 4.349385601999984,
+  "pairs": [
+    {
+      "timestamp_ms": 3303625,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.189392522000162,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3308835,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 4.349385601999984,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3314066,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.008118236999962392,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3319094,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.2094192010004008,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3324324,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.1809763460000795,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3329526,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.31565460499996334,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3334757,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 1.733170245999645,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3334990,
+      "state": "HUNTING",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 1.5020810010000787,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3335220,
+      "state": "HUNTING",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 1.272939105000205,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3335637,
+      "state": "HUNTING",
+      "request_channel": 157,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.8622609039998679,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3335868,
+      "state": "HUNTING",
+      "request_channel": 157,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.6319873749998806,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3336290,
+      "state": "HUNTING",
+      "request_channel": 153,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.2093494640002973,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3336521,
+      "state": "HUNTING",
+      "request_channel": 153,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.0034798930000761175,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3337012,
+      "state": "HUNTING",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.24344494200022382,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3337243,
+      "state": "HUNTING",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.020886944999801926,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3337284,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.0037828819999958796,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3342308,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.154180118000113,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3347483,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.1866018279997661,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3352690,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.18423910100000285,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3357895,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.18761341900017214,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3363103,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.18509718199993586,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3368308,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.19119980899995426,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3373520,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.18512434700005542,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3378726,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.18337265500031208,
+      "ack_channel": 149
+    },
+    {
+      "timestamp_ms": 3383930,
+      "state": "IDLE",
+      "request_channel": 149,
+      "server_received": true,
+      "ack_received": true,
+      "rtt": 0.1804815850000523,
+      "ack_channel": 149
+    }
+  ]
+}
