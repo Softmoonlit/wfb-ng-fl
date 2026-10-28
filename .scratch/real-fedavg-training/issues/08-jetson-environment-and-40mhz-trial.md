@@ -46,3 +46,7 @@
 [固定信道 157 standalone 64 KiB 对照](../evidence/08-jetson-preflight/standalone157-runner/README.md)已完成：四端在 `701963a` 与统一 native SHA `f7c73f41…` 下，停止完整 daemon 后用固定 157／HT40+ native 路径完成 fl01、fl02、fl04 三端 64 KiB 下行和回传，六份文件摘要全部一致，服务恢复无错误。fl02 回传仅约 0.14 Mbps，fl01 约 2.65 Mbps，fl04 约 17.06 Mbps，表明固定信道路径可用但链路质量差异明显。该结果支持“动态 HUNTING／控制宿主路径是进一步排查重点”，不能替代完整 daemon 心跳、真实训练或最终验收，也不证明已经修复 08。完整事实见该证据目录的 run 记录。
 
 随后执行了 fl02 的较大文件参数对照，所有组均保持信道 157／HT40+、FEC 8/14、Server 下行 MCS 3、四板代码与 native 制品一致，并在每组结束恢复 daemon：上行 MCS 4、3、2 均无法在 120 秒内完成 4 MiB 回传；实际功率从 -14 dBm 提高到 -10 dBm 后仍无法完成。fl01、fl04 同期均可完成回传，已完成文件 SHA-256 一致。结果不支持仅通过降低 MCS 或提高 fl02 发射功率修复问题，说明还需检查控制帧路径、网卡/驱动、天线和 USB 环境。详情见 [MCS 与功率对照](../evidence/08-jetson-preflight/mcs-power-matrix/README.md)。
+
+随后对 `-18 dBm / MCS 4` 做了三次重复：一次 fl01 下行校验失败，一次 fl02 超过 120 秒且 fl01/fl04 完成，一次 UFTP 退出码 7。fl02 是最严重节点，但 fl01、fl04 也存在间歇性失败，不能把问题简化为单一 fl02 功率设置。完整记录见同一 MCS/功率证据目录。
+
+[信道 149 / HT20 对照](../evidence/08-jetson-preflight/channel149-ht20/README.md)在四端同版、`-14 dBm`、Server MCS 3、客户端 MCS 4、FEC 8/14 下执行了一次 4 MiB standalone 对照。四端实际读回 149 / 20 MHz，native argv 也为带宽 20；但 UFTP 下行以退出码 7 中止，fl02/fl04 完成注册而 fl01 未注册，未进入上行。恢复无错误，最终回到 157 / HT40+、`-14 dBm`、Server `IDLE`、三客户端 `READY`。该结果不支持切换到 149 / HT20，也不能作为 20 MHz 速率标定证据。
