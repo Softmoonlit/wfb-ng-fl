@@ -61,6 +61,12 @@ class TestClientRadioApplication(unittest.TestCase):
         updater = mock.patch('wfb_ng.fl.client_daemon.apply_link_radio', side_effect=update)
         updater.start()
         self.addCleanup(updater.stop)
+        # native 进程已由本夹具模拟，重武装同样在系统边界记录，不连接真实服务。
+        self.rearms = []
+        rearm = mock.patch('wfb_ng.fl.client_daemon.rearm_link_uplink',
+                           side_effect=lambda port, epoch: self.rearms.append((port, epoch)))
+        rearm.start()
+        self.addCleanup(rearm.stop)
         self.daemon = ClientDaemon(
             ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip='10.80.0.11', work_dir=work.name,
                                uplink_mcs=3, radio_txpower_dbm=12),
@@ -111,8 +117,8 @@ class TestClientRadioApplication(unittest.TestCase):
     def commit(self, patch=None):
         if patch is None:
             patch = {'uplink_mcs': 5, 'radio_txpower_dbm': 14}
-        self.control.handle_broadcast({'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'patch': patch})
-        self.control.handle_broadcast({'type': 'CONFIG_RADIO_COMMIT', 'session_id': 'radio-1',
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'target_nodes': [1], 'patch': patch})
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_COMMIT', 'session_id': 'radio-1', 'target_nodes': [1],
                                        'patch': patch, 'delay_ms': 0})
         self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
         # The public getter synchronizes with the pending COMMIT application.
@@ -125,7 +131,7 @@ class TestClientRadioApplication(unittest.TestCase):
                              uplink_mcs=self.control.uplink_mcs,
                              downlink_mcs=self.control.downlink_mcs,
                              uftp_rate_kbps=self.control.uftp_rate_kbps)
-        self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1',
+        self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1', 'target_nodes': [1],
                                        'channel': self.control.current_channel,
                                        'config': config.to_dict(),
                                        'calibration': self.control.calibration})
@@ -137,7 +143,7 @@ class TestClientRadioApplication(unittest.TestCase):
         patch = {'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uftp_rate_kbps': 1000,
                  'uplink_mcs': 5}
         for kind in ('CONFIG_RADIO_PREPARE', 'CONFIG_RADIO_COMMIT'):
-            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1',
+            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1', 'target_nodes': [1],
                                            'patch': patch, 'delay_ms': 0, 'calibration': True})
         self.assertTrue(self.spawned.wait(1))
         self.assertTrue(self.control.radio_switch_pending)
@@ -174,7 +180,11 @@ class TestClientRadioApplication(unittest.TestCase):
                 try:
                     heartbeat = NodeHeartbeat.from_bytes(raw)
                     received.append(heartbeat)
-                    peer.sendto(b'{"ack": true}', addr)
+                    peer.sendto(json.dumps({
+                        "ack": True,
+                        "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
+                        "channel": self.daemon.config.channel,
+                    }).encode(), addr)
                     if heartbeat.state == 'IDLE':
                         idle.set()
                 except Exception as exc:
@@ -207,7 +217,7 @@ class TestClientRadioApplication(unittest.TestCase):
         patch = {'bandwidth_mhz': 20, 'downlink_mcs': 4, 'uftp_rate_kbps': 7000,
                  'uplink_mcs': 5, 'radio_txpower_dbm': 16}
         for kind in ('CONFIG_RADIO_PREPARE', 'CONFIG_RADIO_COMMIT'):
-            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1',
+            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1', 'target_nodes': [1],
                                            'patch': patch, 'delay_ms': 0, 'calibration': True})
         self.assertTrue(self.spawned.wait(1))
         self.assertTrue(self.control.radio_switch_pending)
@@ -361,7 +371,7 @@ class TestClientRadioApplication(unittest.TestCase):
 
     def test_channel_165_does_not_silently_downgrade_bandwidth(self):
         self.control.handle_broadcast({
-            'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1',
+            'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'target_nodes': [1],
             'patch': {'channel': 165},
         })
         self.assertEqual(self.control.current_channel, 157)
@@ -371,8 +381,8 @@ class TestClientRadioApplication(unittest.TestCase):
     def test_pending_apply_serializes_daemon_and_control_without_early_acks(self):
         self.update_gate = threading.Event()
         patch = {'uplink_mcs': 5}
-        self.control.handle_broadcast({'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'patch': patch})
-        self.control.handle_broadcast({'type': 'CONFIG_RADIO_COMMIT', 'session_id': 'radio-1',
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'target_nodes': [1], 'patch': patch})
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_COMMIT', 'session_id': 'radio-1', 'target_nodes': [1],
                                        'patch': patch, 'delay_ms': 0})
         self.assertTrue(self.spawned.wait(1))
         daemon_entered = threading.Event()

@@ -38,7 +38,7 @@ from .algorithm import validate_algorithm_config
 from .artifacts import read_json, validate_path_safe_identifier, write_json_atomic
 from .evidence import DEFAULT_EVIDENCE_DIR, archive_client_evidence
 from .errors import FLRuntimeError
-from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio
+from .link_radio import DEFAULT_RADIO_CONTROL_PORT, apply_link_radio, rearm_link_uplink
 from .transport import (
     DEFAULT_UFTP_DATA_PORT,
     DEFAULT_UFTP_MULTICAST_HOST,
@@ -1687,6 +1687,10 @@ class ClientDaemon:
                 )
                 if self._current_job_id is not None:
                     self.control_plane.bind_job_context(self._current_job_id)
+                if self.config.enable_link_process:
+                    # 物理换频完成后先重武装当前 native，再发送该信道的心跳。
+                    self.control_plane.on_channel_applied = lambda: rearm_link_uplink(
+                        self.config.radio_control_port, time.monotonic_ns())
                 self.control_plane.on_radio_prepare = self._on_radio_prepare
                 self.control_plane.on_radio_applied = self._on_radio_applied
                 self.control_plane.on_radio_finalized = self._on_radio_finalized

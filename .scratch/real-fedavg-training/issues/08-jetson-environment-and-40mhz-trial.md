@@ -41,7 +41,7 @@
 
 [后续三阶段 ICMP 活动对照](../evidence/08-jetson-preflight/formal-701963a/icmp-activity-diff/README.md)仅改变是否持续输入上行小包，服务、PID、构建及射频参数保持不变。fl02／fl04 在活动阶段维持授权和 READY refresh，ICMP 丢包约 1%～2%；fl01 活动阶段没有 grant、没有有效上行，175 个 ICMP 全丢，服务端整阶段未收到其心跳。停止探针后 fl01 恢复发送，约 94.6 毫秒内交付 161 个旧 ICMP。其恢复阶段首次出现 `pending_unauthorized_fec_due` 与 `zero_timeout_polls` 各增加 4952；该阳性发生在积压之后，不解释最初失联。不能将之前 85 秒窗口的零计数外推成此分支永不发生。
 
-[迟到 ACK 跨频道边界诊断](../evidence/08-jetson-preflight/diagnosis/ack-channel-identity/README.md)在真实 loopback UDP 中三次均未误锁频道：现有发送前 drain 清除了指定窗口的旧 ACK。该候选边界已被证伪，不据此修改 ACK 协议或扩大寻频期限。
+[迟到 ACK 跨频道边界诊断](../evidence/08-jetson-preflight/diagnosis/ack-channel-identity/README.md)在真实 loopback UDP 中三次均未误锁频道：现有发送前 drain 清除了指定窗口的旧 ACK。该结论只覆盖“drain 之前已到达”的特定窗口；本次后续诊断已在“下一频道探测发出之后才到达”的不同窗口确定复现误锁，不能将旧阴性外推为无身份 ACK 安全，详见下节。
 
 [固定信道 157 standalone 64 KiB 对照](../evidence/08-jetson-preflight/standalone157-runner/README.md)已完成：四端在 `701963a` 与统一 native SHA `f7c73f41…` 下，停止完整 daemon 后用固定 157／HT40+ native 路径完成 fl01、fl02、fl04 三端 64 KiB 下行和回传，六份文件摘要全部一致，服务恢复无错误。fl02 回传仅约 0.14 Mbps，fl01 约 2.65 Mbps，fl04 约 17.06 Mbps，表明固定信道路径可用但链路质量差异明显。该结果支持“动态 HUNTING／控制宿主路径是进一步排查重点”，不能替代完整 daemon 心跳、真实训练或最终验收，也不证明已经修复 08。完整事实见该证据目录的 run 记录。
 
@@ -71,4 +71,10 @@
 
 [当前双新网卡条件下的单 fl01 对照](../evidence/08-jetson-preflight/single-client-fl01-current/README.md)仅保留 fl01 后完成 4 MiB 下行和上行，HTTP 201、SHA-256 一致，上行约 0.64 Mbps；Server 能持续给 fl01 发 grant，但仍记录上行丢包。该结果说明 fl01 网卡并非完全失效，而是链路余量低，三客户端并发时容易越过失败阈值。单 fl01 传输通过，但恢复观察未确认全员 READY，随后 fl01/fl02/fl04 状态轮换，未伪造稳定恢复。
 
-[新 fl04 网卡单节点基线](../evidence/08-jetson-preflight/single-client-fl04-new-card-baseline/README.md)在 fl04 已使用新网卡 `fc:22:1c:30:0f:04`、USB 5000M、157/HT40+/14 档条件下仍失败：fl04 能收到 Server 包且两条接收链约 `-64~-70 dBm`，但 `TOKEN_AUTH=0`、`GRANT_SEQ=0`，Server 收不到 node 4 的有效上行声明，UFTP ANNOUNCE 超时退出码 7。该结果排除旧网卡、代码混装和三客户端竞争作为本次失败的首因，优先检查 fl04 发射天线/馈线/接头、USB 线与端口、19 V 发射负载压降及当前位置。runner 清理后延迟 45 秒三端恢复 READY，但不能抵消独立上行控制失败。
+[新 fl04 网卡单节点基线](../evidence/08-jetson-preflight/single-client-fl04-new-card-baseline/README.md)在 fl04 已使用新网卡 `fc:22:1c:30:0f:04`、USB 5000M、157/HT40+/14 档条件下仍失败：fl04 能收到 Server 包且两条接收链约 `-64~-70 dBm`，但 `TOKEN_AUTH=0`、`GRANT_SEQ=0`，Server 收不到 node 4 的有效上行声明，UFTP ANNOUNCE 超时退出码 7。该结果证明该次未建立上行控制，但不能排除控制逻辑，也不能据此认定新网卡损坏。用户已说明该卡此前验证正常，硬件／位置假设与代码机制必须分别验证。runner 清理后延迟 45 秒三端恢复 READY，不替代稳定常驻和训练验收。
+
+### 149 固定基线与常驻控制路径修复
+
+用户确认采用 149 / HT40+ / 14 档 / 下行 MCS3 / 上行 MCS4 / UFTP 15000 Kbps。fl04 在 149 上两次完成 4 MiB 双向传输；提高到 18 档没有明显收益，MCS5 对照上行失败。配置与单节点证据见[射频对照](../evidence/08-jetson-preflight/fl04-radio-comparison/README.md)，不能代替四机训练。
+
+同一 149 基线上，常驻服务仍复现 fl04 离线。[85 秒四端被动捕获与隔离复现](../evidence/08-jetson-preflight/heartbeat-149/README.md)确认了换频与 native READY 锁存不同步、固定重声明相位耦合；公开 loopback 还确定复现迟到 ACK 误锁后续频道。修复分为有身份回执和换频后本机重新武装，保持心跳期限、空口 READY/GRANT 与序号安全；相关审查同时补齐频宽更新顺序、作业接管边界和停止唤醒竞态。修复须经同一已提交源码的四端统一发布和持续心跳验证后，才能执行两轮真实 GPU/MNIST 冒烟。当前未勾选训练通过，不进入缺表的 HT20 或最终三次五轮验收。

@@ -215,25 +215,36 @@ class NodeHeartbeat:
 
 @dataclass(frozen=True)
 class HeartbeatAck:
-    """
-    Downlink ACK datagram payload sent by server to client.
-    Strictly minimal acknowledgement per ADR-0012: exact b'{"ack": true}' (13 bytes, < 20 bytes).
-    """
+    """绑定心跳请求身份和服务端生效信道的下行回执。"""
+    heartbeat_timestamp_ms: int
+    channel: int
     ack: bool = True
 
+    def __post_init__(self) -> None:
+        if type(self.ack) is not bool or self.ack is not True:
+            raise ValueError("ack 必须为 true")
+        for name in ("heartbeat_timestamp_ms", "channel"):
+            value = getattr(self, name)
+            if type(value) is not int or value <= 0:
+                raise ValueError(f"{name} 必须为正整数")
+
     def to_dict(self) -> Dict[str, Any]:
-        return {"ack": self.ack}
+        return {"ack": self.ack,
+                "heartbeat_timestamp_ms": self.heartbeat_timestamp_ms,
+                "channel": self.channel}
 
     def to_bytes(self) -> bytes:
-        return b'{"ack": true}'
+        return json.dumps(self.to_dict()).encode("utf-8")
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "HeartbeatAck":
         if not isinstance(data, dict):
-            raise TypeError(f"Payload must be a dict, got {type(data).__name__}")
-        if "ack" not in data or type(data["ack"]) is not bool:
-            raise ValueError("Missing or invalid boolean 'ack' field")
-        return cls(ack=data["ack"])
+            raise TypeError(f"回执必须为对象，实际为 {type(data).__name__}")
+        if not {"ack", "heartbeat_timestamp_ms", "channel"}.issubset(data):
+            raise ValueError("心跳回执缺少身份字段")
+        return cls(ack=data["ack"],
+                   heartbeat_timestamp_ms=data["heartbeat_timestamp_ms"],
+                   channel=data["channel"])
 
     @classmethod
     def from_bytes(cls, raw: bytes) -> "HeartbeatAck":
@@ -554,6 +565,10 @@ class NodeHorizonRegistry:
         Returns:
             Tuple of (HeartbeatAck, optional alignment patch).
         """
+        if heartbeat.timestamp_ms is None:
+            raise ValueError("心跳缺少 timestamp_ms")
+        ack = HeartbeatAck(heartbeat_timestamp_ms=heartbeat.timestamp_ms,
+                           channel=server_radio.channel)
         with self._lock:
             now = time.monotonic()
             node_id = heartbeat.node_id
@@ -573,7 +588,7 @@ class NodeHorizonRegistry:
                     heartbeat.timestamp_ms,
                     existing_node.timestamp_ms,
                 )
-                return HeartbeatAck(ack=True), None
+                return ack, None
 
             # Two-Army Gate:
             # HUNTING opens confirmation; only its IDLE closure verifies identity.
@@ -641,8 +656,8 @@ class NodeHorizonRegistry:
                 align_patch = {k: v for k, v in server_radio.to_dict().items()
                                if k in ("radio_txpower_dbm", "uplink_mcs", "downlink_mcs",
                                         "bandwidth_mhz", "uftp_rate_kbps")}
-                return HeartbeatAck(ack=True), align_patch
-            return HeartbeatAck(ack=True), None
+                return ack, align_patch
+            return ack, None
 
     def get_node(self, node_id: int) -> Optional[NodeRecord]:
         """Retrieve a node record, marking it OFFLINE if silent for > offline_threshold."""
@@ -685,7 +700,7 @@ class ControlPlaneServer:
     """
     Server-side symmetric UDP control plane engine.
     - Listens on 10.80.0.1:9001 for client unicast heartbeats.
-    - Responds with unicast ACK (b'{"ack": true}', strictly < 20 bytes).
+    - 单播回复携带请求时间戳与服务端生效信道的心跳回执。
     - If radio mismatch detected, dispatches alignment directive.
     - Broadcasts global downlink directives to 255.255.255.255:9000.
     """
@@ -1250,6 +1265,8 @@ class ControlPlaneServer:
         while not self._stop_event.is_set():
             callbacks: List[Tuple[Callable[[Dict[str, Any]], None], Dict[str, Any]]] = []
             with self._liveness_condition:
+                if self._stop_event.is_set():
+                    return
                 now = time.monotonic()
                 next_deadline: Optional[float] = None
                 for job_id, watch in list(self._liveness_watches.items()):
@@ -1895,7 +1912,7 @@ class ControlPlaneServer:
                         self._prepare_acks.keys()
                     ):
                         self._prepare_event.set()
-            return [HeartbeatAck(ack=True).to_bytes()]
+            return None
 
         if msg_type == "COMMIT_SUCCESS":
             cs = CommitSuccess.from_dict(payload)
@@ -1915,7 +1932,7 @@ class ControlPlaneServer:
                         self._commit_successes.keys()
                     ):
                         self._commit_event.set()
-            return [HeartbeatAck(ack=True).to_bytes()]
+            return None
 
         # Standard NodeHeartbeat
         hb = NodeHeartbeat.from_dict(payload)
@@ -2406,6 +2423,8 @@ class ControlPlaneClient:
         self.tun_ip = tun_ip
         self.network_adapter = network_adapter
         self.air_interface = air_interface
+        self.on_channel_applied: Optional[Callable[[], None]] = None
+        self._channel_rearm_pending = False
         self.current_channel = initial_channel
         self.cached_channel = cached_channel or initial_channel
         self.locked_channel: Optional[int] = None
@@ -2419,6 +2438,7 @@ class ControlPlaneClient:
         self._pending_switch_calibration = False
         self.server_host = server_host
         self.server_port = server_port
+        self._server_endpoint: Optional[Tuple[str, int]] = None
         self.broadcast_port = broadcast_port
         self.attempt_timeout_seconds = attempt_timeout_seconds
         self.max_attempts_per_channel = max_attempts_per_channel
@@ -2532,7 +2552,19 @@ class ControlPlaneClient:
             self._last_sent_ts_ms = now_ms
             return now_ms
 
+    def _get_server_endpoint(self) -> Tuple[str, int]:
+        """固定解析一次 IPv4 UDP 目标，发送与来源校验复用同一数字端点。"""
+        with self._lock:
+            if self._server_endpoint is None:
+                address = socket.getaddrinfo(
+                    self.server_host, self.server_port, socket.AF_INET,
+                    socket.SOCK_DGRAM, socket.IPPROTO_UDP,
+                )[0][4]
+                self._server_endpoint = (str(address[0]), int(address[1]))
+            return self._server_endpoint
+
     def _get_uplink_sock(self) -> socket.socket:
+        self._get_server_endpoint()
         with self._lock:
             if self._uplink_sock is None:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -2562,6 +2594,9 @@ class ControlPlaneClient:
         self.current_channel = channel
         if bandwidth_mhz is not None:
             self.bandwidth_mhz = bandwidth_mhz
+            self._channel_rearm_pending = True
+        elif self.on_channel_applied is not None:
+            self.on_channel_applied()
 
     def _apply_txpower_switch(self, txpower_dbm: int) -> None:
         """Switch physical interface txpower via network adapter. Fail closed on error."""
@@ -2605,13 +2640,20 @@ class ControlPlaneClient:
                 self._notify_radio_applied()
                 raise
 
+    def _can_hunt_locked(self) -> bool:
+        """持有状态锁时确认寻频仍拥有射频及状态提交权。"""
+        return (self.state == ClientNodeState.HUNTING
+                and self._pending_switch_session_id is None
+                and self._pre_switch_config is None
+                and not self._stop_event.is_set())
+
     def hunt_once(self, ladder: Optional[List[int]] = None) -> bool:
         """
         Execute one full pass through the three-tier hunting ladder:
         Returns True if server was discovered and locked, False otherwise.
         """
         with self._lock:
-            if self._pre_switch_config is not None:
+            if not self._can_hunt_locked():
                 return False
         channels = ladder if ladder is not None else build_hunting_ladder(self.cached_channel)
         sock = self._get_uplink_sock()
@@ -2621,7 +2663,7 @@ class ControlPlaneClient:
                 return False
 
             with self._lock:
-                if self._pre_switch_config is not None:
+                if not self._can_hunt_locked():
                     return False
                 try:
                     replace(self._current_radio_config(), channel=ch).channel_width
@@ -2630,37 +2672,37 @@ class ControlPlaneClient:
                 self._apply_channel_switch(ch)
 
             for attempt in range(1, self.max_attempts_per_channel + 1):
-                if self._stop_event.is_set():
-                    return False
+                with self._lock:
+                    if not self._can_hunt_locked():
+                        return False
 
-                self._drain_sock(sock)
-                hb = NodeHeartbeat(
-                    node_id=self.node_id,
-                    state=ClientNodeState.HUNTING.value,
-                    elapsed_ms=self.get_elapsed_ms(),
-                    current_channel=ch,
-                    txpower_dbm=self.txpower_dbm,
-                    uplink_mcs=self.uplink_mcs,
-                    bandwidth_mhz=self.bandwidth_mhz,
-                    downlink_mcs=self.downlink_mcs,
-                    uftp_rate_kbps=self.uftp_rate_kbps,
-                    calibration=self.calibration,
-                    timestamp_ms=self._next_timestamp_ms(),
-                )
+                    self._drain_sock(sock)
+                    hb = NodeHeartbeat(
+                        node_id=self.node_id,
+                        state=ClientNodeState.HUNTING.value,
+                        elapsed_ms=self.get_elapsed_ms(),
+                        current_channel=ch,
+                        txpower_dbm=self.txpower_dbm,
+                        uplink_mcs=self.uplink_mcs,
+                        bandwidth_mhz=self.bandwidth_mhz,
+                        downlink_mcs=self.downlink_mcs,
+                        uftp_rate_kbps=self.uftp_rate_kbps,
+                        calibration=self.calibration,
+                        timestamp_ms=self._next_timestamp_ms(),
+                    )
+
+                    deadline = time.monotonic() + self.attempt_timeout_seconds
+                    try:
+                        sock.sendto(hb.to_bytes(), self._get_server_endpoint())
+                    except Exception as exc:
+                        logger.debug("寻频发送异常 (信道=%d): %s", ch, exc)
+                        continue
 
                 try:
-                    sock.sendto(hb.to_bytes(), (self.server_host, self.server_port))
-                except Exception as exc:
-                    logger.debug("寻频发送异常 (信道=%d): %s", ch, exc)
-                    continue
-
-                try:
-                    sock.settimeout(self.attempt_timeout_seconds)
-                    resp_data, _ = sock.recvfrom(4096)
-                    ack = HeartbeatAck.from_bytes(resp_data)
-                    if ack.ack:
+                    ack = self._receive_heartbeat_ack(sock, hb, deadline)
+                    if ack is not None:
                         with self._lock:
-                            if self._pre_switch_config is not None:
+                            if not self._can_hunt_locked():
                                 return False
                             # Success! Lock channel and cache it
                             self.locked_channel = ch
@@ -2668,7 +2710,7 @@ class ControlPlaneClient:
                             self.missed_acks = 0
 
                             # Also drain/check for subsequent CONFIG_RADIO_ALIGN packet
-                            self._check_and_apply_alignment_packet(sock)
+                            self._check_and_apply_alignment_packet(sock, deadline)
 
                             # Transition to IDLE
                             self.state = ClientNodeState.IDLE
@@ -2685,11 +2727,40 @@ class ControlPlaneClient:
 
         return False
 
-    def _check_and_apply_alignment_packet(self, sock: socket.socket) -> None:
-        """Check if an alignment directive was sent as a separate UDP packet."""
+    def _receive_heartbeat_ack(
+        self, sock: socket.socket, heartbeat: NodeHeartbeat, deadline: float,
+    ) -> Optional[HeartbeatAck]:
+        """在本次截止时间内忽略非目标来源、非法及身份不匹配的消息。"""
+        while not self._stop_event.is_set():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return None
+            try:
+                sock.settimeout(remaining)
+                data, address = sock.recvfrom(4096)
+            except (socket.timeout, BlockingIOError):
+                return None
+            if address != self._get_server_endpoint():
+                continue
+            try:
+                ack = HeartbeatAck.from_bytes(data)
+            except (ValueError, TypeError):
+                continue
+            if (ack.heartbeat_timestamp_ms == heartbeat.timestamp_ms
+                    and ack.channel == heartbeat.current_channel):
+                return ack
+        return None
+
+    def _check_and_apply_alignment_packet(self, sock: socket.socket, deadline: float) -> None:
+        """在本次剩余时间内检查服务端随后发送的射频对齐消息。"""
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return
         try:
-            sock.settimeout(0.02)
-            extra_data, _ = sock.recvfrom(4096)
+            sock.settimeout(min(0.02, remaining))
+            extra_data, address = sock.recvfrom(4096)
+            if address != self._get_server_endpoint():
+                return
         except (socket.timeout, BlockingIOError):
             return
         except OSError:
@@ -2721,19 +2792,18 @@ class ControlPlaneClient:
             timestamp_ms=self._next_timestamp_ms(),
         )
 
+        deadline = time.monotonic() + self.attempt_timeout_seconds
         try:
-            sock.sendto(hb.to_bytes(), (self.server_host, self.server_port))
+            sock.sendto(hb.to_bytes(), self._get_server_endpoint())
         except Exception as exc:
             logger.debug("发送心跳失败: %s", exc)
             return None
 
         try:
-            sock.settimeout(self.attempt_timeout_seconds)
-            resp_data, _ = sock.recvfrom(4096)
-            ack = HeartbeatAck.from_bytes(resp_data)
-            if ack.ack:
+            ack = self._receive_heartbeat_ack(sock, hb, deadline)
+            if ack is not None:
                 self.missed_acks = 0
-                self._check_and_apply_alignment_packet(sock)
+                self._check_and_apply_alignment_packet(sock, deadline)
                 return ack
         except (socket.timeout, BlockingIOError):
             pass
@@ -2808,7 +2878,7 @@ class ControlPlaneClient:
                 if remaining <= 0:
                     break
                 try:
-                    sock.sendto(message, (self.server_host, self.server_port))
+                    sock.sendto(message, self._get_server_endpoint())
                 except OSError:
                     time.sleep(min(REPORT_RETRY_INTERVAL_SECONDS, remaining))
                     continue
@@ -2989,7 +3059,7 @@ class ControlPlaneClient:
         """Helper to send unicast control datagram to server."""
         sock = self._get_uplink_sock()
         try:
-            sock.sendto(data, (self.server_host, self.server_port))
+            sock.sendto(data, self._get_server_endpoint())
         except Exception as exc:
             logger.debug("发送单播控制报文失败: %s", exc)
 
@@ -3275,6 +3345,10 @@ class ControlPlaneClient:
         """
         if self.on_radio_applied is not None:
             self.on_radio_applied(self._current_radio_config())
+        if self._channel_rearm_pending:
+            if self.on_channel_applied is not None:
+                self.on_channel_applied()
+            self._channel_rearm_pending = False
 
     def _rollback_switch(self) -> None:
         """恢复事务开始时的完整客户端配置，不隐式回退到基准信道。"""

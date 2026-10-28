@@ -1,3 +1,4 @@
+#include "v6_uplink_rearm_test.hpp"
 #include <cassert>
 #include <arpa/inet.h>
 #include <cerrno>
@@ -91,6 +92,14 @@ int main()
     assert(target.mcs_index == 5);
     assert(target.short_gi);
 
+    cmd_req_t rearm = {};
+    rearm.cmd_id = CMD_REARM_UPLINK;
+    rearm.u.cmd_rearm_uplink.epoch = htobe64(1);
+    // server 不传客户端回调，必须明确拒绝重武装。
+    const auto server_rearm = handle_v6_radio_command(
+        rearm, 13, current, 8, 14, [](const V6RadioConfig &) {});
+    assert(ntohl(server_rearm.response.rc) == ENOTSUP);
+
     bool applied = false;
     const V6RadioCommandResponse set_response = handle_v6_radio_command(
         request,
@@ -174,6 +183,7 @@ int main()
     assert(forty_headers.control_radiotap[MCS_IDX_OFF] == 3);
 
     test_udp_debug_radio_update();
+    test_native_rearm();
     std::cout << "v6 radio command validation and control/data radiotap sync: PASS\n";
     return 0;
 }

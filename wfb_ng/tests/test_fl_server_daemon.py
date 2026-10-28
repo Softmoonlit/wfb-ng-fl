@@ -30,6 +30,7 @@ from wfb_ng.fl.server_daemon import (
 )
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 from wfb_ng.tests.test_fl_radio import MockSurveyBackend
+from wfb_ng.tests.test_fl_training_host import isolated_socket_boundary
 
 
 class TestServerDaemonConfig(unittest.TestCase):
@@ -169,6 +170,8 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                 ServerDaemonConfig(
                     control_bind_host="127.0.0.1",
                     control_bind_port=0,
+                    control_broadcast_addr="127.0.0.1",
+                    control_broadcast_port=0,
                     enable_link_process=False,
                     model_library_dir=root,
                 ),
@@ -224,7 +227,11 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                             "PREPARING diagnostic blocked TASK_READY report reception",
                         )
                         replies = [json.loads(client.recv(4096)) for _ in range(2)]
-                        self.assertIn({"ack": True}, replies)
+                        self.assertIn({
+                            "ack": True,
+                            "heartbeat_timestamp_ms": 1000,
+                            "channel": 157,
+                        }, replies)
                         report_reply = next(reply for reply in replies if reply.get("type") == "TASK_READY_ACK")
                         self.assertTrue(report_reply["ok"])
                         event = diagnostic.get(timeout=1.0)
@@ -260,6 +267,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             uplink_mcs=6,
             control_bind_host="127.0.0.1",
             control_bind_port=self.control_bind_port,
+            control_broadcast_addr="127.0.0.1",
             control_broadcast_port=self.control_broadcast_port,
             work_dir=self.temp_dir,
             enable_link_process=False,
@@ -326,24 +334,42 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
             network_adapter=self.adapter,
             survey_backend=self.survey_backend,
         )
-        daemon.active_job = {"job_id": "terminal-reset"}
+        target_nodes = [1, 2, 4]
+        daemon.control_plane.prepare_task_readiness("terminal-reset", target_nodes)
+        daemon.active_job = {
+            "job_id": "terminal-reset", "target_nodes": target_nodes,
+            "rounds_completed": 0, "io_timeout_seconds": 1,
+        }
         daemon.server_state = ServerState.RUNNING
         role = MagicMock()
         daemon.server_role = role
         calls = []
         role.close.side_effect = lambda: calls.append("role_close")
 
+        def deliver_terminal(message):
+            # 投递边界模拟本作业全部客户端，恢复事实仍由真实控制面协议校验。
+            calls.append("terminal_broadcast")
+            for node_id in target_nodes:
+                replies = daemon.control_plane.handle_datagram(json.dumps({
+                    "type": "JOB_RECOVERY", "job_id": message["job_id"],
+                    "node_id": node_id, "report_id": f"terminal-recovery-{node_id}",
+                    "report": {"recovery_epoch": 1, "recovery_state": "ready"},
+                }).encode(), ("127.0.0.1", node_id))
+                self.assertTrue(json.loads(replies[0])["ok"])
+
         with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), \
                 patch.object(daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")), \
-                patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
+                patch.object(daemon.control_plane, "broadcast_downlink", side_effect=deliver_terminal) as broadcast:
             final_summary = {'rounds_completed': 5, 'final_model_sha256': 'a' * 64,
                              'execution_result': 'succeeded'}
-            daemon._finalize_job(outcome="completed", job_id="terminal-reset", summary=final_summary)
+            first = daemon._finalize_job(outcome="completed", job_id="terminal-reset", summary=final_summary)
             duplicate = daemon._finalize_job(outcome="completed", job_id="terminal-reset")
 
-        self.assertEqual(duplicate['status'], 'ignored')
+        self.assertEqual(duplicate, first)
+        self.assertEqual(duplicate['status'], 'completed')
         self.assertEqual(daemon.get_status_report()['recent_job']['summary'], final_summary)
-        self.assertEqual(calls, ["role_close", "terminal_broadcast"])
+        self.assertCountEqual(calls, ["role_close", "terminal_broadcast"])
+        self.assertEqual(daemon.get_status_report()['recent_job']['recovery_state'], 'ready')
         self.assertEqual(broadcast.call_args.args[0]["job_id"], "terminal-reset")
         self.assertEqual(daemon.server_state, ServerState.IDLE)
         self.assertIsNone(daemon.active_job)

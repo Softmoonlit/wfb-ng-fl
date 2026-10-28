@@ -43,4 +43,5 @@ V6RadioCommandResponse handle_v6_radio_command(
     const V6RadioConfig &current,
     int fec_k,
     int fec_n,
-    const std::function<void(const V6RadioConfig &)> &apply_radio);
+    const std::function<void(const V6RadioConfig &)> &apply_radio,
+    const std::function<uint32_t(uint64_t)> &rearm_uplink = {});

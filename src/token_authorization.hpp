@@ -18,6 +18,8 @@ class TokenAuthorizationState
 {
 public:
     bool apply_event(const TokenAuthorizationEvent &event, uint64_t now_ms);
+    // 物理信道变化只撤销当前授权，保留会话与序号历史。
+    void revoke_authorization();
     bool is_authorized(uint64_t now_ms) const;
     TokenAuthorizationCounters &counters() { return counters_; }
     const TokenAuthorizationCounters &counters() const { return counters_; }

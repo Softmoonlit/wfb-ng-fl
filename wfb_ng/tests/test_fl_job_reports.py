@@ -16,6 +16,7 @@ from wfb_ng.fl.control import (
 )
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.radio import RadioConfig
+from wfb_ng.tests.test_fl_training_host import isolated_socket_boundary
 
 
 def _server():
@@ -28,6 +29,8 @@ def _server():
         ),
         bind_host="127.0.0.1",
         bind_port=0,
+        broadcast_addr="127.0.0.1",
+        broadcast_port=0,
     )
 
 
@@ -203,7 +206,9 @@ def test_round_barrier_does_not_accept_heartbeat_ack():
         timestamp_ms=1,
     )
     heartbeat_ack = _decode_reply(server.handle_datagram(heartbeat.to_bytes(), ("10.0.0.1", 1)))
-    assert heartbeat_ack == {"ack": True}
+    assert heartbeat_ack == {
+        "ack": True, "heartbeat_timestamp_ms": 1, "channel": 157,
+    }
     assert server.wait_for_round_completion("job-1", 1, 0) is False
 
     first = _round_ready(node_id=1)
@@ -423,7 +428,9 @@ def test_client_retries_same_report_id_until_matching_dedicated_ack():
                 received.append(payload)
                 if len(received) == 1:
                     # 普通心跳 ACK 不能确认 TASK_READY。
-                    receiver.sendto(b'{"ack": true}', source)
+                    receiver.sendto(json.dumps({
+                        "ack": True, "heartbeat_timestamp_ms": 1, "channel": 157,
+                    }).encode(), source)
                     continue
                 receiver.sendto(json.dumps({
                     "type": "TASK_READY_ACK",

@@ -1,7 +1,4 @@
-"""
-Tests for WFB-ng Stage 2 Symmetric UDP Control Plane, Three-Tier Hunting,
-and Anti-Desync State Machine (Ticket 03).
-"""
+"""验证双向 UDP 控制面、三级寻频与防失步状态机。"""
 
 import ipaddress
 import json
@@ -32,6 +29,8 @@ from wfb_ng.fl.control import (
     NodeHeartbeat,
     HeartbeatAck,
     NodeRecord,
+    PrepareAck,
+    CommitSuccess,
     NodeHorizonRegistry,
     ControlPlaneServer,
     ControlPlaneClient,
@@ -54,7 +53,7 @@ _PRODUCTION_UDP_PORTS = {9000, 9001, 9002, 9200}
 class _LoopbackOnlyDatagramSocket(_REAL_SOCKET):
     """真实 UDP socket；测试发送不得离开 loopback 或命中生产端口。"""
 
-    def sendto(self, data, address):
+    def check_peer(self, address):
         if self.family == socket.AF_INET and self.type & socket.SOCK_DGRAM:
             host, port = address[:2]
             target = ipaddress.ip_address(host)
@@ -62,11 +61,17 @@ class _LoopbackOnlyDatagramSocket(_REAL_SOCKET):
                 raise AssertionError(f"测试 UDP 禁止发送到非 loopback 地址: {host}")
             if port in _PRODUCTION_UDP_PORTS:
                 raise AssertionError(f"测试 UDP 禁止发送到生产端口: {port}")
+    def sendto(self, data, address):
+        self.check_peer(address)
         return super().sendto(data, address)
+
+    def connect(self, address):
+        self.check_peer(address)
+        return super().connect(address)
 
 
 class FaultInjectingControlPlaneServer(ControlPlaneServer):
-    """Test double for ControlPlaneServer allowing simulated packet loss."""
+    """在公开数据报边界模拟控制面丢包。"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -75,7 +80,7 @@ class FaultInjectingControlPlaneServer(ControlPlaneServer):
 
     def handle_datagram(self, data: bytes, client_addr: Tuple[str, int]) -> Optional[List[bytes]]:
         if self.drop_downlink_acks:
-            # Process internally to update registry horizon, but suppress downlink transmission
+            # 仍更新节点注册表，但抑制下行回执。
             super().handle_datagram(data, client_addr)
             return None
         if self.packet_filter is not None:
@@ -86,7 +91,7 @@ class FaultInjectingControlPlaneServer(ControlPlaneServer):
 
 
 class TestHuntingLadder(unittest.TestCase):
-    """Test three-tier hunting ladder generation, monotonicity, and constraints."""
+    """验证三级寻频顺序、去重与信道约束。"""
 
     def test_default_ladder_without_cache(self):
         ladder = build_hunting_ladder(None)
@@ -114,7 +119,7 @@ class TestHuntingLadder(unittest.TestCase):
         self.assertEqual(len(ladder), 4)
 
     def test_forbidden_161_channel_strictly_excluded(self):
-        # Channel 161 has known driver kernel crash defect and must be excluded
+        # 信道 161 存在已知驱动崩溃缺陷，必须排除。
         ladder = build_hunting_ladder(161)
         self.assertEqual(ladder, [157, 149, 153, 165])
         self.assertNotIn(161, ladder)
@@ -125,17 +130,35 @@ class TestHuntingLadder(unittest.TestCase):
 
 
 class TestControlMessagesSerialization(unittest.TestCase):
-    """Test JSON datagram schemas, ACK size bounds, and serialization."""
+    """验证控制消息的严格身份契约与序列化。"""
 
-    def test_heartbeat_ack_boolean_size_bound(self):
-        # Spec requirement: single boolean receipt {"ack": true} (< 20 bytes)
-        ack = HeartbeatAck(ack=True)
-        raw_bytes = ack.to_bytes()
-        self.assertLess(len(raw_bytes), 20)
-        self.assertEqual(raw_bytes, b'{"ack": true}')
+    def test_socket_guard_blocks_native_and_control_production_endpoints(self):
+        """全局 socket 边界同时阻断控制报文和 native 模块的生产目标。"""
+        from wfb_ng.fl.link_radio import apply_link_radio, rearm_link_uplink
+
+        with patch("socket.socket", _LoopbackOnlyDatagramSocket):
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                for address in (("127.0.0.1", 9200), ("10.80.0.1", 12345)):
+                    with self.subTest(address=address):
+                        with self.assertRaises(AssertionError):
+                            sock.connect(address)
+                        with self.assertRaises(AssertionError):
+                            sock.sendto(b"blocked", address)
+            with self.assertRaises(AssertionError):
+                apply_link_radio(9200, 40, 3)
+            with self.assertRaises(AssertionError):
+                rearm_link_uplink(9200, 1)
+
+    def test_heartbeat_ack_identity_roundtrip(self):
+        """回执序列化必须完整保留请求身份与服务端信道。"""
+        ack = HeartbeatAck(heartbeat_timestamp_ms=1000, channel=157)
+        self.assertEqual(json.loads(ack.to_bytes()), {
+            "ack": True, "heartbeat_timestamp_ms": 1000, "channel": 157,
+        })
+        self.assertEqual(HeartbeatAck.from_bytes(ack.to_bytes()), ack)
 
     def test_protocol_fail_closed_validation(self):
-        """Test strict fail-closed validation on protocol schemas without permissive fallbacks."""
+        """协议字段非法时必须拒绝消息。"""
         with self.assertRaises(ValueError):
             HeartbeatAck.from_dict({})
         with self.assertRaises(ValueError):
@@ -161,7 +184,7 @@ class TestControlMessagesSerialization(unittest.TestCase):
                 "txpower_dbm": 12,
                 "uplink_mcs": 6,
             })
-        # Forbidden channel 161 fails closed
+        # 拒绝禁用信道 161。
         with self.assertRaises(ValueError):
             NodeHeartbeat.from_dict({
                 "node_id": 1,
@@ -171,7 +194,7 @@ class TestControlMessagesSerialization(unittest.TestCase):
                 "txpower_dbm": 12,
                 "uplink_mcs": 6,
             })
-        # Invalid txpower fails closed
+        # 拒绝非法发射功率。
         with self.assertRaises(ValueError):
             NodeHeartbeat.from_dict({
                 "node_id": 1,
@@ -182,16 +205,30 @@ class TestControlMessagesSerialization(unittest.TestCase):
                 "uplink_mcs": 6,
             })
 
-    def test_heartbeat_ack_strict_minimal_schema(self):
-        """ADR-0012 minimalism: HeartbeatAck is strictly b'{"ack": true}' (< 20 bytes)."""
-        ack = HeartbeatAck(ack=True)
-        raw = ack.to_bytes()
-        self.assertEqual(raw, b'{"ack": true}')
-        self.assertEqual(len(raw), 13)
-        self.assertLess(len(raw), 20)
-
-        parsed = HeartbeatAck.from_bytes(raw)
-        self.assertTrue(parsed.ack)
+    def test_heartbeat_ack_requires_strict_complete_identity(self):
+        """拒绝旧协议、缺失字段、假值、布尔整数及非正数。"""
+        valid = {"ack": True, "heartbeat_timestamp_ms": 1000, "channel": 157}
+        for field in valid:
+            incomplete = dict(valid)
+            del incomplete[field]
+            with self.subTest(missing=field), self.assertRaises(ValueError):
+                HeartbeatAck.from_dict(incomplete)
+        for field, values in (
+            ("ack", (False, 1, "true", None)),
+            ("heartbeat_timestamp_ms", (True, False, 0, -1, 1.5, "1000", None)),
+            ("channel", (True, False, 0, -1, 157.0, "157", None)),
+        ):
+            for value in values:
+                invalid = dict(valid, **{field: value})
+                with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                    HeartbeatAck.from_dict(invalid)
+                with self.subTest(constructor=field, value=value), self.assertRaises(ValueError):
+                    HeartbeatAck(**invalid)
+        with self.assertRaises(ValueError):
+            HeartbeatAck.from_bytes(b'{"ack": true}')
+        for payload in (None, [], True, 1, "ack"):
+            with self.subTest(payload=payload), self.assertRaises(TypeError):
+                HeartbeatAck.from_bytes(json.dumps(payload).encode())
 
     def test_node_heartbeat_serialization_roundtrip(self):
         hb = NodeHeartbeat(
@@ -215,7 +252,7 @@ class TestControlMessagesSerialization(unittest.TestCase):
 
 
 class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
-    """Test server-side registry, two-army anti-desync gate, and alignment dispatch."""
+    """验证节点注册、防失步就绪门禁与射频对齐。"""
 
     def setUp(self):
         self.registry = NodeHorizonRegistry()
@@ -239,18 +276,20 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         ack, patch = self.registry.update_heartbeat(
             hb, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
-        self.assertTrue(ack.ack)
+        self.assertEqual(ack.to_dict(), {
+            "ack": True, "heartbeat_timestamp_ms": 211, "channel": 157,
+        })
         self.assertIsNone(patch)
 
         node = self.registry.get_node(1)
         self.assertIsNotNone(node)
         self.assertEqual(node.reported_state, "HUNTING")
-        # Anti-desync gate: MUST be CONNECTING, NEVER READY
+        # 防失步门禁：未经确认必须保持 CONNECTING。
         self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
         self.assertFalse(self.registry.is_node_ready(1))
 
     def test_idle_state_transitions_node_to_ready(self):
-        # First client sends HUNTING
+        # 客户端先发送寻频心跳。
         hb_hunting = NodeHeartbeat(
             node_id=1,
             state=ClientNodeState.HUNTING.value,
@@ -265,7 +304,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         )
         self.assertEqual(self.registry.get_node(1).readiness, NodeReadiness.CONNECTING)
 
-        # After client receives ACK and transitions to IDLE, it immediately reports IDLE
+        # 客户端收到回执转为 IDLE 后立即上报待命状态。
         hb_idle = NodeHeartbeat(
             node_id=1,
             state=ClientNodeState.IDLE.value,
@@ -280,16 +319,12 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         )
         node = self.registry.get_node(1)
         self.assertEqual(node.reported_state, "IDLE")
-        # Anti-desync gate: only now is the ready green light on!
+        # 防失步门禁：只有此时才授予就绪状态。
         self.assertEqual(node.readiness, NodeReadiness.READY)
         self.assertTrue(self.registry.is_node_ready(1))
 
     def test_unsolicited_idle_held_in_connecting(self):
-        """
-        An unsolicited IDLE heartbeat for an unknown node with no preceding
-        HUNTING observation must NOT be granted immediate READY status.
-        It must be held in CONNECTING.
-        """
+        """未知节点未经过寻频确认时，上报 IDLE 仍须保持 CONNECTING。"""
         hb_unsolicited_idle = NodeHeartbeat(
             node_id=3,
             state=ClientNodeState.IDLE.value,
@@ -310,7 +345,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         self.assertFalse(self.registry.is_node_ready(3))
 
     def test_radio_mismatch_triggers_alignment_directive(self):
-        # Client sends heartbeat with txpower 20 dBm and uplink_mcs 3 (mismatch)
+        # 客户端上报功率 20 dBm、上行调制阶数 3，与服务端不匹配。
         hb_mismatch = NodeHeartbeat(
             node_id=2,
             state=ClientNodeState.HUNTING.value,
@@ -323,16 +358,18 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         ack, patch = self.registry.update_heartbeat(
             hb_mismatch, client_addr=("10.80.0.12", 50000), server_radio=self.server_radio
         )
-        self.assertTrue(ack.ack)
+        self.assertEqual(ack.to_dict(), {
+            "ack": True, "heartbeat_timestamp_ms": 291, "channel": 157,
+        })
         self.assertIsNotNone(patch)
-        # Server automatically computes alignment patch
+        # 服务端自动计算射频对齐补丁。
         self.assertEqual(patch.get("radio_txpower_dbm"), 12)
         self.assertEqual(patch.get("uplink_mcs"), 6)
-        # Channel is NOT in alignment patch per rule #89
+        # 按规则 89，对齐补丁不包含信道。
         self.assertNotIn("channel", patch)
 
     def test_node_offline_timeout(self):
-        # Establish node through legitimate HUNTING -> IDLE handshake
+        # 通过合法的寻频到待命确认建立节点身份。
         hb_hunt = NodeHeartbeat(
             node_id=1,
             state=ClientNodeState.HUNTING.value,
@@ -359,7 +396,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         )
         self.assertTrue(self.registry.is_node_ready(1))
 
-        # Fast forward time beyond 10s threshold
+        # 将心跳时间推至十秒离线阈值之前。
         node = self.registry.get_node(1)
         node.last_heartbeat_time -= 11.0
 
@@ -367,11 +404,8 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         self.assertEqual(self.registry.get_node(1).readiness, NodeReadiness.OFFLINE)
 
     def test_reordered_and_replayed_heartbeats_idempotency_and_monotonicity(self):
-        """
-        Verify that out-of-order and replayed stale heartbeats are ignored,
-        and an old replayed IDLE packet cannot falsely grant READY status.
-        """
-        # Node sends HUNTING at t=1000
+        """忽略乱序和重复心跳，旧 IDLE 不能错误授予 READY 状态。"""
+        # 节点在时间戳 1000 发送寻频心跳。
         hb_hunt = NodeHeartbeat(
             node_id=4,
             state=ClientNodeState.HUNTING.value,
@@ -386,7 +420,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         )
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.CONNECTING)
 
-        # Stale replayed IDLE packet from a prior session with t=500 (< 1000)
+        # 重放旧会话时间戳 500 的待命心跳，早于本次寻频。
         hb_stale_idle = NodeHeartbeat(
             node_id=4,
             state=ClientNodeState.IDLE.value,
@@ -396,14 +430,17 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=500,
         )
-        self.registry.update_heartbeat(
+        ack, _ = self.registry.update_heartbeat(
             hb_stale_idle, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
-        # Must still be CONNECTING! Not READY!
+        self.assertEqual(ack.to_dict(), {
+            "ack": True, "heartbeat_timestamp_ms": 500, "channel": 157,
+        })
+        # 此时仍须保持连接中，不能就绪。
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.CONNECTING)
         self.assertFalse(self.registry.is_node_ready(4))
 
-        # Fresh valid IDLE packet at t=1050 (>= 1000)
+        # 时间戳 1050 的待命心跳晚于本次寻频，可完成确认。
         hb_valid_idle = NodeHeartbeat(
             node_id=4,
             state=ClientNodeState.IDLE.value,
@@ -416,11 +453,11 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         self.registry.update_heartbeat(
             hb_valid_idle, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
-        # Now validly READY!
+        # 现在才允许进入就绪状态。
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.READY)
         self.assertTrue(self.registry.is_node_ready(4))
 
-        # Replay stale HUNTING from t=900 (should not downgrade READY to CONNECTING)
+        # 重放时间戳 900 的旧寻频心跳，不能将就绪状态降为连接中。
         hb_old_hunt = NodeHeartbeat(
             node_id=4,
             state=ClientNodeState.HUNTING.value,
@@ -436,8 +473,42 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.READY)
 
 
+class TestControlPlaneServerReceipts(unittest.TestCase):
+    """通过公开数据报接口验证服务端回执，无需启动后台监听线程。"""
+
+    def setUp(self):
+        self.server = ControlPlaneServer(
+            active_radio_config=RadioConfig(channel=153),
+            bind_host="127.0.0.1", bind_port=0,
+            broadcast_addr="127.0.0.1", broadcast_port=0,
+        )
+
+    def test_server_ack_reports_effective_channel_not_heartbeat_channel(self):
+        """服务端回显本次时间戳，信道取服务端生效配置而非客户端报告。"""
+        heartbeat = NodeHeartbeat(
+            node_id=4, state="HUNTING", elapsed_ms=0, current_channel=149,
+            txpower_dbm=12, uplink_mcs=6, timestamp_ms=1000,
+        )
+        replies = self.server.handle_datagram(heartbeat.to_bytes(), ("127.0.0.1", 1))
+        self.assertIsNotNone(replies)
+        self.assertEqual(json.loads(replies[0]), {
+            "ack": True, "heartbeat_timestamp_ms": 1000, "channel": 153,
+        })
+
+    def test_radio_reports_do_not_generate_heartbeat_receipts(self):
+        """射频准备和提交报告不应生成没有心跳身份的通用回执。"""
+        for report in (
+            PrepareAck(node_id=4, session_id="session"),
+            CommitSuccess(node_id=4, session_id="session", current_channel=153),
+        ):
+            with self.subTest(report=report):
+                self.assertIsNone(self.server.handle_datagram(
+                    report.to_bytes(), ("127.0.0.1", 1),
+                ))
+
+
 class TestControlPlaneNetworkLoop(unittest.TestCase):
-    """End-to-end socket testing of UDP control plane, hunting, and anti-desync."""
+    """通过真实 UDP 验证控制面寻频与防失步行为。"""
 
     def setUp(self):
         self.socket_guard = patch("socket.socket", _LoopbackOnlyDatagramSocket)
@@ -452,7 +523,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             self.client_broadcast_port = s2.getsockname()[1]
 
         self.server_radio = RadioConfig(
-            channel=153,  # Server is on candidate channel 153
+            channel=153,  # 服务端位于候选信道 153。
             radio_txpower_dbm=12,
             downlink_mcs=3,
             uplink_mcs=6,
@@ -497,15 +568,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertTrue(self.server.wait_for_task_readiness(0))
 
     def test_unidirectional_drop_two_army_simulation(self):
-        """
-        Simulate 'uplink works, downlink drops' two-army scenario:
-        - Client sends HUNTING to Server.
-        - Downlink drop filter drops Server's ACK.
-        - Assert Client stays in HUNTING and never sends IDLE.
-        - Assert Server stays in CONNECTING, never lights up READY green light.
-        - Downlink restored: Client receives ACK, transitions to IDLE, sends IDLE.
-        - Assert Server transitions to READY!
-        """
+        """模拟上行正常、下行丢包；仅在回执恢复并确认 IDLE 后授予 READY。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -523,31 +586,31 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             max_attempts_per_channel=2,
         )
 
-        # 1. Enable simulated downlink drop on server
+        # 在服务端启用下行丢包。
         self.server.drop_downlink_acks = True
 
-        # Run one hunting probe attempt on 153
+        # 在 153 执行一次寻频。
         found = client.hunt_once(ladder=[153])
         self.assertFalse(found)
         self.assertEqual(client.state, ClientNodeState.HUNTING)
 
-        # Server received HUNTING, but ACK was dropped
+        # 服务端收到寻频心跳，但回执被丢弃。
         node = self.server.registry.get_node(1)
         self.assertIsNotNone(node)
         self.assertEqual(node.reported_state, "HUNTING")
         self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
         self.assertFalse(self.server.registry.is_node_ready(1))
 
-        # 2. Restore downlink
+        # 恢复下行回执。
         self.server.drop_downlink_acks = False
 
-        # Run hunting probe again
+        # 再次执行寻频。
         found = client.hunt_once(ladder=[153])
         self.assertTrue(found)
         self.assertEqual(client.state, ClientNodeState.IDLE)
         self.assertEqual(client.locked_channel, 153)
 
-        # Wait briefly for instant IDLE heartbeat to be processed by server
+        # 等待服务端处理立即发出的待命心跳。
         time.sleep(0.05)
 
         node = self.server.registry.get_node(1)
@@ -558,12 +621,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client.stop()
 
     def test_three_tier_hunting_sweep_progression_and_timing(self):
-        """
-        Server is on channel 153.
-        Client starts with cached channel 157.
-        Progression order must be: 157 (retries) -> 149 (retries) -> 153 (found!).
-        Channel 165 must not be probed.
-        """
+        """服务端位于 153，客户端依次探测 157、149、153，发现后不再探测 165。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=2,
@@ -581,7 +639,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             max_attempts_per_channel=2,
         )
 
-        # When channel != 153, drop ACK to simulate RF mismatch on wrong channels
+        # 信道不是 153 时丢弃回执，以模拟射频信道不匹配。
         def channel_filter(hb: NodeHeartbeat) -> bool:
             return hb.current_channel == 153
 
@@ -595,9 +653,9 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertEqual(client.locked_channel, 153)
         self.assertEqual(client.state, ClientNodeState.IDLE)
 
-        # Verify monotonic channel progression
+        # 验证信道按指定顺序推进。
         self.assertEqual(adapter.channel_history, [157, 149, 153])
-        # Total time took ~2 channels of timeout + fast success on 3rd
+        # 总耗时包含前两个信道的超时与第三个信道的快速成功。
         self.assertLess(elapsed, 1.0)
 
         client.stop()
@@ -622,7 +680,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             broadcast_port=self.client_broadcast_port,
         )
 
-        # Server drops all packets to simulate no server
+        # 丢弃全部回执，模拟服务端不可达。
         self.server.drop_downlink_acks = True
 
         t0 = time.monotonic()
@@ -638,12 +696,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client.stop()
 
     def test_radio_alignment_applied_by_client(self):
-        """
-        Client starts with txpower=20 dBm and uplink_mcs=3.
-        Server expects txpower=12 dBm and uplink_mcs=6.
-        Client receives alignment directive, updates hardware adapter and internal state,
-        and its next heartbeat confirms aligned parameters.
-        """
+        """客户端应用服务端的功率与调制阶数对齐指令，并在后续心跳确认。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -652,8 +705,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             air_interface="wlan0",
             initial_channel=153,
             cached_channel=153,
-            txpower_dbm=20,  # mismatch
-            uplink_mcs=3,   # mismatch
+            txpower_dbm=20,  # 与服务端不匹配。
+            uplink_mcs=3,   # 与服务端不匹配。
             server_host="127.0.0.1",
             server_port=self.server_port,
             broadcast_port=self.client_broadcast_port,
@@ -664,12 +717,12 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         found = client.hunt_once(ladder=[153])
         self.assertTrue(found)
 
-        # Verify client applied alignment
+        # 验证客户端已应用射频对齐。
         self.assertEqual(client.txpower_dbm, 12)
         self.assertEqual(client.uplink_mcs, 6)
         self.assertEqual(adapter.wireless_states["wlan0"]["txpower_dbm"], 12)
 
-        # Allow instant IDLE heartbeat to reach server
+        # 等待立即发出的待命心跳到达服务端。
         time.sleep(0.05)
         node = self.server.registry.get_node(1)
         self.assertEqual(node.txpower_dbm, 12)
@@ -679,10 +732,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client.stop()
 
     def test_instant_heartbeat_on_state_transition(self):
-        """
-        When client transitions state (e.g. IDLE -> RUNNING), it must immediately
-        send a heartbeat with 0 delay.
-        """
+        """客户端状态变化时立即发送心跳。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -705,7 +755,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         time.sleep(0.05)
         self.assertEqual(self.server.registry.get_node(1).reported_state, "IDLE")
 
-        # Instant state transition
+        # 立即切换状态。
         t0 = time.monotonic()
         client.notify_state_change(ClientNodeState.RUNNING)
         time.sleep(0.05)
@@ -719,10 +769,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client.stop()
 
     def test_missed_acks_in_idle_triggers_fallback_to_hunting(self):
-        """
-        In IDLE, missing 2 consecutive ACKs (10s threshold) triggers fallback
-        to HUNTING state.
-        """
+        """空闲时连续两次缺失回执，客户端应返回寻频状态。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -737,31 +784,28 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             server_port=self.server_port,
             broadcast_port=self.client_broadcast_port,
             attempt_timeout_seconds=0.05,
-            idle_interval_seconds=0.05,  # fast interval for test
+            idle_interval_seconds=0.05,  # 使用较短测试周期。
         )
 
         client.hunt_once(ladder=[153])
         self.assertEqual(client.state, ClientNodeState.IDLE)
 
-        # Drop ACKs
+        # 丢弃回执。
         self.server.drop_downlink_acks = True
 
-        # Send heartbeat once (miss 1)
+        # 第一次心跳缺失回执。
         client.send_heartbeat_once(timeout=0.05)
         self.assertEqual(client.state, ClientNodeState.IDLE)
         self.assertEqual(client.missed_acks, 1)
 
-        # Send heartbeat second time (miss 2 -> threshold reached)
+        # 第二次心跳缺失回执，达到失联阈值。
         client.send_heartbeat_once(timeout=0.05)
         self.assertEqual(client.state, ClientNodeState.HUNTING)
 
         client.stop()
 
     def test_server_broadcast_downlink_received_by_client(self):
-        """
-        Server broadcasts to port 19000 (production 9000).
-        Client background listener receives the broadcast and invokes handlers.
-        """
+        """客户端后台监听器通过动态回环端口接收服务端广播并调用处理器。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -796,10 +840,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client.stop()
 
     def test_multi_client_broadcast_reception(self):
-        """
-        Verify that multiple clients (e.g. node 1 and node 2) receive
-        server broadcast downlinks simultaneously via SO_REUSEPORT/SO_BROADCAST.
-        """
+        """多个客户端通过端口复用同时接收服务端回环广播。"""
         adapter1 = MockNetworkAdapter(["wlan0"])
         client1 = ControlPlaneClient(
             node_id=1,
@@ -848,12 +889,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         client2.stop()
 
     def test_client_daemon_control_plane_integration(self):
-        """
-        Verify that ClientDaemon orchestrates ControlPlaneClient:
-        - When daemon starts and finds interface, control plane starts.
-        - Client hunts and reaches server, transitions to IDLE.
-        - Daemon reports IDLE, server reports READY.
-        """
+        """客户端守护进程启动控制面并寻频，确认待命后服务端授予 READY。"""
         adapter = MockNetworkAdapter(["wlan0"])
         config = ClientDaemonConfig(
             node_id=1,
@@ -868,11 +904,11 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         )
         daemon = ClientDaemon(config, network_adapter=adapter)
 
-        # Start daemon supervisory loop in background thread
+        # 在后台线程启动守护监管循环。
         daemon_thread = threading.Thread(target=daemon.run, daemon=True)
         daemon_thread.start()
 
-        # Wait for control plane to hunt and lock
+        # 等待控制面完成寻频并锁定信道。
         max_wait = 2.0
         start_t = time.monotonic()
         while time.monotonic() - start_t < max_wait:
@@ -891,11 +927,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         daemon_thread.join(timeout=1.0)
 
     def test_client_daemon_task_announce_and_abort_handling(self):
-        """
-        Verify that ClientDaemon receives TASK_ANNOUNCE and JOB_ABORT over control plane:
-        - TASK_ANNOUNCE transitions daemon to PREPARING / triggers job.
-        - JOB_ABORT broadcasts abort and restores IDLE.
-        """
+        """客户端守护进程接收任务宣告、启动任务，并在中止后恢复待命。"""
         import sys
         import subprocess
         from unittest.mock import patch
@@ -934,7 +966,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         daemon_thread = threading.Thread(target=daemon.run, daemon=True)
         daemon_thread.start()
 
-        # Wait for daemon to be ready in IDLE
+        # 等待守护进程进入待命状态。
         start_t = time.monotonic()
         while time.monotonic() - start_t < 2.0:
             if daemon.state == DaemonState.IDLE and self.server.registry.is_node_ready(1):
@@ -945,7 +977,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         # 使用真实 prepared 报告及相关确认，心跳回执不能代替准备确认。
         self.server.prepare_task_readiness("job_fl_001", [1])
-        # Broadcast TASK_ANNOUNCE targeted to node 1
+        # 向节点 1 广播任务宣告。
         self.server.broadcast_downlink({
             "type": "TASK_ANNOUNCE",
             "run_id": "run_fl_001",
@@ -967,7 +999,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertEqual(self.server.get_task_preparation_reports("job_fl_001")[1]["report"],
                          {"sample_count": 60000})
 
-        # Wait for job to start
+        # 等待任务开始。
         start_t = time.monotonic()
         while time.monotonic() - start_t < 2.0:
             if daemon.state == DaemonState.RUNNING:
@@ -980,7 +1012,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.server.prepare_job_recovery("job_fl_001", [1])
         self.server.broadcast_downlink({"type": "JOB_ABORT", "job_id": "job_fl_001"})
 
-        # Wait for job to be aborted and return to IDLE
+        # 等待任务中止并恢复待命。
         start_t = time.monotonic()
         while time.monotonic() - start_t < 2.0:
             if daemon.state == DaemonState.IDLE:
@@ -994,10 +1026,7 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         daemon_thread.join(timeout=1.0)
 
     def test_hardware_reconfiguration_failure_fails_closed(self):
-        """
-        When physical hardware reconfiguration fails, control plane operations
-        must fail closed and NOT falsely record state as changed.
-        """
+        """硬件重配失败时传播错误，不能错误记录为配置已更新。"""
         class BrokenAdapter(MockNetworkAdapter):
             def set_channel(self, iface, channel, channel_width="HT40+"):
                 raise OSError("Physical device busy or removed")
@@ -1017,36 +1046,35 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         with self.assertRaises(OSError):
             client._apply_channel_switch(149)
-        self.assertEqual(client.current_channel, 157)  # Unchanged!
+        self.assertEqual(client.current_channel, 157)  # 失败后保持原值。
 
         with self.assertRaises(OSError):
             client._apply_txpower_switch(20)
-        self.assertEqual(client.txpower_dbm, 12)  # Unchanged!
+        self.assertEqual(client.txpower_dbm, 12)  # 失败后保持原值。
 
     def test_client_daemon_persists_locked_channel_across_hotplug(self):
-        """
-        Verify that ClientDaemon retains the discovered locked channel across
-        hardware disconnect/reconnect cycles instead of reverting to initial config.
-        """
+        """客户端守护进程在网卡热插拔后保留已发现的信道。"""
         adapter = MockNetworkAdapter(["wlan0"])
         config = ClientDaemonConfig(
             node_id=1,
             tun_ip="10.80.0.11",
-            channel=157,  # Initial config is 157
+            channel=157,  # 初始信道为 157。
             server_control_host="127.0.0.1",
             server_control_port=self.server_port,
             broadcast_port=self.client_broadcast_port,
             enable_control_plane=True,
+            enable_link_process=False,
             poll_interval_seconds=0.05,
         )
-        # Simulate RF: server only receives packets when client sweeps to 153
+        # 模拟射频条件：仅在客户端切至 153 时接收心跳。
         self.server.packet_filter = lambda hb: hb.current_channel == 153
 
         daemon = ClientDaemon(config, network_adapter=adapter)
+        self.addCleanup(daemon.stop)
         daemon.poll_hardware_once()
         daemon.start_control_plane()
 
-        # Wait for control plane background loop to hunt and lock 153
+        # 等待控制面后台寻频并锁定 153。
         start_t = time.monotonic()
         while time.monotonic() - start_t < 2.0:
             if daemon.control_plane.locked_channel == 153:
@@ -1054,18 +1082,18 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
             time.sleep(0.05)
         self.assertEqual(daemon.control_plane.locked_channel, 153)
 
-        # Unplug interface
+        # 拔出网卡。
         daemon._on_interface_lost()
         self.assertIsNone(daemon.current_interface)
         self.assertIsNone(daemon.control_plane)
-        # Verify daemon preserved the locked channel!
+        # 验证守护进程保留已锁定的信道。
         self.assertEqual(daemon._last_locked_channel, 153)
 
-        # Replug interface
+        # 重新插入网卡。
         adapter.set_interfaces(["wlan0"])
         daemon.poll_hardware_once()
         daemon.start_control_plane()
-        # Verify the new control plane uses 153 as Tier 1 cached channel!
+        # 验证重建的控制面优先使用缓存信道 153。
         self.assertEqual(daemon.control_plane.cached_channel, 153)
 
         daemon.stop()

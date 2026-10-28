@@ -5,11 +5,15 @@
 #define CMD_SET_RADIO 2
 #define CMD_GET_FEC   3
 #define CMD_GET_RADIO 4
+#define CMD_REARM_UPLINK 5
 
 typedef struct {
     uint32_t req_id;
     uint8_t cmd_id;
     union {
+        // 仅用于本机换信道后的重放保护，不进入空口协议。
+        struct { uint64_t epoch; } __attribute__ ((packed)) cmd_rearm_uplink;
+
         struct
         {
             uint8_t k;

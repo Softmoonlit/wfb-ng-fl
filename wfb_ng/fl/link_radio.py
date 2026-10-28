@@ -35,3 +35,29 @@ def apply_link_radio(port: int, bandwidth_mhz: int, mcs: int) -> None:
             raise ValueError(f"本机射频更新被拒绝，状态码 {status}")
     except (OSError, ValueError) as exc:
         raise FLRuntimeError("link_radio_update_failed", f"v6 本机射频更新失败: {exc}") from exc
+
+
+def rearm_link_uplink(port: int, epoch: int) -> None:
+    """宿主物理换信道成功后，使用本机 monotonic_ns 生成的 epoch 重武装上行。"""
+    if type(port) is not int or not 1 <= port <= 65535:
+        raise ValueError("radio_control_port 必须为 1..65535 的整数")
+    if type(epoch) is not int or not 1 <= epoch <= (1 << 64) - 1:
+        raise ValueError("epoch 必须为 1..2**64-1 的整数")
+    request_id = secrets.randbits(32)
+    # 独立命令只携带本地换信道代次，不混用 SET_RADIO，也不改变空口格式。
+    request = struct.pack("!IBQ", request_id, 5, epoch)
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
+            udp.settimeout(1.0)
+            udp.connect(("127.0.0.1", port))
+            udp.send(request)
+            response = udp.recv(4096)
+        if len(response) != 8:
+            raise ValueError("本机上行重武装响应长度无效")
+        response_id, status = struct.unpack("!II", response)
+        if response_id != request_id:
+            raise ValueError("本机上行重武装响应请求身份不匹配")
+        if status != 0:
+            raise ValueError(f"本机上行重武装被拒绝，状态码 {status}")
+    except (OSError, ValueError) as exc:
+        raise FLRuntimeError("link_uplink_rearm_failed", f"v6 本机上行重武装失败: {exc}") from exc

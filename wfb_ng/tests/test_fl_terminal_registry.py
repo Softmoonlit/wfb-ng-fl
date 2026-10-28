@@ -11,7 +11,6 @@ from unittest.mock import patch
 from wfb_ng.fl.control import (
     ClientNodeState,
     ControlPlaneServer,
-    HeartbeatAck,
     NodeHeartbeat,
     NodeReadiness,
 )
@@ -27,6 +26,8 @@ class TestTerminalRegistry(unittest.TestCase):
             active_radio_config=RadioConfig(
                 channel=157, radio_txpower_dbm=12, downlink_mcs=3, uplink_mcs=6,
             ),
+            bind_host="127.0.0.1", bind_port=0,
+            broadcast_addr="127.0.0.1", broadcast_port=0,
         )
         self.addr = ("10.80.0.11", 50000)
 
@@ -39,7 +40,10 @@ class TestTerminalRegistry(unittest.TestCase):
             ).to_bytes(),
             self.addr,
         )
-        self.assertEqual(replies, [HeartbeatAck().to_bytes()])
+        self.assertEqual(len(replies), 1)
+        self.assertEqual(json.loads(replies[0]), {
+            "ack": True, "heartbeat_timestamp_ms": timestamp_ms, "channel": 157,
+        })
         return self.server.registry.get_node(1)
 
     def establish(self, active=False):

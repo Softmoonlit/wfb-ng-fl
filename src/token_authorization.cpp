@@ -58,3 +58,9 @@ bool TokenAuthorizationState::is_authorized(uint64_t now_ms) const
 {
     return has_authorization_ && now_ms < expires_at_ms_;
 }
+
+void TokenAuthorizationState::revoke_authorization()
+{
+    has_authorization_ = false;
+    expires_at_ms_ = 0;
+}

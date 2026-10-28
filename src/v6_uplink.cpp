@@ -477,7 +477,8 @@ void process_radio_control_requests(int fd,
                                    const RadioConfigGetter &get_radio,
                                    const RadioConfigApplier &apply_radio,
                                    int fec_k,
-                                   int fec_n)
+                                   int fec_n,
+                                   const function<uint32_t(uint64_t)> &rearm_uplink = {})
 {
     for (;;)
     {
@@ -487,7 +488,7 @@ void process_radio_control_requests(int fd,
         const ssize_t request_size = recvfrom(fd,
                                               &request,
                                               sizeof(request),
-                                              MSG_DONTWAIT,
+                                              MSG_DONTWAIT | MSG_TRUNC,
                                               reinterpret_cast<sockaddr *>(&address),
                                               &address_size);
         if (request_size < 0)
@@ -514,7 +515,8 @@ void process_radio_control_requests(int fd,
             get_radio(),
             fec_k,
             fec_n,
-            apply_radio);
+            apply_radio,
+            rearm_uplink);
         WFB_INFO("v6_radio_command req_id=%u cmd_id=%u rc=%d payload_size=%zu\n",
                  ntohl(request.req_id),
                  static_cast<unsigned>(request.cmd_id),
@@ -1724,6 +1726,7 @@ void run_client(const Config &config, uint64_t session_id)
         fds[1].events = POLLIN;
     }
 
+    uint64_t channel_epoch = 0;
     AirReadyState ready_state = {};
     ready_state.node_id = config.node_id;
     FixedCapacityTunReadQueue uplink_queue(config.uplink_pause_threshold_bytes,
@@ -1794,7 +1797,22 @@ void run_client(const Config &config, uint64_t session_id)
                 [&]() { return uplink->get_radio_config(); },
                 [&](const V6RadioConfig &target) { uplink->apply_radio_config(target); },
                 config.plaintext_fec_k,
-                config.plaintext_fec_n);
+                config.plaintext_fec_n,
+                [&](uint64_t epoch) -> uint32_t {
+                    if (epoch < channel_epoch) return ESTALE;
+                    if (epoch == channel_epoch) return 0;
+                    // 本地 epoch 仅保护宿主通知重放；不重置空口 GRANT 去重历史。
+                    channel_epoch = epoch;
+                    authorization_state.revoke_authorization();
+                    ready_state.declaration_in_flight = false;
+                    ready_state.last_declare_at_ms = 0;
+                    ready_state.phase = AirReadyState::UNDECLARED;
+                    if (uplink_queue.front() != nullptr)
+                    {
+                        maybe_send_ready(*uplink, get_time_ms(), &ready_state);
+                    }
+                    return 0;
+                });
         }
 
         if (rc > 0)

@@ -101,7 +101,8 @@ V6RadioCommandResponse handle_v6_radio_command(
     const V6RadioConfig &current,
     int fec_k,
     int fec_n,
-    const function<void(const V6RadioConfig &)> &apply_radio)
+    const function<void(const V6RadioConfig &)> &apply_radio,
+    const function<uint32_t(uint64_t)> &rearm_uplink)
 {
     V6RadioCommandResponse result = {};
     result.response.req_id = request.req_id;
@@ -109,6 +110,18 @@ V6RadioCommandResponse handle_v6_radio_command(
 
     switch (request.cmd_id)
     {
+    case CMD_REARM_UPLINK:
+        if (request_size != offsetof(cmd_req_t, u) + sizeof(request.u.cmd_rearm_uplink) ||
+            be64toh(request.u.cmd_rearm_uplink.epoch) == 0)
+        {
+            result.response.rc = htonl(EINVAL);
+            break;
+        }
+        // server 不提供客户端 READY 重武装入口。
+        result.response.rc = htonl(rearm_uplink ?
+            rearm_uplink(be64toh(request.u.cmd_rearm_uplink.epoch)) : ENOTSUP);
+        break;
+
     case CMD_SET_RADIO:
     {
         if (request_size != offsetof(cmd_req_t, u) + sizeof(request.u.cmd_set_radio))

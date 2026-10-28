@@ -129,8 +129,8 @@ pylint:
 clean:
 	rm -rf env session_recovery_test encrypted_session_test v6_radio_update_test wfb_rx wfb_tx wfb_tx_cmd wfb_tun wfb_token_scheduler wfb_token_namespace_bridge wfb_v6_uplink kcp_small_sender kcp_small_receiver wfb_rtsp wfb_keygen dist deb_dist build wfb_ng.egg-info/ wfb_ng-*.tar.gz *~ src/*.o
 
-v6_radio_update_test: tests/cpp/v6_radio_update_test.cpp src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o src/*.hpp
-	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter %.cpp %.o,$^) $(_LDFLAGS) -lpcap
+v6_radio_update_test: tests/cpp/v6_radio_update_test.cpp tests/cpp/v6_uplink_rearm_test.hpp src/v6_uplink.cpp src/rx.link.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o src/*.hpp
+	$(CXX) $(_CFLAGS) -std=gnu++11 -Isrc -o $@ $(filter-out src/v6_uplink.cpp,$(filter %.cpp %.o,$^)) $(_LDFLAGS) -lpcap
 
 test_v6_radio_update: v6_radio_update_test
 	./v6_radio_update_test
