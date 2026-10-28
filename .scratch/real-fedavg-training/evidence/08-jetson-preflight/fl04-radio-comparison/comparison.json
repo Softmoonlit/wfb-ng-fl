@@ -1,0 +1,164 @@
+[
+  {
+    "run": "20261028T104104Z-149-p14-m4",
+    "channel": 149,
+    "power": 14,
+    "mcs": 4,
+    "status": "diagnostic-transfer-and-recovery-passed",
+    "downlink": {
+      "fl04": {
+        "node_id": 4,
+        "path": "/srv/wfb-ng-fl/standalone157-20261028T104104Z-149-p14-m4/received/diagnostic-64k.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      }
+    },
+    "uplink": {
+      "fl04": {
+        "node_id": 4,
+        "path": "/client4",
+        "status_code": 201,
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869",
+        "duration_seconds": 36.041,
+        "throughput_mbps": 0.93
+      }
+    },
+    "server_files": {
+      "4": {
+        "path": "/srv/wfb-ng-fl/standalone157-20261028T104104Z-149-p14-m4/uploads/client_4_update.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      }
+    },
+    "final_ready": true,
+    "recovery_errors": [],
+    "radio_readbacks": {
+      "fl00": [
+        "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+      ],
+      "fl01": [
+        "Interface wlxfc221c300e99\n\tifindex 25\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+      ],
+      "fl02": [
+        "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+      ],
+      "fl04": [
+        "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n"
+      ]
+    },
+    "upload_files": [
+      {
+        "name": "client_4_update.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      },
+      {
+        "name": "server_put_events.jsonl",
+        "size_bytes": 302,
+        "sha256": "e5c7f55d260b394ddf5423d33fe769810ab66fb0e262393f033e5ce6c3cd31bf"
+      }
+    ]
+  },
+  {
+    "run": "20261028T104217Z-149-p18-m4",
+    "channel": 149,
+    "power": 18,
+    "mcs": 4,
+    "status": "diagnostic-transfer-and-recovery-passed",
+    "downlink": {
+      "fl04": {
+        "node_id": 4,
+        "path": "/srv/wfb-ng-fl/standalone157-20261028T104217Z-149-p18-m4/received/diagnostic-64k.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      }
+    },
+    "uplink": {
+      "fl04": {
+        "node_id": 4,
+        "path": "/client4",
+        "status_code": 201,
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869",
+        "duration_seconds": 37.427,
+        "throughput_mbps": 0.9
+      }
+    },
+    "server_files": {
+      "4": {
+        "path": "/srv/wfb-ng-fl/standalone157-20261028T104217Z-149-p18-m4/uploads/client_4_update.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      }
+    },
+    "final_ready": true,
+    "recovery_errors": [],
+    "radio_readbacks": {
+      "fl00": [
+        "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl01": [
+        "Interface wlxfc221c300e99\n\tifindex 25\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl02": [
+        "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl04": [
+        "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ]
+    },
+    "upload_files": [
+      {
+        "name": "client_4_update.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      },
+      {
+        "name": "server_put_events.jsonl",
+        "size_bytes": 302,
+        "sha256": "82653d529d84755ff205105e6af967f72114a74f87176ffe4d265889005ea89c"
+      }
+    ]
+  },
+  {
+    "run": "20261028T104339Z-149-p18-m5",
+    "channel": 149,
+    "power": 18,
+    "mcs": 5,
+    "status": "failed",
+    "downlink": {
+      "fl04": {
+        "node_id": 4,
+        "path": "/srv/wfb-ng-fl/standalone157-20261028T104339Z-149-p18-m5/received/diagnostic-64k.bin",
+        "size_bytes": 4194304,
+        "sha256": "b7f03e8ff310274b7bd7e9b6f67a3a6cc538251d793684ce6b3a0f3d5457e869"
+      }
+    },
+    "uplink": {},
+    "server_files": null,
+    "final_ready": true,
+    "recovery_errors": [],
+    "radio_readbacks": {
+      "fl00": [
+        "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl01": [
+        "Interface wlxfc221c300e99\n\tifindex 25\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl02": [
+        "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ],
+      "fl04": [
+        "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+      ]
+    },
+    "upload_files": [
+      {
+        "name": "client_4_update.bin",
+        "size_bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+]

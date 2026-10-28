@@ -1,0 +1,57 @@
+{
+  "fl00": {
+    "ended": true,
+    "packets": 92,
+    "duration": 85.0466187520069,
+    "drops": [
+      92,
+      0
+    ],
+    "heartbeats": 46,
+    "own_acks": 0,
+    "readiness_samples": {
+      "1": {
+        "READY": 18
+      },
+      "2": {
+        "READY": 18
+      },
+      "4": {
+        "OFFLINE": 18
+      }
+    }
+  },
+  "fl01": {
+    "ended": true,
+    "packets": 71,
+    "duration": 85.09785965600167,
+    "drops": [
+      71,
+      0
+    ],
+    "heartbeats": 29,
+    "own_acks": 28
+  },
+  "fl02": {
+    "ended": true,
+    "packets": 61,
+    "duration": 85.0771744900012,
+    "drops": [
+      61,
+      0
+    ],
+    "heartbeats": 16,
+    "own_acks": 16
+  },
+  "fl04": {
+    "ended": true,
+    "packets": 287,
+    "duration": 85.04159150999999,
+    "drops": [
+      287,
+      0
+    ],
+    "heartbeats": 252,
+    "own_acks": 0
+  }
+}

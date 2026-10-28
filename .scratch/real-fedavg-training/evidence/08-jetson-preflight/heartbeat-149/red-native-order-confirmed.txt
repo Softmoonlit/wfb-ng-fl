@@ -1,0 +1,142 @@
+F.F...                                                                   [100%]
+=================================== FAILURES ===================================
+__________ test_commit_rearms_after_native_configuration[patch0-None] __________
+
+loopback_network = None, failure = None
+patch = {'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uftp_rate_kbps': 1000}
+
+    @pytest.mark.parametrize("failure", [None, "physical", "native"])
+    @pytest.mark.parametrize("patch", [{"bandwidth_mhz": 20, "downlink_mcs": 3, "uftp_rate_kbps": 1000}, {"uplink_mcs": 5}])
+    def test_commit_rearms_after_native_configuration(loopback_network, failure, patch):
+        """带宽切换先设置物理网卡与 native，再重武装；同信道调制更新无需重武装。"""
+        records = []
+        entered = threading.Event()
+    
+        class Adapter(MockNetworkAdapter):
+            """网卡系统边界记录物理应用顺序并注入硬件失败。"""
+    
+            def set_channel(self, *args, **kwargs):
+                records.append("physical")
+                entered.set()
+                if failure == "physical":
+                    raise OSError("物理切换失败")
+                return super().set_channel(*args, **kwargs)
+    
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sink:
+            sink.bind(("127.0.0.1", 0))
+            client = ControlPlaneClient(
+                4, "127.0.0.1", network_adapter=Adapter(["wlan-test"]),
+                air_interface="wlan-test", server_host="127.0.0.1",
+                server_port=sink.getsockname()[1], broadcast_port=sink.getsockname()[1],
+            )
+    
+            def native(config):
+                records.append("native")
+                entered.set()
+                if failure == "native":
+                    raise OSError("native 配置失败")
+    
+            client.on_radio_applied = native
+            client.on_channel_applied = lambda: records.append("rearm")
+            message = {"session_id": "review", "target_nodes": [4], "patch": patch,
+                       "calibration": "bandwidth_mhz" in patch}
+            try:
+                client.handle_broadcast(dict(message, type="CONFIG_RADIO_PREPARE"))
+                client.handle_broadcast(dict(message, type="CONFIG_RADIO_COMMIT", delay_ms=0))
+                assert entered.wait(1), "必须实际进入物理或 native 配置边界"
+                # 属性读取取得同一状态锁，等待本次应用真实完成。
+                assert client.radio_switch_pending
+                if "bandwidth_mhz" in patch:
+                    expected = {
+                        None: ["physical", "native", "rearm"],
+                        "physical": ["physical"],
+                        "native": ["physical", "native"],
+                    }[failure]
+                else:
+                    expected = ["native"]
+>               assert records == expected
+E               AssertionError: assert ['physical', ...rm', 'native'] == ['physical', ...ive', 'rearm']
+E                 At index 1 diff: 'rearm' != 'native'
+E                 Full diff:
+E                 - ['physical', 'native', 'rearm']
+E                 + ['physical', 'rearm', 'native']
+
+wfb_ng/tests/test_fl_control_review.py:64: AssertionError
+_________ test_commit_rearms_after_native_configuration[patch0-native] _________
+
+loopback_network = None, failure = 'native'
+patch = {'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uftp_rate_kbps': 1000}
+
+    @pytest.mark.parametrize("failure", [None, "physical", "native"])
+    @pytest.mark.parametrize("patch", [{"bandwidth_mhz": 20, "downlink_mcs": 3, "uftp_rate_kbps": 1000}, {"uplink_mcs": 5}])
+    def test_commit_rearms_after_native_configuration(loopback_network, failure, patch):
+        """带宽切换先设置物理网卡与 native，再重武装；同信道调制更新无需重武装。"""
+        records = []
+        entered = threading.Event()
+    
+        class Adapter(MockNetworkAdapter):
+            """网卡系统边界记录物理应用顺序并注入硬件失败。"""
+    
+            def set_channel(self, *args, **kwargs):
+                records.append("physical")
+                entered.set()
+                if failure == "physical":
+                    raise OSError("物理切换失败")
+                return super().set_channel(*args, **kwargs)
+    
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sink:
+            sink.bind(("127.0.0.1", 0))
+            client = ControlPlaneClient(
+                4, "127.0.0.1", network_adapter=Adapter(["wlan-test"]),
+                air_interface="wlan-test", server_host="127.0.0.1",
+                server_port=sink.getsockname()[1], broadcast_port=sink.getsockname()[1],
+            )
+    
+            def native(config):
+                records.append("native")
+                entered.set()
+                if failure == "native":
+                    raise OSError("native 配置失败")
+    
+            client.on_radio_applied = native
+            client.on_channel_applied = lambda: records.append("rearm")
+            message = {"session_id": "review", "target_nodes": [4], "patch": patch,
+                       "calibration": "bandwidth_mhz" in patch}
+            try:
+                client.handle_broadcast(dict(message, type="CONFIG_RADIO_PREPARE"))
+                client.handle_broadcast(dict(message, type="CONFIG_RADIO_COMMIT", delay_ms=0))
+                assert entered.wait(1), "必须实际进入物理或 native 配置边界"
+                # 属性读取取得同一状态锁，等待本次应用真实完成。
+                assert client.radio_switch_pending
+                if "bandwidth_mhz" in patch:
+                    expected = {
+                        None: ["physical", "native", "rearm"],
+                        "physical": ["physical"],
+                        "native": ["physical", "native"],
+                    }[failure]
+                else:
+                    expected = ["native"]
+>               assert records == expected
+E               AssertionError: assert ['physical', ...rm', 'native'] == ['physical', 'native']
+E                 At index 1 diff: 'rearm' != 'native'
+E                 Left contains one more item: 'native'
+E                 Full diff:
+E                 - ['physical', 'native']
+E                 + ['physical', 'rearm', 'native']
+E                 ?              +++++++++
+
+wfb_ng/tests/test_fl_control_review.py:64: AssertionError
+----------------------------- Captured stderr call -----------------------------
+节点 4 COMMIT 硬件应用失败: native 配置失败
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch0-None]
+FAILED wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch0-native]
+2 failed, 4 passed, 7 deselected, 2 warnings in 0.60s

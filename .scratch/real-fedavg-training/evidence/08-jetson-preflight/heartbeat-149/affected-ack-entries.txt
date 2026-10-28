@@ -1,0 +1,330 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 60 items
+
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_active_node_recovers_after_offline_with_acknowledged_idle PASSED [  1%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_fresh_hunting_then_idle_recovers_offline_node PASSED [  3%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_invalid_timestamp_rejected_before_registry_update PASSED [  5%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_offline_view_preserves_replay_timestamp PASSED [  6%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_positive_integer_timestamp_parses PASSED [  8%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_ready_node_recovers_after_offline_with_acknowledged_idle PASSED [ 10%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_stale_hunting_cannot_reopen_offline_identity_gate PASSED [ 11%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_stale_running_cannot_revive_offline_node PASSED [ 13%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_unverified_idle_remains_connecting PASSED [ 15%]
+wfb_ng/tests/test_fl_terminal_registry.py::TestTerminalRegistry::test_unverified_running_does_not_grant_persistent_verified_identity PASSED [ 16%]
+wfb_ng/tests/test_fl_job_reports.py::test_task_ready_requires_report_and_validates_before_ack PASSED [ 18%]
+wfb_ng/tests/test_fl_job_reports.py::test_task_ready_duplicate_is_idempotent_but_conflict_is_rejected PASSED [ 20%]
+wfb_ng/tests/test_fl_job_reports.py::test_round_barrier_does_not_accept_heartbeat_ack PASSED [ 21%]
+wfb_ng/tests/test_fl_job_reports.py::test_task_and_round_errors_wake_waiters_and_notify_handler PASSED [ 23%]
+wfb_ng/tests/test_fl_job_reports.py::test_reports_reject_invalid_phase_and_nonparticipant PASSED [ 25%]
+wfb_ng/tests/test_fl_job_reports.py::test_control_report_payload_is_capped_at_4096_bytes PASSED [ 26%]
+wfb_ng/tests/test_fl_job_reports.py::test_broadcast_uses_utf8_and_rejects_byte_overflow PASSED [ 28%]
+wfb_ng/tests/test_fl_job_reports.py::test_lost_final_round_ack_retries_from_receipt_after_clear PASSED [ 30%]
+wfb_ng/tests/test_fl_job_reports.py::test_client_round_and_error_reports_use_dedicated_ack_types PASSED [ 31%]
+wfb_ng/tests/test_fl_job_reports.py::test_client_retries_same_report_id_until_matching_dedicated_ack PASSED [ 33%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_alignment_updates_actual_idle_link PASSED [ 35%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_channel_165_does_not_silently_downgrade_bandwidth PASSED [ 36%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_commit_updates_idle_link_before_success_and_abort_restores_it FAILED [ 38%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_controlled_ht20_updates_hardware_and_link_and_abort_restores_both FAILED [ 40%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_failed_abort_restore_preserves_lease_and_can_retry FAILED [ 41%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_failed_update_cannot_ack_commit_or_final_barriers_and_abort_recovers FAILED [ 43%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_ht20_calibration_survives_public_hardware_rebuild FAILED [ 45%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_idle_link_waits_for_address_and_server_route PASSED [ 46%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_idle_nonparticipant_accepts_job_bound_wire_transaction PASSED [ 48%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_lease_expiration_restores_mcs_and_power_after_proposal FAILED [ 50%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_normal_config_survives_public_hardware_rebuild FAILED [ 51%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_pending_apply_serializes_daemon_and_control_without_early_acks FAILED [ 53%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_supervisor_retries_expired_lease_rollback_until_update_recovers FAILED [ 55%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_task_role_uses_confirmed_effective_mcs_and_power FAILED [ 56%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestLinkRadioUDP::test_full_fixed_phy_payload_and_matching_success PASSED [ 58%]
+wfb_ng/tests/test_fl_client_radio_application.py::TestLinkRadioUDP::test_rejected_or_unrelated_or_malformed_response_cannot_succeed PASSED [ 60%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonConfig::test_default_config PASSED [ 61%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonConfig::test_fail_closed_on_invalid_radio_parameters PASSED [ 63%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonConfig::test_invalid_deployment_algorithm_entry_fails_closed PASSED [ 65%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonConfig::test_load_from_json_file PASSED [ 66%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonConfig::test_load_nonexistent_custom_config_fails_closed PASSED [ 68%]
+wfb_ng/tests/test_fl_server_daemon.py::TestV6UplinkServerCommand::test_channel_165_requires_explicit_narrow_bandwidth PASSED [ 70%]
+wfb_ng/tests/test_fl_server_daemon.py::TestV6UplinkServerCommand::test_command_generation_preallocated_slots_and_no_slot_flags PASSED [ 71%]
+wfb_ng/tests/test_fl_server_daemon.py::TestReportReadinessConcurrency::test_preparing_heartbeat_does_not_block_report_under_daemon_lock PASSED [ 73%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_busy_engine_rejects_new_job_and_survey_without_fake_acceptance PASSED [ 75%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_completed_terminal_requires_explicit_execution_summary PASSED [ 76%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_hunting_node_is_not_a_training_candidate PASSED [ 78%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_invalid_target_nodes_payloads_are_rejected PASSED [ 80%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_model_file_validation_rejects_before_training_host PASSED [ 81%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_old_algorithm_and_partial_mode_fields_are_rejected PASSED [ 83%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_status_snapshot_returns_topology_and_radio PASSED [ 85%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_survey_snapshot_returns_ranking PASSED [ 86%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_target_nodes_not_ready_is_rejected_before_training_host PASSED [ 88%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset FAILED [ 90%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_timed_out_node_is_rejected PASSED [ 91%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_uftp_control_port_conflict_is_rejected PASSED [ 93%]
+wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_unsolicited_idle_is_held_in_connecting PASSED [ 95%]
+wfb_ng/tests/test_fl_server_daemon.py::TestSystemdUnitAndPackage::test_main_cli_argument_parsing_and_run PASSED [ 96%]
+wfb_ng/tests/test_fl_server_daemon.py::TestSystemdUnitAndPackage::test_setup_py_contains_server_daemon_entry_and_data_files PASSED [ 98%]
+wfb_ng/tests/test_fl_server_daemon.py::TestSystemdUnitAndPackage::test_systemd_service_file_exists_and_configured PASSED [100%]
+
+=================================== FAILURES ===================================
+_ TestClientRadioApplication.test_commit_updates_idle_link_before_success_and_abort_restores_it _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_commit_updates_idle_link_before_success_and_abort_restores_it>
+
+    def test_commit_updates_idle_link_before_success_and_abort_restores_it(self):
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:418: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestClientRadioApplication.test_controlled_ht20_updates_hardware_and_link_and_abort_restores_both _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_controlled_ht20_updates_hardware_and_link_and_abort_restores_both>
+
+    def test_controlled_ht20_updates_hardware_and_link_and_abort_restores_both(self):
+        patch = {'bandwidth_mhz': 20, 'downlink_mcs': 3, 'uftp_rate_kbps': 1000,
+                 'uplink_mcs': 5}
+        for kind in ('CONFIG_RADIO_PREPARE', 'CONFIG_RADIO_COMMIT'):
+            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1',
+                                           'patch': patch, 'delay_ms': 0, 'calibration': True})
+>       self.assertTrue(self.spawned.wait(1))
+E       AssertionError: False is not true
+
+wfb_ng/tests/test_fl_client_radio_application.py:142: AssertionError
+_ TestClientRadioApplication.test_failed_abort_restore_preserves_lease_and_can_retry _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_failed_abort_restore_preserves_lease_and_can_retry>
+
+    def test_failed_abort_restore_preserves_lease_and_can_retry(self):
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestClientRadioApplication.test_failed_update_cannot_ack_commit_or_final_barriers_and_abort_recovers _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_failed_update_cannot_ack_commit_or_final_barriers_and_abort_recovers>
+
+    def test_failed_update_cannot_ack_commit_or_final_barriers_and_abort_recovers(self):
+        self.fail_update = True
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestClientRadioApplication.test_ht20_calibration_survives_public_hardware_rebuild _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_ht20_calibration_survives_public_hardware_rebuild>
+
+    def test_ht20_calibration_survives_public_hardware_rebuild(self):
+        patch = {'bandwidth_mhz': 20, 'downlink_mcs': 4, 'uftp_rate_kbps': 7000,
+                 'uplink_mcs': 5, 'radio_txpower_dbm': 16}
+        for kind in ('CONFIG_RADIO_PREPARE', 'CONFIG_RADIO_COMMIT'):
+            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1',
+                                           'patch': patch, 'delay_ms': 0, 'calibration': True})
+>       self.assertTrue(self.spawned.wait(1))
+E       AssertionError: False is not true
+
+wfb_ng/tests/test_fl_client_radio_application.py:216: AssertionError
+_ TestClientRadioApplication.test_lease_expiration_restores_mcs_and_power_after_proposal _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_lease_expiration_restores_mcs_and_power_after_proposal>
+
+    def test_lease_expiration_restores_mcs_and_power_after_proposal(self):
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:303: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestClientRadioApplication.test_normal_config_survives_public_hardware_rebuild _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_normal_config_survives_public_hardware_rebuild>
+
+    def test_normal_config_survives_public_hardware_rebuild(self):
+        self.control.apply_alignment({'downlink_mcs': 4, 'uftp_rate_kbps': 23000,
+                                      'uplink_mcs': 5, 'radio_txpower_dbm': 15})
+>       heartbeat = self._rebuild_control_and_receive_idle()
+
+wfb_ng/tests/test_fl_client_radio_application.py:233: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:200: in _rebuild_control_and_receive_idle
+    self.assertTrue(idle.wait(2), f'重建控制面必须能发送合法心跳并重新入网: {errors}')
+E   AssertionError: False is not true : 重建控制面必须能发送合法心跳并重新入网: []
+----------------------------- Captured stderr call -----------------------------
+检测到无线网卡 wlx-test 被拔出
+_ TestClientRadioApplication.test_pending_apply_serializes_daemon_and_control_without_early_acks _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_pending_apply_serializes_daemon_and_control_without_early_acks>
+
+    def test_pending_apply_serializes_daemon_and_control_without_early_acks(self):
+        self.update_gate = threading.Event()
+        patch = {'uplink_mcs': 5}
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_PREPARE', 'session_id': 'radio-1', 'patch': patch})
+        self.control.handle_broadcast({'type': 'CONFIG_RADIO_COMMIT', 'session_id': 'radio-1',
+                                       'patch': patch, 'delay_ms': 0})
+>       self.assertTrue(self.spawned.wait(1))
+E       AssertionError: False is not true
+
+wfb_ng/tests/test_fl_client_radio_application.py:381: AssertionError
+_ TestClientRadioApplication.test_supervisor_retries_expired_lease_rollback_until_update_recovers _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_supervisor_retries_expired_lease_rollback_until_update_recovers>
+
+    def test_supervisor_retries_expired_lease_rollback_until_update_recovers(self):
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestClientRadioApplication.test_task_role_uses_confirmed_effective_mcs_and_power _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_task_role_uses_confirmed_effective_mcs_and_power>
+
+    def test_task_role_uses_confirmed_effective_mcs_and_power(self):
+>       self.commit()
+
+wfb_ng/tests/test_fl_client_radio_application.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:117: in commit
+    self.assertTrue(self.spawned.wait(1), 'COMMIT must update the actual idle link')
+E   AssertionError: False is not true : COMMIT must update the actual idle link
+_ TestServerDaemonRestIPCAndPreflight.test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset _
+
+self = <wfb_ng.tests.test_fl_server_daemon.TestServerDaemonRestIPCAndPreflight testMethod=test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset>
+
+    def test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset(self):
+        daemon = ServerDaemon(
+            config=ServerDaemonConfig(
+                work_dir=self.temp_dir,
+                enable_link_process=True,
+                enable_control_plane=False,
+            ),
+            network_adapter=self.adapter,
+            survey_backend=self.survey_backend,
+        )
+        daemon.active_job = {"job_id": "terminal-reset"}
+        daemon.server_state = ServerState.RUNNING
+        role = MagicMock()
+        daemon.server_role = role
+        calls = []
+        role.close.side_effect = lambda: calls.append("role_close")
+    
+        with patch.object(daemon, "_stop_link_process", side_effect=lambda: calls.append("link_stop")), \
+                patch.object(daemon, "_start_link_process", side_effect=lambda: calls.append("link_start")), \
+                patch.object(daemon.control_plane, "broadcast_downlink", side_effect=lambda msg: calls.append("terminal_broadcast")) as broadcast:
+            final_summary = {'rounds_completed': 5, 'final_model_sha256': 'a' * 64,
+                             'execution_result': 'succeeded'}
+>           daemon._finalize_job(outcome="completed", job_id="terminal-reset", summary=final_summary)
+
+wfb_ng/tests/test_fl_server_daemon.py:349: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.fl.server_daemon.ServerDaemon object at 0xfffeff4f58a0>
+outcome = 'completed', job_id = 'terminal-reset', reason = 'completed'
+summary = {'execution_result': 'succeeded', 'final_model_sha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'rounds_completed': 5}
+error = ''
+
+    def _finalize_job(
+        self,
+        outcome: str,
+        job_id: Optional[str] = None,
+        reason: str = "completed",
+        summary: Optional[Dict[str, Any]] = None,
+        error: str = "",
+    ) -> Dict[str, Any]:
+        """首次终态冻结结果；取消屏障、等待实际计算退出后才回收角色并确认恢复。"""
+        reason = reason or outcome
+        with self._lock:
+            if self.active_job is None or (job_id is not None and self.active_job['job_id'] != job_id):
+                if self._recent_job is not None and (job_id is None or self._recent_job['job_id'] == job_id):
+                    if error and (reason != self._recent_job.get('reason') or error != self._recent_job.get('error')):
+                        diagnostic = {'reason': reason, 'error': error}
+                        diagnostics = self._recent_job.setdefault('additional_errors', [])
+                        if diagnostic not in diagnostics:
+                            diagnostics.append(diagnostic)
+                    return deepcopy(self._recent_job['terminal_result'])
+                return {'status': 'ignored', 'job_id': job_id}
+            if self.server_state == ServerState.STOPPED:
+                return {'status': 'ignored', 'job_id': job_id}
+            job_id = self.active_job['job_id']
+            first_failure = self.active_job.get('first_failure')
+            if first_failure is not None:
+                outcome, reason, error = 'failed', first_failure['reason'], first_failure['error']
+            terminal_summary = summary if summary is not None else self.active_job.get('summary', {})
+            effect_failed = terminal_summary.get('error_code') == 'effect_criterion_not_met'
+            if outcome == 'completed' or (outcome == 'failed' and effect_failed):
+                if terminal_summary.get('execution_result') != 'succeeded':
+                    raise FLRuntimeError('invalid_coordinator_summary', '完整执行终态缺少明确的执行成功事实')
+                execution = 'succeeded'
+            elif outcome in ('failed', 'aborted'):
+                execution = outcome
+            else:
+                raise FLRuntimeError('invalid_job_outcome', '未知作业终态')
+            result = {'status': outcome, 'job_id': job_id, 'reason': reason}
+            recent = deepcopy(self.active_job)
+            recent.update(execution_result=execution, recovery_state='recovering',
+                          server_phase='recovering', phase_started_at=time.time(), reason=reason,
+                          error=error, terminal_result=result, recovery_wait_finished=False,
+                          server_recovery_complete=False,
+>                         recovery_missing_nodes=list(recent['target_nodes']))
+E           KeyError: 'target_nodes'
+
+wfb_ng/fl/server_daemon.py:1885: KeyError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_normal_config_survives_public_hardware_rebuild
+  Warning: Exception in thread wfb-client-control-loop
+  
+  Traceback (most recent call last):
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/link_radio.py", line 54, in rearm_link_uplink
+      response = udp.recv(4096)
+  ConnectionRefusedError: [Errno 111] Connection refused
+  
+  The above exception was the direct cause of the following exception:
+  
+  Traceback (most recent call last):
+    File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+      self.run()
+    File "/usr/lib/python3.10/threading.py", line 953, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 3542, in _supervisory_loop
+      found = self.hunt_once()
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2648, in hunt_once
+      self._apply_channel_switch(ch)
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2582, in _apply_channel_switch
+      self.on_channel_applied()
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1692, in <lambda>
+      self.control_plane.on_channel_applied = lambda: rearm_link_uplink(
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/link_radio.py", line 63, in rearm_link_uplink
+      raise FLRuntimeError("link_uplink_rearm_failed", f"v6 本机上行重武装失败: {exc}") from exc
+  wfb_ng.fl.errors.FLRuntimeError: v6 本机上行重武装失败: [Errno 111] Connection refused
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_commit_updates_idle_link_before_success_and_abort_restores_it
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_controlled_ht20_updates_hardware_and_link_and_abort_restores_both
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_failed_abort_restore_preserves_lease_and_can_retry
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_failed_update_cannot_ack_commit_or_final_barriers_and_abort_recovers
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_ht20_calibration_survives_public_hardware_rebuild
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_lease_expiration_restores_mcs_and_power_after_proposal
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_normal_config_survives_public_hardware_rebuild
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_pending_apply_serializes_daemon_and_control_without_early_acks
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_supervisor_retries_expired_lease_rollback_until_update_recovers
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_task_role_uses_confirmed_effective_mcs_and_power
+FAILED wfb_ng/tests/test_fl_server_daemon.py::TestServerDaemonRestIPCAndPreflight::test_terminal_job_preserves_persistent_link_and_duplicate_does_not_reset
+================== 11 failed, 49 passed, 3 warnings in 23.36s ==================

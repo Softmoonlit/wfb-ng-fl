@@ -1,0 +1,33 @@
+fl04
+3d7dabf2-8c3e-4304-8208-2395a1abfb2b
+ 18:24:57 up 0 min,  1 user,  load average: 1.99, 0.47, 0.15
+MainPID=872
+ActiveState=active
+phy#1
+	Interface wlxfc221c300f04
+		ifindex 5
+		wdev 0x100000001
+		addr fc:22:1c:30:0f:04
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 2
+		wdev 0x1
+		addr dc:4a:9e:31:8a:9c
+		ssid HONOR 500
+		type managed
+		channel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz
+		txpower 7.00 dBm
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 3: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M
+10月 28 18:24:45 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 18:24:51 fl04 wfb-fl-client-daemon[872]: 2026-10-28 18:24:51,746 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 18:24:51 fl04 wfb-fl-client-daemon[872]: 2026-10-28 18:24:51,748 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 18:24:55 fl04 wfb-fl-client-daemon[872]: 2026-10-28 18:24:55,032 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 28 18:24:55 fl04 wfb-fl-client-daemon[872]: 2026-10-28 18:24:55,074 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64

@@ -1,0 +1,76 @@
+................................................F....................... [ 43%]
+........................................................................ [ 87%]
+.....................                                                    [100%]
+=================================== FAILURES ===================================
+_ TestControlPlaneNetworkLoop.test_client_daemon_persists_locked_channel_across_hotplug _
+
+self = <wfb_ng.tests.test_fl_control_plane.TestControlPlaneNetworkLoop testMethod=test_client_daemon_persists_locked_channel_across_hotplug>
+
+    def test_client_daemon_persists_locked_channel_across_hotplug(self):
+        """客户端守护进程在网卡热插拔后保留已发现的信道。"""
+        adapter = MockNetworkAdapter(["wlan0"])
+        config = ClientDaemonConfig(
+            node_id=1,
+            tun_ip="10.80.0.11",
+            channel=157,  # 初始信道为 157。
+            server_control_host="127.0.0.1",
+            server_control_port=self.server_port,
+            broadcast_port=self.client_broadcast_port,
+            enable_control_plane=True,
+            poll_interval_seconds=0.05,
+        )
+        # 模拟射频条件：仅在客户端切至 153 时接收心跳。
+        self.server.packet_filter = lambda hb: hb.current_channel == 153
+    
+        daemon = ClientDaemon(config, network_adapter=adapter)
+        daemon.poll_hardware_once()
+        daemon.start_control_plane()
+    
+        # 等待控制面后台寻频并锁定 153。
+        start_t = time.monotonic()
+        while time.monotonic() - start_t < 2.0:
+            if daemon.control_plane.locked_channel == 153:
+                break
+            time.sleep(0.05)
+>       self.assertEqual(daemon.control_plane.locked_channel, 153)
+E       AssertionError: None != 153
+
+wfb_ng/tests/test_fl_control_plane.py:1058: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_persists_locked_channel_across_hotplug
+  Warning: Exception in thread wfb-client-control-loop
+  
+  Traceback (most recent call last):
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/link_radio.py", line 61, in rearm_link_uplink
+      raise ValueError(f"本机上行重武装被拒绝，状态码 {status}")
+  ValueError: 本机上行重武装被拒绝，状态码 95
+  
+  The above exception was the direct cause of the following exception:
+  
+  Traceback (most recent call last):
+    File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+      self.run()
+    File "/usr/lib/python3.10/threading.py", line 953, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 3571, in _supervisory_loop
+      found = self.hunt_once()
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2672, in hunt_once
+      self._apply_channel_switch(ch)
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 2599, in _apply_channel_switch
+      self.on_channel_applied()
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1692, in <lambda>
+      self.control_plane.on_channel_applied = lambda: rearm_link_uplink(
+    File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/link_radio.py", line 63, in rearm_link_uplink
+      raise FLRuntimeError("link_uplink_rearm_failed", f"v6 本机上行重武装失败: {exc}") from exc
+  wfb_ng.fl.errors.FLRuntimeError: v6 本机上行重武装失败: 本机上行重武装被拒绝，状态码 95
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_persists_locked_channel_across_hotplug
+1 failed, 164 passed, 3 warnings in 36.29s

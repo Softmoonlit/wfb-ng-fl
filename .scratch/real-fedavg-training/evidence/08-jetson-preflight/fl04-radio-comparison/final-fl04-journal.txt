@@ -1,0 +1,12 @@
+10月 28 18:43:22 fl04 wfb-fl-client-daemon[4279]: 2026-10-28 18:43:22,834 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 18:43:50 fl04 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 28 18:43:50 fl04 wfb-fl-client-daemon[4279]: 2026-10-28 18:43:50,598 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 28 18:43:50 fl04 wfb-fl-client-daemon[4279]: 2026-10-28 18:43:50,921 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 28 18:43:50 fl04 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 28 18:43:50 fl04 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 28 18:46:02 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 18:46:02 fl04 wfb-fl-client-daemon[4493]: 2026-10-28 18:46:02,717 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 18:46:02 fl04 wfb-fl-client-daemon[4493]: 2026-10-28 18:46:02,718 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 18:46:03 fl04 wfb-fl-client-daemon[4493]: 2026-10-28 18:46:03,060 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 28 18:46:03 fl04 wfb-fl-client-daemon[4493]: 2026-10-28 18:46:03,114 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 18:46:17 fl04 wfb-fl-client-daemon[4493]: 2026-10-28 18:46:17,927 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！

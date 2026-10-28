@@ -1,0 +1,7 @@
+607c064 修正冻结制品分发权限并区分平台槽位与参与节点
+ .../heartbeat-149/release-four.py                  | 56 ++++++++++++++++++----
+ .../heartbeat-149/release-node.py                  | 39 ++++++++++-----
+ 2 files changed, 73 insertions(+), 22 deletions(-)
+
+发布环境验证：run() 保留调用者显式 env，仅覆盖 LC_ALL/LANG=C。
+平台白名单 1..10 与实际参与集合 1/2/4 分开核验。

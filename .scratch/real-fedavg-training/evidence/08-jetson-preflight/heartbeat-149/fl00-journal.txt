@@ -1,0 +1,40 @@
+10月 28 18:41:52 fl00 wfb-fl-server-daemon[279128]: 2026-10-28 18:41:52,881 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 28 18:41:52 fl00 wfb-fl-server-daemon[279128]: 2026-10-28 18:41:52,882 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 28 18:41:52 fl00 wfb-fl-server-daemon[279128]: 2026-10-28 18:41:52,885 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+10月 28 18:42:21 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+10月 28 18:42:21 fl00 wfb-fl-server-daemon[279128]: 2026-10-28 18:42:21,933 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+10月 28 18:42:22 fl00 wfb-fl-server-daemon[279128]: 2026-10-28 18:42:22,513 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+10月 28 18:42:22 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+10月 28 18:42:22 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+10月 28 18:43:13 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+10月 28 18:43:13 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:13,666 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+10月 28 18:43:14 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:14,002 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+10月 28 18:43:14 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:14,002 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+10月 28 18:43:14 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:14,060 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 28 18:43:14 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:14,061 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 28 18:43:14 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:14,063 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+10月 28 18:43:45 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+10月 28 18:43:45 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:45,227 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+10月 28 18:43:45 fl00 wfb-fl-server-daemon[280091]: 2026-10-28 18:43:45,952 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+10月 28 18:43:46 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+10月 28 18:43:46 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+10月 28 18:45:53 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,104 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,440 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=157, 发射功率=14 dBm)
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,440 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,499 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,500 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 28 18:45:54 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:45:54,502 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090
+10月 28 18:52:35 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+10月 28 18:52:35 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:52:35,631 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+10月 28 18:52:36 fl00 wfb-fl-server-daemon[281025]: 2026-10-28 18:52:36,374 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+10月 28 18:52:36 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+10月 28 18:52:36 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+10月 28 18:52:36 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 2.338s CPU time.
+10月 28 18:52:41 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+10月 28 18:52:41 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:41,719 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+10月 28 18:52:42 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:42,054 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=149, 发射功率=14 dBm)
+10月 28 18:52:42 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:42,055 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+10月 28 18:52:42 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:42,113 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 28 18:52:42 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:42,114 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 28 18:52:42 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 18:52:42,117 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090

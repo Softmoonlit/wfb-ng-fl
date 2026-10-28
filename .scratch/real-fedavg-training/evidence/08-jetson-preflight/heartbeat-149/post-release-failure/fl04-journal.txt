@@ -1,0 +1,37 @@
+10月 28 19:54:19 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:54:19,612 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:55:51 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:55:51,491 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:57:09 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:57:09,894 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:57:24 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:57:24,664 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:58:00,091 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 28 19:58:00 fl04 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]: Exception in thread wfb-client-control-loop:
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]: Traceback (most recent call last):
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     self.run()
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/lib/python3.10/threading.py", line 953, in run
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     self._target(*self._args, **self._kwargs)
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py", line 3502, in _supervisory_loop
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     found = self.hunt_once()
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py", line 2630, in hunt_once
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     self._apply_channel_switch(ch)
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py", line 2559, in _apply_channel_switch
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     self.network_adapter.set_channel(
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py", line 335, in set_channel
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     self._run_cmd(["iw", "dev", iface, "set", "channel", str(channel), channel_width])
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py", line 298, in _run_cmd
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]:     raise FLRuntimeError(
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]: wfb_ng.fl.errors.FLRuntimeError: 执行命令 iw dev wlxfc221c300f04 set channel 153 HT40- 失败:
+10月 28 19:58:00 fl04 wfb-fl-client-daemon[884]: 2026-10-28 19:58:00,342 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 28 19:58:00 fl04 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 28 19:58:00 fl04 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 28 19:58:00 fl04 systemd[1]: wfb-fl-client-daemon.service: Consumed 15.456s CPU time.
+10月 28 19:58:15 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 19:58:15 fl04 python3[4986]: 2026-10-28 19:58:15,421 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 19:58:15 fl04 python3[4986]: 2026-10-28 19:58:15,422 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 19:58:15 fl04 python3[4986]: 2026-10-28 19:58:15,738 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c4)
+10月 28 19:58:15 fl04 python3[4986]: 2026-10-28 19:58:15,770 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 19:58:54 fl04 python3[4986]: 2026-10-28 19:58:54,218 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:59:20 fl04 python3[4986]: 2026-10-28 19:59:20,555 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:59:33 fl04 python3[4986]: 2026-10-28 19:59:33,341 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:59:54 fl04 python3[4986]: 2026-10-28 19:59:54,267 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 20:00:04 fl04 python3[4986]: 2026-10-28 20:00:04,837 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！

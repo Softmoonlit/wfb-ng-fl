@@ -1,0 +1,22 @@
+{
+  "fl00": {
+    "rc": 0,
+    "stdout": "phy#1\n\tInterface wlxfc221c100157\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:57\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm\nMainPID=281025\nActiveState=active\n",
+    "stderr": ""
+  },
+  "fl01": {
+    "rc": 0,
+    "stdout": "phy#2\n\tInterface wlxfc221c300e99\n\t\tifindex 25\n\t\twdev 0x200000001\n\t\taddr fc:22:1c:30:0e:99\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:a6\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\nMainPID=51941\nActiveState=active\n",
+    "stderr": ""
+  },
+  "fl02": {
+    "rc": 0,
+    "stdout": "phy#1\n\tInterface wlxfc221c500a88\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:50:0a:88\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:86\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\nMainPID=10136\nActiveState=active\n",
+    "stderr": ""
+  },
+  "fl04": {
+    "rc": 0,
+    "stdout": "phy#1\n\tInterface wlxfc221c300f04\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:30:0f:04\n\t\ttype monitor\n\t\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:8a:9c\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\nMainPID=4493\nActiveState=active\n",
+    "stderr": ""
+  }
+}

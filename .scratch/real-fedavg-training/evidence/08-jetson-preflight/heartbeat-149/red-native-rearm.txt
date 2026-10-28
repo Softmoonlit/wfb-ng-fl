@@ -1,0 +1,15 @@
+v6 radio control loopback port=40497
+171013715	PKT	0:0:0:0:0:0:0:0:0:0:0
+171013715	RX_BATCH	0:0:0:0:0
+171013715	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+171013715	READY_FILTER	0:0:0:0:0
+171013715	REASSEMBLY	0:40
+171013715	TOKEN_AUTH	0:0:0:0
+171013715	GRANT_SEQ	0:0
+171013715	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=171013715
+v6_radio_command req_id=71 cmd_id=5 rc=95 payload_size=0
+v6_radio_update_test: tests/cpp/v6_uplink_rearm_test.hpp:94: void test_native_rearm(): Assertion `rearm_command(command, control_port, epoch) == 0' failed.
+
+exit_status=-6

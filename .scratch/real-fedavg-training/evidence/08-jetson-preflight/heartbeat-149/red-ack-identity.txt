@@ -1,0 +1,127 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 1 item
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_late_149_ack_cannot_lock_157 FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_late_149_ack_cannot_lock_157 _______________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff7e1ad660>
+
+    def test_late_149_ack_cannot_lock_157(monkeypatch):
+        """Deliver the 149 receipt only after receiving the 157 HUNTING probe."""
+        real_socket = socket.socket
+        dynamic_ports = set()
+    
+        class LoopbackSocket(real_socket):
+            """Keep real UDP while restricting both ends to this test's ports."""
+    
+            def bind(self, address):
+                assert address == ("127.0.0.1", 0)
+                result = super().bind(address)
+                dynamic_ports.add(self.getsockname()[1])
+                return result
+    
+            def check_destination(self, address):
+                assert address[0] == "127.0.0.1"
+                assert address[1] in dynamic_ports
+                assert address[1] not in {9000, 9001, 9002, 9200}
+                if self.getsockname()[1] == 0:
+                    self.bind(("127.0.0.1", 0))
+    
+            def sendto(self, data, *args):
+                self.check_destination(args[-1])
+                return super().sendto(data, *args)
+    
+            def connect(self, address):
+                self.check_destination(address)
+                return super().connect(address)
+    
+        # Replace only the socket system boundary; all protocol/hunt code is real.
+        monkeypatch.setattr(socket, "socket", LoopbackSocket)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server:
+            server.bind(("127.0.0.1", 0))
+            server.settimeout(3.0)
+            adapter = MockNetworkAdapter(["wlan-test"])
+            client = ControlPlaneClient(
+                node_id=4,
+                tun_ip="127.0.0.1",
+                network_adapter=adapter,
+                air_interface="wlan-test",
+                initial_channel=149,
+                cached_channel=149,
+                server_host="127.0.0.1",
+                server_port=server.getsockname()[1],
+                broadcast_port=server.getsockname()[1],
+                attempt_timeout_seconds=0.5,
+                max_attempts_per_channel=1,
+            )
+            received = []
+            peer_errors = []
+            ack_sent = threading.Event()
+    
+            def delayed_ack_peer():
+                try:
+                    raw, first_address = server.recvfrom(4096)
+                    first = NodeHeartbeat.from_bytes(raw)
+                    received.append((first.current_channel, first.state))
+                    assert received == [(149, "HUNTING")]
+                    # Identity belongs to the first probe. Current parsing accepts
+                    # ack=true and ignores these extra fields (ADR-0012 protocol).
+                    stale_ack = json.dumps({
+                        "ack": True,
+                        "heartbeat_timestamp_ms": first.timestamp_ms,
+                        "channel": first.current_channel,
+                    }).encode("utf-8")
+                    # No reply to 149. Receiving 157 is the release gate: its hunt
+                    # socket drain has already finished, so no timing sleep is needed.
+                    raw, second_address = server.recvfrom(4096)
+                    second = NodeHeartbeat.from_bytes(raw)
+                    received.append((second.current_channel, second.state))
+                    assert received == [(149, "HUNTING"), (157, "HUNTING")]
+                    assert second_address == first_address
+                    server.sendto(stale_ack, second_address)
+                    ack_sent.set()
+                    # Never send a receipt for 157 (including any erroneous IDLE).
+                except BaseException as exc:
+                    peer_errors.append(exc)
+    
+            peer = threading.Thread(target=delayed_ack_peer, daemon=True)
+            peer.start()
+            try:
+                found = client.hunt_once(ladder=[149, 157])
+            finally:
+                client.stop()
+                peer.join(timeout=4.0)
+    
+            assert not peer.is_alive(), "loopback peer exceeded its bounded deadline"
+            assert not peer_errors, repr(peer_errors)
+            assert ack_sent.is_set(), "149 ACK was not released after the 157 probe"
+            assert received == [(149, "HUNTING"), (157, "HUNTING")]
+            assert adapter.channel_history == [149, 157]
+>           assert (found, client.locked_channel, client.state) == (
+                False, None, ClientNodeState.HUNTING
+            ), "a delayed 149 ACK must not discover or lock channel 157"
+E           AssertionError: a delayed 149 ACK must not discover or lock channel 157
+E           assert (True, 157, <ClientNodeState.IDLE: 'IDLE'>) == (False, None, <ClientNodeState.HUNTING: 'HUNTING'>)
+E             At index 0 diff: True != False
+E             Full diff:
+E             - (False, None, <ClientNodeState.HUNTING: 'HUNTING'>)
+E             + (True, 157, <ClientNodeState.IDLE: 'IDLE'>)
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py:102: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_late_149_ack_cannot_lock_157
+======================== 1 failed, 2 warnings in 1.60s =========================

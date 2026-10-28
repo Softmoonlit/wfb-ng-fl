@@ -1,0 +1,13 @@
+10月 28 19:56:54 fl02 wfb-fl-client-daemon[10498]: 2026-10-28 19:56:54,242 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:57:04 fl02 wfb-fl-client-daemon[10498]: 2026-10-28 19:57:04,960 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 19:57:58 fl02 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 28 19:57:58 fl02 wfb-fl-client-daemon[10498]: 2026-10-28 19:57:58,943 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 28 19:57:59 fl02 wfb-fl-client-daemon[10498]: 2026-10-28 19:57:59,260 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 28 19:57:59 fl02 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 28 19:57:59 fl02 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 28 19:57:59 fl02 systemd[1]: wfb-fl-client-daemon.service: Consumed 1min 42.153s CPU time.
+10月 28 19:58:14 fl02 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 19:58:14 fl02 python3[12688]: 2026-10-28 19:58:14,936 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=2, TUN IP=10.80.0.12)
+10月 28 19:58:14 fl02 python3[12688]: 2026-10-28 19:58:14,937 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500a88，开始接管配置...
+10月 28 19:58:15 fl02 python3[12688]: 2026-10-28 19:58:15,104 [INFO] [client-daemon] 网卡 wlxfc221c500a88 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c2)
+10月 28 19:58:15 fl02 python3[12688]: 2026-10-28 19:58:15,150 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64

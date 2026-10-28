@@ -1,0 +1,174 @@
+{
+  "commit": "c86e54aad4d5101cfe19e16d888545041a29de3f",
+  "run_id": "20261028T113545167077Z",
+  "topology_sha256": "183dd2ae50ef44f83d7191bda376d07fda420c1d2a178f34b2186148227a687e",
+  "helper_sha256": "dfa089b2405db0c79e49a774af2c7074507d9079c24fbc3b204cffb423a5831c",
+  "frozen_management_sha256": {
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py": "e33d00448f0f8ef14a12a2c866ae2d239396c6a0917ff3275530b4c205733913",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-node.py": "dfa089b2405db0c79e49a774af2c7074507d9079c24fbc3b204cffb423a5831c",
+    "cluster_nodes.conf": "183dd2ae50ef44f83d7191bda376d07fda420c1d2a178f34b2186148227a687e"
+  },
+  "topology_node_ids": [
+    1,
+    2,
+    4
+  ],
+  "active_job_targets": null,
+  "events": [
+    {
+      "node": "fl00",
+      "phase": "inbox",
+      "argv": [
+        "mkdir",
+        "-m",
+        "700",
+        "/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:45.912908+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer",
+      "argv": [
+        "cp",
+        "--",
+        "/tmp/wfb-release-jaj7nyy1/source.tar",
+        "/tmp/wfb-release-jaj7nyy1/release-node.py",
+        "/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:45.919215+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.201",
+        "mkdir -m 700 /tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:46.085724+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl01",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-jaj7nyy1/source.tar",
+        "/tmp/wfb-release-jaj7nyy1/release-node.py",
+        "fl@192.168.108.201:/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:46.554656+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.202",
+        "mkdir -m 700 /tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:54.438768+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl02",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-jaj7nyy1/source.tar",
+        "/tmp/wfb-release-jaj7nyy1/release-node.py",
+        "fl@192.168.108.202:/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:35:54.807551+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.108.204",
+        "mkdir -m 700 /tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:36:02.491534+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl04",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-jaj7nyy1/source.tar",
+        "/tmp/wfb-release-jaj7nyy1/release-node.py",
+        "fl@192.168.108.204:/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-10-28T11:36:03.060838+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "preflight",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/release-node.py",
+        "preflight",
+        "c86e54aad4d5101cfe19e16d888545041a29de3f",
+        "fl00",
+        "/srv/wfb-ng-fl/release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z",
+        "/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z",
+        "47e3af4cfc77ae0a3e793954bbebfae5028c766f22548c13f14a3942c165fc5b",
+        "-"
+      ],
+      "state": "failed",
+      "utc": "2026-10-28T11:36:12.046143+00:00",
+      "rc": 1,
+      "error": "CalledProcessError(1, ['sudo', '-n', '/usr/bin/python3', '-B', '/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/release-node.py', 'preflight', 'c86e54aad4d5101cfe19e16d888545041a29de3f', 'fl00', '/srv/wfb-ng-fl/release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z', '/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z', '47e3af4cfc77ae0a3e793954bbebfae5028c766f22548c13f14a3942c165fc5b', '-'], None, None)"
+    }
+  ],
+  "state": "failed",
+  "archive_sha256": "47e3af4cfc77ae0a3e793954bbebfae5028c766f22548c13f14a3942c165fc5b",
+  "error": "CalledProcessError(1, ['sudo', '-n', '/usr/bin/python3', '-B', '/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z/release-node.py', 'preflight', 'c86e54aad4d5101cfe19e16d888545041a29de3f', 'fl00', '/srv/wfb-ng-fl/release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z', '/tmp/wfb-release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z', '47e3af4cfc77ae0a3e793954bbebfae5028c766f22548c13f14a3942c165fc5b', '-'], None, None)",
+  "failure_policy": "no rollback, no fallback, no registry changes; inspect logs before manual recovery"
+}

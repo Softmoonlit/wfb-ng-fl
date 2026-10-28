@@ -1,0 +1,171 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 3 items
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_late_149_ack_cannot_lock_157 FAILED [ 33%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_old_ack_then_current_ack_succeeds_in_same_window[hunt] PASSED [ 66%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_old_ack_then_current_ack_succeeds_in_same_window[send] FAILED [100%]
+
+=================================== FAILURES ===================================
+______________________ test_late_149_ack_cannot_lock_157 _______________________
+
+loopback_network = None
+
+    def test_late_149_ack_cannot_lock_157(loopback_network):
+        """收到 157 寻频心跳后才释放 149 的回执，不能错误锁频。"""
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server:
+            server.bind(("127.0.0.1", 0))
+            server.settimeout(3.0)
+            adapter = MockNetworkAdapter(["wlan-test"])
+            client = ControlPlaneClient(
+                node_id=4,
+                tun_ip="127.0.0.1",
+                network_adapter=adapter,
+                air_interface="wlan-test",
+                initial_channel=149,
+                cached_channel=149,
+                server_host="127.0.0.1",
+                server_port=server.getsockname()[1],
+                broadcast_port=server.getsockname()[1],
+                attempt_timeout_seconds=0.5,
+                max_attempts_per_channel=1,
+            )
+            received = []
+            peer_errors = []
+            ack_sent = threading.Event()
+    
+            def delayed_ack_peer():
+                try:
+                    raw, first_address = server.recvfrom(4096)
+                    first = NodeHeartbeat.from_bytes(raw)
+                    received.append((first.current_channel, first.state))
+                    assert received == [(149, "HUNTING")]
+                    # 旧请求回执也包含完整身份，避免仅因缺少字段而虚假通过。
+                    stale_ack = json.dumps({
+                        "ack": True,
+                        "heartbeat_timestamp_ms": first.timestamp_ms,
+                        "channel": first.current_channel,
+                    }).encode("utf-8")
+                    # 不回复 149；收到 157 表示寻频已排空 socket，依收包序列释放回执。
+                    raw, second_address = server.recvfrom(4096)
+                    second = NodeHeartbeat.from_bytes(raw)
+                    received.append((second.current_channel, second.state))
+                    assert received == [(149, "HUNTING"), (157, "HUNTING")]
+                    assert second_address == first_address
+                    server.sendto(stale_ack, second_address)
+                    ack_sent.set()
+                    # 不给 157 回执，包括错误进入 IDLE 后的心跳。
+                except BaseException as exc:
+                    peer_errors.append(exc)
+    
+            peer = threading.Thread(target=delayed_ack_peer, daemon=True)
+            peer.start()
+            try:
+                found = client.hunt_once(ladder=[149, 157])
+            finally:
+                client.stop()
+                peer.join(timeout=4.0)
+    
+            assert not peer.is_alive(), "回环服务线程超出截止时间"
+            assert not peer_errors, repr(peer_errors)
+            assert ack_sent.is_set(), "未在收到 157 探测后释放 149 回执"
+            assert received == [(149, "HUNTING"), (157, "HUNTING")]
+            assert adapter.channel_history == [149, 157]
+>           assert (found, client.locked_channel, client.state) == (
+                False, None, ClientNodeState.HUNTING
+            ), "迟到的 149 回执不能导致发现并锁定 157"
+E           AssertionError: 迟到的 149 回执不能导致发现并锁定 157
+E           assert (True, 157, <ClientNodeState.IDLE: 'IDLE'>) == (False, None, <ClientNodeState.HUNTING: 'HUNTING'>)
+E             At index 0 diff: True != False
+E             Full diff:
+E             - (False, None, <ClientNodeState.HUNTING: 'HUNTING'>)
+E             + (True, 157, <ClientNodeState.IDLE: 'IDLE'>)
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py:107: AssertionError
+_________ test_old_ack_then_current_ack_succeeds_in_same_window[send] __________
+
+loopback_network = None, operation = 'send'
+
+    @pytest.mark.parametrize("operation", ["hunt", "send"])
+    def test_old_ack_then_current_ack_succeeds_in_same_window(loopback_network, operation):
+        """同一等待窗口先收到完整的旧回执，随后仍应接受本次有效回执。"""
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server:
+            server.bind(("127.0.0.1", 0))
+            server.settimeout(2.0)
+            client = ControlPlaneClient(
+                node_id=4, tun_ip="127.0.0.1",
+                network_adapter=MockNetworkAdapter(["wlan-test"]),
+                air_interface="wlan-test", initial_channel=157,
+                server_host="127.0.0.1", server_port=server.getsockname()[1],
+                broadcast_port=server.getsockname()[1], max_attempts_per_channel=1,
+            )
+            heartbeats = []
+            peer_errors = []
+    
+            def reply():
+                try:
+                    raw, address = server.recvfrom(4096)
+                    heartbeat = NodeHeartbeat.from_bytes(raw)
+                    heartbeats.append(heartbeat)
+                    server.sendto(json.dumps({
+                        "ack": True,
+                        "heartbeat_timestamp_ms": heartbeat.timestamp_ms - 1,
+                        "channel": 157,
+                    }).encode(), address)
+                    server.sendto(json.dumps({
+                        "ack": True,
+                        "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
+                        "channel": 157,
+                    }).encode(), address)
+                    if operation == "hunt":
+                        # 寻频成功后，用公开协议确认客户端立即发出的 IDLE 心跳。
+                        raw, address = server.recvfrom(4096)
+                        idle = NodeHeartbeat.from_bytes(raw)
+                        assert idle.state == "IDLE"
+                        server.sendto(json.dumps({
+                            "ack": True, "heartbeat_timestamp_ms": idle.timestamp_ms,
+                            "channel": 157,
+                        }).encode(), address)
+                except BaseException as exc:
+                    peer_errors.append(exc)
+    
+            peer = threading.Thread(target=reply, daemon=True)
+            peer.start()
+            try:
+                if operation == "hunt":
+                    assert client.hunt_once(ladder=[157])
+                    assert client.locked_channel == 157
+                    assert client.state == ClientNodeState.IDLE
+                else:
+                    ack = client.send_heartbeat_once()
+                    assert ack is not None
+>                   assert ack.to_dict() == {
+                        "ack": True,
+                        "heartbeat_timestamp_ms": heartbeats[0].timestamp_ms,
+                        "channel": 157,
+                    }
+E                   AssertionError: assert {'ack': True} == {'ack': True, 'channel': 157, 'heartbeat_timestamp_ms': 170782235}
+E                     Common items:
+E                     {'ack': True}
+E                     Right contains 2 more items:
+E                     {'channel': 157, 'heartbeat_timestamp_ms': 170782235}
+E                     Full diff:
+E                     - {'ack': True, 'channel': 157, 'heartbeat_timestamp_ms': 170782235}
+E                     + {'ack': True}
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py:165: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_late_149_ack_cannot_lock_157
+FAILED wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_old_ack_then_current_ack_succeeds_in_same_window[send]
+=================== 2 failed, 1 passed, 2 warnings in 1.64s ====================

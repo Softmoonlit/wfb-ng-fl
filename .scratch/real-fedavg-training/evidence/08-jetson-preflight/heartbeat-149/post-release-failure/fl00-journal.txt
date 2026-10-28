@@ -1,0 +1,13 @@
+10月 28 19:57:51 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...
+10月 28 19:57:51 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 19:57:51,177 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...
+10月 28 19:57:51 fl00 wfb-fl-server-daemon[282274]: 2026-10-28 19:57:51,624 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止
+10月 28 19:57:51 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.
+10月 28 19:57:51 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.
+10月 28 19:57:51 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 15.470s CPU time.
+10月 28 19:58:07 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,231 [INFO] [client-daemon] 自动纳管无线网卡接口: wlxfc221c100157
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,382 [INFO] [client-daemon] 网卡 wlxfc221c100157 配置就绪 (信道=149, 发射功率=14 dBm)
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,383 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,441 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,442 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)
+10月 28 19:58:08 fl00 python3[313819]: 2026-10-28 19:58:08,445 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090

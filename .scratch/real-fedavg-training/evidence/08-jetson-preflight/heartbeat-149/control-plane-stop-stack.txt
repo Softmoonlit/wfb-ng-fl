@@ -1,0 +1,97 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 78 items
+
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_late_149_ack_cannot_lock_157 PASSED [  1%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_old_ack_then_current_ack_succeeds_in_same_window[hunt] PASSED [  2%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_old_ack_then_current_ack_succeeds_in_same_window[send] PASSED [  3%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[request-hunt] PASSED [  5%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[request-send] PASSED [  6%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[channel-hunt] PASSED [  7%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[channel-send] PASSED [  8%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[port-hunt] PASSED [ 10%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[port-send] PASSED [ 11%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[host-hunt] PASSED [ 12%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[host-send] PASSED [ 14%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[old-protocol-hunt] PASSED [ 15%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_mismatched_ack_cannot_establish_contact[old-protocol-send] PASSED [ 16%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_invalid_stream_does_not_restart_single_deadline[hunt] PASSED [ 17%]
+wfb_ng/tests/test_fl_heartbeat_ack_identity.py::test_invalid_stream_does_not_restart_single_deadline[send] PASSED [ 19%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_default_ladder_without_cache PASSED [ 20%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_forbidden_161_channel_strictly_excluded PASSED [ 21%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_invalid_channel_falls_back_to_benchmark PASSED [ 23%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_ladder_with_cached_149 PASSED [ 24%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_ladder_with_cached_153 PASSED [ 25%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_ladder_with_cached_157 PASSED [ 26%]
+wfb_ng/tests/test_fl_control_plane.py::TestHuntingLadder::test_ladder_with_cached_165 PASSED [ 28%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlMessagesSerialization::test_heartbeat_ack_identity_roundtrip PASSED [ 29%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlMessagesSerialization::test_heartbeat_ack_requires_strict_complete_identity PASSED [ 30%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlMessagesSerialization::test_node_heartbeat_serialization_roundtrip PASSED [ 32%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlMessagesSerialization::test_protocol_fail_closed_validation PASSED [ 33%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_hunting_state_keeps_node_in_connecting PASSED [ 34%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_idle_state_transitions_node_to_ready PASSED [ 35%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_node_offline_timeout PASSED [ 37%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_radio_mismatch_triggers_alignment_directive PASSED [ 38%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_reordered_and_replayed_heartbeats_idempotency_and_monotonicity PASSED [ 39%]
+wfb_ng/tests/test_fl_control_plane.py::TestNodeHorizonRegistryAndAntiDesyncGate::test_unsolicited_idle_held_in_connecting PASSED [ 41%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_control_plane_integration PASSED [ 42%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_persists_locked_channel_across_hotplug PASSED [ 43%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_client_daemon_task_announce_and_abort_handling PASSED [ 44%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_compatible_channel_pool_sweep_under_two_seconds PASSED [ 46%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_hardware_reconfiguration_failure_fails_closed PASSED [ 47%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_instant_heartbeat_on_state_transition PASSED [ 48%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_missed_acks_in_idle_triggers_fallback_to_hunting PASSED [ 50%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_multi_client_broadcast_reception PASSED [ 51%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_radio_alignment_applied_by_client PASSED [ 52%]
+wfb_ng/tests/test_fl_control_plane.py::TestControlPlaneNetworkLoop::test_radio_reports_do_not_generate_heartbeat_receipts Timeout (0:00:15)!
+Thread 0x0000ffff77fff120 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 320 in wait
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 1318 in _liveness_loop
+  File "/usr/lib/python3.10/threading.py", line 953 in run
+  File "/usr/lib/python3.10/threading.py", line 1016 in _bootstrap_inner
+  File "/usr/lib/python3.10/threading.py", line 973 in _bootstrap
+
+Thread 0x0000ffff80e56860 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 1116 in _wait_for_tstate_lock
+  File "/usr/lib/python3.10/threading.py", line 1096 in join
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 859 in stop
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_control_plane.py", line 484 in tearDown
+  File "/usr/lib/python3.10/unittest/case.py", line 552 in _callTearDown
+  File "/usr/lib/python3.10/unittest/case.py", line 594 in run
+  File "/usr/lib/python3.10/unittest/case.py", line 650 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/unittest.py", line 321 in runtest
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 162 in pytest_runtest_call
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 255 in <lambda>
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 311 in from_call
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 254 in call_runtest_hook
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 215 in call_and_report
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 126 in runtestprotocol
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 109 in pytest_runtest_protocol
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 348 in pytest_runtestloop
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 323 in _main
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 269 in wrap_session
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 316 in pytest_cmdline_main
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 162 in main
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 185 in console_main
+  File "/usr/lib/python3/dist-packages/pytest/__main__.py", line 5 in <module>
+  File "/usr/lib/python3.10/runpy.py", line 86 in _run_code
+  File "/usr/lib/python3.10/runpy.py", line 196 in _run_module_as_main

@@ -1,0 +1,64 @@
+============================= test session starts ==============================
+platform linux -- Python 3.10.12, pytest-6.2.5, py-1.10.0, pluggy-0.13.0 -- /usr/bin/python
+cachedir: .pytest_cache
+rootdir: /home/fl/projects/wfb-ng-fl
+plugins: ament-copyright-0.12.14, ament-flake8-0.12.14, launch-testing-ros-0.19.13, ament-pep257-0.12.14, launch-testing-1.0.13, ament-lint-0.12.14, ament-xmllint-0.12.14, colcon-core-0.20.1, cov-3.0.0
+collecting ... collected 13 items
+
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch0-None] FAILED [  7%]
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch0-physical] FAILED [ 15%]
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch0-native] FAILED [ 23%]
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch1-None] PASSED [ 30%]
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch1-physical] PASSED [ 38%]
+wfb_ng/tests/test_fl_control_review.py::test_commit_rearms_after_native_configuration[patch1-native] PASSED [ 46%]
+wfb_ng/tests/test_fl_control_review.py::test_localhost_resolves_to_matching_udp_endpoint[hunt] FAILED [ 53%]
+wfb_ng/tests/test_fl_control_review.py::test_localhost_resolves_to_matching_udp_endpoint[send] FAILED [ 61%]
+wfb_ng/tests/test_fl_control_review.py::test_task_takeover_stops_hunt_without_retuning_or_overwriting_state[entry] FAILED [ 69%]
+wfb_ng/tests/test_fl_control_review.py::test_task_takeover_stops_hunt_without_retuning_or_overwriting_state[after-retune] FAILED [ 76%]
+wfb_ng/tests/test_fl_control_review.py::test_task_takeover_stops_hunt_without_retuning_or_overwriting_state[before-ack] FAILED [ 84%]
+wfb_ng/tests/test_fl_control_review.py::test_task_takeover_stops_hunt_without_retuning_or_overwriting_state[timeout] FAILED [ 92%]
+wfb_ng/tests/test_fl_control_review.py::test_stop_notification_before_liveness_wait_still_joins Timeout (0:00:08)!
+Thread 0x0000ffff9b15d860 (most recent call first):
+  File "/usr/lib/python3.10/threading.py", line 320 in wait
+  File "/usr/lib/python3.10/threading.py", line 607 in wait
+  File "/usr/lib/python3.10/threading.py", line 940 in start
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/control.py", line 839 in start
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/tests/test_fl_control_review.py", line 202 in test_stop_notification_before_liveness_wait_still_joins
+  File "/usr/lib/python3/dist-packages/_pytest/python.py", line 183 in pytest_pyfunc_call
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/python.py", line 1641 in runtest
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 162 in pytest_runtest_call
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 255 in <lambda>
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 311 in from_call
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 254 in call_runtest_hook
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 215 in call_and_report
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 126 in runtestprotocol
+  File "/usr/lib/python3/dist-packages/_pytest/runner.py", line 109 in pytest_runtest_protocol
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 348 in pytest_runtestloop
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 323 in _main
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 269 in wrap_session
+  File "/usr/lib/python3/dist-packages/_pytest/main.py", line 316 in pytest_cmdline_main
+  File "/usr/lib/python3/dist-packages/pluggy/callers.py", line 187 in _multicall
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 83 in <lambda>
+  File "/usr/lib/python3/dist-packages/pluggy/manager.py", line 92 in _hookexec
+  File "/usr/lib/python3/dist-packages/pluggy/hooks.py", line 286 in __call__
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 162 in main
+  File "/usr/lib/python3/dist-packages/_pytest/config/__init__.py", line 185 in console_main
+  File "/usr/lib/python3/dist-packages/pytest/__main__.py", line 5 in <module>
+  File "/usr/lib/python3.10/runpy.py", line 86 in _run_code
+  File "/usr/lib/python3.10/runpy.py", line 196 in _run_module_as_main

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/check_ready.py", line 27, in <module>
+    assert actual['readiness'] == 'READY', (node, actual)
+AssertionError: ('4', {'node_id': 4, 'tun_ip': '10.80.0.14', 'reported_state': 'HUNTING', 'readiness': 'CONNECTING', 'elapsed_ms': 1528, 'current_channel': 153, 'txpower_dbm': 14, 'uplink_mcs': 4, 'last_heartbeat_time': 174259.317225504, 'last_heartbeat_timestamp_ms': 1793188756060, 'last_heartbeat_ago_seconds': 0.51, 'error_code': None, 'can_select': False, 'selection_blockers': [{'code': 'NODE_NOT_READY', 'message': '基础未就绪: CONNECTING'}, {'code': 'NODE_NOT_IDLE', 'message': '节点尚未待命: HUNTING'}]})

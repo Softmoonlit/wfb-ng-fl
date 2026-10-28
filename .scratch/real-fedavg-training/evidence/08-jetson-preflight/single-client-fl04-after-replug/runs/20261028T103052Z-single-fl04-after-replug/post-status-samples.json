@@ -1,0 +1,1176 @@
+[
+  {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 277827
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 77751,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169169.871505408,
+        "last_heartbeat_timestamp_ms": 1793183666615,
+        "last_heartbeat_ago_seconds": 2.48,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 77894,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169170.522978816,
+        "last_heartbeat_timestamp_ms": 1793183667266,
+        "last_heartbeat_ago_seconds": 1.83,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "HUNTING",
+        "readiness": "CONNECTING",
+        "elapsed_ms": 70062,
+        "current_channel": 153,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169172.346411904,
+        "last_heartbeat_timestamp_ms": 1793183669090,
+        "last_heartbeat_ago_seconds": 0.0,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: CONNECTING"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: HUNTING"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 277827
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 82957,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169175.078629792,
+        "last_heartbeat_timestamp_ms": 1793183671822,
+        "last_heartbeat_ago_seconds": 2.28,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 83102,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169175.724528864,
+        "last_heartbeat_timestamp_ms": 1793183672468,
+        "last_heartbeat_ago_seconds": 1.63,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 10233,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169172.99285376,
+        "last_heartbeat_timestamp_ms": 1793183669736,
+        "last_heartbeat_ago_seconds": 4.36,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 277827
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 88163,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169180.279121536,
+        "last_heartbeat_timestamp_ms": 1793183677022,
+        "last_heartbeat_ago_seconds": 2.08,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 88302,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169180.93488976,
+        "last_heartbeat_timestamp_ms": 1793183677678,
+        "last_heartbeat_ago_seconds": 1.43,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 15351,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169178.3274152,
+        "last_heartbeat_timestamp_ms": 1793183675071,
+        "last_heartbeat_ago_seconds": 4.04,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 277827
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 93366,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169185.48411664,
+        "last_heartbeat_timestamp_ms": 1793183682227,
+        "last_heartbeat_ago_seconds": 1.89,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 93510,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169186.133340896,
+        "last_heartbeat_timestamp_ms": 1793183682876,
+        "last_heartbeat_ago_seconds": 1.24,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169183.670582016,
+        "last_heartbeat_timestamp_ms": 1793183680414,
+        "last_heartbeat_ago_seconds": 3.7,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 277827
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 98569,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169190.685831296,
+        "last_heartbeat_timestamp_ms": 1793183687429,
+        "last_heartbeat_ago_seconds": 1.69,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 98710,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169191.33819264,
+        "last_heartbeat_timestamp_ms": 1793183688081,
+        "last_heartbeat_ago_seconds": 1.04,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 5024,
+        "current_channel": 157,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 169188.864591648,
+        "last_heartbeat_timestamp_ms": 1793183685608,
+        "last_heartbeat_ago_seconds": 3.51,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  }
+]

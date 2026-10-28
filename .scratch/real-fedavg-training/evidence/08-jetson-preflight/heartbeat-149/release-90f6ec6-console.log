@@ -1,0 +1,25 @@
+fl00 inbox
+fl00 transfer
+fl01 inbox
+fl00 transfer-fl01
+fl02 inbox
+fl00 transfer-fl02
+fl04 inbox
+fl00 transfer-fl04
+fl00 preflight
+fl01 preflight
+fl02 preflight
+fl04 preflight
+fl00 build
+fl00 binary-fl01
+FAILED; evidence: /home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-90f6ec61eb32-20261028T115016892741Z
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py", line 199, in <module>
+    main()
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py", line 148, in main
+    command('fl00', ['scp', *SSH, '--', root + '/source/wfb_v6_uplink',
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py", line 93, in command
+    result.check_returncode()
+  File "/usr/lib/python3.10/subprocess.py", line 457, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['scp', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', '--', '/srv/wfb-ng-fl/release-90f6ec61eb32c66280a91b85fef6844e9f74da71-20261028T115016892741Z/source/wfb_v6_uplink', 'fl@192.168.108.201:/tmp/wfb-release-90f6ec61eb32c66280a91b85fef6844e9f74da71-20261028T115016892741Z/wfb_v6_uplink']' returned non-zero exit status 1.

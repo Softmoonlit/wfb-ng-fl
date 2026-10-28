@@ -1,5 +1,20 @@
 # 149 基线常驻心跳诊断与修复验证
 
+## 最新结果：已统一发布，常驻稳定性仍未通过
+
+四端已部署提交 `607c064150b661d1e8a568e29a101998ac06b0b7`（包含 `c86e54a` 控制修复和发布脚本修正）。运行中 native SHA-256 均为 `1e6ac8eda88b8dcd2564ddb0b7e87629d6447a3e71e05e328a4c95f1219696b1`，实际 Python 加载身份一致；四端 `iw` 均核验 149 / HT40+ / -14.00 dBm。发布证据见 `release-607c064150b6-20261028T115651441253Z/manifest.json` 与逐端 verify-runtime 输出。平台预置白名单仍为 1..10，实际参与者为 1/2/4，两者分别记录。
+
+发布前 fl00 的 libpcap 依赖经用户指定的网关 20112 代理，从 `.22.04.1` 升级为与其他三端一致的 `.22.04.2`，详见 `fl00-libpcap-upgrade/README.md`。首次发布因管理 SSH、locale、显式环境和产物权限中止，均在停服前；最终成功发布才进入全部停服/安装/启动屏障。依赖摘要差异不等于已经证明 ABI 不兼容。
+
+**120 秒全员 READY 门禁失败**：`stable-120.jsonl` 在约 25 秒记录 fl04 HUNTING/CONNECTING，`stable-120-console.log` 保存失败。没有启动四机训练，没有启用 HT20。
+
+新版本的四端 85 秒被动抓包见 `post-release-failure/`。fl01/fl02 各有 16 条心跳和 16 个对应 ACK；fl04 有 45 条心跳和 45 个对应 ACK，但其中若干 RTT 达 5.655、7.745、9.686 秒。`ack-summary.json` 用同一客户端单调时间计算 RTT，并以 payload SHA 和心跳身份配对服务端收发；Server 收包到回复约 1–26ms。两端分别计算事件间隔后取差，额外延迟集中在上行，不能将跨板单调时间直接相减作为单向时延。
+
+进一步执行相同版本/参数的单 fl04 常驻对照：暂停 fl01/fl02 服务，120 秒采样结束后通过 finally 恢复。见 `single-fl04-resident/operations.jsonl`、`restoration.json` 及 `single-resident-fl00.jsonl` / `single-resident-fl04.jsonl`。在约 61.2 秒 fl04 被判 OFFLINE，约 62.2 秒恢复 READY；两个完整覆盖的心跳 timestamp `2612332`、`2652748` 仅见于 fl04 TUN，未见于 Server TUN。捕获末尾 `2688134` 属于边界，不计丢失。该窗口有效 GRANT 持续增长，FEC 忙循环诊断计数为零；不支持以三客户端竞争、Server ACK 软件阻塞或已假设的空队列 GRANT 边沿解释全部故障。
+
+当前有证据支持的是 fl04 上行交付丢失/延迟以及寻频放大，尚未将其定位到具体发射、驱动、空口或接收环节，不能宣称已证明网卡损坏。两个已确定的协议/换频缺陷已修复，但现场稳定性仍未闭合；08、09、12、13 保持未完成。对照后 fl01/fl02 服务已正常启动，追加只读状态确认三参与节点均恢复 READY；该瞬时结果不替代稳定门禁。
+
+
 ## 现场与配置
 
 用户确认四板固定采用 `149 / HT40+ / 14 档 / 下行 MCS3 / 上行 MCS4 / UFTP 15000 Kbps`。四端已通过标准停服、修改启动配置和重启服务切换至该基线；没有修改注册表或伪造 READY。切换时运行的 Python 提交仍为 `701963ac254261c31c56a074d06966a9217346f6`，canonical native 仍为既有统一版本。`apply_baseline.py`、各端 `*-config-before.json` 和 `baseline-identities.json` 保存变更脚本、原始配置与运行制品身份；实际射频采样见被动捕获中的 `snapshot.radio`。

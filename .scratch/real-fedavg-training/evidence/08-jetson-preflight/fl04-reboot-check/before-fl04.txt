@@ -1,0 +1,189 @@
+fl04
+2026-10-28T18:23:27+08:00
+d0a7cb44-2f40-4c75-967c-e622ff70e174
+ 18:23:27 up 59 min,  1 user,  load average: 0.20, 0.34, 0.35
+MainPID=8403
+ActiveState=active
+phy#1
+	Interface wlxfc221c300f04
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:30:0f:04
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 4
+		wdev 0x1
+		addr dc:4a:9e:31:8a:9c
+		ssid HONOR 500
+		type managed
+		channel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz
+		txpower 7.00 dBm
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M
+        |__ Port 3: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M
+    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M
+    |__ Port 3: Dev 3, If 0, Class=Mass Storage, Driver=usb-storage, 480M
+10月 28 17:18:45 fl04 kernel: nvsciipc: set_db start
+10月 28 17:18:45 fl04 kernel: nvsciipc: set_db done
+10月 28 17:18:47 fl04 kernel: Mass Storage Function, version: 2009/09/11
+10月 28 17:18:47 fl04 kernel: LUN: removable file: (no medium)
+10月 28 17:18:47 fl04 kernel: using random self ethernet address
+10月 28 17:18:47 fl04 kernel: using random host ethernet address
+10月 28 17:18:47 fl04 kernel: bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+10月 28 17:18:47 fl04 kernel: usb0: HOST MAC 4e:b3:26:aa:e4:ac
+10月 28 17:18:47 fl04 kernel: usb0: MAC 4e:b3:26:aa:e4:ad
+10月 28 17:18:47 fl04 kernel: usb1: HOST MAC 4e:b3:26:aa:e4:ae
+10月 28 17:18:47 fl04 kernel: usb1: MAC 4e:b3:26:aa:e4:af
+10月 28 17:18:47 fl04 kernel: tegra-xudc 3550000.usb: EP 0 (type: ctrl, dir: out) enabled
+10月 28 17:18:47 fl04 kernel: l4tbr0: port 1(usb0) entered blocking state
+10月 28 17:18:47 fl04 kernel: l4tbr0: port 1(usb0) entered disabled state
+10月 28 17:18:47 fl04 kernel: device usb0 entered promiscuous mode
+10月 28 17:18:47 fl04 kernel: l4tbr0: port 2(usb1) entered blocking state
+10月 28 17:18:47 fl04 kernel: l4tbr0: port 2(usb1) entered disabled state
+10月 28 17:18:47 fl04 kernel: device usb1 entered promiscuous mode
+10月 28 17:18:48 fl04 kernel: loop0: detected capacity change from 0 to 32768
+10月 28 17:18:48 fl04 kernel: rtl88xxau_wfb 2-1.3:1.0 wlxfc221c300f04: renamed from wlan0
+10月 28 17:18:48 fl04 kernel: enP8p1s0: 0xffff800008abd000, 44:49:c0:1d:7c:fa, IRQ 266
+10月 28 17:18:49 fl04 kernel: loop1: detected capacity change from 0 to 8
+10月 28 17:18:50 fl04 kernel: nvgpu: 17000000.gpu                  gk20a_scale_init:541  [INFO]  enabled scaling for GPU
+10月 28 17:18:51 fl04 kernel: pstore: Using crash dump compression: deflate
+10月 28 17:18:51 fl04 kernel: printk: console [ramoops-1]: printing thread started
+10月 28 17:18:51 fl04 kernel: printk: console [ramoops-1] enabled
+10月 28 17:18:51 fl04 kernel: pstore: Registered ramoops as persistent store backend
+10月 28 17:18:51 fl04 kernel: ramoops: using 0x200000@0x2725f0000, ecc: 0
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram0
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram1
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram2
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram3
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram4
+10月 28 17:18:51 fl04 kernel: zram: Added device: zram5
+10月 28 17:18:51 fl04 kernel: zram0: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram0.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:51 fl04 kernel: zram1: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram1.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:51 fl04 kernel: zram2: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram2.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:51 fl04 kernel: zram3: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram3.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:51 fl04 kernel: zram4: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram4.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:51 fl04 kernel: zram5: detected capacity change from 0 to 1300464
+10月 28 17:18:51 fl04 kernel: Adding 650228k swap on /dev/zram5.  Priority:5 extents:1 across:650228k SS
+10月 28 17:18:53 fl04 kernel: ACK 04 d4
+10月 28 17:18:53 fl04 kernel: ACK 04 d4
+10月 28 17:18:54 fl04 kernel: IPv6: ADDRCONF(NETDEV_CHANGE): wlP4p1s0: link becomes ready
+10月 28 17:18:57 fl04 kernel: nvidia-modeset: Loading NVIDIA UNIX Open Kernel Mode Setting Driver for aarch64  540.4.0  Release Build  (buildbrain@mobile-u64-6336-d8000)  Tue Jan  7 17:35:14 PST 2025
+10月 28 17:18:57 fl04 kernel: [drm] [nvidia-drm] [GPU ID 0x00020000] Loading driver
+10月 28 17:18:57 fl04 kernel: NVRM rpcRmApiControl_dce: NVRM_RPC_DCE: Failed RM ctrl call cmd:0x731341 result 0xffff:
+10月 28 17:18:57 fl04 kernel: [drm] Initialized nvidia-drm 0.0.0 20160202 for 13800000.display on minor 1
+10月 28 17:18:57 fl04 kernel: nv_platform 13800000.display: [drm] Cannot find any crtc or sizes
+10月 28 17:19:00 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:19:08 fl04 kernel: rfkill: input handler disabled
+10月 28 17:19:12 fl04 kernel: loop1: detected capacity change from 0 to 8
+10月 28 17:24:50 fl04 kernel: nvgpu: 17000000.gpu             railgate_enable_store:365  [INFO]  railgate is disabled.
+10月 28 17:25:02 fl04 kernel: loop1: detected capacity change from 0 to 8
+10月 28 17:25:13 fl04 kernel: loop1: detected capacity change from 0 to 8
+10月 28 17:26:04 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:26:05 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:26:41 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:26:43 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:27:30 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:27:31 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:28:37 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:28:39 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:30:33 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:30:35 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:31:20 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:31:21 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:31:23 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:31:25 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:31:55 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:31:56 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:32:30 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:32:31 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:33:53 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:33:54 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:37:48 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:37:49 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:43:36 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:43:38 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:44:17 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:45:17 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:46:43 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:46:45 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 17:49:05 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 17:49:06 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:01:40 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 18:01:41 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:03:04 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 18:03:05 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:05:08 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 18:05:09 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:13:31 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 18:13:34 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:13:40 fl04 kernel: device wlxfc221c300f04 left promiscuous mode
+10月 28 18:13:42 fl04 kernel: device wlxfc221c300f04 entered promiscuous mode
+10月 28 18:03:04 fl04 systemd[1]: wfb-fl-client-daemon.service: Consumed 1.302s CPU time.
+10月 28 18:03:04 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 18:03:05 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:05,116 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 18:03:05 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:05,117 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 18:03:05 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:05,320 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 28 18:03:05 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:05,363 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 18:03:21 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:21,286 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:03:38 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:03:38,722 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:04:42 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:04:42,108 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:05:08 fl04 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 28 18:05:08 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:05:08,331 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 28 18:05:08 fl04 wfb-fl-client-daemon[7051]: 2026-10-28 18:05:08,555 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 28 18:05:08 fl04 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 28 18:05:08 fl04 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 28 18:05:08 fl04 systemd[1]: wfb-fl-client-daemon.service: Consumed 1.676s CPU time.
+10月 28 18:05:08 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 18:05:08 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:08,995 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 18:05:08 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:08,996 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 18:05:09 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:09,198 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 28 18:05:09 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:09,239 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 18:05:20 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:20,250 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:05:42 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:05:42,004 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:06:14 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:06:14,270 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:06:51 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:06:51,380 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:08:16 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:08:16,718 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:08:56 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:08:56,082 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:09:31 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:09:31,055 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:10:00 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:10:00,205 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:10:32 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:10:32,899 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:11:45 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:11:45,089 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:12:25 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:12:25,311 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:13:11 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:13:11,103 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:13:31 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:13:31,924 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+10月 28 18:13:31 fl04 systemd[1]: Stopping WFB-ng FL client persistent daemon...
+10月 28 18:13:32 fl04 wfb-fl-client-daemon[7313]: 2026-10-28 18:13:32,440 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+10月 28 18:13:32 fl04 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.
+10月 28 18:13:32 fl04 systemd[1]: Stopped WFB-ng FL client persistent daemon.
+10月 28 18:13:32 fl04 systemd[1]: wfb-fl-client-daemon.service: Consumed 5.388s CPU time.
+10月 28 18:13:41 fl04 systemd[1]: Started WFB-ng FL client persistent daemon.
+10月 28 18:13:41 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:13:41,798 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=4, TUN IP=10.80.0.14)
+10月 28 18:13:41 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:13:41,799 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...
+10月 28 18:13:42 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:13:42,000 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=157, TXPower=14 dBm, TUN=fl-c4)
+10月 28 18:13:42 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:13:42,027 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+10月 28 18:13:56 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:13:56,967 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:14:52 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:14:52,362 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:15:02 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:15:02,863 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:16:05 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:16:05,665 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:16:16 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:16:16,185 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:17:07 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:17:07,692 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:17:54 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:17:54,441 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:18:04 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:18:04,957 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:18:36 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:18:36,396 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:18:57 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:18:57,870 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:19:32 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:19:32,864 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:20:07 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:20:07,741 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:20:29 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:20:29,648 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:21:06 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:21:06,670 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:21:54 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:21:54,689 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:22:20 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:22:20,500 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
+10月 28 18:23:05 fl04 wfb-fl-client-daemon[8403]: 2026-10-28 18:23:05,002 [WARNING] [client-daemon] 连续 2 次未收到 ACK，判定失联，退回寻频自愈！
