@@ -46,7 +46,7 @@ def write_json(path, value):
 
 def run(args, timeout=60, check=True, **kwargs):
     print('ARGV', json.dumps(args), file=sys.stderr, flush=True)
-    env = dict(os.environ)
+    env = dict(kwargs.pop('env', os.environ))
     env['LC_ALL'] = 'C'
     env['LANG'] = 'C'
     kwargs['env'] = env
