@@ -68,3 +68,5 @@
 后续天线、馈线、USB、供电负载和逐链 RSSI 检查统一记录在[工单 08 后续硬件与射频诊断计划](../evidence/08-jetson-preflight/pending-hardware-diagnostics.md)。这些检查暂不阻塞其余软件工单，但在进入三客户端完整 FedAvg 实训前仍必须完成；当前 08 不能标记为通过。
 
 [三客户端双新网卡 smoke test](../evidence/08-jetson-preflight/three-client-new-nics-smoke/README.md)确认 fl02 `fc:22:1c:50:0a:88` 与 fl04 `fc:22:1c:30:0f:04` 均已更换。r2 中三端 HTTP 201、4 MiB 和 SHA-256 全部成功，但 r3 在下行注册阶段因 fl01 掉出退出码 7，r4 又因 fl01 多轮 NAK 后超时退出码 9；fl01 日志出现约 `-76 dBm` 接收链和大量 `PACKET_LOSS`。因此双新网卡已改善 fl02/fl04 的已知硬件变量，但三客户端整体仍未稳定，当前必须处理 fl01 的位置/天线/USB/供电或链路环境，不进入完整 FedAvg。r4 后通过 fl01、fl04 顺序重启恢复 Server `IDLE`、三客户端 `READY`。
+
+[当前双新网卡条件下的单 fl01 对照](../evidence/08-jetson-preflight/single-client-fl01-current/README.md)仅保留 fl01 后完成 4 MiB 下行和上行，HTTP 201、SHA-256 一致，上行约 0.64 Mbps；Server 能持续给 fl01 发 grant，但仍记录上行丢包。该结果说明 fl01 网卡并非完全失效，而是链路余量低，三客户端并发时容易越过失败阈值。单 fl01 传输通过，但恢复观察未确认全员 READY，随后 fl01/fl02/fl04 状态轮换，未伪造稳定恢复。
