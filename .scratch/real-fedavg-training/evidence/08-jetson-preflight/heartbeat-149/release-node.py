@@ -23,6 +23,8 @@ VERSION = '0.0.0'
 NATIVE = Path('/usr/bin/wfb_v6_uplink')
 RADIO = dict(channel=149, bandwidth_mhz=40, radio_txpower_dbm=14,
              downlink_mcs=3, uplink_mcs=4, uftp_rate_kbps=15000)
+WHITELIST_IDS = tuple(range(1, 11))
+PARTICIPANT_IDS = (1, 2, 4)
 UNITS = ['wfb-fl-server.service', 'wfb-fl-client.service',
          'wfb-fl-server-daemon.service', 'wfb-fl-client-daemon.service']
 
@@ -362,14 +364,16 @@ def main():
         elif phase == 'install':
             stopped()
             require(sha(source / 'wfb_v6_uplink') == native_sha, 'install binary hash mismatch')
-            # 安装器只调用 build_identity，不调用 build_v6；输入全部来自冻结归档。
-            out['install'] = run(['/bin/sh', str(source / 'scripts/install/install-v8.sh')],
-                                  timeout=150, cwd='/tmp', env=clean_env)
-            require(sha(NATIVE) == native_sha, 'installed binary mismatch')
             before = json.loads((root / 'preflight.json').read_text())
             package_root = Path(before['runtime_import_probe']['probe']['root'])
             require(package_root.is_absolute() and package_root.name == 'wfb_ng' and
                     str(package_root).startswith('/usr/'), 'unexpected installed package location')
+            # issue41_algorithm.py 已从冻结源码删除；直接安装不会清除旧版本遗留文件。
+            (package_root / 'fl/issue41_algorithm.py').unlink(missing_ok=True)
+            # 安装器只调用 build_identity，不调用 build_v6；输入全部来自冻结归档。
+            out['install'] = run(['/bin/sh', str(source / 'scripts/install/install-v8.sh')],
+                                  timeout=150, cwd='/tmp', env=clean_env)
+            require(sha(NATIVE) == native_sha, 'installed binary mismatch')
             # -B 只禁止写入，仍可能读取旧字节码，因此只清除自动生成的缓存。
             for cache in sorted(package_root.rglob('__pycache__'), reverse=True):
                 shutil.rmtree(cache)
@@ -380,7 +384,7 @@ def main():
                 config = Path('/etc/wfb-ng-fl/server.json')
                 current = json.loads(config.read_text())
                 require(current == before['server_config'], 'server config changed during maintenance')
-                current.update(RADIO, known_clients=[1, 2, 4])
+                current.update(RADIO, known_clients=list(WHITELIST_IDS))
                 mode = config.stat().st_mode & 0o777
                 write_json(config, current)
                 config.chmod(mode)
@@ -420,7 +424,8 @@ def main():
                     sha(source / 'scripts/install/v8-wfb-ng-init.py'), 'package root mismatch')
             if role == 'server':
                 before = json.loads((root / 'preflight.json').read_text())
-                expected_config = {**before['server_config'], **RADIO, 'known_clients': [1, 2, 4]}
+                expected_config = {**before['server_config'], **RADIO,
+                                   'known_clients': list(WHITELIST_IDS)}
                 require(json.loads(Path('/etc/wfb-ng-fl/server.json').read_text()) == expected_config,
                         'server config/topology changed or preserved training fields differ')
                 out['known_clients'] = expected_config['known_clients']
@@ -469,20 +474,30 @@ def main():
                         require(option(native['argv'], flag) == value, 'native argument mismatch: ' + flag)
                     if role == 'server':
                         known = option(native['argv'], '--known-clients').split(',')
-                        require(sorted(known) == ['1', '2', '4'], 'native known-clients must be exactly 1/2/4')
+                        expected_known = [str(n) for n in WHITELIST_IDS]
+                        require(sorted(known, key=int) == expected_known,
+                                'native known-clients must expose whitelist slots 1..10')
                         targets = []
                         for index, value in enumerate(native['argv']):
                             if value == '--client-target':
                                 targets.append(native['argv'][index + 1])
                             elif value.startswith('--client-target='):
                                 targets.append(value.split('=', 1)[1])
-                        expected_targets = [str(n) + ':10.80.0.' + str(10 + n) + ':127.0.0.1:1' for n in (1, 2, 4)]
-                        require(sorted(targets) == sorted(expected_targets), 'native client-targets differ from authorized topology')
+                        expected_targets = [str(n) + ':10.80.0.' + str(10 + n) + ':127.0.0.1:1'
+                                            for n in WHITELIST_IDS]
+                        require(sorted(targets) == sorted(expected_targets),
+                                'native client-targets differ from whitelist slots 1..10')
                         server_config = json.loads(Path('/etc/wfb-ng-fl/server.json').read_text())
                         before = json.loads((root / 'preflight.json').read_text())
-                        require(server_config == {**before['server_config'], **RADIO, 'known_clients': [1, 2, 4]},
-                                'running server configuration/topology drift')
-                        sample['topology_sets'] = {'known_clients': known, 'client_targets': targets, 'node_ids': [1, 2, 4]}
+                        require(server_config == {**before['server_config'], **RADIO,
+                                                  'known_clients': list(WHITELIST_IDS)},
+                                'running server configuration/whitelist drift')
+                        sample['topology_sets'] = {
+                            'whitelist_ids': list(WHITELIST_IDS),
+                            'participant_ids': list(PARTICIPANT_IDS),
+                            'known_clients': known,
+                            'client_targets': targets,
+                        }
                     else:
                         identity = json.loads(Path('/etc/wfb-ng-fl/node.json').read_text())
                         before = json.loads((root / 'preflight.json').read_text())
