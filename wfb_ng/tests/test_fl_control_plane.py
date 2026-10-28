@@ -17,7 +17,6 @@ from wfb_ng.fl.control import (
     HUNTING_ATTEMPT_TIMEOUT_SECONDS,
     HUNTING_RETRIES_PER_CHANNEL,
     IDLE_HEARTBEAT_INTERVAL_SECONDS,
-    IDLE_MISSED_ACK_THRESHOLD,
     ACTIVE_HEARTBEAT_INTERVAL_SECONDS,
     NODE_OFFLINE_THRESHOLD_SECONDS,
     SERVER_CONTROL_BROADCAST_ADDR,
@@ -768,8 +767,8 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
 
         client.stop()
 
-    def test_missed_acks_in_idle_triggers_fallback_to_hunting(self):
-        """空闲时连续两次缺失回执，客户端应返回寻频状态。"""
+    def test_missed_acks_in_idle_preserve_contact_within_ten_seconds(self):
+        """空闲时连续两次缺失回执仍在十秒观察窗口，不能返回寻频。"""
         adapter = MockNetworkAdapter()
         client = ControlPlaneClient(
             node_id=1,
@@ -798,9 +797,10 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertEqual(client.state, ClientNodeState.IDLE)
         self.assertEqual(client.missed_acks, 1)
 
-        # 第二次心跳缺失回执，达到失联阈值。
+        # 第二次心跳缺失回执，仍未到十秒失联阈值。
         client.send_heartbeat_once(timeout=0.05)
-        self.assertEqual(client.state, ClientNodeState.HUNTING)
+        self.assertEqual(client.state, ClientNodeState.IDLE)
+        self.assertEqual(client.missed_acks, 2)
 
         client.stop()
 

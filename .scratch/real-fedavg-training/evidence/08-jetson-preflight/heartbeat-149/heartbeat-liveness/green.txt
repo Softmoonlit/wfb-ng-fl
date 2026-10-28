@@ -1,0 +1,18 @@
+python -m pytest -q wfb_ng/tests/test_fl_control_plane.py wfb_ng/tests/test_fl_heartbeat_ack_identity.py wfb_ng/tests/test_fl_heartbeat_liveness.py wfb_ng/tests/test_fl_control_review.py wfb_ng/tests/test_fl_control_routing.py wfb_ng/tests/test_fl_client_daemon.py wfb_ng/tests/test_fl_radio_transactions.py wfb_ng/tests/test_fl_radio_switch.py wfb_ng/tests/test_fl_client_jobradio.py
+
+........................................................................ [ 37%]
+........................................................................ [ 75%]
+................................................                         [100%]
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+192 passed, 2 warnings in 39.03s
+
+mypy --follow-imports=silent wfb_ng/fl/control.py
+
+Success: no issues found in 1 source file

@@ -275,7 +275,7 @@ WinHTTP代理信息不等于浏览器系统/PAC代理；另检查Windows代理�
 | Client TASK_READY ACK等待 | 8秒，socket重试间隔最多250 ms | 与Server的10秒预算不是同一个值，需两端证据。 |
 | 每轮收update | 默认120秒 | Coordinator的有效update等待预算；不是整轮含下发的总墙钟限制。 |
 | Web作业HTTP I/O | 固定120秒 | 当前Transport的socket/I/O操作超时，不等于整个PUT统一120秒总时限；按实际阻塞位置分析。 |
-| 心跳 / OFFLINE | 空闲5秒、活动2秒；超过10秒投影OFFLINE | 区分已验证身份和活性，OFFLINE不会自动撤销身份；记录拥塞期间ACK缺失。 |
+| 心跳 / OFFLINE | 当前空闲及活动默认约2秒；Server静默超过10秒投影OFFLINE；IDLE客户端按10秒持续无有效确认才寻频，单次探测仍230ms，见[ADR-0018](../adr/0018-区分心跳探测失败与链路持续失活.md) | 区分已验证身份和活性，OFFLINE不会自动撤销身份；记录拥塞期间ACK缺失。历史运行参数以当次证据为准。 |
 | Token Grant / Guard | 当前C++默认120 ms / 10 ms；daemon不覆写 | 从实际argv和启动日志确认；这是代码默认，尚无本次10 Client性能证明。 |
 
 上述事实对应 `server_daemon.py` 的启动屏障和Web作业翻译、`control.py` 的TASK_READY/心跳、`coordinator.py` 的round预算、`transport.py` 的I/O、`src/v6_uplink.cpp` 的调度默认。HTTP和round可以在其他底层入口有不同配置，本表不把Web取值扩展为所有API的硬上限。历史180/15调度组合及15 ms feedback window是不同参数，不能相互代替。

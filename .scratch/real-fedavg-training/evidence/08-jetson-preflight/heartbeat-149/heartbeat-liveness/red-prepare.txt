@@ -1,0 +1,62 @@
+.....F...F                                                               [100%]
+=================================== FAILURES ===================================
+________ test_unacknowledged_idle_entry_has_finite_nonrenewable_window _________
+
+heartbeat_peer = namespace(client=<wfb_ng.fl.control.ControlPlaneClient object at 0xffffae4db3a0>, clock=namespace(now=130.75), exchang...idth_mhz=40, downlink_mcs=3, uftp_rate_kbps=15000, calibration=False)], reports=<queue.Queue object at 0xffffae4da080>)
+
+    def test_unacknowledged_idle_entry_has_finite_nonrenewable_window(heartbeat_peer):
+        """首次待命有有限起点，活动后返回待命不能续期既有确认。"""
+        p = heartbeat_peer
+        p.exchange(100, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+        assert p.exchange(109.7) is None
+        assert p.client.state == ClientNodeState.IDLE
+        p.client.notify_state_change(ClientNodeState.IDLE)
+        assert p.exchange(109.75) is None
+        assert p.client.state == ClientNodeState.HUNTING
+        p.exchange(120, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
+        p.exchange(130, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+        assert p.exchange(130.5) is None
+>       assert p.client.state == ClientNodeState.HUNTING
+E       AssertionError: assert <ClientNodeState.IDLE: 'IDLE'> == <ClientNodeSt...NG: 'HUNTING'>
+E         - HUNTING
+E         + IDLE
+
+wfb_ng/tests/test_fl_heartbeat_liveness.py:152: AssertionError
+----------------------------- Captured stderr call -----------------------------
+十秒内未确认有效心跳，退回寻频自愈，累计缺失 2 次 ACK
+__________ test_prepare_suppresses_hunting_without_renewing_liveness ___________
+
+heartbeat_peer = namespace(client=<wfb_ng.fl.control.ControlPlaneClient object at 0xffffada3b1c0>, clock=namespace(now=110.25), exchang...idth_mhz=40, downlink_mcs=3, uftp_rate_kbps=15000, calibration=False)], reports=<queue.Queue object at 0xffffada3ada0>)
+
+    def test_prepare_suppresses_hunting_without_renewing_liveness(heartbeat_peer):
+        """准备事务只保留禁止寻频行为，取消后仍使用事务前的活性起点。"""
+        p = heartbeat_peer
+        p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+        p.client.bind_job_context("job")
+        proposal = {"session_id": "prepare", "job_id": "job", "target_nodes": [4],
+                    "channel": 149, "patch": {"radio_txpower_dbm": 13}}
+        p.clock.now = 109
+        p.client.handle_broadcast(dict(proposal, type="CONFIG_RADIO_PREPARE"))
+        assert p.reports.get(timeout=1)["type"] == "PREPARE_ACK"
+        assert p.client.radio_switch_pending
+        assert p.exchange(110) is None
+>       assert p.client.state == ClientNodeState.IDLE
+E       AssertionError: assert <ClientNodeSt...NG: 'HUNTING'> == <ClientNodeState.IDLE: 'IDLE'>
+E         - IDLE
+E         + HUNTING
+
+wfb_ng/tests/test_fl_heartbeat_liveness.py:207: AssertionError
+----------------------------- Captured stderr call -----------------------------
+十秒内未确认有效心跳，退回寻频自愈，累计缺失 1 次 ACK
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_liveness.py::test_unacknowledged_idle_entry_has_finite_nonrenewable_window
+FAILED wfb_ng/tests/test_fl_heartbeat_liveness.py::test_prepare_suppresses_hunting_without_renewing_liveness
+2 failed, 8 passed, 2 warnings in 2.17s

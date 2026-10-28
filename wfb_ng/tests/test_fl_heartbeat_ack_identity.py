@@ -24,7 +24,9 @@ def loopback_network(monkeypatch):
         def bind(self, address):
             assert ipaddress.ip_address(address[0]).is_loopback
             assert address[1] == 0 or address[1] in dynamic_ports
+            assert address[1] not in {9000, 9001, 9002, 9200}
             result = super().bind(address)
+            assert self.getsockname()[1] not in {9000, 9001, 9002, 9200}
             dynamic_ports.add(self.getsockname()[1])
             return result
 
@@ -45,6 +47,18 @@ def loopback_network(monkeypatch):
 
     # 仅限制 socket 系统边界，协议与寻频逻辑保持真实执行。
     monkeypatch.setattr(socket, "socket", LoopbackSocket)
+
+
+@pytest.mark.parametrize("port", [9000, 9001, 9002, 9200])
+def test_dynamic_loopback_guard_blocks_production_ports(loopback_network, port):
+    """回环地址也不得绕过生产端口保护，收发双方只使用动态端口。"""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        with pytest.raises(AssertionError):
+            sock.bind(("127.0.0.1", port))
+        with pytest.raises(AssertionError):
+            sock.sendto(b"blocked", ("127.0.0.1", port))
+        with pytest.raises(AssertionError):
+            sock.connect(("127.0.0.1", port))
 
 
 def test_late_149_ack_cannot_lock_157(loopback_network):

@@ -48,8 +48,7 @@ CANDIDATE_CHANNELS: Tuple[int, ...] = (149, 153, 165)
 # Timing Parameters
 HUNTING_ATTEMPT_TIMEOUT_SECONDS: float = 0.23
 HUNTING_RETRIES_PER_CHANNEL: int = 2
-IDLE_HEARTBEAT_INTERVAL_SECONDS: float = 5.0
-IDLE_MISSED_ACK_THRESHOLD: int = 2
+IDLE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
 ACTIVE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
 NODE_OFFLINE_THRESHOLD_SECONDS: float = 10.0
 
@@ -2367,13 +2366,12 @@ class ControlPlaneServer:
 
 
 class ControlPlaneClient:
-    """
-    Client-side symmetric UDP control plane agent.
-    - Implements three-tier hunting ladder: cached -> 157 -> [149, 153, 165].
-    - Monotonically sweeps channels, retrying 2 times (250ms each) per channel (< 2s total).
-    - Transitions from HUNTING to IDLE upon ACK receipt and immediately fires IDLE heartbeat.
-    - Adaptive frequencies: 500ms hunting, 5s idle, 2s active.
-    - 0-delay instant trigger on state transitions.
+    """客户端双向 UDP 控制面，负责心跳与三级寻频。
+
+    寻频顺序为缓存信道、157、其余候选信道，每信道默认尝试两次，
+    单次回执等待预算为 230ms。有效回执锁定信道并立即上报待命心跳。
+    空闲和活动心跳默认每两秒发送；状态变化立即上报。
+    待命期间仅在最近有效确认对应的发送时间已过去十秒后恢复寻频。
     """
 
     def __init__(
@@ -2449,6 +2447,8 @@ class ControlPlaneClient:
         self.missed_acks: int = 0
         self._state_enter_time: float = time.monotonic()
         self._last_sent_ts_ms: int = 0
+        # 有效回执对应的本机发送时间；首次待命探测只授予有限观察窗口。
+        self._idle_liveness_anchor: Optional[float] = None
 
         self._uplink_sock: Optional[socket.socket] = None
         self._broadcast_listener_sock: Optional[socket.socket] = None
@@ -2691,7 +2691,8 @@ class ControlPlaneClient:
                         timestamp_ms=self._next_timestamp_ms(),
                     )
 
-                    deadline = time.monotonic() + self.attempt_timeout_seconds
+                    sent_mono = time.monotonic()
+                    deadline = sent_mono + self.attempt_timeout_seconds
                     try:
                         sock.sendto(hb.to_bytes(), self._get_server_endpoint())
                     except Exception as exc:
@@ -2708,6 +2709,7 @@ class ControlPlaneClient:
                             self.locked_channel = ch
                             self.cached_channel = ch
                             self.missed_acks = 0
+                            self._idle_liveness_anchor = sent_mono
 
                             # Also drain/check for subsequent CONFIG_RADIO_ALIGN packet
                             self._check_and_apply_alignment_packet(sock, deadline)
@@ -2792,7 +2794,10 @@ class ControlPlaneClient:
             timestamp_ms=self._next_timestamp_ms(),
         )
 
-        deadline = time.monotonic() + self.attempt_timeout_seconds
+        sent_mono = time.monotonic()
+        if state == ClientNodeState.IDLE.value and self._idle_liveness_anchor is None:
+            self._idle_liveness_anchor = sent_mono
+        deadline = sent_mono + self.attempt_timeout_seconds
         try:
             sock.sendto(hb.to_bytes(), self._get_server_endpoint())
         except Exception as exc:
@@ -2803,6 +2808,8 @@ class ControlPlaneClient:
             ack = self._receive_heartbeat_ack(sock, hb, deadline)
             if ack is not None:
                 self.missed_acks = 0
+                # 接收与对齐耗时不能把已确认请求的有效期向后延长。
+                self._idle_liveness_anchor = sent_mono
                 self._check_and_apply_alignment_packet(sock, deadline)
                 return ack
         except (socket.timeout, BlockingIOError):
@@ -2824,16 +2831,18 @@ class ControlPlaneClient:
                     state=self.state.value,
                     elapsed_ms=self.get_elapsed_ms(),
                 )
-                if ack is None:
-                    if self.state == ClientNodeState.IDLE and self._pre_switch_config is None:
+                if (self.state == ClientNodeState.IDLE
+                        and not self.radio_switch_pending
+                        and self._pre_switch_config is None):
+                    if ack is None:
                         self.missed_acks += 1
-                        if self.missed_acks >= IDLE_MISSED_ACK_THRESHOLD:
-                            logger.warning(
-                                "连续 %d 次未收到 ACK，判定失联，退回寻频自愈！",
-                                self.missed_acks,
-                            )
-                            self.state = ClientNodeState.HUNTING
-                            self._state_enter_time = time.monotonic()
+                    # 仅在本次探测结束时检查，与服务端使用同一个十秒阈值。
+                    now = time.monotonic()
+                    if (self._idle_liveness_anchor is not None
+                            and now - self._idle_liveness_anchor >= NODE_OFFLINE_THRESHOLD_SECONDS):
+                        logger.warning("十秒内未确认有效心跳，退回寻频自愈，累计缺失 %d 次 ACK", self.missed_acks)
+                        self.state = ClientNodeState.HUNTING
+                        self._state_enter_time = now
                 return ack
             finally:
                 self.attempt_timeout_seconds = old_timeout
