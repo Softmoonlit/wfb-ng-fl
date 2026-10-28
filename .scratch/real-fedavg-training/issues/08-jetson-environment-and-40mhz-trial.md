@@ -58,3 +58,7 @@
 [fl02/fl04 网卡互换与 19 V 供电交叉诊断](../evidence/08-jetson-preflight/swap-cross-matrix/README.md)完成了交叉变量隔离：fl02 使用原 fl04 网卡并改为 19 V 后，成功获得 grant、完成 4 MiB 下行，但上行仍在 120 秒超时；fl04 使用原 fl02 网卡后，4 MiB 双向文件均完整且 SHA-256 一致，但上行耗时 86.385 秒、约 0.39 Mbps，远低于交换前原 fl04 网卡约 9.17 Mbps。该矩阵支持“原 fl02 网卡自身劣化”与“fl02 主机/位置/天线/USB/供电链路独立异常”叠加，不能归因于单纯 MCS、功率或 Server 调度代码。操作者报告 fl02 已换为 19 V，但板端无输入电压遥测。
 
 [fl02/fl04 物理位置互换对照](../evidence/08-jetson-preflight/position-cross-matrix/README.md)在网卡已互换、两台现场均使用 19 V 的条件下进一步只互换物理位置：fl02 主机搭配原 fl04 网卡移动到 fl04 原位置后，4 MiB 双向成功，上行约 4.61 Mbps；同一网卡在 fl02 原位置时上行超时。fl04 主机搭配原 fl02 网卡移动到 fl02 原位置后，下行成功但上行超时；同一网卡在较好位置时可完成但仅约 0.39 Mbps。该对照直接复现位置/天线环境影响，并与原 fl02 网卡自身劣化叠加，继续排除单纯 MCS、功率或公共 Server/native 代码作为首要根因。两轮结束后均通过连续 6 个 API 采样确认 Server `IDLE`、三客户端 `READY`。
+
+### 暂缓的硬件与射频诊断
+
+后续天线、馈线、USB、供电负载和逐链 RSSI 检查统一记录在[工单 08 后续硬件与射频诊断计划](../evidence/08-jetson-preflight/pending-hardware-diagnostics.md)。这些检查暂不阻塞其余软件工单，但在进入三客户端完整 FedAvg 实训前仍必须完成；当前 08 不能标记为通过。
