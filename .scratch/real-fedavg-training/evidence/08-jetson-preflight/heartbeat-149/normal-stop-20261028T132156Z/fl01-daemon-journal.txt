@@ -1,0 +1,11 @@
+[178614.019103] fl01 python3[55889]: 2026-10-28 21:22:04,338 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+[178614.471073] fl01 python3[55889]: 2026-10-28 21:22:04,791 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/client_role.json --job-context /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/algorithm_config.json
+[178618.677375] fl01 python3[55889]: 2026-10-28 21:22:08,996 [INFO] [client-daemon] TASK_READY_ACK report_id=1c64185873b04d7685091b32347564f3 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=1 server=10.80.0.1:9001
+[178618.680049] fl01 python3[55889]: 2026-10-28 21:22:08,997 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> RUNNING (0 延迟即刻抢跑)
+[178621.310030] fl01 python3[55889]: 2026-10-28 21:22:11,629 [INFO] [client-daemon] 终止子进程组 PGID=56229 (PID=56229)
+[178622.721781] fl01 python3[55889]: 2026-10-28 21:22:13,040 [INFO] [client-daemon] 回收作业 web-4c8de13bb3e64e93ac913520f4ab793c 资源 (exit_code=0)
+[178622.726862] fl01 python3[55889]: 2026-10-28 21:22:13,046 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+[178622.798270] fl01 python3[55889]: 2026-10-28 21:22:13,117 [INFO] [client-daemon] 客户端状态跃迁: RUNNING -> ABORTING (0 延迟即刻抢跑)
+[178623.068303] fl01 python3[55889]: 2026-10-28 21:22:13,387 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=417da85e23d84ca7ae5af1cd38f8b025 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=1 server=10.80.0.1:9001
+[178623.069249] fl01 python3[55889]: 2026-10-28 21:22:13,388 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+[178623.339961] fl01 python3[55889]: 2026-10-28 21:22:13,659 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=417da85e23d84ca7ae5af1cd38f8b025 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=1 server=10.80.0.1:9001

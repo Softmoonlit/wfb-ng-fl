@@ -1,5 +1,12 @@
 # 08 票 Jetson 环境与官方 MNIST 准备记录
 
+## 最新验收进度
+
+早期环境准备之后，四端已统一部署c62cde2，完成120秒全员READY观察、两轮真实CUDA/MNIST训练和独立聚合/评估复核，并通过另一个短作业的运行期间正常停止与全员待命恢复。详见[当前汇总](heartbeat-149/README.md)、[训练独立复核](heartbeat-149/heartbeat-liveness/gpu-smoke-two-rounds/independent-review/README.md)和[正常停止验收](heartbeat-149/normal-stop-20261028T132156Z/README.md)。这些记录覆盖08，不替代09标定、12故障矩阵或13三次五轮正式验收。
+
+## 以下为最初环境准备时的历史记录
+
+
 本次已完成授权范围内的三客户端 NVIDIA PyTorch 安装、四端官方 MNIST 预置，以及四端固定模型 GPU 前向、反向和优化器更新检查。未停止或重启角色服务、未修改无线、未部署当前未提交代码、未启动作业、未提交，也未修改 08 工单状态。08 的真实无线少轮训练、模型链、停止及恢复仍由主线后续正式验收。
 
 初始只读预检报告完整保留在 [readonly-preflight-report.md](readonly-preflight-report.md)。其中“缺 torch、未发现数据”等结论对应准备前的历史时刻；以下为 2026-10-26 18:21～18:37 UTC 后续环境准备结果。所有失败与重测均保留。

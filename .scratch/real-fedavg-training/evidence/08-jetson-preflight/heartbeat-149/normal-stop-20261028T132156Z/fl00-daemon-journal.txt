@@ -1,0 +1,19 @@
+[179226.101303] fl00 python3[349554]: 2026-10-28 21:22:02,844 [INFO] [client-daemon] 作业 web-4c8de13bb3e64e93ac913520f4ab793c 成功通过前置门禁并启动 (模式: sync, 轮次: 2, 节点: [1, 2, 4], 模型大小: 38792 B)
+[179228.813678] fl00 python3[349554]: 2026-10-28 21:22:05,555 [ERROR] [client-daemon] FLCoordinator execution failed for job web-4c8de13bb3e64e93ac913520f4ab793c
+[179228.813678] fl00 python3[349554]: Traceback (most recent call last):
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/coordinator.py", line 896, in run
+[179228.813678] fl00 python3[349554]:     current_model_path = self._run_synchronous_loop(current_model_path)
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/coordinator.py", line 1048, in _run_synchronous_loop
+[179228.813678] fl00 python3[349554]:     updates_by_node = self.runtime.wait_for_updates()
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/runtime.py", line 472, in wait_for_updates
+[179228.813678] fl00 python3[349554]:     result = self._wait_for_complete_updates(
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/runtime.py", line 491, in _wait_for_complete_updates
+[179228.813678] fl00 python3[349554]:     raise self._fatal_error
+[179228.813678] fl00 python3[349554]: wfb_ng.fl.errors.FLRuntimeError: 协同作业被主动中止: issue08_normal_stop_during_running
+[179228.813678] fl00 python3[349554]: During handling of the above exception, another exception occurred:
+[179228.813678] fl00 python3[349554]: Traceback (most recent call last):
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/coordinator.py", line 633, in _run_wrapper
+[179228.813678] fl00 python3[349554]:     summary = self.run()
+[179228.813678] fl00 python3[349554]:   File "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/coordinator.py", line 922, in run
+[179228.813678] fl00 python3[349554]:     raise failure_exc
+[179228.813678] fl00 python3[349554]: wfb_ng.fl.errors.FLRuntimeError: issue08_normal_stop_during_running

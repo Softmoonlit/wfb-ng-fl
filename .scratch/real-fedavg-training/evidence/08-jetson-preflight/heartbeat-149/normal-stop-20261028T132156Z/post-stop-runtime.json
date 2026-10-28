@@ -1,0 +1,1040 @@
+{
+  "nodes": {
+    "fl00": {
+      "host": "fl00",
+      "processes": [
+        {
+          "pid": 349554,
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py",
+            "daemon",
+            "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+            "fl00",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z",
+            "--",
+            "--config",
+            "/etc/wfb-ng-fl/server.json",
+            "--channel",
+            "149",
+            "--bandwidth-mhz",
+            "40",
+            "--txpower",
+            "14",
+            "--downlink-mcs",
+            "3",
+            "--uplink-mcs",
+            "4",
+            "--uftp-rate-kbps",
+            "15000"
+          ],
+          "exe": "/usr/bin/python3.10"
+        },
+        {
+          "pid": 349662,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "server",
+            "--tun-name",
+            "fl-s",
+            "--tun-addr",
+            "10.80.0.1/24",
+            "--node-id",
+            "255",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "3",
+            "--radio-short-gi",
+            "--air-interface",
+            "wlxfc221c100157",
+            "--known-clients",
+            "1,2,3,4,5,6,7,8,9,10",
+            "--client-target",
+            "1:10.80.0.11:127.0.0.1:1",
+            "--client-target",
+            "2:10.80.0.12:127.0.0.1:1",
+            "--client-target",
+            "3:10.80.0.13:127.0.0.1:1",
+            "--client-target",
+            "4:10.80.0.14:127.0.0.1:1",
+            "--client-target",
+            "5:10.80.0.15:127.0.0.1:1",
+            "--client-target",
+            "6:10.80.0.16:127.0.0.1:1",
+            "--client-target",
+            "7:10.80.0.17:127.0.0.1:1",
+            "--client-target",
+            "8:10.80.0.18:127.0.0.1:1",
+            "--client-target",
+            "9:10.80.0.19:127.0.0.1:1",
+            "--client-target",
+            "10:10.80.0.20:127.0.0.1:1",
+            "--downlink-pause-threshold-bytes",
+            "131072",
+            "--downlink-resume-threshold-bytes",
+            "65536",
+            "--downlink-queue-packets-limit",
+            "64"
+          ],
+          "exe": "/usr/bin/wfb_v6_uplink",
+          "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+        }
+      ],
+      "native": {
+        "pid": 349662,
+        "argv": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "server",
+          "--tun-name",
+          "fl-s",
+          "--tun-addr",
+          "10.80.0.1/24",
+          "--node-id",
+          "255",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "3",
+          "--radio-short-gi",
+          "--air-interface",
+          "wlxfc221c100157",
+          "--known-clients",
+          "1,2,3,4,5,6,7,8,9,10",
+          "--client-target",
+          "1:10.80.0.11:127.0.0.1:1",
+          "--client-target",
+          "2:10.80.0.12:127.0.0.1:1",
+          "--client-target",
+          "3:10.80.0.13:127.0.0.1:1",
+          "--client-target",
+          "4:10.80.0.14:127.0.0.1:1",
+          "--client-target",
+          "5:10.80.0.15:127.0.0.1:1",
+          "--client-target",
+          "6:10.80.0.16:127.0.0.1:1",
+          "--client-target",
+          "7:10.80.0.17:127.0.0.1:1",
+          "--client-target",
+          "8:10.80.0.18:127.0.0.1:1",
+          "--client-target",
+          "9:10.80.0.19:127.0.0.1:1",
+          "--client-target",
+          "10:10.80.0.20:127.0.0.1:1",
+          "--downlink-pause-threshold-bytes",
+          "131072",
+          "--downlink-resume-threshold-bytes",
+          "65536",
+          "--downlink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+      },
+      "iw": "phy#1\n\tInterface wlxfc221c100157\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:57\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm\n"
+    },
+    "fl01": {
+      "host": "fl01",
+      "processes": [
+        {
+          "pid": 55889,
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py",
+            "daemon",
+            "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+            "fl01",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z",
+            "--",
+            "--config",
+            "/etc/wfb-ng-fl/node.json",
+            "--mnist-data-dir",
+            "/srv/wfb-ng-fl/mnist",
+            "--work-dir",
+            "/srv/wfb-ng-fl/client",
+            "--channel",
+            "149",
+            "--bandwidth-mhz",
+            "40",
+            "--radio-txpower-dbm",
+            "14",
+            "--uplink-mcs",
+            "4"
+          ],
+          "exe": "/usr/bin/python3.10"
+        },
+        {
+          "pid": 56282,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c1",
+            "--tun-addr",
+            "10.80.0.11/24",
+            "--node-id",
+            "1",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--radio-short-gi",
+            "--air-interface",
+            "wlxfc221c300e99",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "exe": "/usr/bin/wfb_v6_uplink",
+          "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+        }
+      ],
+      "native": {
+        "pid": 56282,
+        "argv": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "client",
+          "--tun-name",
+          "fl-c1",
+          "--tun-addr",
+          "10.80.0.11/24",
+          "--node-id",
+          "1",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "4",
+          "--radio-short-gi",
+          "--air-interface",
+          "wlxfc221c300e99",
+          "--uplink-pause-threshold-bytes",
+          "131072",
+          "--uplink-resume-threshold-bytes",
+          "65536",
+          "--uplink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+      },
+      "iw": "phy#2\n\tInterface wlxfc221c300e99\n\t\tifindex 25\n\t\twdev 0x200000001\n\t\taddr fc:22:1c:30:0e:99\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:a6\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\n"
+    },
+    "fl02": {
+      "host": "fl02",
+      "processes": [
+        {
+          "pid": 14712,
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py",
+            "daemon",
+            "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+            "fl02",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z",
+            "--",
+            "--config",
+            "/etc/wfb-ng-fl/node.json",
+            "--mnist-data-dir",
+            "/srv/wfb-ng-fl/mnist",
+            "--work-dir",
+            "/srv/wfb-ng-fl/client",
+            "--channel",
+            "149",
+            "--bandwidth-mhz",
+            "40",
+            "--radio-txpower-dbm",
+            "14",
+            "--uplink-mcs",
+            "4"
+          ],
+          "exe": "/usr/bin/python3.10"
+        },
+        {
+          "pid": 15192,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c2",
+            "--tun-addr",
+            "10.80.0.12/24",
+            "--node-id",
+            "2",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--radio-short-gi",
+            "--air-interface",
+            "wlxfc221c500a88",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "exe": "/usr/bin/wfb_v6_uplink",
+          "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+        }
+      ],
+      "native": {
+        "pid": 15192,
+        "argv": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "client",
+          "--tun-name",
+          "fl-c2",
+          "--tun-addr",
+          "10.80.0.12/24",
+          "--node-id",
+          "2",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "4",
+          "--radio-short-gi",
+          "--air-interface",
+          "wlxfc221c500a88",
+          "--uplink-pause-threshold-bytes",
+          "131072",
+          "--uplink-resume-threshold-bytes",
+          "65536",
+          "--uplink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+      },
+      "iw": "phy#1\n\tInterface wlxfc221c500a88\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:50:0a:88\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:86\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\n"
+    },
+    "fl04": {
+      "host": "fl04",
+      "processes": [
+        {
+          "pid": 9490,
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py",
+            "daemon",
+            "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+            "fl04",
+            "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z",
+            "--",
+            "--config",
+            "/etc/wfb-ng-fl/node.json",
+            "--mnist-data-dir",
+            "/srv/wfb-ng-fl/mnist",
+            "--work-dir",
+            "/srv/wfb-ng-fl/client",
+            "--channel",
+            "149",
+            "--bandwidth-mhz",
+            "40",
+            "--radio-txpower-dbm",
+            "14",
+            "--uplink-mcs",
+            "4"
+          ],
+          "exe": "/usr/bin/python3.10"
+        },
+        {
+          "pid": 10353,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c4",
+            "--tun-addr",
+            "10.80.0.14/24",
+            "--node-id",
+            "4",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--radio-short-gi",
+            "--air-interface",
+            "wlxfc221c300f04",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "exe": "/usr/bin/wfb_v6_uplink",
+          "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+        }
+      ],
+      "native": {
+        "pid": 10353,
+        "argv": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "client",
+          "--tun-name",
+          "fl-c4",
+          "--tun-addr",
+          "10.80.0.14/24",
+          "--node-id",
+          "4",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "4",
+          "--radio-short-gi",
+          "--air-interface",
+          "wlxfc221c300f04",
+          "--uplink-pause-threshold-bytes",
+          "131072",
+          "--uplink-resume-threshold-bytes",
+          "65536",
+          "--uplink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+      },
+      "iw": "phy#1\n\tInterface wlxfc221c300f04\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:30:0f:04\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:8a:9c\n\t\tssid HONOR 500\n\t\ttype managed\n\t\tchannel 165 (5825 MHz), width: 20 MHz, center1: 5825 MHz\n\t\ttxpower 7.00 dBm\n"
+    }
+  },
+  "status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": {
+      "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+      "run_id": "web-22d6f8be73cd4508839983ccc26d3967",
+      "mode": "sync",
+      "target_nodes": [
+        1,
+        2,
+        4
+      ],
+      "model_path": "/srv/wfb-ng-fl/server/job_web-4c8de13bb3e64e93ac913520f4ab793c/artifacts/initial.pt",
+      "model_size_bytes": 38792,
+      "rounds": 2,
+      "round_timeout_seconds": 1800.0,
+      "io_timeout_seconds": 120.0,
+      "live_observation": false,
+      "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "radio_config": null,
+      "started_at": 1793193718.159322,
+      "preparation_timeout_seconds": 300.0,
+      "algorithm": {
+        "client_entry": "wfb_ng.fl.mnist:client_entry",
+        "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+        "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+        "config": {
+          "data_seed": 2026
+        },
+        "radio_policy_entry": null
+      },
+      "radio_results": [],
+      "initial_metrics": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "server_preparation": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "sample_count": 10000,
+        "data_sha256": {
+          "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+          "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+        },
+        "device": {
+          "type": "cpu",
+          "name": "CPU",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        },
+        "data_seed": 2026
+      },
+      "current_round": 1,
+      "rounds_completed": 0,
+      "server_phase": "ready",
+      "phase_started_at": 1793193725.4394393,
+      "client_preparation_reports": {
+        "4": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        },
+        "2": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        },
+        "1": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        }
+      },
+      "round_started_at": 1793193722.8495188,
+      "execution_result": "aborted",
+      "recovery_state": "ready",
+      "reason": "issue08_normal_stop_during_running",
+      "error": "",
+      "terminal_result": {
+        "status": "aborted",
+        "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+        "reason": "issue08_normal_stop_during_running"
+      },
+      "recovery_wait_finished": true,
+      "server_recovery_complete": true,
+      "recovery_missing_nodes": [],
+      "recovery_reports": {
+        "4": {
+          "report_id": "95bf78183d124b93ab8e0ed38b614626",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 4,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.14",
+            35925
+          ]
+        },
+        "1": {
+          "report_id": "417da85e23d84ca7ae5af1cd38f8b025",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 1,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.11",
+            32881
+          ]
+        },
+        "2": {
+          "report_id": "869ac63de858496ea73dd551d5e97949",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 2,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.12",
+            50137
+          ]
+        }
+      },
+      "terminal_delivery_succeeded": true,
+      "additional_errors": [
+        {
+          "reason": "aborted",
+          "error": "issue08_normal_stop_during_running"
+        }
+      ],
+      "summary": {
+        "schema_version": 1,
+        "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+        "run_id": "web-22d6f8be73cd4508839983ccc26d3967",
+        "mode": "sync",
+        "status": "aborted",
+        "execution_result": "aborted",
+        "rounds_total": 2,
+        "rounds_completed": 0,
+        "target_nodes": [
+          1,
+          2,
+          4
+        ],
+        "initial_metrics": {
+          "loss": 2.3295671367645263,
+          "accuracy": 0.0891
+        },
+        "effect_result": null,
+        "rounds": [],
+        "final_model_path": "/srv/wfb-ng-fl/server/job_web-4c8de13bb3e64e93ac913520f4ab793c/artifacts/initial.pt",
+        "final_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "final_model_size_bytes": 38792,
+        "events": [
+          {
+            "type": "JOB_STARTED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.844879,
+            "monotonic": 179226.101304096,
+            "target_nodes": [
+              1,
+              2,
+              4
+            ],
+            "rounds": 2,
+            "initial_metrics": {
+              "loss": 2.3295671367645263,
+              "accuracy": 0.0891
+            }
+          },
+          {
+            "type": "ROUND_STARTED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.8494651,
+            "monotonic": 179226.1058904,
+            "round_index": 1,
+            "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "round_started_monotonic": 179226.105541312,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "MODEL_PUBLISH_START",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.8535929,
+            "monotonic": 179226.110017728,
+            "round_index": 1,
+            "io_started_monotonic": 179226.109998464,
+            "io_deadline_monotonic": 179346.109998464,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "MODEL_PUBLISHED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193725.0292547,
+            "monotonic": 179228.28567968,
+            "round_index": 1,
+            "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "io_completed_monotonic": 179228.285671808,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "WAIT_FOR_UPDATES_START",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193725.0333772,
+            "monotonic": 179228.2898024,
+            "round_index": 1,
+            "round_deadline_monotonic": 181026.105541312
+          }
+        ],
+        "error_code": "aborted",
+        "error_message": "issue08_normal_stop_during_running",
+        "completed_at": 1793193725.5446665
+      },
+      "recovery_report_history": {
+        "4": [
+          {
+            "report_id": "95bf78183d124b93ab8e0ed38b614626",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 4,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.14",
+              35925
+            ]
+          }
+        ],
+        "1": [
+          {
+            "report_id": "417da85e23d84ca7ae5af1cd38f8b025",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 1,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.11",
+              32881
+            ]
+          }
+        ],
+        "2": [
+          {
+            "report_id": "869ac63de858496ea73dd551d5e97949",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 2,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.12",
+              50137
+            ]
+          }
+        ]
+      }
+    },
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 349662
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 82710,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 179313.386289504,
+        "last_heartbeat_timestamp_ms": 1793193810129,
+        "last_heartbeat_ago_seconds": 1.77,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 82792,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 179313.329710112,
+        "last_heartbeat_timestamp_ms": 1793193810073,
+        "last_heartbeat_ago_seconds": 1.82,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 4257,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 179309.477912096,
+        "last_heartbeat_timestamp_ms": 1793193806221,
+        "last_heartbeat_ago_seconds": 5.68,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  }
+}

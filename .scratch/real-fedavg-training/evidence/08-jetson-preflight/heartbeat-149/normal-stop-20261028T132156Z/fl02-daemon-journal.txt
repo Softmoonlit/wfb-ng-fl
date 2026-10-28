@@ -1,0 +1,11 @@
+[18991.790725] fl02 python3[14712]: 2026-10-28 21:22:04,420 [INFO] [client-daemon] 客户端状态跃迁: IDLE -> PREPARING (0 延迟即刻抢跑)
+[18992.191495] fl02 python3[14712]: 2026-10-28 21:22:04,821 [INFO] [client-daemon] 派生 RoleService 子进程沙箱: /usr/bin/python3 -m wfb_ng.fl.service --config /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/client_role.json --job-context /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/job_context.json --algorithm wfb_ng.fl.mnist:client_entry --algorithm-config /srv/wfb-ng-fl/client/job_web-4c8de13bb3e64e93ac913520f4ab793c/algorithm_config.json
+[18996.023291] fl02 python3[14712]: 2026-10-28 21:22:08,652 [INFO] [client-daemon] TASK_READY_ACK report_id=e307650a35ce4e9989cc90fc60b444c2 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=2 server=10.80.0.1:9001
+[18996.026076] fl02 python3[14712]: 2026-10-28 21:22:08,654 [INFO] [client-daemon] 客户端状态跃迁: PREPARING -> RUNNING (0 延迟即刻抢跑)
+[18998.961722] fl02 python3[14712]: 2026-10-28 21:22:11,591 [INFO] [client-daemon] 终止子进程组 PGID=15138 (PID=15138)
+[19000.429477] fl02 python3[14712]: 2026-10-28 21:22:13,058 [INFO] [client-daemon] 回收作业 web-4c8de13bb3e64e93ac913520f4ab793c 资源 (exit_code=0)
+[19000.433923] fl02 python3[14712]: 2026-10-28 21:22:13,064 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+[19000.502753] fl02 python3[14712]: 2026-10-28 21:22:13,133 [INFO] [client-daemon] 客户端状态跃迁: RUNNING -> ABORTING (0 延迟即刻抢跑)
+[19000.748099] fl02 python3[14712]: 2026-10-28 21:22:13,378 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=869ac63de858496ea73dd551d5e97949 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=2 server=10.80.0.1:9001
+[19000.748551] fl02 python3[14712]: 2026-10-28 21:22:13,378 [INFO] [client-daemon] 客户端状态跃迁: ABORTING -> IDLE (0 延迟即刻抢跑)
+[19000.785464] fl02 python3[14712]: 2026-10-28 21:22:13,416 [INFO] [client-daemon] JOB_RECOVERY_ACK report_id=869ac63de858496ea73dd551d5e97949 job_id=web-4c8de13bb3e64e93ac913520f4ab793c node_id=2 server=10.80.0.1:9001

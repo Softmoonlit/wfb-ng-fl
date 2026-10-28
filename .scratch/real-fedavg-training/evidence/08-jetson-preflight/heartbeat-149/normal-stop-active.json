@@ -1,0 +1,12 @@
+{
+  "output": ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/normal-stop-20261028T132156Z",
+  "pid": 360289,
+  "command": [
+    "python3",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/stop-web.py",
+    "--web-url",
+    "http://192.168.108.100:8080",
+    "--output",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/normal-stop-20261028T132156Z"
+  ]
+}
