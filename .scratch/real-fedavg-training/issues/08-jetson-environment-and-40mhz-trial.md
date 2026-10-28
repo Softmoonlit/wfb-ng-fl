@@ -61,6 +61,8 @@
 
 ### 暂缓的硬件与射频诊断
 
-[fl04 新较好位置单客户端验证](../evidence/08-jetson-preflight/new-position-fl04/README.md)在 fl04 移动到新的较好位置后完成：当前仍使用原 fl02 网卡 `fc:22:1c:30:0c:bb`、现场 19 V、157 / HT40+、MCS 4，4 MiB 下行和上行均成功且 SHA-256 一致，上行约 1.28 Mbps。该位置可以支持单节点闭环，但原 fl02 网卡吞吐仍明显劣化；在三客户端 FedAvg 前应先更换该网卡。
+[fl04 新较好位置单客户端验证](../evidence/08-jetson-preflight/new-position-fl04/README.md)在 fl04 移动到新的较好位置后完成：当时仍使用原 fl02 网卡 `fc:22:1c:30:0c:bb`、现场 19 V、157 / HT40+、MCS 4，4 MiB 下行和上行均成功且 SHA-256 一致，上行约 1.28 Mbps。该位置可以支持单节点闭环，但原 fl02 网卡吞吐明显劣化。
+
+[三客户端新 fl02 网卡 smoke test](../evidence/08-jetson-preflight/three-client-new-fl02-nic-smoke/README.md)完成了仅替换 fl02 网卡后的通信验证：三客户端下行均成功；fl02 新网卡 `fc:22:1c:50:0a:88` 上行 4 MiB 成功，约 1.76 Mbps；fl04 上行超过 120 秒超时，实际 MAC 仍为原 fl02 网卡 `fc:22:1c:30:0c:bb`。该结果确认新 fl02 网卡已改善 node 2，当前三客户端失败点转移到 fl04；需先核对/更换 fl04 网卡，再进行三客户端 smoke test，不进入完整 FedAvg。
 
 后续天线、馈线、USB、供电负载和逐链 RSSI 检查统一记录在[工单 08 后续硬件与射频诊断计划](../evidence/08-jetson-preflight/pending-hardware-diagnostics.md)。这些检查暂不阻塞其余软件工单，但在进入三客户端完整 FedAvg 实训前仍必须完成；当前 08 不能标记为通过。
