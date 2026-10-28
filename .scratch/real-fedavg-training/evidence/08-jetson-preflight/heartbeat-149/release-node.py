@@ -46,6 +46,10 @@ def write_json(path, value):
 
 def run(args, timeout=60, check=True, **kwargs):
     print('ARGV', json.dumps(args), file=sys.stderr, flush=True)
+    env = dict(os.environ)
+    env['LC_ALL'] = 'C'
+    env['LANG'] = 'C'
+    kwargs['env'] = env
     result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, **kwargs)
     record = {'argv': args, 'rc': result.returncode, 'out': result.stdout, 'err': result.stderr}
     print(json.dumps(record, ensure_ascii=False), file=sys.stderr, flush=True)
