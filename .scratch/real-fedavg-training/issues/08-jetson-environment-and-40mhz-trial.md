@@ -50,3 +50,5 @@
 随后对 `-18 dBm / MCS 4` 做了三次重复：一次 fl01 下行校验失败，一次 fl02 超过 120 秒且 fl01/fl04 完成，一次 UFTP 退出码 7。fl02 是最严重节点，但 fl01、fl04 也存在间歇性失败，不能把问题简化为单一 fl02 功率设置。完整记录见同一 MCS/功率证据目录。
 
 [信道 149 / HT20 对照](../evidence/08-jetson-preflight/channel149-ht20/README.md)在四端同版、`-14 dBm`、Server MCS 3、客户端 MCS 4、FEC 8/14 下执行了一次 4 MiB standalone 对照。四端实际读回 149 / 20 MHz，native argv 也为带宽 20；但 UFTP 下行以退出码 7 中止，fl02/fl04 完成注册而 fl01 未注册，未进入上行。恢复无错误，最终回到 157 / HT40+、`-14 dBm`、Server `IDLE`、三客户端 `READY`。该结果不支持切换到 149 / HT20，也不能作为 20 MHz 速率标定证据。
+
+[单客户端 fl02 / 157 / HT40+ 诊断](../evidence/08-jetson-preflight/single-client-fl02-157-ht40/README.md)仅保留 node 2，服务端 target/known-clients、UFTP 和 HTTP 收尾均只针对 fl02；fl01/fl04 只停服并恢复。fl02 能收到服务端包并生成声明，但 `GRANT_SEQ=0`、授权发送为 0，服务端 `PKT_SRC node2` 全程为 0，UFTP REGISTER 最终以退出码 6 结束，未进入文件传输。该结果排除了“只有三客户端同时在线才会失败”的充分解释，但尚不能单独区分 fl02 本地射频/驱动链路与 native 控制帧协议问题。恢复后四端回到 157 / HT40+、`-14 dBm`、Server `IDLE`、三客户端 `READY`。
