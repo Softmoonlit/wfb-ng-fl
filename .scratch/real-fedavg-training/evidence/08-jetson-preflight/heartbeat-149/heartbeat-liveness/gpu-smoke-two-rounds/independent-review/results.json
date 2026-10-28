@@ -1,0 +1,454 @@
+{
+  "job_id": "web-7383444963c54f558b721675d592b43b",
+  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+  "model_sha256": [
+    "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+    "083c9e58be8652b587275a2f35c75f47eec01a5f38b9a57c33f5ac2d130f21f5"
+  ],
+  "hash_chain_pass": true,
+  "training": [
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/144f5bb6-66dc-40e8-b5dc-1baea2acbb26/updates/1/update.bin",
+      "source_sha256": "c94ac16ea3b106d8a213fa91cef308eb33f5b9b2498ba233048ac7daf2e12cc4",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "node_id": 1,
+        "round_index": 1,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.8489615363756816,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "144f5bb6-66dc-40e8-b5dc-1baea2acbb26",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/144f5bb6-66dc-40e8-b5dc-1baea2acbb26/updates/2/update.bin",
+      "source_sha256": "ef56f6b73ed5c7702c84289eea918892967eec8e2b4bd949823a3ddd47ae60d5",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "node_id": 2,
+        "round_index": 1,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.8489632481575012,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "144f5bb6-66dc-40e8-b5dc-1baea2acbb26",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/144f5bb6-66dc-40e8-b5dc-1baea2acbb26/updates/4/update.bin",
+      "source_sha256": "2a02719e1ee4c10186b06c78d574fb8254e7f293146334e608a602ab872936e8",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "node_id": 4,
+        "round_index": 1,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.8489665092309316,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "144f5bb6-66dc-40e8-b5dc-1baea2acbb26",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/97600cf6-0366-4416-a35f-13106f85091c/updates/1/update.bin",
+      "source_sha256": "34e4ad771896d8234611d9fba515bf9a5f309adb3cb421288f55020819f6e9c8",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+        "node_id": 1,
+        "round_index": 2,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.27430199116865794,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "97600cf6-0366-4416-a35f-13106f85091c",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/97600cf6-0366-4416-a35f-13106f85091c/updates/2/update.bin",
+      "source_sha256": "73580bab34c8330aaa24f9ff27719cbc9bfee9fd4d06353dee9cf84fbbcd2e15",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+        "node_id": 2,
+        "round_index": 2,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.27430104014078777,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "97600cf6-0366-4416-a35f-13106f85091c",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    },
+    {
+      "source": "/srv/wfb-ng-fl/server/job_web-7383444963c54f558b721675d592b43b_role/rounds/97600cf6-0366-4416-a35f-13106f85091c/updates/4/update.bin",
+      "source_sha256": "82e8bb8646539094708cfba37573da60c11dbe9df16ab1322d2a580694d75bd2",
+      "metadata": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+        "node_id": 4,
+        "round_index": 2,
+        "sample_count": 60000,
+        "optimizer_steps": 938,
+        "train_loss": 0.2742947626670202,
+        "device": {
+          "type": "cuda",
+          "name": "Orin",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        }
+      },
+      "transport_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+      "round_state": {
+        "committed_update_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "participant_node_ids": [
+          1,
+          2,
+          4
+        ],
+        "role": "server",
+        "round_id": "97600cf6-0366-4416-a35f-13106f85091c",
+        "schema_version": 1,
+        "state": "succeeded"
+      }
+    }
+  ],
+  "weighted_comparison": [
+    {
+      "round": 1,
+      "total_samples": 180000,
+      "weights": {
+        "1": 0.3333333333333333,
+        "2": 0.3333333333333333,
+        "4": 0.3333333333333333
+      },
+      "tensors": [
+        {
+          "name": "conv1.weight",
+          "shape": [
+            8,
+            1,
+            3,
+            3
+          ],
+          "elements": 72,
+          "max_abs_error_fp64": 3.973642981325298e-08,
+          "mean_abs_error_fp64": 6.29505073849318e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv1.bias",
+          "shape": [
+            8
+          ],
+          "elements": 8,
+          "max_abs_error_fp64": 2.4835268633283114e-09,
+          "mean_abs_error_fp64": 5.11742352276624e-10,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv2.weight",
+          "shape": [
+            16,
+            8,
+            3,
+            3
+          ],
+          "elements": 1152,
+          "max_abs_error_fp64": 2.9802322387695312e-08,
+          "mean_abs_error_fp64": 3.1482074898210746e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv2.bias",
+          "shape": [
+            16
+          ],
+          "elements": 16,
+          "max_abs_error_fp64": 2.4835268702672053e-09,
+          "mean_abs_error_fp64": 6.924286337177659e-10,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "classifier.weight",
+          "shape": [
+            10,
+            784
+          ],
+          "elements": 7840,
+          "max_abs_error_fp64": 1.4901161193847656e-08,
+          "mean_abs_error_fp64": 1.4210152490418482e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "classifier.bias",
+          "shape": [
+            10
+          ],
+          "elements": 10,
+          "max_abs_error_fp64": 2.4835268633283114e-09,
+          "mean_abs_error_fp64": 5.355104807074767e-10,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    {
+      "round": 2,
+      "total_samples": 180000,
+      "weights": {
+        "1": 0.3333333333333333,
+        "2": 0.3333333333333333,
+        "4": 0.3333333333333333
+      },
+      "tensors": [
+        {
+          "name": "conv1.weight",
+          "shape": [
+            8,
+            1,
+            3,
+            3
+          ],
+          "elements": 72,
+          "max_abs_error_fp64": 3.973642981325298e-08,
+          "mean_abs_error_fp64": 4.886209760360582e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv1.bias",
+          "shape": [
+            8
+          ],
+          "elements": 8,
+          "max_abs_error_fp64": 2.4835268633283114e-09,
+          "mean_abs_error_fp64": 3.3636145695891903e-10,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv2.weight",
+          "shape": [
+            16,
+            8,
+            3,
+            3
+          ],
+          "elements": 1152,
+          "max_abs_error_fp64": 1.986821490662649e-08,
+          "mean_abs_error_fp64": 3.0732568105983765e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "conv2.bias",
+          "shape": [
+            16
+          ],
+          "elements": 16,
+          "max_abs_error_fp64": 4.967053726656623e-09,
+          "mean_abs_error_fp64": 9.725530010371236e-10,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "classifier.weight",
+          "shape": [
+            10,
+            784
+          ],
+          "elements": 7840,
+          "max_abs_error_fp64": 1.4901161193847656e-08,
+          "mean_abs_error_fp64": 1.4645311289883994e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        },
+        {
+          "name": "classifier.bias",
+          "shape": [
+            10
+          ],
+          "elements": 10,
+          "max_abs_error_fp64": 3.725290298461914e-09,
+          "mean_abs_error_fp64": 1.3348956906869547e-09,
+          "tolerance": 4.76837158203125e-07,
+          "pass": true
+        }
+      ],
+      "pass": true
+    }
+  ],
+  "independent_evaluation": [
+    {
+      "model": "M0",
+      "count": 10000,
+      "device": "cpu",
+      "batch_size": 64,
+      "loss": 2.329567143630126,
+      "accuracy": 0.0891,
+      "correct": 891,
+      "recorded": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "loss_abs_difference": 6.865599644356735e-09,
+      "accuracy_equal": true,
+      "seconds": 1.671295904001454,
+      "pass": true
+    },
+    {
+      "model": "M1",
+      "count": 10000,
+      "device": "cpu",
+      "batch_size": 64,
+      "loss": 0.41196369954398954,
+      "accuracy": 0.8747,
+      "correct": 8747,
+      "recorded": {
+        "loss": 0.41196369478702544,
+        "accuracy": 0.8747
+      },
+      "loss_abs_difference": 4.75696410040527e-09,
+      "accuracy_equal": true,
+      "seconds": 1.328253248007968,
+      "pass": true
+    },
+    {
+      "model": "M2",
+      "count": 10000,
+      "device": "cpu",
+      "batch_size": 64,
+      "loss": 0.2099322292178732,
+      "accuracy": 0.9393,
+      "correct": 9393,
+      "recorded": {
+        "loss": 0.2099322290658951,
+        "accuracy": 0.9393
+      },
+      "loss_abs_difference": 1.519780967740303e-10,
+      "accuracy_equal": true,
+      "seconds": 1.5491104959801305,
+      "pass": true
+    }
+  ],
+  "pass": true
+}

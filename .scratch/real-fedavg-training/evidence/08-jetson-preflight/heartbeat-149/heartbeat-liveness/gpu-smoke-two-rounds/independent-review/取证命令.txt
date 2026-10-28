@@ -1,0 +1,18 @@
+本地：python3 .scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/heartbeat-liveness/gpu-smoke-two-rounds/independent-review/独立复核.py
+结果：exit 0；results.json pass=true；三次独立评估均 pass=true。
+三个地址使用 ssh -o BatchMode=yes -o ConnectTimeout=8 fl@<IP>，只读以下命令：
+sudo find /srv/wfb-ng-fl/client/job_web-7383444963c54f558b721675d592b43b -maxdepth 3 -type f
+sudo journalctl -u wfb-fl-client --since "@1793192970" --until "@1793193070" --no-pager -o short-iso
+fl01/.101 exit255 No route to host；fl02/.102 exit255 No route to host；fl04/.204 exit0，作业目录不存在/错误unit无日志。
+fl04 后续只读：sudo ls -la /srv/wfb-ng-fl
+systemctl list-units --all --type=service --no-pager "*fl*"
+sudo journalctl --since "@1793192970" --until "@1793193070" --no-pager -o short-iso --grep "7383444963c54f558b721675d592b43b|cuda|optimizer_steps|train_loss|09e03cfb"
+sudo journalctl -u wfb-fl-client-daemon.service --since "@1793192970" --until "@1793193070" --no-pager -o short-iso
+结果：exit0，完整输出见 fl04-targeted.txt 与 fl04-daemon-journal.txt。
+
+地址更正补证（父进程确认 release-four.py NODES）：
+原 fl01-journal.txt/fl02-journal.txt 分别改名为 fl01-wrong-address-journal.txt/fl02-wrong-address-journal.txt。
+对 fl01=192.168.108.201、fl02=192.168.108.202 各执行：
+ssh -o BatchMode=yes -o ConnectTimeout=8 fl@<IP> 'sudo find /srv/wfb-ng-fl/client/job_web-7383444963c54f558b721675d592b43b -maxdepth 3 -type f; sudo journalctl -u wfb-fl-client-daemon.service --since "@1793192970" --until "@1793193070" --no-pager -o short-iso'
+stdout/stderr 分别写入 fl01-journal.txt/fl02-journal.txt。两次 SSH 均 exit 0，find 报作业目录不存在；journal 含作业派生、两轮 ACK、exit_code=0、回收 ACK 及回到 IDLE。
+仅更正地址、同时间窗日志与证据说明/哈希，未重跑数学复核或测试。

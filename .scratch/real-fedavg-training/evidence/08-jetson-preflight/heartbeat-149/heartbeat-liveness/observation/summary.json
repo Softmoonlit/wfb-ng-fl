@@ -1,0 +1,46 @@
+{
+  "seconds": 120.46793087999686,
+  "samples": 121,
+  "nodes": {
+    "1": {
+      "non_ready_samples": 0,
+      "transitions": [
+        {
+          "elapsed": 0.008217248017899692,
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149,
+          "heartbeat_age": 2.01
+        }
+      ],
+      "max_heartbeat_age": 6.42
+    },
+    "2": {
+      "non_ready_samples": 0,
+      "transitions": [
+        {
+          "elapsed": 0.008217248017899692,
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149,
+          "heartbeat_age": 1.1
+        }
+      ],
+      "max_heartbeat_age": 6.32
+    },
+    "4": {
+      "non_ready_samples": 0,
+      "transitions": [
+        {
+          "elapsed": 0.008217248017899692,
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149,
+          "heartbeat_age": 0.97
+        }
+      ],
+      "max_heartbeat_age": 9.72
+    }
+  },
+  "passed": true
+}

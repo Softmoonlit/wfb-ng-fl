@@ -1,0 +1,571 @@
+{
+  "status": "terminal_observed",
+  "job_id": "web-7383444963c54f558b721675d592b43b",
+  "parent_decision_required": false,
+  "execution": {
+    "result": "succeeded",
+    "rounds_completed": 2,
+    "confirmed": true
+  },
+  "effect": {
+    "round_index": 2,
+    "metrics": {
+      "loss": 0.2099322290658951,
+      "accuracy": 0.9393
+    },
+    "verdict": true,
+    "reason": "末轮准确率高于初始且损失低于初始"
+  },
+  "recovery": {
+    "confirmed": true,
+    "state": "ready",
+    "details": {
+      "state": "ready",
+      "recovery_state": "ready",
+      "missing_nodes": [],
+      "reports": [
+        {
+          "node_id": 1,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "c1ec5c32abff44b88b3599fa00c8435c"
+        },
+        {
+          "node_id": 2,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "f1a39916eaf742deab088429f10d4f14"
+        },
+        {
+          "node_id": 4,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "53945b59f8d74fbda7c164246f1b5acb"
+        }
+      ],
+      "server_recovery_complete": true,
+      "additional_errors": [],
+      "first_failure": null,
+      "liveness_events": []
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 6193,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 178555.59745936,
+        "last_heartbeat_timestamp_ms": 1793193052341,
+        "last_heartbeat_ago_seconds": 1.32,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "state": "idle",
+        "online": true
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 4129,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 178555.485673408,
+        "last_heartbeat_timestamp_ms": 1793193052229,
+        "last_heartbeat_ago_seconds": 1.43,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "state": "idle",
+        "online": true
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 178556.16626608,
+        "last_heartbeat_timestamp_ms": 1793193052909,
+        "last_heartbeat_ago_seconds": 0.75,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "state": "idle",
+        "online": true
+      }
+    }
+  },
+  "frozen_parameters_confirmed": true,
+  "success": true,
+  "job": {
+    "job_id": "web-7383444963c54f558b721675d592b43b",
+    "run_id": "web-7f8df318aee940dcaaa828fbf44b1449",
+    "target_nodes": [
+      1,
+      2,
+      4
+    ],
+    "model_size_bytes": 38792,
+    "rounds": 2,
+    "round_timeout_seconds": 1800.0,
+    "io_timeout_seconds": 120.0,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "started_at": 1793192982.2826614,
+    "preparation_timeout_seconds": 300.0,
+    "current_round": 2,
+    "rounds_completed": 2,
+    "server_phase": "ready",
+    "phase_started_at": 1793193045.619682,
+    "round_started_at": 1793193025.4415205,
+    "execution_result": "succeeded",
+    "recovery_state": "ready",
+    "reason": "completed",
+    "error": "",
+    "algorithm": {
+      "client_entry": "wfb_ng.fl.mnist:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+      "config": {
+        "data_seed": 2026
+      }
+    },
+    "server_preparation": {
+      "model_format": "mnist-two-conv-fp32-v1",
+      "sample_count": 10000,
+      "data_seed": 2026,
+      "device": {
+        "type": "cpu",
+        "name": "CPU",
+        "torch_version": "2.5.0a0+872d972e41.nv24.08",
+        "cuda_version": "12.6"
+      },
+      "data_sha256": {
+        "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+        "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+      }
+    },
+    "initial_metrics": {
+      "loss": 2.3295671367645263,
+      "accuracy": 0.0891
+    },
+    "effect_result": {
+      "round_index": 2,
+      "metrics": {
+        "loss": 0.2099322290658951,
+        "accuracy": 0.9393
+      },
+      "verdict": true,
+      "reason": "末轮准确率高于初始且损失低于初始"
+    },
+    "evaluation": {
+      "initial_metrics": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "rounds": [
+        {
+          "round_index": 1,
+          "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+          "output_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+          "metrics": {
+            "loss": 0.41196369478702544,
+            "accuracy": 0.8747
+          },
+          "verdict": null,
+          "reason": null,
+          "committed_nodes": [
+            1,
+            2,
+            4
+          ],
+          "dropped_out_nodes": [],
+          "client_submission_returns_received": true,
+          "training": [
+            {
+              "node_id": 1,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 1,
+              "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.8489615363756816,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            },
+            {
+              "node_id": 2,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 1,
+              "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.8489632481575012,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            },
+            {
+              "node_id": 4,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 1,
+              "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.8489665092309316,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            }
+          ]
+        },
+        {
+          "round_index": 2,
+          "input_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+          "output_model_sha256": "083c9e58be8652b587275a2f35c75f47eec01a5f38b9a57c33f5ac2d130f21f5",
+          "metrics": {
+            "loss": 0.2099322290658951,
+            "accuracy": 0.9393
+          },
+          "verdict": true,
+          "reason": "末轮准确率高于初始且损失低于初始",
+          "committed_nodes": [
+            1,
+            2,
+            4
+          ],
+          "dropped_out_nodes": [],
+          "client_submission_returns_received": true,
+          "training": [
+            {
+              "node_id": 1,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 2,
+              "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.27430199116865794,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            },
+            {
+              "node_id": 2,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 2,
+              "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.27430104014078777,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            },
+            {
+              "node_id": 4,
+              "model_format": "mnist-two-conv-fp32-v1",
+              "round_index": 2,
+              "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+              "sample_count": 60000,
+              "optimizer_steps": 938,
+              "train_loss": 0.2742947626670202,
+              "device": {
+                "type": "cuda",
+                "name": "Orin",
+                "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                "cuda_version": "12.6"
+              }
+            }
+          ]
+        }
+      ],
+      "effect_result": {
+        "round_index": 2,
+        "metrics": {
+          "loss": 0.2099322290658951,
+          "accuracy": 0.9393
+        },
+        "verdict": true,
+        "reason": "末轮准确率高于初始且损失低于初始"
+      },
+      "final_model_sha256": "083c9e58be8652b587275a2f35c75f47eec01a5f38b9a57c33f5ac2d130f21f5",
+      "final_model_size_bytes": 38792
+    },
+    "radio_results": [],
+    "participants": [
+      {
+        "node_id": 1,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": [
+          {
+            "node_id": 1,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 1,
+            "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.8489615363756816,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          },
+          {
+            "node_id": 1,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 2,
+            "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.27430199116865794,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          }
+        ]
+      },
+      {
+        "node_id": 2,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": [
+          {
+            "node_id": 2,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 1,
+            "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.8489632481575012,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          },
+          {
+            "node_id": 2,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 2,
+            "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.27430104014078777,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          }
+        ]
+      },
+      {
+        "node_id": 4,
+        "online": true,
+        "state": "idle",
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": [],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": [
+          {
+            "node_id": 4,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 1,
+            "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.8489665092309316,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          },
+          {
+            "node_id": 4,
+            "model_format": "mnist-two-conv-fp32-v1",
+            "round_index": 2,
+            "base_model_sha256": "09e03cfb1217ee7668c9cbe16f9f290eac1fa8701fdea0009326cadd1b8672c3",
+            "sample_count": 60000,
+            "optimizer_steps": 938,
+            "train_loss": 0.2742947626670202,
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            }
+          }
+        ]
+      }
+    ],
+    "recovery_missing_nodes": [],
+    "recovery_reports": [
+      {
+        "node_id": 1,
+        "report": {
+          "recovery_epoch": 1,
+          "recovery_state": "ready"
+        },
+        "report_id": "c1ec5c32abff44b88b3599fa00c8435c"
+      },
+      {
+        "node_id": 2,
+        "report": {
+          "recovery_epoch": 1,
+          "recovery_state": "ready"
+        },
+        "report_id": "f1a39916eaf742deab088429f10d4f14"
+      },
+      {
+        "node_id": 4,
+        "report": {
+          "recovery_epoch": 1,
+          "recovery_state": "ready"
+        },
+        "report_id": "53945b59f8d74fbda7c164246f1b5acb"
+      }
+    ],
+    "additional_errors": [],
+    "first_failure": null,
+    "liveness_events": [],
+    "client_error": null,
+    "recovery_wait_finished": true,
+    "server_recovery_complete": true,
+    "recovery": {
+      "state": "ready",
+      "recovery_state": "ready",
+      "missing_nodes": [],
+      "reports": [
+        {
+          "node_id": 1,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "c1ec5c32abff44b88b3599fa00c8435c"
+        },
+        {
+          "node_id": 2,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "f1a39916eaf742deab088429f10d4f14"
+        },
+        {
+          "node_id": 4,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "report_id": "53945b59f8d74fbda7c164246f1b5acb"
+        }
+      ],
+      "server_recovery_complete": true,
+      "additional_errors": [],
+      "first_failure": null,
+      "liveness_events": []
+    }
+  }
+}

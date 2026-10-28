@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "python3",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/smoke-web.py",
+    "--web-url",
+    "http://192.168.108.100:8080",
+    "--output",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/heartbeat-liveness/gpu-smoke-two-rounds",
+    "--deployed-commit",
+    "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "--deployed-argv-json",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/heartbeat-liveness/deployed-argv.json",
+    "--deployment-evidence",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/heartbeat-liveness/deployment-evidence.json",
+    "--release-evidence",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-c62cde266ef5-20261028T130351850367Z/manifest.json",
+    "--heartbeat-evidence",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/heartbeat-liveness/stable-ready.jsonl",
+    "--stable-heartbeat-seconds",
+    "120"
+  ],
+  "observer_pid": 358207
+}
