@@ -1,0 +1,25 @@
+{
+  "utc": "2026-10-27T18:15:09.382756+00:00",
+  "scope": "本地文件静态审查；未SSH、未运行demo或dry-run、未接触硬件/服务",
+  "files": {
+    "tests/demo/run_fl_demo.sh": "12c94170e2273f1aa63a0b983b46ae79c95fded6304160d55c5ccf1c27c99270",
+    "tests/demo/fl_demo_metrics.py": "b425156d618ac219df7a5e376c6014a5b664ed18ad38e93861f09d8adf0bf162",
+    "scripts/lib/cluster_config.sh": "78d9d3a5a2a309072b1ebb8b2ab1c7fa19c87a2edd700c33b5d2872ef6fcf102",
+    "scripts/lib/radio_interface.sh": "518102b0288b8f255723192844dae2014e2d5ac5630d695524ce09e52c36ad8d"
+  },
+  "frozen_commit": "701963ac254261c31c56a074d06966a9217346f6",
+  "plan_sha256": "18a85a73cff9dc482d2724a15c7fe9877ef5d682da7dc0daf4a0933cb658a980",
+  "helper_imports": [
+    "import argparse",
+    "import hashlib",
+    "import http.client",
+    "import http.server",
+    "import json",
+    "import os",
+    "import re",
+    "import sys",
+    "import time",
+    "from pathlib import Path",
+    "from typing import Any, Dict, List, Optional, Tuple"
+  ]
+}

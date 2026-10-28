@@ -42,3 +42,5 @@
 [后续三阶段 ICMP 活动对照](../evidence/08-jetson-preflight/formal-701963a/icmp-activity-diff/README.md)仅改变是否持续输入上行小包，服务、PID、构建及射频参数保持不变。fl02／fl04 在活动阶段维持授权和 READY refresh，ICMP 丢包约 1%～2%；fl01 活动阶段没有 grant、没有有效上行，175 个 ICMP 全丢，服务端整阶段未收到其心跳。停止探针后 fl01 恢复发送，约 94.6 毫秒内交付 161 个旧 ICMP。其恢复阶段首次出现 `pending_unauthorized_fec_due` 与 `zero_timeout_polls` 各增加 4952；该阳性发生在积压之后，不解释最初失联。不能将之前 85 秒窗口的零计数外推成此分支永不发生。
 
 [迟到 ACK 跨频道边界诊断](../evidence/08-jetson-preflight/diagnosis/ack-channel-identity/README.md)在真实 loopback UDP 中三次均未误锁频道：现有发送前 drain 清除了指定窗口的旧 ACK。该候选边界已被证伪，不据此修改 ACK 协议或扩大寻频期限。
+
+[固定信道 157 standalone 64 KiB 对照](../evidence/08-jetson-preflight/standalone157-runner/README.md)已完成：四端在 `701963a` 与统一 native SHA `f7c73f41…` 下，停止完整 daemon 后用固定 157／HT40+ native 路径完成 fl01、fl02、fl04 三端 64 KiB 下行和回传，六份文件摘要全部一致，服务恢复无错误。fl02 回传仅约 0.14 Mbps，fl01 约 2.65 Mbps，fl04 约 17.06 Mbps，表明固定信道路径可用但链路质量差异明显。该结果支持“动态 HUNTING／控制宿主路径是进一步排查重点”，不能替代完整 daemon 心跳、真实训练或最终验收，也不证明已经修复 08。完整事实见该证据目录的 run 记录。
