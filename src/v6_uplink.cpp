@@ -43,7 +43,8 @@ using namespace std;
 namespace {
 
 const uint32_t kIdleSleepMs = 10;
-const uint64_t kReadyRedeclareTimeoutMs = 4000;
+// 有 pending 且无有效授权时，未确认 READY 固定每秒重试；这是链路层声明重试，不是 UFTP 超时。
+const uint64_t kReadyRedeclareTimeoutMs = 1000;
 const uint64_t kFecFlushIdleMs = 2;
 
 struct AirReadyState {
@@ -1744,6 +1745,11 @@ void run_client(const Config &config, uint64_t session_id)
 
         uint64_t now_ms = get_time_ms();
         uint64_t next_wakeup = log_send_ts;
+        if (uplink_queue.front() != nullptr && !authorization_state.is_authorized(now_ms) &&
+            ready_state.declaration_in_flight)
+        {
+            next_wakeup = min(next_wakeup, ready_state.last_declare_at_ms + kReadyRedeclareTimeoutMs);
+        }
         const uint64_t uplink_flush_deadline_ms = uplink->next_flush_deadline_ms();
         if (uplink_flush_deadline_ms > 0)
         {

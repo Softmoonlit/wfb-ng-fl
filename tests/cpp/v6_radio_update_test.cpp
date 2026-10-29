@@ -238,6 +238,7 @@ int main()
     test_udp_debug_radio_update();
     test_udp_control_and_data_mcs();
     test_native_rearm();
+    test_native_ready_retry_loss();
     std::cout << "v6 radio command validation and control/data radiotap sync: PASS\n";
     return 0;
 }

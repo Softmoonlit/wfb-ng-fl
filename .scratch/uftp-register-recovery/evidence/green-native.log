@@ -1,0 +1,92 @@
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.29.28720-9db5ca0d"' -std=gnu++11 -Isrc -o v6_radio_update_test tests/cpp/v6_radio_update_test.cpp src/rx.link.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o src/token_scheduler.o  -lrt -lsodium -lpcap
+In file included from tests/cpp/v6_uplink_rearm_test.hpp:29,
+                 from tests/cpp/v6_radio_update_test.cpp:1:
+tests/cpp/../../src/v6_uplink.cpp:1909:6: warning: ‘void {anonymous}::run_server({anonymous}::Config, uint64_t)’ defined but not used [-Wunused-function]
+ 1909 | void run_server(Config config, uint64_t session_id)
+      |      ^~~~~~~~~~
+tests/cpp/../../src/v6_uplink.cpp:846:8: warning: ‘{anonymous}::Config {anonymous}::parse_args(int, char**)’ defined but not used [-Wunused-function]
+  846 | Config parse_args(int argc, char **argv)
+      |        ^~~~~~~~~~
+./v6_radio_update_test
+v6_radio_frame kind=data generation=0 bandwidth=40 mcs_index=3 short_gi=1
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=0 short_gi=1
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_frame kind=data generation=1 bandwidth=20 mcs_index=5 short_gi=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+v6 radio control loopback port=49047
+62042657	PKT	0:0:0:0:0:0:0:0:0:0:0
+62042657	RX_BATCH	0:0:0:0:0
+62042657	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+62042657	READY_FILTER	0:0:0:0:0
+62042657	REASSEMBLY	0:40
+62042657	TOKEN_AUTH	0:0:0:0
+62042657	GRANT_SEQ	0:0
+62042657	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62042657
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=3 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62042737
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_update generation=2 bandwidth=20 data_mcs_index=4 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_frame kind=control generation=2 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62042898
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=116 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+grant_accept node_id=9 sequence=10 duration_ms=3000 expires_at_ms=62046058
+v6_radio_frame kind=data generation=2 bandwidth=20 mcs_index=4 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=62043058
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62043139
+grant_accept node_id=9 sequence=11 duration_ms=3000 expires_at_ms=62046219
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=62043219
+grant_accept node_id=9 sequence=0 duration_ms=3000 expires_at_ms=62046219
+v6_radio_update generation=3 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_frame kind=control generation=3 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62043219
+grant_accept node_id=9 sequence=1 duration_ms=3000 expires_at_ms=62046299
+v6_radio_frame kind=data generation=3 bandwidth=20 mcs_index=5 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=62043299
+native run_client UDP rearm, READY, authorization and sequence: PASS
+LISTEN_UDP_CONTROL 56991
+v6 radio control loopback port=56991
+62043301	PKT	0:0:0:0:0:0:0:0:0:0:0
+62043301	RX_BATCH	0:0:0:0:0
+62043301	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+62043301	READY_FILTER	0:0:0:0:0
+62043301	REASSEMBLY	0:40
+62043301	TOKEN_AUTH	0:0:0:0
+62043301	GRANT_SEQ	0:0
+62043301	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=62044502
+redeclare node_id=9 state=declared_waiting_for_grant->declared_waiting_for_grant at_ms=62045503
+native run_client UDP rearm, READY, authorization and sequence: PASS
+READY loss retry 1: received=1 elapsed_ms=1001
+redeclare node_id=9 state=declared_waiting_for_grant->declared_waiting_for_grant at_ms=62046504
+READY loss retry 2: received=1 elapsed_ms=1001
+grant_accept node_id=9 sequence=1 duration_ms=3000 expires_at_ms=62049504
+v6_radio_frame kind=data generation=0 bandwidth=20 mcs_index=0 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=62046504
+62048302	PKT	1:28:0:0:0:0:0:0:0:0:0
+62048302	RX_BATCH	0:0:0:0:0
+62048302	GRANT_FILTER	1:1:0:0:0:0:0:0:0
+62048302	READY_FILTER	0:0:0:0:0
+62048302	REASSEMBLY	0:40
+62048302	TOKEN_AUTH	1:0:2:3
+62048302	GRANT_SEQ	1:1
+62048302	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+redeclare node_id=9 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=62049808
+grant_accept node_id=9 sequence=2 duration_ms=3000 expires_at_ms=62052808
+native run_client READY/GRANT loss recovery_ms=2002, idle and authorized pending: PASS
+v6 radio command validation and control/data radiotap sync: PASS
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.10.29.28720-9db5ca0d"' -std=gnu++11 -c -o src/v6_uplink.o src/v6_uplink.cpp
+g++ -o wfb_v6_uplink src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap

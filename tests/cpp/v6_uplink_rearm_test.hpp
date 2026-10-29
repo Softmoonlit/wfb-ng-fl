@@ -140,3 +140,54 @@ static void test_native_rearm() {
     close(tun[0]); close(air); close(command);
     std::cout << "native run_client UDP rearm, READY, authorization and sequence: PASS\n";
 }
+
+// 只观察真实客户端的 UDP 输出；不读取 READY 私有状态或重试常量。
+static void test_native_ready_retry_loss() {
+    uint16_t air_port, input_port, unused;
+    int air = rearm_udp(&air_port), input_reservation = rearm_udp(&input_port);
+    int command = rearm_udp(&unused);
+    int tun[2]; assert(socketpair(AF_UNIX, SOCK_DGRAM, 0, tun) == 0);
+    Config config; config.node_id = 9; config.link_id = 1;
+    config.uplink_stream = 1; config.downlink_stream = 2;
+    config.air_listen_port = input_port; config.radio_control_port = 0;
+    config.air_target_host = "127.0.0.1"; config.air_target_port = air_port;
+    // READY 的重试不能依赖日志定时器提供唤醒。
+    config.log_interval = 5000;
+    close(input_reservation);
+    pid_t child = fork(); assert(child >= 0);
+    if (child == 0) { prctl(PR_SET_PDEATHSIG, SIGKILL); close(tun[0]); rearm_tun_fd = tun[1]; run_client(config, 42); _exit(0); }
+    struct ChildCleanup { pid_t pid; ~ChildCleanup() { kill(pid, SIGKILL); waitpid(pid, nullptr, 0); } } cleanup{child};
+    close(tun[1]);
+    assert(!rearm_receive(air, 1200, WFB_CONTROL_TYPE_READY));
+    const uint8_t data = 0x45;
+    assert(send(tun[0], &data, 1, 0) == 1);
+    assert(rearm_receive(air, 500, WFB_CONTROL_TYPE_READY));
+    const uint64_t first_ready_ms = get_time_ms();
+    // 丢弃首个 READY；第二个 READY 到达后模拟其 GRANT 丢失（不交给客户端）。
+    for (int loss = 0; loss < 2; ++loss) {
+        const uint64_t before_ms = get_time_ms();
+        const bool received = rearm_receive(air, 1200, WFB_CONTROL_TYPE_READY);
+        const uint64_t elapsed_ms = get_time_ms() - before_ms;
+        std::cerr << "READY loss retry " << loss + 1 << ": received=" << received
+                  << " elapsed_ms=" << elapsed_ms << std::endl;
+        assert(received);
+        assert(elapsed_ms >= 800 && elapsed_ms <= 1800);
+    }
+    const uint64_t recovery_ms = get_time_ms() - first_ready_ms;
+    assert(recovery_ms <= 2400);
+    rearm_grant(command, input_port, 1);
+    assert(rearm_receive(air, 500, WFB_PACKET_DATA));
+    // 仍有有效的三秒授权时，新 pending 数据应直接发送，不重新声明 READY。
+    assert(!rearm_receive(air, 1100, WFB_CONTROL_TYPE_READY));
+    assert(send(tun[0], &data, 1, 0) == 1);
+    assert(rearm_receive(air, 500, WFB_PACKET_DATA));
+    // 跨过授权到期与重试周期，空队列仍不发送 READY。
+    assert(!rearm_receive(air, 2200, WFB_CONTROL_TYPE_READY));
+    assert(send(tun[0], &data, 1, 0) == 1);
+    assert(rearm_receive(air, 500, WFB_CONTROL_TYPE_READY));
+    rearm_grant(command, input_port, 2);
+    assert(rearm_receive(air, 500, WFB_PACKET_DATA));
+    close(tun[0]); close(air); close(command);
+    std::cout << "native run_client READY/GRANT loss recovery_ms=" << recovery_ms
+              << ", idle and authorized pending: PASS" << std::endl;
+}

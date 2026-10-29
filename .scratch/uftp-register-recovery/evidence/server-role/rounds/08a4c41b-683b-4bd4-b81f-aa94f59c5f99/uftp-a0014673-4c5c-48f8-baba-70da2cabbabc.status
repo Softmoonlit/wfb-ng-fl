@@ -1,0 +1,9 @@
+CONNECT;success;0x00000001
+CONNECT;success;0x00000002
+RESULT;0x00000001;08a4c41b-683b-4bd4-b81f-aa94f59c5f99/model.bin;37KB;copy;293.13KB/s
+RESULT;0x00000002;08a4c41b-683b-4bd4-b81f-aa94f59c5f99/model.bin;37KB;copy;1400.37KB/s
+RESULT;0x00000001;08a4c41b-683b-4bd4-b81f-aa94f59c5f99/model.manifest.json;0KB;copy;1.63KB/s
+RESULT;0x00000002;08a4c41b-683b-4bd4-b81f-aa94f59c5f99/model.manifest.json;0KB;copy;49.45KB/s
+HSTATS;target;copy;overwrite;skip;totalMB;time;speedKB/s
+STATS;0x00000001;2;0;0;0MB;0.260;146.45KB/s
+STATS;0x00000002;2;0;0;0MB;0.031;1214.16KB/s
