@@ -526,6 +526,10 @@
           throw new Error(`${result.error.code}: ${result.error.message}${reasons ? `；${reasons}` : ''}`);
         }
         requestAccepted = true;
+        // 受理后草稿结束，后续准备状态由固定作业参与者展示。
+        selectedNodes.clear();
+        byId('selection-notice').textContent = '';
+        byId('selection-notice').hidden = true;
         pendingJobId = result.job_id;
         stateFresh = false;
         acceptedStatus = `作业 ${result.job_id} 已受理，准备结果请查看作业详情。`;

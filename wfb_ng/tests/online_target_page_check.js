@@ -96,6 +96,15 @@ function openPage(initial = snapshot()) {
   await page.refresh(snapshot({instance_id: 'two', nodes: [client(5)]}));
   assert.equal(page.elements['job-target-nodes'].children[0].children[0].checked, false);
   assert.equal(page.elements['start-job'].disabled, true, '实例变化清空草稿');
+  const started = openPage(snapshot({nodes: [client(1)]})); await flush();
+  started.select(1);
+  await started.submit();
+  assert.ok(started.elements['job-target-nodes'].children.every(n => !n.children[0].checked),
+    '受理成功立即清空启动草稿');
+  await started.refresh(snapshot({nodes: [client(1, {state: 'preparing', readiness: 'ACTIVE',
+    can_select: false, selection_blockers: [{code: 'NODE_NOT_IDLE', message: '节点尚未待命: PREPARING'}]})]}));
+  assert.equal(started.elements['selection-notice'].textContent, '', '正常准备不能误报选择失效');
+
   const reloaded = openPage(snapshot({instance_id: 'two', nodes: [client(5)]})); await flush();
   assert.equal(reloaded.elements['start-job'].disabled, true, '整页重开初始为空');
   reloaded.select(5);

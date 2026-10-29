@@ -372,7 +372,12 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
 
   assert.equal(cElements['job-recovery'].textContent, '已恢复待命');
   assert.equal(cElements['server-state'].textContent, '待命');
-  assert.equal(cElements['start-job'].disabled, false, 'Start job button re-enabled after recovery is ready');
+  assert.equal(cElements['start-job'].disabled, true, '恢复后草稿为空，需要重新选择节点');
+  for (const label of cElements['job-target-nodes'].children) {
+    label.children[0].checked = true;
+    label.children[0].listeners.change();
+  }
+  assert.equal(cElements['start-job'].disabled, false, '重新勾选后允许下一次启动');
 
   // Restart next job with 2 rounds
   cElements['job-rounds-input'].value = '2';
