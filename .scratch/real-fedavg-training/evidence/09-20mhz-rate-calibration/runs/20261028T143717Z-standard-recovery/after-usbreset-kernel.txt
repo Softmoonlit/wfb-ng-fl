@@ -1,0 +1,1163 @@
+[一 10月 26 19:34:56 2026] Booting Linux on physical CPU 0x0000000000 [0x410fd421]
+[一 10月 26 19:34:56 2026] Linux version 5.15.148-tegra (buildbrain@mobile-u64-6336-d8000) (aarch64-buildroot-linux-gnu-gcc.br_real (Buildroot 2022.08) 11.3.0, GNU ld (GNU Binutils) 2.38) #1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025 ()
+[一 10月 26 19:34:56 2026] Machine model: NVIDIA Jetson Orin Nano Engineering Reference Developer Kit Super
+[一 10月 26 19:34:56 2026] efi: EFI v2.70 by EDK II
+[一 10月 26 19:34:56 2026] efi: RTPROP=0x26d82f198 TPMFinalLog=0x25e3f0000 SMBIOS=0xffff0000 SMBIOS 3.0=0x26d220000 MEMATTR=0x267178018 ESRT=0x2679d7018 TPMEventLog=0x25e408018 RNG=0x25a940018 MEMRESERVE=0x25e40ac18 
+[一 10月 26 19:34:56 2026] random: crng init done
+[一 10月 26 19:34:56 2026] secureboot: Secure boot disabled
+[一 10月 26 19:34:56 2026] esrt: Reserving ESRT space from 0x00000002679d7018 to 0x00000002679d7050.
+[一 10月 26 19:34:56 2026] Reserved memory: created CMA memory pool at 0x000000024a000000, size 256 MiB
+[一 10月 26 19:34:56 2026] OF: reserved mem: initialized node linux,cma, compatible id shared-dma-pool
+[一 10月 26 19:34:56 2026] NUMA: No NUMA configuration found
+[一 10月 26 19:34:56 2026] NUMA: Faking a node at [mem 0x0000000080000000-0x0000000277ffffff]
+[一 10月 26 19:34:56 2026] NUMA: NODE_DATA [mem 0x271307800-0x271309fff]
+[一 10月 26 19:34:56 2026] Zone ranges:
+[一 10月 26 19:34:56 2026]   DMA      [mem 0x0000000080000000-0x00000000ffffffff]
+[一 10月 26 19:34:56 2026]   DMA32    empty
+[一 10月 26 19:34:56 2026]   Normal   [mem 0x0000000100000000-0x0000000277ffffff]
+[一 10月 26 19:34:56 2026] Movable zone start for each node
+[一 10月 26 19:34:56 2026] Early memory node ranges
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000080000000-0x00000000bdffffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x00000000c2000000-0x00000000fffdffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x00000000fffe0000-0x00000000ffffffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000100000000-0x000000025e233fff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000025e234000-0x000000025e3fffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000025e400000-0x000000025e40afff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000025e40b000-0x000000025e40bfff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000025e40c000-0x000000026b8effff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000026b8f0000-0x000000026d82ffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x000000026d830000-0x0000000271dfffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000271e00000-0x0000000271ffffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000272000000-0x000000027259ffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000272f00000-0x0000000272ffffff]
+[一 10月 26 19:34:56 2026]   node   0: [mem 0x0000000276000000-0x0000000277ffffff]
+[一 10月 26 19:34:56 2026] mminit::pageflags_layout_widths Section 0 Node 4 Zone 2 Lastcpupid 16 Kasantag 0 Flags 24
+[一 10月 26 19:34:56 2026] mminit::pageflags_layout_shifts Section 21 Node 4 Zone 2 Lastcpupid 16 Kasantag 0
+[一 10月 26 19:34:56 2026] mminit::pageflags_layout_pgshifts Section 0 Node 60 Zone 58 Lastcpupid 42 Kasantag 0
+[一 10月 26 19:34:56 2026] mminit::pageflags_layout_nodezoneid Node/Zone ID: 64 -> 58
+[一 10月 26 19:34:56 2026] mminit::pageflags_layout_usage location: 64 -> 42 layout 42 -> 24 unused 24 -> 0 page-flags
+[一 10月 26 19:34:56 2026] Initmem setup node 0 [mem 0x0000000080000000-0x0000000277ffffff]
+[一 10月 26 19:34:56 2026] mminit::memmap_init Initialising map node 0 zone 0 pfns 524288 -> 1048576
+[一 10月 26 19:34:56 2026] mminit::memmap_init Initialising map node 0 zone 2 pfns 1048576 -> 2588672
+[一 10月 26 19:34:56 2026] On node 0, zone DMA: 16384 pages in unavailable ranges
+[一 10月 26 19:34:56 2026] On node 0, zone Normal: 2400 pages in unavailable ranges
+[一 10月 26 19:34:56 2026] On node 0, zone Normal: 12288 pages in unavailable ranges
+[一 10月 26 19:34:56 2026] psci: probing for conduit method from DT.
+[一 10月 26 19:34:56 2026] psci: PSCIv1.1 detected in firmware.
+[一 10月 26 19:34:56 2026] psci: Using standard PSCI v0.2 function IDs
+[一 10月 26 19:34:56 2026] psci: Trusted OS migration not required
+[一 10月 26 19:34:56 2026] psci: SMC Calling Convention v1.2
+[一 10月 26 19:34:56 2026] percpu: Embedded 29 pages/cpu s80408 r8192 d30184 u118784
+[一 10月 26 19:34:56 2026] pcpu-alloc: s80408 r8192 d30184 u118784 alloc=29*4096
+[一 10月 26 19:34:56 2026] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU0
+[一 10月 26 19:34:56 2026] CPU features: detected: Address authentication (architected algorithm)
+[一 10月 26 19:34:56 2026] CPU features: detected: GIC system register CPU interface
+[一 10月 26 19:34:56 2026] CPU features: detected: Virtualization Host Extensions
+[一 10月 26 19:34:56 2026] CPU features: detected: Hardware dirty bit management
+[一 10月 26 19:34:56 2026] CPU features: detected: Spectre-v4
+[一 10月 26 19:34:56 2026] CPU features: detected: Spectre-BHB
+[一 10月 26 19:34:56 2026] CPU features: kernel page table isolation forced ON by KASLR
+[一 10月 26 19:34:56 2026] CPU features: detected: Kernel page table isolation (KPTI)
+[一 10月 26 19:34:56 2026] alternatives: patching kernel code
+[一 10月 26 19:34:56 2026] mminit::zonelist general 0:DMA = 0:DMA 
+[一 10月 26 19:34:56 2026] mminit::zonelist general 0:Normal = 0:Normal 0:DMA 
+[一 10月 26 19:34:56 2026] mminit::zonelist thisnode 0:DMA = 0:DMA 
+[一 10月 26 19:34:56 2026] mminit::zonelist thisnode 0:Normal = 0:Normal 0:DMA 
+[一 10月 26 19:34:56 2026] Built 1 zonelists, mobility grouping on.  Total pages: 2001056
+[一 10月 26 19:34:56 2026] Policy zone: Normal
+[一 10月 26 19:34:56 2026] Kernel command line: root=PARTUUID=be5566a8-6bee-43cb-8ad4-ad29b1228357 rw rootwait rootfstype=ext4 mminit_loglevel=4 console=ttyTCU0,115200 firmware_class.path=/etc/firmware fbcon=map:0 nospectre_bhb video=efifb:off console=tty0 bl_prof_dataptr=2031616@0x271E10000 bl_prof_ro_ptr=65536@0x271E00000 
+[一 10月 26 19:34:56 2026] Unknown kernel command line parameters "bl_prof_dataptr=2031616@0x271E10000 bl_prof_ro_ptr=65536@0x271E00000", will be passed to user space.
+[一 10月 26 19:34:56 2026] Dentry cache hash table entries: 1048576 (order: 11, 8388608 bytes, linear)
+[一 10月 26 19:34:56 2026] Inode-cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[一 10月 26 19:34:56 2026] mem auto-init: stack:off, heap alloc:off, heap free:off
+[一 10月 26 19:34:56 2026] software IO TLB: mapped [mem 0x00000000fbfe0000-0x00000000fffe0000] (64MB)
+[一 10月 26 19:34:56 2026] Memory: 7517476K/8133248K available (20160K kernel code, 4064K rwdata, 10060K rodata, 7680K init, 529K bss, 353628K reserved, 262144K cma-reserved)
+[一 10月 26 19:34:56 2026] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=6, Nodes=1
+[一 10月 26 19:34:56 2026] trace event string verifier disabled
+[一 10月 26 19:34:56 2026] rcu: Preemptible hierarchical RCU implementation.
+[一 10月 26 19:34:56 2026] rcu: 	RCU event tracing is enabled.
+[一 10月 26 19:34:56 2026] rcu: 	RCU restricting CPUs from NR_CPUS=256 to nr_cpu_ids=6.
+[一 10月 26 19:34:56 2026] 	Trampoline variant of Tasks RCU enabled.
+[一 10月 26 19:34:56 2026] 	Rude variant of Tasks RCU enabled.
+[一 10月 26 19:34:56 2026] 	Tracing variant of Tasks RCU enabled.
+[一 10月 26 19:34:56 2026] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[一 10月 26 19:34:56 2026] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=6
+[一 10月 26 19:34:56 2026] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[一 10月 26 19:34:56 2026] GICv3: GIC: Using split EOI/Deactivate mode
+[一 10月 26 19:34:56 2026] GICv3: 960 SPIs implemented
+[一 10月 26 19:34:56 2026] GICv3: 0 Extended SPIs implemented
+[一 10月 26 19:34:56 2026] GICv3: Distributor has no Range Selector support
+[一 10月 26 19:34:56 2026] Root IRQ handler: gic_handle_irq
+[一 10月 26 19:34:56 2026] GICv3: 16 PPIs implemented
+[一 10月 26 19:34:56 2026] GICv3: CPU0: found redistributor 0 region 0:0x000000000f440000
+[一 10月 26 19:34:56 2026] arch_timer: cp15 timer(s) running at 31.25MHz (phys).
+[一 10月 26 19:34:56 2026] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0xe6a171046, max_idle_ns: 881590405314 ns
+[一 10月 26 19:34:56 2026] sched_clock: 56 bits at 31MHz, resolution 32ns, wraps every 4398046511088ns
+[一 10月 26 19:34:56 2026] Console: colour dummy device 80x25
+[一 10月 26 19:34:56 2026] printk: console [tty0] enabled
+[一 10月 26 19:34:56 2026] Calibrating delay loop (skipped), value calculated using timer frequency.. 62.50 BogoMIPS (lpj=125000)
+[一 10月 26 19:34:56 2026] pid_max: default: 32768 minimum: 301
+[一 10月 26 19:34:56 2026] LSM: Security Framework initializing
+[一 10月 26 19:34:56 2026] Yama: becoming mindful.
+[一 10月 26 19:34:56 2026] SELinux:  Initializing.
+[一 10月 26 19:34:56 2026] Mount-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[一 10月 26 19:34:56 2026] Mountpoint-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[一 10月 26 19:34:56 2026] rcu: Hierarchical SRCU implementation.
+[一 10月 26 19:34:56 2026] Tegra Revision: A01 SKU: 213 CPU Process: 0 SoC Process: 0
+[一 10月 26 19:34:56 2026] Remapping and enabling EFI services.
+[一 10月 26 19:34:56 2026] smp: Bringing up secondary CPUs ...
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU1
+[一 10月 26 19:34:56 2026] GICv3: CPU1: found redistributor 100 region 0:0x000000000f460000
+[一 10月 26 19:34:56 2026] CPU1: Booted secondary processor 0x0000000100 [0x410fd421]
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU2
+[一 10月 26 19:34:56 2026] GICv3: CPU2: found redistributor 200 region 0:0x000000000f480000
+[一 10月 26 19:34:56 2026] CPU2: Booted secondary processor 0x0000000200 [0x410fd421]
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU3
+[一 10月 26 19:34:56 2026] GICv3: CPU3: found redistributor 300 region 0:0x000000000f4a0000
+[一 10月 26 19:34:56 2026] CPU3: Booted secondary processor 0x0000000300 [0x410fd421]
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU4
+[一 10月 26 19:34:56 2026] GICv3: CPU4: found redistributor 10200 region 0:0x000000000f500000
+[一 10月 26 19:34:56 2026] CPU4: Booted secondary processor 0x0000010200 [0x410fd421]
+[一 10月 26 19:34:56 2026] Detected PIPT I-cache on CPU5
+[一 10月 26 19:34:56 2026] GICv3: CPU5: found redistributor 10300 region 0:0x000000000f520000
+[一 10月 26 19:34:56 2026] CPU5: Booted secondary processor 0x0000010300 [0x410fd421]
+[一 10月 26 19:34:56 2026] smp: Brought up 1 node, 6 CPUs
+[一 10月 26 19:34:56 2026] SMP: Total of 6 processors activated.
+[一 10月 26 19:34:56 2026] CPU features: detected: 32-bit EL0 Support
+[一 10月 26 19:34:56 2026] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[一 10月 26 19:34:56 2026] CPU features: detected: Common not Private translations
+[一 10月 26 19:34:56 2026] CPU features: detected: CRC32 instructions
+[一 10月 26 19:34:56 2026] CPU features: detected: Data cache clean to Point of Persistence
+[一 10月 26 19:34:56 2026] CPU features: detected: Generic authentication (architected algorithm)
+[一 10月 26 19:34:56 2026] CPU features: detected: RCpc load-acquire (LDAPR)
+[一 10月 26 19:34:56 2026] CPU features: detected: LSE atomic instructions
+[一 10月 26 19:34:56 2026] CPU features: detected: Privileged Access Never
+[一 10月 26 19:34:56 2026] CPU features: detected: RAS Extension Support
+[一 10月 26 19:34:56 2026] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[一 10月 26 19:34:56 2026] spectre-bhb mitigation disabled by command line option
+[一 10月 26 19:34:56 2026] CPU: All CPU(s) started at EL2
+[一 10月 26 19:34:56 2026] devtmpfs: initialized
+[一 10月 26 19:34:56 2026] KASLR enabled
+[一 10月 26 19:34:56 2026] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[一 10月 26 19:34:56 2026] futex hash table entries: 2048 (order: 5, 131072 bytes, linear)
+[一 10月 26 19:34:56 2026] pinctrl core: initialized pinctrl subsystem
+[一 10月 26 19:34:56 2026] SMBIOS 3.6.0 present.
+[一 10月 26 19:34:56 2026] DMI: NVIDIA NVIDIA Jetson Orin Nano Engineering Reference Developer Kit Super/Jetson, BIOS 36.4.3-gcid-38968081 01/08/2025
+[一 10月 26 19:34:56 2026] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[一 10月 26 19:34:56 2026] DMA: preallocated 1024 KiB GFP_KERNEL pool for atomic allocations
+[一 10月 26 19:34:56 2026] DMA: preallocated 1024 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[一 10月 26 19:34:56 2026] DMA: preallocated 1024 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[一 10月 26 19:34:56 2026] audit: initializing netlink subsys (disabled)
+[一 10月 26 19:34:56 2026] audit: type=2000 audit(0.064:1): state=initialized audit_enabled=0 res=1
+[一 10月 26 19:34:56 2026] thermal_sys: Registered thermal governor 'step_wise'
+[一 10月 26 19:34:56 2026] thermal_sys: Registered thermal governor 'user_space'
+[一 10月 26 19:34:56 2026] thermal_sys: Registered thermal governor 'power_allocator'
+[一 10月 26 19:34:56 2026] cpuidle: using governor menu
+[一 10月 26 19:34:56 2026] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[一 10月 26 19:34:56 2026] ASID allocator initialised with 32768 entries
+[一 10月 26 19:34:56 2026] Serial: AMBA PL011 UART driver
+[一 10月 26 19:34:56 2026] 31d0000.serial: ttyAMA0 at MMIO 0x31d0000 (irq = 117, base_baud = 0) is a SBSA
+[一 10月 26 19:34:56 2026] platform bpmp: Fixing up cyclic dependency with 2c60000.external-memory-controller
+[一 10月 26 19:34:56 2026] HugeTLB registered 1.00 GiB page size, pre-allocated 0 pages
+[一 10月 26 19:34:56 2026] HugeTLB registered 32.0 MiB page size, pre-allocated 0 pages
+[一 10月 26 19:34:56 2026] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
+[一 10月 26 19:34:56 2026] HugeTLB registered 64.0 KiB page size, pre-allocated 0 pages
+[一 10月 26 19:34:56 2026] cryptd: max_cpu_qlen set to 1000
+[一 10月 26 19:34:56 2026] ACPI: Interpreter disabled.
+[一 10月 26 19:34:56 2026] VDD_1V8_AO: supplied by VDD_5V0_SYS
+[一 10月 26 19:34:56 2026] VDD_3V3_AO: supplied by VDD_5V0_SYS
+[一 10月 26 19:34:56 2026] VDD_AV10_HUB: supplied by VDD_5V0_SYS
+[一 10月 26 19:34:56 2026] iommu: Default domain type: Translated 
+[一 10月 26 19:34:56 2026] iommu: DMA domain TLB invalidation policy: strict mode 
+[一 10月 26 19:34:56 2026] SCSI subsystem initialized
+[一 10月 26 19:34:56 2026] libata version 3.00 loaded.
+[一 10月 26 19:34:56 2026] vgaarb: loaded
+[一 10月 26 19:34:56 2026] usbcore: registered new interface driver usbfs
+[一 10月 26 19:34:56 2026] usbcore: registered new interface driver hub
+[一 10月 26 19:34:56 2026] usbcore: registered new device driver usb
+[一 10月 26 19:34:56 2026] pps_core: LinuxPPS API ver. 1 registered
+[一 10月 26 19:34:56 2026] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[一 10月 26 19:34:56 2026] PTP clock support registered
+[一 10月 26 19:34:56 2026] EDAC MC: Ver: 3.0.0
+[一 10月 26 19:34:56 2026] Registered efivars operations
+[一 10月 26 19:34:56 2026] FPGA manager framework
+[一 10月 26 19:34:56 2026] Advanced Linux Sound Architecture Driver Initialized.
+[一 10月 26 19:34:56 2026] Bluetooth: Core ver 2.22
+[一 10月 26 19:34:56 2026] NET: Registered PF_BLUETOOTH protocol family
+[一 10月 26 19:34:56 2026] Bluetooth: HCI device and connection manager initialized
+[一 10月 26 19:34:56 2026] Bluetooth: HCI socket layer initialized
+[一 10月 26 19:34:56 2026] Bluetooth: L2CAP socket layer initialized
+[一 10月 26 19:34:56 2026] Bluetooth: SCO socket layer initialized
+[一 10月 26 19:34:56 2026] clocksource: Switched to clocksource arch_sys_counter
+[一 10月 26 19:34:56 2026] VFS: Disk quotas dquot_6.6.0
+[一 10月 26 19:34:56 2026] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[一 10月 26 19:34:56 2026] pnp: PnP ACPI: disabled
+[一 10月 26 19:34:56 2026] NET: Registered PF_INET protocol family
+[一 10月 26 19:34:56 2026] IP idents hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[一 10月 26 19:34:56 2026] tcp_listen_portaddr_hash hash table entries: 4096 (order: 4, 65536 bytes, linear)
+[一 10月 26 19:34:56 2026] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[一 10月 26 19:34:56 2026] TCP established hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[一 10月 26 19:34:56 2026] TCP bind hash table entries: 65536 (order: 8, 1048576 bytes, linear)
+[一 10月 26 19:34:56 2026] TCP: Hash tables configured (established 65536 bind 65536)
+[一 10月 26 19:34:56 2026] UDP hash table entries: 4096 (order: 5, 131072 bytes, linear)
+[一 10月 26 19:34:56 2026] UDP-Lite hash table entries: 4096 (order: 5, 131072 bytes, linear)
+[一 10月 26 19:34:56 2026] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[一 10月 26 19:34:56 2026] RPC: Registered named UNIX socket transport module.
+[一 10月 26 19:34:56 2026] RPC: Registered udp transport module.
+[一 10月 26 19:34:56 2026] RPC: Registered tcp transport module.
+[一 10月 26 19:34:56 2026] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[一 10月 26 19:34:56 2026] PCI: CLS 0 bytes, default 64
+[一 10月 26 19:34:56 2026] Unpacking initramfs...
+[一 10月 26 19:34:56 2026] hw perfevents: enabled with armv8_cortex_a78 PMU driver, 7 counters available
+[一 10月 26 19:34:56 2026] kvm [1]: IPA Size Limit: 48 bits
+[一 10月 26 19:34:56 2026] kvm [1]: GICv3: no GICV resource entry
+[一 10月 26 19:34:56 2026] kvm [1]: disabling GICv2 emulation
+[一 10月 26 19:34:56 2026] kvm [1]: GIC system register CPU interface enabled
+[一 10月 26 19:34:56 2026] kvm [1]: vgic interrupt IRQ9
+[一 10月 26 19:34:56 2026] kvm [1]: VHE mode initialized successfully
+[一 10月 26 19:34:56 2026] Initialise system trusted keyrings
+[一 10月 26 19:34:56 2026] Key type blacklist registered
+[一 10月 26 19:34:56 2026] workingset: timestamp_bits=42 max_order=21 bucket_order=0
+[一 10月 26 19:34:56 2026] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[一 10月 26 19:34:56 2026] NFS: Registering the id_resolver key type
+[一 10月 26 19:34:56 2026] Key type id_resolver registered
+[一 10月 26 19:34:56 2026] Key type id_legacy registered
+[一 10月 26 19:34:56 2026] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[一 10月 26 19:34:56 2026] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[一 10月 26 19:34:56 2026] ntfs: driver 2.1.32 [Flags: R/O].
+[一 10月 26 19:34:56 2026] 9p: Installing v9fs 9p2000 file system support
+[一 10月 26 19:34:56 2026] integrity: Platform Keyring initialized
+[一 10月 26 19:34:56 2026] Key type asymmetric registered
+[一 10月 26 19:34:56 2026] Asymmetric key parser 'x509' registered
+[一 10月 26 19:34:56 2026] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+[一 10月 26 19:34:56 2026] io scheduler mq-deadline registered
+[一 10月 26 19:34:56 2026] io scheduler kyber registered
+[一 10月 26 19:34:56 2026] EINJ: ACPI disabled.
+[一 10月 26 19:34:56 2026] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[一 10月 26 19:34:56 2026] SuperH (H)SCI(F) driver initialized
+[一 10月 26 19:34:56 2026] msm_serial: driver initialized
+[一 10月 26 19:34:56 2026] printk: console [ttyTCU0] enabled
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: probing hardware configuration...
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: SMMUv2 with:
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	stage 1 translation
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	stage 2 translation
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	nested translation
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	stream matching with 128 register groups
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	128 context banks (0 stage-2 only)
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	Supported page sizes: 0x61311000
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	Stage-1: 48-bit VA -> 48-bit IPA
+[一 10月 26 19:34:56 2026] arm-smmu 8000000.iommu: 	Stage-2: 48-bit IPA -> 48-bit PA
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: probing hardware configuration...
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: SMMUv2 with:
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	stage 1 translation
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	stage 2 translation
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	nested translation
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	stream matching with 128 register groups
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	128 context banks (0 stage-2 only)
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	Supported page sizes: 0x61311000
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	Stage-1: 48-bit VA -> 48-bit IPA
+[一 10月 26 19:34:56 2026] arm-smmu 10000000.iommu: 	Stage-2: 48-bit IPA -> 48-bit PA
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: probing hardware configuration...
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: SMMUv2 with:
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	stage 1 translation
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	stage 2 translation
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	nested translation
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	stream matching with 128 register groups
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	128 context banks (0 stage-2 only)
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	Supported page sizes: 0x61311000
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	Stage-1: 48-bit VA -> 48-bit IPA
+[一 10月 26 19:34:56 2026] arm-smmu 12000000.iommu: 	Stage-2: 48-bit IPA -> 48-bit PA
+[一 10月 26 19:34:56 2026] loop: module loaded
+[一 10月 26 19:34:56 2026] megasas: 07.717.02.00-rc1
+[一 10月 26 19:34:56 2026] tun: Universal TUN/TAP device driver, 1.6
+[一 10月 26 19:34:56 2026] thunder_xcv, ver 1.0
+[一 10月 26 19:34:56 2026] thunder_bgx, ver 1.0
+[一 10月 26 19:34:56 2026] nicpf, ver 1.0
+[一 10月 26 19:34:56 2026] hclge is initializing
+[一 10月 26 19:34:56 2026] hns3: Hisilicon Ethernet Network Driver for Hip08 Family - version
+[一 10月 26 19:34:56 2026] hns3: Copyright (c) 2017 Huawei Corporation.
+[一 10月 26 19:34:56 2026] e1000: Intel(R) PRO/1000 Network Driver
+[一 10月 26 19:34:56 2026] e1000: Copyright (c) 1999-2006 Intel Corporation.
+[一 10月 26 19:34:56 2026] e1000e: Intel(R) PRO/1000 Network Driver
+[一 10月 26 19:34:56 2026] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[一 10月 26 19:34:56 2026] igb: Intel(R) Gigabit Ethernet Network Driver
+[一 10月 26 19:34:56 2026] igb: Copyright (c) 2007-2014 Intel Corporation.
+[一 10月 26 19:34:56 2026] igbvf: Intel(R) Gigabit Virtual Function Network Driver
+[一 10月 26 19:34:56 2026] igbvf: Copyright (c) 2009 - 2012 Intel Corporation.
+[一 10月 26 19:34:56 2026] sky2: driver version 1.30
+[一 10月 26 19:34:56 2026] VFIO - User Level meta-driver version: 0.3
+[一 10月 26 19:34:56 2026] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[一 10月 26 19:34:56 2026] ehci-pci: EHCI PCI platform driver
+[一 10月 26 19:34:56 2026] ehci-platform: EHCI generic platform driver
+[一 10月 26 19:34:56 2026] ehci-orion: EHCI orion driver
+[一 10月 26 19:34:56 2026] ehci-exynos: EHCI Exynos driver
+[一 10月 26 19:34:56 2026] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[一 10月 26 19:34:56 2026] ohci-pci: OHCI PCI platform driver
+[一 10月 26 19:34:56 2026] ohci-platform: OHCI generic platform driver
+[一 10月 26 19:34:56 2026] ohci-exynos: OHCI Exynos driver
+[一 10月 26 19:34:56 2026] usbcore: registered new interface driver usb-storage
+[一 10月 26 19:34:56 2026] i2c_dev: i2c /dev entries driver
+[一 10月 26 19:34:56 2026] pps pps0: new PPS source ktimer
+[一 10月 26 19:34:56 2026] pps pps0: ktimer PPS source registered
+[一 10月 26 19:34:56 2026] pps_ldisc: PPS line discipline registered
+[一 10月 26 19:34:56 2026] device-mapper: ioctl: 4.45.0-ioctl (2021-03-22) initialised: dm-devel@redhat.com
+[一 10月 26 19:34:56 2026] sdhci: Secure Digital Host Controller Interface driver
+[一 10月 26 19:34:56 2026] sdhci: Copyright(c) Pierre Ossman
+[一 10月 26 19:34:56 2026] Synopsys Designware Multimedia Card Interface Driver
+[一 10月 26 19:34:56 2026] sdhci-pltfm: SDHCI platform and OF driver helper
+[一 10月 26 19:34:56 2026] ledtrig-cpu: registered to indicate activity on CPUs
+[一 10月 26 19:34:56 2026] SMCCC: SOC_ID: ID = jep106:036b:0234 Revision = 0x00000401
+[一 10月 26 19:34:56 2026] tegra-bpmp bpmp: Adding to iommu group 0
+[一 10月 26 19:34:56 2026] tegra-bpmp bpmp: firmware: e941463f35523d12ee54-da583751bbf
+[一 10月 26 19:34:56 2026] Freeing initrd memory: 15480K
+[一 10月 26 19:34:59 2026] clocksource: tsc: mask: 0xffffffffffffff max_cycles: 0xe6a171046, max_idle_ns: 881590405314 ns
+[一 10月 26 19:34:59 2026] clocksource: osc: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 49772407460 ns
+[一 10月 26 19:34:59 2026] clocksource: usec: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275 ns
+[一 10月 26 19:34:59 2026] hid: raw HID events driver (C) Jiri Kosina
+[一 10月 26 19:34:59 2026] usbcore: registered new interface driver usbhid
+[一 10月 26 19:34:59 2026] usbhid: USB HID core driver
+[一 10月 26 19:34:59 2026] optee: probing for conduit method.
+[一 10月 26 19:34:59 2026] optee: revision 4.2 (d78bc5fa)
+[一 10月 26 19:34:59 2026] optee: dynamic shared memory is enabled
+[一 10月 26 19:34:59 2026] optee: initialized driver
+[一 10月 26 19:34:59 2026] usbcore: registered new interface driver snd-usb-audio
+[一 10月 26 19:34:59 2026] NET: Registered PF_PACKET protocol family
+[一 10月 26 19:34:59 2026] Bluetooth: RFCOMM TTY layer initialized
+[一 10月 26 19:34:59 2026] Bluetooth: RFCOMM socket layer initialized
+[一 10月 26 19:34:59 2026] Bluetooth: RFCOMM ver 1.11
+[一 10月 26 19:34:59 2026] 9pnet: Installing 9P2000 support
+[一 10月 26 19:34:59 2026] Key type dns_resolver registered
+[一 10月 26 19:34:59 2026] printk: console [tty0]: printing thread started
+[一 10月 26 19:34:59 2026] printk: console [ttyTCU0]: printing thread started
+[一 10月 26 19:34:59 2026] Loading compiled-in X.509 certificates
+[一 10月 26 19:34:59 2026] Loaded X.509 cert 'Build time autogenerated kernel key: 6ad7eb1abc7541e974a48fc505964410c4019a6e'
+[一 10月 26 19:34:59 2026] tegra-gpcdma 2600000.dma-controller: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] tegra-gpcdma 2600000.dma-controller: GPC DMA driver register 31 channels
+[一 10月 26 19:34:59 2026] serial-tegra 3100000.serial: RX in PIO mode
+[一 10月 26 19:34:59 2026] serial-tegra 3100000.serial: TX in PIO mode
+[一 10月 26 19:34:59 2026] 3100000.serial: ttyTHS1 at MMIO 0x3100000 (irq = 112, base_baud = 0) is a TEGRA_UART
+[一 10月 26 19:34:59 2026] 3140000.serial: ttyTHS2 at MMIO 0x3140000 (irq = 113, base_baud = 0) is a TEGRA_UART
+[一 10月 26 19:34:59 2026] tegra_rtc c2a0000.rtc: registered as rtc1
+[一 10月 26 19:34:59 2026] tegra_rtc c2a0000.rtc: Tegra internal Real Time Clock
+[一 10月 26 19:34:59 2026] tegra-i2c 3160000.i2c: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] tegra-i2c 3180000.i2c: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] tegra-i2c 31b0000.i2c: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] tegra-i2c c240000.i2c: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] i2c 1-0025: Fixing up cyclic dependency with 3520000.padctl
+[一 10月 26 19:34:59 2026] tegra-i2c c250000.i2c: Adding to iommu group 1
+[一 10月 26 19:34:59 2026] cpufreq: cpufreq_online: CPU4: Running at unlisted initial frequency: 1781000 KHz, changing to: 1728000 KHz
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: Adding to iommu group 2
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: Firmware timestamp: 2023-02-10 03:48:10 UTC
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: xHCI Host Controller
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: new USB bus registered, assigned bus number 1
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: hcc params 0x0180ff05 hci version 0x120 quirks 0x0000000000010810
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: irq 124, io mem 0x03610000
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: xHCI Host Controller
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: new USB bus registered, assigned bus number 2
+[一 10月 26 19:34:59 2026] tegra-xusb 3610000.usb: Host supports USB 3.1 Enhanced SuperSpeed
+[一 10月 26 19:34:59 2026] hub 1-0:1.0: USB hub found
+[一 10月 26 19:34:59 2026] hub 1-0:1.0: 4 ports detected
+[一 10月 26 19:34:59 2026] hub 2-0:1.0: USB hub found
+[一 10月 26 19:34:59 2026] hub 2-0:1.0: 4 ports detected
+[一 10月 26 19:34:59 2026] sdhci-tegra 3400000.mmc: Adding to iommu group 3
+[一 10月 26 19:34:59 2026] irq: IRQ228: trimming hierarchy from :bus@0:pmc@c360000
+[一 10月 26 19:34:59 2026] irq: IRQ229: trimming hierarchy from :bus@0:interrupt-controller@f400000-1
+[一 10月 26 19:34:59 2026] input: gpio-keys as /devices/platform/gpio-keys/input/input0
+[一 10月 26 19:34:59 2026] ALSA device list:
+[一 10月 26 19:34:59 2026]   No soundcards found.
+[一 10月 26 19:34:59 2026] sdhci-tegra 3400000.mmc: Got CD GPIO
+[一 10月 26 19:34:59 2026] irq: IRQ230: trimming hierarchy from :bus@0:interrupt-controller@f400000-1
+[一 10月 26 19:34:59 2026] mmc0: SDHCI controller on 3400000.mmc [3400000.mmc] using ADMA 64-bit
+[一 10月 26 19:34:59 2026] Freeing unused kernel memory: 7680K
+[一 10月 26 19:34:59 2026] Run /init as init process
+[一 10月 26 19:34:59 2026]   with arguments:
+[一 10月 26 19:34:59 2026]     /init
+[一 10月 26 19:34:59 2026]   with environment:
+[一 10月 26 19:34:59 2026]     HOME=/
+[一 10月 26 19:34:59 2026]     TERM=linux
+[一 10月 26 19:34:59 2026]     bl_prof_dataptr=2031616@0x271E10000
+[一 10月 26 19:34:59 2026]     bl_prof_ro_ptr=65536@0x271E00000
+[一 10月 26 19:34:59 2026] Checking overlayfs setting...
+[一 10月 26 19:34:59 2026] Overlayfs is disabled...
+[一 10月 26 19:34:59 2026] Root device found: PARTUUID=be5566a8-6bee-43cb-8ad4-ad29b1228357
+[一 10月 26 19:34:59 2026] usb 1-2: new high-speed USB device number 2 using tegra-xusb
+[一 10月 26 19:35:00 2026] hub 1-2:1.0: USB hub found
+[一 10月 26 19:35:00 2026] hub 1-2:1.0: 4 ports detected
+[一 10月 26 19:35:00 2026] usb 2-1: new SuperSpeed Plus Gen 2x1 USB device number 2 using tegra-xusb
+[一 10月 26 19:35:00 2026] hub 2-1:1.0: USB hub found
+[一 10月 26 19:35:00 2026] hub 2-1:1.0: 4 ports detected
+[一 10月 26 19:35:00 2026] usb 1-3: new full-speed USB device number 3 using tegra-xusb
+[一 10月 26 19:35:00 2026] usb 1-2.1: new high-speed USB device number 4 using tegra-xusb
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: Adding to iommu group 4
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: host bridge /bus@0/pcie@14100000 ranges:
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie:      MEM 0x2080000000..0x20a7ffffff -> 0x2080000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie:      MEM 0x20a8000000..0x20afffffff -> 0x0040000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie:       IO 0x0030100000..0x00301fffff -> 0x0030100000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: iATU unroll: enabled
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: Detected iATU regions: 8 outbound, 2 inbound
+[一 10月 26 19:35:03 2026] tegra-xudc 3550000.usb: Adding to iommu group 5
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: Link up
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: Link up
+[一 10月 26 19:35:03 2026] tegra194-pcie 14100000.pcie: PCI host bridge to bus 0001:00
+[一 10月 26 19:35:03 2026] pci_bus 0001:00: root bus resource [io  0x0000-0xfffff] (bus address [0x30100000-0x301fffff])
+[一 10月 26 19:35:03 2026] pci_bus 0001:00: root bus resource [mem 0x20a8000000-0x20afffffff] (bus address [0x40000000-0x47ffffff])
+[一 10月 26 19:35:03 2026] pci_bus 0001:00: root bus resource [bus 00-ff]
+[一 10月 26 19:35:03 2026] pci_bus 0001:00: root bus resource [mem 0x2080000000-0x20a7ffffff pref]
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0: [10de:229e] type 01 class 0x060400
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0: PME# supported from D0 D3hot
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: [10ec:c822] type 00 class 0x028000
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: reg 0x10: [io  0x0000-0x00ff]
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: reg 0x18: [mem 0x20a8000000-0x20a800ffff 64bit]
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: supports D1 D2
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0: BAR 14: assigned [mem 0x20a8000000-0x20a80fffff]
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0: BAR 13: assigned [io  0x1000-0x1fff]
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: BAR 2: assigned [mem 0x20a8000000-0x20a800ffff 64bit]
+[一 10月 26 19:35:03 2026] pci 0001:01:00.0: BAR 0: assigned [io  0x1000-0x10ff]
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0: PCI bridge to [bus 01-ff]
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0:   bridge window [io  0x1000-0x1fff]
+[一 10月 26 19:35:03 2026] pci 0001:00:00.0:   bridge window [mem 0x20a8000000-0x20a80fffff]
+[一 10月 26 19:35:03 2026] pcieport 0001:00:00.0: Adding to iommu group 4
+[一 10月 26 19:35:03 2026] pcieport 0001:00:00.0: PME: Signaling with IRQ 191
+[一 10月 26 19:35:03 2026] pcieport 0001:00:00.0: AER: enabled with IRQ 191
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: Adding to iommu group 6
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: host bridge /bus@0/pcie@14160000 ranges:
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie:      MEM 0x2140000000..0x2427ffffff -> 0x2140000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie:      MEM 0x2428000000..0x242fffffff -> 0x0040000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie:       IO 0x0036100000..0x00361fffff -> 0x0036100000
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: iATU unroll: enabled
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: Detected iATU regions: 8 outbound, 2 inbound
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: Link up
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: Link up
+[一 10月 26 19:35:03 2026] tegra194-pcie 14160000.pcie: PCI host bridge to bus 0004:00
+[一 10月 26 19:35:03 2026] pci_bus 0004:00: root bus resource [io  0x100000-0x1fffff] (bus address [0x36100000-0x361fffff])
+[一 10月 26 19:35:03 2026] pci_bus 0004:00: root bus resource [mem 0x2428000000-0x242fffffff] (bus address [0x40000000-0x47ffffff])
+[一 10月 26 19:35:03 2026] pci_bus 0004:00: root bus resource [bus 00-ff]
+[一 10月 26 19:35:03 2026] pci_bus 0004:00: root bus resource [mem 0x2140000000-0x2427ffffff pref]
+[一 10月 26 19:35:03 2026] pci 0004:00:00.0: [10de:229c] type 01 class 0x060400
+[一 10月 26 19:35:03 2026] pci 0004:00:00.0: PME# supported from D0 D3hot
+[一 10月 26 19:35:03 2026] pci 0004:01:00.0: [1e4b:1202] type 00 class 0x010802
+[一 10月 26 19:35:03 2026] pci 0004:01:00.0: reg 0x10: [mem 0x00000000-0x00003fff 64bit]
+[一 10月 26 19:35:03 2026] pci 0004:01:00.0: PME# supported from D0 D3hot D3cold
+[一 10月 26 19:35:03 2026] pci 0004:00:00.0: BAR 14: assigned [mem 0x2428000000-0x24280fffff]
+[一 10月 26 19:35:03 2026] pci 0004:01:00.0: BAR 0: assigned [mem 0x2428000000-0x2428003fff 64bit]
+[一 10月 26 19:35:03 2026] pci 0004:00:00.0: PCI bridge to [bus 01-ff]
+[一 10月 26 19:35:03 2026] pci 0004:00:00.0:   bridge window [mem 0x2428000000-0x24280fffff]
+[一 10月 26 19:35:03 2026] pcieport 0004:00:00.0: Adding to iommu group 6
+[一 10月 26 19:35:03 2026] pcieport 0004:00:00.0: PME: Signaling with IRQ 193
+[一 10月 26 19:35:03 2026] pcieport 0004:00:00.0: AER: enabled with IRQ 193
+[一 10月 26 19:35:03 2026] nvme 0004:01:00.0: Adding to iommu group 6
+[一 10月 26 19:35:03 2026] nvme nvme0: pci function 0004:01:00.0
+[一 10月 26 19:35:03 2026] nvme 0004:01:00.0: enabling device (0000 -> 0002)
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie: Adding to iommu group 7
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie: host bridge /bus@0/pcie@141e0000 ranges:
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie:      MEM 0x3000000000..0x3227ffffff -> 0x3000000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie:      MEM 0x3228000000..0x322fffffff -> 0x0040000000
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie:       IO 0x003e100000..0x003e1fffff -> 0x003e100000
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie: iATU unroll: enabled
+[一 10月 26 19:35:03 2026] tegra194-pcie 141e0000.pcie: Detected iATU regions: 8 outbound, 2 inbound
+[一 10月 26 19:35:03 2026] nvme nvme0: allocated 8 MiB host memory buffer.
+[一 10月 26 19:35:03 2026] nvme nvme0: 6/0/0 default/read/poll queues
+[一 10月 26 19:35:03 2026] nvme nvme0: Ignoring bogus Namespace Identifiers
+[一 10月 26 19:35:03 2026]  nvme0n1: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15
+[一 10月 26 19:35:04 2026] EXT4-fs (nvme0n1p1): 2 orphan inodes deleted
+[一 10月 26 19:35:04 2026] EXT4-fs (nvme0n1p1): recovery complete
+[一 10月 26 19:35:04 2026] EXT4-fs (nvme0n1p1): mounted filesystem with ordered data mode. Opts: (null). Quota mode: none.
+[一 10月 26 19:35:04 2026] Rootfs mounted over PARTUUID=be5566a8-6bee-43cb-8ad4-ad29b1228357
+[一 10月 26 19:35:04 2026] Switching from initrd to actual rootfs
+[一 10月 26 19:35:04 2026] systemd[1]: System time before build time, advancing clock.
+[一 10月 26 19:35:04 2026] NET: Registered PF_INET6 protocol family
+[一 10月 26 19:35:04 2026] Segment Routing with IPv6
+[一 10月 26 19:35:04 2026] In-situ OAM (IOAM) with IPv6
+[一 10月 26 19:35:04 2026] systemd[1]: systemd 249.11-0ubuntu3.12 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY -P11KIT -QRENCODE +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+[一 10月 26 19:35:04 2026] systemd[1]: Detected architecture arm64.
+[一 10月 26 19:35:04 2026] systemd[1]: Hostname set to <fl00>.
+[一 10月 26 19:35:04 2026] systemd[1]: Using hardware watchdog 'NVIDIA Tegra186 WDT', version 0, device /dev/watchdog
+[一 10月 26 19:35:04 2026] systemd[1]: Set hardware watchdog to 2min.
+[一 10月 26 19:35:04 2026] systemd[1]: /lib/systemd/system/snapd.service:23: Unknown key name 'RestartMode' in section 'Service', ignoring.
+[一 10月 26 19:35:04 2026] systemd[1]: /etc/systemd/system/nvs-service.service:41: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+[一 10月 26 19:35:04 2026] systemd[1]: /etc/systemd/system/nvargus-daemon.service:42: Standard output type syslog is obsolete, automatically updating to journal. Please update your unit file, and consider removing the setting altogether.
+[一 10月 26 19:35:04 2026] tegra194-pcie 141e0000.pcie: Phy link never came up
+[一 10月 26 19:35:04 2026] systemd[1]: Queued start job for default target Graphical Interface.
+[一 10月 26 19:35:04 2026] systemd[1]: Created slice Slice /system/modprobe.
+[一 10月 26 19:35:04 2026] systemd[1]: Created slice Slice /system/serial-getty.
+[一 10月 26 19:35:04 2026] systemd[1]: Created slice Slice /system/systemd-fsck.
+[一 10月 26 19:35:04 2026] systemd[1]: Created slice User and Session Slice.
+[一 10月 26 19:35:04 2026] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[一 10月 26 19:35:04 2026] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[一 10月 26 19:35:04 2026] systemd[1]: Reached target Slice Units.
+[一 10月 26 19:35:04 2026] systemd[1]: Reached target Mounting snaps.
+[一 10月 26 19:35:04 2026] systemd[1]: Reached target Swaps.
+[一 10月 26 19:35:04 2026] systemd[1]: Reached target Local Verity Protected Volumes.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on Device-mapper event daemon FIFOs.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on LVM2 poll daemon socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on RPCbind Server Activation Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on Syslog Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on fsck to fsckd communication Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on initctl Compatibility Named Pipe.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on Journal Audit Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on Journal Socket (/dev/log).
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on Journal Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on udev Control Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Listening on udev Kernel Socket.
+[一 10月 26 19:35:04 2026] systemd[1]: Mounting Huge Pages File System...
+[一 10月 26 19:35:04 2026] systemd[1]: Mounting POSIX Message Queue File System...
+[一 10月 26 19:35:04 2026] systemd[1]: Mounting Kernel Debug File System...
+[一 10月 26 19:35:04 2026] systemd[1]: Mounting Kernel Trace File System...
+[一 10月 26 19:35:04 2026] systemd[1]: Starting Journal Service...
+[一 10月 26 19:35:04 2026] systemd[1]: Finished Availability of block devices.
+[一 10月 26 19:35:04 2026] systemd[1]: Starting Set the console keyboard layout...
+[一 10月 26 19:35:04 2026] systemd[1]: Starting Create List of Static Device Nodes...
+[一 10月 26 19:35:04 2026] systemd[1]: Starting Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+[一 10月 26 19:35:04 2026] systemd[1]: Starting Load Kernel Module configfs...
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Load Kernel Module drm...
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Load Kernel Module efi_pstore...
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Load Kernel Module fuse...
+[一 10月 26 19:35:05 2026] systemd[1]: Starting NVIDIA specific first-boot udev script...
+[一 10月 26 19:35:05 2026] fuse: init (API version 7.34)
+[一 10月 26 19:35:05 2026] systemd[1]: Started Nameserver information manager.
+[一 10月 26 19:35:05 2026] systemd[1]: Reached target Preparation for Network.
+[一 10月 26 19:35:05 2026] systemd[1]: Condition check resulted in File System Check on Root Device being skipped.
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Load Kernel Modules...
+[一 10月 26 19:35:05 2026] nvsciipc: loading out-of-tree module taints kernel.
+[一 10月 26 19:35:05 2026] nvsciipc: loaded module
+[一 10月 26 19:35:05 2026] nvmap_heap_init: nvmap_heap_init: created heap block cache
+[一 10月 26 19:35:05 2026] nvmap_page_pool_init: Total RAM pages: 1950695
+[一 10月 26 19:35:05 2026] nvmap_page_pool_init: nvmap page pool size: 243836 pages (952 MB)
+[一 10月 26 19:35:05 2026] nvmap_background_zero_thread: PP zeroing thread starting.
+[一 10月 26 19:35:05 2026] tegra-host1x 13e00000.host1x: Adding to iommu group 8
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.0: Adding to iommu group 9
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.1: Adding to iommu group 10
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.2: Adding to iommu group 11
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.3: Adding to iommu group 12
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.4: Adding to iommu group 13
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.5: Adding to iommu group 14
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.6: Adding to iommu group 15
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.7: Adding to iommu group 16
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.8: Adding to iommu group 17
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.9: Adding to iommu group 18
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.10: Adding to iommu group 19
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.11: Adding to iommu group 20
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.12: Adding to iommu group 21
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.13: Adding to iommu group 22
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.14: Adding to iommu group 23
+[一 10月 26 19:35:05 2026] host1x-context host1x-ctx.15: Adding to iommu group 24
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Remount Root and Kernel File Systems...
+[一 10月 26 19:35:05 2026] EXT4-fs (nvme0n1p1): re-mounted. Opts: (null). Quota mode: none.
+[一 10月 26 19:35:05 2026] systemd[1]: Starting Coldplug All udev Devices...
+[一 10月 26 19:35:05 2026] nvgpu: 17000000.gpu          nvgpu_nvhost_syncpt_init:122  [INFO]  syncpt_unit_base 60000000 syncpt_unit_size 4000000 size 10000
+
+[一 10月 26 19:35:05 2026] systemd[1]: Started Journal Service.
+[一 10月 26 19:35:05 2026] systemd-journald[247]: Received client request to flush runtime journal.
+[一 10月 26 19:35:05 2026] mc: Linux media interface: v0.10
+[一 10月 26 19:35:05 2026] tegra-soc-hwpm f100000.hwpm: Adding to iommu group 25
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:vi0-thi@15f00000: Adding to iommu group 26
+[一 10月 26 19:35:05 2026] videodev: Linux video capture interface: v2.00
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:vi0-thi@15f00000: syncpt_unit_base 60000000 syncpt_unit_size 4000000 size 10000
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:vi1-thi@14f00000: Adding to iommu group 27
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:vi1-thi@14f00000: syncpt_unit_base 60000000 syncpt_unit_size 4000000 size 10000
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:isp-thi@14b00000: Adding to iommu group 28
+[一 10月 26 19:35:05 2026] scare-pigeon 13e00000.host1x:isp-thi@14b00000: syncpt_unit_base 60000000 syncpt_unit_size 4000000 size 10000
+[一 10月 26 19:35:05 2026] tegra-vic 15340000.vic: Adding to iommu group 29
+[一 10月 26 19:35:05 2026] Inserting ivc_ext.ko module
+[一 10月 26 19:35:05 2026] tegra-nvdec 15480000.nvdec: Adding to iommu group 30
+[一 10月 26 19:35:05 2026] tegra-nvjpg 15380000.nvjpg: Adding to iommu group 31
+[一 10月 26 19:35:05 2026] tegra-nvjpg 15540000.nvjpg: Adding to iommu group 32
+[一 10月 26 19:35:05 2026] tegra186-cam-rtcpu bc00000.rtcpu: Adding to iommu group 33
+[一 10月 26 19:35:05 2026] tegra186-cam-rtcpu bc00000.rtcpu: Trace buffer configured at IOVA=0xbff00000
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus: region 0: iova=0xbfec0000-0xbfee027f size=131712
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:echo@0: echo: ver=0 grp=1 RX[16x64]=0x1000-0x1480 TX[16x64]=0x1480-0x1900
+[一 10月 26 19:35:05 2026] tegra-ofa 15a50000.ofa: Adding to iommu group 34
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:dbg@1: dbg: ver=0 grp=1 RX[1x512]=0x1900-0x1b80 TX[1x512]=0x1b80-0x1e00
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:dbg@2: dbg: ver=0 grp=1 RX[1x8192]=0x1e00-0x3e80 TX[1x8192]=0x3e80-0x5f00
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:ivccontrol@3: ivccontrol: ver=0 grp=1 RX[64x320]=0x5f00-0xaf80 TX[64x320]=0xaf80-0x10000
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:ivccapture@4: ivccapture: ver=0 grp=1 RX[512x64]=0x10000-0x18080 TX[512x64]=0x18080-0x20100
+[一 10月 26 19:35:05 2026] drm drm: [drm] Cannot find any crtc or sizes
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:diag@5: diag: ver=0 grp=1 RX[1x64]=0x20100-0x201c0 TX[1x64]=0x201c0-0x20280
+[一 10月 26 19:35:05 2026] tegra186-cam-rtcpu bc00000.rtcpu: using cam RTCPU IRQ (219)
+[一 10月 26 19:35:05 2026] tegra186-cam-rtcpu bc00000.rtcpu: tegra_camrtc_mon_create is successful
+[一 10月 26 19:35:05 2026] tegra186-cam-rtcpu bc00000.rtcpu: firmware version cpu=rce cmd=6 sha1=e2238c99959d2df9350d393f04e1f44e5bef98cb
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:echo@0: ivc channel driver missing
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:dbg@1: ivc channel driver missing
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:dbg@2: ivc channel driver missing
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:ivccontrol@3: ivc channel driver missing
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:ivccapture@4: ivc channel driver missing
+[一 10月 26 19:35:05 2026] tegra-ivc-bus bc00000.rtcpu:ivc-bus:diag@5: ivc channel driver missing
+[一 10月 26 19:35:05 2026] [drm] Initialized tegra 1.0.99 20120330 for drm on minor 0
+[一 10月 26 19:35:05 2026] [RCE] TCU debug prints will be routed to traces.
+[一 10月 26 19:35:05 2026] tegra194-isp5 14800000.isp: Adding to iommu group 28
+[一 10月 26 19:35:05 2026] tegra194-vi5 13e00000.host1x:vi0@15c00000: Adding to iommu group 26
+[一 10月 26 19:35:05 2026] driver not enabled, cannot register any devices
+[一 10月 26 19:35:05 2026] driver not enabled, cannot register any devices
+[一 10月 26 19:35:05 2026] driver not enabled, cannot register any devices
+[一 10月 26 19:35:05 2026] tegra194-vi5 13e00000.host1x:vi1@14c00000: Adding to iommu group 27
+[一 10月 26 19:35:05 2026] (NULL device *): fops function table already registered
+[一 10月 26 19:35:05 2026] driver not enabled, cannot register any devices
+[一 10月 26 19:35:05 2026] tegra194-pcie 141e0000.pcie: Phy link never came up
+[一 10月 26 19:35:05 2026] tegra194-pcie 141e0000.pcie: PCI host bridge to bus 0007:00
+[一 10月 26 19:35:05 2026] pci_bus 0007:00: root bus resource [io  0x200000-0x2fffff] (bus address [0x3e100000-0x3e1fffff])
+[一 10月 26 19:35:05 2026] pci_bus 0007:00: root bus resource [mem 0x3228000000-0x322fffffff] (bus address [0x40000000-0x47ffffff])
+[一 10月 26 19:35:05 2026] pci_bus 0007:00: root bus resource [bus 00-ff]
+[一 10月 26 19:35:05 2026] pci_bus 0007:00: root bus resource [mem 0x3000000000-0x3227ffffff pref]
+[一 10月 26 19:35:05 2026] pci 0007:00:00.0: [10de:229a] type 01 class 0x060400
+[一 10月 26 19:35:05 2026] pci 0007:00:00.0: PME# supported from D0 D3hot
+[一 10月 26 19:35:05 2026] pci 0007:00:00.0: PCI bridge to [bus 01-ff]
+[一 10月 26 19:35:05 2026] pcieport 0007:00:00.0: Adding to iommu group 7
+[一 10月 26 19:35:05 2026] pcieport 0007:00:00.0: PME: Signaling with IRQ 195
+[一 10月 26 19:35:05 2026] pcieport 0007:00:00.0: AER: enabled with IRQ 195
+[一 10月 26 19:35:05 2026] pci_bus 0007:01: busn_res: [bus 01-ff] is released
+[一 10月 26 19:35:05 2026] pci 0007:00:00.0: Removing from iommu group 7
+[一 10月 26 19:35:05 2026] pci_bus 0007:00: busn_res: [bus 00-ff] is released
+[一 10月 26 19:35:05 2026] tegra194-pcie 140a0000.pcie: Adding to iommu group 35
+[一 10月 26 19:35:06 2026] nvvrs_pseq 4-003c: NVVRS Vendor ID: 0x9
+[一 10月 26 19:35:06 2026] nvvrs_pseq 4-003c: NVVRS Model Rev: 0x82
+[一 10月 26 19:35:06 2026] nvvrs_pseq 4-003c: NVVRS PSEQ probe successful
+[一 10月 26 19:35:06 2026] tegra-dce d800000.dce: Adding to iommu group 36
+[一 10月 26 19:35:06 2026] dce: dce_ipc_channel_init:311  Invalid Channel State [0x0] for ch_type [2]
+[一 10月 26 19:35:06 2026] dce: tegra_dce_probe:245  Found display consumer device
+[一 10月 26 19:35:06 2026] dce: dce_mailbox_set_full_interrupt:157  Intr bit set multiple times for MB : [0x5]
+[一 10月 26 19:35:06 2026] dce: dce_mailbox_set_full_interrupt:157  Intr bit set multiple times for MB : [0x5]
+[一 10月 26 19:35:06 2026] dce: dce_admin_send_cmd_ver:456  version : [0x3] err : [0x0]
+[一 10月 26 19:35:06 2026] dce: dce_mailbox_set_full_interrupt:157  Intr bit set multiple times for MB : [0x1]
+[一 10月 26 19:35:06 2026] dce: dce_admin_setup_clients_ipc:585  Channel Reset Complete for Type [1] ...
+[一 10月 26 19:35:06 2026] dce: dce_admin_setup_clients_ipc:561  Get queue info failed for [2]
+[一 10月 26 19:35:06 2026] dce: dce_mailbox_set_full_interrupt:157  Intr bit set multiple times for MB : [0x2]
+[一 10月 26 19:35:06 2026] dce: dce_admin_setup_clients_ipc:585  Channel Reset Complete for Type [3] ...
+[一 10月 26 19:35:06 2026] dce: dce_start_boot_flow:166  DCE_BOOT_DONE
+[一 10月 26 19:35:06 2026] spi-tegra114 3210000.spi: Adding to iommu group 1
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: host bridge /bus@0/pcie@140a0000 ranges:
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie:      MEM 0x3240000000..0x3527ffffff -> 0x3240000000
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie:      MEM 0x3528000000..0x352fffffff -> 0x0040000000
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie:       IO 0x002a100000..0x002a1fffff -> 0x002a100000
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: iATU unroll: enabled
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: Detected iATU regions: 8 outbound, 2 inbound
+[一 10月 26 19:35:06 2026] nv_platform 13800000.display: Adding to iommu group 37
+[一 10月 26 19:35:06 2026] platform 13800000.display:nvdisplay-niso: Adding to iommu group 38
+[一 10月 26 19:35:06 2026] spi-tegra114 3230000.spi: Adding to iommu group 1
+[一 10月 26 19:35:06 2026] at24 0-0050: 256 byte 24c02 EEPROM, read-only
+[一 10月 26 19:35:06 2026] at24 0-0057: 256 byte 24c02 EEPROM, read-only
+[一 10月 26 19:35:06 2026] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[一 10月 26 19:35:06 2026] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[一 10月 26 19:35:06 2026] cfg80211: Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[一 10月 26 19:35:06 2026] tegra-hda 3510000.hda: Adding to iommu group 39
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: Link up
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: Link up
+[一 10月 26 19:35:06 2026] tegra194-pcie 140a0000.pcie: PCI host bridge to bus 0008:00
+[一 10月 26 19:35:06 2026] pci_bus 0008:00: root bus resource [io  0x300000-0x3fffff] (bus address [0x2a100000-0x2a1fffff])
+[一 10月 26 19:35:06 2026] pci_bus 0008:00: root bus resource [mem 0x3528000000-0x352fffffff] (bus address [0x40000000-0x47ffffff])
+[一 10月 26 19:35:06 2026] pci_bus 0008:00: root bus resource [bus 00-ff]
+[一 10月 26 19:35:06 2026] pci_bus 0008:00: root bus resource [mem 0x3240000000-0x3527ffffff pref]
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0: [10de:229c] type 01 class 0x060400
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0: PME# supported from D0 D3hot
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: [10ec:8168] type 00 class 0x020000
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: reg 0x10: [io  0x0000-0x00ff]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: reg 0x18: [mem 0x00000000-0x00000fff 64bit]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: reg 0x20: [mem 0x00000000-0x00003fff 64bit]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: supports D1 D2
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: PME# supported from D0 D1 D2 D3hot D3cold
+[一 10月 26 19:35:06 2026] input: NVIDIA Jetson Orin Nano HDA HDMI/DP,pcm=3 as /devices/platform/bus@0/3510000.hda/sound/card0/input1
+[一 10月 26 19:35:06 2026] rtl88x2ce 0001:01:00.0: Adding to iommu group 4
+[一 10月 26 19:35:06 2026] rtl88x2ce 0001:01:00.0: enabling device (0000 -> 0003)
+[一 10月 26 19:35:06 2026] input: NVIDIA Jetson Orin Nano HDA HDMI/DP,pcm=7 as /devices/platform/bus@0/3510000.hda/sound/card0/input2
+[一 10月 26 19:35:06 2026] input: NVIDIA Jetson Orin Nano HDA HDMI/DP,pcm=8 as /devices/platform/bus@0/3510000.hda/sound/card0/input3
+[一 10月 26 19:35:06 2026] input: NVIDIA Jetson Orin Nano HDA HDMI/DP,pcm=9 as /devices/platform/bus@0/3510000.hda/sound/card0/input4
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0: BAR 14: assigned [mem 0x3528000000-0x35280fffff]
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0: BAR 13: assigned [io  0x300000-0x300fff]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: BAR 4: assigned [mem 0x3528000000-0x3528003fff 64bit]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: BAR 2: assigned [mem 0x3528004000-0x3528004fff 64bit]
+[一 10月 26 19:35:06 2026] pci 0008:01:00.0: BAR 0: assigned [io  0x300000-0x3000ff]
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0: PCI bridge to [bus 01-ff]
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0:   bridge window [io  0x300000-0x300fff]
+[一 10月 26 19:35:06 2026] pci 0008:00:00.0:   bridge window [mem 0x3528000000-0x35280fffff]
+[一 10月 26 19:35:06 2026] tegra234-aon c000000.aon: Adding to iommu group 40
+[一 10月 26 19:35:06 2026] gic 2a41000.interrupt-controller: GIC IRQ controller registered
+[一 10月 26 19:35:06 2026]  c000000.aon:hsp: probed
+[一 10月 26 19:35:06 2026] tegra-aconnect bus@0:aconnect@2900000: Tegra ACONNECT bus registered
+[一 10月 26 19:35:06 2026] tegra234-aon c000000.aon: init done
+[一 10月 26 19:35:06 2026] pcieport 0008:00:00.0: Adding to iommu group 35
+[一 10月 26 19:35:06 2026] pcieport 0008:00:00.0: PME: Signaling with IRQ 189
+[一 10月 26 19:35:06 2026] irq: IRQ242: trimming hierarchy from :bus@0:pmc@c360000
+[一 10月 26 19:35:06 2026] fusb301 1-0025: device id: 0x12
+[一 10月 26 19:35:06 2026] pcieport 0008:00:00.0: AER: enabled with IRQ 189
+[一 10月 26 19:35:06 2026] CAN device driver interface
+[一 10月 26 19:35:06 2026] thermal-trip-event cpu-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] TT CAN feature is not supported
+[一 10月 26 19:35:06 2026] 	 Message RAM Configuration
+                             	| base addr   |0x0c312000|
+                             	| sidfc_flssa |0x00000000|
+                             	| xidfc_flesa |0x00000040|
+                             	| rxf0c_f0sa  |0x000000c0|
+                             	| rxf1c_f1sa  |0x000009c0|
+                             	| rxbc_rbsa   |0x000009c0|
+                             	| txefc_efsa  |0x000009c0|
+                             	| txbc_tbsa   |0x00000a40|
+                             	| tmc_tmsa    |0x00000ec0|
+                             	| mram size   |0x00001000|
+[一 10月 26 19:35:06 2026] thermal-trip-event gpu-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event cv0-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event cv1-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event cv2-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event soc0-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event soc1-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] thermal-trip-event soc2-throttle-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] Release 3.2.3 from 09.06.2018
+[一 10月 26 19:35:06 2026] thermal-trip-event hot-surface-alert: cooling device registered.
+[一 10月 26 19:35:06 2026] fusb301 1-0025: toggle_time(0) is not updated
+[一 10月 26 19:35:06 2026] fusb301 1-0025: fusb301_set_mode: mode (32)(32)
+[一 10月 26 19:35:06 2026] fusb301 1-0025: fusb301_detach: type[0x00] chipstate[0x01]
+[一 10月 26 19:35:06 2026] fusb301 1-0025: fusb_update_state: 1
+[一 10月 26 19:35:06 2026] fusb301 1-0025: mode[0x20], host_cur[0x02], dttime[0x00]
+[一 10月 26 19:35:06 2026] net can0: mttcan device registered (regs=00000000a04c34a5, irq=201)
+[一 10月 26 19:35:06 2026] usbcore: registered new interface driver btusb
+[一 10月 26 19:35:06 2026] rtk_btusb: Realtek Bluetooth USB driver ver 3.1.6fd4e69.20220818-105856
+[一 10月 26 19:35:06 2026] rtk_btcoex: rtk_btcoex_init: version: 1.2
+[一 10月 26 19:35:06 2026] rtk_btcoex: create workqueue
+[一 10月 26 19:35:06 2026] Bluetooth: hci0: RTL: examining hci_ver=0a hci_rev=000c lmp_ver=0a lmp_subver=8822
+[一 10月 26 19:35:06 2026] Bluetooth: hci0: RTL: rom_version status=0 version=3
+[一 10月 26 19:35:06 2026] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_fw.bin
+[一 10月 26 19:35:06 2026] rtk_btcoex: alloc buffers 1792, 2432 for ev and l2
+[一 10月 26 19:35:06 2026] usbcore: registered new interface driver rtk_btusb
+[一 10月 26 19:35:06 2026] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cu_config.bin
+[一 10月 26 19:35:06 2026] Bluetooth: hci0: RTL: cfg_sz 6, total sz 35086
+[一 10月 26 19:35:06 2026] 88XXau_wfb: module verification failed: signature and/or required key missing - tainting kernel
+[一 10月 26 19:35:06 2026] loop0: detected capacity change from 0 to 8
+[一 10月 26 19:35:06 2026] loop1: detected capacity change from 0 to 378768
+[一 10月 26 19:35:06 2026] loop2: detected capacity change from 0 to 391440
+[一 10月 26 19:35:06 2026] loop3: detected capacity change from 0 to 141232
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] loop4: detected capacity change from 0 to 141288
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] loop5: detected capacity change from 0 to 126688
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] loop6: detected capacity change from 0 to 126640
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] loop7: detected capacity change from 0 to 110976
+[一 10月 26 19:35:06 2026] loop8: detected capacity change from 0 to 98056
+[一 10月 26 19:35:06 2026] loop9: detected capacity change from 0 to 98784
+[一 10月 26 19:35:06 2026] loop10: detected capacity change from 0 to 1257552
+[一 10月 26 19:35:06 2026] loop11: detected capacity change from 0 to 187776
+[一 10月 26 19:35:06 2026] nvvrs-pseq-rtc nvvrs-pseq-rtc: registered as rtc0
+[一 10月 26 19:35:06 2026] nvvrs-pseq-rtc nvvrs-pseq-rtc: setting system clock to 1970-01-01T00:00:33 UTC (33)
+[一 10月 26 19:35:06 2026] loop12: detected capacity change from 0 to 357512
+[一 10月 26 19:35:06 2026] loop13: detected capacity change from 0 to 90656
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] r8168 0008:01:00.0: Adding to iommu group 35
+[一 10月 26 19:35:06 2026] r8168 Gigabit Ethernet driver 8.053.00-NAPI loaded
+[一 10月 26 19:35:06 2026] r8168 0008:01:00.0: enabling device (0000 -> 0003)
+[一 10月 26 19:35:06 2026] loop14: detected capacity change from 0 to 90800
+[一 10月 26 19:35:06 2026] rtl88x2ce 0001:01:00.0 wlP1p1s0: renamed from wlan0
+[一 10月 26 19:35:06 2026] squashfs: SQUASHFS error: Xattrs in filesystem, these will be ignored
+[一 10月 26 19:35:06 2026] unable to read xattr id index table
+[一 10月 26 19:35:06 2026] tegra-adma 2930000.dma-controller: Tegra210 ADMA driver registered 32 channels
+[一 10月 26 19:35:06 2026] r8168: This product is covered by one or more of the following patents: US6,570,884, US6,115,776, and US6,327,625.
+[一 10月 26 19:35:06 2026] r8168  Copyright (C) 2024 Realtek NIC software team <nicfae@realtek.com> 
+                              This program comes with ABSOLUTELY NO WARRANTY; for details, please see <http://www.gnu.org/licenses/>. 
+                              This is free software, and you are welcome to redistribute it under certain conditions; see <http://www.gnu.org/licenses/>. 
+[一 10月 26 19:35:06 2026] r8168 0008:01:00.0 enP8p1s0: renamed from eth0
+[一 10月 26 19:35:07 2026] tegra210-admaif 290f000.admaif: Adding to iommu group 41
+[一 10月 26 19:35:07 2026] Bluetooth: hci0: RTL: fw version 0x19b76d7d
+[一 10月 26 19:35:09 2026] using random self ethernet address
+[一 10月 26 19:35:09 2026] using random host ethernet address
+[一 10月 26 19:35:09 2026] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[一 10月 26 19:35:09 2026] Bluetooth: BNEP filters: protocol multicast
+[一 10月 26 19:35:09 2026] Bluetooth: BNEP socket layer initialized
+[一 10月 26 19:35:09 2026] NET: Registered PF_ALG protocol family
+[一 10月 26 19:35:09 2026] loop15: detected capacity change from 0 to 32768
+[一 10月 26 19:35:09 2026] nv_nvsciipc_init.sh[754]: found /dev/nvsciipc
+[一 10月 26 19:35:09 2026] nvsciipc: set_db start
+[一 10月 26 19:35:09 2026] nvsciipc: set_db done
+[一 10月 26 19:35:09 2026] enP8p1s0: 0xffff800008939000, 3c:6d:66:b5:0c:0b, IRQ 252
+[一 10月 26 19:35:09 2026] Mass Storage Function, version: 2009/09/11
+[一 10月 26 19:35:09 2026] LUN: removable file: (no medium)
+[一 10月 26 19:35:09 2026] using random self ethernet address
+[一 10月 26 19:35:09 2026] using random host ethernet address
+[一 10月 26 19:35:09 2026] pstore: Using crash dump compression: deflate
+[一 10月 26 19:35:09 2026] printk: console [ramoops-1]: printing thread started
+[一 10月 26 19:35:09 2026] printk: console [ramoops-1] enabled
+[一 10月 26 19:35:09 2026] pstore: Registered ramoops as persistent store backend
+[一 10月 26 19:35:09 2026] ramoops: using 0x200000@0x2725f0000, ecc: 0
+[一 10月 26 19:35:09 2026] usbcore: registered new interface driver rtl88xxau_wfb
+[一 10月 26 19:35:09 2026] usb 1-2.1: USB disconnect, device number 4
+[一 10月 26 19:35:09 2026] usb 2-1.1: new SuperSpeed USB device number 3 using tegra-xusb
+[一 10月 26 19:35:09 2026] usb 2-1.1: Int endpoint with wBytesPerInterval of 512 in config 1 interface 0 altsetting 0 ep 133: setting to 64
+[一 10月 26 19:35:09 2026] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+[一 10月 26 19:35:09 2026] usb0: HOST MAC 16:fd:dc:6d:67:90
+[一 10月 26 19:35:09 2026] usb0: MAC 16:fd:dc:6d:67:91
+[一 10月 26 19:35:09 2026] usb1: HOST MAC 16:fd:dc:6d:67:92
+[一 10月 26 19:35:09 2026] usb1: MAC 16:fd:dc:6d:67:93
+[一 10月 26 19:35:09 2026] tegra-xudc 3550000.usb: EP 0 (type: ctrl, dir: out) enabled
+[一 10月 26 19:35:09 2026] l4tbr0: port 1(usb0) entered blocking state
+[一 10月 26 19:35:09 2026] l4tbr0: port 1(usb0) entered disabled state
+[一 10月 26 19:35:09 2026] device usb0 entered promiscuous mode
+[一 10月 26 19:35:09 2026] l4tbr0: port 2(usb1) entered blocking state
+[一 10月 26 19:35:09 2026] l4tbr0: port 2(usb1) entered disabled state
+[一 10月 26 19:35:09 2026] device usb1 entered promiscuous mode
+[一 10月 26 19:35:09 2026] loop15: detected capacity change from 0 to 32768
+[一 10月 26 19:35:10 2026] nvgpu: 17000000.gpu                  gk20a_scale_init:541  [INFO]  enabled scaling for GPU
+
+[一 10月 26 19:35:11 2026] zram: Added device: zram0
+[一 10月 26 19:35:11 2026] zram: Added device: zram1
+[一 10月 26 19:35:11 2026] zram: Added device: zram2
+[一 10月 26 19:35:11 2026] zram: Added device: zram3
+[一 10月 26 19:35:11 2026] zram: Added device: zram4
+[一 10月 26 19:35:11 2026] zram: Added device: zram5
+[一 10月 26 19:35:11 2026] zram0: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram0.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:11 2026] zram1: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram1.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:11 2026] zram2: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram2.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:11 2026] zram3: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram3.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:11 2026] zram4: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram4.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:11 2026] zram5: detected capacity change from 0 to 1300464
+[一 10月 26 19:35:11 2026] Adding 650228k swap on /dev/zram5.  Priority:5 extents:1 across:650228k SS
+[一 10月 26 19:35:12 2026] nvidia-modeset: Loading NVIDIA UNIX Open Kernel Mode Setting Driver for aarch64  540.4.0  Release Build  (buildbrain@mobile-u64-6336-d8000)  Tue Jan  7 17:35:14 PST 2025
+[一 10月 26 19:35:12 2026] [drm] [nvidia-drm] [GPU ID 0x00020000] Loading driver
+[一 10月 26 19:35:12 2026] NVRM rpcRmApiControl_dce: NVRM_RPC_DCE: Failed RM ctrl call cmd:0x731341 result 0xffff:
+[一 10月 26 19:35:12 2026] [drm] Initialized nvidia-drm 0.0.0 20160202 for 13800000.display on minor 1
+[一 10月 26 19:35:12 2026] nv_platform 13800000.display: [drm] Cannot find any crtc or sizes
+[一 10月 26 19:35:12 2026] rtl88xxau_wfb 2-1.1:1.0 wlxfc221c100157: renamed from wlan0
+[一 10月 26 19:35:14 2026] loop16: detected capacity change from 0 to 8
+[一 10月 26 19:35:16 2026] rfkill: input handler disabled
+[一 10月 26 19:35:19 2026] audit: type=1326 audit(1791633543.051:2): auid=4294967295 uid=0 gid=0 ses=4294967295 subj=kernel pid=2090 comm="cupsd" exe="/snap/cups/1261/sbin/cupsd" sig=0 arch=c00000b7 syscall=55 compat=0 ip=0xffffb49a79cc code=0x50000
+[一 10月 26 19:35:19 2026] audit: type=1326 audit(1791633543.143:3): auid=4294967295 uid=0 gid=0 ses=4294967295 subj=kernel pid=2090 comm="cupsd" exe="/snap/cups/1261/sbin/cupsd" sig=0 arch=c00000b7 syscall=55 compat=0 ip=0xffffb49a79cc code=0x50000
+[一 10月 26 19:35:19 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 19:35:56 2026] nvgpu: 17000000.gpu             railgate_enable_store:365  [INFO]  railgate is disabled.
+[一 10月 26 19:38:11 2026] r8168: enP8p1s0: link up
+[一 10月 26 19:38:11 2026] IPv6: ADDRCONF(NETDEV_CHANGE): enP8p1s0: link becomes ready
+[一 10月 26 20:42:38 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:42:54 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 20:44:56 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:45:02 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 20:52:57 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:53:15 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 20:53:25 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:54:21 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 20:55:24 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:56:11 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 20:56:57 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 20:59:46 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:00:35 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:02:02 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:03:30 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:04:12 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:04:27 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:06:17 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:07:04 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:08:12 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:08:38 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:09:53 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:10:21 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:13:09 2026] audit: type=1326 audit(1793020389.980:4): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=18999 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb4a9668 code=0x50000
+[一 10月 26 21:14:46 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:15:09 2026] audit: type=1326 audit(1793020510.624:5): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20042 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff843b9668 code=0x50000
+[一 10月 26 21:16:34 2026] audit: type=1326 audit(1793020595.468:6): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20539 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9fd59668 code=0x50000
+[一 10月 26 21:17:56 2026] audit: type=1326 audit(1793020677.316:7): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=20939 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91729668 code=0x50000
+[一 10月 26 21:19:44 2026] audit: type=1326 audit(1793020785.276:8): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=21300 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9a5d9668 code=0x50000
+[一 10月 26 21:20:59 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:21:14 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:22:19 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:22:33 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:23:37 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:23:48 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:25:34 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:25:43 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:25:44 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:25:46 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:26:24 2026] audit: type=1326 audit(1793021185.292:9): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=23702 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87f79668 code=0x50000
+[一 10月 26 21:26:40 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:27:11 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:27:27 2026] audit: type=1326 audit(1793021248.020:10): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=24730 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa2ce9668 code=0x50000
+[一 10月 26 21:29:16 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:29:25 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:31:34 2026] audit: type=1326 audit(1793021494.856:11): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=25581 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa9e99668 code=0x50000
+[一 10月 26 21:32:09 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:40:03 2026] audit: type=1326 audit(1793022003.912:12): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=27545 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff85f39668 code=0x50000
+[一 10月 26 21:40:24 2026] audit: type=1326 audit(1793022025.716:13): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=27908 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9f149668 code=0x50000
+[一 10月 26 21:40:52 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:41:15 2026] audit: type=1326 audit(1793022076.604:14): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=28831 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff84349668 code=0x50000
+[一 10月 26 21:43:49 2026] audit: type=1326 audit(1793022229.796:15): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=29609 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaea39668 code=0x50000
+[一 10月 26 21:45:17 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 21:45:27 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 21:48:32 2026] audit: type=1326 audit(1793022513.596:16): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=30946 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c419668 code=0x50000
+[一 10月 26 21:53:13 2026] audit: type=1326 audit(1793022794.436:17): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=31820 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ca19668 code=0x50000
+[一 10月 26 22:00:12 2026] audit: type=1326 audit(1793023213.164:18): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=33464 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbc9c9668 code=0x50000
+[一 10月 26 22:13:43 2026] audit: type=1326 audit(1793024024.016:19): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=35463 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c2e9668 code=0x50000
+[一 10月 26 22:22:30 2026] audit: type=1326 audit(1793024550.928:20): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=37092 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91f09668 code=0x50000
+[一 10月 26 22:31:41 2026] audit: type=1326 audit(1793025101.816:21): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=38176 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87249668 code=0x50000
+[一 10月 26 22:33:39 2026] audit: type=1326 audit(1793025220.160:22): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=38886 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffba819668 code=0x50000
+[一 10月 26 22:36:46 2026] audit: type=1326 audit(1793025407.520:23): auid=1000 uid=1000 gid=1000 ses=194 subj=kernel pid=39751 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff879c9668 code=0x50000
+[一 10月 26 23:15:20 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 23:26:48 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 23:29:24 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 23:29:25 2026] device wlxfc221c100157 entered promiscuous mode
+[一 10月 26 23:41:53 2026] device wlxfc221c100157 left promiscuous mode
+[一 10月 26 23:44:06 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 00:26:14 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 00:26:16 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 02:17:54 2026] audit: type=1326 audit(1793038674.944:24): auid=1000 uid=1000 gid=1000 ses=3 subj=kernel pid=68874 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8cac9668 code=0x50000
+[二 10月 27 08:34:05 2026] r8168: enP8p1s0: link down
+[二 10月 27 09:51:10 2026] r8168: enP8p1s0: link up
+[二 10月 27 10:22:14 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 10:22:15 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 10:27:38 2026] audit: type=1326 audit(1793068059.472:25): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=152007 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9ab19668 code=0x50000
+[二 10月 27 10:28:22 2026] audit: type=1326 audit(1793068103.396:26): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=152600 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88a59668 code=0x50000
+[二 10月 27 10:29:34 2026] audit: type=1326 audit(1793068175.664:27): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153028 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb1659668 code=0x50000
+[二 10月 27 10:30:51 2026] audit: type=1326 audit(1793068252.152:28): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153477 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9cd99668 code=0x50000
+[二 10月 27 10:31:03 2026] audit: type=1326 audit(1793068263.920:29): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=153734 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93029668 code=0x50000
+[二 10月 27 10:31:49 2026] audit: type=1326 audit(1793068310.148:30): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154103 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff7efd9668 code=0x50000
+[二 10月 27 10:32:26 2026] audit: type=1326 audit(1793068347.608:31): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154394 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa9f9668 code=0x50000
+[二 10月 27 10:32:42 2026] audit: type=1326 audit(1793068362.960:32): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154653 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93159668 code=0x50000
+[二 10月 27 10:33:33 2026] audit: type=1326 audit(1793068414.136:33): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=154967 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff7e789668 code=0x50000
+[二 10月 27 10:34:00 2026] audit: type=1326 audit(1793068441.176:34): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155284 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8e319668 code=0x50000
+[二 10月 27 10:34:25 2026] audit: type=1326 audit(1793068466.216:35): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155583 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff841f9668 code=0x50000
+[二 10月 27 10:34:54 2026] audit: type=1326 audit(1793068494.980:36): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=155912 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa749668 code=0x50000
+[二 10月 27 10:35:54 2026] audit: type=1326 audit(1793068555.360:37): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156357 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff96da9668 code=0x50000
+[二 10月 27 10:35:55 2026] audit: type=1326 audit(1793068556.684:38): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156617 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9beb9668 code=0x50000
+[二 10月 27 10:36:30 2026] audit: type=1326 audit(1793068590.960:39): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=156921 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb909668 code=0x50000
+[二 10月 27 10:39:28 2026] audit: type=1326 audit(1793068769.376:40): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=158129 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91c49668 code=0x50000
+[二 10月 27 10:41:19 2026] audit: type=1326 audit(1793068880.464:41): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=158613 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb46f9668 code=0x50000
+[二 10月 27 10:43:58 2026] audit: type=1326 audit(1793069039.012:42): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159148 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff93349668 code=0x50000
+[二 10月 27 10:44:00 2026] audit: type=1326 audit(1793069041.440:43): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159441 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8b949668 code=0x50000
+[二 10月 27 10:44:01 2026] audit: type=1326 audit(1793069042.644:44): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=159745 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ee59668 code=0x50000
+[二 10月 27 10:46:04 2026] audit: type=1326 audit(1793069165.492:45): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160238 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c369668 code=0x50000
+[二 10月 27 10:46:21 2026] audit: type=1326 audit(1793069182.504:46): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160572 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb91a9668 code=0x50000
+[二 10月 27 10:46:21 2026] audit: type=1326 audit(1793069182.524:47): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=160579 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff9a159668 code=0x50000
+[二 10月 27 10:47:19 2026] audit: type=1326 audit(1793069239.952:48): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161302 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb2a59668 code=0x50000
+[二 10月 27 10:47:37 2026] audit: type=1326 audit(1793069258.564:49): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161630 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8a1e9668 code=0x50000
+[二 10月 27 10:47:39 2026] audit: type=1326 audit(1793069260.200:50): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=161910 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbac19668 code=0x50000
+[二 10月 27 10:47:40 2026] audit: type=1326 audit(1793069261.516:51): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162215 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb0209668 code=0x50000
+[二 10月 27 10:47:42 2026] audit: type=1326 audit(1793069262.980:52): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162508 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffafd69668 code=0x50000
+[二 10月 27 10:47:45 2026] audit: type=1326 audit(1793069266.036:53): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=162827 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff91e49668 code=0x50000
+[二 10月 27 10:48:02 2026] audit: type=1326 audit(1793069282.736:54): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163136 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffba919668 code=0x50000
+[二 10月 27 10:48:03 2026] audit: type=1326 audit(1793069284.104:55): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163415 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ed89668 code=0x50000
+[二 10月 27 10:48:21 2026] audit: type=1326 audit(1793069301.744:56): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=163699 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffaa1f9668 code=0x50000
+[二 10月 27 10:48:46 2026] audit: type=1326 audit(1793069327.540:57): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=164046 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffbb279668 code=0x50000
+[二 10月 27 10:52:32 2026] audit: type=1326 audit(1793069553.668:58): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=164464 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb3cc9668 code=0x50000
+[二 10月 27 11:14:47 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 11:19:22 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 11:31:02 2026] audit: type=1326 audit(1793071863.664:59): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=170527 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88079668 code=0x50000
+[二 10月 27 15:06:11 2026] audit: type=1326 audit(1793084772.228:60): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=173090 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa9b09668 code=0x50000
+[二 10月 27 15:08:07 2026] audit: type=1326 audit(1793084887.740:61): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=173861 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8ab79668 code=0x50000
+[二 10月 27 15:08:08 2026] audit: type=1326 audit(1793084889.484:62): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=174164 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff84549668 code=0x50000
+[二 10月 27 15:08:29 2026] audit: type=1326 audit(1793084910.356:63): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=174494 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb56b9668 code=0x50000
+[二 10月 27 15:08:31 2026] audit: type=1326 audit(1793084912.692:64): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=174766 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87879668 code=0x50000
+[二 10月 27 15:08:34 2026] audit: type=1326 audit(1793084914.908:65): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=175023 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff81ea9668 code=0x50000
+[二 10月 27 15:08:55 2026] audit: type=1326 audit(1793084936.704:66): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=175372 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff87939668 code=0x50000
+[二 10月 27 15:09:24 2026] audit: type=1326 audit(1793084965.536:67): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=175690 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff88439668 code=0x50000
+[二 10月 27 15:09:28 2026] audit: type=1326 audit(1793084969.512:68): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=175994 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb7539668 code=0x50000
+[二 10月 27 15:09:32 2026] audit: type=1326 audit(1793084973.136:69): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=176288 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff890e9668 code=0x50000
+[二 10月 27 15:09:34 2026] audit: type=1326 audit(1793084974.900:70): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=176579 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffac139668 code=0x50000
+[二 10月 27 15:12:32 2026] audit: type=1326 audit(1793085153.292:71): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=177378 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa6219668 code=0x50000
+[二 10月 27 15:13:11 2026] audit: type=1326 audit(1793085191.812:72): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=177879 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff97039668 code=0x50000
+[二 10月 27 15:13:30 2026] audit: type=1326 audit(1793085210.996:73): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=178249 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa7f99668 code=0x50000
+[二 10月 27 15:13:32 2026] audit: type=1326 audit(1793085213.508:74): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=178512 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff80b19668 code=0x50000
+[二 10月 27 15:13:35 2026] audit: type=1326 audit(1793085215.968:75): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=178770 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa0b39668 code=0x50000
+[二 10月 27 15:15:50 2026] audit: type=1326 audit(1793085350.976:76): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=179564 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb21e9668 code=0x50000
+[二 10月 27 15:15:52 2026] audit: type=1326 audit(1793085353.536:77): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=179843 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa2fa9668 code=0x50000
+[二 10月 27 15:15:55 2026] audit: type=1326 audit(1793085356.076:78): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=180112 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb83a9668 code=0x50000
+[二 10月 27 15:17:45 2026] audit: type=1326 audit(1793085465.860:79): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=184515 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff80ae9668 code=0x50000
+[二 10月 27 15:18:46 2026] audit: type=1326 audit(1793085527.560:80): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=186420 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8c9e9668 code=0x50000
+[二 10月 27 15:18:49 2026] audit: type=1326 audit(1793085530.108:81): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=186704 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff7eb09668 code=0x50000
+[二 10月 27 15:18:51 2026] audit: type=1326 audit(1793085532.636:82): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=186979 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffb5439668 code=0x50000
+[二 10月 27 15:20:33 2026] audit: type=1326 audit(1793085634.524:83): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=187633 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffad599668 code=0x50000
+[二 10月 27 15:22:06 2026] audit: type=1326 audit(1793085727.364:84): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=188424 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff95499668 code=0x50000
+[二 10月 27 15:22:09 2026] audit: type=1326 audit(1793085729.960:85): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=188702 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff8b3a9668 code=0x50000
+[二 10月 27 15:22:11 2026] audit: type=1326 audit(1793085732.496:86): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=188959 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff90669668 code=0x50000
+[二 10月 27 15:22:17 2026] audit: type=1326 audit(1793085738.216:87): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=189224 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff890e9668 code=0x50000
+[二 10月 27 16:10:01 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 16:10:29 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 20:23:56 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 20:24:07 2026] device wlxfc221c100157 entered promiscuous mode
+[二 10月 27 20:58:00 2026] audit: type=1326 audit(1793105881.500:88): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=221652 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffa4ae9668 code=0x50000
+[二 10月 27 21:05:18 2026] audit: type=1326 audit(1793106319.464:89): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=223117 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffffada79668 code=0x50000
+[二 10月 27 21:37:49 2026] device wlxfc221c100157 left promiscuous mode
+[二 10月 27 21:38:17 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 01:15:08 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 01:15:16 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 01:19:02 2026] audit: type=1326 audit(1793121543.544:90): auid=1000 uid=1000 gid=1000 ses=217 subj=kernel pid=236060 comm="chrome" exe="/snap/chromium/3498/usr/lib/chromium-browser/chrome" sig=0 arch=c00000b7 syscall=444 compat=0 ip=0xffff97789668 code=0x50000
+[三 10月 28 09:48:45 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 09:48:46 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 09:48:56 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 09:48:58 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:13:21 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:13:24 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:14:37 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:14:39 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:15:52 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:15:54 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:16:58 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:16:59 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:18:33 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:18:34 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:19:51 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:19:53 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:21:16 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:21:18 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:24:01 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:24:04 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:28:58 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:29:00 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:33:16 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:33:18 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:34:19 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:34:20 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:46:24 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:46:25 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 10:47:21 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 10:47:23 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:27:13 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:27:15 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:28:07 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:28:09 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:28:22 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:28:23 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:29:27 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:29:28 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:29:43 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:29:44 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:29:48 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:29:50 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:44:30 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:44:31 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 11:44:39 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 11:44:41 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:07:23 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:07:25 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:07:31 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:07:33 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:10:17 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:10:18 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:15:43 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:15:44 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:15:44 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:15:46 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:18:36 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:18:37 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:19:10 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:19:17 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:19:25 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:19:26 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:21:29 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:21:31 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:21:46 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:21:47 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 12:23:30 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 12:23:31 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:00:20 2026] r8168: enP8p1s0: link down
+[三 10月 28 16:00:56 2026] r8168: enP8p1s0: link up
+[三 10月 28 16:17:27 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:17:28 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:18:05 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:18:05 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:20:11 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:20:12 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:22:06 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:22:06 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:23:38 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:23:39 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:25:27 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:25:28 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:30:38 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:30:39 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:30:50 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:30:51 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:32:13 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:32:14 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:33:01 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:33:02 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:35:10 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:35:12 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:36:15 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:36:16 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:55:31 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:55:32 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:56:07 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:56:08 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 16:57:36 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 16:57:38 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:12:08 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:12:09 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:16:02 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:16:03 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:17:01 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:17:03 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:18:03 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:18:04 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:25:55 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:25:56 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:26:35 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:26:36 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:27:23 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:27:24 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:28:31 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:28:31 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:30:26 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:30:28 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:31:14 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:31:14 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:31:17 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:31:18 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:31:49 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:31:49 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:32:23 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:32:24 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:33:43 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:33:45 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:43:03 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:43:04 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:44:11 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:44:12 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:45:09 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:45:10 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 17:48:50 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 17:48:51 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:01:11 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:01:12 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:02:35 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:02:36 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:04:33 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:04:34 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:13:26 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:13:27 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:13:34 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:13:35 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:30:56 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:30:56 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:33:06 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:33:07 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:41:09 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:41:11 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:41:50 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:41:52 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:42:21 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:42:23 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:43:11 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:43:13 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:43:44 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:43:46 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:45:52 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:45:53 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 18:52:34 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 18:52:41 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 19:57:50 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 19:58:07 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 20:46:09 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 20:46:25 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 21:04:57 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 21:05:14 2026] device wlxfc221c100157 entered promiscuous mode
+[三 10月 28 22:37:26 2026] device wlxfc221c100157 left promiscuous mode
+[三 10月 28 22:42:38 2026] usb 2-1.1: Failed to set U1 timeout to 0x0,error code -110
+[三 10月 28 22:42:44 2026] usb 2-1.1: Set SEL for device-initiated U1 failed.
+[三 10月 28 22:42:50 2026] usb 2-1.1: Set SEL for device-initiated U2 failed.
+[三 10月 28 22:42:50 2026] usb 2-1.1: usb_reset_and_verify_device Failed to disable LPM
+[三 10月 28 22:42:52 2026] usb 2-1-port1: cannot disable (err = -110)
+[三 10月 28 22:43:02 2026] hub 2-1:1.0: hub_ext_port_status failed (err = -110)

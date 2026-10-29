@@ -1,0 +1,15 @@
+{
+  "inputs": [
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T141859Z-single",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T142137Z-matrix",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T142414Z-matrix-retry",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T153723Z-single8-postreboot-startupbaseline",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T172704Z-single8-two-client"
+  ],
+  "excluded_historical_schema": [
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261026T184403Z",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261026T184920Z-retry",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261026T190537Z-clean",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261027T020324Z-transport-params"
+  ]
+}

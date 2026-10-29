@@ -1,0 +1,16 @@
+{
+  "bytes": 8388608,
+  "sha256": "cc391535087dff61febe3e8cd4832a10e0bb40c7c48085263128c584968a8d5b",
+  "hash_seconds": 0.012287195000681095,
+  "received_files": [
+    "uftpd.status",
+    "receiver-console.log",
+    "receiver.json",
+    "received/model-8mib.bin"
+  ],
+  "receiver_stopped": true,
+  "uftpd.log": null,
+  "uftpd.status": "CONNECT;2026/10/28-22:19:45;000000FF;4CCB51CB;10.80.0.1;10.80.0.1\nRESULT;2026/10/28-22:20:38;000000FF;4CCB51CB;model-8mib.bin;8192KB;copied\n",
+  "receiver-console.log": "2026/10/28 22:19:44.501970: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/10/28 22:19:44.502274: Loaded ECDSA key with curve prime256v1 and fingerprint 12:DE:95:FF:46:F3:F9:08:D9:2A:76:8F:78:55:11:39:11:F4:8E:D1\n2026/10/28 22:19:45.059539: [4CCB51CB/00:0]: Received request from 000000FF at 10.80.0.1 (10.80.0.1)\n2026/10/28 22:19:45.059605: [4CCB51CB/00:0]: Using private multicast address 239.255.42.2\n2026/10/28 22:19:45.059730: [4CCB51CB/00:0]: REGISTER sent\n2026/10/28 22:19:45.373855: [4CCB51CB/00:0]: Registration confirmed\n2026/10/28 22:19:45.609623: [4CCB51CB/00:0001]: Name of file to receive: model-8mib.bin\n2026/10/28 22:19:45.609669: [4CCB51CB/00:0001]: Bytes: 8388608, Blocks: 6453, Sections: 1\n2026/10/28 22:19:45.609956: [4CCB51CB/00:0001]: FILEINFO_ACK sent\n2026/10/28 22:20:20.479470: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:20.708529: [4CCB51CB/00:0001]: Sent 1917 NAKs for section 0\n2026/10/28 22:20:22.819122: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:23.047865: [4CCB51CB/00:0001]: Sent 1917 NAKs for section 0\n2026/10/28 22:20:25.955256: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:36.088172: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:36.317483: [4CCB51CB/00:0001]: Sent 87 NAKs for section 0\n2026/10/28 22:20:36.726318: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:36.955054: [4CCB51CB/00:0001]: Sent 87 NAKs for section 0\n2026/10/28 22:20:37.367414: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:38.012271: [4CCB51CB/00:0001]: Got DONE message for section 0\n2026/10/28 22:20:38.012388: [4CCB51CB/00:0001]: File transfer complete\n2026/10/28 22:20:38.012433: [4CCB51CB/00:0001]: COMPLETE sent\n2026/10/28 22:20:38.012468: [4CCB51CB/00:0001]: starting file close\n2026/10/28 22:20:38.012486: [4CCB51CB/00:0001]: done file close\n2026/10/28 22:20:38.202965: [4CCB51CB/00:0]: Got DONE message for group\n2026/10/28 22:20:38.203004: [4CCB51CB/00:0]: Group complete\n2026/10/28 22:20:38.203047: [4CCB51CB/00:0]: COMPLETE sent\n2026/10/28 22:20:38.838901: [4CCB51CB/00:0]: Group file transfer confirmed\n2026/10/28 22:20:43.552556: Exiting on signal 15\n",
+  "receiver.json": "{\"pid\": 11481, \"argv\": [\"uftpd\", \"-d\", \"-p\", \"1144\", \"-U\", \"0x00000004\", \"-D\", \"/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/received\", \"-T\", \"/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/tmp\", \"-I\", \"fl-c4\", \"-M\", \"239.255.42.1\", \"-L\", \"/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/uftpd.log\", \"-F\", \"/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/uftpd.status\"], \"poll\": null, \"start_ticks\": \"994012\"}"
+}

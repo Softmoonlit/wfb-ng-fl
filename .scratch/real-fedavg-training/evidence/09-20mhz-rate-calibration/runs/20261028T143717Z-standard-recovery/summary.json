@@ -1,0 +1,7 @@
+{
+  "success": false,
+  "baseline_restored": false,
+  "services_stopped": true,
+  "reason": "fl00测试网卡USB驱动阻塞；usbreset失败No such device；接口消失，待人工重新插拔",
+  "evidence": "fl00-iw-blocked.json, after-usbreset-kernel.txt, final-stopped.json"
+}

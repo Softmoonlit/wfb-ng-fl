@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""通过既有管理网页执行两轮四机真实训练并持久记录事实。
+"""通过既有管理网页执行两轮两客户端真实训练并持久记录事实。
 
-本文件只供父流程在 release 已验证、三客户端稳定心跳至少一百二十秒后运行。
+本文件只供父流程在 release 已验证、两个客户端稳定心跳至少一百二十秒后运行。
 部署证据必须来自实际部署进程和发布产物，工作树提交不能代替实际构建核验。
 本脚本不运行部署命令，不访问远程终端，不复制模型，不修改配置，不探测射频。
 """
@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 
 MODEL = "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1"
 MODEL_SOURCE = "/srv/wfb-ng-fl/server/mnist-initial-seed7.pt"
-TARGETS = [1, 2, 4]
+TARGETS = [1, 2]
 ROUNDS = 2
 POLL = 5
 DEADLINE = 300 + ROUNDS * 1800 + 120
@@ -35,10 +35,10 @@ def arguments():
     parser.add_argument("--output", required=True, help="新的证据目录，必须不存在")
     parser.add_argument("--deployed-commit", required=True, help="实际发布产物的完整提交哈希")
     parser.add_argument("--deployed-argv-json", required=True,
-                        help="实际四机进程参数的本地 JSON 文件，键为 server、1、2、4，值为参数数组")
+                        help="实际三机进程参数的本地 JSON 文件，键为 server、1、2，值为参数数组")
     parser.add_argument("--deployment-evidence", required=True, help="实际部署构建核验的本地证据文件")
     parser.add_argument("--release-evidence", required=True, help="父流程确认 release 已验证版的本地证据文件")
-    parser.add_argument("--heartbeat-evidence", required=True, help="三客户端稳定心跳的本地证据文件")
+    parser.add_argument("--heartbeat-evidence", required=True, help="两个客户端稳定心跳的本地证据文件")
     parser.add_argument("--stable-heartbeat-seconds", required=True, type=float,
                         help="父流程从心跳证据确认的连续稳定秒数，至少一百二十秒")
     args = parser.parse_args()
@@ -183,7 +183,7 @@ def main():
     prerequisites = {name: evidence(getattr(args, name)) for name in
                      ("deployment_evidence", "release_evidence", "heartbeat_evidence", "deployed_argv_json")}
     argv = json.loads(prerequisites["deployed_argv_json"]["text"])
-    if (not isinstance(argv, dict) or set(argv) != {"server", "1", "2", "4"}
+    if (not isinstance(argv, dict) or set(argv) != {"server", "1", "2"}
             or any(not isinstance(value, list) or not value
                    or any(not isinstance(item, str) for item in value) for value in argv.values())):
         raise ValueError("实际部署参数证据必须逐台给出 server、1、2、4 的非空参数数组")

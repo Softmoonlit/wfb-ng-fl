@@ -1,0 +1,14 @@
+{
+  "http": 410,
+  "body": {
+    "error": {
+      "code": "ROUTE_REPLACED",
+      "message": "该路由已退出 Web 契约",
+      "details": {
+        "replacement": "/api/v1/jobs"
+      },
+      "request_id": "02d5b4e9-df00-4b56-8e3f-aed3b45829cc"
+    }
+  },
+  "stderr": ""
+}

@@ -1,0 +1,34 @@
+{
+  "http": 200,
+  "body": {
+    "calibration": true,
+    "session_id": "switch_2176ba75a7864f2cbbc2e9ef3abae107",
+    "status": "finalized",
+    "target_channel": 149,
+    "applied_patch": {
+      "channel": 149,
+      "bandwidth_mhz": 20,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 2000
+    },
+    "failed_phase": null,
+    "unresponsive_nodes": [],
+    "error_message": null,
+    "effective_config": {
+      "channel": 149,
+      "bandwidth_mhz": 20,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 2000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT20",
+      "guard_interval": "short"
+    },
+    "local_committed_config": null
+  },
+  "elapsed_seconds": 3.556338207999943
+}

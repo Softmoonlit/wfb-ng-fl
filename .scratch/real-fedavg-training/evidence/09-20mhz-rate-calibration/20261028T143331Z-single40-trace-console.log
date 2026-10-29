@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 429, in <module>
+    sys.exit(main())
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 374, in main
+    status=wait_ready(RUN/'initial-ready.json')
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 136, in wait_ready
+    raise RuntimeError('all-target IDLE/READY gate failed')
+RuntimeError: all-target IDLE/READY gate failed

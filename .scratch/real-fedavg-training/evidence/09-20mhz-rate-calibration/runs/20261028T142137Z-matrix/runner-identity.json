@@ -1,0 +1,14 @@
+{
+  "sha256": "612ea454a946468b7e16495d2723cc7d1a0e611df408fda68d83a4826263bbb2",
+  "argv": [
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py",
+    "--execute-new-build",
+    "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "--expected-native-sha256",
+    "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93",
+    "--mode",
+    "matrix",
+    "--output",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T142137Z-matrix"
+  ]
+}

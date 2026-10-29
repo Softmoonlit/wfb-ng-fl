@@ -1,0 +1,18 @@
+{
+  "bytes": null,
+  "sha256": null,
+  "error": "final_file_missing",
+  "hash_seconds": 8.621400047559291e-05,
+  "received_files": [
+    "uftpd.status",
+    "receiver-console.log",
+    "receiver.json",
+    "tmp/_group_DE444693_restart",
+    "tmp/_group_DE444693/model-40mib.bin"
+  ],
+  "receiver_stopped": true,
+  "uftpd.log": null,
+  "uftpd.status": "CONNECT;2026/10/28-22:24:56;000000FF;DE444693;10.80.0.1;10.80.0.1\n",
+  "receiver-console.log": "2026/10/28 22:24:56.107902: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/10/28 22:24:56.108244: Loaded ECDSA key with curve prime256v1 and fingerprint 57:30:61:D1:2E:AD:2F:AF:B3:2A:D0:48:8D:D0:0D:AF:86:CD:07:39\n2026/10/28 22:24:56.751032: [DE444693/00:0]: Received request from 000000FF at 10.80.0.1 (10.80.0.1)\n2026/10/28 22:24:56.751275: [DE444693/00:0]: Using private multicast address 239.255.42.2\n2026/10/28 22:24:56.751621: [DE444693/00:0]: REGISTER sent\n2026/10/28 22:24:56.935020: [DE444693/00:0]: Registration confirmed\n2026/10/28 22:24:57.119547: [DE444693/00:0001]: Name of file to receive: model-40mib.bin\n2026/10/28 22:24:57.119658: [DE444693/00:0001]: Bytes: 41943040, Blocks: 32264, Sections: 4\n2026/10/28 22:24:57.121047: [DE444693/00:0001]: FILEINFO_ACK sent\n2026/10/28 22:25:40.146022: [DE444693/00:0001]: Sent 1574 NAKs for section 0\n2026/10/28 22:26:24.259850: [DE444693/00:0001]: Sent 4873 NAKs for section 1\n2026/10/28 22:27:05.352926: [DE444693/00:0001]: Sent 6321 NAKs for section 2\n2026/10/28 22:27:09.608708: [DE444693/00:0001]: Transfer timed out\n2026/10/28 22:27:09.609471: [DE444693/00:0001]: starting file close\n2026/10/28 22:27:09.609597: [DE444693/00:0001]: done file close\n2026/10/28 22:27:09.609827: [DE444693/00:0001]: Writing restart file\n2026/10/28 22:28:17.132768: Exiting on signal 15\n",
+  "receiver.json": "{\"pid\": 16709, \"argv\": [\"uftpd\", \"-d\", \"-p\", \"1144\", \"-U\", \"0x00000002\", \"-D\", \"/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/received\", \"-T\", \"/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp\", \"-I\", \"fl-c2\", \"-M\", \"239.255.42.1\", \"-L\", \"/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/uftpd.log\", \"-F\", \"/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/uftpd.status\"], \"poll\": null, \"start_ticks\": \"2276347\"}"
+}

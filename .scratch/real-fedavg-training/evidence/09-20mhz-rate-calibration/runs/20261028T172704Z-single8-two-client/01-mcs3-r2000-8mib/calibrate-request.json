@@ -1,0 +1,15 @@
+{
+  "confirmed": true,
+  "target_nodes": [
+    1,
+    2
+  ],
+  "patch": {
+    "channel": 149,
+    "bandwidth_mhz": 20,
+    "radio_txpower_dbm": 14,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 2000
+  }
+}

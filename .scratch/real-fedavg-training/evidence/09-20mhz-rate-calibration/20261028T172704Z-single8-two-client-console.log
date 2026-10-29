@@ -1,0 +1,5 @@
+2026-10-28T17:27:16.347407+00:00 START 01-mcs3-r2000-8mib
+2026-10-28T17:27:54.944081+00:00 END 01-mcs3-r2000-8mib success=False
+2026-10-28T17:27:54.946523+00:00 STOP RuntimeError('attempt failed: 01-mcs3-r2000-8mib')
+2026-10-28T17:27:54.946780+00:00 RESTORE start
+2026-10-28T17:28:24.873924+00:00 RESTORE end {"success": true, "errors": {}, "iw": {"fl02": {"air_interface": "wlxfc221c500a88", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}, "fl01": {"air_interface": "wlxfc221c300e99", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}, "fl00": {"air_interface": "wlxfc221c100157", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}}}

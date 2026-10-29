@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 429, in <module>
+    sys.exit(main())
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 383, in main
+    if runtime and (runtime['bandwidth'],runtime['data_mcs_index'],runtime['control_mcs_index'])!=(40,ORIGINAL['downlink_mcs'] if h=='fl00' else ORIGINAL['uplink_mcs'],0):raise RuntimeError(h+' baseline native runtime differs from frozen normal config')
+RuntimeError: fl02 baseline native runtime differs from frozen normal config

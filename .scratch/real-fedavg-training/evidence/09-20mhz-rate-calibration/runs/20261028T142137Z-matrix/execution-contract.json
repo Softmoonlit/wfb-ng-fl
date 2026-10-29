@@ -1,0 +1,31 @@
+{
+  "mode": "matrix",
+  "expected_commit": "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+  "expected_native_sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93",
+  "frozen_normal_radio": {
+    "channel": 149,
+    "bandwidth_mhz": 40,
+    "channel_width": "HT40+",
+    "radio_txpower_dbm": 14,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 15000
+  },
+  "matrix_mib": 40,
+  "single_mib": 8,
+  "rates": [
+    2000,
+    4000
+  ],
+  "mcs": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "repeats": 3,
+  "matrix_attempts": 24,
+  "admission_rule": "预检完整记录，按正式空闲全ready API准入；不得推断零丢包",
+  "no_training": true,
+  "no_deployment": true
+}

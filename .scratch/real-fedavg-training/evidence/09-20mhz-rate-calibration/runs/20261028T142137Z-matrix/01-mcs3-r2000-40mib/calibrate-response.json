@@ -1,0 +1,36 @@
+{
+  "http": 200,
+  "body": {
+    "calibration": false,
+    "session_id": "switch_e33239328ad74d3699918f3f7c4ccbb5",
+    "status": "rolled_back",
+    "target_channel": 149,
+    "applied_patch": {
+      "channel": 149,
+      "bandwidth_mhz": 20,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 2000
+    },
+    "failed_phase": "PREPARE",
+    "unresponsive_nodes": [
+      1
+    ],
+    "error_message": "节点缺失或准备失败: [1]",
+    "effective_config": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "local_committed_config": null
+  },
+  "elapsed_seconds": 5.560204031993635
+}

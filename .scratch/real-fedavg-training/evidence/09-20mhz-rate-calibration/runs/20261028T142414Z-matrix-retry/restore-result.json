@@ -1,0 +1,9 @@
+{
+  "success": false,
+  "errors": {
+    "request": "RuntimeError('restore not finalized with original config')",
+    "ready": "RuntimeError('all-target IDLE/READY gate failed')",
+    "snapshot": "RuntimeError(\"fl04 actual iw radio mismatch: {'air_interface': 'wlxfc221c300f04', 'channel': 165, 'frequency': 5825, 'width': 20, 'center': 5825, 'txpower': '-14.00'}\")",
+    "status": "RuntimeError('full original radio config not restored')"
+  }
+}

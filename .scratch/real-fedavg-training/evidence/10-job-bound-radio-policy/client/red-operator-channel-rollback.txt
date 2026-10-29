@@ -1,0 +1,56 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_wire_reversible_failure_restores_operator_channel_and_same_owner _____
+
+radio_wire = (<wfb_ng.fl.client_daemon.ClientDaemon object at 0xffff7d7bb6d0>, <wfb_ng.tests.test_fl_client_daemon.MockNetworkAdapt... {'bandwidth_mhz': 40, 'channel': 157, 'channel_width': 'HT40+', 'downlink_mcs': 3, ...}, 'job_id': 'radio-job', ...}])
+
+    def test_wire_reversible_failure_restores_operator_channel_and_same_owner(radio_wire):
+        import threading
+        import time
+        daemon, adapter, work, exchange, messages = radio_wire
+        before = daemon._effective_radio
+        assert before.channel == 153
+        process = daemon.sandbox._process
+        owner = (process.pid, dict(adapter.tun_interfaces))
+        base = dict(job_id='radio-job', session_id='rollback-job', target_nodes=[1])
+        patch = {'uplink_mcs': 5, 'radio_txpower_dbm': 14}
+        ack = exchange(dict(base, type='CONFIG_RADIO_PREPARE', patch=patch), 'PREPARE_ACK')
+        assert ack['ok']
+        exchange(dict(base, type='CONFIG_RADIO_COMMIT', patch=patch, delay_ms=0))
+        deadline = time.monotonic() + 2
+        while not (work / 'v6-update.json').exists() and time.monotonic() < deadline:
+            threading.Event().wait(.01)
+        assert (work / 'v6-update.json').exists()
+        assert daemon.control_plane.radio_switch_pending
+        daemon._job_stop_event.set()  # 已成立事务停止时仍须允许提交前回滚。
+        exchange(dict(base, type='CONFIG_RADIO_ABORT'), 'RADIO_SWITCH_ROLLBACK_ACK')
+>       assert daemon._effective_radio == before
+E       AssertionError: assert RadioConfig(c...dwidth_mhz=40) == RadioConfig(c...dwidth_mhz=40)
+E         
+E         Omitting 5 identical items, use -vv to show
+E         Differing attributes:
+E         ['channel']
+E         
+E         Drill down into differing attribute channel:
+E           channel: 157 != 153
+
+wfb_ng/tests/test_fl_client_jobradio.py:371: AssertionError
+----------------------------- Captured stderr call -----------------------------
+节点 1 射频 ABORT session=rollback-job
+--------------------------- Captured stderr teardown ---------------------------
+作业 radio-job 资源未恢复
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/wfb_ng/fl/client_daemon.py", line 1393, in _recover_job_resources
+    raise FLRuntimeError('client_stopped', '客户端正在退出，待命链路未恢复')
+wfb_ng.fl.errors.FLRuntimeError: 客户端正在退出，待命链路未恢复
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_client_jobradio.py::test_wire_reversible_failure_restores_operator_channel_and_same_owner
+1 failed, 2 warnings in 1.22s

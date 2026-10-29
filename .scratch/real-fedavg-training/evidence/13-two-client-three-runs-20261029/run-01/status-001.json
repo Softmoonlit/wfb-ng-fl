@@ -1,0 +1,1289 @@
+{
+  "schema_version": 1,
+  "instance_id": "8a64e9bf-499f-4fd0-85e7-7e5acda7510b",
+  "server": {
+    "state": "running",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "short"
+    },
+    "can_start_job": false,
+    "start_blockers": [
+      {
+        "code": "SERVER_NOT_IDLE",
+        "message": "Server 尚未待命"
+      },
+      {
+        "code": "JOB_RUNNING",
+        "message": "作业正在运行"
+      },
+      {
+        "code": "NODES_NOT_READY",
+        "message": "没有待命且就绪的节点"
+      }
+    ],
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "link_process": {
+      "running": true,
+      "pid": 3762
+    },
+    "air_interface": "wlxfc221c100157"
+  },
+  "nodes": [
+    {
+      "node_id": 1,
+      "tun_ip": "10.80.0.11",
+      "reported_state": "RUNNING",
+      "readiness": "ACTIVE",
+      "elapsed_ms": 8310,
+      "current_channel": 149,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 8355.627160992,
+      "last_heartbeat_timestamp_ms": 1793208680162,
+      "last_heartbeat_ago_seconds": 1.72,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_NOT_READY",
+          "message": "基础未就绪: ACTIVE"
+        },
+        {
+          "code": "NODE_NOT_IDLE",
+          "message": "节点尚未待命: RUNNING"
+        }
+      ],
+      "state": "running",
+      "online": true
+    },
+    {
+      "node_id": 2,
+      "tun_ip": "10.80.0.12",
+      "reported_state": "RUNNING",
+      "readiness": "ACTIVE",
+      "elapsed_ms": 8516,
+      "current_channel": 149,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 8355.777854784,
+      "last_heartbeat_timestamp_ms": 1793208680313,
+      "last_heartbeat_ago_seconds": 1.57,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_NOT_READY",
+          "message": "基础未就绪: ACTIVE"
+        },
+        {
+          "code": "NODE_NOT_IDLE",
+          "message": "节点尚未待命: RUNNING"
+        }
+      ],
+      "state": "running",
+      "online": true
+    },
+    {
+      "node_id": 3,
+      "tun_ip": "10.80.0.13",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 4,
+      "tun_ip": "10.80.0.14",
+      "reported_state": "IDLE",
+      "readiness": "OFFLINE",
+      "elapsed_ms": 234382,
+      "current_channel": 149,
+      "txpower_dbm": 14,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 5769.6072584,
+      "last_heartbeat_timestamp_ms": 1793206094142,
+      "last_heartbeat_ago_seconds": 2587.74,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 5,
+      "tun_ip": "10.80.0.15",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 6,
+      "tun_ip": "10.80.0.16",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 7,
+      "tun_ip": "10.80.0.17",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 8,
+      "tun_ip": "10.80.0.18",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 9,
+      "tun_ip": "10.80.0.19",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    },
+    {
+      "node_id": 10,
+      "tun_ip": "10.80.0.20",
+      "reported_state": null,
+      "readiness": "OFFLINE",
+      "elapsed_ms": 0,
+      "current_channel": null,
+      "txpower_dbm": null,
+      "uplink_mcs": null,
+      "last_heartbeat_time": null,
+      "last_heartbeat_timestamp_ms": null,
+      "last_heartbeat_ago_seconds": null,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ],
+      "state": "offline",
+      "online": false
+    }
+  ],
+  "job": {
+    "job_id": "web-c92a06af4d454db299603786001d93c3",
+    "run_id": "web-d8be49f9dc8646ebaae3a74f8ccd523d",
+    "target_nodes": [
+      1,
+      2
+    ],
+    "model_size_bytes": 38792,
+    "rounds": 5,
+    "round_timeout_seconds": 1800.0,
+    "io_timeout_seconds": 120.0,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "started_at": 1793208667.650348,
+    "preparation_timeout_seconds": 300.0,
+    "current_round": 1,
+    "rounds_completed": 0,
+    "server_phase": "waiting_updates",
+    "phase_started_at": 1793208672.7506862,
+    "round_started_at": 1793208671.847932,
+    "algorithm": {
+      "client_entry": "wfb_ng.fl.mnist:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+      "config": {
+        "data_seed": 2026
+      }
+    },
+    "server_preparation": {
+      "model_format": "mnist-two-conv-fp32-v1",
+      "sample_count": 10000,
+      "data_seed": 2026,
+      "device": {
+        "type": "cpu",
+        "name": "CPU",
+        "torch_version": "2.5.0a0+872d972e41.nv24.08",
+        "cuda_version": "12.6"
+      },
+      "data_sha256": {
+        "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+        "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+      }
+    },
+    "initial_metrics": {
+      "loss": 2.3295671367645263,
+      "accuracy": 0.0891
+    },
+    "effect_result": null,
+    "evaluation": {
+      "initial_metrics": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "rounds": [],
+      "effect_result": null,
+      "final_model_sha256": null,
+      "final_model_size_bytes": null
+    },
+    "radio_results": [],
+    "participants": [
+      {
+        "node_id": 1,
+        "online": true,
+        "state": "running",
+        "readiness": "ACTIVE",
+        "reported_state": "RUNNING",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: ACTIVE"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: RUNNING"
+          }
+        ],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": []
+      },
+      {
+        "node_id": 2,
+        "online": true,
+        "state": "running",
+        "readiness": "ACTIVE",
+        "reported_state": "RUNNING",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: ACTIVE"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: RUNNING"
+          }
+        ],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": []
+      }
+    ],
+    "recovery_missing_nodes": [],
+    "recovery_reports": [],
+    "additional_errors": [],
+    "first_failure": null,
+    "liveness_events": [],
+    "client_error": null,
+    "recovery_wait_finished": null,
+    "server_recovery_complete": null,
+    "recovery": {
+      "state": "not_required",
+      "recovery_state": "not_required",
+      "missing_nodes": [],
+      "reports": [],
+      "server_recovery_complete": null,
+      "additional_errors": [],
+      "first_failure": null,
+      "liveness_events": []
+    },
+    "execution_result": "running",
+    "recovery_state": "not_required"
+  },
+  "current_job": {
+    "job_id": "web-c92a06af4d454db299603786001d93c3",
+    "run_id": "web-d8be49f9dc8646ebaae3a74f8ccd523d",
+    "target_nodes": [
+      1,
+      2
+    ],
+    "model_size_bytes": 38792,
+    "rounds": 5,
+    "round_timeout_seconds": 1800.0,
+    "io_timeout_seconds": 120.0,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "started_at": 1793208667.650348,
+    "preparation_timeout_seconds": 300.0,
+    "current_round": 1,
+    "rounds_completed": 0,
+    "server_phase": "waiting_updates",
+    "phase_started_at": 1793208672.7506862,
+    "round_started_at": 1793208671.847932,
+    "algorithm": {
+      "client_entry": "wfb_ng.fl.mnist:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+      "config": {
+        "data_seed": 2026
+      }
+    },
+    "server_preparation": {
+      "model_format": "mnist-two-conv-fp32-v1",
+      "sample_count": 10000,
+      "data_seed": 2026,
+      "device": {
+        "type": "cpu",
+        "name": "CPU",
+        "torch_version": "2.5.0a0+872d972e41.nv24.08",
+        "cuda_version": "12.6"
+      },
+      "data_sha256": {
+        "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+        "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+      }
+    },
+    "initial_metrics": {
+      "loss": 2.3295671367645263,
+      "accuracy": 0.0891
+    },
+    "effect_result": null,
+    "evaluation": {
+      "initial_metrics": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "rounds": [],
+      "effect_result": null,
+      "final_model_sha256": null,
+      "final_model_size_bytes": null
+    },
+    "radio_results": [],
+    "participants": [
+      {
+        "node_id": 1,
+        "online": true,
+        "state": "running",
+        "readiness": "ACTIVE",
+        "reported_state": "RUNNING",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: ACTIVE"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: RUNNING"
+          }
+        ],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": []
+      },
+      {
+        "node_id": 2,
+        "online": true,
+        "state": "running",
+        "readiness": "ACTIVE",
+        "reported_state": "RUNNING",
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: ACTIVE"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: RUNNING"
+          }
+        ],
+        "disconnection_events": [],
+        "preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_seed": 2026,
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          }
+        },
+        "training": []
+      }
+    ],
+    "recovery_missing_nodes": [],
+    "recovery_reports": [],
+    "additional_errors": [],
+    "first_failure": null,
+    "liveness_events": [],
+    "client_error": null,
+    "recovery_wait_finished": null,
+    "server_recovery_complete": null,
+    "recovery": {
+      "state": "not_required",
+      "recovery_state": "not_required",
+      "missing_nodes": [],
+      "reports": [],
+      "server_recovery_complete": null,
+      "additional_errors": [],
+      "first_failure": null,
+      "liveness_events": []
+    },
+    "execution_result": "running",
+    "recovery_state": "not_required"
+  },
+  "recent_job": null,
+  "execution_result": "running",
+  "recovery_state": "not_required",
+  "events": [
+    {
+      "sequence": 1,
+      "type": "MANAGEMENT_WEB_CHANGED",
+      "timestamp": "2026-10-28T15:28:37.043556+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": null,
+      "message": "ready"
+    },
+    {
+      "sequence": 2,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:29:40.656647+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 3,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:35:20.719133+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 4,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:36:02.362288+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 5,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:36:31.125192+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 6,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:36:46.609988+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 7,
+      "type": "RADIO_APPLY_RESULT",
+      "timestamp": "2026-10-28T15:37:48.811077+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": null,
+      "message": "finalized"
+    },
+    {
+      "sequence": 8,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:38:18.825991+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 9,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:38:32.912978+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 10,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:38:41.201358+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 11,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:39:00.885100+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 12,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:39:18.334099+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 13,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:39:53.834795+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 14,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:40:21.132769+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 15,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:40:21.283453+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 16,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:41:06.578774+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 17,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:42:11.672632+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 18,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:43:04.010168+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 19,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:43:17.244879+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 20,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:45:12.199222+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 21,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:45:40.808256+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 22,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:46:11.521878+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 23,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:47:28.954161+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 24,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:54:17.817874+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 25,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:54:59.850688+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 26,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:55:10.913808+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 27,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:55:56.716414+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 28,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T15:56:14.411977+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 29,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:05:10.525765+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 30,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:05:21.584505+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 31,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:08:35.220393+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 32,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:13:47.238932+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 33,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:17:36.902125+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 34,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:26:41.072993+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 35,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:29:04.457721+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 36,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:30:19.408655+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 37,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:32:29.524142+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 38,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:33:53.331667+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 39,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:36:24.140891+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 40,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:37:32.477040+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 41,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:37:45.752589+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 42,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:38:18.935869+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 43,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:40:00.556024+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 44,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:40:35.816983+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 45,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:44:03.258155+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 46,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:44:18.876632+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 47,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:47:29.510323+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 48,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:48:26.006653+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 4,
+      "message": "节点 4 离线"
+    },
+    {
+      "sequence": 49,
+      "type": "JOB_STARTED",
+      "timestamp": "2026-10-28T16:52:35.217653+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "JOB_STARTED"
+    },
+    {
+      "sequence": 50,
+      "type": "ROUND_STARTED",
+      "timestamp": "2026-10-28T16:52:35.233489+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "ROUND_STARTED"
+    },
+    {
+      "sequence": 51,
+      "type": "MODEL_PUBLISH_START",
+      "timestamp": "2026-10-28T16:52:35.237818+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "MODEL_PUBLISH_START"
+    },
+    {
+      "sequence": 52,
+      "type": "MODEL_PUBLISHED",
+      "timestamp": "2026-10-28T16:52:36.130958+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "MODEL_PUBLISHED"
+    },
+    {
+      "sequence": 53,
+      "type": "WAIT_FOR_UPDATES_START",
+      "timestamp": "2026-10-28T16:52:36.135499+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "WAIT_FOR_UPDATES_START"
+    },
+    {
+      "sequence": 54,
+      "type": "UPDATES_COLLECTED",
+      "timestamp": "2026-10-28T16:52:43.309583+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "UPDATES_COLLECTED"
+    },
+    {
+      "sequence": 55,
+      "type": "AGGREGATE_START",
+      "timestamp": "2026-10-28T16:52:43.314078+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "AGGREGATE_START"
+    },
+    {
+      "sequence": 56,
+      "type": "AGGREGATION_COMPLETED",
+      "timestamp": "2026-10-28T16:52:43.350221+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "AGGREGATION_COMPLETED"
+    },
+    {
+      "sequence": 57,
+      "type": "EVALUATION_COMPLETED",
+      "timestamp": "2026-10-28T16:52:44.515840+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "EVALUATION_COMPLETED"
+    },
+    {
+      "sequence": 58,
+      "type": "ROUND_REPORT_WAIT_START",
+      "timestamp": "2026-10-28T16:52:44.520493+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "ROUND_REPORT_WAIT_START"
+    },
+    {
+      "sequence": 59,
+      "type": "ROUND_REPORT_COMPLETED",
+      "timestamp": "2026-10-28T16:52:44.524747+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "ROUND_REPORT_COMPLETED"
+    },
+    {
+      "sequence": 60,
+      "type": "ROUND_COMPLETED",
+      "timestamp": "2026-10-28T16:52:44.529258+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "ROUND_COMPLETED"
+    },
+    {
+      "sequence": 61,
+      "type": "EVALUATION_COMPLETED",
+      "timestamp": "2026-10-28T16:52:59.383458+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "末轮准确率高于初始且损失低于初始"
+    },
+    {
+      "sequence": 62,
+      "type": "JOB_COMPLETED",
+      "timestamp": "2026-10-28T16:52:59.414281+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "JOB_COMPLETED"
+    },
+    {
+      "sequence": 63,
+      "type": "RECOVERY_STARTED",
+      "timestamp": "2026-10-28T16:52:59.430397+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "RECOVERY_STARTED"
+    },
+    {
+      "sequence": 64,
+      "type": "RECOVERY_COMPLETED",
+      "timestamp": "2026-10-28T16:53:00.250583+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "RECOVERY_COMPLETED"
+    },
+    {
+      "sequence": 65,
+      "type": "JOB_COMPLETED",
+      "timestamp": "2026-10-28T16:53:00.251878+00:00",
+      "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+      "round_id": null,
+      "node_id": null,
+      "message": "completed"
+    },
+    {
+      "sequence": 66,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T16:56:59.276071+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 67,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T17:28:10.166019+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 1,
+      "message": "节点 1 离线"
+    },
+    {
+      "sequence": 68,
+      "type": "NODE_OFFLINE",
+      "timestamp": "2026-10-28T17:28:10.166096+00:00",
+      "job_id": null,
+      "round_id": null,
+      "node_id": 2,
+      "message": "节点 2 离线"
+    },
+    {
+      "sequence": 69,
+      "type": "JOB_STARTED",
+      "timestamp": "2026-10-28T17:31:11.830720+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "JOB_STARTED"
+    },
+    {
+      "sequence": 70,
+      "type": "ROUND_STARTED",
+      "timestamp": "2026-10-28T17:31:11.847963+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "ROUND_STARTED"
+    },
+    {
+      "sequence": 71,
+      "type": "MODEL_PUBLISH_START",
+      "timestamp": "2026-10-28T17:31:11.852618+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "MODEL_PUBLISH_START"
+    },
+    {
+      "sequence": 72,
+      "type": "MODEL_PUBLISHED",
+      "timestamp": "2026-10-28T17:31:12.745701+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "MODEL_PUBLISHED"
+    },
+    {
+      "sequence": 73,
+      "type": "WAIT_FOR_UPDATES_START",
+      "timestamp": "2026-10-28T17:31:12.750706+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "WAIT_FOR_UPDATES_START"
+    },
+    {
+      "sequence": 74,
+      "type": "UPDATES_COLLECTED",
+      "timestamp": "2026-10-28T17:31:21.103254+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "UPDATES_COLLECTED"
+    },
+    {
+      "sequence": 75,
+      "type": "AGGREGATE_START",
+      "timestamp": "2026-10-28T17:31:21.108660+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "AGGREGATE_START"
+    },
+    {
+      "sequence": 76,
+      "type": "AGGREGATION_COMPLETED",
+      "timestamp": "2026-10-28T17:31:21.143340+00:00",
+      "job_id": "web-c92a06af4d454db299603786001d93c3",
+      "round_id": null,
+      "node_id": null,
+      "message": "AGGREGATION_COMPLETED"
+    }
+  ],
+  "state_version": 416,
+  "generated_at": "2026-10-28T17:31:21.887622+00:00"
+}

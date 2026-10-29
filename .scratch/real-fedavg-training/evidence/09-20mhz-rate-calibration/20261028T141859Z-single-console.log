@@ -1,0 +1,4 @@
+2026-10-28T14:19:10.573053+00:00 START 01-mcs3-r2000-8mib
+2026-10-28T14:20:49.287315+00:00 END 01-mcs3-r2000-8mib success=True
+2026-10-28T14:20:49.287645+00:00 RESTORE start
+2026-10-28T14:21:15.724189+00:00 RESTORE end {"success": true, "errors": {}, "iw": {"fl04": {"air_interface": "wlxfc221c300f04", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}, "fl01": {"air_interface": "wlxfc221c300e99", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}, "fl02": {"air_interface": "wlxfc221c500a88", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}, "fl00": {"air_interface": "wlxfc221c100157", "channel": 149, "frequency": 5745, "width": 40, "center": 5755, "txpower": "-14.00"}}}

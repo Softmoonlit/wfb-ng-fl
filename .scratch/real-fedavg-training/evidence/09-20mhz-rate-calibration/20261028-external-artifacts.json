@@ -1,0 +1,206 @@
+{
+  "fl00": {
+    "files": [
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/source/model-8mib.bin",
+        "bytes": 8388608,
+        "sha256": "cc391535087dff61febe3e8cd4832a10e0bb40c7c48085263128c584968a8d5b",
+        "hash_seconds": 0.013397472008364275
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142137Z-matrix/source/model-40mib.bin",
+        "bytes": 41943040,
+        "sha256": "0e4f5d29ef29e18920bcc23c8d75db9d7d8d2812be86d1202e80abc23ba4b1f9",
+        "hash_seconds": 0.061240896000526845
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/source/model-40mib.bin",
+        "bytes": 41943040,
+        "sha256": "9669b6f73e6b5452cfdd508d975e6c6e8db93bc79f1e2f4db855d5d3bd06d62b",
+        "hash_seconds": 0.05747484799940139
+      }
+    ],
+    "count": 3,
+    "total_bytes": 92274688
+  },
+  "fl01": {
+    "files": [
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/received/model-8mib.bin",
+        "bytes": 8388608,
+        "sha256": "cc391535087dff61febe3e8cd4832a10e0bb40c7c48085263128c584968a8d5b",
+        "hash_seconds": 0.014166059991111979
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver-console.log",
+        "bytes": 2708,
+        "sha256": "3cdedb9fb62d74c67a24bc92e742e22f8b3ac483d012c5fc4623f67182a41d08",
+        "hash_seconds": 0.00013043501530773938
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver.json",
+        "bytes": 515,
+        "sha256": "2fdf8b26ea5020d7e071ba2d7dae5c537f421db07a1eb8fe061f86b9a4f30ff0",
+        "hash_seconds": 0.0002996229741256684
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/uftpd.status",
+        "bytes": 140,
+        "sha256": "9d1d8fad1286a8e7cd629de97f9b61c61c13eeee4ec96067857319fb7f6dd991",
+        "hash_seconds": 4.921702202409506e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver-console.log",
+        "bytes": 1344,
+        "sha256": "5e53279de2e772e0581c7f76ce9ab4bfd884cd534cb003d05a4305288c2fee5a",
+        "hash_seconds": 6.819400005042553e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver.json",
+        "bytes": 543,
+        "sha256": "9d6ab1ea598d4828ec26a97dbbf587f404661e2b715c211d992bc0a52d074679",
+        "hash_seconds": 4.496099427342415e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693/model-40mib.bin",
+        "bytes": 31496400,
+        "sha256": "8a8b38ff14564794c62493f366fc47266d6927a7697c7359de5380f552ede073",
+        "hash_seconds": 0.04577684198739007
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693_restart",
+        "bytes": 32604,
+        "sha256": "8a5641f13d868802df944127f0ce7b4b24b35484cc0593867ffb4c34450f361e",
+        "hash_seconds": 0.0002014119818340987
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/uftpd.status",
+        "bytes": 66,
+        "sha256": "87bbbfaf06151264c8c49a2cee5dcb263fd7a7be74d72c1f0db8d3282bd5d5c4",
+        "hash_seconds": 5.324900848791003e-05
+      }
+    ],
+    "count": 9,
+    "total_bytes": 39922928
+  },
+  "fl04": {
+    "files": [
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/received/model-8mib.bin",
+        "bytes": 8388608,
+        "sha256": "cc391535087dff61febe3e8cd4832a10e0bb40c7c48085263128c584968a8d5b",
+        "hash_seconds": 0.012781899999026791
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver-console.log",
+        "bytes": 2230,
+        "sha256": "8bb924e4743774c302db4b7f3835d915dfacf45fbe5fa3fa258eaab6747e5e62",
+        "hash_seconds": 0.00010086600013892166
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver.json",
+        "bytes": 513,
+        "sha256": "558f8789d0e7e0ab46d986eb9473efd255d912a5ed71a25b815abc09b5eec0da",
+        "hash_seconds": 0.00023120599871617742
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/uftpd.status",
+        "bytes": 140,
+        "sha256": "7aba5d153722ff20a268879775c4df5b81f30e4b03155c191ce7f5a7a9eab3f2",
+        "hash_seconds": 4.403300044941716e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver-console.log",
+        "bytes": 1267,
+        "sha256": "cfce9929cfd97e42c71702b7e0b3fc78e4eaf5a35b45c536207be6fc06b02cf7",
+        "hash_seconds": 6.153699905553367e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver.json",
+        "bytes": 542,
+        "sha256": "75b475be8b3d075d2b48cc917df7f3f0a118ae4064a11e80c273870b76d23c2b",
+        "hash_seconds": 4.275299943401478e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693/model-40mib.bin",
+        "bytes": 31275400,
+        "sha256": "eb7c6ba133ad3f5dd3bf8f0f6ca18f8bceaff844045cf2c1fb8caef5f26c1a98",
+        "hash_seconds": 0.04271554200022365
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693_restart",
+        "bytes": 32604,
+        "sha256": "c16aa2b12aa30b75c3f17c7e56cfe6f53ffdbe485b110215d188561b47116bed",
+        "hash_seconds": 0.00043668400030583143
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/uftpd.status",
+        "bytes": 66,
+        "sha256": "87bbbfaf06151264c8c49a2cee5dcb263fd7a7be74d72c1f0db8d3282bd5d5c4",
+        "hash_seconds": 5.2257999413996004e-05
+      }
+    ],
+    "count": 9,
+    "total_bytes": 39701370
+  },
+  "fl02": {
+    "files": [
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/received/model-8mib.bin",
+        "bytes": 8388608,
+        "sha256": "cc391535087dff61febe3e8cd4832a10e0bb40c7c48085263128c584968a8d5b",
+        "hash_seconds": 0.013931158002378652
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver-console.log",
+        "bytes": 2495,
+        "sha256": "fa4b21e2ee7b36ce54cebd537fafd494b1bbb5c5dfbef03b0ffc91c276e6d08d",
+        "hash_seconds": 0.00011885300045832992
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/receiver.json",
+        "bytes": 514,
+        "sha256": "c594b4973101e138a58c691fa2a747aa447617cc5dc3f8194500248b4b917af6",
+        "hash_seconds": 0.00023389799753203988
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T141859Z-single/01-mcs3-r2000-8mib/uftpd.status",
+        "bytes": 140,
+        "sha256": "c3a85bf500e57126c1d1696d723dd06f1b9aa7d3f8570265b4602db3cba7bd1a",
+        "hash_seconds": 4.553799954010174e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver-console.log",
+        "bytes": 1344,
+        "sha256": "76d6eb1ba3970c447d5621c1f6070b4c78d1a6ca136993f3a9c767d2660ce2a9",
+        "hash_seconds": 6.352299897116609e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/receiver.json",
+        "bytes": 542,
+        "sha256": "17d352bc11a735604b942af50104c551857bea7e4982b706f62f76ecbbd685ba",
+        "hash_seconds": 4.425799852469936e-05
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693/model-40mib.bin",
+        "bytes": 31519800,
+        "sha256": "347540acab2e6970047b377a5790b8748dc0db78e677f59b9eec257e8de598d1",
+        "hash_seconds": 0.0456843600004504
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/tmp/_group_DE444693_restart",
+        "bytes": 32604,
+        "sha256": "ae3fd42ad5e3fd486a7e199fc01c04bb6ac70a6d0a2ad0ddba253988f877f30a",
+        "hash_seconds": 0.00018506400010664947
+      },
+      {
+        "path": "/srv/wfb-ng-fl/calibration/09/20261028T142414Z-matrix-retry/01-mcs3-r2000-40mib/uftpd.status",
+        "bytes": 66,
+        "sha256": "87bbbfaf06151264c8c49a2cee5dcb263fd7a7be74d72c1f0db8d3282bd5d5c4",
+        "hash_seconds": 4.521799928625114e-05
+      }
+    ],
+    "count": 9,
+    "total_bytes": 39946113
+  }
+}

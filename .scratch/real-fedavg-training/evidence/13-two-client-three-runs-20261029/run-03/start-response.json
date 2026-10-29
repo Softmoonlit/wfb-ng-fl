@@ -1,0 +1,20 @@
+{
+  "http": 202,
+  "body": {
+    "status": "accepted",
+    "run_id": "web-19cf553de1c145908b7445e30e5115a0",
+    "job_id": "web-451fbb8010f74cb7a9c3321a4e44037e",
+    "mode": "sync",
+    "rounds": 5,
+    "target_nodes": [
+      1,
+      2
+    ],
+    "model_size_bytes": 38792,
+    "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+    "preparation_timeout_seconds": 300.0,
+    "round_timeout_seconds": 1800.0,
+    "io_timeout_seconds": 120.0,
+    "idempotency_key": "final2-3-05425d0372714455adbc33960a1131a4"
+  }
+}

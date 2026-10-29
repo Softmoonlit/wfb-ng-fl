@@ -1,0 +1,234 @@
+{
+  "artifact_type": "fp64_audit_backup_manifest",
+  "files": [
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M0.pt",
+      "from_snapshot": true,
+      "sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/initial.pt",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M1.bin",
+      "from_snapshot": true,
+      "sha256": "8943e0eb804b48610775df44b68ade51706530590a436455676510ebee0ddc32",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/global-model-round-0001.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M2.bin",
+      "from_snapshot": true,
+      "sha256": "8fce642b76348f9a7910682a08ddd66e815769c8fe2407bb126bf918d528b696",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/global-model-round-0002.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M3.bin",
+      "from_snapshot": true,
+      "sha256": "489d16af609f2538b69db49a1f5f280fd4c3ff439bdb87f5ab702fc8f9fbed17",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/global-model-round-0003.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M4.bin",
+      "from_snapshot": true,
+      "sha256": "b939a466a45f9a34282b64205bf1801b970d23666fbcd15a1af07ede7d6368b7",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/global-model-round-0004.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/models/M5.bin",
+      "from_snapshot": true,
+      "sha256": "5662b0de30e8633ea96fbe50d99b0e80d74ea290ead87cab78d7e07c7da9b658",
+      "size_bytes": 38792,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/artifacts/global-model-round-0005.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0001/node-1/update.bin",
+      "from_snapshot": true,
+      "sha256": "b5a670fa61f27131d5732efa9ce8630c24b27dd702a8457fac0d8360da2c2bde",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c08d34c9-7c5a-495d-9114-11ebc5d043fe/updates/1/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0001/node-1/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "e75d57ec381ea9d201791638b01a42dc1fbb8037a7069c12324fa1ad480cc935",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c08d34c9-7c5a-495d-9114-11ebc5d043fe/updates/1/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0001/node-2/update.bin",
+      "from_snapshot": true,
+      "sha256": "23515767a1fa5331c82abd51bae078d9e3d820f39a535e36a4fbf57cb71d4fc0",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c08d34c9-7c5a-495d-9114-11ebc5d043fe/updates/2/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0001/node-2/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "8b16cc57d11faac466ef97dc976ee5b715318d8cca6679571ddba0f9f77e756b",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c08d34c9-7c5a-495d-9114-11ebc5d043fe/updates/2/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0002/node-1/update.bin",
+      "from_snapshot": true,
+      "sha256": "fed60949b065f5777466a0a24cb8a1faa1a27488041f919710ef700b26bb3f8b",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/77475ab2-5705-472d-b248-554960db8936/updates/1/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0002/node-1/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "30428927aaf74b4f6c3e09b4f3e568394bac77a83afedd00790641f2ff91849e",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/77475ab2-5705-472d-b248-554960db8936/updates/1/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0002/node-2/update.bin",
+      "from_snapshot": true,
+      "sha256": "ce52b48898de7533eccc5c1b32219476d15938708ea5afe78eae03255b0d3f66",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/77475ab2-5705-472d-b248-554960db8936/updates/2/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0002/node-2/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "746b4fe2397e6eb3a63d0e55568da20ea41463e3a19ada121e6214761aa7741a",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/77475ab2-5705-472d-b248-554960db8936/updates/2/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0003/node-1/update.bin",
+      "from_snapshot": true,
+      "sha256": "29ae382b4d62c9415910389ac6cfb9e43b4740f710affc29f68099de6759d1bb",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/5259a204-fa8a-44ce-bea0-299f29165732/updates/1/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0003/node-1/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "6e97de5d7a184f2187c695954e9eb8f7dd9f23618d7f48ee36e2ed25feec10e0",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/5259a204-fa8a-44ce-bea0-299f29165732/updates/1/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0003/node-2/update.bin",
+      "from_snapshot": true,
+      "sha256": "9a3e21e527986234b13b18391421ee027f0458d941ccd295c955a8ebbb801851",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/5259a204-fa8a-44ce-bea0-299f29165732/updates/2/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0003/node-2/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "0a53b0c889065a36881f462abcf2f88824ea0c236683293f3af4edbd4cab7dea",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/5259a204-fa8a-44ce-bea0-299f29165732/updates/2/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0004/node-1/update.bin",
+      "from_snapshot": true,
+      "sha256": "dfa8b5c4d5f48b41753113a9915bee6dabdbede59e6a8c45b36eb9c686ffa2d5",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c05bba2e-da64-40ab-b9fc-8601adac306a/updates/1/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0004/node-1/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "5071feb52a320feb2359cf60affb25ae56b56fbd985ebb2e6ae16b01d8f1078c",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c05bba2e-da64-40ab-b9fc-8601adac306a/updates/1/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0004/node-2/update.bin",
+      "from_snapshot": true,
+      "sha256": "5a70c708456ab35dec44cfc45a59b7304db6be6d3661825eeb58f6259c410627",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c05bba2e-da64-40ab-b9fc-8601adac306a/updates/2/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0004/node-2/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "3caa5819e2ff9d952094769ac7b9456997b9af543e1431646fece2c14e7076c9",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/c05bba2e-da64-40ab-b9fc-8601adac306a/updates/2/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0005/node-1/update.bin",
+      "from_snapshot": true,
+      "sha256": "54e2b0ef6fdf9a0fd0f0c2465e769bec93696a8fb16e7c5f796e6f14c69b22ce",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/e76fef97-b1d7-4ce3-93f5-05cfd4b95145/updates/1/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0005/node-1/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "1b3e9e4f4fd00a416068cfc7180ec86159cbda938a39b6c3e020a7c014c7b2eb",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/e76fef97-b1d7-4ce3-93f5-05cfd4b95145/updates/1/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0005/node-2/update.bin",
+      "from_snapshot": true,
+      "sha256": "8fe0ad3e99fbe88b4d0a2430a78667fa12415a9833d848642216a398afa2d61f",
+      "size_bytes": 39048,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/e76fef97-b1d7-4ce3-93f5-05cfd4b95145/updates/2/update.bin",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/updates/round-0005/node-2/update.manifest.json",
+      "from_snapshot": true,
+      "sha256": "2f1cd64ac3b06867dc4389ffdbc75c9d06e3de4a6bde605e49251f59171d8a85",
+      "size_bytes": 203,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3_role/rounds/e76fef97-b1d7-4ce3-93f5-05cfd4b95145/updates/2/update.manifest.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/metadata/coordinator_summary.json",
+      "from_snapshot": true,
+      "sha256": "cf1029d82e85d1d861b3282ff590b663865fa029aa51b91e1a1c14a48ee5860a",
+      "size_bytes": 28948,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/coordinator_summary.json",
+      "verified": true
+    },
+    {
+      "backup_path": "/srv/wfb-ng-fl/server/fp64-audit-13-two-client/audit-web-c92a06af4d454db299603786001d93c3/backup/metadata/coordinator_summary.manifest.json",
+      "from_snapshot": true,
+      "sha256": "a44bfda77319f11ac7ee199b7fb46054f9cb8622995e8843a25ff25d0e363b0e",
+      "size_bytes": 336,
+      "source_path": "/srv/wfb-ng-fl/server/job_web-c92a06af4d454db299603786001d93c3/coordinator_summary.manifest.json",
+      "verified": true
+    }
+  ],
+  "schema_version": 1,
+  "tool": {
+    "name": "wfb_ng.fl.fp64_audit",
+    "version": "1.0.0"
+  }
+}

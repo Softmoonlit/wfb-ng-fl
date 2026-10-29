@@ -1,0 +1,20 @@
+stop all completed
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/recover-baseline.py", line 39, in <module>
+    stopped=m.allhosts(m.SNAP);m.save(OUT/'stopped.json',stopped)
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 40, in allhosts
+    return {fut[f]:json.loads(f.result()) for f in cf.as_completed(fut)}
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 40, in <dictcomp>
+    return {fut[f]:json.loads(f.result()) for f in cf.as_completed(fut)}
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/fl/projects/wfb-ng-fl/.scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py", line 25, in remote
+    if p.returncode:raise RuntimeError(f'{host}: rc={p.returncode}: {p.stderr.decode()[-2000:]} {p.stdout.decode()[-1000:]}')
+RuntimeError: fl00: rc=1: Traceback (most recent call last):
+  File "<stdin>", line 27, in <module>
+RuntimeError: expected exactly one native for iw snapshot
+ 

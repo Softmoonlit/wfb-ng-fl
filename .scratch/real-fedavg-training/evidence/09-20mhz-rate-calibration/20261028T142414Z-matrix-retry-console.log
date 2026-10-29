@@ -1,0 +1,5 @@
+2026-10-28T14:24:26.051486+00:00 START 01-mcs3-r2000-40mib
+2026-10-28T14:28:23.614925+00:00 END 01-mcs3-r2000-40mib success=False
+2026-10-28T14:28:23.617260+00:00 STOP RuntimeError('attempt failed: 01-mcs3-r2000-40mib')
+2026-10-28T14:28:23.618116+00:00 RESTORE start
+2026-10-28T14:28:57.822059+00:00 RESTORE end {"success": false, "errors": {"request": "RuntimeError('restore not finalized with original config')", "ready": "RuntimeError('all-target IDLE/READY gate failed')", "snapshot": "RuntimeError(\"fl04 actual iw radio mismatch: {'air_interface': 'wlxfc221c300f04', 'channel': 165, 'frequency': 5825, 'width': 20, 'center': 5825, 'txpower': '-14.00'}\")", "status": "RuntimeError('full original radio config not restored')"}}

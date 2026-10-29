@@ -1,0 +1,20 @@
+{
+  "cmd": [
+    "python3",
+    "-B",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py",
+    "--execute-new-build",
+    "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "--expected-native-sha256",
+    "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93",
+    "--mode",
+    "single",
+    "--single-mib",
+    "8",
+    "--output",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T172704Z-single8-two-client"
+  ],
+  "pid": 4612,
+  "output": ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T172704Z-single8-two-client",
+  "console": ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/20261028T172704Z-single8-two-client-console.log"
+}

@@ -1,0 +1,56 @@
+{
+  "fl00": {
+    "rc": 0,
+    "out": "",
+    "err": "",
+    "argv": [
+      "sudo",
+      "-n",
+      "systemctl",
+      "stop",
+      "wfb-fl-server-daemon.service"
+    ]
+  },
+  "fl01": {
+    "rc": 0,
+    "out": "",
+    "err": "",
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl01",
+      "sudo -n systemctl stop wfb-fl-client-daemon.service"
+    ]
+  },
+  "fl02": {
+    "rc": 0,
+    "out": "",
+    "err": "",
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl02",
+      "sudo -n systemctl stop wfb-fl-client-daemon.service"
+    ]
+  },
+  "fl04": {
+    "rc": 0,
+    "out": "",
+    "err": "",
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl04",
+      "sudo -n systemctl stop wfb-fl-client-daemon.service"
+    ]
+  }
+}

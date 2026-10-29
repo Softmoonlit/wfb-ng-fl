@@ -1,0 +1,532 @@
+{
+  "http": 200,
+  "body": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.108.100",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": {
+      "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+      "run_id": "web-22d6f8be73cd4508839983ccc26d3967",
+      "mode": "sync",
+      "target_nodes": [
+        1,
+        2,
+        4
+      ],
+      "model_path": "/srv/wfb-ng-fl/server/job_web-4c8de13bb3e64e93ac913520f4ab793c/artifacts/initial.pt",
+      "model_size_bytes": 38792,
+      "rounds": 2,
+      "round_timeout_seconds": 1800.0,
+      "io_timeout_seconds": 120.0,
+      "live_observation": false,
+      "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+      "radio_config": null,
+      "started_at": 1793193718.159322,
+      "preparation_timeout_seconds": 300.0,
+      "algorithm": {
+        "client_entry": "wfb_ng.fl.mnist:client_entry",
+        "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+        "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+        "config": {
+          "data_seed": 2026
+        },
+        "radio_policy_entry": null
+      },
+      "radio_results": [],
+      "initial_metrics": {
+        "loss": 2.3295671367645263,
+        "accuracy": 0.0891
+      },
+      "server_preparation": {
+        "model_format": "mnist-two-conv-fp32-v1",
+        "sample_count": 10000,
+        "data_sha256": {
+          "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+          "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+        },
+        "device": {
+          "type": "cpu",
+          "name": "CPU",
+          "torch_version": "2.5.0a0+872d972e41.nv24.08",
+          "cuda_version": "12.6"
+        },
+        "data_seed": 2026
+      },
+      "current_round": 1,
+      "rounds_completed": 0,
+      "server_phase": "ready",
+      "phase_started_at": 1793193725.4394393,
+      "client_preparation_reports": {
+        "4": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        },
+        "2": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        },
+        "1": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 60000,
+          "data_sha256": {
+            "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+            "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+          },
+          "device": {
+            "type": "cuda",
+            "name": "Orin",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        }
+      },
+      "round_started_at": 1793193722.8495188,
+      "execution_result": "aborted",
+      "recovery_state": "ready",
+      "reason": "issue08_normal_stop_during_running",
+      "error": "",
+      "terminal_result": {
+        "status": "aborted",
+        "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+        "reason": "issue08_normal_stop_during_running"
+      },
+      "recovery_wait_finished": true,
+      "server_recovery_complete": true,
+      "recovery_missing_nodes": [],
+      "recovery_reports": {
+        "4": {
+          "report_id": "95bf78183d124b93ab8e0ed38b614626",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 4,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.14",
+            35925
+          ]
+        },
+        "1": {
+          "report_id": "417da85e23d84ca7ae5af1cd38f8b025",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 1,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.11",
+            32881
+          ]
+        },
+        "2": {
+          "report_id": "869ac63de858496ea73dd551d5e97949",
+          "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+          "node_id": 2,
+          "report": {
+            "recovery_epoch": 1,
+            "recovery_state": "ready"
+          },
+          "source": [
+            "10.80.0.12",
+            50137
+          ]
+        }
+      },
+      "terminal_delivery_succeeded": true,
+      "additional_errors": [
+        {
+          "reason": "aborted",
+          "error": "issue08_normal_stop_during_running"
+        }
+      ],
+      "summary": {
+        "schema_version": 1,
+        "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+        "run_id": "web-22d6f8be73cd4508839983ccc26d3967",
+        "mode": "sync",
+        "status": "aborted",
+        "execution_result": "aborted",
+        "rounds_total": 2,
+        "rounds_completed": 0,
+        "target_nodes": [
+          1,
+          2,
+          4
+        ],
+        "initial_metrics": {
+          "loss": 2.3295671367645263,
+          "accuracy": 0.0891
+        },
+        "effect_result": null,
+        "rounds": [],
+        "final_model_path": "/srv/wfb-ng-fl/server/job_web-4c8de13bb3e64e93ac913520f4ab793c/artifacts/initial.pt",
+        "final_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "final_model_size_bytes": 38792,
+        "events": [
+          {
+            "type": "JOB_STARTED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.844879,
+            "monotonic": 179226.101304096,
+            "target_nodes": [
+              1,
+              2,
+              4
+            ],
+            "rounds": 2,
+            "initial_metrics": {
+              "loss": 2.3295671367645263,
+              "accuracy": 0.0891
+            }
+          },
+          {
+            "type": "ROUND_STARTED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.8494651,
+            "monotonic": 179226.1058904,
+            "round_index": 1,
+            "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "round_started_monotonic": 179226.105541312,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "MODEL_PUBLISH_START",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193722.8535929,
+            "monotonic": 179226.110017728,
+            "round_index": 1,
+            "io_started_monotonic": 179226.109998464,
+            "io_deadline_monotonic": 179346.109998464,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "MODEL_PUBLISHED",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193725.0292547,
+            "monotonic": 179228.28567968,
+            "round_index": 1,
+            "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "io_completed_monotonic": 179228.285671808,
+            "round_deadline_monotonic": 181026.105541312
+          },
+          {
+            "type": "WAIT_FOR_UPDATES_START",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "mode": "sync",
+            "timestamp": 1793193725.0333772,
+            "monotonic": 179228.2898024,
+            "round_index": 1,
+            "round_deadline_monotonic": 181026.105541312
+          }
+        ],
+        "error_code": "aborted",
+        "error_message": "issue08_normal_stop_during_running",
+        "completed_at": 1793193725.5446665
+      },
+      "recovery_report_history": {
+        "4": [
+          {
+            "report_id": "95bf78183d124b93ab8e0ed38b614626",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 4,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.14",
+              35925
+            ]
+          }
+        ],
+        "1": [
+          {
+            "report_id": "417da85e23d84ca7ae5af1cd38f8b025",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 1,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.11",
+              32881
+            ]
+          }
+        ],
+        "2": [
+          {
+            "report_id": "869ac63de858496ea73dd551d5e97949",
+            "job_id": "web-4c8de13bb3e64e93ac913520f4ab793c",
+            "node_id": 2,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.12",
+              50137
+            ]
+          }
+        ]
+      }
+    },
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 20,
+      "radio_txpower_dbm": 14,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 2000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT20",
+      "guard_interval": "short"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100157",
+    "link_process": {
+      "running": true,
+      "pid": 349662
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 125784,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 182978.86260816,
+        "last_heartbeat_timestamp_ms": 1793197475606,
+        "last_heartbeat_ago_seconds": 3.92,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 123682,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 182979.123427616,
+        "last_heartbeat_timestamp_ms": 1793197475867,
+        "last_heartbeat_ago_seconds": 3.66,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 72784,
+        "current_channel": 149,
+        "txpower_dbm": 14,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 182977.55872592,
+        "last_heartbeat_timestamp_ms": 1793197474302,
+        "last_heartbeat_ago_seconds": 5.23,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_seconds": 0.0033549759828019887
+}

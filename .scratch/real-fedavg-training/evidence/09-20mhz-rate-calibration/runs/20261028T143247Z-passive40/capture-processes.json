@@ -1,0 +1,48 @@
+{
+  "fl00": {
+    "pid": 381993,
+    "argv": [
+      "sudo",
+      "-n",
+      "python3",
+      "-B",
+      "-"
+    ]
+  },
+  "fl01": {
+    "pid": 381994,
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl01",
+      "sudo -n python3 -B -"
+    ]
+  },
+  "fl02": {
+    "pid": 381995,
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl02",
+      "sudo -n python3 -B -"
+    ]
+  },
+  "fl04": {
+    "pid": 381996,
+    "argv": [
+      "ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=8",
+      "fl04",
+      "sudo -n python3 -B -"
+    ]
+  }
+}

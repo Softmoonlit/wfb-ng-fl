@@ -1,0 +1,1056 @@
+[
+  {
+    "http": 200,
+    "body": {
+      "server_state": "IDLE",
+      "management_web": {
+        "status": "ready",
+        "host": "192.168.108.100",
+        "port": 8080,
+        "error": null
+      },
+      "link_required": true,
+      "recent_job": {
+        "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+        "run_id": "web-23c1f5392a2849cdb999b277e2bae625",
+        "mode": "sync",
+        "target_nodes": [
+          1,
+          2
+        ],
+        "model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/initial.pt",
+        "model_size_bytes": 38792,
+        "rounds": 2,
+        "round_timeout_seconds": 1800.0,
+        "io_timeout_seconds": 120.0,
+        "live_observation": false,
+        "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+        "radio_config": null,
+        "started_at": 1793206350.909102,
+        "preparation_timeout_seconds": 300.0,
+        "algorithm": {
+          "client_entry": "wfb_ng.fl.mnist:client_entry",
+          "aggregate_entry": "wfb_ng.fl.mnist:aggregate_entry",
+          "evaluate_entry": "wfb_ng.fl.mnist:evaluate_entry",
+          "config": {
+            "data_seed": 2026
+          },
+          "radio_policy_entry": null
+        },
+        "radio_results": [],
+        "initial_metrics": {
+          "loss": 2.3295671367645263,
+          "accuracy": 0.0891
+        },
+        "server_preparation": {
+          "model_format": "mnist-two-conv-fp32-v1",
+          "sample_count": 10000,
+          "data_sha256": {
+            "t10k-images-idx3-ubyte": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+            "t10k-labels-idx1-ubyte": "ff7bcfd416de33731a308c3f266cc351222c34898ecbeaf847f06e48f7ec33f2"
+          },
+          "device": {
+            "type": "cpu",
+            "name": "CPU",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "cuda_version": "12.6"
+          },
+          "data_seed": 2026
+        },
+        "current_round": 2,
+        "rounds_completed": 2,
+        "server_phase": "ready",
+        "phase_started_at": 1793206379.422366,
+        "client_preparation_reports": {
+          "1": {
+            "model_format": "mnist-two-conv-fp32-v1",
+            "sample_count": 60000,
+            "data_sha256": {
+              "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+              "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+            },
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            },
+            "data_seed": 2026
+          },
+          "2": {
+            "model_format": "mnist-two-conv-fp32-v1",
+            "sample_count": 60000,
+            "data_sha256": {
+              "train-images-idx3-ubyte": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+              "train-labels-idx1-ubyte": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+            },
+            "device": {
+              "type": "cuda",
+              "name": "Orin",
+              "torch_version": "2.5.0a0+872d972e41.nv24.08",
+              "cuda_version": "12.6"
+            },
+            "data_seed": 2026
+          }
+        },
+        "round_started_at": 1793206364.5345163,
+        "round_results": [
+          {
+            "round_index": 1,
+            "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/initial.pt",
+            "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+            "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+            "output_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+            "committed_nodes": [
+              1,
+              2
+            ],
+            "updates": {
+              "1": {
+                "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/1/update.bin",
+                "size_bytes": 39048,
+                "sha256": "1e6e956c439f82d3cc3de95192b741c9526f2ce8d9986cb912ec4d59a7f21135"
+              },
+              "2": {
+                "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/2/update.bin",
+                "size_bytes": 39048,
+                "sha256": "7c0968866aa51353335a49864a9032af7a77de91c1d0cb90221a43885dbe2d8b"
+              }
+            },
+            "dropped_out_nodes": [],
+            "client_submission_returns_received": true,
+            "metrics": {
+              "loss": 0.41197967913150785,
+              "accuracy": 0.8747
+            },
+            "verdict": null,
+            "reason": null,
+            "round_started_monotonic": 6030.697538976,
+            "round_deadline_monotonic": 7830.697538976,
+            "publish_io_started_monotonic": 6030.70208864,
+            "publish_io_deadline_monotonic": 6150.70208864,
+            "publish_io_completed_monotonic": 6031.595188896,
+            "duration_seconds": 9.287,
+            "training": [
+              {
+                "model_format": "mnist-two-conv-fp32-v1",
+                "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+                "node_id": 1,
+                "round_index": 1,
+                "sample_count": 60000,
+                "optimizer_steps": 938,
+                "train_loss": 0.8489624035199483,
+                "device": {
+                  "type": "cuda",
+                  "name": "Orin",
+                  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                  "cuda_version": "12.6"
+                }
+              },
+              {
+                "model_format": "mnist-two-conv-fp32-v1",
+                "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+                "node_id": 2,
+                "round_index": 1,
+                "sample_count": 60000,
+                "optimizer_steps": 938,
+                "train_loss": 0.8489624580224355,
+                "device": {
+                  "type": "cuda",
+                  "name": "Orin",
+                  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                  "cuda_version": "12.6"
+                }
+              }
+            ]
+          },
+          {
+            "round_index": 2,
+            "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+            "input_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+            "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0002.bin",
+            "output_model_sha256": "eb3e2492cc53c9b430e8c511667cfedcb634070a40e3944175cfae981de48635",
+            "committed_nodes": [
+              1,
+              2
+            ],
+            "updates": {
+              "1": {
+                "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/1/update.bin",
+                "size_bytes": 39048,
+                "sha256": "e046dab2ed3a4112172187cb354bf39783a33c8037ff2174e1e6d77cc106275c"
+              },
+              "2": {
+                "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/2/update.bin",
+                "size_bytes": 39048,
+                "sha256": "1b38c497403abf180534f9a6957260d68713cec25d3425ed1413c27431fc99c5"
+              }
+            },
+            "dropped_out_nodes": [],
+            "client_submission_returns_received": true,
+            "metrics": {
+              "loss": 0.2099649447977543,
+              "accuracy": 0.9393
+            },
+            "verdict": true,
+            "reason": "末轮准确率高于初始且损失低于初始",
+            "round_started_monotonic": 6039.998598464,
+            "round_deadline_monotonic": 7839.998598464,
+            "publish_io_started_monotonic": 6040.003791328,
+            "publish_io_deadline_monotonic": 6160.003791328,
+            "publish_io_completed_monotonic": 6047.425430016,
+            "duration_seconds": 14.855,
+            "training": [
+              {
+                "model_format": "mnist-two-conv-fp32-v1",
+                "base_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                "node_id": 1,
+                "round_index": 2,
+                "sample_count": 60000,
+                "optimizer_steps": 938,
+                "train_loss": 0.2742959788719813,
+                "device": {
+                  "type": "cuda",
+                  "name": "Orin",
+                  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                  "cuda_version": "12.6"
+                }
+              },
+              {
+                "model_format": "mnist-two-conv-fp32-v1",
+                "base_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                "node_id": 2,
+                "round_index": 2,
+                "sample_count": 60000,
+                "optimizer_steps": 938,
+                "train_loss": 0.27429579100608825,
+                "device": {
+                  "type": "cuda",
+                  "name": "Orin",
+                  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                  "cuda_version": "12.6"
+                }
+              }
+            ]
+          }
+        ],
+        "effect_result": {
+          "round_index": 2,
+          "metrics": {
+            "loss": 0.2099649447977543,
+            "accuracy": 0.9393
+          },
+          "verdict": true,
+          "reason": "末轮准确率高于初始且损失低于初始"
+        },
+        "radio_boundary_round": 2,
+        "summary": {
+          "schema_version": 1,
+          "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+          "run_id": "web-23c1f5392a2849cdb999b277e2bae625",
+          "mode": "sync",
+          "status": "succeeded",
+          "execution_result": "succeeded",
+          "rounds_total": 2,
+          "rounds_completed": 2,
+          "target_nodes": [
+            1,
+            2
+          ],
+          "initial_metrics": {
+            "loss": 2.3295671367645263,
+            "accuracy": 0.0891
+          },
+          "effect_result": {
+            "round_index": 2,
+            "metrics": {
+              "loss": 0.2099649447977543,
+              "accuracy": 0.9393
+            },
+            "verdict": true,
+            "reason": "末轮准确率高于初始且损失低于初始"
+          },
+          "rounds": [
+            {
+              "round_index": 1,
+              "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/initial.pt",
+              "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+              "output_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+              "committed_nodes": [
+                1,
+                2
+              ],
+              "updates": {
+                "1": {
+                  "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/1/update.bin",
+                  "size_bytes": 39048,
+                  "sha256": "1e6e956c439f82d3cc3de95192b741c9526f2ce8d9986cb912ec4d59a7f21135"
+                },
+                "2": {
+                  "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/2/update.bin",
+                  "size_bytes": 39048,
+                  "sha256": "7c0968866aa51353335a49864a9032af7a77de91c1d0cb90221a43885dbe2d8b"
+                }
+              },
+              "dropped_out_nodes": [],
+              "client_submission_returns_received": true,
+              "metrics": {
+                "loss": 0.41197967913150785,
+                "accuracy": 0.8747
+              },
+              "verdict": null,
+              "reason": null,
+              "round_started_monotonic": 6030.697538976,
+              "round_deadline_monotonic": 7830.697538976,
+              "publish_io_started_monotonic": 6030.70208864,
+              "publish_io_deadline_monotonic": 6150.70208864,
+              "publish_io_completed_monotonic": 6031.595188896,
+              "duration_seconds": 9.287,
+              "training": [
+                {
+                  "model_format": "mnist-two-conv-fp32-v1",
+                  "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+                  "node_id": 1,
+                  "round_index": 1,
+                  "sample_count": 60000,
+                  "optimizer_steps": 938,
+                  "train_loss": 0.8489624035199483,
+                  "device": {
+                    "type": "cuda",
+                    "name": "Orin",
+                    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                    "cuda_version": "12.6"
+                  }
+                },
+                {
+                  "model_format": "mnist-two-conv-fp32-v1",
+                  "base_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+                  "node_id": 2,
+                  "round_index": 1,
+                  "sample_count": 60000,
+                  "optimizer_steps": 938,
+                  "train_loss": 0.8489624580224355,
+                  "device": {
+                    "type": "cuda",
+                    "name": "Orin",
+                    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                    "cuda_version": "12.6"
+                  }
+                }
+              ]
+            },
+            {
+              "round_index": 2,
+              "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+              "input_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+              "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0002.bin",
+              "output_model_sha256": "eb3e2492cc53c9b430e8c511667cfedcb634070a40e3944175cfae981de48635",
+              "committed_nodes": [
+                1,
+                2
+              ],
+              "updates": {
+                "1": {
+                  "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/1/update.bin",
+                  "size_bytes": 39048,
+                  "sha256": "e046dab2ed3a4112172187cb354bf39783a33c8037ff2174e1e6d77cc106275c"
+                },
+                "2": {
+                  "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/2/update.bin",
+                  "size_bytes": 39048,
+                  "sha256": "1b38c497403abf180534f9a6957260d68713cec25d3425ed1413c27431fc99c5"
+                }
+              },
+              "dropped_out_nodes": [],
+              "client_submission_returns_received": true,
+              "metrics": {
+                "loss": 0.2099649447977543,
+                "accuracy": 0.9393
+              },
+              "verdict": true,
+              "reason": "末轮准确率高于初始且损失低于初始",
+              "round_started_monotonic": 6039.998598464,
+              "round_deadline_monotonic": 7839.998598464,
+              "publish_io_started_monotonic": 6040.003791328,
+              "publish_io_deadline_monotonic": 6160.003791328,
+              "publish_io_completed_monotonic": 6047.425430016,
+              "duration_seconds": 14.855,
+              "training": [
+                {
+                  "model_format": "mnist-two-conv-fp32-v1",
+                  "base_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                  "node_id": 1,
+                  "round_index": 2,
+                  "sample_count": 60000,
+                  "optimizer_steps": 938,
+                  "train_loss": 0.2742959788719813,
+                  "device": {
+                    "type": "cuda",
+                    "name": "Orin",
+                    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                    "cuda_version": "12.6"
+                  }
+                },
+                {
+                  "model_format": "mnist-two-conv-fp32-v1",
+                  "base_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                  "node_id": 2,
+                  "round_index": 2,
+                  "sample_count": 60000,
+                  "optimizer_steps": 938,
+                  "train_loss": 0.27429579100608825,
+                  "device": {
+                    "type": "cuda",
+                    "name": "Orin",
+                    "torch_version": "2.5.0a0+872d972e41.nv24.08",
+                    "cuda_version": "12.6"
+                  }
+                }
+              ]
+            }
+          ],
+          "final_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0002.bin",
+          "final_model_sha256": "eb3e2492cc53c9b430e8c511667cfedcb634070a40e3944175cfae981de48635",
+          "final_model_size_bytes": 38792,
+          "events": [
+            {
+              "type": "JOB_STARTED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206355.228229,
+              "monotonic": 6030.692592672,
+              "target_nodes": [
+                1,
+                2
+              ],
+              "rounds": 2,
+              "initial_metrics": {
+                "loss": 2.3295671367645263,
+                "accuracy": 0.0891
+              }
+            },
+            {
+              "type": "ROUND_STARTED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206355.233418,
+              "monotonic": 6030.69778144,
+              "round_index": 1,
+              "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "round_started_monotonic": 6030.697538976,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "MODEL_PUBLISH_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206355.237752,
+              "monotonic": 6030.702115328,
+              "round_index": 1,
+              "io_started_monotonic": 6030.70208864,
+              "io_deadline_monotonic": 6150.70208864,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "MODEL_PUBLISHED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206356.1308362,
+              "monotonic": 6031.59519952,
+              "round_index": 1,
+              "model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+              "io_completed_monotonic": 6031.595188896,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "WAIT_FOR_UPDATES_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206356.1354477,
+              "monotonic": 6031.59981104,
+              "round_index": 1,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "UPDATES_COLLECTED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206363.3094602,
+              "monotonic": 6038.773824,
+              "round_index": 1,
+              "submitted_nodes": [
+                1,
+                2
+              ],
+              "dropped_out_nodes": [],
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "AGGREGATE_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206363.31402,
+              "monotonic": 6038.778382976,
+              "round_index": 1,
+              "submitted_nodes": [
+                1,
+                2
+              ],
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "AGGREGATION_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206363.350138,
+              "monotonic": 6038.814501344,
+              "round_index": 1,
+              "output_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "EVALUATION_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.5157144,
+              "monotonic": 6039.980078336,
+              "round_index": 1,
+              "metrics": {
+                "loss": 0.41197967913150785,
+                "accuracy": 0.8747
+              },
+              "verdict": null,
+              "reason": null,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "ROUND_REPORT_WAIT_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.5204391,
+              "monotonic": 6039.984802208,
+              "round_index": 1,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "ROUND_REPORT_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.524694,
+              "monotonic": 6039.989057216,
+              "round_index": 1,
+              "round_deadline_monotonic": 7830.697538976
+            },
+            {
+              "type": "ROUND_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.528927,
+              "monotonic": 6039.99329024,
+              "round_index": 1,
+              "summary": {
+                "round_index": 1,
+                "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/initial.pt",
+                "input_model_sha256": "b1a1c1734bec69acd26df1ed6c6aaafecd0b7a6b5b3c2f9b594043d7fca453d1",
+                "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+                "output_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                "committed_nodes": [
+                  1,
+                  2
+                ],
+                "updates": {
+                  "1": {
+                    "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/1/update.bin",
+                    "size_bytes": 39048,
+                    "sha256": "1e6e956c439f82d3cc3de95192b741c9526f2ce8d9986cb912ec4d59a7f21135"
+                  },
+                  "2": {
+                    "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/821a47be-d124-48d2-bcbc-7a99870c8e86/updates/2/update.bin",
+                    "size_bytes": 39048,
+                    "sha256": "7c0968866aa51353335a49864a9032af7a77de91c1d0cb90221a43885dbe2d8b"
+                  }
+                },
+                "dropped_out_nodes": [],
+                "client_submission_returns_received": true,
+                "metrics": {
+                  "loss": 0.41197967913150785,
+                  "accuracy": 0.8747
+                },
+                "verdict": null,
+                "reason": null,
+                "round_started_monotonic": 6030.697538976,
+                "round_deadline_monotonic": 7830.697538976,
+                "publish_io_started_monotonic": 6030.70208864,
+                "publish_io_deadline_monotonic": 6150.70208864,
+                "publish_io_completed_monotonic": 6031.595188896,
+                "duration_seconds": 9.287
+              }
+            },
+            {
+              "type": "ROUND_STARTED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.5344706,
+              "monotonic": 6039.998834208,
+              "round_index": 2,
+              "input_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+              "round_started_monotonic": 6039.998598464,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "MODEL_PUBLISH_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206364.5394466,
+              "monotonic": 6040.003809632,
+              "round_index": 2,
+              "io_started_monotonic": 6040.003791328,
+              "io_deadline_monotonic": 6160.003791328,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "MODEL_PUBLISHED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206371.9610772,
+              "monotonic": 6047.425440384,
+              "round_index": 2,
+              "model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+              "io_completed_monotonic": 6047.425430016,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "WAIT_FOR_UPDATES_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206371.9649706,
+              "monotonic": 6047.429334144,
+              "round_index": 2,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "UPDATES_COLLECTED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206378.2837071,
+              "monotonic": 6053.748071072,
+              "round_index": 2,
+              "submitted_nodes": [
+                1,
+                2
+              ],
+              "dropped_out_nodes": [],
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "AGGREGATE_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206378.2878084,
+              "monotonic": 6053.752172064,
+              "round_index": 2,
+              "submitted_nodes": [
+                1,
+                2
+              ],
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "AGGREGATION_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206378.3253047,
+              "monotonic": 6053.7896696,
+              "round_index": 2,
+              "output_model_sha256": "eb3e2492cc53c9b430e8c511667cfedcb634070a40e3944175cfae981de48635",
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "EVALUATION_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206379.3833203,
+              "monotonic": 6054.847684704,
+              "round_index": 2,
+              "metrics": {
+                "loss": 0.2099649447977543,
+                "accuracy": 0.9393
+              },
+              "verdict": true,
+              "reason": "末轮准确率高于初始且损失低于初始",
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "ROUND_REPORT_WAIT_START",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206379.3890398,
+              "monotonic": 6054.853403072,
+              "round_index": 2,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "ROUND_REPORT_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206379.392471,
+              "monotonic": 6054.85683424,
+              "round_index": 2,
+              "round_deadline_monotonic": 7839.998598464
+            },
+            {
+              "type": "ROUND_COMPLETED",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "mode": "sync",
+              "timestamp": 1793206379.3959503,
+              "monotonic": 6054.860313504,
+              "round_index": 2,
+              "summary": {
+                "round_index": 2,
+                "input_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0001.bin",
+                "input_model_sha256": "0d695940ba1d7b965b2b77e8cf6e5801d15bcbaf30627e157961a7270c65f92b",
+                "output_model_path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547/artifacts/global-model-round-0002.bin",
+                "output_model_sha256": "eb3e2492cc53c9b430e8c511667cfedcb634070a40e3944175cfae981de48635",
+                "committed_nodes": [
+                  1,
+                  2
+                ],
+                "updates": {
+                  "1": {
+                    "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/1/update.bin",
+                    "size_bytes": 39048,
+                    "sha256": "e046dab2ed3a4112172187cb354bf39783a33c8037ff2174e1e6d77cc106275c"
+                  },
+                  "2": {
+                    "path": "/srv/wfb-ng-fl/server/job_web-82816dafbc9d44d6b859dc428b3e5547_role/rounds/28e7af7f-df2e-4d43-82f9-e64a92059ccc/updates/2/update.bin",
+                    "size_bytes": 39048,
+                    "sha256": "1b38c497403abf180534f9a6957260d68713cec25d3425ed1413c27431fc99c5"
+                  }
+                },
+                "dropped_out_nodes": [],
+                "client_submission_returns_received": true,
+                "metrics": {
+                  "loss": 0.2099649447977543,
+                  "accuracy": 0.9393
+                },
+                "verdict": true,
+                "reason": "末轮准确率高于初始且损失低于初始",
+                "round_started_monotonic": 6039.998598464,
+                "round_deadline_monotonic": 7839.998598464,
+                "publish_io_started_monotonic": 6040.003791328,
+                "publish_io_deadline_monotonic": 6160.003791328,
+                "publish_io_completed_monotonic": 6047.425430016,
+                "duration_seconds": 14.855
+              }
+            }
+          ],
+          "error_code": null,
+          "error_message": null,
+          "completed_at": 1793206379.4027648
+        },
+        "execution_result": "succeeded",
+        "recovery_state": "ready",
+        "reason": "completed",
+        "error": "",
+        "terminal_result": {
+          "status": "completed",
+          "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+          "reason": "completed"
+        },
+        "recovery_wait_finished": true,
+        "server_recovery_complete": true,
+        "recovery_missing_nodes": [],
+        "recovery_reports": {
+          "1": {
+            "report_id": "ef3b7337cbfd4bf39456d79843ef2644",
+            "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+            "node_id": 1,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.11",
+              55228
+            ]
+          },
+          "2": {
+            "report_id": "0c677d8038ec41eeae9ed7531f8dc8b1",
+            "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+            "node_id": 2,
+            "report": {
+              "recovery_epoch": 1,
+              "recovery_state": "ready"
+            },
+            "source": [
+              "10.80.0.12",
+              51033
+            ]
+          }
+        },
+        "terminal_delivery_succeeded": true,
+        "recovery_report_history": {
+          "1": [
+            {
+              "report_id": "ef3b7337cbfd4bf39456d79843ef2644",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "node_id": 1,
+              "report": {
+                "recovery_epoch": 1,
+                "recovery_state": "ready"
+              },
+              "source": [
+                "10.80.0.11",
+                55228
+              ]
+            }
+          ],
+          "2": [
+            {
+              "report_id": "0c677d8038ec41eeae9ed7531f8dc8b1",
+              "job_id": "web-82816dafbc9d44d6b859dc428b3e5547",
+              "node_id": 2,
+              "report": {
+                "recovery_epoch": 1,
+                "recovery_state": "ready"
+              },
+              "source": [
+                "10.80.0.12",
+                51033
+              ]
+            }
+          ]
+        }
+      },
+      "active_job": null,
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 14,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 14,
+        "channel_width": "HT40+",
+        "guard_interval": "short"
+      },
+      "tun": {
+        "name": "fl-s",
+        "ip": "10.80.0.1",
+        "cidr": "10.80.0.1/24",
+        "txqueuelen": 5000,
+        "is_active": true
+      },
+      "air_interface": "wlxfc221c100157",
+      "link_process": {
+        "running": true,
+        "pid": 3762
+      },
+      "nodes": {
+        "1": {
+          "node_id": 1,
+          "tun_ip": "10.80.0.11",
+          "reported_state": "IDLE",
+          "readiness": "READY",
+          "elapsed_ms": 2055518,
+          "current_channel": 149,
+          "txpower_dbm": 14,
+          "uplink_mcs": 4,
+          "last_heartbeat_time": 8111.093164864,
+          "last_heartbeat_timestamp_ms": 1793208435628,
+          "last_heartbeat_ago_seconds": 0.73,
+          "error_code": null,
+          "can_select": true,
+          "selection_blockers": []
+        },
+        "2": {
+          "node_id": 2,
+          "tun_ip": "10.80.0.12",
+          "reported_state": "IDLE",
+          "readiness": "READY",
+          "elapsed_ms": 2054982,
+          "current_channel": 149,
+          "txpower_dbm": 14,
+          "uplink_mcs": 4,
+          "last_heartbeat_time": 8110.832180928,
+          "last_heartbeat_timestamp_ms": 1793208435367,
+          "last_heartbeat_ago_seconds": 0.99,
+          "error_code": null,
+          "can_select": true,
+          "selection_blockers": []
+        },
+        "3": {
+          "node_id": 3,
+          "tun_ip": "10.80.0.13",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "4": {
+          "node_id": 4,
+          "tun_ip": "10.80.0.14",
+          "reported_state": "IDLE",
+          "readiness": "OFFLINE",
+          "elapsed_ms": 234382,
+          "current_channel": 149,
+          "txpower_dbm": 14,
+          "uplink_mcs": 4,
+          "last_heartbeat_time": 5769.6072584,
+          "last_heartbeat_timestamp_ms": 1793206094142,
+          "last_heartbeat_ago_seconds": 2342.22,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "5": {
+          "node_id": 5,
+          "tun_ip": "10.80.0.15",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "6": {
+          "node_id": 6,
+          "tun_ip": "10.80.0.16",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "7": {
+          "node_id": 7,
+          "tun_ip": "10.80.0.17",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "8": {
+          "node_id": 8,
+          "tun_ip": "10.80.0.18",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "9": {
+          "node_id": 9,
+          "tun_ip": "10.80.0.19",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        },
+        "10": {
+          "node_id": 10,
+          "tun_ip": "10.80.0.20",
+          "reported_state": null,
+          "readiness": "OFFLINE",
+          "elapsed_ms": 0,
+          "current_channel": null,
+          "txpower_dbm": null,
+          "uplink_mcs": null,
+          "last_heartbeat_time": null,
+          "last_heartbeat_timestamp_ms": null,
+          "last_heartbeat_ago_seconds": null,
+          "error_code": null,
+          "can_select": false,
+          "selection_blockers": [
+            {
+              "code": "NODE_OFFLINE",
+              "message": "节点未上线或心跳已超时"
+            }
+          ]
+        }
+      }
+    },
+    "elapsed_seconds": 0.0045957760003148
+  }
+]

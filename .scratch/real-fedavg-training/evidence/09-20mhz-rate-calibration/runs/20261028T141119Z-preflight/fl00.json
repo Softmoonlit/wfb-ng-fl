@@ -1,0 +1,308 @@
+{
+  "host": "fl00",
+  "identity": {
+    "commit": "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "schema_version": 1
+  },
+  "python_path": "/usr/local/lib/python3.10/dist-packages/wfb_ng",
+  "processes": [
+    {
+      "pid": 349554,
+      "args": [
+        "/usr/bin/python3",
+        "-B",
+        "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py",
+        "daemon",
+        "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+        "fl00",
+        "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z",
+        "--",
+        "--config",
+        "/etc/wfb-ng-fl/server.json",
+        "--channel",
+        "149",
+        "--bandwidth-mhz",
+        "40",
+        "--txpower",
+        "14",
+        "--downlink-mcs",
+        "3",
+        "--uplink-mcs",
+        "4",
+        "--uftp-rate-kbps",
+        "15000"
+      ],
+      "ticks": "17821790",
+      "exe": "/usr/bin/python3.10",
+      "sha256": "488dbdb614cb20e9e2e0aebab76645bcb66a87d5dafb3a7723d2da46be6d9fd9"
+    },
+    {
+      "pid": 349662,
+      "args": [
+        "/usr/bin/wfb_v6_uplink",
+        "--role",
+        "server",
+        "--tun-name",
+        "fl-s",
+        "--tun-addr",
+        "10.80.0.1/24",
+        "--node-id",
+        "255",
+        "--link-id",
+        "7669206",
+        "--uplink-stream",
+        "1",
+        "--downlink-stream",
+        "2",
+        "--fec-k",
+        "8",
+        "--fec-n",
+        "14",
+        "--radio-bandwidth",
+        "40",
+        "--radio-control-port",
+        "9200",
+        "--radio-mcs-index",
+        "3",
+        "--radio-short-gi",
+        "--air-interface",
+        "wlxfc221c100157",
+        "--known-clients",
+        "1,2,3,4,5,6,7,8,9,10",
+        "--client-target",
+        "1:10.80.0.11:127.0.0.1:1",
+        "--client-target",
+        "2:10.80.0.12:127.0.0.1:1",
+        "--client-target",
+        "3:10.80.0.13:127.0.0.1:1",
+        "--client-target",
+        "4:10.80.0.14:127.0.0.1:1",
+        "--client-target",
+        "5:10.80.0.15:127.0.0.1:1",
+        "--client-target",
+        "6:10.80.0.16:127.0.0.1:1",
+        "--client-target",
+        "7:10.80.0.17:127.0.0.1:1",
+        "--client-target",
+        "8:10.80.0.18:127.0.0.1:1",
+        "--client-target",
+        "9:10.80.0.19:127.0.0.1:1",
+        "--client-target",
+        "10:10.80.0.20:127.0.0.1:1",
+        "--downlink-pause-threshold-bytes",
+        "131072",
+        "--downlink-resume-threshold-bytes",
+        "65536",
+        "--downlink-queue-packets-limit",
+        "64"
+      ],
+      "ticks": "17821858",
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93"
+    }
+  ],
+  "loaded_path": "/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/python-loaded.json",
+  "loaded": {
+    "pid": 349554,
+    "tick": "17821790",
+    "host": "fl00",
+    "interpreter_exe": "/usr/bin/python3.10",
+    "cwd": "/",
+    "expectedCommit": "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "pythonLoaded": {
+      "root": "/usr/local/lib/python3.10/dist-packages/wfb_ng",
+      "identity": {
+        "commit": "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+        "schema_version": 1
+      },
+      "files": {
+        "wfb_ng": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py",
+          "relative": "__init__.py",
+          "sha256": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232"
+        },
+        "wfb_ng.fl": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/__init__.py",
+          "relative": "fl/__init__.py",
+          "sha256": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+        },
+        "wfb_ng.fl.algorithm": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/algorithm.py",
+          "relative": "fl/algorithm.py",
+          "sha256": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+        },
+        "wfb_ng.fl.artifacts": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/artifacts.py",
+          "relative": "fl/artifacts.py",
+          "sha256": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+        },
+        "wfb_ng.fl.client_daemon": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "relative": "fl/client_daemon.py",
+          "sha256": "75743cd31a5517426edca96367016f41b01991225d96e217311693e3adc91a83"
+        },
+        "wfb_ng.fl.console": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console.py",
+          "relative": "fl/console.py",
+          "sha256": "869a85f9b1ae5df9f37244cebd8f80a0c2736a828078f3e76c2e89ec3e376cbb"
+        },
+        "wfb_ng.fl.console_http": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py",
+          "relative": "fl/console_http.py",
+          "sha256": "52fbc6b7990983bbec1488d04f46da9ac3406971944167477a40e36f0d9bf3e9"
+        },
+        "wfb_ng.fl.control": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py",
+          "relative": "fl/control.py",
+          "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+        },
+        "wfb_ng.fl.coordinator": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/coordinator.py",
+          "relative": "fl/coordinator.py",
+          "sha256": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+        },
+        "wfb_ng.fl.errors": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/errors.py",
+          "relative": "fl/errors.py",
+          "sha256": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+        },
+        "wfb_ng.fl.evidence": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/evidence.py",
+          "relative": "fl/evidence.py",
+          "sha256": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+        },
+        "wfb_ng.fl.link_radio": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/link_radio.py",
+          "relative": "fl/link_radio.py",
+          "sha256": "62b0fb0e64362aa483f59e57af742ccb48bb621573113f2db500f77e659e4d69"
+        },
+        "wfb_ng.fl.model_library": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/model_library.py",
+          "relative": "fl/model_library.py",
+          "sha256": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+        },
+        "wfb_ng.fl.observation": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/observation.py",
+          "relative": "fl/observation.py",
+          "sha256": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+        },
+        "wfb_ng.fl.radio": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/radio.py",
+          "relative": "fl/radio.py",
+          "sha256": "ff1f71836c9fb1684581c540556f41de9dd5026a03887efaefa2d60486026858"
+        },
+        "wfb_ng.fl.role": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py",
+          "relative": "fl/role.py",
+          "sha256": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+        },
+        "wfb_ng.fl.runtime": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/runtime.py",
+          "relative": "fl/runtime.py",
+          "sha256": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+        },
+        "wfb_ng.fl.server_daemon": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+          "relative": "fl/server_daemon.py",
+          "sha256": "02831cc51b93dd1d525f38cad4625bcfc140a66075e841578b21d3c3f3885fcb"
+        },
+        "wfb_ng.fl.transport": {
+          "path": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/transport.py",
+          "relative": "fl/transport.py",
+          "sha256": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+        }
+      },
+      "installed": {
+        "__init__.py": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232",
+        "fl/__init__.py": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+        "fl/algorithm.py": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+        "fl/artifacts.py": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+        "fl/build_identity.json": "7b38459dc2dc1408497b1f2aea12b6fc572a98d09033f98273ec8ae6dfb9652c",
+        "fl/client_daemon.py": "75743cd31a5517426edca96367016f41b01991225d96e217311693e3adc91a83",
+        "fl/console.py": "869a85f9b1ae5df9f37244cebd8f80a0c2736a828078f3e76c2e89ec3e376cbb",
+        "fl/console_http.py": "52fbc6b7990983bbec1488d04f46da9ac3406971944167477a40e36f0d9bf3e9",
+        "fl/control.py": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec",
+        "fl/coordinator.py": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+        "fl/errors.py": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+        "fl/evidence.py": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+        "fl/fp64_audit.py": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+        "fl/issue41_fixtures.py": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+        "fl/link_radio.py": "62b0fb0e64362aa483f59e57af742ccb48bb621573113f2db500f77e659e4d69",
+        "fl/mnist.py": "c79b1a5d36b2039ff1f12d665c68535ca083491a444f1d7f3453502f4103d5e9",
+        "fl/mnist_data.py": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+        "fl/model_library.py": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+        "fl/observation.py": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+        "fl/radio.py": "ff1f71836c9fb1684581c540556f41de9dd5026a03887efaefa2d60486026858",
+        "fl/reference_model.py": "59728755ef86959c602814acbd4059f1dd87f57adf9d1d22dc1c98ab98cb19d3",
+        "fl/role.py": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+        "fl/runtime.py": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+        "fl/server_daemon.py": "02831cc51b93dd1d525f38cad4625bcfc140a66075e841578b21d3c3f3885fcb",
+        "fl/service.py": "c90645c37b2992093fbb6c2c5b7a94e9ec639a5e8f66d4bbf039a3850299237a",
+        "fl/static/console.css": "d7962082c4613c15e7893d5cacaf7ee68e27ddeee86b827e2a21954c7bcc36cc",
+        "fl/static/console.js": "9dc75d74d38aa16d20164a59a9720309bbfee5194c314ed18d6319c328953f8a",
+        "fl/static/index.html": "346a12ed91ac686175242037fcf12923c64e7e97e29cae273da70f5934d39741",
+        "fl/static/models.css": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+        "fl/static/models.html": "0287bf0f749d0462ba9e03718e24dbb2c34edd3f35356154a9faa10c675fb82e",
+        "fl/static/models.js": "a65b17b91f1a6a474bec47a9d968eb260a51f1c2daab3ad7f1713af69e22482d",
+        "fl/static/radio.css": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+        "fl/static/radio.html": "52ebe6a7f9887d7d3020fadf071cd0123446e8e0a9a601f37bff22da62ebb567",
+        "fl/static/radio.js": "ae28e9035d5617803d64c4df6fe87a0a41c020249b06e22e14e083db0608b4a5",
+        "fl/transport.py": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+      },
+      "identity_sha256": "7b38459dc2dc1408497b1f2aea12b6fc572a98d09033f98273ec8ae6dfb9652c"
+    },
+    "argv": [
+      "--config",
+      "/etc/wfb-ng-fl/server.json",
+      "--channel",
+      "149",
+      "--bandwidth-mhz",
+      "40",
+      "--txpower",
+      "14",
+      "--downlink-mcs",
+      "3",
+      "--uplink-mcs",
+      "4",
+      "--uftp-rate-kbps",
+      "15000"
+    ]
+  },
+  "iw": {
+    "rc": 0,
+    "out": "phy#1\n\tInterface wlxfc221c100157\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:57\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm\n"
+  },
+  "usb": {
+    "rc": 0,
+    "out": "/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 10000M\n    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/4p, 10000M\n        |__ Port 1: Dev 3, If 0, Class=Vendor Specific Class, Driver=rtl88xxau_wfb, 5000M\n/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=tegra-xusb/4p, 480M\n    |__ Port 2: Dev 2, If 0, Class=Hub, Driver=hub/4p, 480M\n    |__ Port 3: Dev 3, If 0, Class=Wireless, Driver=btusb, 12M\n    |__ Port 3: Dev 3, If 1, Class=Wireless, Driver=btusb, 12M\n"
+  },
+  "interfaces": {
+    "rc": 0,
+    "out": "[{\"ifindex\":1,\"ifname\":\"lo\",\"flags\":[\"LOOPBACK\",\"UP\",\"LOWER_UP\"],\"mtu\":65536,\"qdisc\":\"noqueue\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"loopback\",\"address\":\"00:00:00:00:00:00\",\"broadcast\":\"00:00:00:00:00:00\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"127.0.0.1\",\"prefixlen\":8,\"scope\":\"host\",\"label\":\"lo\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":2,\"ifname\":\"wlP1p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"dc:4a:9e:e2:3c:48\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":3,\"ifname\":\"can0\",\"flags\":[\"NOARP\",\"ECHO\"],\"mtu\":16,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":10,\"link_type\":\"can\",\"addr_info\":[]},{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3c:6d:66:b5:0c:0b\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.108.100\",\"prefixlen\":24,\"broadcast\":\"192.168.108.255\",\"scope\":\"global\",\"noprefixroute\":true,\"label\":\"enP8p1s0\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295},{\"family\":\"inet6\",\"local\":\"fe80::212d:5c5e:f4b2:9e7a\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":5,\"ifname\":\"l4tbr0\",\"flags\":[\"BROADCAST\",\"MULTICAST\"],\"mtu\":1500,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3e:c7:e7:79:f3:87\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":6,\"ifname\":\"usb0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"16:fd:dc:6d:67:91\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":7,\"ifname\":\"usb1\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"16:fd:dc:6d:67:93\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":8,\"ifname\":\"wlxfc221c100157\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":4052,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ieee802.11/radiotap\",\"address\":\"fc:22:1c:10:01:57\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":124,\"ifname\":\"fl-s\",\"flags\":[\"POINTOPOINT\",\"MULTICAST\",\"NOARP\",\"UP\",\"LOWER_UP\"],\"mtu\":3982,\"qdisc\":\"pfifo_fast\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":5000,\"link_type\":\"none\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.80.0.1\",\"prefixlen\":24,\"scope\":\"global\",\"label\":\"fl-s\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]}]\n"
+  },
+  "sockets": {
+    "rc": 0,
+    "out": "State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                  \nUNCONN 0      0          10.80.0.1:44999      0.0.0.0:*    users:((\"python3\",pid=349554,fd=5))                     \nUNCONN 0      0         127.0.0.53:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=560,fd=13))               \nUNCONN 0      0            0.0.0.0:67         0.0.0.0:*    users:((\"dnsmasq\",pid=698,fd=3))                        \nUNCONN 0      0            0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=559,fd=5),(\"systemd\",pid=1,fd=63))\nUNCONN 0      0          10.80.0.1:9001       0.0.0.0:*    users:((\"python3\",pid=349554,fd=4))                     \nUNCONN 0      0            0.0.0.0:54109      0.0.0.0:*    users:((\"avahi-daemon\",pid=572,fd=14))                  \nUNCONN 0      0          127.0.0.1:9200       0.0.0.0:*    users:((\"wfb_v6_uplink\",pid=349662,fd=4))               \nUNCONN 0      0            0.0.0.0:5353       0.0.0.0:*    users:((\"avahi-daemon\",pid=572,fd=12))                  \nUNCONN 0      0                  *:36749            *:*    users:((\"avahi-daemon\",pid=572,fd=15))                  \nUNCONN 0      0                  *:111              *:*    users:((\"rpcbind\",pid=559,fd=7),(\"systemd\",pid=1,fd=65))\nUNCONN 0      0                  *:5353             *:*    users:((\"avahi-daemon\",pid=572,fd=13))                  \n"
+  },
+  "driver": {
+    "rc": 0,
+    "out": "/sys/class/net/enP8p1s0/device/driver/module/version\n8.053.00-NAPI\n/sys/class/net/wlP1p1s0/device/driver/module/version\nv5.14.0.4-250-g5d0d248cc.20240517_COEX20240327-2727\n/sys/class/net/wlxfc221c100157/device/driver/module/version\nv5.2.20.2_28373.20190919\n"
+  },
+  "uftp": {
+    "rc": 1,
+    "out": "uftp: option requires an argument -- 'h'\nuftp [ -R txrate ] [ -L logfile ] [ -B udp_buf_size ]\n    [ -g max_log_size ] [ -n max_log_count ] [ -m max_nak_count ]\n    [ -Y keytype ] [ -h hashtype ] [ -e curve ] [ -c ]\n    [ -k key_file ] [ -K rsa:key_length | ec:curve ] [ -l ] [ -T ]\n    [ -b block_size ] [ -t ttl ] [ -Q dscp ] [ -z | -Z ] [ -I interface ]\n    [ -U UID ] [ -p port ] [ -u source_port ] [ -j proxylist_file ]\n    [ -q ] [ -f ] [ -y ] [ -x log_level ] [ -a max_passes ]\n    [ -H host[,host...] | -H @hostlist_file | -F restart_file ] [ -o ]\n    [ -X exclude_file ] [ -M pub_multicast_addr ] [ -P priv_multicast_addr ]\n    [ -C cc_type ] [ -D dest_name ] [ -E base_dir[,base_dir... ] ]\n    [ -S status_file ] [ -r init_grtt[:min_grtt:max_grtt] ] [ -s robust ] \n    [ -W txweight ] [ -N max_nak_pct ] { -i list_file | file [ file... ] }\n"
+  },
+  "uftpd": {
+    "rc": 1,
+    "out": "uftpd: option requires an argument -- 'h'\nuftpd [ -d ] [ -p port ] [ -B buf_size ]\n    [ -E ] [ -Q dscp ] [ -U UID ] [ -x log_level ] [ -t ] [ -T temp_dir ]\n    [ -D dest_dir [ dest_dir... ]] [ -A backup_dir [ backup_dir... ]]\n    [ -c cache_size ] [ -s postreceive_script ]\n    [ -F status_file ] [ -q ] [ -L logfile ] [ -P pidfile ]\n    [ -o ] [ -S serverlist_file ] [ -R proxylist_file ] [ -r v4proxy[/fp] ]\n    [ -k keyfile ] [ -K rsa:key_length | ec:curve ]\n    [ -m ] [ -N priority ] [ -i ] [ -g max_log_size ] [ -n max_log_count ]\n    [ -H hb_server[:port][,hb_server[:port]...] ] [ -h hb_interval ]\n    [ -I interface[,interface...] ] [ -M pub_mcast_addr[,pub_mcast_addr...] ]\n"
+  },
+  "load": "0.44 0.22 0.12 3/635 362271\n",
+  "ps": {
+    "rc": 0,
+    "out": "    PID %CPU %MEM COMMAND\n 263030 18.4  7.7 pi\n 362186 11.0  0.2 python3 -B .scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/preflight-current.py\n 362224  8.0  0.1 python3 -B -\n 361814  5.1  1.7 pi\n 361725  3.5  1.8 pi\n 362222  2.0  0.0 ssh -o BatchMode=yes -o ConnectTimeout=8 fl02 sudo -n python3 -B -\n 349554  1.3  5.1 /usr/bin/python3 -B /srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z/release-node.py daemon c62cde266ef509d605c8c923b0f4fa35e42fc4dd fl00 /srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z -- --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 14 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000\n 362219  1.0  0.0 ssh -o BatchMode=yes -o ConnectTimeout=8 fl01 sudo -n python3 -B -\n 362223  1.0  0.0 ssh -o BatchMode=yes -o ConnectTimeout=8 fl04 sudo -n python3 -B -\n 268539  0.4  7.9 /home/fl/.zed_server/zed-remote-server-stable-1.25.3+stable.382.8dd255c3eafb5231056fe4e6f601cedd011f1c93 run --log-file /home/fl/.local/share/zed/logs/server-workspace-6.log --pid-file /home/fl/.local/share/zed/server_state/workspace-6/server.pid --stdin-socket /home/fl/.local/share/zed/server_state/workspace-6/stdin.sock --stdout-socket /home/fl/.local/share/zed/server_state/workspace-6/stdout.sock --stderr-socket /home/fl/.local/share/zed/server_state/workspace-6/stderr.sock\n   2407  0.1  0.0 [RTW_CMD_THREAD]\n 262994  0.1  0.0 sshd: fl@pts/0\n 349662  0.1  0.1 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64\n      1  0.0  0.1 /sbin/init 2\n      2  0.0  0.0 [kthreadd]\n      3  0.0  0.0 [rcu_gp]\n      4  0.0  0.0 [rcu_par_gp]\n      5  0.0  0.0 [slub_flushwq]\n      6  0.0  0.0 [netns]\n      8  0.0  0.0 [kworker/0:0H-events_highpri]\n     10  0.0  0.0 [mm_percpu_wq]\n     11  0.0  0.0 [rcu_tasks_kthre]\n     12  0.0  0.0 [rcu_tasks_rude_]\n     13  0.0  0.0 [rcu_tasks_trace]\n     14  0.0  0.0 [ksoftirqd/0]\n     15  0.0  0.0 [rcu_preempt]\n     16  0.0  0.0 [migration/0]\n     17  0.0  0.0 [cpuhp/0]\n     18  0.0  0.0 [cpuhp/1]\n     19  0.0  0.0 [migration/1]\n     20  0.0  0.0 [ksoftirqd/1]\n     22  0.0  0.0 [kworker/1:0H-events_highpri]\n     23  0.0  0.0 [cpuhp/2]\n     24  0.0  0.0 [migration/2]\n     25  0.0  0.0 [ksoftirqd/2]\n     27  0.0  0.0 [kworker/2:0H-events_highpri]\n     28  0.0  0.0 [cpuhp/3]\n     29  0.0  0.0 [migration/3]\n     30  0.0  0.0 [ksoftirqd/3]\n     32  0.0  0.0 [kworker/3:0H-kblockd]\n     33  0.0  0.0 [cpuhp/4]\n     34  0.0  0.0 [migration/4]\n     35  0.0  0.0 [ksoftirqd/4]\n     37  0.0  0.0 [kworker/4:0H-events_highpri]\n     38  0.0  0.0 [cpuhp/5]\n     39  0.0  0.0 [migration/5]\n     40  0.0  0.0 [ksoftirqd/5]\n     42  0.0  0.0 [kworker/5:0H-events_highpri]\n     43  0.0  0.0 [kdevtmpfs]\n     44  0.0  0.0 [inet_frag_wq]\n     51  0.0  0.0 [kauditd]\n     52  0.0  0.0 [oom_reaper]\n     53  0.0  0.0 [writeback]\n     54  0.0  0.0 [kcompactd0]\n     55  0.0  0.0 [ksmd]\n     56  0.0  0.0 [khugepaged]\n     67  0.0  0.0 [cryptd]\n     86  0.0  0.0 [kintegrityd]\n     87  0.0  0.0 [kblockd]\n     88  0.0  0.0 [blkcg_punt_bio]\n     89  0.0  0.0 [tpm_dev_wq]\n     90  0.0  0.0 [ata_sff]\n     91  0.0  0.0 [edac-poller]\n     92  0.0  0.0 [devfreq_wq]\n     93  0.0  0.0 [watchdogd]\n     96  0.0  0.0 [kworker/0:1H-kblockd]\n     97  0.0  0.0 [rpciod]\n     98  0.0  0.0 [kworker/u13:0-hci0]\n     99  0.0  0.0 [xprtiod]\n    127  0.0  0.0 [kswapd0]\n    128  0.0  0.0 [nfsiod]\n    132  0.0  0.0 [vfio-irqfd-clea]\n    133  0.0  0.0 [dm_bufio_cache]\n    135  0.0  0.0 [krfcommd]\n    136  0.0  0.0 [pr/tty0]\n    137  0.0  0.0 [pr/ttyTCU0]\n    140  0.0  0.0 [irq/114-3160000]\n    142  0.0  0.0 [irq/115-3180000]\n    144  0.0  0.0 [irq/116-31b0000]\n    145  0.0  0.0 [irq/167-c240000]\n    146  0.0  0.0 [irq/168-c250000]\n    150  0.0  0.0 [irq/125-3610000]\n    151  0.0  0.0 [irq/122-3610000]\n    154  0.0  0.0 [sdhci]\n    155  0.0  0.0 [irq/120-mmc0]\n    156  0.0  0.0 [irq/230-3400000]\n    172  0.0  0.0 [kworker/1:1H-kblockd]\n    174  0.0  0.0 [kworker/4:1H-kblockd]\n    179  0.0  0.0 [irq/191-tegra-p]\n    180  0.0  0.0 [nvme-wq]\n    181  0.0  0.0 [nvme-reset-wq]\n    182  0.0  0.0 [nvme-delete-wq]\n    191  0.0  0.0 [irq/191-aerdrv]\n    192  0.0  0.0 [irq/193-tegra-p]\n    195  0.0  0.0 [irq/193-aerdrv]\n    196  0.0  0.0 [irq/195-tegra-p]\n    201  0.0  0.0 [kworker/3:1H-kblockd]\n    202  0.0  0.0 [jbd2/nvme0n1p1-]\n    203  0.0  0.0 [ext4-rsv-conver]\n    215  0.0  0.0 [mld]\n    216  0.0  0.0 [ipv6_addrconf]\n    247  0.0  0.3 /lib/systemd/systemd-journald\n    263  0.0  0.0 [kworker/5:1H-kblockd]\n    267  0.0  0.0 [kworker/2:1H-kblockd]\n    272  0.0  0.0 [nvmap-bz]\n    273  0.0  0.0 [irq/188-host1x_]\n    277  0.0  0.0 [irq/197-gk20a_s]\n    278  0.0  0.0 [irq/198-gk20a_s]\n    279  0.0  0.0 [irq/199-gk20a_s]\n    280  0.0  0.0 [irq/200-gk20a_n]\n    284  0.0  0.0 /bin/bash /etc/systemd/nv-tee-supplicant.sh\n    288  0.0  0.0 /usr/sbin/tee-supplicant\n    291  0.0  0.0 [optee_bus_scan]\n    294  0.0  0.0 /lib/systemd/systemd-udevd\n    334  0.0  0.0 [irq/219-bc00000]\n    337  0.0  0.0 [capture-control]\n    338  0.0  0.0 [capture]\n    340  0.0  0.0 [irq/189-tegra-p]\n    347  0.0  0.0 [irq/239-nvvrs-p]\n    348  0.0  0.0 [irq/214-tegra_d]\n    349  0.0  0.0 [irq/215-tegra_d]\n    350  0.0  0.0 [dce-async-ipc-w]\n    357  0.0  0.0 [irq/118-3210000]\n    359  0.0  0.0 [nv_queue]\n    360  0.0  0.0 [nv_queue]\n    364  0.0  0.0 [spi0]\n    367  0.0  0.0 [irq/119-3230000]\n    372  0.0  0.0 [spi1]\n    375  0.0  0.0 [cfg80211]\n    382  0.0  0.0 [irq/189-aerdrv]\n    449  0.0  0.0 [kworker/u13:2-hci0]\n    450  0.0  0.0 [btfwwork]\n    452  0.0  0.0 [bttimerwork]\n    558  0.0  0.0 /usr/sbin/haveged --Foreground --verbose=1\n    559  0.0  0.0 /sbin/rpcbind -f -w\n    560  0.0  0.1 /lib/systemd/systemd-resolved\n    572  0.0  0.0 avahi-daemon: running [fl00.local]\n    573  0.0  0.0 /usr/lib/bluetooth/bluetoothd -d --noplugin=audio,a2dp,avrcp\n    574  0.0  0.0 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n    575  0.0  0.1 /usr/sbin/NetworkManager --no-daemon\n    582  0.0  0.1 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers\n    587  0.0  0.1 python3 /opt/nvidia/pva-allow-2/bin/nvidiaPvaAllowd.py\n    591  0.0  0.1 /usr/libexec/polkitd --no-debug\n    593  0.0  0.0 /usr/libexec/power-profiles-daemon\n    596  0.0  0.0 /usr/sbin/rsyslogd -n -iNONE\n    597  0.0  0.0 seatd -g video\n    611  0.0  0.3 /usr/lib/snapd/snapd\n    616  0.0  0.0 /usr/libexec/accounts-daemon\n    619  0.0  0.0 /usr/libexec/switcheroo-control\n    622  0.0  0.0 /lib/systemd/systemd-logind\n    623  0.0  0.1 /usr/libexec/udisks2/udisksd\n    626  0.0  0.0 /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant\n    628  0.0  0.0 [sugov:0]\n    629  0.0  0.0 [sugov:4]\n    640  0.0  0.0 avahi-daemon: chroot helper\n    693  0.0  0.1 /usr/sbin/ModemManager\n    698  0.0  0.0 /usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/wfb-ng-fl/management-dhcp.conf --pid-file=\n    815  0.0  0.0 [RTW_CMD_THREAD]\n    866  0.0  0.0 [pr/ramoops-1]\n    876  0.0  0.0 [file-storage]\n    942  0.0  0.0 [sw-quiesce]\n    956  0.0  0.0 [nvgpu_channel_p]\n    958  0.0  0.0 [nvgpu_pg_init_g]\n    959  0.0  0.0 [nvgpu_clk_arb_p]\n    960  0.0  0.0 /usr/sbin/nvargus-daemon\n    963  0.0  0.0 /usr/sbin/nvs-service\n    975  0.0  0.0 /bin/sh /snap/cups/1261/scripts/run-cups-browsed\n    983  0.0  0.0 /bin/sh /snap/cups/1261/scripts/run-cupsd\n   1034  0.0  0.0 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\n   1061  0.0  0.0 /usr/sbin/cron -f -P\n   1094  0.0  0.0 /usr/sbin/kerneloops --test\n   1120  0.0  0.0 /usr/sbin/gdm3\n   1127  0.0  0.0 /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyGS0 vt220\n   1128  0.0  0.0 /usr/sbin/kerneloops\n   1131  0.0  0.0 /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyTCU0 vt220\n   1142  0.0  0.0 /usr/sbin/nvphsd\n   1146  0.0  0.1 gdm-session-worker [pam/gdm-autologin]\n   1147  0.0  0.0 /usr/sbin/nvphsd\n   1242  0.0  0.1 /lib/systemd/systemd --user\n   1250  0.0  0.0 (sd-pam)\n   1430  0.0  0.0 /usr/bin/pipewire\n   1433  0.0  0.0 /usr/bin/pipewire-media-session\n   1437  0.0  0.1 /usr/bin/pulseaudio --daemonize=no --log-target=journal\n   1442  0.0  0.0 /usr/bin/gnome-keyring-daemon --daemonize --login\n   1447  0.0  0.0 /usr/libexec/rtkit-daemon\n   1457  0.0  0.0 /usr/libexec/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --session=ubuntu\n   1461  0.0  0.4 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -nolisten tcp -background none -noreset -keeptty -novtswitch -verbose 3\n   1463  0.0  0.0 /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n   1475  0.0  0.0 [nvidia-modeset/]\n   1476  0.0  0.0 [nvidia-modeset/]\n   1478  0.0  0.0 [nvidia]\n   1479  0.0  0.0 [nv_queue]\n   1525  0.0  0.1 /usr/libexec/gnome-session-binary --session=ubuntu\n   1628  0.0  0.0 /usr/libexec/at-spi-bus-launcher\n   1634  0.0  0.0 /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/run/user/1000/at-spi/bus_0\n   1647  0.0  0.0 /usr/libexec/gnome-session-ctl --monitor\n   1662  0.0  0.0 /usr/libexec/gvfsd\n   1679  0.0  0.0 /usr/libexec/gvfsd-fuse /run/user/1000/gvfs -f\n   1685  0.0  0.1 /usr/libexec/gnome-session-binary --systemd-service --session=ubuntu\n   1710  0.0  1.9 /usr/bin/gnome-shell\n   1765  0.0  0.2 /usr/bin/python3 /usr/local/bin/jtop --force\n   1782  0.0  0.2 /usr/bin/python3 /usr/local/bin/jtop --force\n   1790  0.0  0.2 /usr/bin/python3 /usr/local/bin/jtop --force\n   1853  0.0  0.0 /usr/libexec/xdg-permission-store\n   1856  0.0  0.1 /usr/libexec/gnome-shell-calendar-server\n   1894  0.0  0.2 /usr/libexec/evolution-source-registry\n   1953  0.0  0.3 /usr/libexec/goa-daemon\n   1960  0.0  0.0 /usr/libexec/upowerd\n   1972  0.0  0.3 /usr/libexec/evolution-calendar-factory\n   1991  0.0  0.1 /usr/libexec/goa-identity-service\n   1994  0.0  0.0 /usr/libexec/dconf-service\n   2007  0.0  0.3 /usr/libexec/evolution-addressbook-factory\n   2008  0.0  0.0 /usr/libexec/gvfs-udisks2-volume-monitor\n   2027  0.0  0.0 /usr/libexec/gvfs-goa-volume-monitor\n   2031  0.0  0.0 /usr/libexec/gvfs-gphoto2-volume-monitor\n   2037  0.0  0.0 /usr/libexec/gvfs-afc-volume-monitor\n   2042  0.0  0.0 /usr/libexec/gvfs-mtp-volume-monitor\n   2046  0.0  0.2 /usr/libexec/packagekitd\n   2060  0.0  0.1 /usr/libexec/gvfsd-trash --spawner :1.19 /org/gtk/gvfs/exec_spaw/0\n   2090  0.0  0.1 cupsd -f -s /var/snap/cups/common/etc/cups/cups-files.conf -c /var/snap/cups/common/etc/cups/cupsd.conf\n   2096  0.0  0.1 /usr/libexec/xdg-desktop-portal\n   2100  0.0  0.1 /usr/libexec/xdg-document-portal\n   2105  0.0  0.0 fusermount3 -o rw,nosuid,nodev,fsname=portal,auto_unmount,subtype=portal -- /run/user/1000/doc\n   2109  0.0  0.2 /usr/bin/gjs /usr/share/gnome-shell/org.gnome.Shell.Notifications\n   2111  0.0  0.3 /usr/libexec/xdg-desktop-portal-gnome\n   2112  0.0  0.0 /usr/libexec/at-spi2-registryd --use-gnome-session\n   2126  0.0  0.0 sh -c /usr/bin/ibus-daemon --panel disable $([ \"$XDG_SESSION_TYPE\" = \"x11\" ] && echo \"--xim\")\n   2127  0.0  0.0 /usr/libexec/gsd-a11y-settings\n   2129  0.0  0.2 /usr/libexec/gsd-color\n   2130  0.0  0.1 /usr/libexec/gsd-datetime\n   2132  0.0  0.0 /usr/libexec/gsd-housekeeping\n   2133  0.0  0.1 /usr/bin/ibus-daemon --panel disable --xim\n   2135  0.0  0.2 /usr/libexec/gsd-keyboard\n   2136  0.0  0.2 /usr/libexec/gsd-media-keys\n   2140  0.0  0.2 /usr/libexec/gsd-power\n   2141  0.0  0.1 /usr/libexec/gsd-print-notifications\n   2146  0.0  0.1 /usr/libexec/gsd-rfkill\n   2147  0.0  0.0 /usr/libexec/gsd-screensaver-proxy\n   2151  0.0  0.1 /usr/libexec/gsd-sharing\n   2152  0.0  0.0 /usr/libexec/gsd-smartcard\n   2156  0.0  0.1 /usr/libexec/gsd-sound\n   2162  0.0  0.2 /usr/libexec/gsd-wacom\n   2168  0.0  0.2 /usr/libexec/gsd-xsettings\n   2176  0.0  0.1 /usr/libexec/gsd-printer\n   2204  0.0  0.0 /usr/libexec/ibus-memconf\n   2205  0.0  0.2 /usr/libexec/ibus-extension-gtk3\n   2208  0.0  0.6 /usr/libexec/evolution-data-server/evolution-alarm-notify\n   2213  0.0  0.9 /usr/bin/gnome-software --gapplication-service\n   2217  0.0  0.2 /usr/libexec/ibus-x11 --kill-daemon\n   2229  0.0  0.5 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2231  0.0  0.0 /usr/libexec/ibus-portal\n   2241  0.0  0.0 /usr/libexec/gsd-disk-utility-notify\n   2244  0.0  0.1 cups-browsed -c /var/snap/cups/common/etc/cups/cups-browsed.conf\n   2287  0.0  0.1 /usr/libexec/colord\n   2352  0.0  0.2 /usr/bin/gjs /usr/share/gnome-shell/org.gnome.ScreenSaver\n   2365  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2366  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2367  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2368  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2369  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2370  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2371  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2372  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2373  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2374  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2377  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2378  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2379  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2380  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2381  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2382  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2383  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2384  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2388  0.0  0.3 /usr/libexec/tracker-miner-fs-3\n   2389  0.0  0.2 python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2396  0.0  0.2 /usr/libexec/ibus-engine-libpinyin --ibus\n   2414  0.0  0.2 /usr/libexec/xdg-desktop-portal-gtk\n   2609  0.0  0.0 /usr/libexec/gvfsd-metadata\n   2617  0.0  0.4 update-notifier\n   4496  0.0  0.0 /lib/systemd/systemd-timesyncd\n   7764  0.0  2.3 /usr/bin/python3 /usr/bin/update-manager --no-update --no-focus-on-map\n 126928  0.0  0.0 [kworker/5:1-mm_percpu_wq]\n 262941  0.0  0.1 sshd: fl [priv]\n 262995  0.0  0.0 -bash\n 264797  0.0  0.0 [kworker/4:0-events]\n 265402  0.0  0.0 [kworker/1:0-events]\n 268299  0.0  0.1 sshd: fl [priv]\n 268352  0.0  0.0 sshd: fl@pts/1\n 268353  0.0  0.0 bash\n 268502  0.0  0.1 sshd: fl [priv]\n 268533  0.0  0.1 sshd: fl@notty\n 268534  0.0  2.0 .zed_server/zed-remote-server-stable-1.25.3+stable.382.8dd255c3eafb5231056fe4e6f601cedd011f1c93 proxy --identifier workspace-6\n 268536  0.0  0.0 /home/fl/.zed_server/zed-remote-server-stable-1.25.3+stable.382.8dd255c3eafb5231056fe4e6f601cedd011f1c93 --crash-handler /home/fl/.cache/zed/zed-remote-server-proxy-crash-handler-268534\n 268547  0.0  0.0 /home/fl/.zed_server/zed-remote-server-stable-1.25.3+stable.382.8dd255c3eafb5231056fe4e6f601cedd011f1c93 --crash-handler /home/fl/.cache/zed/zed-remote-server-crash-handler-268539\n 278755  0.0  0.0 [kworker/2:1-events]\n 282216  0.0  0.0 [kworker/4:1]\n 282373  0.0  0.0 [kworker/3:1-events]\n 304748  0.0  0.0 [kworker/u12:10-devfreq_wq]\n 312641  0.0  0.0 [kworker/1:1-events]\n 325408  0.0  0.0 [kworker/0:2-events]\n 348305  0.0  0.0 [kworker/2:0-cgroup_destroy]\n 348942  0.0  0.3 /usr/libexec/fwupd/fwupd\n 349655  0.0  0.0 [kworker/5:0]\n 353371  0.0  0.0 [kworker/u12:2-events_unbound]\n 358654  0.0  0.0 [kworker/u12:3-events_freezable_power_]\n 359741  0.0  0.0 [kworker/u12:6-events_freezable_power_]\n 361629  0.0  0.0 [kworker/3:2-events]\n 361631  0.0  0.0 [kworker/u12:8-events_unbound]\n 361648  0.0  0.0 [kworker/u12:0-devfreq_wq]\n 361653  0.0  0.0 [kworker/u12:4-events_freezable_power_]\n 361654  0.0  0.0 [kworker/u12:7-events_freezable_power_]\n 361685  0.0  0.0 [kworker/u12:1-events_freezable_power_]\n 361697  0.0  0.0 [kworker/u12:5-devfreq_wq]\n 361698  0.0  0.0 [kworker/0:1-events]\n 361703  0.0  0.0 [kworker/u12:9-events_freezable_power_]\n 361940  0.0  0.0 [kworker/0:0]\n 362218  0.0  0.0 sudo -n python3 -B -\n 362272  0.0  0.0 ps -eo pid,pcpu,pmem,args --sort=-pcpu\n"
+  },
+  "disk": {
+    "rc": 0,
+    "out": "文件系统             1B的块        已用        可用 已用% 挂载点\n/dev/nvme0n1p1 123887923200 42710654976 74836791296   37% /\n"
+  }
+}

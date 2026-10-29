@@ -1,0 +1,719 @@
+grant seq=35293 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35294 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35295 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35296 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35297 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1
+grant seq=35298 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2
+grant seq=35299 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1689 consecutive_silent_grants=12 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35300 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+182813054	RX_ANT	5745:4:40	1	14:-58:-57:-56:12:13:17
+182813054	RX_ANT	5745:4:40	0	14:-46:-46:-46:12:14:17
+182813054	PKT	15:2299:0:0:14:14:0:0:0:1:279
+182813054	RX_BATCH	4:15:166:86:8
+182813054	PKT_SRC	1:0:0:0:0:0:0
+182813054	PKT_SRC	2:14:2275:0:0:1:279
+182813054	PKT_SRC	3:0:0:0:0:0:0
+182813054	PKT_SRC	4:0:0:0:0:0:0
+182813054	PKT_SRC	5:0:0:0:0:0:0
+182813054	PKT_SRC	6:0:0:0:0:0:0
+182813054	PKT_SRC	7:0:0:0:0:0:0
+182813054	PKT_SRC	8:0:0:0:0:0:0
+182813054	PKT_SRC	9:0:0:0:0:0:0
+182813054	PKT_SRC	10:0:0:0:0:0:0
+182813054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182813054	READY_FILTER	5129:5129:0:0:0
+182813054	REASSEMBLY	0:40
+grant seq=35301 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35302 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35303 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=518 consecutive_silent_grants=3 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35304 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35305 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35306 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35307 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182814054	RX_ANT	5745:4:40	1	14:-50:-48:-48:13:15:18
+182814054	RX_ANT	5745:4:40	0	14:-52:-51:-50:12:15:18
+182814054	PKT	15:2306:0:0:14:14:0:0:0:1:280
+182814054	RX_BATCH	4:15:161:82:9
+182814054	PKT_SRC	1:14:2282:0:0:1:280
+182814054	PKT_SRC	2:0:0:0:0:0:0
+182814054	PKT_SRC	3:0:0:0:0:0:0
+182814054	PKT_SRC	4:0:0:0:0:0:0
+182814054	PKT_SRC	5:0:0:0:0:0:0
+182814054	PKT_SRC	6:0:0:0:0:0:0
+182814054	PKT_SRC	7:0:0:0:0:0:0
+182814054	PKT_SRC	8:0:0:0:0:0:0
+182814054	PKT_SRC	9:0:0:0:0:0:0
+182814054	PKT_SRC	10:0:0:0:0:0:0
+182814054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182814054	READY_FILTER	5130:5130:0:0:0
+182814054	REASSEMBLY	0:40
+grant seq=35308 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35309 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35310 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35311 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1
+grant seq=35312 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4
+grant seq=35313 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1298 consecutive_silent_grants=9 active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35314 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35315 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+182815054	RX_ANT	5745:4:40	1	25:-40:-35:-32:7:13:22
+182815054	RX_ANT	5745:4:40	0	25:-44:-43:-42:7:13:22
+182815054	PKT	27:5616:0:0:25:25:3:0:0:7:1948
+182815054	RX_BATCH	13:27:394:86:7
+182815054	PKT_SRC	1:0:0:0:0:0:0
+182815054	PKT_SRC	2:0:0:0:0:0:0
+182815054	PKT_SRC	3:0:0:0:0:0:0
+182815054	PKT_SRC	4:25:5568:3:0:7:1948
+182815054	PKT_SRC	5:0:0:0:0:0:0
+182815054	PKT_SRC	6:0:0:0:0:0:0
+182815054	PKT_SRC	7:0:0:0:0:0:0
+182815054	PKT_SRC	8:0:0:0:0:0:0
+182815054	PKT_SRC	9:0:0:0:0:0:0
+182815054	PKT_SRC	10:0:0:0:0:0:0
+182815054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182815054	READY_FILTER	5132:5132:0:0:0
+182815054	REASSEMBLY	0:40
+grant seq=35316 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=331 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35317 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35318 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35319 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35320 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=519 consecutive_silent_grants=3 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35321 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35322 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35323 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182816054	RX_ANT	5745:4:40	1	28:-58:-52:-48:12:14:18
+182816054	RX_ANT	5745:4:40	0	28:-52:-48:-46:12:14:19
+182816054	PKT	29:4581:0:0:28:28:0:0:0:2:559
+182816054	RX_BATCH	7:29:225:83:8
+182816054	PKT_SRC	1:14:2282:0:0:1:280
+182816054	PKT_SRC	2:14:2275:0:0:1:279
+182816054	PKT_SRC	3:0:0:0:0:0:0
+182816054	PKT_SRC	4:0:0:0:0:0:0
+182816054	PKT_SRC	5:0:0:0:0:0:0
+182816054	PKT_SRC	6:0:0:0:0:0:0
+182816054	PKT_SRC	7:0:0:0:0:0:0
+182816054	PKT_SRC	8:0:0:0:0:0:0
+182816054	PKT_SRC	9:0:0:0:0:0:0
+182816054	PKT_SRC	10:0:0:0:0:0:0
+182816054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182816054	READY_FILTER	5133:5133:0:0:0
+182816054	REASSEMBLY	0:40
+grant seq=35324 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35325 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35326 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35327 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35328 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35329 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1
+grant seq=35330 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4
+182817054	PKT	1:24:0:0:0:0:0:0:0:0:0
+182817054	RX_BATCH	1:1:26:26:1
+182817054	PKT_SRC	1:0:0:0:0:0:0
+182817054	PKT_SRC	2:0:0:0:0:0:0
+182817054	PKT_SRC	3:0:0:0:0:0:0
+182817054	PKT_SRC	4:0:0:0:0:0:0
+182817054	PKT_SRC	5:0:0:0:0:0:0
+182817054	PKT_SRC	6:0:0:0:0:0:0
+182817054	PKT_SRC	7:0:0:0:0:0:0
+182817054	PKT_SRC	8:0:0:0:0:0:0
+182817054	PKT_SRC	9:0:0:0:0:0:0
+182817054	PKT_SRC	10:0:0:0:0:0:0
+182817054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182817054	READY_FILTER	5134:5134:0:0:0
+182817054	REASSEMBLY	0:40
+grant seq=35331 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1430 consecutive_silent_grants=10 active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35332 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35333 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35334 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35335 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=516 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35336 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35337 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=517 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35338 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182818054	RX_ANT	5745:4:40	1	41:-58:-47:-32:8:14:20
+182818054	RX_ANT	5745:4:40	0	41:-52:-46:-42:8:14:20
+182818054	PKT	43:6572:0:0:41:41:1:0:0:3:837
+182818054	RX_BATCH	10:43:461:100:9
+182818054	PKT_SRC	1:14:2282:0:0:1:280
+182818054	PKT_SRC	2:14:2275:0:0:1:279
+182818054	PKT_SRC	3:0:0:0:0:0:0
+182818054	PKT_SRC	4:13:1967:1:0:1:278
+182818054	PKT_SRC	5:0:0:0:0:0:0
+182818054	PKT_SRC	6:0:0:0:0:0:0
+182818054	PKT_SRC	7:0:0:0:0:0:0
+182818054	PKT_SRC	8:0:0:0:0:0:0
+182818054	PKT_SRC	9:0:0:0:0:0:0
+182818054	PKT_SRC	10:0:0:0:0:0:0
+182818054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182818054	READY_FILTER	5136:5136:0:0:0
+182818054	REASSEMBLY	0:40
+grant seq=35339 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35340 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35341 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35342 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35343 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35344 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35345 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35346 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182819054	PKT	0:0:0:0:0:0:0:0:0:0:0
+182819054	RX_BATCH	0:0:0:0:0
+182819054	PKT_SRC	1:0:0:0:0:0:0
+182819054	PKT_SRC	2:0:0:0:0:0:0
+182819054	PKT_SRC	3:0:0:0:0:0:0
+182819054	PKT_SRC	4:0:0:0:0:0:0
+182819054	PKT_SRC	5:0:0:0:0:0:0
+182819054	PKT_SRC	6:0:0:0:0:0:0
+182819054	PKT_SRC	7:0:0:0:0:0:0
+182819054	PKT_SRC	8:0:0:0:0:0:0
+182819054	PKT_SRC	9:0:0:0:0:0:0
+182819054	PKT_SRC	10:0:0:0:0:0:0
+182819054	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182819054	READY_FILTER	5136:5136:0:0:0
+182819054	REASSEMBLY	0:40
+ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1
+grant seq=35347 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4
+grant seq=35348 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1429 consecutive_silent_grants=10 active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35349 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35350 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35351 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35352 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=517 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35353 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+182820055	RX_ANT	5745:4:40	1	28:-58:-46:-32:10:14:21
+182820055	RX_ANT	5745:4:40	0	28:-46:-44:-42:10:15:22
+182820055	PKT	31:4615:0:0:28:28:0:0:0:2:557
+182820055	RX_BATCH	9:31:324:81:8
+182820055	PKT_SRC	1:0:0:0:0:0:0
+182820055	PKT_SRC	2:14:2275:0:0:1:279
+182820055	PKT_SRC	3:0:0:0:0:0:0
+182820055	PKT_SRC	4:14:2268:0:0:1:278
+182820055	PKT_SRC	5:0:0:0:0:0:0
+182820055	PKT_SRC	6:0:0:0:0:0:0
+182820055	PKT_SRC	7:0:0:0:0:0:0
+182820055	PKT_SRC	8:0:0:0:0:0:0
+182820055	PKT_SRC	9:0:0:0:0:0:0
+182820055	PKT_SRC	10:0:0:0:0:0:0
+182820055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182820055	READY_FILTER	5139:5139:0:0:0
+182820055	REASSEMBLY	0:40
+grant seq=35354 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=517 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35355 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35356 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35357 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35358 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35359 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35360 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35361 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182821055	RX_ANT	5745:4:40	1	14:-50:-48:-48:12:14:17
+182821055	RX_ANT	5745:4:40	0	14:-52:-50:-50:12:14:18
+182821055	PKT	14:2282:0:0:14:14:0:0:0:1:280
+182821055	RX_BATCH	3:14:66:47:8
+182821055	PKT_SRC	1:14:2282:0:0:1:280
+182821055	PKT_SRC	2:0:0:0:0:0:0
+182821055	PKT_SRC	3:0:0:0:0:0:0
+182821055	PKT_SRC	4:0:0:0:0:0:0
+182821055	PKT_SRC	5:0:0:0:0:0:0
+182821055	PKT_SRC	6:0:0:0:0:0:0
+182821055	PKT_SRC	7:0:0:0:0:0:0
+182821055	PKT_SRC	8:0:0:0:0:0:0
+182821055	PKT_SRC	9:0:0:0:0:0:0
+182821055	PKT_SRC	10:0:0:0:0:0:0
+182821055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182821055	READY_FILTER	5139:5139:0:0:0
+182821055	REASSEMBLY	0:40
+grant seq=35362 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35363 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=4 active_queue=[1,4] cursor=0 cursor_node_id=1
+grant seq=35364 node_id=1 duration_ms=120 kind=normal active_queue=[1,4] cursor=1 cursor_node_id=4
+grant seq=35365 node_id=4 duration_ms=120 kind=normal active_queue=[1,4] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1431 consecutive_silent_grants=10 active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35366 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35367 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35368 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35369 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=515 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+182822055	RX_ANT	5745:4:40	1	25:-58:-48:-32:8:13:19
+182822055	RX_ANT	5745:4:40	0	25:-46:-45:-42:8:13:18
+182822055	PKT	27:4244:0:0:25:25:3:0:0:2:557
+182822055	RX_BATCH	7:27:281:77:8
+182822055	PKT_SRC	1:0:0:0:0:0:0
+182822055	PKT_SRC	2:14:2275:0:0:1:279
+182822055	PKT_SRC	3:0:0:0:0:0:0
+182822055	PKT_SRC	4:11:1921:3:0:1:278
+182822055	PKT_SRC	5:0:0:0:0:0:0
+182822055	PKT_SRC	6:0:0:0:0:0:0
+182822055	PKT_SRC	7:0:0:0:0:0:0
+182822055	PKT_SRC	8:0:0:0:0:0:0
+182822055	PKT_SRC	9:0:0:0:0:0:0
+182822055	PKT_SRC	10:0:0:0:0:0:0
+182822055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182822055	READY_FILTER	5141:5141:0:0:0
+182822055	REASSEMBLY	0:40
+ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2
+grant seq=35370 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4
+grant seq=35371 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2
+grant seq=35372 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4
+grant seq=35373 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=444 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35374 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35375 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35376 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+182823055	RX_ANT	5745:4:40	1	26:-58:-46:-32:10:14:19
+182823055	RX_ANT	5745:4:40	0	26:-46:-44:-42:9:14:20
+182823055	PKT	27:2702:0:0:26:26:1:0:0:2:320
+182823055	RX_BATCH	7:27:215:66:9
+182823055	PKT_SRC	1:0:0:0:0:0:0
+182823055	PKT_SRC	2:14:1442:0:0:1:160
+182823055	PKT_SRC	3:0:0:0:0:0:0
+182823055	PKT_SRC	4:12:1236:1:0:1:160
+182823055	PKT_SRC	5:0:0:0:0:0:0
+182823055	PKT_SRC	6:0:0:0:0:0:0
+182823055	PKT_SRC	7:0:0:0:0:0:0
+182823055	PKT_SRC	8:0:0:0:0:0:0
+182823055	PKT_SRC	9:0:0:0:0:0:0
+182823055	PKT_SRC	10:0:0:0:0:0:0
+182823055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182823055	READY_FILTER	5142:5142:0:0:0
+182823055	REASSEMBLY	0:40
+grant seq=35377 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35378 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35379 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35380 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+ready_refresh node_id=4 active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35381 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35382 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35383 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35384 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=388 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+182824055	RX_ANT	5745:4:40	1	27:-58:-46:-32:9:14:23
+182824055	RX_ANT	5745:4:40	0	27:-46:-44:-42:9:14:22
+182824055	PKT	29:4568:0:0:27:27:1:0:0:2:557
+182824055	RX_BATCH	8:29:306:86:8
+182824055	PKT_SRC	1:0:0:0:0:0:0
+182824055	PKT_SRC	2:14:2275:0:0:1:279
+182824055	PKT_SRC	3:0:0:0:0:0:0
+182824055	PKT_SRC	4:13:2245:1:0:1:278
+182824055	PKT_SRC	5:0:0:0:0:0:0
+182824055	PKT_SRC	6:0:0:0:0:0:0
+182824055	PKT_SRC	7:0:0:0:0:0:0
+182824055	PKT_SRC	8:0:0:0:0:0:0
+182824055	PKT_SRC	9:0:0:0:0:0:0
+182824055	PKT_SRC	10:0:0:0:0:0:0
+182824055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182824055	READY_FILTER	5144:5144:0:0:0
+182824055	REASSEMBLY	0:40
+grant seq=35385 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35386 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35387 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35388 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35389 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35390 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35391 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35392 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+182825055	PKT	0:0:0:0:0:0:0:0:0:0:0
+182825055	RX_BATCH	0:0:0:0:0
+182825055	PKT_SRC	1:0:0:0:0:0:0
+182825055	PKT_SRC	2:0:0:0:0:0:0
+182825055	PKT_SRC	3:0:0:0:0:0:0
+182825055	PKT_SRC	4:0:0:0:0:0:0
+182825055	PKT_SRC	5:0:0:0:0:0:0
+182825055	PKT_SRC	6:0:0:0:0:0:0
+182825055	PKT_SRC	7:0:0:0:0:0:0
+182825055	PKT_SRC	8:0:0:0:0:0:0
+182825055	PKT_SRC	9:0:0:0:0:0:0
+182825055	PKT_SRC	10:0:0:0:0:0:0
+182825055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182825055	READY_FILTER	5144:5144:0:0:0
+182825055	REASSEMBLY	0:40
+grant seq=35393 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35394 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35395 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35396 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2
+grant seq=35397 node_id=2 duration_ms=120 kind=normal active_queue=[2,4] cursor=1 cursor_node_id=4
+grant seq=35398 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=1819 consecutive_silent_grants=13 active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35399 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+182826055	PKT	2:48:0:0:0:0:0:0:0:0:0
+182826055	RX_BATCH	2:2:165:85:1
+182826055	PKT_SRC	1:0:0:0:0:0:0
+182826055	PKT_SRC	2:0:0:0:0:0:0
+182826055	PKT_SRC	3:0:0:0:0:0:0
+182826055	PKT_SRC	4:0:0:0:0:0:0
+182826055	PKT_SRC	5:0:0:0:0:0:0
+182826055	PKT_SRC	6:0:0:0:0:0:0
+182826055	PKT_SRC	7:0:0:0:0:0:0
+182826055	PKT_SRC	8:0:0:0:0:0:0
+182826055	PKT_SRC	9:0:0:0:0:0:0
+182826055	PKT_SRC	10:0:0:0:0:0:0
+182826055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182826055	READY_FILTER	5146:5146:0:0:0
+182826055	REASSEMBLY	0:40
+grant seq=35400 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35401 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35402 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35403 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35404 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35405 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+silent_remove node_id=4 silence_ms=644 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35406 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35407 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+182827055	RX_ANT	5745:4:40	1	25:-58:-46:-32:9:13:18
+182827055	RX_ANT	5745:4:40	0	25:-46:-44:-42:9:14:19
+182827055	PKT	25:3923:0:0:25:25:3:0:0:2:558
+182827055	RX_BATCH	4:25:150:63:8
+182827055	PKT_SRC	1:0:0:0:0:0:0
+182827055	PKT_SRC	2:13:1973:1:0:1:279
+182827055	PKT_SRC	3:0:0:0:0:0:0
+182827055	PKT_SRC	4:12:1950:2:0:1:279
+182827055	PKT_SRC	5:0:0:0:0:0:0
+182827055	PKT_SRC	6:0:0:0:0:0:0
+182827055	PKT_SRC	7:0:0:0:0:0:0
+182827055	PKT_SRC	8:0:0:0:0:0:0
+182827055	PKT_SRC	9:0:0:0:0:0:0
+182827055	PKT_SRC	10:0:0:0:0:0:0
+182827055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182827055	READY_FILTER	5146:5146:0:0:0
+182827055	REASSEMBLY	0:40
+grant seq=35408 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35409 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=4 active_queue=[2,4] cursor=0 cursor_node_id=2
+v6_radio_command req_id=330182641 cmd_id=2 rc=0 payload_size=0
+ready_accept node_id=1 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+ready_refresh node_id=2 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+ready_refresh node_id=1 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+ready_refresh node_id=2 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+grant seq=35410 node_id=2 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=1 cursor_node_id=4
+grant seq=35411 node_id=4 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=2 cursor_node_id=1
+grant seq=35412 node_id=1 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=0 cursor_node_id=2
+ready_refresh node_id=4 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+ready_refresh node_id=2 active_queue=[2,4,1] cursor=0 cursor_node_id=2
+grant seq=35413 node_id=2 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=1 cursor_node_id=4
+grant seq=35414 node_id=4 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=2 cursor_node_id=1
+grant seq=35415 node_id=1 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=0 cursor_node_id=2
+182828055	RX_ANT	5745:4:40	1	113:-58:-48:-32:8:14:21
+182828055	RX_ANT	5745:4:40	0	113:-52:-46:-42:8:14:22
+182828055	PKT	120:27040:0:0:113:113:11:0:0:21:6850
+182828055	RX_BATCH	38:120:991:67:8
+182828055	PKT_SRC	1:37:9026:3:0:10:3046
+182828055	PKT_SRC	2:42:9214:0:0:5:1762
+182828055	PKT_SRC	3:0:0:0:0:0:0
+182828055	PKT_SRC	4:34:8632:8:0:6:2042
+182828055	PKT_SRC	5:0:0:0:0:0:0
+182828055	PKT_SRC	6:0:0:0:0:0:0
+182828055	PKT_SRC	7:0:0:0:0:0:0
+182828055	PKT_SRC	8:0:0:0:0:0:0
+182828055	PKT_SRC	9:0:0:0:0:0:0
+182828055	PKT_SRC	10:0:0:0:0:0:0
+182828055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182828055	READY_FILTER	5153:5153:0:0:0
+182828055	REASSEMBLY	0:40
+grant seq=35416 node_id=2 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=1 cursor_node_id=4
+grant seq=35417 node_id=4 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=2 cursor_node_id=1
+grant seq=35418 node_id=1 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=0 cursor_node_id=2
+grant seq=35419 node_id=2 duration_ms=120 kind=normal active_queue=[2,4,1] cursor=1 cursor_node_id=4
+silent_remove node_id=1 silence_ms=851 consecutive_silent_grants=2 active_queue=[2,4] cursor=1 cursor_node_id=4
+grant seq=35420 node_id=4 duration_ms=120 kind=normal active_queue=[2,4] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=909 consecutive_silent_grants=2 active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35421 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35422 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+182829055	PKT	0:0:0:0:0:0:0:0:0:0:0
+182829055	RX_BATCH	0:0:0:0:0
+182829055	PKT_SRC	1:0:0:0:0:0:0
+182829055	PKT_SRC	2:0:0:0:0:0:0
+182829055	PKT_SRC	3:0:0:0:0:0:0
+182829055	PKT_SRC	4:0:0:0:0:0:0
+182829055	PKT_SRC	5:0:0:0:0:0:0
+182829055	PKT_SRC	6:0:0:0:0:0:0
+182829055	PKT_SRC	7:0:0:0:0:0:0
+182829055	PKT_SRC	8:0:0:0:0:0:0
+182829055	PKT_SRC	9:0:0:0:0:0:0
+182829055	PKT_SRC	10:0:0:0:0:0:0
+182829055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182829055	READY_FILTER	5153:5153:0:0:0
+182829055	REASSEMBLY	0:40
+grant seq=35423 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35424 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+grant seq=35425 node_id=4 duration_ms=120 kind=normal active_queue=[4] cursor=0 cursor_node_id=4
+ready_accept node_id=2 active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35426 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+grant seq=35427 node_id=2 duration_ms=120 kind=normal active_queue=[4,2] cursor=0 cursor_node_id=4
+grant seq=35428 node_id=4 duration_ms=120 kind=normal active_queue=[4,2] cursor=1 cursor_node_id=2
+ready_accept node_id=1 active_queue=[4,2,1] cursor=1 cursor_node_id=2
+grant seq=35429 node_id=2 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=2 cursor_node_id=1
+grant seq=35430 node_id=1 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=0 cursor_node_id=4
+182830055	RX_ANT	5745:4:40	1	40:-58:-48:-32:8:14:21
+182830055	RX_ANT	5745:4:40	0	40:-52:-47:-42:7:14:23
+182830055	PKT	42:6535:0:0:40:40:2:0:0:3:835
+182830055	RX_BATCH	10:42:406:87:8
+182830055	PKT_SRC	1:14:2275:0:0:1:279
+182830055	PKT_SRC	2:14:2268:0:0:1:278
+182830055	PKT_SRC	3:0:0:0:0:0:0
+182830055	PKT_SRC	4:12:1944:2:0:1:278
+182830055	PKT_SRC	5:0:0:0:0:0:0
+182830055	PKT_SRC	6:0:0:0:0:0:0
+182830055	PKT_SRC	7:0:0:0:0:0:0
+182830055	PKT_SRC	8:0:0:0:0:0:0
+182830055	PKT_SRC	9:0:0:0:0:0:0
+182830055	PKT_SRC	10:0:0:0:0:0:0
+182830055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182830055	READY_FILTER	5155:5155:0:0:0
+182830055	REASSEMBLY	0:40
+grant seq=35431 node_id=4 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=1 cursor_node_id=2
+grant seq=35432 node_id=2 duration_ms=120 kind=normal active_queue=[4,2,1] cursor=2 cursor_node_id=1
+silent_remove node_id=4 silence_ms=663 consecutive_silent_grants=2 active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35433 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=780 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35434 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35435 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35436 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35437 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35438 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182831055	PKT	0:0:0:0:0:0:0:0:0:0:0
+182831055	RX_BATCH	0:0:0:0:0
+182831055	PKT_SRC	1:0:0:0:0:0:0
+182831055	PKT_SRC	2:0:0:0:0:0:0
+182831055	PKT_SRC	3:0:0:0:0:0:0
+182831055	PKT_SRC	4:0:0:0:0:0:0
+182831055	PKT_SRC	5:0:0:0:0:0:0
+182831055	PKT_SRC	6:0:0:0:0:0:0
+182831055	PKT_SRC	7:0:0:0:0:0:0
+182831055	PKT_SRC	8:0:0:0:0:0:0
+182831055	PKT_SRC	9:0:0:0:0:0:0
+182831055	PKT_SRC	10:0:0:0:0:0:0
+182831055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182831055	READY_FILTER	5155:5155:0:0:0
+182831055	REASSEMBLY	0:40
+grant seq=35439 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35440 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35441 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35442 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1
+grant seq=35443 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2
+grant seq=35444 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1821 consecutive_silent_grants=11 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35445 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+182832055	RX_ANT	5745:4:40	1	14:-58:-57:-56:12:14:16
+182832055	RX_ANT	5745:4:40	0	14:-46:-46:-46:13:14:17
+182832055	PKT	16:2316:0:0:14:14:0:0:0:1:278
+182832055	RX_BATCH	5:16:188:74:8
+182832055	PKT_SRC	1:0:0:0:0:0:0
+182832055	PKT_SRC	2:14:2268:0:0:1:278
+182832055	PKT_SRC	3:0:0:0:0:0:0
+182832055	PKT_SRC	4:0:0:0:0:0:0
+182832055	PKT_SRC	5:0:0:0:0:0:0
+182832055	PKT_SRC	6:0:0:0:0:0:0
+182832055	PKT_SRC	7:0:0:0:0:0:0
+182832055	PKT_SRC	8:0:0:0:0:0:0
+182832055	PKT_SRC	9:0:0:0:0:0:0
+182832055	PKT_SRC	10:0:0:0:0:0:0
+182832055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182832055	READY_FILTER	5157:5157:0:0:0
+182832055	REASSEMBLY	0:40
+grant seq=35446 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35447 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=390 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35448 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35449 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35450 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35451 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35452 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35453 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182833055	RX_ANT	5745:4:40	1	4:-48:-48:-48:14:15:19
+182833055	RX_ANT	5745:4:40	0	4:-52:-51:-50:14:15:18
+182833055	PKT	4:371:0:0:4:4:0:0:0:1:279
+182833055	RX_BATCH	2:4:62:50:3
+182833055	PKT_SRC	1:4:371:0:0:1:279
+182833055	PKT_SRC	2:0:0:0:0:0:0
+182833055	PKT_SRC	3:0:0:0:0:0:0
+182833055	PKT_SRC	4:0:0:0:0:0:0
+182833055	PKT_SRC	5:0:0:0:0:0:0
+182833055	PKT_SRC	6:0:0:0:0:0:0
+182833055	PKT_SRC	7:0:0:0:0:0:0
+182833055	PKT_SRC	8:0:0:0:0:0:0
+182833055	PKT_SRC	9:0:0:0:0:0:0
+182833055	PKT_SRC	10:0:0:0:0:0:0
+182833055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182833055	READY_FILTER	5157:5157:0:0:0
+182833055	REASSEMBLY	0:40
+grant seq=35454 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35455 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35456 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35457 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35458 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35459 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1
+grant seq=35460 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2
+grant seq=35461 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1821 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2
+182834055	RX_ANT	5745:4:40	1	14:-58:-57:-56:12:14:16
+182834055	RX_ANT	5745:4:40	0	14:-46:-46:-46:13:15:17
+182834055	PKT	15:2292:0:0:14:14:0:0:0:1:278
+182834055	RX_BATCH	5:15:151:66:7
+182834055	PKT_SRC	1:0:0:0:0:0:0
+182834055	PKT_SRC	2:14:2268:0:0:1:278
+182834055	PKT_SRC	3:0:0:0:0:0:0
+182834055	PKT_SRC	4:0:0:0:0:0:0
+182834055	PKT_SRC	5:0:0:0:0:0:0
+182834055	PKT_SRC	6:0:0:0:0:0:0
+182834055	PKT_SRC	7:0:0:0:0:0:0
+182834055	PKT_SRC	8:0:0:0:0:0:0
+182834055	PKT_SRC	9:0:0:0:0:0:0
+182834055	PKT_SRC	10:0:0:0:0:0:0
+182834055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182834055	READY_FILTER	5158:5158:0:0:0
+182834055	REASSEMBLY	0:40
+grant seq=35462 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35463 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35464 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=388 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+PACKET_LOSS source_node=1 previous_seq=12915 current_seq=12920 lost_count=4
+grant seq=35465 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35466 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35467 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35468 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35469 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182835055	RX_ANT	5745:4:40	1	14:-50:-48:-48:14:14:17
+182835055	RX_ANT	5745:4:40	0	14:-52:-51:-50:12:14:16
+182835055	PKT	15:2299:0:0:14:14:0:4:0:1:279
+182835055	RX_BATCH	5:15:171:79:8
+182835055	PKT_SRC	1:14:2275:0:4:1:279
+182835055	PKT_SRC	2:0:0:0:0:0:0
+182835055	PKT_SRC	3:0:0:0:0:0:0
+182835055	PKT_SRC	4:0:0:0:0:0:0
+182835055	PKT_SRC	5:0:0:0:0:0:0
+182835055	PKT_SRC	6:0:0:0:0:0:0
+182835055	PKT_SRC	7:0:0:0:0:0:0
+182835055	PKT_SRC	8:0:0:0:0:0:0
+182835055	PKT_SRC	9:0:0:0:0:0:0
+182835055	PKT_SRC	10:0:0:0:0:0:0
+182835055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182835055	READY_FILTER	5159:5159:0:0:0
+182835055	REASSEMBLY	0:40
+4 packets lost
+grant seq=35470 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35471 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35472 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35473 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35474 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35475 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35476 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1
+182836055	PKT	1:24:0:0:0:0:0:0:0:0:0
+182836055	RX_BATCH	1:1:79:79:1
+182836055	PKT_SRC	1:0:0:0:0:0:0
+182836055	PKT_SRC	2:0:0:0:0:0:0
+182836055	PKT_SRC	3:0:0:0:0:0:0
+182836055	PKT_SRC	4:0:0:0:0:0:0
+182836055	PKT_SRC	5:0:0:0:0:0:0
+182836055	PKT_SRC	6:0:0:0:0:0:0
+182836055	PKT_SRC	7:0:0:0:0:0:0
+182836055	PKT_SRC	8:0:0:0:0:0:0
+182836055	PKT_SRC	9:0:0:0:0:0:0
+182836055	PKT_SRC	10:0:0:0:0:0:0
+182836055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182836055	READY_FILTER	5160:5160:0:0:0
+182836055	REASSEMBLY	0:40
+grant seq=35477 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2
+grant seq=35478 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1818 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35479 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35480 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35481 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=389 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35482 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35483 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35484 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182837055	RX_ANT	5745:4:40	1	28:-58:-52:-48:1:13:16
+182837055	RX_ANT	5745:4:40	0	28:-52:-48:-46:11:13:16
+182837055	PKT	29:4567:0:0:28:28:0:0:0:2:557
+182837055	RX_BATCH	8:29:217:79:8
+182837055	PKT_SRC	1:14:2275:0:0:1:279
+182837055	PKT_SRC	2:14:2268:0:0:1:278
+182837055	PKT_SRC	3:0:0:0:0:0:0
+182837055	PKT_SRC	4:0:0:0:0:0:0
+182837055	PKT_SRC	5:0:0:0:0:0:0
+182837055	PKT_SRC	6:0:0:0:0:0:0
+182837055	PKT_SRC	7:0:0:0:0:0:0
+182837055	PKT_SRC	8:0:0:0:0:0:0
+182837055	PKT_SRC	9:0:0:0:0:0:0
+182837055	PKT_SRC	10:0:0:0:0:0:0
+182837055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182837055	READY_FILTER	5161:5161:0:0:0
+182837055	REASSEMBLY	0:40
+grant seq=35485 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35486 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35487 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35488 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35489 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35490 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35491 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35492 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182838055	PKT	0:0:0:0:0:0:0:0:0:0:0
+182838055	RX_BATCH	0:0:0:0:0
+182838055	PKT_SRC	1:0:0:0:0:0:0
+182838055	PKT_SRC	2:0:0:0:0:0:0
+182838055	PKT_SRC	3:0:0:0:0:0:0
+182838055	PKT_SRC	4:0:0:0:0:0:0
+182838055	PKT_SRC	5:0:0:0:0:0:0
+182838055	PKT_SRC	6:0:0:0:0:0:0
+182838055	PKT_SRC	7:0:0:0:0:0:0
+182838055	PKT_SRC	8:0:0:0:0:0:0
+182838055	PKT_SRC	9:0:0:0:0:0:0
+182838055	PKT_SRC	10:0:0:0:0:0:0
+182838055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182838055	READY_FILTER	5161:5161:0:0:0
+182838055	REASSEMBLY	0:40
+grant seq=35493 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=2 active_queue=[1,2] cursor=0 cursor_node_id=1
+grant seq=35494 node_id=1 duration_ms=120 kind=normal active_queue=[1,2] cursor=1 cursor_node_id=2
+grant seq=35495 node_id=2 duration_ms=120 kind=normal active_queue=[1,2] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=1821 consecutive_silent_grants=13 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=35496 node_id=2 duration_ms=120 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=35497 node_id=2 duration_ms=120 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=35498 node_id=1 duration_ms=120 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=388 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35499 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+182839055	RX_ANT	5745:4:40	1	28:-58:-53:-48:12:14:16
+182839055	RX_ANT	5745:4:40	0	28:-52:-48:-46:12:14:18
+182839055	PKT	30:4605:0:0:28:28:0:0:0:2:559
+182839055	RX_BATCH	8:30:318:82:8
+182839055	PKT_SRC	1:14:2282:0:0:1:280
+182839055	PKT_SRC	2:14:2275:0:0:1:279
+182839055	PKT_SRC	3:0:0:0:0:0:0
+182839055	PKT_SRC	4:0:0:0:0:0:0
+182839055	PKT_SRC	5:0:0:0:0:0:0
+182839055	PKT_SRC	6:0:0:0:0:0:0
+182839055	PKT_SRC	7:0:0:0:0:0:0
+182839055	PKT_SRC	8:0:0:0:0:0:0
+182839055	PKT_SRC	9:0:0:0:0:0:0
+182839055	PKT_SRC	10:0:0:0:0:0:0
+182839055	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+182839055	READY_FILTER	5163:5163:0:0:0
+182839055	REASSEMBLY	0:40
+grant seq=35500 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=35501 node_id=1 duration_ms=120 kind=normal active_queue=[1] cursor=0 cursor_node_id=1

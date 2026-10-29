@@ -1,0 +1,16 @@
+{
+  "sha256": "716e0b6ccf7c51a81e7d845bfabeddb69e6604d08d888b11230e85d70196826c",
+  "argv": [
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/run_measurements.py",
+    "--execute-new-build",
+    "c62cde266ef509d605c8c923b0f4fa35e42fc4dd",
+    "--expected-native-sha256",
+    "5248592c31820abdb15ce5f9aad2d539a5e7a4a4e179af52d3a6e2b48eed9f93",
+    "--mode",
+    "single",
+    "--single-mib",
+    "40",
+    "--output",
+    ".scratch/real-fedavg-training/evidence/09-20mhz-rate-calibration/runs/20261028T143331Z-single40-trace"
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "attempt": "01-mcs3-r2000-40mib",
+  "mcs": 3,
+  "rate_kbps": 2000,
+  "mib": 40,
+  "target_nodes": [
+    1,
+    2,
+    4
+  ],
+  "started_utc": "2026-10-28T14:21:48.664696+00:00",
+  "success": false,
+  "phase": "finished",
+  "error": "RuntimeError('calibration not finalized')",
+  "receiver_probe_errors": {
+    "fl01": "RuntimeError('fl01: rc=1: Traceback (most recent call last):\\n  File \"<stdin>\", line 14, in <module>\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1134, in read_text\\n    with self.open(mode=\\'r\\', encoding=encoding, errors=errors) as f:\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\\n    return self._accessor.open(self, mode, buffering, encoding, errors,\\nFileNotFoundError: [Errno 2] No such file or directory: \\'/srv/wfb-ng-fl/calibration/09/20261028T142137Z-matrix/01-mcs3-r2000-40mib/receiver.json\\'\\n ')",
+    "fl02": "RuntimeError('fl02: rc=1: Traceback (most recent call last):\\n  File \"<stdin>\", line 14, in <module>\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1134, in read_text\\n    with self.open(mode=\\'r\\', encoding=encoding, errors=errors) as f:\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\\n    return self._accessor.open(self, mode, buffering, encoding, errors,\\nFileNotFoundError: [Errno 2] No such file or directory: \\'/srv/wfb-ng-fl/calibration/09/20261028T142137Z-matrix/01-mcs3-r2000-40mib/receiver.json\\'\\n ')",
+    "fl04": "RuntimeError('fl04: rc=1: Traceback (most recent call last):\\n  File \"<stdin>\", line 14, in <module>\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1134, in read_text\\n    with self.open(mode=\\'r\\', encoding=encoding, errors=errors) as f:\\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\\n    return self._accessor.open(self, mode, buffering, encoding, errors,\\nFileNotFoundError: [Errno 2] No such file or directory: \\'/srv/wfb-ng-fl/calibration/09/20261028T142137Z-matrix/01-mcs3-r2000-40mib/receiver.json\\'\\n ')"
+  },
+  "pid_tun_unchanged": true,
+  "endpoint_error": "RuntimeError(\"fl02 actual iw radio mismatch: {'air_interface': 'wlxfc221c500a88', 'channel': 149, 'frequency': 5745, 'width': 40, 'center': 5755, 'txpower': '-14.00'}\")",
+  "rx_ant_targets": {
+    "fl01": false,
+    "fl02": false,
+    "fl04": false
+  },
+  "server255_evidence": {
+    "fl01": [
+      "182206349\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "182208349\tPKT_SRC\t255:126:8764:0:0:9:838",
+      "182210349\tPKT_SRC\t255:27:1830:0:0:2:186",
+      "182211349\tPKT_SRC\t255:14:980:0:0:1:94",
+      "182212349\tPKT_SRC\t255:27:1923:1:0:2:186",
+      "182213349\tPKT_SRC\t255:14:980:0:0:1:94",
+      "182214349\tPKT_SRC\t255:14:973:0:0:1:93",
+      "182215349\tPKT_SRC\t255:27:5115:1:0:2:642",
+      "182216349\tPKT_SRC\t255:14:973:0:0:1:93",
+      "182217349\tPKT_SRC\t255:14:973:0:0:1:93",
+      "182219349\tPKT_SRC\t255:28:1946:0:0:2:186",
+      "182220350\tPKT_SRC\t255:153:16044:1:5:14:2394",
+      "182222350\tPKT_SRC\t255:27:1830:0:0:2:186",
+      "182223350\tPKT_SRC\t255:14:980:0:0:1:94",
+      "182225351\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "182227352\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "182229352\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "182231353\tPKT_SRC\t255:11:811:2:0:1:93",
+      "182232353\tPKT_SRC\t255:14:980:0:0:1:94"
+    ],
+    "fl02": [
+      "22583999\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "22585999\tPKT_SRC\t255:124:8718:2:0:9:838",
+      "22587999\tPKT_SRC\t255:27:1830:0:0:2:186",
+      "22588999\tPKT_SRC\t255:14:980:0:0:1:94",
+      "22589999\tPKT_SRC\t255:27:1923:1:0:2:186",
+      "22590999\tPKT_SRC\t255:14:980:0:0:1:94",
+      "22591999\tPKT_SRC\t255:14:973:0:0:1:93",
+      "22592999\tPKT_SRC\t255:28:5138:0:0:2:642",
+      "22593999\tPKT_SRC\t255:14:973:0:0:1:93",
+      "22594999\tPKT_SRC\t255:14:973:0:0:1:93",
+      "22597001\tPKT_SRC\t255:27:1923:1:0:2:186",
+      "22598001\tPKT_SRC\t255:154:18514:0:0:13:2300",
+      "22599001\tPKT_SRC\t255:13:957:1:0:1:94",
+      "22600001\tPKT_SRC\t255:27:1830:1:0:2:186",
+      "22601001\tPKT_SRC\t255:14:980:0:0:1:94",
+      "22603001\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "22605001\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "22607002\tPKT_SRC\t255:28:1953:0:0:2:187",
+      "22609002\tPKT_SRC\t255:14:973:0:0:1:93",
+      "22610002\tPKT_SRC\t255:14:980:0:0:1:94"
+    ],
+    "fl04": [
+      "10071788\tPKT_SRC\t255:14:973:0:0:1:93",
+      "10072788\tPKT_SRC\t255:13:863:0:0:1:94",
+      "10073788\tPKT_SRC\t255:104:7414:7:0:8:744",
+      "10074788\tPKT_SRC\t255:13:863:0:0:1:94",
+      "10075788\tPKT_SRC\t255:13:857:0:0:1:93",
+      "10076788\tPKT_SRC\t255:26:1720:0:0:2:187",
+      "10078789\tPKT_SRC\t255:42:2926:0:0:3:280",
+      "10080789\tPKT_SRC\t255:38:5926:3:0:3:735",
+      "10082789\tPKT_SRC\t255:28:1946:0:0:2:186",
+      "10084789\tPKT_SRC\t255:14:973:0:0:1:93",
+      "10085789\tPKT_SRC\t255:27:4457:1:0:2:548",
+      "10086789\tPKT_SRC\t255:148:15394:6:0:13:1939",
+      "10088789\tPKT_SRC\t255:35:2486:5:0:3:280",
+      "10090789\tPKT_SRC\t255:14:1067:1:0:2:187",
+      "10091789\tPKT_SRC\t255:12:840:1:0:0:0",
+      "10092789\tPKT_SRC\t255:13:857:0:0:1:93",
+      "10093789\tPKT_SRC\t255:11:817:2:0:1:94",
+      "10095790\tPKT_SRC\t255:25:1791:2:0:2:187",
+      "10097790\tPKT_SRC\t255:25:1791:2:0:2:187"
+    ]
+  },
+  "rx_ant_server255_lines": {
+    "fl01": [],
+    "fl02": [],
+    "fl04": []
+  },
+  "tx_application_lines": {
+    "fl00": [],
+    "fl01": [],
+    "fl02": [],
+    "fl04": []
+  },
+  "radio_updates": {
+    "fl00": [],
+    "fl01": [],
+    "fl02": [],
+    "fl04": []
+  },
+  "tx_mcs_audit": {
+    "fl00": {
+      "before": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 3,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=3 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "endpoint": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 3,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=3 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "requires_window_update": true,
+      "passed": false
+    },
+    "fl01": {
+      "before": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "endpoint": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "requires_window_update": true,
+      "passed": false
+    },
+    "fl02": {
+      "before": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "endpoint": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "requires_window_update": true,
+      "passed": false
+    },
+    "fl04": {
+      "before": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "endpoint": {
+        "generation": 2,
+        "bandwidth": 40,
+        "data_mcs_index": 4,
+        "control_mcs_index": 0,
+        "line": "v6_radio_update generation=2 bandwidth=40 data_mcs_index=4 control_mcs_index=0 short_gi=1 radiotap_flags=0x05 sync=data+control fec=8/14"
+      },
+      "requires_window_update": true,
+      "passed": false
+    }
+  },
+  "tx_mcs_stable": false,
+  "group_complete": false,
+  "nak_lines": [],
+  "pass_lines": [],
+  "all_hashes_match": false,
+  "goodput_mbps": null,
+  "ended_utc": "2026-10-28T14:22:17.828636+00:00"
+}
