@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""四板显式发布：仅在 fl00 使用明确已提交的完整 SHA 执行。
+"""当前两客户端显式发布：仅在 fl00 使用明确已提交的完整 SHA 执行。
 
 用法：python3 release-four.py FULL_COMMIT。
 所有联网和部署动作仅在 main() 中发生；失败停止推进，不自动回滚。
@@ -19,7 +19,7 @@ import urllib.request
 
 HERE = Path(__file__).resolve().parent
 NODES = {'fl00': None, 'fl01': '192.168.108.201',
-         'fl02': '192.168.108.202', 'fl04': '192.168.108.204'}
+         'fl02': '192.168.108.202'}
 WHITELIST_IDS = tuple(range(1, 11))
 SSH = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7']
 
@@ -58,9 +58,11 @@ def main():
                 'client4 192.168.108.204 fl 4 10.80.0.14']
     if sorted(' '.join(r.split()) for r in rows) != expected:
         raise SystemExit('cluster_nodes.conf topology mismatch')
-    participant_ids = tuple(sorted(int(row.split()[3]) for row in rows))
-    if participant_ids != (1, 2, 4):
-        raise SystemExit('participant topology must be exactly nodes 1/2/4')
+    topology_ids = tuple(sorted(int(row.split()[3]) for row in rows))
+    if topology_ids != (1, 2, 4):
+        raise SystemExit('recorded topology must contain nodes 1/2/4')
+    # 当前授权只发布两客户端；fl04 保留拓扑记录但不参与本次发布。
+    participant_ids = (1, 2)
     for key, value in {'SERVER_HOST': 'fl00', 'SERVER_USER': 'fl', 'SERVER_NODE_ID': '255',
                        'SERVER_TUN_IP': '10.80.0.1/24', 'WIRELESS_CHANNEL': '149',
                        'WIRELESS_CHANNEL_WIDTH': 'HT40+', 'WIRELESS_TXPOWER_DBM': '14',
@@ -218,7 +220,7 @@ def main():
                 if ready:
                     break
                 if attempt == 19:
-                    raise RuntimeError('fresh READY heartbeats on channel 149 not observed for nodes 1/2/4')
+                    raise RuntimeError('fresh READY heartbeats on channel 149 not observed for nodes 1/2')
                 time.sleep(2)
             manifest['state'] = 'verified'
             save()
