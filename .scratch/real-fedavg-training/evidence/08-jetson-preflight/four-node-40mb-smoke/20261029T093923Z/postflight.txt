@@ -1,0 +1,83 @@
+restore_exit_code=1
+=== after restore fl00 ===
+HOST=fl00
+TIME=2026-10-29T09:45:18Z
+UNITS
+activating
+activating
+active
+active
+PROCESSES
+41774 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 6 --radio-short-gi --air-interface wlxfc221c100157 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+41810 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100157 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+IFACE=wlxfc221c100157
+Interface wlxfc221c100157
+	ifindex 5
+	wdev 0x100000001
+	addr fc:22:1c:10:01:57
+	type monitor
+	wiphy 1
+	channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+	txpower -14.00 dBm
+=== after restore fl01 ===
+HOST=fl01
+TIME=2026-10-29T09:45:20Z
+UNITS
+activating
+activating
+active
+active
+PROCESSES
+9911 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+9949 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c300e99 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+IFACE=wlxfc221c300e99
+Interface wlxfc221c300e99
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:30:0e:99
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -12.00 dBm
+=== after restore fl02 ===
+HOST=fl02
+TIME=2026-10-29T09:45:20Z
+UNITS
+activating
+activating
+active
+active
+PROCESSES
+9531 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+9567 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c500a88 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+IFACE=wlxfc221c500a88
+Interface wlxfc221c500a88
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:50:0a:88
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -12.00 dBm
+=== after restore fl04 ===
+HOST=fl04
+TIME=2026-10-29T09:45:21Z
+UNITS
+activating
+activating
+active
+active
+PROCESSES
+5409 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c4 --tun-addr 10.80.0.14/24 --node-id 4 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+5446 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c300f04 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64
+IFACE=wlxfc221c300f04
+Interface wlxfc221c300f04
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:30:0f:04
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -12.00 dBm
+=== final server status ===
+{"server_state": "IDLE", "management_web": {"status": "ready", "host": "192.168.108.100", "port": 8080, "error": null}, "link_required": true, "recent_job": null, "active_job": null, "radio": {"channel": 149, "bandwidth_mhz": 40, "radio_txpower_dbm": 14, "downlink_mcs": 3, "uplink_mcs": 4, "uftp_rate_kbps": 15000, "fec_k": 8, "fec_n": 14, "channel_width": "HT40+", "guard_interval": "short"}, "tun": {"name": "fl-s", "ip": "10.80.0.1", "cidr": "10.80.0.1/24", "txqueuelen": 5000, "is_active": true}, "air_interface": "wlxfc221c100157", "link_process": {"running": true, "pid": 41810}, "nodes": {"1": {"node_id": 1, "tun_ip": "10.80.0.11", "reported_state": "HUNTING", "readiness": "CONNECTING", "elapsed_ms": 480, "current_channel": 157, "txpower_dbm": 12, "uplink_mcs": 6, "last_heartbeat_time": 66790.85775568, "last_heartbeat_timestamp_ms": 1793267115393, "last_heartbeat_ago_seconds": 4.82, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_NOT_READY", "message": "\u57fa\u7840\u672a\u5c31\u7eea: CONNECTING"}, {"code": "NODE_NOT_IDLE", "message": "\u8282\u70b9\u5c1a\u672a\u5f85\u547d: HUNTING"}]}, "2": {"node_id": 2, "tun_ip": "10.80.0.12", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "3": {"node_id": 3, "tun_ip": "10.80.0.13", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "4": {"node_id": 4, "tun_ip": "10.80.0.14", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "5": {"node_id": 5, "tun_ip": "10.80.0.15", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "6": {"node_id": 6, "tun_ip": "10.80.0.16", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "7": {"node_id": 7, "tun_ip": "10.80.0.17", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "8": {"node_id": 8, "tun_ip": "10.80.0.18", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "9": {"node_id": 9, "tun_ip": "10.80.0.19", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}, "10": {"node_id": 10, "tun_ip": "10.80.0.20", "reported_state": null, "readiness": "OFFLINE", "elapsed_ms": 0, "current_channel": null, "txpower_dbm": null, "uplink_mcs": null, "last_heartbeat_time": null, "last_heartbeat_timestamp_ms": null, "last_heartbeat_ago_seconds": null, "error_code": null, "can_select": false, "selection_blockers": [{"code": "NODE_OFFLINE", "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"}]}}}

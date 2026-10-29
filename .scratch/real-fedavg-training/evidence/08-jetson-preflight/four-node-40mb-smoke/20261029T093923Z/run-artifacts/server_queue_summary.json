@@ -1,0 +1,18 @@
+{
+  "role": "server",
+  "link_security_mode": "trusted_plaintext",
+  "node_id": 255,
+  "queued_bytes": 0,
+  "queued_packets": 0,
+  "queued_packets_limit": 64,
+  "pause_threshold_bytes": 131072,
+  "resume_threshold_bytes": 65536,
+  "tun_read_paused": false,
+  "current_pause_reason": "none",
+  "tun_read_pause_total": 39298,
+  "tun_read_resume_total": 39298,
+  "tun_read_pause_total_by_reason": {
+    "queued_bytes_threshold": 0,
+    "queued_packets_limit": 39298
+  }
+}

@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/tests/demo/fl_demo_metrics.py", line 724, in <module>
+    main()
+  File "/home/fl/projects/wfb-ng-fl/tests/demo/fl_demo_metrics.py", line 675, in main
+    res = send_http_put_file(
+  File "/home/fl/projects/wfb-ng-fl/tests/demo/fl_demo_metrics.py", line 395, in send_http_put_file
+    conn.request(
+  File "/usr/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1077, in _send_output
+    self.send(chunk)
+  File "/usr/lib/python3.10/http/client.py", line 999, in send
+    self.sock.sendall(data)
+TimeoutError: timed out

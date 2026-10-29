@@ -1,0 +1,73 @@
+stop_rc=0
+=== after stop fl00 ===
+HOST=fl00
+TIME=2026-10-29T09:39:29Z
+UNITS
+inactive
+inactive
+inactive
+inactive
+PROCESSES
+IFACE=wlxfc221c100157
+Interface wlxfc221c100157
+	ifindex 5
+	wdev 0x100000001
+	addr fc:22:1c:10:01:57
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -14.00 dBm
+=== after stop fl01 ===
+HOST=fl01
+TIME=2026-10-29T09:39:31Z
+UNITS
+inactive
+inactive
+inactive
+inactive
+PROCESSES
+IFACE=wlxfc221c300e99
+Interface wlxfc221c300e99
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:30:0e:99
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -14.00 dBm
+=== after stop fl02 ===
+HOST=fl02
+TIME=2026-10-29T09:39:31Z
+UNITS
+inactive
+inactive
+inactive
+inactive
+PROCESSES
+IFACE=wlxfc221c500a88
+Interface wlxfc221c500a88
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:50:0a:88
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -14.00 dBm
+=== after stop fl04 ===
+HOST=fl04
+TIME=2026-10-29T09:39:32Z
+UNITS
+inactive
+inactive
+inactive
+inactive
+PROCESSES
+IFACE=wlxfc221c300f04
+Interface wlxfc221c300f04
+	ifindex 8
+	wdev 0x100000001
+	addr fc:22:1c:30:0f:04
+	type monitor
+	wiphy 1
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -14.00 dBm
