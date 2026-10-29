@@ -1,0 +1,9 @@
+{
+  "source_commit": "80294dff43996378c20e5e354201b63ffbaf587b",
+  "target_hosts": ["fl00", "fl01", "fl02", "fl04"],
+  "participant_ids": [1, 2, 4],
+  "radio": {"channel": 149, "bandwidth_mhz": 40, "txpower_dbm": 14, "downlink_mcs": 3, "uplink_mcs": 4},
+  "server_config_sha256": "04d6e243c194e620d9d166a422d88d573e3c3ac15cb2865c810519f491ef04d8",
+  "server_algorithm": "wfb_ng.fl.mnist_cnn_32_64",
+  "release_evidence": "../08-jetson-preflight/heartbeat-149/release-80294dff4399-20261029T100728194822Z"
+}

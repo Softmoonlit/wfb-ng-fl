@@ -21,3 +21,5 @@ Type: task
 ## Comments
 
 2026-10-29：用户同意新增约 203KB 模型，最终论文训练任务仍未确定。
+
+2026-10-29：80294df 已统一发布到 fl00/fl01/fl02/fl04；四节点 `[1,2,4]` 两轮真实 GPU FedAvg 成功，模型格式、三端 CUDA、聚合、评估和 recovery 均通过。持久证据见 `.scratch/real-fedavg-training/evidence/compact-model-four-node/web-66ef4968e6514452971ee5d4d00a2352/README.md`。
