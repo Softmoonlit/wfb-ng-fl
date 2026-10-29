@@ -1,0 +1,87 @@
+{
+  "server_address": "10.80.0.1:8080",
+  "total_bytes": 125829120,
+  "duration_seconds": 196.126,
+  "expected_sha256": "9fa46b7088bfb012fc433384c202058250927ce808c6b54e8af6b851bc3b0354",
+  "mcs": 5,
+  "slot_duration_ms": 120,
+  "guard_interval_ms": 10,
+  "telemetry": {
+    "rx_ant_samples": 1524,
+    "rx_packets": 88878,
+    "rx_bytes": 240630895,
+    "packets_lost": 4878,
+    "packets_fec_recovered": 12000,
+    "loss_rate": 0.052,
+    "fec_recovery_rate": 0.711,
+    "tun_pause_count": 0,
+    "tun_resume_count": 0,
+    "tcp_retransmits": 0,
+    "authorized_sends_by_node": {
+      "2": 11298,
+      "4": 11335,
+      "1": 11882
+    },
+    "loss_and_fec_by_node": {
+      "1": {
+        "rx_packets": 35311,
+        "rx_bytes": 87742192,
+        "packets_lost": 2533,
+        "packets_fec_recovered": 4848,
+        "out_packets": 10787,
+        "out_bytes": 42823878
+      },
+      "2": {
+        "rx_packets": 25388,
+        "rx_bytes": 74986762,
+        "packets_lost": 1055,
+        "packets_fec_recovered": 3401,
+        "out_packets": 10738,
+        "out_bytes": 42615981
+      },
+      "4": {
+        "rx_packets": 27377,
+        "rx_bytes": 77882693,
+        "packets_lost": 1290,
+        "packets_fec_recovered": 3751,
+        "out_packets": 10732,
+        "out_bytes": 42617687
+      }
+    }
+  },
+  "clients": [
+    {
+      "role": "client1",
+      "tun_ip": "10.80.0.11",
+      "server_path": "/var/lib/wfb-ng/fl_demo-four-node-40mb-20261029T095146Z-mcs4-mcs5-18k/server_received/client_1_update.bin",
+      "size_bytes": 41943040,
+      "duration_seconds": 195.475,
+      "status_code": 201,
+      "sha256": "9fa46b7088bfb012fc433384c202058250927ce808c6b54e8af6b851bc3b0354",
+      "tun_pause_count": 0,
+      "tun_resume_count": 0
+    },
+    {
+      "role": "client2",
+      "tun_ip": "10.80.0.12",
+      "server_path": "/var/lib/wfb-ng/fl_demo-four-node-40mb-20261029T095146Z-mcs4-mcs5-18k/server_received/client_2_update.bin",
+      "size_bytes": 41943040,
+      "duration_seconds": 82.182,
+      "status_code": 201,
+      "sha256": "9fa46b7088bfb012fc433384c202058250927ce808c6b54e8af6b851bc3b0354",
+      "tun_pause_count": 0,
+      "tun_resume_count": 0
+    },
+    {
+      "role": "client4",
+      "tun_ip": "10.80.0.14",
+      "server_path": "/var/lib/wfb-ng/fl_demo-four-node-40mb-20261029T095146Z-mcs4-mcs5-18k/server_received/client_4_update.bin",
+      "size_bytes": 41943040,
+      "duration_seconds": 88.989,
+      "status_code": 201,
+      "sha256": "9fa46b7088bfb012fc433384c202058250927ce808c6b54e8af6b851bc3b0354",
+      "tun_pause_count": 0,
+      "tun_resume_count": 0
+    }
+  ]
+}

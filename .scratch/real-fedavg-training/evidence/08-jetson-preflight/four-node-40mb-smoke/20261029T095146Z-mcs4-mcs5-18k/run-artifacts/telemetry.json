@@ -1,0 +1,43 @@
+{
+  "rx_ant_samples": 1524,
+  "rx_packets": 88878,
+  "rx_bytes": 240630895,
+  "packets_lost": 4878,
+  "packets_fec_recovered": 12000,
+  "loss_rate": 0.052,
+  "fec_recovery_rate": 0.711,
+  "tun_pause_count": 0,
+  "tun_resume_count": 0,
+  "tcp_retransmits": 0,
+  "authorized_sends_by_node": {
+    "2": 11298,
+    "4": 11335,
+    "1": 11882
+  },
+  "loss_and_fec_by_node": {
+    "1": {
+      "rx_packets": 35311,
+      "rx_bytes": 87742192,
+      "packets_lost": 2533,
+      "packets_fec_recovered": 4848,
+      "out_packets": 10787,
+      "out_bytes": 42823878
+    },
+    "2": {
+      "rx_packets": 25388,
+      "rx_bytes": 74986762,
+      "packets_lost": 1055,
+      "packets_fec_recovered": 3401,
+      "out_packets": 10738,
+      "out_bytes": 42615981
+    },
+    "4": {
+      "rx_packets": 27377,
+      "rx_bytes": 77882693,
+      "packets_lost": 1290,
+      "packets_fec_recovered": 3751,
+      "out_packets": 10732,
+      "out_bytes": 42617687
+    }
+  }
+}
