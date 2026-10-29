@@ -12,6 +12,7 @@ import torch
 from .artifacts import fsync_directory, preflight_artifact
 from .errors import FLRuntimeError
 from .mnist_data import load_mnist
+from . import reference_model as _reference_model
 from .reference_model import (MODEL_FORMAT, MAX_MODEL_BYTES, load_model,
                               MNISTReferenceModel, ModelPath, validate_state_dict, write_model_atomic)
 
@@ -29,7 +30,8 @@ def validate_config(config):
     return config['data_seed']
 
 
-def validate_preparation_report(report, *, expected_samples=60000, require_gpu=True, expected_seed=None):
+def validate_preparation_report(report, *, expected_samples=60000, require_gpu=True,
+                                expected_seed=None, model_module=_reference_model):
     """宿主复核有限准备事实；不修改报告，也不接受缺失或额外字段。"""
     if (type(expected_samples) is not int or not 0 < expected_samples <= 60000
             or type(require_gpu) is not bool
@@ -38,7 +40,7 @@ def validate_preparation_report(report, *, expected_samples=60000, require_gpu=T
         raise FLRuntimeError('invalid_mnist_preparation', '准备报告检查条件无效')
     fields = {'model_format', 'sample_count', 'data_sha256', 'device', 'data_seed'}
     if (not isinstance(report, Mapping) or set(report) != fields
-            or report['model_format'] != MODEL_FORMAT
+            or report['model_format'] != model_module.MODEL_FORMAT
             or type(report['sample_count']) is not int or report['sample_count'] != expected_samples
             or type(report['data_seed']) is not int or not 0 < report['data_seed'] < 2**63
             or (expected_seed is not None and report['data_seed'] != expected_seed)):
@@ -66,14 +68,14 @@ def _cpu_storage(storage, location):
     return storage
 
 
-def _load_update(path):
-    stream, _ = preflight_artifact(path, MAX_MODEL_BYTES)
+def _load_update(path, model_module=_reference_model):
+    stream, _ = preflight_artifact(path, model_module.MAX_MODEL_BYTES)
     try:
-        data = stream.read(MAX_MODEL_BYTES + 1)
+        data = stream.read(model_module.MAX_MODEL_BYTES + 1)
     finally:
         stream.close()
     try:
-        if len(data) > MAX_MODEL_BYTES:
+        if len(data) > model_module.MAX_MODEL_BYTES:
             raise ValueError('update 超过大小限制')
         return torch.load(io.BytesIO(data), weights_only=True, map_location=_cpu_storage)
     except FLRuntimeError:
@@ -82,9 +84,9 @@ def _load_update(path):
         raise FLRuntimeError('invalid_mnist_update', 'update 文件格式无效') from exc
 
 
-def _validate_update(value, node, round_index, base_sha):
+def _validate_update(value, node, round_index, base_sha, model_module=_reference_model):
     if (type(value) is not dict or set(value) != UPDATE_FIELDS
-            or value['model_format'] != MODEL_FORMAT
+            or value['model_format'] != model_module.MODEL_FORMAT
             or type(value['node_id']) is not int or value['node_id'] != node
             or type(value['round_index']) is not int or value['round_index'] != round_index
             or value['base_model_sha256'] != base_sha):
@@ -99,11 +101,12 @@ def _validate_update(value, node, round_index, base_sha):
             or device['type'] != 'cuda'
             or any(type(item) is not str or not 0 < len(item) <= 128 for item in device.values())):
         raise FLRuntimeError('invalid_mnist_update', 'update 训练设备必须为有限 GPU 描述')
-    validate_state_dict(value['state_dict'])
+    model_module.validate_state_dict(value['state_dict'])
 
 
 def read_update_metadata(path: ModelPath, *, node_id: int, round_index: int,
-                         base_model_sha256: str, expected_sample_count: int) -> dict:
+                         base_model_sha256: str, expected_sample_count: int,
+                         model_module=_reference_model) -> dict:
     """严格读取参考 update 的有限事实，不返回参数，也不推断训练或作业成功。"""
     if (type(node_id) is not int or not 1 <= node_id <= 10
             or type(round_index) is not int or not 0 < round_index < 2**63
@@ -111,9 +114,9 @@ def read_update_metadata(path: ModelPath, *, node_id: int, round_index: int,
             or re.fullmatch(r'[0-9a-f]{64}', base_model_sha256) is None
             or type(expected_sample_count) is not int or not 0 < expected_sample_count <= 60000):
         raise FLRuntimeError('invalid_mnist_update', 'update 元数据预期身份、摘要或样本约束无效')
-    value = _load_update(path)
+    value = _load_update(path, model_module)
     try:
-        _validate_update(value, node_id, round_index, base_model_sha256)
+        _validate_update(value, node_id, round_index, base_model_sha256, model_module)
     except (TypeError, ValueError, OverflowError, RuntimeError) as exc:
         raise FLRuntimeError('invalid_mnist_update', 'update 元数据或参数格式无效') from exc
     if value['sample_count'] != expected_sample_count:
@@ -125,7 +128,8 @@ def read_update_metadata(path: ModelPath, *, node_id: int, round_index: int,
             'train_loss': float(value['train_loss']), 'device': dict(value['device'])}
 
 
-def aggregate_entry(current_model_path, updates_by_node, output_model_path, config, context):
+def aggregate_entry(current_model_path, updates_by_node, output_model_path, config, context,
+                    *, model_module=_reference_model):
     """按实际样本数合并完整参数，保留初始模型来源。"""
     seed = validate_config(config)
     context.check_stop()
@@ -145,15 +149,16 @@ def aggregate_entry(current_model_path, updates_by_node, output_model_path, conf
     if (not isinstance(preparations, Mapping) or set(preparations) != set(targets)
             or any(type(node) is not int for node in preparations)):
         raise FLRuntimeError('invalid_mnist_preparation', '聚合缺少完整的客户端准备报告')
-    base = load_model(current_model_path)
+    base = model_module.load_model(current_model_path)
     updates = []
     for node in targets:
         context.check_stop()
         report = preparations[node]
         accepted_samples = report.get('sample_count') if isinstance(report, Mapping) else None
-        validate_preparation_report(report, expected_samples=accepted_samples, expected_seed=seed)
-        value = _load_update(updates_by_node[node])
-        _validate_update(value, node, context.round_index, base.sha256)
+        validate_preparation_report(report, expected_samples=accepted_samples,
+                                    expected_seed=seed, model_module=model_module)
+        value = _load_update(updates_by_node[node], model_module)
+        _validate_update(value, node, context.round_index, base.sha256, model_module)
         if value['sample_count'] != accepted_samples:
             raise FLRuntimeError('invalid_mnist_update', 'update 实际样本数与已通过准备的样本数不一致')
         updates.append(value)
@@ -164,7 +169,7 @@ def aggregate_entry(current_model_path, updates_by_node, output_model_path, conf
         for name in state:
             state[name].add_(value['state_dict'][name], alpha=value['sample_count'] / total)
     context.check_stop()
-    write_model_atomic(output_model_path, state, base.initialization_seed)
+    model_module.write_model_atomic(output_model_path, state, base.initialization_seed)
 
 
 def _device_report(device):
@@ -174,12 +179,13 @@ def _device_report(device):
             'cuda_version': str(torch.version.cuda) if torch.version.cuda else 'unavailable'}
 
 
-def _preparation(dataset, device, data_seed):
-    report = {'model_format': MODEL_FORMAT, 'sample_count': len(dataset.labels),
+def _preparation(dataset, device, data_seed, model_module=_reference_model):
+    report = {'model_format': model_module.MODEL_FORMAT, 'sample_count': len(dataset.labels),
               'data_sha256': dict(dataset.sha256), 'device': _device_report(device),
               'data_seed': data_seed}
     validate_preparation_report(report, expected_samples=len(dataset.labels),
-                                require_gpu=device.type == 'cuda', expected_seed=data_seed)
+                                require_gpu=device.type == 'cuda', expected_seed=data_seed,
+                                model_module=model_module)
     return report
 
 
@@ -191,11 +197,11 @@ def _batches(dataset, device, order):
         yield images, labels
 
 
-def evaluate_entry(model_path, config, context):
+def evaluate_entry(model_path, config, context, *, model_module=_reference_model):
     """服务端固定测试集评估；使用 CPU 并如实记录，末轮判定相对初始改善。"""
     seed = validate_config(config)
     context.check_stop()
-    artifact = load_model(model_path)
+    artifact = model_module.load_model(model_path)
     dataset = load_mnist(context.local_config.get('mnist_data_dir'), 'test', context.check_stop)
     device = torch.device('cpu')
     model = artifact.model.to(device).eval()
@@ -222,18 +228,18 @@ def evaluate_entry(model_path, config, context):
         reason = '末轮准确率高于初始且损失低于初始' if verdict else '末轮准确率和损失未同时优于初始'
     context.check_stop()
     return {'metrics': metrics,
-            'preparation': _preparation(dataset, device, seed) if context.round_index == 0 else None,
+            'preparation': _preparation(dataset, device, seed, model_module) if context.round_index == 0 else None,
             'verdict': verdict, 'reason': reason}
 
 
-def _prepare_gpu():
+def _prepare_gpu(model_module=_reference_model):
     if not torch.cuda.is_available():
         raise FLRuntimeError('mnist_gpu_unavailable', 'MNIST 训练要求 GPU，CUDA 不可用')
     device = torch.device('cuda', 0)
     try:
         # 准备屏障前实际执行固定网络的前反向与 SGD，及时暴露依赖或内核错误。
         with torch.random.fork_rng(devices=[]):
-            probe = MNISTReferenceModel().to(device)
+            probe = model_module.MODEL_CLASS().to(device)
         loss = torch.nn.functional.cross_entropy(
             probe(torch.zeros(2, 1, 28, 28, dtype=torch.float32, device=device)),
             torch.zeros(2, dtype=torch.long, device=device))
@@ -247,7 +253,7 @@ def _prepare_gpu():
     return device
 
 
-def _write_update_atomic(path, value, context):
+def _write_update_atomic(path, value, context, model_module=_reference_model):
     temporary, published = None, False
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -256,8 +262,9 @@ def _write_update_atomic(path, value, context):
             torch.save(value, stream)
             stream.flush()
             os.fsync(stream.fileno())
-        restored = _load_update(temporary)
-        _validate_update(restored, value['node_id'], value['round_index'], value['base_model_sha256'])
+        restored = _load_update(temporary, model_module)
+        _validate_update(restored, value['node_id'], value['round_index'],
+                         value['base_model_sha256'], model_module)
         context.check_stop()
         os.link(temporary, path)
         published = True
@@ -271,19 +278,19 @@ def _write_update_atomic(path, value, context):
             os.unlink(temporary)
 
 
-def client_entry(runtime, config, context):
+def client_entry(runtime, config, context, *, model_module=_reference_model):
     """GPU 准备通过后拥有本地完整轮次循环，提交确认后才报告完成。"""
     seed = validate_config(config)
     context.check_stop()
-    device = _prepare_gpu()
+    device = _prepare_gpu(model_module)
     context.check_stop()
     dataset = load_mnist(context.local_config.get('mnist_data_dir'), 'train', context.check_stop)
-    context.report_prepared(_preparation(dataset, device, seed))
+    context.report_prepared(_preparation(dataset, device, seed, model_module))
     generator = torch.Generator(device='cpu').manual_seed(seed)
     for index in range(1, context.rounds + 1):
         current = context.for_phase('training', round_index=index)
         current.check_stop()
-        artifact = load_model(runtime.wait_for_model())
+        artifact = model_module.load_model(runtime.wait_for_model())
         current.check_stop()
         model = artifact.model.to(device).train()
         optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0, weight_decay=0)
@@ -302,14 +309,14 @@ def client_entry(runtime, config, context):
             loss_sum += loss.item() * len(labels)
         if samples != 60000 or steps != 938:
             raise FLRuntimeError('invalid_mnist_training', '本轮必须完整执行 60000 样本及尾批次')
-        value = {'model_format': MODEL_FORMAT,
+        value = {'model_format': model_module.MODEL_FORMAT,
                  'state_dict': {name: tensor.detach().cpu().clone() for name, tensor in model.state_dict().items()},
                  'base_model_sha256': artifact.sha256, 'node_id': current.node_id,
                  'round_index': index, 'sample_count': samples, 'optimizer_steps': steps,
                  'train_loss': loss_sum / samples, 'device': _device_report(device)}
         current.check_stop()
         output = Path(current.artifact_dir) / f'update-{index:04d}.pt'
-        _write_update_atomic(output, value, current)
+        _write_update_atomic(output, value, current, model_module)
         current.check_stop()
         runtime.submit_update(str(output))
         current.report_round_complete(index)

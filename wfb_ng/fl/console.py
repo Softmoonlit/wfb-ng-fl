@@ -11,6 +11,7 @@ from typing import Any, BinaryIO, Callable, Dict, Optional
 
 from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
+from .mnist_deployment import get_mnist_deployment
 from .radio import (ALLOWED_5GHZ_CHANNELS, ALLOWED_BANDWIDTH_MHZ, ALLOWED_MCS_VALUES,
                     ALLOWED_PATCH_KEYS, FIXED_FEC_K, FIXED_FEC_N, TXPOWER_MAX_DBM, TXPOWER_MIN_DBM,
                     get_downlink_rate_bounds, validate_radio_config)
@@ -432,7 +433,9 @@ def _project_algorithm(value: Any) -> Optional[Dict[str, Any]]:
             result[key] = value[key]
     # 参考 MNIST 只允许页面看到已冻结的无路径 data_seed；未知算法不暴露 config。
     config = value.get('config')
-    if (client_entry == 'wfb_ng.fl.mnist:client_entry'
+    deployment = get_mnist_deployment(
+        client_entry, value.get('aggregate_entry'), value.get('evaluate_entry'))
+    if (deployment is not None
             and isinstance(config, dict)
             and type(config.get('data_seed')) is int
             and 0 < config['data_seed'] < 2 ** 63):

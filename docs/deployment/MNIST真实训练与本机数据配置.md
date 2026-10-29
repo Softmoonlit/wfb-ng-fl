@@ -48,6 +48,35 @@ sha256sum /srv/wfb-ng-fl/mnist/train-images-idx3-ubyte \
 
 这不是独立可启动的完整服务器配置。各客户端须在本端 Daemon 启动配置中提供本地参数，例如 `--mnist-data-dir /srv/wfb-ng-fl/mnist`；实际目录以该板的部署记录为准。本页不修改部署脚本或 systemd 配置。
 
+## 紧凑 CNN 模型 bundle
+
+除最小参考模型 `mnist-two-conv-fp32-v1` 外，项目提供一个独立的 `mnist-cnn-32-64-fp32-v1` bundle，用于更有代表性的 MNIST FedAvg 流程验证。它不是最终论文模型，也不会自动替换默认入口。
+
+新模型固定为 `Conv2d(1, 32, 3)`、`Conv2d(32, 64, 3)`、两次 ReLU/2 倍最大池化及 `3136 -> 10` 线性层，共 50,186 个 FP32 参数。以 seed 2026 生成的 PyTorch 制品约为 203,080 字节，仍低于 1 MiB 模型和 update 上限。生成到不存在的路径：
+
+```bash
+python -m wfb_ng.fl.mnist_cnn_model \
+  /var/lib/wfb-ng-fl/models/mnist-cnn-32-64-seed2026.pt \
+  --seed 2026
+```
+
+使用新 bundle 时，服务端配置必须同时显式设置以下三个入口，并让模型库中的初始制品 SHA 指向上述新模型：
+
+```json
+{
+  "client_entry": "wfb_ng.fl.mnist_cnn_32_64:client_entry",
+  "aggregate_entry": "wfb_ng.fl.mnist_cnn_32_64:aggregate_entry",
+  "evaluate_entry": "wfb_ng.fl.mnist_cnn_32_64:evaluate_entry",
+  "mnist_data_dir": "/srv/wfb-ng-fl/mnist",
+  "algorithm_config": {"data_seed": 2026}
+}
+```
+
+三个入口必须成组使用；新 loader 只接受 `mnist-cnn-32-64-fp32-v1`，旧 loader 只接受 `mnist-two-conv-fp32-v1`，不会根据文件名、大小或摘要自动选择模型，也没有旧模型回退。客户端只需继续使用本机的 `mnist_data_dir`；服务端会在 `TASK_ANNOUNCE` 中下发新算法入口。
+
+该 bundle 沿用本节其余数据、GPU、聚合、评估和制品校验契约。两种模型的模型 SHA、update SHA、训练结果和曲线应分开记录，不能混合比较。
+
+
 `algorithm_config` 恰有一个字段 `data_seed`，必须是 `0 < data_seed < 2**63` 的整数，不接受布尔值、缺失字段或额外字段。该种子初始化客户端 CPU 数据排列 Generator，连续各轮使用其随机序列。它与初始模型的初始化种子分别记录，不承诺跨 GPU 或跨软件版本的位级一致。
 
 三个入口的代码及匹配 PyTorch 依赖须预先安装到相应板端，执行作业的解释器必须能导入它们。不通过作业控制通路分发或安装代码。宿主显式调用：
@@ -62,7 +91,7 @@ Coordinator 拥有服务端发布、完整收集和轮次推进，客户端入�
 
 ## 固定计算与 GPU 要求
 
-模型共有 9,098 个 FP32 参数，两层卷积通道为 1→8→16，配合 ReLU、最大池化及十类线性分类层。训练和评估统一把图像转换为 FP32 后除以 255，使用普通交叉熵损失。每个客户端每轮从收到的全局模型重新加载参数，执行完整一个 epoch，batch size 为 64，保留尾部 32 个训练样本，实际共 938 次优化器更新。优化器固定为 SGD，学习率 0.01，无 momentum、无 weight decay；这些固定计算不开放为配置参数。
+模型结构由所选 bundle 固定。最小参考模型共有 9,098 个 FP32 参数，两层卷积通道为 1→8→16；紧凑 CNN 共有 50,186 个 FP32 参数，两层卷积通道为 1→32→64。两者都配合 ReLU、最大池化及十类线性分类层。训练和评估统一把图像转换为 FP32 后除以 255，使用普通交叉熵损失。每个客户端每轮从收到的全局模型重新加载参数，执行完整一个 epoch，batch size 为 64，保留尾部训练样本，实际优化器更新数由本端完整样本数决定。优化器固定为 SGD，学习率 0.01，无 momentum、无 weight decay；这些固定计算不开放为配置参数。
 
 客户端必须具有可用 CUDA GPU。准备阶段实际执行固定网络的 GPU 前向、反向和 SGD 操作，必要依赖、GPU 或内核操作失败会明确失败，不降级为 CPU 训练。基础角色 ready 不代表训练准备通过。各端实际 JetPack、CUDA、Python、PyTorch、设备信息和安装身份须逐端核对，不能用 fl00 的结果推断其他板。
 
@@ -90,7 +119,9 @@ Coordinator 拥有服务端发布、完整收集和轮次推进，客户端入�
 }
 ```
 
-服务端初始评估的准备报告使用 `sample_count = 10000`、两份 `t10k` 文件名及实际 CPU 描述。`device` 四个值均为长度 1～128 的字符串；没有 CUDA 版本时记录 `unavailable`，GPU 报告不接受该值。宿主可调用公开校验器：
+示例使用最小参考模型；切换紧凑 CNN 时将该值改为 `mnist-cnn-32-64-fp32-v1`，并同时使用上文的新三入口。
+
+`device` 四个值均为长度 1～128 的字符串；没有 CUDA 版本时记录 `unavailable`，GPU 报告不接受该值。宿主可调用公开校验器：
 
 ```python
 validate_preparation_report(report, expected_samples=60000,
@@ -103,13 +134,13 @@ validate_preparation_report(server_report, expected_samples=10000,
 
 模型和 update 均为单个 PyTorch 文件，使用 `weights_only=True` 读取，只保存基本类型元数据和完整 CPU 参数，不保存可执行模型对象。固定模型与 update 的算法读取上限均为 1 MiB。两类文件均严格核对参数键、形状、FP32、CPU、稠密布局和有限数值。
 
-模型顶层字段恰为 `model_format`、`state_dict`、`initialization`。其中初始化元数据保留 `source = "xavier-uniform-weights-zero-bias-v1"` 及原始 `seed`，聚合后仍保持票 01 可直接加载的格式。初始及聚合模型的实际文件 SHA-256 由宿主记录模型链；保留初始化来源不表示参数未经训练。
+`model_format` 始终与所选 bundle 一致：最小参考模型为 `mnist-two-conv-fp32-v1`，紧凑 CNN 为 `mnist-cnn-32-64-fp32-v1`。
 
 update 顶层恰有九个字段：
 
 | 字段 | 含义与校验 |
 | --- | --- |
-| `model_format` | 固定为 `mnist-two-conv-fp32-v1` |
+| `model_format` | 固定为当前部署 bundle 的模型格式；最小参考模型为 `mnist-two-conv-fp32-v1`，紧凑 CNN 为 `mnist-cnn-32-64-fp32-v1` |
 | `state_dict` | 本轮本地训练后的完整 CPU／FP32 参数 |
 | `base_model_sha256` | 本轮实际读取的全局模型文件摘要 |
 | `node_id` | 与外部节点键一致的整数身份 |

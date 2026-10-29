@@ -23,6 +23,7 @@ context.document.createElement=tag=>{const el=create(tag);if(tag==='a') el.click
 vm.runInNewContext(fs.readFileSync(source,'utf8'),context);
 const api=context.EvaluationCurves;
 const algorithm={client_entry:'wfb_ng.fl.mnist:client_entry',aggregate_entry:'wfb_ng.fl.mnist:aggregate_entry',evaluate_entry:'wfb_ng.fl.mnist:evaluate_entry'};
+const compactAlgorithm={client_entry:'wfb_ng.fl.mnist_cnn_32_64:client_entry',aggregate_entry:'wfb_ng.fl.mnist_cnn_32_64:aggregate_entry',evaluate_entry:'wfb_ng.fl.mnist_cnn_32_64:evaluate_entry'};
 function job(){return {job_id:'任务<&"'+ 'x'.repeat(120),algorithm,model_sha256:'initial',rounds:8,execution_result:'failed',evaluation:{initial_metrics:{loss:2,accuracy:0},rounds:[
   {round_index:1,output_model_sha256:'first',metrics:{loss:1,accuracy:0.5},verdict:false,reason:'已有原因,含"引号"\n下一行'},
   {round_index:2,output_model_sha256:'second',metrics:{loss:0,accuracy:null},reason:'评估失败'},
@@ -32,6 +33,7 @@ function job(){return {job_id:'任务<&"'+ 'x'.repeat(120),algorithm,model_sha25
 ]}};}
 const input=job(), before=JSON.stringify(input);
 const points=api.modelPoints(input);
+assert.equal(api.modelPoints({...input,algorithm:compactAlgorithm}).length,6,'compact MNIST bundle is a curve source');
 assert.equal(points.length,6);
 assert.equal(points[0].round_index,0);
 assert.equal(points[0].model_sha256,'initial');

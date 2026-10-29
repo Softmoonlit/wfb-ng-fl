@@ -8,10 +8,15 @@
     loss: {label: '测试交叉熵损失', axis: '交叉熵损失（无量纲）', scale: 1}
   };
 
+  const MNIST_ENTRY_BUNDLES = [
+    ['wfb_ng.fl.mnist:client_entry', 'wfb_ng.fl.mnist:aggregate_entry', 'wfb_ng.fl.mnist:evaluate_entry'],
+    ['wfb_ng.fl.mnist_cnn_32_64:client_entry', 'wfb_ng.fl.mnist_cnn_32_64:aggregate_entry', 'wfb_ng.fl.mnist_cnn_32_64:evaluate_entry']
+  ];
+
   function applicable(job) {
     const algorithm = job && job.algorithm;
-    return !!algorithm && ['client', 'aggregate', 'evaluate'].every(
-      name => algorithm[name + '_entry'] === 'wfb_ng.fl.mnist:' + name + '_entry');
+    return !!algorithm && MNIST_ENTRY_BUNDLES.some(bundle =>
+      bundle.every((entry, index) => algorithm[['client_entry', 'aggregate_entry', 'evaluate_entry'][index]] === entry));
   }
 
   function validNumber(value) {

@@ -23,6 +23,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
 import argparse
 from copy import deepcopy
 import hashlib
+import importlib
 import ipaddress
 import json
 import logging
@@ -73,6 +74,7 @@ from .control import (
 from .console import ConsoleApplicationService
 from .console_http import ManagementWebListener, validate_management_address
 from .errors import FLRuntimeError
+from .mnist_deployment import get_mnist_deployment, is_known_mnist_entry
 from .radio import (
     ALLOWED_5GHZ_CHANNELS,
     DEFAULT_CHANNEL,
@@ -92,6 +94,14 @@ from .radio import (
 )
 
 logger = logging.getLogger("wfb_fl_server_daemon")
+
+
+def _mnist_module_for_entries(client_entry: str, aggregate_entry: str,
+                              evaluate_entry: str):
+    deployment = get_mnist_deployment(client_entry, aggregate_entry, evaluate_entry)
+    return importlib.import_module(deployment.module_name) if deployment is not None else None
+
+
 if not logger.handlers:
     logging.basicConfig(
         level=logging.INFO,
@@ -186,6 +196,9 @@ class ServerDaemonConfig:
         for entry in entries:
             if not isinstance(entry, str) or entry.count(':') != 1 or not all(entry.split(':')):
                 raise FLRuntimeError('invalid_configuration', '部署算法入口格式须为 module:callable')
+        if any(is_known_mnist_entry(entry) for entry in entries[:3]) and \
+                get_mnist_deployment(*entries[:3]) is None:
+            raise FLRuntimeError('invalid_configuration', '已知 MNIST 算法入口必须使用完整匹配的三入口 bundle')
         if self.mnist_data_dir is not None and (not isinstance(self.mnist_data_dir, str)
                                                 or not os.path.isabs(self.mnist_data_dir)):
             raise FLRuntimeError('invalid_configuration', 'mnist_data_dir须为本机绝对目录')
@@ -1423,10 +1436,12 @@ class ServerDaemon:
                 if (not initial_result['preparation'] or initial_result['verdict'] is not None
                         or initial_result['reason'] is not None):
                     raise FLRuntimeError('invalid_initial_metrics', '初始评估须返回非空准备事实且不判定最终效果')
-                if self.config.evaluate_entry == 'wfb_ng.fl.mnist:evaluate_entry':
-                    from .mnist import validate_preparation_report
-                    validate_preparation_report(initial_result['preparation'], expected_samples=10000,
-                                                require_gpu=False, expected_seed=algorithm_config.get('data_seed'))
+                mnist_module = _mnist_module_for_entries(
+                    self.config.client_entry, self.config.aggregate_entry, self.config.evaluate_entry)
+                if mnist_module is not None:
+                    mnist_module.validate_preparation_report(
+                        initial_result['preparation'], expected_samples=10000,
+                        require_gpu=False, expected_seed=algorithm_config.get('data_seed'))
                 algorithm_context.check_stop()
                 os.makedirs(algorithm_context.artifact_dir, exist_ok=True)
                 write_json_atomic(Path(algorithm_context.artifact_dir) / 'initial_evaluation.json', initial_result)
@@ -1670,11 +1685,13 @@ class ServerDaemon:
                 preparation_reference: Dict[str, Any] = {}
 
                 def validate_task_report(message: Dict[str, Any], source: Tuple[str, int]) -> None:
-                    if self.config.client_entry == 'wfb_ng.fl.mnist:client_entry':
-                        from .mnist import validate_preparation_report
+                    mnist_module = _mnist_module_for_entries(
+                        self.config.client_entry, self.config.aggregate_entry, self.config.evaluate_entry)
+                    if mnist_module is not None:
                         report = message['report']
-                        validate_preparation_report(report, expected_samples=60000, require_gpu=True,
-                                                    expected_seed=algorithm_config.get('data_seed'))
+                        mnist_module.validate_preparation_report(
+                            report, expected_samples=60000, require_gpu=True,
+                            expected_seed=algorithm_config.get('data_seed'))
                         comparable = {key: report[key] for key in
                                       ('model_format', 'sample_count', 'data_sha256', 'data_seed')}
                         if preparation_reference and comparable != preparation_reference:
@@ -1814,13 +1831,14 @@ class ServerDaemon:
         preparation_reports: Dict[int, Any],
     ) -> Callable[..., Any]:
         """部署 MNIST 聚合成功后读取固定 update 的有限 metadata；generic 不解析。"""
-        if self.config.aggregate_entry != 'wfb_ng.fl.mnist:aggregate_entry':
+        mnist_module = _mnist_module_for_entries(
+            self.config.client_entry, self.config.aggregate_entry, self.config.evaluate_entry)
+        if mnist_module is None:
             return aggregate_fn
 
         def aggregate_with_training_facts(current: str, updates: Any, output: str,
                                           config: Any, context: Any) -> Any:
             result = aggregate_fn(current, updates, output, config, context)
-            from .mnist import read_update_metadata
             base_sha = calculate_file_sha256(current)
             expected = {
                 node: report.get('sample_count') if isinstance(report, dict) else None
@@ -1832,7 +1850,7 @@ class ServerDaemon:
                 expected_samples = expected.get(node)
                 if type(expected_samples) is not int:
                     raise FLRuntimeError('invalid_mnist_preparation', '聚合缺少节点样本准备事实')
-                facts.append(read_update_metadata(
+                facts.append(mnist_module.read_update_metadata(
                     updates[node], node_id=node, round_index=context.round_index,
                     base_model_sha256=base_sha, expected_sample_count=expected_samples))
             self._job_training_by_round[context.round_index] = deepcopy(facts)
