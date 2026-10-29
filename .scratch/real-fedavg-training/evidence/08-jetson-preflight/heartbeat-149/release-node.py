@@ -25,7 +25,7 @@ NATIVE = Path('/usr/bin/wfb_v6_uplink')
 RADIO = dict(channel=149, bandwidth_mhz=40, radio_txpower_dbm=14,
              downlink_mcs=3, uplink_mcs=4, uftp_rate_kbps=15000)
 WHITELIST_IDS = tuple(range(1, 11))
-PARTICIPANT_IDS = (1, 2)
+PARTICIPANT_IDS = (1, 2, 4)
 UNITS = ['wfb-fl-server.service', 'wfb-fl-client.service',
          'wfb-fl-server-daemon.service', 'wfb-fl-client-daemon.service']
 
@@ -271,7 +271,7 @@ def main():
     require(len(sys.argv) == 8, 'use release-four.py FULL_COMMIT on fl00')
     phase, commit, host, root_text, inbox_text, archive_sha, native_sha = sys.argv[1:]
     require(re.fullmatch('[0-9a-f]{40}', commit), 'invalid commit')
-    require(host in ('fl00', 'fl01', 'fl02') and os.uname().nodename == host, 'host mismatch')
+    require(host in ('fl00', 'fl01', 'fl02', 'fl04') and os.uname().nodename == host, 'host mismatch')
     require(os.geteuid() == 0, 'must run via sudo -n')
     root, inbox = Path(root_text), Path(inbox_text)
     require(str(root).startswith('/srv/wfb-ng-fl/release-' + commit + '-') and
