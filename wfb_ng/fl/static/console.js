@@ -342,6 +342,7 @@
       return `节点 ${participant.node_id} · ${fact}${participant.error_code ? ` · ${participant.error_code}` : ''}${disconnections ? ` · 失联事件：${disconnections}` : ''}`;
     }).join('；') : '—';
     renderTrainingResults(job);
+    EvaluationCurves.render(byId('job-evaluation-curves'), job);
     renderParticipantResults(job);
     renderRadioResults(job);
     byId('job-error').textContent = job ? [job.error, job.recovery_error, job.reason].filter(Boolean).join(' · ') : '';

@@ -30,7 +30,7 @@ function openPage(initial = snapshot()) {
   const intervals = {};
   function EventSource() {stream = this; this.listeners = {};}
   EventSource.prototype.addEventListener = function(name, fn) {this.listeners[name] = fn;};
-  const context = {document: {getElementById(id) {return elements[id] ||= element('div');}, createElement: element},
+  const context = {EvaluationCurves: {render() {}}, document: {getElementById(id) {return elements[id] ||= element('div');}, createElement: element},
     fetch: async (url, opts = {}) => {
       if (url === '/api/v1/models') return {ok: true, json: async () => ({models: []})};
       if (url === '/api/v1/state') {

@@ -148,9 +148,9 @@ def test_address_ownership_rejects_wireless_and_tun_and_accepts_ethernet():
 def register_idle(daemon):
     hb = _heartbeat()
     from dataclasses import replace
-    hb = replace(hb, state='HUNTING')
+    hb = replace(hb, state='HUNTING', timestamp_ms=1)
     daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
-    hb = replace(hb, state='IDLE')
+    hb = replace(hb, state='IDLE', timestamp_ms=2)
     daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
 
 
@@ -250,6 +250,18 @@ def test_packaged_page_renders_errors_retry_and_refresh_with_existing_node():
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_evaluation_curves_render_and_export_snapshot_facts():
+    import shutil
+    import subprocess
+    from pathlib import Path
+    node = shutil.which('node')
+    assert node, '评估曲线行为检查需要现有 Node 环境'
+    result = subprocess.run([node, str(Path(__file__).with_name('evaluation_curves_test.js'))],
+                            text=True, capture_output=True, timeout=10,
+                            cwd=Path(__file__).resolve().parents[2])
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_real_chromium_renders_training_facts_and_reload():
     import os
     import shutil
@@ -268,7 +280,7 @@ def test_real_chromium_renders_training_facts_and_reload():
         [sys.executable, str(Path(__file__).with_name('console_training_browser_check.py'))],
         cwd=root, env=env, text=True, capture_output=True, timeout=120)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert '评估表、固定参与者摘要、未判定事实与重载快照恢复通过' in result.stdout
+    assert '真实 SVG/CSV 下载及独立打开通过' in result.stdout
 
 
 def test_local_recovery_failure_does_not_overwrite_execution_error_or_core_idle():
@@ -421,10 +433,25 @@ def test_snapshot_huge_numbers_and_unknown_algorithm_config_fail_closed():
     }
     state = daemon.console.snapshot()
     job = state['current_job']
-    assert job['evaluation']['initial_metrics'] is None
-    assert job['evaluation']['rounds'][0]['metrics'] is None
+    assert job['evaluation']['initial_metrics'] == {'accuracy': 0}
+    assert job['evaluation']['rounds'][0]['metrics'] == {'accuracy': 0}
     assert 'train_loss' not in job['participants'][0]['training'][0]
     assert job['algorithm'] == {'client_entry': 'custom.client:entry'}
+
+@pytest.mark.parametrize('invalid_accuracy', [None, float('nan'), float('inf'), True])
+def test_evaluation_snapshot_keeps_valid_metric_when_other_metric_is_missing(invalid_accuracy):
+    daemon = make_daemon()
+    daemon.server_state = ServerState.RUNNING
+    daemon.active_job = {
+        'job_id': 'partial-metrics', 'target_nodes': [1], 'rounds': 1,
+        'initial_metrics': {'loss': 0.25, 'accuracy': invalid_accuracy},
+        'round_results': [{'round_index': 1, 'metrics': {'loss': 0, 'accuracy': invalid_accuracy}}],
+    }
+    evaluation = daemon.console.snapshot()['current_job']['evaluation']
+    assert evaluation['initial_metrics'] == {'loss': 0.25}
+    assert evaluation['rounds'][0]['metrics'] == {'loss': 0}
+    json.dumps(evaluation, allow_nan=False)
+
 
 @pytest.mark.parametrize('host', ['0.0.0.0', '127.0.0.1', '127.1.2.3', '10.80.0.1', 'not-an-address'])
 def test_web_config_rejects_forbidden_addresses(host):
@@ -533,6 +560,7 @@ def test_http_static_schema_host_and_method_boundaries():
         return result
     try:
         for path, content_type in [('/', 'text/html'), ('/assets/console.js', 'text/javascript'),
+                                    ('/assets/evaluation-curves.js', 'text/javascript'),
                                     ('/assets/console.css', 'text/css')]:
             status, headers, body = request('GET', path)
             assert status == 200 and headers['Content-Type'].startswith(content_type)

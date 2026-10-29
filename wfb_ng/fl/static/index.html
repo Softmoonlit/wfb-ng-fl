@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>WFB 联邦训练控制台</title>
   <link rel="stylesheet" href="/assets/console.css">
+  <script defer src="/assets/evaluation-curves.js"></script>
   <script defer src="/assets/console.js"></script>
 </head>
 <body>
@@ -68,6 +69,7 @@
           </table>
         </div>
         <p id="job-evaluation-note" class="muted">暂无评估事实</p>
+        <section id="job-evaluation-curves" aria-label="全局模型评估曲线" aria-live="off"></section>
         <h3>固定参与者摘要</h3>
         <div class="result-table-wrap">
           <table id="job-participant-table" aria-label="固定参与者准备与训练摘要">

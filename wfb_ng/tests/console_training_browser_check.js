@@ -1,8 +1,10 @@
 // 工单07真实 Chromium 页面：评估表、固定参与者摘要、快照恢复，不触碰真实无线控制面。
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
 (async () => {
-  const [debugUrl, consoleUrl] = process.argv.slice(2);
+  const [debugUrl, consoleUrl, downloadDir] = process.argv.slice(2);
   const targets = await (await fetch(`${debugUrl}/json/list`)).json();
   const target = targets.find(entry => entry.type === 'page');
   assert.ok(target, 'Chromium CDP page target is required');
@@ -91,7 +93,27 @@ const assert = require('node:assert/strict');
     await waitFor("document.querySelectorAll('#job-evaluation-rows tr').length === 3");
     assert.equal(await evaluate("performance.getEntriesByType('resource').filter(entry => new URL(entry.name).pathname.startsWith('/api/v1/jobs')).length"), 0);
 
-    console.log('Chromium 真实页面：评估表、固定参与者摘要、未判定事实与重载快照恢复通过');
+    await waitFor("document.querySelectorAll('#job-evaluation-curves svg').length === 2");
+    assert.equal(await evaluate("document.querySelectorAll('#job-evaluation-curves circle[role=button]').length"), 6);
+    await evaluate("document.querySelector('#job-evaluation-curves circle[role=button]').dispatchEvent(new MouseEvent('click', {bubbles:true}))");
+    assert.match(await evaluate("document.querySelector('.evaluation-curves-details').textContent"), /M0.*准确率 0/);
+    await call('Browser.setDownloadBehavior', {behavior: 'allow', downloadPath: downloadDir});
+    await evaluate("for (const button of document.querySelectorAll('.evaluation-curves-download')) button.click()");
+    const downloads = ['job-07-browser-accuracy.svg', 'job-07-browser-loss.svg', 'job-07-browser-evaluation.csv'];
+    const deadline = performance.now() + 5000;
+    while (!downloads.every(name => fs.existsSync(path.join(downloadDir, name)))) {
+      if (performance.now() > deadline) throw new Error('评估文件下载未完成');
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    const csv = fs.readFileSync(path.join(downloadDir, downloads[2]), 'utf8');
+    assert.ok(csv.includes('job-07-browser,2,' + 'c'.repeat(64) + ',1.25,0.75,false,受控未达标'));
+    const svgLoad = waitForEvent('Page.loadEventFired');
+    await call('Page.navigate', {url: 'file://' + path.join(downloadDir, downloads[0])});
+    await svgLoad;
+    assert.equal(await evaluate('document.documentElement.namespaceURI'), 'http://www.w3.org/2000/svg');
+    assert.match(await evaluate('document.documentElement.textContent'), /测试准确率.*job-07-browser/s);
+    assert.equal(await evaluate('document.querySelectorAll("circle[role=button]").length'), 3);
+    console.log('Chromium 真实页面：评估表、曲线点详情、刷新恢复、真实 SVG/CSV 下载及独立打开通过');
   } finally {
     socket.close();
   }

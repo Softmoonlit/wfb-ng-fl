@@ -89,6 +89,7 @@ function createConsoleContext(fetchHandler, eventSourceHolder, confirmCallback) 
       createElement
     },
     fetch: fetchHandler,
+    EvaluationCurves: {render() {}},
     setInterval(callback) { timerTick = callback; return 1; },
     sessionStorage: {
       getItem(k) { return this[k] || null; },

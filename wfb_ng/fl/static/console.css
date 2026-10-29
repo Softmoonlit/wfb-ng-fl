@@ -413,4 +413,15 @@ tr:hover td {
   margin: 0 0 12px;
   font-size: 12px;
 }
+/* 论文图使用浅色画布，页面说明沿用控制台主题。 */
+.evaluation-curves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.evaluation-curves > h3, .evaluation-curves > p { grid-column: 1 / -1; margin: 8px 0; }
+.evaluation-curves-figure { min-width: 0; margin: 0; }
+.evaluation-curves-figure svg { display: block; width: 100%; height: auto; background: white; color: #172033; border-radius: 6px; }
+.evaluation-curves-figure circle { cursor: pointer; }
+.evaluation-curves-figure circle:focus { outline: none; stroke: #c2410c; stroke-width: 3; }
+.evaluation-curves-note, .evaluation-curves-missing { white-space: pre-line; overflow-wrap: anywhere; }
+.evaluation-curves-details { overflow-wrap: anywhere; min-height: 3em; }
+.evaluation-curves-download { justify-self: start; margin-top: 8px; }
+@media (max-width: 800px) { .evaluation-curves { grid-template-columns: minmax(0, 1fr); } }
 [hidden] { display: none !important; }

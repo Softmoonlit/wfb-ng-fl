@@ -55,13 +55,13 @@ def _finite_float(value: Any) -> Optional[float]:
 
 
 def _finite_metrics(value: Any) -> Optional[Dict[str, Any]]:
-    """只投影已验证的有限数值指标，保留合法的零值。"""
+    """逐指标投影有限数值；缺失项不抹除其他已取得指标，合法零值保留。"""
     if not isinstance(value, dict) or not value:
         return None
-    if any(not isinstance(key, str) or not _finite_number(item)
-           for key, item in value.items()):
+    if any(not isinstance(key, str) for key in value):
         return None
-    return deepcopy(value)
+    metrics = {key: deepcopy(item) for key, item in value.items() if _finite_number(item)}
+    return metrics or None
 
 
 def _sha256(value: Any) -> Optional[str]:

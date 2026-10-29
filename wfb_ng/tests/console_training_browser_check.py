@@ -27,6 +27,11 @@ def main() -> None:
         daemon.server_state = ServerState.IDLE
         daemon._recent_job = {
             'job_id': 'job-07-browser',
+            'algorithm': {
+                'client_entry': 'wfb_ng.fl.mnist:client_entry',
+                'aggregate_entry': 'wfb_ng.fl.mnist:aggregate_entry',
+                'evaluate_entry': 'wfb_ng.fl.mnist:evaluate_entry',
+            },
             'run_id': 'run-07-browser',
             'model_sha256': 'a' * 64,
             'model_size_bytes': 10,
@@ -146,6 +151,7 @@ def main() -> None:
                     'node', str(Path(__file__).with_suffix('.js')),
                     f'http://127.0.0.1:{debug_port}',
                     f'http://127.0.0.1:{server.server_port}/',
+                    tmp,
                 ], check=True, timeout=30)
         finally:
             if chromium is not None:

@@ -38,6 +38,7 @@ const snapshot = {
 };
 function openPage(responses) {
   const elements = {};
+  const curveJobs = [];
   let tick;
   function EventSource(url) {
     this.url = url;
@@ -46,7 +47,8 @@ function openPage(responses) {
   }
   EventSource.prototype.addEventListener = function(name, callback) {this.listeners[name] = callback;};
   EventSource.prototype.emit = function(name, data) {this.listeners[name]({data, lastEventId:'9'});};
-  const context = {document:{getElementById(id){return elements[id] ||= element();}, createElement:element},
+  const context = {EvaluationCurves: {render(container, job) {curveJobs.push(job);}},
+    document:{getElementById(id){return elements[id] ||= element();}, createElement:element},
     fetch:async(path) => {
       assert.equal(path, '/api/v1/state');
       const value=responses.shift();
@@ -55,7 +57,7 @@ function openPage(responses) {
     }, setInterval(callback){tick=callback;}, EventSource,
     sessionStorage:{getItem(){return null;},setItem(){}}, console};
   vm.runInNewContext(script, context);
-  return {elements, tick:()=>tick(), stream:EventSource.instance};
+  return {elements, curveJobs, tick:()=>tick(), stream:EventSource.instance};
 }
 async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
 (async()=>{
@@ -66,6 +68,7 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   assert.match(page.elements['job-result'].textContent,/失败/);
   assert.match(page.elements['job-recovery'].textContent,/恢复受阻/);
   assert.match(page.elements['job-error'].textContent,/摘要错误/);
+  assert.equal(page.curveJobs.at(-1)?.job_id, 'job-1', '曲线与评估表使用同一快照作业');
   assert.equal(page.elements['job-evaluation-rows'].children.length, 2);
   assert.match(text(page.elements['job-evaluation-rows'].children[0]), /2/);
   assert.match(text(page.elements['job-evaluation-rows'].children[0]), /0/);
@@ -88,6 +91,7 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   page.stream.emit('snapshot', JSON.stringify(aborted));
   await flush();
   assert.match(text(page.elements['job-evaluation-rows'].children[1]), /未确认/);
+  assert.equal(page.curveJobs.at(-1).execution_result, 'aborted', '停止后仍传递已有评估事实');
 
   assert.match(page.elements['start-blockers'].children[0].textContent,/资源恢复未完成/);
   assert.match(page.elements['radio'].textContent,/157/);
@@ -112,5 +116,12 @@ async function flush(){for(let i=0;i<8;i++) await Promise.resolve();}
   const refreshed=openPage([snapshot]); await flush();
   assert.match(refreshed.elements['job-id'].textContent,/job-1/);
   assert.match(refreshed.elements['job-recovery'].textContent,/恢复受阻/);
+  assert.equal(refreshed.curveJobs.at(-1).evaluation.rounds.length, 1, '页面重开从快照恢复曲线');
+  const next = JSON.parse(JSON.stringify(snapshot));
+  next.state_version = 7;
+  next.job = {...next.job, job_id: 'next-job', evaluation: {initial_metrics: {loss: 3, accuracy: 0.1}, rounds: []}};
+  page.stream.emit('snapshot', JSON.stringify(next)); await flush();
+  assert.equal(page.curveJobs.at(-1).job_id, 'next-job');
+  assert.equal(page.curveJobs.at(-1).evaluation.rounds.length, 0, '下一作业不携带上一作业轮次');
   console.log('Packaged console JS: rendering, failure, retry and refresh passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -1,0 +1,160 @@
+node:assert:150
+  throw new AssertionError(obj);
+  ^
+
+AssertionError [ERR_ASSERTION]: new round restores focused metric and round
+
+{
+  addEventListener: [Function: addEventListener],
+  append: [Function: append],
+  attributes: {
+    'aria-label': 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得',
+    'stroke-width': '1',
+    cx: '90',
+    cy: '82',
+    fill: '#2563eb',
+    r: '5',
+    role: 'button',
+    stroke: 'white',
+    tabindex: '0'
+  },
+  children: [
+    {
+      addEventListener: [Function: addEventListener],
+      append: [Function: append],
+      attributes: {},
+      children: [],
+      click: [Function: click],
+      contains: [Function: contains],
+      focus: [Function: focus],
+      listeners: {},
+      ns: 'http://www.w3.org/2000/svg',
+      replaceChildren: [Function: replaceChildren],
+      setAttribute: [Function: setAttribute],
+      tag: 'title',
+      textContent: 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得'
+    }
+  ],
+  click: [Function: click],
+  contains: [Function: contains],
+  focus: [Function: focus],
+  listeners: {
+    click: [Function: show],
+    focus: [Function: show],
+    keydown: [Function (anonymous)],
+    mouseenter: [Function: show]
+  },
+  ns: 'http://www.w3.org/2000/svg',
+  replaceChildren: [Function: replaceChildren],
+  setAttribute: [Function: setAttribute],
+  tag: 'circle',
+  textContent: ''
+}
+
+    at Object.<anonymous> (/home/fl/projects/wfb-ng-fl/wfb_ng/tests/evaluation_curves_test.js:176:8)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: {
+    tag: 'circle',
+    ns: 'http://www.w3.org/2000/svg',
+    children: [
+      {
+        tag: 'title',
+        ns: 'http://www.w3.org/2000/svg',
+        children: [],
+        attributes: {},
+        listeners: {},
+        textContent: 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得',
+        append: [Function: append],
+        replaceChildren: [Function: replaceChildren],
+        setAttribute: [Function: setAttribute],
+        addEventListener: [Function: addEventListener],
+        contains: [Function: contains],
+        focus: [Function: focus],
+        click: [Function: click]
+      }
+    ],
+    attributes: {
+      cx: '90',
+      cy: '82',
+      r: '5',
+      fill: '#2563eb',
+      stroke: 'white',
+      'stroke-width': '1',
+      tabindex: '0',
+      role: 'button',
+      'aria-label': 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得'
+    },
+    listeners: {
+      mouseenter: [Function: show],
+      focus: [Function: show],
+      click: [Function: show],
+      keydown: [Function (anonymous)]
+    },
+    textContent: '',
+    append: [Function: append],
+    replaceChildren: [Function: replaceChildren],
+    setAttribute: [Function: setAttribute],
+    addEventListener: [Function: addEventListener],
+    contains: [Function: contains],
+    focus: [Function: focus],
+    click: [Function: click]
+  },
+  expected: {
+    tag: 'circle',
+    ns: 'http://www.w3.org/2000/svg',
+    children: [
+      {
+        tag: 'title',
+        ns: 'http://www.w3.org/2000/svg',
+        children: [],
+        attributes: {},
+        listeners: {},
+        textContent: 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得',
+        append: [Function: append],
+        replaceChildren: [Function: replaceChildren],
+        setAttribute: [Function: setAttribute],
+        addEventListener: [Function: addEventListener],
+        contains: [Function: contains],
+        focus: [Function: focus],
+        click: [Function: click]
+      }
+    ],
+    attributes: {
+      cx: '90',
+      cy: '82',
+      r: '5',
+      fill: '#2563eb',
+      stroke: 'white',
+      'stroke-width': '1',
+      tabindex: '0',
+      role: 'button',
+      'aria-label': 'M0 · 通信轮次 0 · 模型 focus-m0 · 测试准确率 0.25（原始值），25% · 测试交叉熵损失 2 · 效果判定 未判定 · 原因 未取得'
+    },
+    listeners: {
+      mouseenter: [Function: show],
+      focus: [Function: show],
+      click: [Function: show],
+      keydown: [Function (anonymous)]
+    },
+    textContent: '',
+    append: [Function: append],
+    replaceChildren: [Function: replaceChildren],
+    setAttribute: [Function: setAttribute],
+    addEventListener: [Function: addEventListener],
+    contains: [Function: contains],
+    focus: [Function: focus],
+    click: [Function: click]
+  },
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.23.3

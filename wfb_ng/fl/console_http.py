@@ -29,6 +29,7 @@ STATIC_ROUTES = {'/': ('index.html', 'text/html; charset=utf-8'),
                  '/assets/models.js': ('models.js', 'text/javascript; charset=utf-8'),
                  '/assets/models.css': ('models.css', 'text/css; charset=utf-8'),
                  '/assets/console.css': ('console.css', 'text/css; charset=utf-8'),
+                 '/assets/evaluation-curves.js': ('evaluation-curves.js', 'text/javascript; charset=utf-8'),
                  '/assets/console.js': ('console.js', 'text/javascript; charset=utf-8')}
 REPLACED_ROUTES = {'/api/v1/jobs/start': '/api/v1/jobs',
                    '/api/v1/jobs/abort': '/api/v1/jobs/{job_id}/abort',
