@@ -1,0 +1,1488 @@
+{
+  "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+  "run_id": "20261103T114943570298Z",
+  "topology_sha256": "b0a97a01463f3203f88c697c80ee744e715e46456ae28bdd0a73702c4db71a82",
+  "helper_sha256": "fba6c73364827d5b89b3242223666e44717f88b06aff874fb84b24a48c3ecdcc",
+  "frozen_management_sha256": {
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py": "2f765143dddba085781e0df13a6d74a5e7da08b6601d4a084478608b2b432201",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-node.py": "fba6c73364827d5b89b3242223666e44717f88b06aff874fb84b24a48c3ecdcc",
+    "cluster_nodes.conf": "b0a97a01463f3203f88c697c80ee744e715e46456ae28bdd0a73702c4db71a82"
+  },
+  "whitelist_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "participant_ids": [
+    1,
+    2,
+    4
+  ],
+  "node_identity_ids": [
+    1,
+    2,
+    4
+  ],
+  "active_job_targets": null,
+  "events": [
+    {
+      "node": "fl00",
+      "phase": "inbox",
+      "argv": [
+        "mkdir",
+        "-m",
+        "700",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:49:50.181373+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer",
+      "argv": [
+        "cp",
+        "--",
+        "/tmp/wfb-release-v66fp1nk/source.tar",
+        "/tmp/wfb-release-v66fp1nk/release-node.py",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:49:50.187420+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "mkdir -m 700 /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:49:50.303629+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl01",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-v66fp1nk/source.tar",
+        "/tmp/wfb-release-v66fp1nk/release-node.py",
+        "fl@192.168.137.15:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:49:51.473775+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "mkdir -m 700 /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:53:40.356116+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl02",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-v66fp1nk/source.tar",
+        "/tmp/wfb-release-v66fp1nk/release-node.py",
+        "fl@192.168.137.94:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:53:42.026410+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "mkdir -m 700 /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:57:32.779583+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl04",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-v66fp1nk/source.tar",
+        "/tmp/wfb-release-v66fp1nk/release-node.py",
+        "fl@192.168.137.184:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T11:57:33.999655+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "preflight",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "preflight",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "-"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:01:31.491879+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "preflight",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py preflight 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 -"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:01:35.985457+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "preflight",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py preflight 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 -"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:01:44.227480+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "preflight",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py preflight 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 -"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:01:50.337711+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "build",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "build",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "-"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:01:55.716744+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "canonical-binary",
+      "argv": [
+        "sudo",
+        "-n",
+        "install",
+        "-m",
+        "0644",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/source/wfb_v6_uplink",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/canonical-wfb_v6_uplink"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:15.351556+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "canonical-binary-sha",
+      "argv": [
+        "sha256sum",
+        "--",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/canonical-wfb_v6_uplink"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:15.373829+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "binary-fl01",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/canonical-wfb_v6_uplink",
+        "fl@192.168.137.15:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/wfb_v6_uplink"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:15.383934+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "binary-fl02",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/canonical-wfb_v6_uplink",
+        "fl@192.168.137.94:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/wfb_v6_uplink"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:17.908990+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "binary-fl04",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/canonical-wfb_v6_uplink",
+        "fl@192.168.137.184:/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/wfb_v6_uplink"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:21.085598+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "stage",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "stage",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:23.611382+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "stage",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stage 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:23.782795+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "stage",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stage 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:25.506767+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "stage",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stage 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:27.932343+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "stop",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "stop",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:28.967388+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "stop",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stop 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:29.639929+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "stop",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stop 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:30.913307+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "stop",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stop 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:32.236826+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "stopped",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "stopped",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:33.863787+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "stopped",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stopped 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:34.085359+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "stopped",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stopped 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:34.857991+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "stopped",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py stopped 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:35.830947+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "install",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "install",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:37.808737+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py install 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:39.132992+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py install 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:42.210040+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py install 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:45.687406+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "verify-install",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "verify-install",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:48.366619+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "verify-install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-install 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:49.691320+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "verify-install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-install 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:51.617834+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "verify-install",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-install 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:53.342297+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "start",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "start",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:56.521862+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "start",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py start 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:56.644031+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "start",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py start 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:02:58.218862+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "start",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py start 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:03:00.444361+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "verify-runtime",
+      "argv": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-B",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py",
+        "verify-runtime",
+        "5443ca22658202805317a9a974c261cde7c751b9",
+        "fl00",
+        "/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "/tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z",
+        "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+        "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:03:01.170507+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "verify-runtime",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-runtime 5443ca22658202805317a9a974c261cde7c751b9 fl01 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:03:05.700307+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl02",
+      "phase": "verify-runtime",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.94",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-runtime 5443ca22658202805317a9a974c261cde7c751b9 fl02 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:03:11.782143+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl04",
+      "phase": "verify-runtime",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.184",
+        "sudo -n /usr/bin/python3 -B /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py verify-runtime 5443ca22658202805317a9a974c261cde7c751b9 fl04 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z /tmp/wfb-release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z 7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26 1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T12:03:17.213115+00:00",
+      "rc": 0
+    }
+  ],
+  "state": "verified",
+  "archive_sha256": "7a07513daa832c0cb3188d8a2580587b903249235a128e3e2135392e1f277c26",
+  "abi": {
+    "fl00": {
+      "fingerprint": {
+        "machine": "aarch64",
+        "libc": "glibc 2.35",
+        "compiler_target": "aarch64-linux-gnu",
+        "elf": {
+          "Class": "ELF64",
+          "Data": "2's complement, little endian",
+          "OS/ABI": "UNIX - GNU",
+          "ABI Version": "0",
+          "Machine": "AArch64",
+          "Flags": "0x0"
+        },
+        "libraries": {
+          "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+          "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+          "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+          "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+          "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+          "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+          "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+          "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+          "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+          "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+          "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+          "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+          "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+          "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+          "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+        }
+      },
+      "checks": [
+        {
+          "argv": [
+            "uname",
+            "-m"
+          ],
+          "rc": 0,
+          "out": "aarch64\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "getconf",
+            "GNU_LIBC_VERSION"
+          ],
+          "rc": 0,
+          "out": "glibc 2.35\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "-dumpmachine"
+          ],
+          "rc": 0,
+          "out": "aarch64-linux-gnu\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "--version"
+          ],
+          "rc": 0,
+          "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "file",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "/usr/bin/wfb_v6_uplink: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=faaa490bbb51ebcb344ecfa67289a37d34270d29, for GNU/Linux 3.7.0, not stripped\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-h",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "ELF Header:\n  Magic:   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  Class:                             ELF64\n  Data:                              2's complement, little endian\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI Version:                       0\n  Type:                              DYN (Position-Independent Executable file)\n  Machine:                           AArch64\n  Version:                           0x1\n  Entry point address:               0x7880\n  Start of program headers:          64 (bytes into file)\n  Start of section headers:          281008 (bytes into file)\n  Flags:                             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-l",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nElf file type is DYN (Position-Independent Executable file)\nEntry point 0x7880\nThere are 9 program headers, starting at offset 64\n\nProgram Headers:\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034c73 0x0000000000034c73  R E    0x10000\n  LOAD           0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001168 0x0000000000012890  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002e040 0x000000000002e040 0x000000000002e040\n                 0x0000000000000a3c 0x0000000000000a3c  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001138 0x0000000000001138  R      0x1\n\n Section to Segment mapping:\n  Segment Sections...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-n",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: faaa490bbb51ebcb344ecfa67289a37d34270d29\n\nDisplaying notes found in: .note.ABI-tag\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-p",
+            ".comment",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-d",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDynamic section at offset 0x35880 contains 32 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libsodium.so.23]\n 0x0000000000000001 (NEEDED)             Shared library: [libpcap.so.0.8]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-aarch64.so.1]\n 0x000000000000000c (INIT)               0x47b8\n 0x000000000000000d (FINI)               0x29b30\n 0x0000000000000019 (INIT_ARRAY)         0x44ec8\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x44ee8\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x298\n 0x0000000000000005 (STRTAB)             0x12c0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              4455 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000003 (PLTGOT)             0x45ac0\n 0x0000000000000002 (PLTRELSZ)           3312 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x3ac8\n 0x0000000000000007 (RELA)               0x26a0\n 0x0000000000000008 (RELASZ)             5160 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000000000001e (FLAGS)              BIND_NOW\n 0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE\n 0x000000006ffffffe (VERNEED)            0x2580\n 0x000000006fffffff (VERNEEDNUM)         4\n 0x000000006ffffff0 (VERSYM)             0x2428\n 0x000000006ffffff9 (RELACOUNT)          156\n 0x0000000000000000 (NULL)               0x0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "--version-info",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nVersion symbols section '.gnu.version' contains 170 entries:\n Addr: 0x0000000000002428  Offset: 0x002428  Link: 5 (.dynsym)\n  000:   0 (*local*)       0 (*local*)       0 (*local*)       2 (GLIBCXX_3.4)\n  004:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  008:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  00c:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  010:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  014:   5 (GLIBCXX_3.4.14)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  018:   7 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  01c:   6 (CXXABI_1.3)    3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  020:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  024:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  028:   3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)   1 (*global*)   \n  02c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  030:   2 (GLIBCXX_3.4)   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  034:   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    9 (GLIBC_2.34)    1 (*global*)   \n  038:   a (GLIBCXX_3.4.29)    1 (*global*)      3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  03c:   3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17)    1 (*global*)   \n  040:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  044:   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  048:   1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)\n  04c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)   \n  050:   4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  054:   1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  058:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  05c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  060:   1 (*global*)      1 (*global*)      3 (GLIBC_2.17)    b (GLIBC_2.32) \n  064:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  068:   4 (GLIBCXX_3.4.21)    4 (GLIBCXX_3.4.21)    c (GLIBCXX_3.4.18)    2 (GLIBCXX_3.4)\n  06c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)\n  070:   3 (GLIBC_2.17)    d (CXXABI_1.3.8)   3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  074:   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17)    e (GLIBCXX_3.4.20) \n  078:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  07c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17) \n  080:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  084:   6 (CXXABI_1.3)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    6 (CXXABI_1.3) \n  088:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  08c:   1 (*global*)      3 (GLIBC_2.17)    f (GCC_3.0)       1 (*global*)   \n  090:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   1 (*global*)      3 (GLIBC_2.17) \n  094:   3 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)\n  098:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  09c:   1 (*global*)      3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  0a0:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  0a4:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   1 (*global*)      1 (*global*)   \n  0a8:   1 (*global*)      1 (*global*)   \n\nVersion needs section '.gnu.version_r' contains 4 entries:\n Addr: 0x0000000000002580  Offset: 0x002580  Link: 6 (.dynstr)\n  000000: Version: 1  File: libgcc_s.so.1  Cnt: 1\n  0x0010:   Name: GCC_3.0  Flags: none  Version: 15\n  0x0020: Version: 1  File: ld-linux-aarch64.so.1  Cnt: 1\n  0x0030:   Name: GLIBC_2.17  Flags: none  Version: 7\n  0x0040: Version: 1  File: libc.so.6  Cnt: 3\n  0x0050:   Name: GLIBC_2.32  Flags: none  Version: 11\n  0x0060:   Name: GLIBC_2.34  Flags: none  Version: 9\n  0x0070:   Name: GLIBC_2.17  Flags: none  Version: 3\n  0x0080: Version: 1  File: libstdc++.so.6  Cnt: 9\n  0x0090:   Name: GLIBCXX_3.4.20  Flags: none  Version: 14\n  0x00a0:   Name: CXXABI_1.3.8  Flags: none  Version: 13\n  0x00b0:   Name: GLIBCXX_3.4.18  Flags: none  Version: 12\n  0x00c0:   Name: GLIBCXX_3.4.29  Flags: none  Version: 10\n  0x00d0:   Name: GLIBCXX_3.4.9  Flags: none  Version: 8\n  0x00e0:   Name: CXXABI_1.3  Flags: none  Version: 6\n  0x00f0:   Name: GLIBCXX_3.4.14  Flags: none  Version: 5\n  0x0100:   Name: GLIBCXX_3.4.21  Flags: none  Version: 4\n  0x0110:   Name: GLIBCXX_3.4  Flags: none  Version: 2\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "ldd",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff81189000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffff81070000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffff81010000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffff80de0000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffff80db0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff80c00000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff81150000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffff80ba0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff80b00000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffff80a20000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffff809e0000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffff80910000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffff808e0000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffff808c0000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffff807d0000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffff80790000)\n",
+          "err": ""
+        }
+      ]
+    },
+    "fl01": {
+      "fingerprint": {
+        "machine": "aarch64",
+        "libc": "glibc 2.35",
+        "compiler_target": "aarch64-linux-gnu",
+        "elf": {
+          "Class": "ELF64",
+          "Data": "2's complement, little endian",
+          "OS/ABI": "UNIX - GNU",
+          "ABI Version": "0",
+          "Machine": "AArch64",
+          "Flags": "0x0"
+        },
+        "libraries": {
+          "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+          "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+          "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+          "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+          "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+          "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+          "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+          "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+          "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+          "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+          "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+          "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+          "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+          "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+          "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+        }
+      },
+      "checks": [
+        {
+          "argv": [
+            "uname",
+            "-m"
+          ],
+          "rc": 0,
+          "out": "aarch64\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "getconf",
+            "GNU_LIBC_VERSION"
+          ],
+          "rc": 0,
+          "out": "glibc 2.35\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "-dumpmachine"
+          ],
+          "rc": 0,
+          "out": "aarch64-linux-gnu\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "--version"
+          ],
+          "rc": 0,
+          "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "file",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "/usr/bin/wfb_v6_uplink: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=faaa490bbb51ebcb344ecfa67289a37d34270d29, for GNU/Linux 3.7.0, not stripped\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-h",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "ELF Header:\n  Magic:   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  Class:                             ELF64\n  Data:                              2's complement, little endian\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI Version:                       0\n  Type:                              DYN (Position-Independent Executable file)\n  Machine:                           AArch64\n  Version:                           0x1\n  Entry point address:               0x7880\n  Start of program headers:          64 (bytes into file)\n  Start of section headers:          281008 (bytes into file)\n  Flags:                             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-l",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nElf file type is DYN (Position-Independent Executable file)\nEntry point 0x7880\nThere are 9 program headers, starting at offset 64\n\nProgram Headers:\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034c73 0x0000000000034c73  R E    0x10000\n  LOAD           0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001168 0x0000000000012890  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002e040 0x000000000002e040 0x000000000002e040\n                 0x0000000000000a3c 0x0000000000000a3c  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001138 0x0000000000001138  R      0x1\n\n Section to Segment mapping:\n  Segment Sections...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-n",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: faaa490bbb51ebcb344ecfa67289a37d34270d29\n\nDisplaying notes found in: .note.ABI-tag\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-p",
+            ".comment",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-d",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDynamic section at offset 0x35880 contains 32 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libsodium.so.23]\n 0x0000000000000001 (NEEDED)             Shared library: [libpcap.so.0.8]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-aarch64.so.1]\n 0x000000000000000c (INIT)               0x47b8\n 0x000000000000000d (FINI)               0x29b30\n 0x0000000000000019 (INIT_ARRAY)         0x44ec8\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x44ee8\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x298\n 0x0000000000000005 (STRTAB)             0x12c0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              4455 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000003 (PLTGOT)             0x45ac0\n 0x0000000000000002 (PLTRELSZ)           3312 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x3ac8\n 0x0000000000000007 (RELA)               0x26a0\n 0x0000000000000008 (RELASZ)             5160 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000000000001e (FLAGS)              BIND_NOW\n 0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE\n 0x000000006ffffffe (VERNEED)            0x2580\n 0x000000006fffffff (VERNEEDNUM)         4\n 0x000000006ffffff0 (VERSYM)             0x2428\n 0x000000006ffffff9 (RELACOUNT)          156\n 0x0000000000000000 (NULL)               0x0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "--version-info",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nVersion symbols section '.gnu.version' contains 170 entries:\n Addr: 0x0000000000002428  Offset: 0x002428  Link: 5 (.dynsym)\n  000:   0 (*local*)       0 (*local*)       0 (*local*)       2 (GLIBCXX_3.4)\n  004:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  008:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  00c:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  010:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  014:   5 (GLIBCXX_3.4.14)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  018:   7 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  01c:   6 (CXXABI_1.3)    3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  020:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  024:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  028:   3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)   1 (*global*)   \n  02c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  030:   2 (GLIBCXX_3.4)   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  034:   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    9 (GLIBC_2.34)    1 (*global*)   \n  038:   a (GLIBCXX_3.4.29)    1 (*global*)      3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  03c:   3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17)    1 (*global*)   \n  040:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  044:   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  048:   1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)\n  04c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)   \n  050:   4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  054:   1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  058:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  05c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  060:   1 (*global*)      1 (*global*)      3 (GLIBC_2.17)    b (GLIBC_2.32) \n  064:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  068:   4 (GLIBCXX_3.4.21)    4 (GLIBCXX_3.4.21)    c (GLIBCXX_3.4.18)    2 (GLIBCXX_3.4)\n  06c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)\n  070:   3 (GLIBC_2.17)    d (CXXABI_1.3.8)   3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  074:   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17)    e (GLIBCXX_3.4.20) \n  078:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  07c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17) \n  080:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  084:   6 (CXXABI_1.3)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    6 (CXXABI_1.3) \n  088:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  08c:   1 (*global*)      3 (GLIBC_2.17)    f (GCC_3.0)       1 (*global*)   \n  090:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   1 (*global*)      3 (GLIBC_2.17) \n  094:   3 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)\n  098:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  09c:   1 (*global*)      3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  0a0:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  0a4:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   1 (*global*)      1 (*global*)   \n  0a8:   1 (*global*)      1 (*global*)   \n\nVersion needs section '.gnu.version_r' contains 4 entries:\n Addr: 0x0000000000002580  Offset: 0x002580  Link: 6 (.dynstr)\n  000000: Version: 1  File: libgcc_s.so.1  Cnt: 1\n  0x0010:   Name: GCC_3.0  Flags: none  Version: 15\n  0x0020: Version: 1  File: ld-linux-aarch64.so.1  Cnt: 1\n  0x0030:   Name: GLIBC_2.17  Flags: none  Version: 7\n  0x0040: Version: 1  File: libc.so.6  Cnt: 3\n  0x0050:   Name: GLIBC_2.32  Flags: none  Version: 11\n  0x0060:   Name: GLIBC_2.34  Flags: none  Version: 9\n  0x0070:   Name: GLIBC_2.17  Flags: none  Version: 3\n  0x0080: Version: 1  File: libstdc++.so.6  Cnt: 9\n  0x0090:   Name: GLIBCXX_3.4.20  Flags: none  Version: 14\n  0x00a0:   Name: CXXABI_1.3.8  Flags: none  Version: 13\n  0x00b0:   Name: GLIBCXX_3.4.18  Flags: none  Version: 12\n  0x00c0:   Name: GLIBCXX_3.4.29  Flags: none  Version: 10\n  0x00d0:   Name: GLIBCXX_3.4.9  Flags: none  Version: 8\n  0x00e0:   Name: CXXABI_1.3  Flags: none  Version: 6\n  0x00f0:   Name: GLIBCXX_3.4.14  Flags: none  Version: 5\n  0x0100:   Name: GLIBCXX_3.4.21  Flags: none  Version: 4\n  0x0110:   Name: GLIBCXX_3.4  Flags: none  Version: 2\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "ldd",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff9ca51000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffff9c940000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffff9c8e0000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffff9c6b0000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffff9c680000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9c4d0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9ca18000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffff9c470000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9c3d0000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffff9c2f0000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffff9c2b0000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffff9c1e0000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffff9c1b0000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffff9c190000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffff9c0a0000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffff9c060000)\n",
+          "err": ""
+        }
+      ]
+    },
+    "fl02": {
+      "fingerprint": {
+        "machine": "aarch64",
+        "libc": "glibc 2.35",
+        "compiler_target": "aarch64-linux-gnu",
+        "elf": {
+          "Class": "ELF64",
+          "Data": "2's complement, little endian",
+          "OS/ABI": "UNIX - GNU",
+          "ABI Version": "0",
+          "Machine": "AArch64",
+          "Flags": "0x0"
+        },
+        "libraries": {
+          "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+          "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+          "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+          "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+          "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+          "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+          "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+          "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+          "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+          "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+          "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+          "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+          "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+          "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+          "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+        }
+      },
+      "checks": [
+        {
+          "argv": [
+            "uname",
+            "-m"
+          ],
+          "rc": 0,
+          "out": "aarch64\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "getconf",
+            "GNU_LIBC_VERSION"
+          ],
+          "rc": 0,
+          "out": "glibc 2.35\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "-dumpmachine"
+          ],
+          "rc": 0,
+          "out": "aarch64-linux-gnu\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "--version"
+          ],
+          "rc": 0,
+          "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "file",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "/usr/bin/wfb_v6_uplink: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=faaa490bbb51ebcb344ecfa67289a37d34270d29, for GNU/Linux 3.7.0, not stripped\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-h",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "ELF Header:\n  Magic:   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  Class:                             ELF64\n  Data:                              2's complement, little endian\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI Version:                       0\n  Type:                              DYN (Position-Independent Executable file)\n  Machine:                           AArch64\n  Version:                           0x1\n  Entry point address:               0x7880\n  Start of program headers:          64 (bytes into file)\n  Start of section headers:          281008 (bytes into file)\n  Flags:                             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-l",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nElf file type is DYN (Position-Independent Executable file)\nEntry point 0x7880\nThere are 9 program headers, starting at offset 64\n\nProgram Headers:\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034c73 0x0000000000034c73  R E    0x10000\n  LOAD           0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001168 0x0000000000012890  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002e040 0x000000000002e040 0x000000000002e040\n                 0x0000000000000a3c 0x0000000000000a3c  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001138 0x0000000000001138  R      0x1\n\n Section to Segment mapping:\n  Segment Sections...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-n",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: faaa490bbb51ebcb344ecfa67289a37d34270d29\n\nDisplaying notes found in: .note.ABI-tag\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-p",
+            ".comment",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-d",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDynamic section at offset 0x35880 contains 32 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libsodium.so.23]\n 0x0000000000000001 (NEEDED)             Shared library: [libpcap.so.0.8]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-aarch64.so.1]\n 0x000000000000000c (INIT)               0x47b8\n 0x000000000000000d (FINI)               0x29b30\n 0x0000000000000019 (INIT_ARRAY)         0x44ec8\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x44ee8\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x298\n 0x0000000000000005 (STRTAB)             0x12c0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              4455 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000003 (PLTGOT)             0x45ac0\n 0x0000000000000002 (PLTRELSZ)           3312 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x3ac8\n 0x0000000000000007 (RELA)               0x26a0\n 0x0000000000000008 (RELASZ)             5160 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000000000001e (FLAGS)              BIND_NOW\n 0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE\n 0x000000006ffffffe (VERNEED)            0x2580\n 0x000000006fffffff (VERNEEDNUM)         4\n 0x000000006ffffff0 (VERSYM)             0x2428\n 0x000000006ffffff9 (RELACOUNT)          156\n 0x0000000000000000 (NULL)               0x0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "--version-info",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nVersion symbols section '.gnu.version' contains 170 entries:\n Addr: 0x0000000000002428  Offset: 0x002428  Link: 5 (.dynsym)\n  000:   0 (*local*)       0 (*local*)       0 (*local*)       2 (GLIBCXX_3.4)\n  004:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  008:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  00c:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  010:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  014:   5 (GLIBCXX_3.4.14)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  018:   7 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  01c:   6 (CXXABI_1.3)    3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  020:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  024:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  028:   3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)   1 (*global*)   \n  02c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  030:   2 (GLIBCXX_3.4)   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  034:   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    9 (GLIBC_2.34)    1 (*global*)   \n  038:   a (GLIBCXX_3.4.29)    1 (*global*)      3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  03c:   3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17)    1 (*global*)   \n  040:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  044:   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  048:   1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)\n  04c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)   \n  050:   4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  054:   1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  058:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  05c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  060:   1 (*global*)      1 (*global*)      3 (GLIBC_2.17)    b (GLIBC_2.32) \n  064:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  068:   4 (GLIBCXX_3.4.21)    4 (GLIBCXX_3.4.21)    c (GLIBCXX_3.4.18)    2 (GLIBCXX_3.4)\n  06c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)\n  070:   3 (GLIBC_2.17)    d (CXXABI_1.3.8)   3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  074:   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17)    e (GLIBCXX_3.4.20) \n  078:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  07c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17) \n  080:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  084:   6 (CXXABI_1.3)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    6 (CXXABI_1.3) \n  088:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  08c:   1 (*global*)      3 (GLIBC_2.17)    f (GCC_3.0)       1 (*global*)   \n  090:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   1 (*global*)      3 (GLIBC_2.17) \n  094:   3 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)\n  098:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  09c:   1 (*global*)      3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  0a0:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  0a4:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   1 (*global*)      1 (*global*)   \n  0a8:   1 (*global*)      1 (*global*)   \n\nVersion needs section '.gnu.version_r' contains 4 entries:\n Addr: 0x0000000000002580  Offset: 0x002580  Link: 6 (.dynstr)\n  000000: Version: 1  File: libgcc_s.so.1  Cnt: 1\n  0x0010:   Name: GCC_3.0  Flags: none  Version: 15\n  0x0020: Version: 1  File: ld-linux-aarch64.so.1  Cnt: 1\n  0x0030:   Name: GLIBC_2.17  Flags: none  Version: 7\n  0x0040: Version: 1  File: libc.so.6  Cnt: 3\n  0x0050:   Name: GLIBC_2.32  Flags: none  Version: 11\n  0x0060:   Name: GLIBC_2.34  Flags: none  Version: 9\n  0x0070:   Name: GLIBC_2.17  Flags: none  Version: 3\n  0x0080: Version: 1  File: libstdc++.so.6  Cnt: 9\n  0x0090:   Name: GLIBCXX_3.4.20  Flags: none  Version: 14\n  0x00a0:   Name: CXXABI_1.3.8  Flags: none  Version: 13\n  0x00b0:   Name: GLIBCXX_3.4.18  Flags: none  Version: 12\n  0x00c0:   Name: GLIBCXX_3.4.29  Flags: none  Version: 10\n  0x00d0:   Name: GLIBCXX_3.4.9  Flags: none  Version: 8\n  0x00e0:   Name: CXXABI_1.3  Flags: none  Version: 6\n  0x00f0:   Name: GLIBCXX_3.4.14  Flags: none  Version: 5\n  0x0100:   Name: GLIBCXX_3.4.21  Flags: none  Version: 4\n  0x0110:   Name: GLIBCXX_3.4  Flags: none  Version: 2\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "ldd",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffadfa8000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffffadea0000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffffade40000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffffadc10000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffffadbe0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffada30000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffadf6f000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffffad9d0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffad930000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffffad850000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffffad810000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffffad740000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffffad710000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffffad6f0000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffffad600000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffffad5c0000)\n",
+          "err": ""
+        }
+      ]
+    },
+    "fl04": {
+      "fingerprint": {
+        "machine": "aarch64",
+        "libc": "glibc 2.35",
+        "compiler_target": "aarch64-linux-gnu",
+        "elf": {
+          "Class": "ELF64",
+          "Data": "2's complement, little endian",
+          "OS/ABI": "UNIX - GNU",
+          "ABI Version": "0",
+          "Machine": "AArch64",
+          "Flags": "0x0"
+        },
+        "libraries": {
+          "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+          "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+          "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+          "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+          "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+          "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+          "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+          "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+          "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+          "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+          "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+          "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+          "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+          "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+          "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+        }
+      },
+      "checks": [
+        {
+          "argv": [
+            "uname",
+            "-m"
+          ],
+          "rc": 0,
+          "out": "aarch64\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "getconf",
+            "GNU_LIBC_VERSION"
+          ],
+          "rc": 0,
+          "out": "glibc 2.35\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "-dumpmachine"
+          ],
+          "rc": 0,
+          "out": "aarch64-linux-gnu\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "g++",
+            "--version"
+          ],
+          "rc": 0,
+          "out": "g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0\nCopyright (C) 2021 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "file",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "/usr/bin/wfb_v6_uplink: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (GNU/Linux), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=faaa490bbb51ebcb344ecfa67289a37d34270d29, for GNU/Linux 3.7.0, not stripped\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-h",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "ELF Header:\n  Magic:   7f 45 4c 46 02 01 01 03 00 00 00 00 00 00 00 00 \n  Class:                             ELF64\n  Data:                              2's complement, little endian\n  Version:                           1 (current)\n  OS/ABI:                            UNIX - GNU\n  ABI Version:                       0\n  Type:                              DYN (Position-Independent Executable file)\n  Machine:                           AArch64\n  Version:                           0x1\n  Entry point address:               0x7880\n  Start of program headers:          64 (bytes into file)\n  Start of section headers:          281008 (bytes into file)\n  Flags:                             0x0\n  Size of this header:               64 (bytes)\n  Size of program headers:           56 (bytes)\n  Number of program headers:         9\n  Size of section headers:           64 (bytes)\n  Number of section headers:         30\n  Section header string table index: 29\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-l",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nElf file type is DYN (Position-Independent Executable file)\nEntry point 0x7880\nThere are 9 program headers, starting at offset 64\n\nProgram Headers:\n  Type           Offset             VirtAddr           PhysAddr\n                 FileSiz            MemSiz              Flags  Align\n  PHDR           0x0000000000000040 0x0000000000000040 0x0000000000000040\n                 0x00000000000001f8 0x00000000000001f8  R      0x8\n  INTERP         0x0000000000000238 0x0000000000000238 0x0000000000000238\n                 0x000000000000001b 0x000000000000001b  R      0x1\n      [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]\n  LOAD           0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000034c73 0x0000000000034c73  R E    0x10000\n  LOAD           0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001168 0x0000000000012890  RW     0x10000\n  DYNAMIC        0x0000000000035880 0x0000000000045880 0x0000000000045880\n                 0x0000000000000240 0x0000000000000240  RW     0x8\n  NOTE           0x0000000000000254 0x0000000000000254 0x0000000000000254\n                 0x0000000000000044 0x0000000000000044  R      0x4\n  GNU_EH_FRAME   0x000000000002e040 0x000000000002e040 0x000000000002e040\n                 0x0000000000000a3c 0x0000000000000a3c  R      0x4\n  GNU_STACK      0x0000000000000000 0x0000000000000000 0x0000000000000000\n                 0x0000000000000000 0x0000000000000000  RW     0x10\n  GNU_RELRO      0x0000000000034ec8 0x0000000000044ec8 0x0000000000044ec8\n                 0x0000000000001138 0x0000000000001138  R      0x1\n\n Section to Segment mapping:\n  Segment Sections...\n   00     \n   01     .interp \n   02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .plt .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table \n   03     .init_array .fini_array .data.rel.ro .dynamic .got .data .bss \n   04     .dynamic \n   05     .note.gnu.build-id .note.ABI-tag \n   06     .eh_frame_hdr \n   07     \n   08     .init_array .fini_array .data.rel.ro .dynamic .got \n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-n",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: faaa490bbb51ebcb344ecfa67289a37d34270d29\n\nDisplaying notes found in: .note.ABI-tag\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_ABI_TAG (ABI version tag)\n    OS: Linux, ABI: 3.7.0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-p",
+            ".comment",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nString dump of section '.comment':\n  [     0]  GCC: (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0\n\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "-d",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nDynamic section at offset 0x35880 contains 32 entries:\n  Tag        Type                         Name/Value\n 0x0000000000000001 (NEEDED)             Shared library: [libsodium.so.23]\n 0x0000000000000001 (NEEDED)             Shared library: [libpcap.so.0.8]\n 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]\n 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]\n 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-aarch64.so.1]\n 0x000000000000000c (INIT)               0x47b8\n 0x000000000000000d (FINI)               0x29b30\n 0x0000000000000019 (INIT_ARRAY)         0x44ec8\n 0x000000000000001b (INIT_ARRAYSZ)       32 (bytes)\n 0x000000000000001a (FINI_ARRAY)         0x44ee8\n 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)\n 0x000000006ffffef5 (GNU_HASH)           0x298\n 0x0000000000000005 (STRTAB)             0x12c0\n 0x0000000000000006 (SYMTAB)             0x2d0\n 0x000000000000000a (STRSZ)              4455 (bytes)\n 0x000000000000000b (SYMENT)             24 (bytes)\n 0x0000000000000015 (DEBUG)              0x0\n 0x0000000000000003 (PLTGOT)             0x45ac0\n 0x0000000000000002 (PLTRELSZ)           3312 (bytes)\n 0x0000000000000014 (PLTREL)             RELA\n 0x0000000000000017 (JMPREL)             0x3ac8\n 0x0000000000000007 (RELA)               0x26a0\n 0x0000000000000008 (RELASZ)             5160 (bytes)\n 0x0000000000000009 (RELAENT)            24 (bytes)\n 0x000000000000001e (FLAGS)              BIND_NOW\n 0x000000006ffffffb (FLAGS_1)            Flags: NOW PIE\n 0x000000006ffffffe (VERNEED)            0x2580\n 0x000000006fffffff (VERNEEDNUM)         4\n 0x000000006ffffff0 (VERSYM)             0x2428\n 0x000000006ffffff9 (RELACOUNT)          156\n 0x0000000000000000 (NULL)               0x0\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "readelf",
+            "--version-info",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\nVersion symbols section '.gnu.version' contains 170 entries:\n Addr: 0x0000000000002428  Offset: 0x002428  Link: 5 (.dynsym)\n  000:   0 (*local*)       0 (*local*)       0 (*local*)       2 (GLIBCXX_3.4)\n  004:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  008:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  00c:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  010:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  014:   5 (GLIBCXX_3.4.14)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  018:   7 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  01c:   6 (CXXABI_1.3)    3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  020:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  024:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  028:   3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)   1 (*global*)   \n  02c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  030:   2 (GLIBCXX_3.4)   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  034:   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    9 (GLIBC_2.34)    1 (*global*)   \n  038:   a (GLIBCXX_3.4.29)    1 (*global*)      3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  03c:   3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17)    1 (*global*)   \n  040:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  044:   2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  048:   1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)\n  04c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)   \n  050:   4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17)    2 (GLIBCXX_3.4)\n  054:   1 (*global*)      4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21) \n  058:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    8 (GLIBCXX_3.4.9)   2 (GLIBCXX_3.4)\n  05c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  060:   1 (*global*)      1 (*global*)      3 (GLIBC_2.17)    b (GLIBC_2.32) \n  064:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   6 (CXXABI_1.3)    3 (GLIBC_2.17) \n  068:   4 (GLIBCXX_3.4.21)    4 (GLIBCXX_3.4.21)    c (GLIBCXX_3.4.18)    2 (GLIBCXX_3.4)\n  06c:   3 (GLIBC_2.17)    3 (GLIBC_2.17)    1 (*global*)      2 (GLIBCXX_3.4)\n  070:   3 (GLIBC_2.17)    d (CXXABI_1.3.8)   3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  074:   1 (*global*)      6 (CXXABI_1.3)    3 (GLIBC_2.17)    e (GLIBCXX_3.4.20) \n  078:   3 (GLIBC_2.17)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  07c:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    1 (*global*)      3 (GLIBC_2.17) \n  080:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  084:   6 (CXXABI_1.3)    2 (GLIBCXX_3.4)   3 (GLIBC_2.17)    6 (CXXABI_1.3) \n  088:   3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17)    3 (GLIBC_2.17) \n  08c:   1 (*global*)      3 (GLIBC_2.17)    f (GCC_3.0)       1 (*global*)   \n  090:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   1 (*global*)      3 (GLIBC_2.17) \n  094:   3 (GLIBC_2.17)    1 (*global*)      4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)\n  098:   1 (*global*)      3 (GLIBC_2.17)    4 (GLIBCXX_3.4.21)    6 (CXXABI_1.3) \n  09c:   1 (*global*)      3 (GLIBC_2.17)    1 (*global*)      3 (GLIBC_2.17) \n  0a0:   4 (GLIBCXX_3.4.21)    2 (GLIBCXX_3.4)   4 (GLIBCXX_3.4.21)    3 (GLIBC_2.17) \n  0a4:   2 (GLIBCXX_3.4)   2 (GLIBCXX_3.4)   1 (*global*)      1 (*global*)   \n  0a8:   1 (*global*)      1 (*global*)   \n\nVersion needs section '.gnu.version_r' contains 4 entries:\n Addr: 0x0000000000002580  Offset: 0x002580  Link: 6 (.dynstr)\n  000000: Version: 1  File: libgcc_s.so.1  Cnt: 1\n  0x0010:   Name: GCC_3.0  Flags: none  Version: 15\n  0x0020: Version: 1  File: ld-linux-aarch64.so.1  Cnt: 1\n  0x0030:   Name: GLIBC_2.17  Flags: none  Version: 7\n  0x0040: Version: 1  File: libc.so.6  Cnt: 3\n  0x0050:   Name: GLIBC_2.32  Flags: none  Version: 11\n  0x0060:   Name: GLIBC_2.34  Flags: none  Version: 9\n  0x0070:   Name: GLIBC_2.17  Flags: none  Version: 3\n  0x0080: Version: 1  File: libstdc++.so.6  Cnt: 9\n  0x0090:   Name: GLIBCXX_3.4.20  Flags: none  Version: 14\n  0x00a0:   Name: CXXABI_1.3.8  Flags: none  Version: 13\n  0x00b0:   Name: GLIBCXX_3.4.18  Flags: none  Version: 12\n  0x00c0:   Name: GLIBCXX_3.4.29  Flags: none  Version: 10\n  0x00d0:   Name: GLIBCXX_3.4.9  Flags: none  Version: 8\n  0x00e0:   Name: CXXABI_1.3  Flags: none  Version: 6\n  0x00f0:   Name: GLIBCXX_3.4.14  Flags: none  Version: 5\n  0x0100:   Name: GLIBCXX_3.4.21  Flags: none  Version: 4\n  0x0110:   Name: GLIBCXX_3.4  Flags: none  Version: 2\n",
+          "err": ""
+        },
+        {
+          "argv": [
+            "ldd",
+            "/usr/bin/wfb_v6_uplink"
+          ],
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffb1814000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffffb1710000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffffb16b0000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffffb1480000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffffb1450000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb12a0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb17db000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffffb1240000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb11a0000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffffb10c0000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffffb1080000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffffb0fb0000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffffb0f80000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffffb0f60000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffffb0e70000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffffb0e30000)\n",
+          "err": ""
+        }
+      ]
+    }
+  },
+  "native_sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+  "staged_dependency_sha256": {
+    "fl00": {
+      "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+      "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+      "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+      "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+      "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+      "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+      "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+      "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+      "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+      "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+      "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+      "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+      "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+      "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+      "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+    },
+    "fl01": {
+      "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+      "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+      "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+      "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+      "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+      "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+      "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+      "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+      "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+      "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+      "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+      "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+      "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+      "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+      "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+    },
+    "fl02": {
+      "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+      "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+      "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+      "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+      "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+      "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+      "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+      "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+      "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+      "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+      "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+      "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+      "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+      "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+      "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+    },
+    "fl04": {
+      "/usr/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+      "/usr/lib/aarch64-linux-gnu/libcap.so.2.44": "06d8d750d71761eef629745bf28075d96e5e611d6e0e133a6e2f8eb3c75f4ed6",
+      "/usr/lib/aarch64-linux-gnu/libdbus-1.so.3.19.13": "60318833358e86e5ab0069b01002f66c7258e6aef787fdbeb4394a3af3ab7a6f",
+      "/usr/lib/aarch64-linux-gnu/libgcc_s.so.1": "d4bbb45d5d80f4b15d4bf50bfc8ded0a26a44c638859df97be40a6339adb3485",
+      "/usr/lib/aarch64-linux-gnu/libgcrypt.so.20.3.4": "ba7a84570bf8d1bd7306d7796ed066223374272768e9a940f4d71dedd5edae8f",
+      "/usr/lib/aarch64-linux-gnu/libgpg-error.so.0.32.1": "06777d614f3789db885c7081d41fe6efa5ad4864fda3d5b44b627b7a6df67413",
+      "/usr/lib/aarch64-linux-gnu/liblz4.so.1.9.3": "72a50edc3a3b9b5879b50d708ab36bc0d29e17522f7f50ff0e5328386509587c",
+      "/usr/lib/aarch64-linux-gnu/liblzma.so.5.2.5": "3da8981d9ab934354b74e904baf787ee2211a97a163183b3655efe4a59008f91",
+      "/usr/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+      "/usr/lib/aarch64-linux-gnu/libpcap.so.1.10.1": "dce7aa5224a551815d7bb50deb01d6f4fd2d77416eda63b97bd9df226d78ce60",
+      "/usr/lib/aarch64-linux-gnu/libsodium.so.23.3.0": "63eb11db5d941430cb38aa4dbcbc96fcd93f0727b99c5bed1572d4d3f067d177",
+      "/usr/lib/aarch64-linux-gnu/libstdc++.so.6.0.30": "03efc8de2eb1f016fa59a937b8858c48ad893558737ef61fe16bbb622283c759",
+      "/usr/lib/aarch64-linux-gnu/libsystemd.so.0.32.0": "84d94ec804cbd0bb05e56d2e347bba976211b1cc71598acee42617d32a208e44",
+      "/usr/lib/aarch64-linux-gnu/libzstd.so.1.4.8": "a1561916ef6f9bfdcf3246b4cb1eab98771a9f689422cae645d89e3cc589035d",
+      "/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+    }
+  }
+}

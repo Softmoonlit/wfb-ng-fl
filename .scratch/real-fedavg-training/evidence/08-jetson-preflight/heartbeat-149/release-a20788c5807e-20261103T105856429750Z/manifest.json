@@ -1,0 +1,97 @@
+{
+  "commit": "a20788c5807e209c0e4129fe83756499899398bc",
+  "run_id": "20261103T105856429750Z",
+  "topology_sha256": "b0a97a01463f3203f88c697c80ee744e715e46456ae28bdd0a73702c4db71a82",
+  "helper_sha256": "fba6c73364827d5b89b3242223666e44717f88b06aff874fb84b24a48c3ecdcc",
+  "frozen_management_sha256": {
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-four.py": "cf0e984aacd130ec4d057a74201e25e169c6e3f4729c1822ae5da80559d9de08",
+    ".scratch/real-fedavg-training/evidence/08-jetson-preflight/heartbeat-149/release-node.py": "fba6c73364827d5b89b3242223666e44717f88b06aff874fb84b24a48c3ecdcc",
+    "cluster_nodes.conf": "b0a97a01463f3203f88c697c80ee744e715e46456ae28bdd0a73702c4db71a82"
+  },
+  "whitelist_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "participant_ids": [
+    1,
+    2,
+    4
+  ],
+  "node_identity_ids": null,
+  "active_job_targets": null,
+  "events": [
+    {
+      "node": "fl00",
+      "phase": "inbox",
+      "argv": [
+        "mkdir",
+        "-m",
+        "700",
+        "/tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T10:58:57.807561+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer",
+      "argv": [
+        "cp",
+        "--",
+        "/tmp/wfb-release-jtmzy2y5/source.tar",
+        "/tmp/wfb-release-jtmzy2y5/release-node.py",
+        "/tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z/"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T10:58:57.813593+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl01",
+      "phase": "inbox",
+      "argv": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "fl@192.168.137.15",
+        "mkdir -m 700 /tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z"
+      ],
+      "state": "passed",
+      "utc": "2026-11-03T10:58:58.079844+00:00",
+      "rc": 0
+    },
+    {
+      "node": "fl00",
+      "phase": "transfer-fl01",
+      "argv": [
+        "scp",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=7",
+        "--",
+        "/tmp/wfb-release-jtmzy2y5/source.tar",
+        "/tmp/wfb-release-jtmzy2y5/release-node.py",
+        "fl@192.168.137.15:/tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z/"
+      ],
+      "state": "failed",
+      "utc": "2026-11-03T10:59:00.000652+00:00",
+      "error": "TimeoutExpired(['scp', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', '--', '/tmp/wfb-release-jtmzy2y5/source.tar', '/tmp/wfb-release-jtmzy2y5/release-node.py', 'fl@192.168.137.15:/tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z/'], 599.9999701230004)"
+    }
+  ],
+  "state": "failed",
+  "archive_sha256": "3b662dc0a635e8af684bd98d17d09dbb82edee9ff0cba83e22d4b5faa310e728",
+  "error": "TimeoutExpired(['scp', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7', '--', '/tmp/wfb-release-jtmzy2y5/source.tar', '/tmp/wfb-release-jtmzy2y5/release-node.py', 'fl@192.168.137.15:/tmp/wfb-release-a20788c5807e209c0e4129fe83756499899398bc-20261103T105856429750Z/'], 599.9999701230004)",
+  "failure_policy": "no rollback, no fallback, no registry changes; inspect logs before manual recovery"
+}
