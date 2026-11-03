@@ -18,8 +18,8 @@ import time
 import urllib.request
 
 HERE = Path(__file__).resolve().parent
-NODES = {'fl00': None, 'fl01': '192.168.108.201',
-         'fl02': '192.168.108.202', 'fl04': '192.168.108.204'}
+NODES = {'fl00': None, 'fl01': '192.168.137.15',
+         'fl02': '192.168.137.94', 'fl04': '192.168.137.184'}
 WHITELIST_IDS = tuple(range(1, 11))
 SSH = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=7']
 
@@ -53,9 +53,9 @@ def main():
     if len(blocks) != 1:
         raise SystemExit('need exactly one CLIENTS topology block')
     rows = shlex.split(blocks[0], comments=True)
-    expected = ['client1 192.168.108.201 fl 1 10.80.0.11',
-                'client2 192.168.108.202 fl 2 10.80.0.12',
-                'client4 192.168.108.204 fl 4 10.80.0.14']
+    expected = ['client1 192.168.137.15 fl 1 10.80.0.11',
+                'client2 192.168.137.94 fl 2 10.80.0.12',
+                'client4 192.168.137.184 fl 4 10.80.0.14']
     if sorted(' '.join(r.split()) for r in rows) != expected:
         raise SystemExit('cluster_nodes.conf topology mismatch')
     topology_ids = tuple(sorted(int(row.split()[3]) for row in rows))
