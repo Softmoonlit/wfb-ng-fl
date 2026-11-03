@@ -146,7 +146,7 @@ def main():
         status('server-before')  # 不以 fl04 当前就绪状态作为发布前置条件。
         with tempfile.TemporaryDirectory(prefix='wfb-release-') as temp:
             archive = Path(temp) / 'source.tar'
-            subprocess.run(['git', '-C', str(repo), 'archive', '--format=tar',
+            subprocess.run(['git', '-C', str(repo), 'archive', '--format=tar.gz',
                             '--output=' + str(archive), commit], check=True, timeout=60)
             helper = Path(temp) / 'release-node.py'
             helper.write_bytes(frozen[helper_relative])
