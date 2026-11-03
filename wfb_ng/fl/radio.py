@@ -478,16 +478,11 @@ def is_foreign_80211_frame(data: bytes, pkttype: int, local_mac: Optional[bytes]
 
 
 def find_wl_interfaces(sysfs_net: str = "/sys/class/net") -> List[str]:
-    """
-    Find wireless interfaces (prefix 'wl*') via sysfs, prioritizing RTL8812AU (rtl88xxau_wfb) driver binding.
-    Per ARMv8 deployment manual:
-    - Interface names are assigned dynamically by udev with 'wl*' prefix (e.g. wlan*, wlx*, wlP*).
-    - Interfaces bound to rtl88xxau_wfb driver are prioritized/isolated to avoid confusing with onboard hotspot.
-    """
+    """仅发现绑定 WFB RTL8812AU 驱动的专用空口网卡。"""
     if not os.path.isdir(sysfs_net):
         return []
     try:
-        candidates = sorted([name for name in os.listdir(sysfs_net) if name.startswith("wl")])
+        candidates = sorted(os.listdir(sysfs_net))
     except OSError:
         return []
 
@@ -498,14 +493,12 @@ def find_wl_interfaces(sysfs_net: str = "/sys/class/net") -> List[str]:
             try:
                 target = os.path.realpath(driver_path)
                 driver_name = os.path.basename(target)
-                if driver_name in ("rtl88xxau_wfb", "88XXau_wfb", "8812au"):
+                if driver_name == "rtl88xxau_wfb":
                     driver_matched.append(iface)
             except OSError:
                 pass
 
-    if driver_matched:
-        return driver_matched
-    return candidates
+    return driver_matched
 
 
 class LiveRadioSurveyBackend:
@@ -642,11 +635,14 @@ def survey_spectrum(
     Issues risk warning if all channels are congested.
     """
     if backend is None:
-        if not interface:
-            detected = find_wl_interfaces()
+        detected = find_wl_interfaces()
+        if interface:
+            if interface not in detected:
+                raise RuntimeError(f"Interface {interface} is not bound to the dedicated WFB driver.")
+        else:
             if not detected:
                 raise RuntimeError(
-                    "No wl* wireless interface detected. Specify --interface or connect wireless card."
+                    "No WFB RTL8812AU wireless interface detected. Connect the WFB radio."
                 )
             interface = detected[0]
         backend = LiveRadioSurveyBackend()
@@ -836,7 +832,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Subcommand: survey
     p_surv = subparsers.add_parser("survey", help="执行 5 GHz 频段快速扫频探路并输出干净度排行")
-    p_surv.add_argument("-i", "--interface", type=str, help="无线网卡接口名称 (默认自动探测 wl*)")
+    p_surv.add_argument("-i", "--interface", type=str, help="专用 WFB 无线网卡接口名称 (默认按驱动绑定自动探测)")
     p_surv.add_argument("-d", "--duration-ms", type=float, default=300.0, help="单信道嗅探时长毫秒 (默认 300ms)")
     p_surv.add_argument("-t", "--congestion-threshold", type=float, default=50.0, help="拥堵判定阈值 fps (默认 50)")
     p_surv.add_argument("--json", action="store_true", help="输出 JSON 格式")

@@ -60,6 +60,43 @@ def test_role_service_accepts_and_normalizes_positive_finite_io_budget(role_conf
         service.close()
 
 
+@pytest.mark.parametrize('role_config_path', ['server'], indirect=True)
+def test_role_service_rejects_non_wfb_air_interface(role_config_path, monkeypatch):
+    config = json.loads(role_config_path.read_text(encoding='utf-8'))
+    config['link_args'].extend(['--air-interface', 'wlP1p1s0'])
+    role_config_path.write_text(json.dumps(config), encoding='utf-8')
+    monkeypatch.setattr('wfb_ng.fl.service.find_wl_interfaces', lambda: ['wlx-wfb'])
+
+    with pytest.raises(FLRuntimeError) as error:
+        load_role_service(role_config_path)
+
+    assert error.value.error_code == 'radio_interface_unavailable'
+
+
+@pytest.mark.parametrize('air_argument', [
+    '--air-interface=wlP1p1s0',
+    '--air-interfac=wlP1p1s0',
+    '--air-interfac',
+    '--air-i=wlP1p1s0',
+    '--a=wlP1p1s0',
+    '--a',
+    '-W',
+    '-WwlP1p1s0',
+])
+@pytest.mark.parametrize('role_config_path', ['server'], indirect=True)
+def test_role_service_rejects_noncanonical_air_interface_forms(role_config_path, air_argument):
+    config = json.loads(role_config_path.read_text(encoding='utf-8'))
+    config['link_args'].append(air_argument)
+    if air_argument in ('-W', '--air-interfac', '--a'):
+        config['link_args'].append('wlP1p1s0')
+    role_config_path.write_text(json.dumps(config), encoding='utf-8')
+
+    with pytest.raises(FLRuntimeError) as error:
+        load_role_service(role_config_path)
+
+    assert error.value.error_code == 'invalid_configuration'
+
+
 @pytest.mark.parametrize('budget', [
     True, False, float('nan'), float('inf'), -float('inf'),
     0, 0.0, -0.0, -0.2, -1, '0.2', None,

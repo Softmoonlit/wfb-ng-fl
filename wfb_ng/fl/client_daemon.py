@@ -7,7 +7,7 @@ wfb_ng.fl.client_daemon: Client Persistent Daemon, Hardware Polling, and RoleSer
 Per ADR-0010, ADR-0012, ADR-0014:
 - Persistent systemd daemon: wfb-fl-client-daemon.
 - Identity: /etc/wfb-ng-fl/node.json (node_id 1..10, static tun_ip 10.80.0.{10+node_id}).
-- Hardware Polling: 3s suspended retry if wl* wireless interface not detected; auto hot takeover.
+- Hardware Polling: 3s suspended retry if WFB RTL8812AU interface is not detected; auto hot takeover.
 - Hardware Configuration: Monitor mode, Channel 157 (HT40+), TX power (12 dBm), TUN setup/cleanup.
 - Sandbox: Short-lifecycle RoleService(role='client') spawned via subprocess.Popen in isolated process group.
 - Resource Audit: Strict cleanup of child processes (SIGTERM/SIGKILL pgid) and TUN network devices upon completion/abort.
@@ -1113,12 +1113,14 @@ class ClientDaemon:
     def poll_hardware_once(self) -> Optional[str]:
         """
         Execute a single pass of hardware polling:
-        - If no wl* interface is found: returns None (state: POLLING_HARDWARE).
-        - If wl* interface is found: configures wireless and returns interface (state: IDLE).
+        - If no WFB RTL8812AU interface is found: returns None (state: POLLING_HARDWARE).
+        - If a dedicated interface is found: configures wireless and returns it (state: IDLE).
         - If known interface disappeared: triggers hardware unplug recovery.
         """
-        candidates = ([self.config.interface] if self.config.interface
-                      else self.network_adapter.find_interfaces())
+        discovered = self.network_adapter.find_interfaces()
+        candidates = ([self.config.interface]
+                      if self.config.interface and self.config.interface in discovered
+                      else ([] if self.config.interface else discovered))
         if not candidates:
             if self.current_interface is not None:
                 logger.warning("检测到无线网卡 %s 被拔出", self.current_interface)
@@ -1790,6 +1792,11 @@ class ClientDaemon:
             self.config.tun_ip,
         )
 
+        if not self.config.enable_link_process and not self.config.enable_control_plane:
+            logger.info("无线链路与控制面均已禁用，守护进程不接管网卡")
+            self._stop_event.wait()
+            return
+
         while not self._stop_event.is_set():
             if self.current_interface is None:
                 iface = self.poll_hardware_once()
@@ -1883,7 +1890,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     parser.add_argument(
         "--interface",
-        help="指定无线网卡接口 (默认: 动态探测 wl*)",
+        help="指定专用 WFB 无线网卡接口 (默认: 按驱动绑定自动探测)",
     )
     parser.add_argument(
         "--channel",

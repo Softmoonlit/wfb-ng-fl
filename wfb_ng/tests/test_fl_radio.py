@@ -469,14 +469,25 @@ class TestSpectrumSurvey(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 survey_spectrum(interface=None, backend=None)
 
-    def test_find_wl_interfaces_detects_wl_prefix(self):
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            # Create mock sysfs net directories
-            for name in ["eth0", "ens33", "lo", "wlan0", "wlP1p2s0", "wlx001a"]:
-                os.makedirs(os.path.join(tmp_dir, name))
+    def test_survey_rejects_explicit_non_wfb_interface_before_hardware_access(self):
+        with mock.patch("wfb_ng.fl.radio.find_wl_interfaces", return_value=["wlx-wfb"]), \
+                mock.patch("wfb_ng.fl.radio.LiveRadioSurveyBackend") as backend:
+            with self.assertRaisesRegex(RuntimeError, "not bound to the dedicated WFB driver"):
+                survey_spectrum(interface="wlP1p1s0")
+        backend.assert_not_called()
 
-            results = find_wl_interfaces(sysfs_net=tmp_dir)
-            self.assertEqual(results, ["wlP1p2s0", "wlan0", "wlx001a"])
+    def test_find_wl_interfaces_rejects_non_wfb_wireless_devices(self):
+        for driver_name in ("rtl88x2ce", "8812au"):
+            with self.subTest(driver_name=driver_name), tempfile.TemporaryDirectory() as tmp_dir:
+                management_driver = os.path.join(tmp_dir, "drivers", driver_name)
+                os.makedirs(management_driver)
+
+                net_dir = os.path.join(tmp_dir, "net")
+                os.makedirs(os.path.join(net_dir, "wlP1p1s0", "device"))
+                os.makedirs(os.path.join(net_dir, "eth0", "device"))
+                os.symlink(management_driver, os.path.join(net_dir, "wlP1p1s0", "device", "driver"))
+
+                self.assertEqual(find_wl_interfaces(sysfs_net=net_dir), [])
 
     def test_find_wl_interfaces_prioritizes_rtl8812au_driver(self):
         with tempfile.TemporaryDirectory() as tmp_dir:

@@ -295,6 +295,43 @@ class TestHardwarePolling(unittest.TestCase):
         self.assertTrue(adapter.wireless_states["wlx_hotplug_01"]["is_up"])
         self.assertTrue(adapter.is_tun_active(daemon.config.tun_name))
 
+    def test_disabled_radio_planes_do_not_poll_or_configure_interfaces(self):
+        adapter = MockNetworkAdapter(interfaces=["wlx-dedicated"])
+        daemon = ClientDaemon(
+            ClientDaemonConfig(
+                **client_network_kwargs(), node_id=1, tun_ip="10.80.0.11",
+                enable_link_process=False,
+                enable_control_plane=False,
+            ),
+            network_adapter=adapter,
+        )
+
+        class StopAfterFirstWait:
+            stopped = False
+
+            def is_set(self):
+                return self.stopped
+
+            def wait(self, timeout=None):
+                self.stopped = True
+                return True
+
+        daemon._stop_event = StopAfterFirstWait()
+        daemon.run()
+        self.assertEqual(adapter.wireless_states, {})
+
+    def test_explicit_interface_must_be_a_discovered_wfb_radio(self):
+        adapter = MockNetworkAdapter(interfaces=["wlP1p1s0"])
+        config = ClientDaemonConfig(
+            **client_network_kwargs(), node_id=1, tun_ip="10.80.0.11",
+            interface="wlx-missing",
+        )
+        daemon = ClientDaemon(config=config, network_adapter=adapter)
+
+        self.assertIsNone(daemon.poll_hardware_once())
+        self.assertEqual(adapter.wireless_states, {})
+        self.assertEqual(daemon.state, DaemonState.POLLING_HARDWARE)
+
     def test_polling_detects_card_unplugged(self):
         adapter = MockNetworkAdapter(interfaces=["wlx_hotplug_01"])
         config = ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", poll_interval_seconds=0.05)

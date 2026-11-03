@@ -9,7 +9,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
 - Persistent systemd daemon: wfb-fl-server-daemon.
 - Pre-allocated Node Slot Pool: Launches wfb_v6_uplink with --known-clients 1..10 and
   static 10.80.0.{10+n} client targets, relying on built-in 120ms/10ms scheduling defaults.
-- Hardware Management: Takes over wl* physical wireless adapter, configures Monitor mode,
+- Hardware Management: Takes over the dedicated WFB RTL8812AU adapter, configures Monitor mode,
   txpower (12 dBm), Channel 157 (HT40+), and TUN interface with txqueuelen=5000.
 - Control Plane: Symmetric UDP control plane on 9001 (client uplink) and 9000 (server broadcast),
   maintaining in-memory NodeHorizonRegistry with two-army anti-desync gate.
@@ -703,7 +703,7 @@ class ServerDaemon:
         self.adapter = network_adapter or LinuxNetworkAdapter()
         self.survey_backend = survey_backend
         self.runtime_factory = runtime_factory
-        self.current_interface: Optional[str] = self.config.air_interface
+        self.current_interface: Optional[str] = self.config.air_interface or None
 
         self.server_state = ServerState.INITIALIZING
         self.active_job: Optional[Dict[str, Any]] = None
@@ -1208,9 +1208,10 @@ class ServerDaemon:
                 raise FLRuntimeError("engine_busy", "当前状态无法执行扫频")
             self.server_state = ServerState.SURVEYING
         try:
-            iface = self.current_interface or "wlan0"
+            if not self.current_interface:
+                raise FLRuntimeError("radio_interface_unavailable", "未检测到专用 WFB 无线网卡，无法执行扫频")
             report = survey_spectrum(
-                interface=iface,
+                interface=self.current_interface,
                 duration_ms=duration_ms,
                 backend=self.survey_backend,
                 congestion_threshold_fps=congestion_threshold_fps,
@@ -2080,12 +2081,13 @@ class ServerDaemon:
         if not executable:
             raise FLRuntimeError("link_executable_missing", "未找到 wfb_v6_uplink 可执行程序，链路底座无法启动")
 
-        iface = self.current_interface or "wlan0"
+        if not self.current_interface:
+            raise FLRuntimeError("radio_interface_unavailable", "未检测到专用 WFB 无线网卡，无法启动链路底座")
         cmd = build_v6_uplink_server_command(
             executable_path=executable,
             tun_name=self.config.tun_name,
             tun_addr=self.config.tun_cidr,
-            air_interface=iface,
+            air_interface=self.current_interface,
             channel=radio.channel,
             downlink_mcs=radio.downlink_mcs,
             link_id=self.config.link_id,
@@ -2175,17 +2177,28 @@ class ServerDaemon:
 
             self._stop_event.clear()
 
-            # 1. Hardware interface discovery and configuration
-            if self.current_interface is None:
+            # 1. Hardware interface discovery and configuration. Explicit names
+            # must still resolve to a dedicated WFB driver-bound adapter.
+            radio_required = self.config.enable_link_process or self.config.enable_control_plane
+            interface_requested = radio_required or self.current_interface is not None
+            if interface_requested:
                 interfaces = self.adapter.find_interfaces()
-                if interfaces:
+                if self.current_interface:
+                    if self.current_interface not in interfaces:
+                        raise FLRuntimeError(
+                            "radio_interface_unavailable",
+                            f"配置的接口 {self.current_interface} 不是可用的专用 WFB 无线网卡",
+                        )
+                elif interfaces:
                     self.current_interface = interfaces[0]
                     self.control_plane.air_interface = self.current_interface
-                    logger.info("自动纳管无线网卡接口: %s", self.current_interface)
+                    logger.info("自动纳管专用 WFB 无线网卡接口: %s", self.current_interface)
                 else:
-                    logger.warning("未检测到物理无线网卡，将以无网卡模式运行")
+                    raise FLRuntimeError(
+                        "radio_interface_unavailable", "未检测到专用 WFB 无线网卡，拒绝启动无线服务"
+                    )
 
-            if self.current_interface:
+            if radio_required:
                 width = self.radio_config.channel_width
                 self.adapter.configure_wireless(
                     iface=self.current_interface,

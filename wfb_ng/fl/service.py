@@ -18,6 +18,7 @@ from typing import List, Union
 
 from .algorithm import freeze_algorithm_config
 from .errors import FLRuntimeError
+from .radio import find_wl_interfaces
 from .role import ClientRole, ServerRole
 from .transport import validate_server_http_host
 
@@ -227,6 +228,12 @@ def load_role_service(path, expected_role=None):
         executables[name] = executable
 
     link_args = config['link_args']
+    if '--air-interface' in link_args:
+        air_interface = _single_option_value(link_args, '--air-interface')
+        if air_interface not in find_wl_interfaces():
+            raise FLRuntimeError(
+                'radio_interface_unavailable',
+                '链路接口不是绑定 rtl88xxau_wfb 的专用 WFB 网卡')
     tun_name = _single_option_value(link_args, '--tun-name')
     if role_name == 'server':
         known_client_node_ids = _parse_known_client_node_ids(
@@ -369,6 +376,11 @@ def _read_config(path):
     if '--role' in link_args or '--node-id' in link_args:
         raise FLRuntimeError(
             'invalid_configuration', '链路角色参数不能重复指定')
+    if any((value.startswith('--a') and value != '--air-interface') or
+           value.startswith('-W') for value in link_args):
+        raise FLRuntimeError(
+            'invalid_configuration',
+            '链路网卡参数必须使用 --air-interface <name> 形式')
     _single_option_value(link_args, '--tun-name')
     return config
 

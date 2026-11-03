@@ -161,6 +161,96 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "20")
 
 
+class TestServerRadioIsolation(unittest.TestCase):
+    def test_no_radio_mode_does_not_discover_or_configure_interfaces(self):
+        adapter = MockNetworkAdapter(["wlP1p1s0"])
+        daemon = ServerDaemon(
+            ServerDaemonConfig(
+                ipc_port=0,
+                air_interface="",
+                enable_link_process=False,
+                enable_control_plane=False,
+            ),
+            network_adapter=adapter,
+        )
+
+        daemon.start()
+        try:
+            self.assertIsNone(daemon.current_interface)
+            self.assertEqual(adapter.wireless_states, {})
+        finally:
+            daemon.stop()
+
+    def test_no_radio_mode_does_not_configure_explicit_wfb_interface(self):
+        adapter = MockNetworkAdapter(["wlx-dedicated"])
+        daemon = ServerDaemon(
+            ServerDaemonConfig(
+                ipc_port=0,
+                air_interface="wlx-dedicated",
+                enable_link_process=False,
+                enable_control_plane=False,
+            ),
+            network_adapter=adapter,
+        )
+
+        daemon.start()
+        try:
+            self.assertEqual(daemon.current_interface, "wlx-dedicated")
+            self.assertEqual(adapter.wireless_states, {})
+        finally:
+            daemon.stop()
+
+    def test_no_radio_mode_rejects_explicit_non_wfb_interface(self):
+        adapter = MockNetworkAdapter(["wlx-dedicated"])
+        daemon = ServerDaemon(
+            ServerDaemonConfig(
+                air_interface="wlP1p1s0",
+                enable_link_process=False,
+                enable_control_plane=False,
+            ),
+            network_adapter=adapter,
+        )
+
+        with self.assertRaises(FLRuntimeError) as caught:
+            daemon.start()
+
+        self.assertEqual(caught.exception.error_code, "radio_interface_unavailable")
+        self.assertEqual(adapter.wireless_states, {})
+
+    def test_explicit_non_wfb_interface_is_rejected_before_configuration(self):
+        adapter = MockNetworkAdapter(["wlx-dedicated"])
+        daemon = ServerDaemon(
+            ServerDaemonConfig(
+                air_interface="wlP1p1s0",
+                enable_link_process=False,
+            ),
+            network_adapter=adapter,
+        )
+
+        with self.assertRaises(FLRuntimeError) as caught:
+            daemon.start()
+
+        self.assertEqual(caught.exception.error_code, "radio_interface_unavailable")
+        self.assertEqual(adapter.wireless_states, {})
+
+    def test_survey_without_wfb_interface_does_not_fall_back_to_wlan0(self):
+        daemon = ServerDaemon(
+            ServerDaemonConfig(
+                ipc_port=0,
+                enable_link_process=False,
+                enable_control_plane=False,
+            ),
+            network_adapter=MockNetworkAdapter(),
+        )
+        daemon.start()
+        try:
+            with self.assertRaises(FLRuntimeError) as caught:
+                daemon.run_spectrum_survey()
+            self.assertEqual(caught.exception.error_code, "radio_interface_unavailable")
+        finally:
+            daemon.stop()
+
+
 class TestReportReadinessConcurrency(unittest.TestCase):
     """Heartbeat processing must not block a real TASK_READY report."""
 
