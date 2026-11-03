@@ -157,7 +157,8 @@ def main():
                     command(node, ['cp', '--', str(archive), str(helper), inbox + '/'], 'transfer')
                 else:
                     command('fl00', ['scp', *SSH, '--', str(archive), str(helper),
-                                      'fl@' + NODES[node] + ':' + inbox + '/'], 'transfer-' + node)
+                                      'fl@' + NODES[node] + ':' + inbox + '/'],
+                            'transfer-' + node, 600)
             audits = {node: phase(node, 'preflight') for node in NODES}
             identity_ids = sorted(value['node_identity']['node_id'] for node, value in audits.items()
                                   if node != 'fl00')
