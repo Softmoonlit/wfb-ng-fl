@@ -201,6 +201,7 @@ def main():
     parser.add_argument('--model-manifest', required=True, type=Path, help='模型 CLI 输出的 JSON manifest')
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
+    parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
     parser.add_argument('--uftp-rate-kbps', type=int, default=15000,
                         choices=range(12000, 18001), metavar='KBIT/S',
                         help='HT40/MCS3 下行注入速率')
@@ -212,7 +213,7 @@ def main():
         manifest = model_manifest_info(args.model_manifest, payload)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
-    radio_patch = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3,
+    radio_patch = dict(channel=args.channel, bandwidth_mhz=40, downlink_mcs=3,
                        uplink_mcs=4, radio_txpower_dbm=18,
                        uftp_rate_kbps=args.uftp_rate_kbps)
     plan = dict(kind='model-equivalent-communication', hosts=HOSTS, nodes=[1, 2, 4, 5],
