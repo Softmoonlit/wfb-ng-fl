@@ -239,6 +239,7 @@ int main()
     test_udp_control_and_data_mcs();
     test_native_rearm();
     test_native_ready_retry_loss();
+    test_native_unauthorized_fec_deadline();
     std::cout << "v6 radio command validation and control/data radiotap sync: PASS\n";
     return 0;
 }

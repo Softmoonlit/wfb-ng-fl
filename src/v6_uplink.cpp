@@ -1751,7 +1751,7 @@ void run_client(const Config &config, uint64_t session_id)
             next_wakeup = min(next_wakeup, ready_state.last_declare_at_ms + kReadyRedeclareTimeoutMs);
         }
         const uint64_t uplink_flush_deadline_ms = uplink->next_flush_deadline_ms();
-        if (uplink_flush_deadline_ms > 0)
+        if (uplink_flush_deadline_ms > 0 && authorization_state.is_authorized(now_ms))
         {
             next_wakeup = min(next_wakeup, uplink_flush_deadline_ms);
         }
@@ -1873,7 +1873,10 @@ void run_client(const Config &config, uint64_t session_id)
         const QueuedTunPacket *pending_packet = uplink_queue.front();
         if (pending_packet == NULL)
         {
-            uplink->flush_data_block_if_due(now_ms);
+            if (authorization_state.is_authorized(now_ms))
+            {
+                uplink->flush_data_block_if_due(now_ms);
+            }
             continue;
         }
 
@@ -1888,6 +1891,10 @@ void run_client(const Config &config, uint64_t session_id)
             continue;
         }
 
+        if (current_flush_deadline_ms > 0 && now_ms >= current_flush_deadline_ms)
+        {
+            uplink->flush_data_block_if_due(now_ms);
+        }
         uplink->send_data(pending_packet->bytes, pending_packet->size);
         authorization_state.counters().authorized_sends += 1;
         apply_grant_seen(now_ms, &ready_state);

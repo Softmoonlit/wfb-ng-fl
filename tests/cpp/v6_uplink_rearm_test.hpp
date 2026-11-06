@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <cstdlib>
 #include <stdlib.h>
@@ -72,15 +73,81 @@ static void rearm_apply_radio(int fd, uint16_t port, uint8_t mcs) {
     uint32_t response[2] = {}; assert(recv(fd, response, sizeof(response), 0) == 8);
     assert(response[0] == request.req_id && response[1] == 0);
 }
-static void rearm_grant(int fd, uint16_t port, uint64_t seq, uint64_t session = 100) {
+static void rearm_grant(int fd, uint16_t port, uint64_t seq, uint64_t session = 100, uint32_t duration_ms = 3000) {
     std::vector<uint8_t> packet(sizeof(wrxfwd_t)+sizeof(wcontrol_envelope_hdr_t)+sizeof(wcontrol_grant_payload_t), 0);
     auto *h = reinterpret_cast<wcontrol_envelope_hdr_t *>(packet.data()+sizeof(wrxfwd_t));
     h->packet_type = WFB_PACKET_CONTROL; h->magic = htobe16(WFB_CONTROL_MAGIC);
     h->version = WFB_CONTROL_VERSION; h->control_type = WFB_CONTROL_TYPE_GRANT;
     h->source_node = 1; h->target_node = 9; h->session_id = htobe64(session); h->sequence = htobe64(seq);
-    reinterpret_cast<wcontrol_grant_payload_t *>(packet.data()+sizeof(wrxfwd_t)+sizeof(*h))->duration_ms = htobe32(3000);
+    reinterpret_cast<wcontrol_grant_payload_t *>(packet.data()+sizeof(wrxfwd_t)+sizeof(*h))->duration_ms = htobe32(duration_ms);
     rearm_send(fd, port, packet.data(), packet.size());
 }
+static bool rearm_receive_data_frame(int fd, int timeout_ms, uint64_t *nonce, uint8_t *flags) {
+    pollfd p = {fd, POLLIN, 0};
+    if (poll(&p, 1, timeout_ms) != 1) return false;
+    uint8_t packet[4096] = {};
+    ssize_t n = recv(fd, packet, sizeof(packet), 0);
+    if (n <= static_cast<ssize_t>(sizeof(wrxfwd_t) + sizeof(wblock_hdr_t))) return false;
+    const auto *block = reinterpret_cast<const wblock_hdr_t *>(packet + sizeof(wrxfwd_t));
+    if (block->packet_type != WFB_PACKET_DATA || be16toh(block->magic) != WFB_DATA_MAGIC) return false;
+    const auto *fragment = reinterpret_cast<const wpacket_hdr_t *>(packet + sizeof(wrxfwd_t) + sizeof(*block));
+    *nonce = be64toh(block->data_nonce);
+    *flags = fragment->flags;
+    return true;
+}
+
+static void test_native_unauthorized_fec_deadline() {
+    uint16_t air_port, input_port, unused;
+    int air = rearm_udp(&air_port), input_reservation = rearm_udp(&input_port);
+    int command = rearm_udp(&unused), output_pipe[2];
+    assert(pipe(output_pipe) == 0);
+    int tun[2]; assert(socketpair(AF_UNIX, SOCK_DGRAM, 0, tun) == 0);
+    Config config; config.node_id = 9; config.link_id = 1;
+    config.uplink_stream = 1; config.downlink_stream = 2;
+    config.air_listen_port = input_port; config.radio_control_port = 0;
+    config.air_target_host = "127.0.0.1"; config.air_target_port = air_port;
+    config.plaintext_fec_k = 2; config.plaintext_fec_n = 3;
+    config.log_interval = 50;
+    close(input_reservation);
+    pid_t child = fork(); assert(child >= 0);
+    if (child == 0) {
+        prctl(PR_SET_PDEATHSIG, SIGKILL); close(tun[0]); close(output_pipe[0]);
+        assert(dup2(output_pipe[1], STDOUT_FILENO) >= 0); close(output_pipe[1]);
+        rearm_tun_fd = tun[1]; run_client(config, 42); _exit(0);
+    }
+    close(tun[1]); close(output_pipe[1]);
+    const uint8_t data = 0x45;
+    assert(send(tun[0], &data, 1, 0) == 1);
+    assert(rearm_receive(air, 500, WFB_CONTROL_TYPE_READY));
+    rearm_grant(command, input_port, 1, 100, 100);
+
+    uint64_t first_nonce = 0; uint8_t first_flags = 0;
+    assert(rearm_receive_data_frame(air, 500, &first_nonce, &first_flags));
+    assert((first_nonce & 0xff) == 0 && first_flags == 0);
+    const uint64_t first_block = first_nonce >> 8;
+    // 首 block 的合法 idle close 在授权有效期间完成并被观察到。
+    uint64_t close_nonce[2] = {}; uint8_t close_flags[2] = {};
+    assert(rearm_receive_data_frame(air, 100, &close_nonce[0], &close_flags[0]));
+    assert(rearm_receive_data_frame(air, 100, &close_nonce[1], &close_flags[1]));
+    assert((close_nonce[0] >> 8) == first_block && (close_nonce[0] & 0xff) == 1);
+    assert((close_nonce[1] >> 8) == first_block && (close_nonce[1] & 0xff) == 2);
+    assert(close_flags[0] == WFB_PACKET_FEC_ONLY);
+
+    usleep(120000);
+    assert(send(tun[0], &data, 1, 0) == 1);
+    assert(!rearm_receive_data_frame(air, 100, &first_nonce, &first_flags));
+
+    rearm_grant(command, input_port, 2, 100, 3000);
+    uint64_t pending_nonce = 0; uint8_t pending_flags = 0;
+    assert(rearm_receive_data_frame(air, 500, &pending_nonce, &pending_flags));
+    assert((pending_nonce >> 8) == first_block + 1);
+    assert((pending_nonce & 0xff) == 0 && pending_flags == 0);
+
+    close(output_pipe[0]); close(tun[0]); close(air); close(command);
+    std::cout << "native run_client unauthorized pending FEC deadline/order: PASS\n";
+}
+
+
 static void test_native_rearm() {
     uint16_t air_port, input_port, control_port, unused;
     int air = rearm_udp(&air_port), input_reservation = rearm_udp(&input_port);
