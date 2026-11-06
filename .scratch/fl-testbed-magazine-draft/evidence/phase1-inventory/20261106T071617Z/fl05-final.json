@@ -1,0 +1,131 @@
+{
+  "hostname": "fl05",
+  "time_utc": "2026-11-06T07:31:21Z",
+  "platform": "Linux-5.15.148-tegra-aarch64-with-glibc2.35",
+  "checks": {
+    "identity": {
+      "exit": 0,
+      "stdout": "uid=0(root) gid=0(root) groups=0(root)",
+      "stderr": ""
+    },
+    "sudo": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "disk": {
+      "exit": 0,
+      "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        28G   22G  4.5G  84% /\n/dev/sda1        28G   22G  4.5G  84% /",
+      "stderr": ""
+    },
+    "memory": {
+      "exit": 0,
+      "stdout": "total        used        free      shared  buff/cache   available\nMem:            7619        1245        5065          29        1308        6127\nSwap:           3809           0        3809",
+      "stderr": ""
+    },
+    "usb": {
+      "exit": 0,
+      "stdout": "Bus 002 Device 003: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter\nBus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub\nBus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub\nBus 001 Device 003: ID 349c:0418 Generic USB2.0 Device\nBus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub\nBus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub",
+      "stderr": ""
+    },
+    "radio": {
+      "exit": 0,
+      "stdout": "phy#1\n\tInterface wlx5cffffaf6d8c\n\t\tifindex 6\n\t\twdev 0x100000001\n\t\taddr 5c:ff:ff:af:6d:8c\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:89:dc\n\t\tssid iPhone 18 Pro Max\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm",
+      "stderr": ""
+    },
+    "regulatory": {
+      "exit": 0,
+      "stdout": "global\ncountry 00: DFS-UNSET\n\t(755 - 928 @ 2), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(2402 - 2472 @ 40), (N/A, 20), (N/A)\n\t(2457 - 2482 @ 20), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(2474 - 2494 @ 20), (N/A, 20), (N/A), NO-OFDM, PASSIVE-SCAN\n\t(5170 - 5250 @ 80), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (N/A, 20), (0 ms), DFS, AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5730 @ 160), (N/A, 20), (0 ms), DFS, PASSIVE-SCAN\n\t(5735 - 5835 @ 80), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(57240 - 63720 @ 2160), (N/A, 0), (N/A)\n\nphy#0 (self-managed)\ncountry 00: DFS-UNSET\n\t(2402 - 2472 @ 40), (6, 20), (N/A), NO-80MHZ, NO-160MHZ\n\t(2457 - 2477 @ 20), (6, 20), (N/A), AUTO-BW, NO-80MHZ, NO-160MHZ, PASSIVE-SCAN\n\t(2462 - 2482 @ 20), (6, 20), (N/A), AUTO-BW, NO-80MHZ, NO-160MHZ\n\t(5170 - 5230 @ 40), (6, 20), (N/A), AUTO-BW\n\t(5230 - 5250 @ 20), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5710 @ 160), (6, 20), (N/A), PASSIVE-SCAN\n\t(5735 - 5755 @ 20), (6, 20), (N/A), AUTO-BW\n\t(5755 - 5835 @ 80), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN",
+      "stderr": ""
+    },
+    "gpu": {
+      "exit": 0,
+      "stdout": "Orin (nvgpu), [N/A], [N/A], [N/A]",
+      "stderr": ""
+    },
+    "services": {
+      "exit": 0,
+      "stdout": "MainPID=0\nExecStart={ path=/usr/bin/wfb-fl-server-daemon ; argv[]=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090 ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }\nId=wfb-fl-server-daemon.service\nActiveState=inactive\nSubState=dead\n\nMainPID=3987\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 ; ignore_errors=no ; start_time=[Fri 2026-11-06 15:22:40 CST] ; stop_time=[n/a] ; pid=3987 ; code=(null) ; status=0/0 }\nId=wfb-fl-client-daemon.service\nActiveState=active\nSubState=running",
+      "stderr": ""
+    },
+    "processes": {
+      "exit": 0,
+      "stdout": "   3987 python3 /usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4\n   4013 /usr/bin/wfb_v6_uplink --role client --tun-name fl-c5 --tun-addr 10.80.0.15/24 --node-id 5 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlx5cffffaf6d8c --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64",
+      "stderr": ""
+    },
+    "install": {
+      "exit": 0,
+      "stdout": "module= /usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py\ndistributions= []",
+      "stderr": ""
+    }
+  },
+  "wireless_interfaces": [
+    {
+      "interface": "wlP4p1s0",
+      "driver": "rtl88x2ce",
+      "address": "dc:4a:9e:31:89:dc"
+    },
+    {
+      "interface": "wlx5cffffaf6d8c",
+      "driver": "rtl88xxau_wfb",
+      "address": "5c:ff:ff:af:6d:8c"
+    }
+  ],
+  "configs": {
+    "/etc/wfb-ng-fl/node.json": {
+      "node_id": 5,
+      "tun_ip": "10.80.0.15/24"
+    },
+    "/etc/wfb-ng-fl/server.json": {
+      "ipc_host": "127.0.0.1",
+      "ipc_port": 9090,
+      "web_host": null,
+      "web_port": 8080,
+      "model_library_dir": "/var/lib/wfb-ng-fl/models",
+      "channel": 157,
+      "radio_txpower_dbm": 12,
+      "downlink_mcs": 3,
+      "uplink_mcs": 6,
+      "tun_name": "fl-s",
+      "tun_ip": "10.80.0.1",
+      "tun_cidr": "10.80.0.1/24",
+      "tun_txqueuelen": 5000,
+      "known_clients": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    }
+  },
+  "native_processes": [
+    {
+      "pid": 4013,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+    }
+  ],
+  "thermals": {
+    "thermal_zone2": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "cpu-thermal": "46937",
+    "soc2-thermal": "47000",
+    "soc0-thermal": "47656",
+    "thermal_zone3": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "gpu-thermal": "46562",
+    "tj-thermal": "47656",
+    "soc1-thermal": "47375",
+    "thermal_zone4": {
+      "error": "can't concat NoneType to bytes"
+    }
+  }
+}

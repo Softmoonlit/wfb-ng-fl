@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 13454,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c10 --tun-addr 10.80.0.20/24 --node-id 10 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T15:22:40+0800 fl10 wfb-fl-client-daemon[909]: 2026-11-06 15:22:40,450 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: Exception in thread wfb-client-control-loop:\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: Traceback (most recent call last):\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/link_radio.py\", line 54, in rearm_link_uplink\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     response = udp.recv(4096)\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: TimeoutError: timed out\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: The above exception was the direct cause of the following exception:\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: Traceback (most recent call last):\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/lib/python3.10/threading.py\", line 1016, in _bootstrap_inner\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     self.run()\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/lib/python3.10/threading.py\", line 953, in run\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     self._target(*self._args, **self._kwargs)\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py\", line 3580, in _supervisory_loop\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     found = self.hunt_once()\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py\", line 2672, in hunt_once\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     self._apply_channel_switch(ch)\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/control.py\", line 2599, in _apply_channel_switch\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     self.on_channel_applied()\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py\", line 1694, in <lambda>\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     self.control_plane.on_channel_applied = lambda: rearm_link_uplink(\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/link_radio.py\", line 63, in rearm_link_uplink\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]:     raise FLRuntimeError(\"link_uplink_rearm_failed\", f\"v6 本机上行重武装失败: {exc}\") from exc\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: wfb_ng.fl.errors.FLRuntimeError: v6 本机上行重武装失败: timed out\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[909]: 2026-11-06 15:22:41,353 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止\n2026-11-06T15:22:41+0800 fl10 systemd[1]: wfb-fl-client-daemon.service: Deactivated successfully.\n2026-11-06T15:22:41+0800 fl10 systemd[1]: Stopped WFB-ng FL client persistent daemon.\n2026-11-06T15:22:41+0800 fl10 systemd[1]: wfb-fl-client-daemon.service: Consumed 22min 46.737s CPU time.\n2026-11-06T15:22:41+0800 fl10 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:22:41,923 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=10, TUN IP=10.80.0.20)\n2026-11-06T15:22:41+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:22:41,925 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500a88，开始接管配置...\n2026-11-06T15:22:42+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:22:42,257 [INFO] [client-daemon] 网卡 wlxfc221c500a88 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c10)\n2026-11-06T15:22:42+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:22:42,303 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c10 --tun-addr 10.80.0.20/24 --node-id 10 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n2026-11-06T15:23:20+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:23:20,012 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:23:53+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:23:53,448 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:26:35+0800 fl10 wfb-fl-client-daemon[13431]: 2026-11-06 15:26:35,300 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Package libsodium was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libsodium.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libsodium' found\nPackage libpcap was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libpcap.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libpcap' found"
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\nfl-c10:tun:connected (externally)\ndocker0:bridge:connected (externally)\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\np2p-dev-wlxfc221c500a88:wifi-p2p:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlxfc221c500a88:wifi:unmanaged",
+    "stderr": ""
+  }
+}

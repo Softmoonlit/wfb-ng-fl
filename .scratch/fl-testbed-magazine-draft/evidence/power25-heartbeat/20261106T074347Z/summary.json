@@ -1,0 +1,112 @@
+{
+  "elapsed": 122.02,
+  "target_seconds": 120,
+  "counts": {
+    "1": {
+      "ready": 33,
+      "samples": 106,
+      "states": {
+        "CONNECTING/HUNTING": 66,
+        "OFFLINE/HUNTING": 7,
+        "READY/IDLE": 33
+      },
+      "max_heartbeat_age": 15.44
+    },
+    "2": {
+      "ready": 96,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 96,
+        "CONNECTING/HUNTING": 10
+      },
+      "max_heartbeat_age": 3.32
+    },
+    "4": {
+      "ready": 0,
+      "samples": 106,
+      "states": {
+        "CONNECTING/HUNTING": 106
+      },
+      "max_heartbeat_age": 4.49
+    },
+    "5": {
+      "ready": 82,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 82,
+        "CONNECTING/HUNTING": 24
+      },
+      "max_heartbeat_age": 3.89
+    },
+    "6": {
+      "ready": 93,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 93,
+        "CONNECTING/HUNTING": 13
+      },
+      "max_heartbeat_age": 4.43
+    },
+    "7": {
+      "ready": 0,
+      "samples": 106,
+      "states": {
+        "OFFLINE/None": 106
+      },
+      "max_heartbeat_age": 0
+    },
+    "8": {
+      "ready": 93,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 93,
+        "CONNECTING/HUNTING": 13
+      },
+      "max_heartbeat_age": 3.26
+    },
+    "9": {
+      "ready": 82,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 82,
+        "CONNECTING/HUNTING": 24
+      },
+      "max_heartbeat_age": 5.46
+    },
+    "10": {
+      "ready": 94,
+      "samples": 106,
+      "states": {
+        "READY/IDLE": 94,
+        "CONNECTING/HUNTING": 12
+      },
+      "max_heartbeat_age": 6.32
+    }
+  },
+  "ipc_errors": [],
+  "hardware_errors": [
+    {
+      "host": "fl01",
+      "valid_index25": false,
+      "exit": 255,
+      "iw": "",
+      "stderr": "ssh: connect to host 192.168.0.191 port 22: Connection timed out\n"
+    },
+    {
+      "host": "fl01",
+      "valid_index25": false,
+      "exit": 255,
+      "iw": "",
+      "stderr": "ssh: connect to host 192.168.0.191 port 22: Connection timed out\n"
+    },
+    {
+      "host": "fl01",
+      "valid_index25": false,
+      "exit": 255,
+      "iw": "",
+      "stderr": "Connection timed out during banner exchange\nConnection to 192.168.0.191 port 22 timed out\n"
+    }
+  ],
+  "finished": true,
+  "all_nodes_ready_every_sample": false
+}

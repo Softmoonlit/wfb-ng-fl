@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 8375,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100119 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T15:27:25+0800 fl00 python3[8301]: Traceback (most recent call last):\n2026-11-06T15:27:25+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-06T15:27:25+0800 fl00 python3[8301]:     self.validate(self.host)\n2026-11-06T15:27:25+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 765, in <lambda>\n2026-11-06T15:27:25+0800 fl00 python3[8301]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-06T15:27:25+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 383, in validate_management_address\n2026-11-06T15:27:25+0800 fl00 python3[8301]:     raise ManagementAddressError('WEB_INTERFACE_FORBIDDEN', '管理地址不得归属无线、TUN 或回环接口')\n2026-11-06T15:27:25+0800 fl00 python3[8301]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址不得归属无线、TUN 或回环接口\n2026-11-06T15:27:26+0800 fl00 python3[8301]: 2026-11-06 15:27:26,775 [WARNING] [client-daemon] Management Web unavailable\n2026-11-06T15:27:26+0800 fl00 python3[8301]: Traceback (most recent call last):\n2026-11-06T15:27:26+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-06T15:27:26+0800 fl00 python3[8301]:     self.validate(self.host)\n2026-11-06T15:27:26+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 765, in <lambda>\n2026-11-06T15:27:26+0800 fl00 python3[8301]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-06T15:27:26+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 383, in validate_management_address\n2026-11-06T15:27:26+0800 fl00 python3[8301]:     raise ManagementAddressError('WEB_INTERFACE_FORBIDDEN', '管理地址不得归属无线、TUN 或回环接口')\n2026-11-06T15:27:26+0800 fl00 python3[8301]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址不得归属无线、TUN 或回环接口\n2026-11-06T15:27:27+0800 fl00 python3[8301]: 2026-11-06 15:27:27,779 [WARNING] [client-daemon] Management Web unavailable\n2026-11-06T15:27:27+0800 fl00 python3[8301]: Traceback (most recent call last):\n2026-11-06T15:27:27+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-06T15:27:27+0800 fl00 python3[8301]:     self.validate(self.host)\n2026-11-06T15:27:27+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 765, in <lambda>\n2026-11-06T15:27:27+0800 fl00 python3[8301]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-06T15:27:27+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 383, in validate_management_address\n2026-11-06T15:27:27+0800 fl00 python3[8301]:     raise ManagementAddressError('WEB_INTERFACE_FORBIDDEN', '管理地址不得归属无线、TUN 或回环接口')\n2026-11-06T15:27:27+0800 fl00 python3[8301]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址不得归属无线、TUN 或回环接口\n2026-11-06T15:27:28+0800 fl00 python3[8301]: 2026-11-06 15:27:28,782 [WARNING] [client-daemon] Management Web unavailable\n2026-11-06T15:27:28+0800 fl00 python3[8301]: Traceback (most recent call last):\n2026-11-06T15:27:28+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-06T15:27:28+0800 fl00 python3[8301]:     self.validate(self.host)\n2026-11-06T15:27:28+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 765, in <lambda>\n2026-11-06T15:27:28+0800 fl00 python3[8301]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-06T15:27:28+0800 fl00 python3[8301]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 383, in validate_management_address\n2026-11-06T15:27:28+0800 fl00 python3[8301]:     raise ManagementAddressError('WEB_INTERFACE_FORBIDDEN', '管理地址不得归属无线、TUN 或回环接口')\n2026-11-06T15:27:28+0800 fl00 python3[8301]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址不得归属无线、TUN 或回环接口",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 0,
+    "stdout": "1.0.18\n1.10.1",
+    "stderr": ""
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP1p1s0:wifi:connected\nfl-s:tun:connected (externally)\np2p-dev-wlP1p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlxfc221c100119:wifi:unmanaged",
+    "stderr": ""
+  }
+}

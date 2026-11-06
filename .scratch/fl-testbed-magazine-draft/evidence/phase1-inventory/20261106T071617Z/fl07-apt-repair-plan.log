@@ -1,0 +1,27 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Correcting dependencies... Done
+The following additional packages will be installed:
+  libatomic1 libcc1-0 libgfortran5 libgomp1 libhwasan0 libitm1 liblsan0
+  libubsan1
+The following packages will be upgraded:
+  libatomic1 libcc1-0 libgfortran5 libgomp1 libhwasan0 libitm1 liblsan0
+  libubsan1
+8 upgraded, 0 newly installed, 0 to remove and 570 not upgraded.
+Inst libatomic1 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libgomp1:arm64 libhwasan0:arm64 libgfortran5:arm64 libcc1-0:arm64 libitm1:arm64 libubsan1:arm64 liblsan0:arm64 ]
+Inst libcc1-0 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libgomp1:arm64 libhwasan0:arm64 libgfortran5:arm64 libitm1:arm64 libubsan1:arm64 liblsan0:arm64 ]
+Inst libgfortran5 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libgomp1:arm64 libhwasan0:arm64 libitm1:arm64 libubsan1:arm64 liblsan0:arm64 ]
+Inst libgomp1 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libhwasan0:arm64 libitm1:arm64 libubsan1:arm64 liblsan0:arm64 ]
+Inst libhwasan0 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libitm1:arm64 libubsan1:arm64 liblsan0:arm64 ]
+Inst libitm1 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libubsan1:arm64 liblsan0:arm64 ]
+Inst liblsan0 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64]) [libubsan1:arm64 ]
+Inst libubsan1 [12.3.0-1ubuntu1~22.04] (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libatomic1 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libcc1-0 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libgfortran5 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libgomp1 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libhwasan0 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libitm1 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf liblsan0 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])
+Conf libubsan1 (12.3.0-1ubuntu1~22.04.3 Ubuntu:22.04/jammy-updates, Ubuntu:22.04/jammy-security [arm64])

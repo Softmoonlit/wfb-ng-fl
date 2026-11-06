@@ -1,0 +1,9 @@
+{
+  "host": "fl09",
+  "interface": "wlxfc221c100157",
+  "before": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n",
+  "after": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -25.00 dBm\n",
+  "actual_power_index": 25,
+  "module_override": "25",
+  "scope": "受控硬件功率对照，守护进程配置仍为原值；不将心跳中配置值视为实际功率"
+}

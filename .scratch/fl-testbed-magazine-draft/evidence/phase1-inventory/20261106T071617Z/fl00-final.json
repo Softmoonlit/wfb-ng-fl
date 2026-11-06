@@ -1,0 +1,185 @@
+{
+  "hostname": "fl00",
+  "time_utc": "2026-11-06T07:31:20Z",
+  "platform": "Linux-5.15.148-tegra-aarch64-with-glibc2.35",
+  "checks": {
+    "identity": {
+      "exit": 0,
+      "stdout": "uid=0(root) gid=0(root) 组=0(root)",
+      "stderr": ""
+    },
+    "sudo": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "disk": {
+      "exit": 0,
+      "stdout": "文件系统        大小  已用  可用 已用% 挂载点\n/dev/nvme0n1p1  116G   42G   69G   38% /\n/dev/nvme0n1p1  116G   42G   69G   38% /",
+      "stderr": ""
+    },
+    "memory": {
+      "exit": 0,
+      "stdout": "total        used        free      shared  buff/cache   available\n内存：       7619        1807        3707          49        2105        5530\n交换：       3809           0        3809",
+      "stderr": ""
+    },
+    "usb": {
+      "exit": 0,
+      "stdout": "Bus 002 Device 003: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter\nBus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub\nBus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub\nBus 001 Device 003: ID 0bda:c822 Realtek Semiconductor Corp. Bluetooth Radio \nBus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub\nBus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub",
+      "stderr": ""
+    },
+    "radio": {
+      "exit": 0,
+      "stdout": "phy#1\n\tInterface wlxfc221c100119\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:19\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -14.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\tssid iPhone 18 Pro Max\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm",
+      "stderr": ""
+    },
+    "regulatory": {
+      "exit": 0,
+      "stdout": "global\ncountry 00: DFS-UNSET\n\t(755 - 928 @ 2), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(2402 - 2472 @ 40), (N/A, 20), (N/A)\n\t(2457 - 2482 @ 20), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(2474 - 2494 @ 20), (N/A, 20), (N/A), NO-OFDM, PASSIVE-SCAN\n\t(5170 - 5250 @ 80), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (N/A, 20), (0 ms), DFS, AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5730 @ 160), (N/A, 20), (0 ms), DFS, PASSIVE-SCAN\n\t(5735 - 5835 @ 80), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(57240 - 63720 @ 2160), (N/A, 0), (N/A)\n\nphy#0 (self-managed)\ncountry 00: DFS-UNSET\n\t(2402 - 2472 @ 40), (6, 20), (N/A), NO-80MHZ, NO-160MHZ\n\t(2457 - 2482 @ 20), (6, 20), (N/A), AUTO-BW, NO-80MHZ, NO-160MHZ, PASSIVE-SCAN\n\t(5170 - 5190 @ 20), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5190 - 5210 @ 20), (6, 20), (N/A), AUTO-BW\n\t(5210 - 5250 @ 40), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5710 @ 160), (6, 20), (N/A), PASSIVE-SCAN\n\t(5735 - 5835 @ 80), (6, 20), (N/A), PASSIVE-SCAN",
+      "stderr": ""
+    },
+    "gpu": {
+      "exit": 0,
+      "stdout": "Orin (nvgpu), [N/A], [N/A], [N/A]",
+      "stderr": ""
+    },
+    "services": {
+      "exit": 0,
+      "stdout": "MainPID=8301\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -B /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py daemon 5443ca22658202805317a9a974c261cde7c751b9 fl00 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z -- --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 14 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 ; ignore_errors=no ; start_time=[Fri 2026-11-06 15:22:39 CST] ; stop_time=[n/a] ; pid=8301 ; code=(null) ; status=0/0 }\nId=wfb-fl-server-daemon.service\nActiveState=active\nSubState=running\n\nMainPID=0\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }\nId=wfb-fl-client-daemon.service\nActiveState=inactive\nSubState=dead",
+      "stderr": ""
+    },
+    "processes": {
+      "exit": 0,
+      "stdout": "    703 /usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/wfb-ng-fl/management-dhcp.conf --pid-file=\n   8301 /usr/bin/python3 -B /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py daemon 5443ca22658202805317a9a974c261cde7c751b9 fl00 /srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z -- --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 14 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000\n   8375 /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --radio-short-gi --air-interface wlxfc221c100119 --known-clients 1,2,3,4,5,6,7,8,9,10 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64",
+      "stderr": ""
+    },
+    "install": {
+      "exit": 0,
+      "stdout": "module= /usr/local/lib/python3.10/dist-packages/wfb_ng/__init__.py\ndistributions= []",
+      "stderr": ""
+    }
+  },
+  "wireless_interfaces": [
+    {
+      "interface": "wlP1p1s0",
+      "driver": "rtl88x2ce",
+      "address": "dc:4a:9e:e2:3c:48"
+    },
+    {
+      "interface": "wlxfc221c100119",
+      "driver": "rtl88xxau_wfb",
+      "address": "fc:22:1c:10:01:19"
+    }
+  ],
+  "configs": {
+    "/etc/wfb-ng-fl/node.json": {
+      "node_id": 1,
+      "tun_ip": "10.80.0.11/24"
+    },
+    "/etc/wfb-ng-fl/server.json": {
+      "bandwidth_mhz": 40,
+      "channel": 149,
+      "downlink_mcs": 3,
+      "ipc_host": "127.0.0.1",
+      "ipc_port": 9090,
+      "known_clients": [
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "model_library_dir": "/var/lib/wfb-ng-fl/models",
+      "radio_txpower_dbm": 14,
+      "tun_cidr": "10.80.0.1/24",
+      "tun_ip": "10.80.0.1",
+      "tun_name": "fl-s",
+      "tun_txqueuelen": 5000,
+      "uftp_rate_kbps": 15000,
+      "uplink_mcs": 4,
+      "web_host": "192.168.0.190",
+      "web_port": 8080,
+      "work_dir": "/srv/wfb-ng-fl/server",
+      "mnist_data_dir": "/srv/wfb-ng-fl/mnist",
+      "client_entry": "wfb_ng.fl.mnist_cnn_32_64:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist_cnn_32_64:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist_cnn_32_64:evaluate_entry",
+      "algorithm_config": {
+        "data_seed": 2026
+      },
+      "preparation_timeout_seconds": 300.0,
+      "round_timeout_seconds": 1800.0,
+      "io_timeout_seconds": 120.0
+    },
+    "/etc/wfb-ng-fl/server-no-radio.json": {
+      "air_interface": "",
+      "enable_link_process": false,
+      "enable_control_plane": false,
+      "bandwidth_mhz": 40,
+      "channel": 149,
+      "downlink_mcs": 3,
+      "ipc_host": "127.0.0.1",
+      "ipc_port": 9090,
+      "known_clients": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "model_library_dir": "/var/lib/wfb-ng-fl/models",
+      "radio_txpower_dbm": 14,
+      "tun_cidr": "10.80.0.1/24",
+      "tun_ip": "10.80.0.1",
+      "tun_name": "fl-s",
+      "tun_txqueuelen": 5000,
+      "uftp_rate_kbps": 15000,
+      "uplink_mcs": 4,
+      "web_port": 8080,
+      "work_dir": "/srv/wfb-ng-fl/server",
+      "mnist_data_dir": "/srv/wfb-ng-fl/mnist",
+      "client_entry": "wfb_ng.fl.mnist_cnn_32_64:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist_cnn_32_64:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist_cnn_32_64:evaluate_entry",
+      "algorithm_config": {
+        "data_seed": 2026
+      },
+      "preparation_timeout_seconds": 300.0,
+      "round_timeout_seconds": 1800.0,
+      "io_timeout_seconds": 120.0
+    }
+  },
+  "native_processes": [
+    {
+      "pid": 8375,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127"
+    }
+  ],
+  "thermals": {
+    "thermal_zone2": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "cpu-thermal": "41968",
+    "soc2-thermal": "41468",
+    "soc0-thermal": "41500",
+    "thermal_zone3": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "gpu-thermal": "41875",
+    "tj-thermal": "42468",
+    "soc1-thermal": "42468",
+    "thermal_zone4": {
+      "error": "can't concat NoneType to bytes"
+    }
+  }
+}

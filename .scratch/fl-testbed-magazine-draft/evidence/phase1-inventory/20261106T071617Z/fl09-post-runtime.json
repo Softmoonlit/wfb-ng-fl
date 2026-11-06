@@ -1,0 +1,71 @@
+{
+  "native": [],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T15:23:48+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Main process exited, code=exited, status=1/FAILURE\n2026-11-06T15:23:48+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Failed with result 'exit-code'.\n2026-11-06T15:23:51+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Scheduled restart job, restart counter is at 22.\n2026-11-06T15:23:51+0800 fl09 systemd[1]: Stopped WFB-ng FL client persistent daemon.\n2026-11-06T15:23:51+0800 fl09 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]: Traceback (most recent call last):\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]:   File \"/usr/bin/wfb-fl-client-daemon\", line 4, in <module>\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]:     from wfb_ng.fl.client_daemon import main\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py\", line 35, in <module>\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]:     from pyroute2 import IPRoute, NetlinkError\n2026-11-06T15:23:51+0800 fl09 wfb-fl-client-daemon[5153]: ModuleNotFoundError: No module named 'pyroute2'\n2026-11-06T15:23:51+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Main process exited, code=exited, status=1/FAILURE\n2026-11-06T15:23:51+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Failed with result 'exit-code'.\n2026-11-06T15:23:54+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Scheduled restart job, restart counter is at 23.\n2026-11-06T15:23:54+0800 fl09 systemd[1]: Stopped WFB-ng FL client persistent daemon.\n2026-11-06T15:23:54+0800 fl09 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]: Traceback (most recent call last):\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]:   File \"/usr/bin/wfb-fl-client-daemon\", line 4, in <module>\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]:     from wfb_ng.fl.client_daemon import main\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py\", line 35, in <module>\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]:     from pyroute2 import IPRoute, NetlinkError\n2026-11-06T15:23:55+0800 fl09 wfb-fl-client-daemon[5154]: ModuleNotFoundError: No module named 'pyroute2'\n2026-11-06T15:23:55+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Main process exited, code=exited, status=1/FAILURE\n2026-11-06T15:23:55+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Failed with result 'exit-code'.\n2026-11-06T15:23:58+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Scheduled restart job, restart counter is at 24.\n2026-11-06T15:23:58+0800 fl09 systemd[1]: Stopped WFB-ng FL client persistent daemon.\n2026-11-06T15:23:58+0800 fl09 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]: Traceback (most recent call last):\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]:   File \"/usr/bin/wfb-fl-client-daemon\", line 4, in <module>\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]:     from wfb_ng.fl.client_daemon import main\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py\", line 35, in <module>\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]:     from pyroute2 import IPRoute, NetlinkError\n2026-11-06T15:23:58+0800 fl09 wfb-fl-client-daemon[5157]: ModuleNotFoundError: No module named 'pyroute2'\n2026-11-06T15:23:58+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Main process exited, code=exited, status=1/FAILURE\n2026-11-06T15:23:58+0800 fl09 systemd[1]: wfb-fl-client-daemon.service: Failed with result 'exit-code'.",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Package libsodium was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libsodium.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libsodium' found\nPackage libpcap was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libpcap.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libpcap' found"
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\ndocker0:bridge:connected (externally)\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\np2p-dev-wlxfc221c100157:wifi-p2p:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlxfc221c100157:wifi:unmanaged",
+    "stderr": ""
+  }
+}

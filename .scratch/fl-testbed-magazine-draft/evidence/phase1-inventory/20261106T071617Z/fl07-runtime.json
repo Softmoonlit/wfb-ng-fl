@@ -1,0 +1,51 @@
+{
+  "native": [],
+  "installed": {},
+  "journal": {
+    "exit": 0,
+    "stdout": "-- No entries --",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 127,
+      "stdout": "",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Package libsodium was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libsodium.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libsodium' found\nPackage libpcap was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libpcap.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libpcap' found"
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\ndocker0:bridge:connected (externally)\nwlxfc221c300cbc:wifi:disconnected\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\np2p-dev-wlxfc221c300cbc:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged",
+    "stderr": ""
+  }
+}

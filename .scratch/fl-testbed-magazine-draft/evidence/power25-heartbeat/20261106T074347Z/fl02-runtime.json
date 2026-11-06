@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 3619,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlx88e62852aae4 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T15:31:22+0800 fl02 python3[3594]: 2026-11-06 15:31:22,075 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:32:48+0800 fl02 python3[3594]: 2026-11-06 15:32:48,892 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:33:17+0800 fl02 python3[3594]: 2026-11-06 15:33:17,363 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:34:33+0800 fl02 python3[3594]: 2026-11-06 15:34:33,220 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:36:32+0800 fl02 python3[3594]: 2026-11-06 15:36:32,506 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:36:54+0800 fl02 python3[3594]: 2026-11-06 15:36:54,753 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:08+0800 fl02 python3[3594]: 2026-11-06 15:37:08,540 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:36+0800 fl02 python3[3594]: 2026-11-06 15:37:36,750 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:54+0800 fl02 python3[3594]: 2026-11-06 15:37:54,343 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:05+0800 fl02 python3[3594]: 2026-11-06 15:38:05,765 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:23+0800 fl02 python3[3594]: 2026-11-06 15:38:23,343 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:34+0800 fl02 python3[3594]: 2026-11-06 15:38:34,769 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:52+0800 fl02 python3[3594]: 2026-11-06 15:38:52,351 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:03+0800 fl02 python3[3594]: 2026-11-06 15:39:03,911 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:27+0800 fl02 python3[3594]: 2026-11-06 15:39:27,592 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:45+0800 fl02 python3[3594]: 2026-11-06 15:39:45,130 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:02+0800 fl02 python3[3594]: 2026-11-06 15:40:02,702 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:14+0800 fl02 python3[3594]: 2026-11-06 15:40:14,265 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:33+0800 fl02 python3[3594]: 2026-11-06 15:40:33,744 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:47+0800 fl02 python3[3594]: 2026-11-06 15:40:47,415 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:59+0800 fl02 python3[3594]: 2026-11-06 15:40:59,031 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:41:10+0800 fl02 python3[3594]: 2026-11-06 15:41:10,619 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:41:22+0800 fl02 python3[3594]: 2026-11-06 15:41:22,042 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:42:13+0800 fl02 python3[3594]: 2026-11-06 15:42:13,037 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:42:24+0800 fl02 python3[3594]: 2026-11-06 15:42:24,384 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:43:59+0800 fl02 python3[3594]: 2026-11-06 15:43:59,069 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:10+0800 fl02 python3[3594]: 2026-11-06 15:44:10,542 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:22+0800 fl02 python3[3594]: 2026-11-06 15:44:22,122 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:50+0800 fl02 python3[3594]: 2026-11-06 15:44:50,727 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:12+0800 fl02 python3[3594]: 2026-11-06 15:45:12,659 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:26+0800 fl02 python3[3594]: 2026-11-06 15:45:26,357 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:37+0800 fl02 python3[3594]: 2026-11-06 15:45:37,983 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:55+0800 fl02 python3[3594]: 2026-11-06 15:45:55,571 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:46:15+0800 fl02 python3[3594]: 2026-11-06 15:46:15,321 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:46:40+0800 fl02 python3[3594]: 2026-11-06 15:46:40,187 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 0,
+    "stdout": "1.0.18\n1.10.1",
+    "stderr": ""
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\ndocker0:bridge:connected (externally)\nfl-c2:tun:connected (externally)\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlx88e62852aae4:wifi:unmanaged",
+    "stderr": ""
+  }
+}

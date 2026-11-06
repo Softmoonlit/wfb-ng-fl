@@ -1,0 +1,12 @@
+{
+  "fl01": {
+    "exit": 0,
+    "stdout": "iface=wlxfc221c300f04\nfc:22:1c:30:0f:04\n/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0\n/sys/bus/usb/drivers/rtl88xxau_wfb\n\taddr fc:22:1c:30:0f:04\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  "fl08": {
+    "exit": 0,
+    "stdout": "iface=wlxfc221c300e99\nfc:22:1c:30:0e:99\n/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0\n/sys/bus/usb/drivers/rtl88xxau_wfb\n\taddr fc:22:1c:30:0e:99\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  }
+}

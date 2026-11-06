@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 1492,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T14:25:28+0800 fl01 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T14:25:34+0800 fl01 python3[861]: 2026-11-06 14:25:34,429 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=1, TUN IP=10.80.0.11)\n2026-11-06T14:25:34+0800 fl01 python3[861]: 2026-11-06 14:25:34,433 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300f04，开始接管配置...\n2026-11-06T14:25:37+0800 fl01 python3[861]: 2026-11-06 14:25:37,743 [INFO] [client-daemon] 网卡 wlxfc221c300f04 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c1)\n2026-11-06T14:25:37+0800 fl01 python3[861]: 2026-11-06 14:25:37,778 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n2026-11-06T14:28:32+0800 fl01 python3[861]: 2026-11-06 14:28:32,647 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:28:46+0800 fl01 python3[861]: 2026-11-06 14:28:46,188 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:29:06+0800 fl01 python3[861]: 2026-11-06 14:29:06,491 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:40:01+0800 fl01 python3[861]: 2026-11-06 14:40:01,908 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:41:50+0800 fl01 python3[861]: 2026-11-06 14:41:50,675 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:42:56+0800 fl01 python3[861]: 2026-11-06 14:42:56,517 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:45:41+0800 fl01 python3[861]: 2026-11-06 14:45:41,548 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:48:31+0800 fl01 python3[861]: 2026-11-06 14:48:31,322 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:52:39+0800 fl01 python3[861]: 2026-11-06 14:52:39,771 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:53:38+0800 fl01 python3[861]: 2026-11-06 14:53:38,727 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:54:37+0800 fl01 python3[861]: 2026-11-06 14:54:37,920 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:54:49+0800 fl01 python3[861]: 2026-11-06 14:54:49,244 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:55:00+0800 fl01 python3[861]: 2026-11-06 14:55:00,828 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:55:12+0800 fl01 python3[861]: 2026-11-06 14:55:12,252 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T14:56:32+0800 fl01 python3[861]: 2026-11-06 14:56:32,246 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:01:05+0800 fl01 python3[861]: 2026-11-06 15:01:05,101 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:09:13+0800 fl01 python3[861]: 2026-11-06 15:09:13,404 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:12:57+0800 fl01 python3[861]: 2026-11-06 15:12:57,049 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:13:10+0800 fl01 python3[861]: 2026-11-06 15:13:10,745 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:16:19+0800 fl01 python3[861]: 2026-11-06 15:16:19,196 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 0,
+    "stdout": "1.0.18\n1.10.1",
+    "stderr": ""
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\ndocker0:bridge:connected (externally)\nfl-c1:tun:connected (externally)\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlxfc221c300f04:wifi:unmanaged",
+    "stderr": ""
+  }
+}

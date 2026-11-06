@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 1397,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c8 --tun-addr 10.80.0.18/24 --node-id 8 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T14:25:05+0800 fl08 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T14:25:12+0800 fl08 wfb-fl-client-daemon[836]: 2026-11-06 14:25:12,526 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=8, TUN IP=10.80.0.18)\n2026-11-06T14:25:12+0800 fl08 wfb-fl-client-daemon[836]: 2026-11-06 14:25:12,530 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300e99，开始接管配置...\n2026-11-06T14:25:14+0800 fl08 wfb-fl-client-daemon[836]: 2026-11-06 14:25:14,231 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c8)\n2026-11-06T14:25:14+0800 fl08 wfb-fl-client-daemon[836]: 2026-11-06 14:25:14,278 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c8 --tun-addr 10.80.0.18/24 --node-id 8 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Package libsodium was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libsodium.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libsodium' found\nPackage libpcap was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libpcap.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libpcap' found"
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\nfl-c8:tun:connected (externally)\ndocker0:bridge:connected (externally)\nwlxfc221c300e99:wifi:disconnected\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\np2p-dev-wlxfc221c300e99:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "host": "fl00",
+    "exit": 0,
+    "stdout": "wlxfc221c100119\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl01",
+    "exit": 0,
+    "stdout": "wlxfc221c300f04\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl02",
+    "exit": 0,
+    "stdout": "wlx88e62852aae4\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl04",
+    "exit": 0,
+    "stdout": "wlxfc221c300cbb\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl05",
+    "exit": 0,
+    "stdout": "wlx5cffffaf6d8c\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl06",
+    "exit": 0,
+    "stdout": "wlxfc221c500bfe\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl07",
+    "exit": 0,
+    "stdout": "wlxfc221c300cbc\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl08",
+    "exit": 0,
+    "stdout": "wlxfc221c300e99\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl09",
+    "exit": 0,
+    "stdout": "wlxfc221c100157\n\ttxpower -18.00 dBm\n\ttxpower -18.00 dBm\n",
+    "stderr": ""
+  },
+  {
+    "host": "fl10",
+    "exit": -1,
+    "error": "TimeoutExpired(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=6', 'fl10', 'sudo -n bash -s'], 20)"
+  }
+]

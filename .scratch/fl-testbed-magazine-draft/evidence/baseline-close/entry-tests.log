@@ -1,0 +1,152 @@
+....................................................F................... [ 52%]
+..........................................F...F..................        [100%]
+=================================== FAILURES ===================================
+_ TestReportReadinessConcurrency.test_preparing_heartbeat_does_not_block_report_under_daemon_lock _
+
+self = <wfb_ng.tests.test_fl_server_daemon.TestReportReadinessConcurrency testMethod=test_preparing_heartbeat_does_not_block_report_under_daemon_lock>
+
+    def test_preparing_heartbeat_does_not_block_report_under_daemon_lock(self):
+        with tempfile.TemporaryDirectory() as root:
+            daemon = ServerDaemon(
+                ServerDaemonConfig(
+                    control_bind_host="127.0.0.1",
+                    control_bind_port=0,
+                    control_broadcast_addr="127.0.0.1",
+                    control_broadcast_port=0,
+                    enable_link_process=False,
+                    model_library_dir=root,
+                ),
+                network_adapter=MockNetworkAdapter(),
+            )
+            control = daemon.control_plane
+            address_fixture = ("127.0.0.1", 50001)
+            hunting = NodeHeartbeat(
+                node_id=1, state="HUNTING", elapsed_ms=0, current_channel=157,
+                txpower_dbm=12, uplink_mcs=6, timestamp_ms=998,
+            )
+            # 先完成身份握手和 IDLE；下方仅观察 PREPARING 的真实业务回调。
+            challenge = HeartbeatAck.from_bytes(
+                control.handle_datagram(hunting.to_bytes(), address_fixture)[0])
+            self.assertFalse(challenge.confirmed)
+            self.assertIsNone(control.registry.get_node(1))
+            hunting = replace(hunting, session=challenge.session)
+            confirmed = HeartbeatAck.from_bytes(
+                control.handle_datagram(hunting.to_bytes(), address_fixture)[0])
+            self.assertTrue(confirmed.confirmed)
+            idle = replace(hunting, state="IDLE", timestamp_ms=999)
+            control.handle_datagram(idle.to_bytes(), address_fixture)
+            entered_callback = threading.Event()
+            original_callback = control.on_heartbeat_received
+    
+            def on_heartbeat(hb, record):
+                entered_callback.set()
+                original_callback(hb, record)
+    
+            control.on_heartbeat_received = on_heartbeat
+            diagnostic = daemon.event_bus.subscribe()
+            control.start()
+            try:
+                address = control._server_sock.getsockname()
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                    client.settimeout(1.0)
+                    control.prepare_task_readiness("startup-job", [1])
+                    heartbeat = NodeHeartbeat(
+                        node_id=1,
+                        state="PREPARING",
+                        elapsed_ms=0,
+                        current_channel=157,
+                        txpower_dbm=12,
+                        uplink_mcs=6,
+                        timestamp_ms=1000,
+                        boot_id=hunting.boot_id, session=hunting.session,
+                    )
+                    with daemon._lock:
+                        client.sendto(heartbeat.to_bytes(), address)
+                        self.assertTrue(entered_callback.wait(1.0))
+                        client.sendto(
+                            json.dumps(
+                                {
+                                    "type": "TASK_READY",
+                                    "report_id": "startup-report-1",
+                                    "job_id": "startup-job",
+                                    "node_id": 1,
+                                    "report": {
+                                        "model_format": "reference",
+                                        "sample_count": 1,
+                                        "data_sha256": {},
+                                        "device": {"type": "cpu"},
+                                    },
+                                }
+                            ).encode(),
+                            address,
+                        )
+                        self.assertTrue(
+                            control.wait_for_task_readiness(1.0),
+                            "PREPARING diagnostic blocked TASK_READY report reception",
+                        )
+                        replies = [json.loads(client.recv(4096)) for _ in range(2)]
+                        self.assertIn({
+                            "ack": True,
+                            "heartbeat_timestamp_ms": 1000,
+                            "channel": 157,
+                            "boot_id": hunting.boot_id,
+                            "session": hunting.session,
+                            "confirmed": True,
+                        }, replies)
+>                       report_reply = next(reply for reply in replies if reply.get("type") == "TASK_READY_ACK")
+E                       StopIteration
+
+wfb_ng/tests/test_fl_server_daemon.py:361: StopIteration
+_ TestClientRadioApplication.test_ht20_calibration_survives_public_hardware_rebuild _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_ht20_calibration_survives_public_hardware_rebuild>
+
+    def test_ht20_calibration_survives_public_hardware_rebuild(self):
+        patch = {'bandwidth_mhz': 20, 'downlink_mcs': 4, 'uftp_rate_kbps': 7000,
+                 'uplink_mcs': 5, 'radio_txpower_dbm': 16}
+        for kind in ('CONFIG_RADIO_PREPARE', 'CONFIG_RADIO_COMMIT'):
+            self.control.handle_broadcast({'type': kind, 'session_id': 'radio-1', 'target_nodes': [1],
+                                           'patch': patch, 'delay_ms': 0, 'calibration': True})
+        self.assertTrue(self.spawned.wait(1))
+        self.assertTrue(self.control.radio_switch_pending)
+        self.dispatch('RADIO_SWITCH_FINALIZED')
+        self.dispatch('RADIO_SWITCH_CONFIRMED')
+        self.assertFalse(self.control.radio_switch_pending)
+>       heartbeat = self._rebuild_control_and_receive_idle()
+
+wfb_ng/tests/test_fl_client_radio_application.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:206: in _rebuild_control_and_receive_idle
+    self.assertTrue(idle.wait(2), f'重建控制面必须能发送合法心跳并重新入网: {errors}')
+E   AssertionError: False is not true : 重建控制面必须能发送合法心跳并重新入网: []
+----------------------------- Captured stderr call -----------------------------
+检测到无线网卡 wlx-test 被拔出
+_ TestClientRadioApplication.test_normal_config_survives_public_hardware_rebuild _
+
+self = <wfb_ng.tests.test_fl_client_radio_application.TestClientRadioApplication testMethod=test_normal_config_survives_public_hardware_rebuild>
+
+    def test_normal_config_survives_public_hardware_rebuild(self):
+        self.control.apply_alignment({'downlink_mcs': 4, 'uftp_rate_kbps': 23000,
+                                      'uplink_mcs': 5, 'radio_txpower_dbm': 15})
+>       heartbeat = self._rebuild_control_and_receive_idle()
+
+wfb_ng/tests/test_fl_client_radio_application.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/tests/test_fl_client_radio_application.py:206: in _rebuild_control_and_receive_idle
+    self.assertTrue(idle.wait(2), f'重建控制面必须能发送合法心跳并重新入网: {errors}')
+E   AssertionError: False is not true : 重建控制面必须能发送合法心跳并重新入网: []
+----------------------------- Captured stderr call -----------------------------
+检测到无线网卡 wlx-test 被拔出
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_server_daemon.py::TestReportReadinessConcurrency::test_preparing_heartbeat_does_not_block_report_under_daemon_lock
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_ht20_calibration_survives_public_hardware_rebuild
+FAILED wfb_ng/tests/test_fl_client_radio_application.py::TestClientRadioApplication::test_normal_config_survives_public_hardware_rebuild
+3 failed, 134 passed, 1 deselected, 2 warnings in 25.61s

@@ -1,0 +1,78 @@
+{
+  "native": [
+    {
+      "pid": 6101,
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "sha256": "1be18f71f1c41884756cf4549cb335fe2baa7b53c8b37c47e113eb97f7610127",
+      "args": "/usr/bin/wfb_v6_uplink --role client --tun-name fl-c9 --tun-addr 10.80.0.19/24 --node-id 9 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c100157 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 "
+    }
+  ],
+  "installed": {
+    "fl/build_identity.json": {
+      "sha256": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+      "data": {
+        "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+        "schema_version": 1
+      }
+    },
+    "fl/radio.py": {
+      "sha256": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334"
+    },
+    "fl/client_daemon.py": {
+      "sha256": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38"
+    },
+    "fl/control.py": {
+      "sha256": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec"
+    },
+    "fl/server_daemon.py": {
+      "sha256": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092"
+    }
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T15:26:22+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:26:22,749 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c9 --tun-addr 10.80.0.19/24 --node-id 9 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c100157 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n2026-11-06T15:26:34+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:26:34,434 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:32:51+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:32:51,985 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:33:57+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:33:57,519 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:35:52+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:35:52,851 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:36:49+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:36:49,067 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:00+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:37:00,548 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:11+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:37:11,977 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:35+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:37:35,509 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:37:53+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:37:53,106 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:04+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:38:04,557 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:22+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:38:22,131 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:33+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:38:33,554 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:38:51+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:38:51,143 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:02+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:39:02,717 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:22+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:39:22,204 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:39+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:39:39,804 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:39:57+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:39:57,368 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:14+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:40:14,798 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:34+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:40:34,281 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:47+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:40:47,971 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:40:59+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:40:59,549 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:41:11+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:41:11,136 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:41:22+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:41:22,588 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:42:13+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:42:13,560 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:43:47+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:43:47,720 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:09+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:44:09,376 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:26+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:44:26,843 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:44:50+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:44:50,748 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:12+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:45:12,610 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:26+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:45:26,272 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:45:43+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:45:43,742 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:46:01+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:46:01,312 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:46:23+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:46:23,128 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK\n2026-11-06T15:46:44+0800 fl09 wfb-fl-client-daemon[6084]: 2026-11-06 15:46:44,760 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK",
+    "stderr": ""
+  },
+  "tools": {
+    "uftp": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftp",
+      "stderr": ""
+    },
+    "uftpd": {
+      "exit": 0,
+      "stdout": "/usr/bin/uftpd",
+      "stderr": ""
+    },
+    "wfb_v6_uplink": {
+      "exit": 0,
+      "stdout": "/usr/bin/wfb_v6_uplink",
+      "stderr": ""
+    },
+    "make": {
+      "exit": 0,
+      "stdout": "/usr/bin/make",
+      "stderr": ""
+    },
+    "gcc": {
+      "exit": 0,
+      "stdout": "/usr/bin/gcc",
+      "stderr": ""
+    },
+    "pkg-config": {
+      "exit": 0,
+      "stdout": "/usr/bin/pkg-config",
+      "stderr": ""
+    }
+  },
+  "libraries": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Package libsodium was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libsodium.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libsodium' found\nPackage libpcap was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libpcap.pc'\nto the PKG_CONFIG_PATH environment variable\nNo package 'libpcap' found"
+  },
+  "network_manager": {
+    "exit": 0,
+    "stdout": "wlP4p1s0:wifi:connected\nfl-c9:tun:connected (externally)\ndocker0:bridge:connected (externally)\np2p-dev-wlP4p1s0:wifi-p2p:disconnected\nenP8p1s0:ethernet:unavailable\np2p-dev-wlxfc221c100157:wifi-p2p:unavailable\nl4tbr0:bridge:unmanaged\ncan0:can:unmanaged\nusb0:ethernet:unmanaged\nusb1:ethernet:unmanaged\nlo:loopback:unmanaged\nwlxfc221c100157:wifi:unmanaged",
+    "stderr": ""
+  }
+}

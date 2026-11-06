@@ -1,0 +1,9 @@
+{"command": ["ldd", "/tmp/wfb_v6_uplink"]}
+{"exit": 0, "stdout": "\tlinux-vdso.so.1 (0x0000ffffa14aa000)\n\tlibsodium.so.23 => /lib/aarch64-linux-gnu/libsodium.so.23 (0x0000ffffa13a0000)\n\tlibpcap.so.0.8 => /lib/aarch64-linux-gnu/libpcap.so.0.8 (0x0000ffffa1340000)\n\tlibstdc++.so.6 => /lib/aarch64-linux-gnu/libstdc++.so.6 (0x0000ffffa1110000)\n\tlibgcc_s.so.1 => /lib/aarch64-linux-gnu/libgcc_s.so.1 (0x0000ffffa10e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa0f30000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa1471000)\n\tlibdbus-1.so.3 => /lib/aarch64-linux-gnu/libdbus-1.so.3 (0x0000ffffa0ed0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa0e30000)\n\tlibsystemd.so.0 => /lib/aarch64-linux-gnu/libsystemd.so.0 (0x0000ffffa0d50000)\n\tliblzma.so.5 => /lib/aarch64-linux-gnu/liblzma.so.5 (0x0000ffffa0d10000)\n\tlibzstd.so.1 => /lib/aarch64-linux-gnu/libzstd.so.1 (0x0000ffffa0c40000)\n\tliblz4.so.1 => /lib/aarch64-linux-gnu/liblz4.so.1 (0x0000ffffa0c10000)\n\tlibcap.so.2 => /lib/aarch64-linux-gnu/libcap.so.2 (0x0000ffffa0bf0000)\n\tlibgcrypt.so.20 => /lib/aarch64-linux-gnu/libgcrypt.so.20 (0x0000ffffa0b00000)\n\tlibgpg-error.so.0 => /lib/aarch64-linux-gnu/libgpg-error.so.0 (0x0000ffffa0ac0000)\n", "stderr": ""}
+{"command": ["sh", "scripts/install/install-v8.sh"]}
+{"exit": 0, "stdout": "python3 setup.py --name >/dev/null\n", "stderr": ""}
+{"command": ["systemctl", "daemon-reload"]}
+{"exit": 0, "stdout": "", "stderr": ""}
+{"command": ["systemctl", "enable", "wfb-fl-client-daemon"]}
+{"exit": 0, "stdout": "", "stderr": "Created symlink /etc/systemd/system/multi-user.target.wants/wfb-fl-client-daemon.service \u2192 /lib/systemd/system/wfb-fl-client-daemon.service.\n"}
+{"host": "fl07", "installed_commit": "5443ca22658202805317a9a974c261cde7c751b9", "state": "installed-not-started"}

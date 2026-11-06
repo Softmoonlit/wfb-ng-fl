@@ -1,0 +1,23 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+You might want to run 'apt --fix-broken install' to correct these.
+The following packages have unmet dependencies:
+ libatomic1 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libcc1-0 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libgfortran5 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libgomp1 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libhwasan0 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libitm1 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ liblsan0 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ libubsan1 : Depends: gcc-12-base (= 12.3.0-1ubuntu1~22.04) but 12.3.0-1ubuntu1~22.04.3 is to be installed
+ python3-pyroute2 : Depends: python3-psutil but it is not going to be installed
+                    Depends: python3-pyroute2.core but it is not going to be installed
+                    Depends: python3-pyroute2.ethtool but it is not going to be installed
+                    Depends: python3-pyroute2.ipdb but it is not going to be installed
+                    Depends: python3-pyroute2.ipset but it is not going to be installed
+                    Depends: python3-pyroute2.ndb but it is not going to be installed
+                    Depends: python3-pyroute2.nftables but it is not going to be installed
+                    Depends: python3-pyroute2.nslink but it is not going to be installed
+                    Depends: python3-pyroute2.protocols but it is not going to be installed
+E: Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution).

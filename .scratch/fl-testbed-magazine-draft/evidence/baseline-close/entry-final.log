@@ -1,0 +1,206 @@
+........................................................................ [ 43%]
+........................................................................ [ 86%]
+...............F..FFF.                                                   [100%]
+=================================== FAILURES ===================================
+_ TestTwoPhaseRadioSwitchNetworkLoop.test_normal_atomic_two_phase_switch_to_channel_149 _
+
+self = <wfb_ng.tests.test_fl_radio_switch.TestTwoPhaseRadioSwitchNetworkLoop testMethod=test_normal_atomic_two_phase_switch_to_channel_149>
+
+    def test_normal_atomic_two_phase_switch_to_channel_149(self):
+        """
+        Full two-phase reconfiguration from Channel 157 to Channel 149:
+        - Server broadcasts CONFIG_RADIO_PREPARE.
+        - Clients 1 & 2 return PREPARE_ACK.
+        - Server broadcasts CONFIG_RADIO_COMMIT (delay=0.1s, lease=2.0s).
+        - Clients and Server switch physical adapter to 149.
+        - Server broadcasts NEW_CHANNEL_PING on 149.
+        - Clients refresh watchdog and send COMMIT_SUCCESS.
+        - Server broadcasts RADIO_SWITCH_FINALIZED.
+        - Assert all nodes locked on 149 with disarmed watchdogs.
+        """
+        self._bring_clients_online()
+    
+>       res = self.server.reconfigure_radio(
+            patch={"target_channel": 149},
+            target_nodes=[1, 2],
+            prepare_timeout_seconds=1.0,
+            commit_delay_seconds=0.1,
+            commit_timeout_seconds=2.0,
+            lease_timeout_seconds=2.0,
+            ping_interval_seconds=0.08,
+        )
+
+wfb_ng/tests/test_fl_radio_switch.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/control.py:2048: in reconfigure_radio
+    return self._reconfigure_radio(
+wfb_ng/fl/control.py:2107: in _reconfigure_radio
+    norm_patch = normalize_radio_patch(patch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+patch = {'target_channel': 149}
+
+    def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
+        """校验并复制规范patch字段，不接受旧字段别名。"""
+        if not isinstance(patch, dict):
+            raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+        for key in patch:
+            if key not in ALLOWED_PATCH_KEYS:
+>               raise ValueError(f"Unknown patch key: {key!r}")
+E               ValueError: Unknown patch key: 'target_channel'
+
+wfb_ng/fl/radio.py:304: ValueError
+__ TestTwoPhaseRadioSwitchNetworkLoop.test_phase1_missing_node_aborts_switch ___
+
+self = <wfb_ng.tests.test_fl_radio_switch.TestTwoPhaseRadioSwitchNetworkLoop testMethod=test_phase1_missing_node_aborts_switch>
+
+    def test_phase1_missing_node_aborts_switch(self):
+        """
+        If any target node fails to return PREPARE_ACK within prepare_timeout_seconds,
+        Server aborts Phase 1, broadcasts CONFIG_RADIO_ABORT, and stays on original channel.
+        """
+        self._bring_clients_online()
+    
+        # Suppress client 2's PREPARE_ACK by unregistering handler
+        self.client2._broadcast_handlers["CONFIG_RADIO_PREPARE"] = []
+    
+>       res = self.server.reconfigure_radio(
+            patch={"target_channel": 153},
+            target_nodes=[1, 2],
+            prepare_timeout_seconds=0.25,
+            commit_delay_seconds=0.1,
+            commit_timeout_seconds=1.0,
+        )
+
+wfb_ng/tests/test_fl_radio_switch.py:398: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/control.py:2048: in reconfigure_radio
+    return self._reconfigure_radio(
+wfb_ng/fl/control.py:2107: in _reconfigure_radio
+    norm_patch = normalize_radio_patch(patch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+patch = {'target_channel': 153}
+
+    def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
+        """校验并复制规范patch字段，不接受旧字段别名。"""
+        if not isinstance(patch, dict):
+            raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+        for key in patch:
+            if key not in ALLOWED_PATCH_KEYS:
+>               raise ValueError(f"Unknown patch key: {key!r}")
+E               ValueError: Unknown patch key: 'target_channel'
+
+wfb_ng/fl/radio.py:304: ValueError
+__ TestTwoPhaseRadioSwitchNetworkLoop.test_phase1_negative_ack_aborts_switch ___
+
+self = <wfb_ng.tests.test_fl_radio_switch.TestTwoPhaseRadioSwitchNetworkLoop testMethod=test_phase1_negative_ack_aborts_switch>
+
+    def test_phase1_negative_ack_aborts_switch(self):
+        """If a client returns PREPARE_ACK(ok=False), Server immediately aborts Phase 1."""
+        self._bring_clients_online()
+    
+        # Client 2 intercepts PREPARE and returns ok=False
+        def _failing_prepare(msg):
+            ack = PrepareAck(
+                node_id=2,
+                session_id=msg.get("session_id", ""),
+                ok=False,
+                error="simulated hardware failure",
+            )
+            self.client2._send_unicast_datagram(ack.to_bytes())
+    
+        self.client2._broadcast_handlers["CONFIG_RADIO_PREPARE"] = [_failing_prepare]
+    
+>       res = self.server.reconfigure_radio(
+            patch={"target_channel": 153},
+            target_nodes=[1, 2],
+            prepare_timeout_seconds=0.3,
+            commit_delay_seconds=0.1,
+            commit_timeout_seconds=1.0,
+        )
+
+wfb_ng/tests/test_fl_radio_switch.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/control.py:2048: in reconfigure_radio
+    return self._reconfigure_radio(
+wfb_ng/fl/control.py:2107: in _reconfigure_radio
+    norm_patch = normalize_radio_patch(patch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+patch = {'target_channel': 153}
+
+    def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
+        """校验并复制规范patch字段，不接受旧字段别名。"""
+        if not isinstance(patch, dict):
+            raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+        for key in patch:
+            if key not in ALLOWED_PATCH_KEYS:
+>               raise ValueError(f"Unknown patch key: {key!r}")
+E               ValueError: Unknown patch key: 'target_channel'
+
+wfb_ng/fl/radio.py:304: ValueError
+_ TestTwoPhaseRadioSwitchNetworkLoop.test_phase2_timeout_triggers_server_revert_and_client_watchdog_fallback _
+
+self = <wfb_ng.tests.test_fl_radio_switch.TestTwoPhaseRadioSwitchNetworkLoop testMethod=test_phase2_timeout_triggers_server_revert_and_client_watchdog_fallback>
+
+    def test_phase2_timeout_triggers_server_revert_and_client_watchdog_fallback(self):
+        """
+        Anomaly & split-brain prevention exercise:
+        - Server and Client 1 switch to target Channel 149.
+        - Client 2 is isolated / fails to report on 149.
+        - Server times out on 149, ceases pings, and reverts to Channel 157!
+        - Client 1's lease watchdog expires (since Server disappeared from 149).
+        - Client 1's watchdog forces physical adapter back to Channel 157 and resumes hunting!
+        - Client 1 rediscovers Server on 157 and re-registers as READY!
+        - Cluster completely reunites on Channel 157 with zero brain split.
+        """
+        self._bring_clients_online()
+    
+        # Inhibit Client 2 from Phase 2: Client 2 acknowledges PREPARE but drops COMMIT
+        self.client2._broadcast_handlers["CONFIG_RADIO_COMMIT"] = []
+    
+>       res = self.server.reconfigure_radio(
+            patch={"target_channel": 149},
+            target_nodes=[1, 2],
+            prepare_timeout_seconds=1.0,
+            commit_delay_seconds=0.05,
+            commit_timeout_seconds=0.35,  # Short commit timeout
+            lease_timeout_seconds=0.55,   # Short lease watchdog
+            ping_interval_seconds=0.08,
+        )
+
+wfb_ng/tests/test_fl_radio_switch.py:432: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+wfb_ng/fl/control.py:2048: in reconfigure_radio
+    return self._reconfigure_radio(
+wfb_ng/fl/control.py:2107: in _reconfigure_radio
+    norm_patch = normalize_radio_patch(patch)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+patch = {'target_channel': 149}
+
+    def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
+        """校验并复制规范patch字段，不接受旧字段别名。"""
+        if not isinstance(patch, dict):
+            raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
+        for key in patch:
+            if key not in ALLOWED_PATCH_KEYS:
+>               raise ValueError(f"Unknown patch key: {key!r}")
+E               ValueError: Unknown patch key: 'target_channel'
+
+wfb_ng/fl/radio.py:304: ValueError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_radio_switch.py::TestTwoPhaseRadioSwitchNetworkLoop::test_normal_atomic_two_phase_switch_to_channel_149
+FAILED wfb_ng/tests/test_fl_radio_switch.py::TestTwoPhaseRadioSwitchNetworkLoop::test_phase1_missing_node_aborts_switch
+FAILED wfb_ng/tests/test_fl_radio_switch.py::TestTwoPhaseRadioSwitchNetworkLoop::test_phase1_negative_ack_aborts_switch
+FAILED wfb_ng/tests/test_fl_radio_switch.py::TestTwoPhaseRadioSwitchNetworkLoop::test_phase2_timeout_triggers_server_revert_and_client_watchdog_fallback
+4 failed, 162 passed, 1 deselected, 2 warnings in 34.68s

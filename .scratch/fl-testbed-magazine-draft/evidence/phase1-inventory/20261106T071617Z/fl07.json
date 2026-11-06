@@ -1,0 +1,93 @@
+{
+  "hostname": "fl07",
+  "time_utc": "2026-11-06T07:16:18Z",
+  "platform": "Linux-5.15.148-tegra-aarch64-with-glibc2.35",
+  "checks": {
+    "identity": {
+      "exit": 0,
+      "stdout": "uid=1000(fl) gid=1000(fl) groups=1000(fl),4(adm),24(cdrom),27(sudo),29(audio),30(dip),44(video),46(plugdev),104(render),116(i2c),120(lpadmin),135(gdm),136(sambashare),996(weston-launch),999(gpio)",
+      "stderr": ""
+    },
+    "sudo": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "disk": {
+      "exit": 0,
+      "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1        28G   21G  6.2G  77% /\n/dev/sda1        28G   21G  6.2G  77% /",
+      "stderr": ""
+    },
+    "memory": {
+      "exit": 0,
+      "stdout": "total        used        free      shared  buff/cache   available\nMem:            7619        1077        5317          36        1224        6293\nSwap:           3809           0        3809",
+      "stderr": ""
+    },
+    "usb": {
+      "exit": 0,
+      "stdout": "Bus 002 Device 003: ID 0bda:8812 Realtek Semiconductor Corp. RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter\nBus 002 Device 002: ID 0bda:0489 Realtek Semiconductor Corp. 4-Port USB 3.0 Hub\nBus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub\nBus 001 Device 003: ID 349c:0418 Generic USB2.0 Device\nBus 001 Device 002: ID 0bda:5489 Realtek Semiconductor Corp. 4-Port USB 2.0 Hub\nBus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub",
+      "stderr": ""
+    },
+    "radio": {
+      "exit": 0,
+      "stdout": "phy#1\n\tInterface wlxfc221c300cbc\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:30:0c:bc\n\t\ttype managed\n\t\tchannel 1 (2412 MHz), width: 20 MHz, center1: 2412 MHz\n\t\ttxpower 18.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:84:42\n\t\tssid iPhone 18 Pro Max\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm",
+      "stderr": ""
+    },
+    "regulatory": {
+      "exit": 0,
+      "stdout": "global\ncountry 00: DFS-UNSET\n\t(755 - 928 @ 2), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(2402 - 2472 @ 40), (N/A, 20), (N/A)\n\t(2457 - 2482 @ 20), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(2474 - 2494 @ 20), (N/A, 20), (N/A), NO-OFDM, PASSIVE-SCAN\n\t(5170 - 5250 @ 80), (N/A, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (N/A, 20), (0 ms), DFS, AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5730 @ 160), (N/A, 20), (0 ms), DFS, PASSIVE-SCAN\n\t(5735 - 5835 @ 80), (N/A, 20), (N/A), PASSIVE-SCAN\n\t(57240 - 63720 @ 2160), (N/A, 0), (N/A)\n\nphy#0 (self-managed)\ncountry 00: DFS-UNSET\n\t(2402 - 2472 @ 40), (6, 20), (N/A), NO-80MHZ, NO-160MHZ\n\t(2457 - 2482 @ 20), (6, 20), (N/A), AUTO-BW, NO-80MHZ, NO-160MHZ, PASSIVE-SCAN\n\t(5170 - 5230 @ 40), (6, 20), (N/A), AUTO-BW\n\t(5230 - 5250 @ 20), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5250 - 5330 @ 80), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5490 - 5710 @ 160), (6, 20), (N/A), PASSIVE-SCAN\n\t(5735 - 5755 @ 20), (6, 20), (N/A), AUTO-BW\n\t(5755 - 5775 @ 20), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN\n\t(5775 - 5795 @ 20), (6, 20), (N/A), AUTO-BW\n\t(5795 - 5835 @ 40), (6, 20), (N/A), AUTO-BW, PASSIVE-SCAN",
+      "stderr": ""
+    },
+    "gpu": {
+      "exit": 0,
+      "stdout": "Orin (nvgpu), [N/A], [N/A], [N/A]",
+      "stderr": ""
+    },
+    "services": {
+      "exit": 0,
+      "stdout": "MainPID=0\nId=wfb-fl-server-daemon.service\nActiveState=inactive\nSubState=dead\n\nMainPID=0\nId=wfb-fl-client-daemon.service\nActiveState=inactive\nSubState=dead",
+      "stderr": ""
+    },
+    "processes": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "install": {
+      "exit": 0,
+      "stdout": "module= None\ndistributions= []",
+      "stderr": ""
+    }
+  },
+  "wireless_interfaces": [
+    {
+      "interface": "wlxfc221c300cbc",
+      "driver": "rtl88xxau_wfb",
+      "address": "fc:22:1c:30:0c:bc"
+    },
+    {
+      "interface": "wlP4p1s0",
+      "driver": "rtl88x2ce",
+      "address": "dc:4a:9e:31:84:42"
+    }
+  ],
+  "configs": {},
+  "native_processes": [],
+  "thermals": {
+    "thermal_zone2": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "cpu-thermal": "46468",
+    "soc2-thermal": "45531",
+    "soc0-thermal": "46437",
+    "thermal_zone3": {
+      "error": "can't concat NoneType to bytes"
+    },
+    "gpu-thermal": "47156",
+    "tj-thermal": "47156",
+    "soc1-thermal": "45500",
+    "thermal_zone4": {
+      "error": "can't concat NoneType to bytes"
+    }
+  }
+}

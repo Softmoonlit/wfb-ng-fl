@@ -1,0 +1,15 @@
+11月 06 19:42:03 fl01 systemd[1]: Started WFB-ng FL client persistent daemon.
+11月 06 19:42:03 fl01 python3[10956]: 2026-11-06 19:42:03,800 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=1, TUN IP=10.80.0.11)
+11月 06 19:42:03 fl01 python3[10956]: 2026-11-06 19:42:03,802 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300e99，开始接管配置...
+11月 06 19:42:07 fl01 python3[10956]: 2026-11-06 19:42:07,043 [INFO] [client-daemon] 网卡 wlxfc221c300e99 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c1)
+11月 06 19:42:07 fl01 python3[10956]: 2026-11-06 19:42:07,100 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+11月 06 19:42:27 fl01 python3[10956]: 2026-11-06 19:42:27,476 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:43:02 fl01 python3[10956]: 2026-11-06 19:43:02,623 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:43:13 fl01 python3[10956]: 2026-11-06 19:43:13,979 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:43:25 fl01 python3[10956]: 2026-11-06 19:43:25,307 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:44:14 fl01 python3[10956]: 2026-11-06 19:44:14,221 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:44:25 fl01 python3[10956]: 2026-11-06 19:44:25,465 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:44:50 fl01 python3[10956]: 2026-11-06 19:44:50,291 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:45:01 fl01 python3[10956]: 2026-11-06 19:45:01,656 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:45:28 fl01 python3[10956]: 2026-11-06 19:45:28,180 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+11月 06 19:45:39 fl01 python3[10956]: 2026-11-06 19:45:39,669 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK

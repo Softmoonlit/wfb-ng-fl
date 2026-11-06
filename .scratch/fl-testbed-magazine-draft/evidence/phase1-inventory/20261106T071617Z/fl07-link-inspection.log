@@ -1,0 +1,44 @@
+phy#1
+	Interface wlxfc221c300cbc
+		ifindex 8
+		wdev 0x100000001
+		addr fc:22:1c:30:0c:bc
+		type monitor
+		channel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz
+		txpower -14.00 dBm
+phy#0
+	Interface wlP4p1s0
+		ifindex 4
+		wdev 0x1
+		addr dc:4a:9e:31:84:42
+		ssid iPhone 18 Pro Max
+		type managed
+		channel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz
+		txpower 13.00 dBm
+MainPID=6474
+ActiveState=active
+SubState=running
+11月 06 15:26:22 fl07 systemd[1]: Started WFB-ng FL client persistent daemon.
+11月 06 15:26:22 fl07 wfb-fl-client-daemon[6474]: 2026-11-06 15:26:22,552 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=7, TUN IP=10.80.0.17)
+11月 06 15:26:22 fl07 wfb-fl-client-daemon[6474]: 2026-11-06 15:26:22,554 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c300cbc，开始接管配置...
+11月 06 15:26:22 fl07 wfb-fl-client-daemon[6474]: 2026-11-06 15:26:22,935 [INFO] [client-daemon] 网卡 wlxfc221c300cbc 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c7)
+11月 06 15:26:22 fl07 wfb-fl-client-daemon[6474]: 2026-11-06 15:26:22,964 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c7 --tun-addr 10.80.0.17/24 --node-id 7 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c300cbc --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+11: fl-c7: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 3982 qdisc pfifo_fast state UNKNOWN mode DEFAULT group default qlen 500
+    link/none 
+    RX:  bytes packets errors dropped  missed   mcast           
+         33672     366      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+         64834     235      0       0       0       0 
+State  Recv-Q Send-Q              Local Address:Port  Peer Address:PortProcess                                                  
+UNCONN 0      0                      127.0.0.53:53         0.0.0.0:*    users:(("systemd-resolve",pid=449,fd=13))               
+ESTAB  0      0                   192.168.0.197:68     192.168.0.1:67   users:(("NetworkManager",pid=463,fd=25))                
+UNCONN 0      0                         0.0.0.0:111        0.0.0.0:*    users:(("rpcbind",pid=448,fd=5),("systemd",pid=1,fd=64))
+UNCONN 0      0                         0.0.0.0:57645      0.0.0.0:*    users:(("avahi-daemon",pid=461,fd=14))                  
+UNCONN 0      0                         0.0.0.0:41435      0.0.0.0:*    users:(("python3",pid=6474,fd=5))                       
+UNCONN 0      0                         0.0.0.0:9000       0.0.0.0:*    users:(("python3",pid=6474,fd=4))                       
+UNCONN 0      0                       127.0.0.1:9200       0.0.0.0:*    users:(("wfb_v6_uplink",pid=6489,fd=4))                 
+UNCONN 0      0                         0.0.0.0:5353       0.0.0.0:*    users:(("avahi-daemon",pid=461,fd=12))                  
+UNCONN 0      0                               *:111              *:*    users:(("rpcbind",pid=448,fd=7),("systemd",pid=1,fd=66))
+UNCONN 0      0      [fe80::b8d9:1f22:37ba:916]:546              *:*    users:(("NetworkManager",pid=463,fd=27))                
+UNCONN 0      0                               *:5353             *:*    users:(("avahi-daemon",pid=461,fd=13))                  
+UNCONN 0      0                               *:34339            *:*    users:(("avahi-daemon",pid=461,fd=15))                  

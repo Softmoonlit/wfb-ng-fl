@@ -1,0 +1,22 @@
+# 本地调试中间产物；关键红测和最终回归已单独跟踪。
+/02-green.txt
+/03-heartbeat-suite.txt
+/04-regression.txt
+/05-regression.txt
+/06-green-regression.txt
+/07-adjacent.txt
+/08-job-boundaries.txt
+/09-job-green.txt
+/10-radio.exit
+/10-radio.txt
+/11-radio-green.txt
+/12-final-regression.txt
+/14-idempotency-green.txt
+/15-restart-reorder-green.txt
+/16-idempotency-final-regression.txt
+/18-cookie-green.txt
+/implement.py
+/migrate-existing.py
+/migrate.py
+# 冻结源码归档可从提交重建，摘要保存在state中。
+/heartbeat-*/source.tar

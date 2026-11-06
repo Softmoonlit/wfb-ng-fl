@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<stdin>", line 61, in <module>
+  File "/usr/lib/python3.10/pathlib.py", line 1135, in read_text
+    return f.read()
+  File "/usr/lib/python3.10/codecs.py", line 321, in decode
+    data = self.buffer + input
+TypeError: can't concat NoneType to bytes
