@@ -8,17 +8,17 @@ packaging seams without reviving the old file-simulation job contract.
 
 import json
 import os
+from dataclasses import replace
 import socket
 import tempfile
 import threading
-import time
 import unittest
 from unittest.mock import MagicMock, patch
 
 from wfb_ng.fl.control import (
     ClientNodeState,
+    HeartbeatAck,
     NodeHeartbeat,
-    NodeReadiness,
 )
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.server_daemon import (
@@ -31,6 +31,21 @@ from wfb_ng.fl.server_daemon import (
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
 from wfb_ng.tests.test_fl_radio import MockSurveyBackend
 from wfb_ng.tests.test_fl_training_host import isolated_socket_boundary
+
+
+def confirm_hunting(test, client, address, heartbeat):
+    """使用同一回环 UDP 端点回显公共 challenge，保持 boot_id 和时间戳。"""
+    client.settimeout(1.0)
+    client.sendto(heartbeat.to_bytes(), address)
+    challenge = HeartbeatAck.from_bytes(client.recv(4096))
+    test.assertFalse(challenge.confirmed)
+    test.assertEqual(challenge.boot_id, heartbeat.boot_id)
+    heartbeat = replace(heartbeat, session=challenge.session)
+    client.sendto(heartbeat.to_bytes(), address)
+    confirmed = HeartbeatAck.from_bytes(client.recv(4096))
+    test.assertTrue(confirmed.confirmed)
+    test.assertEqual(confirmed.session, challenge.session)
+    return heartbeat
 
 
 class TestServerDaemonConfig(unittest.TestCase):
@@ -268,6 +283,22 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                 network_adapter=MockNetworkAdapter(),
             )
             control = daemon.control_plane
+            address_fixture = ("127.0.0.1", 50001)
+            hunting = NodeHeartbeat(
+                node_id=1, state="HUNTING", elapsed_ms=0, current_channel=157,
+                txpower_dbm=12, uplink_mcs=6, timestamp_ms=998,
+            )
+            # 先完成身份握手和 IDLE；下方仅观察 PREPARING 的真实业务回调。
+            challenge = HeartbeatAck.from_bytes(
+                control.handle_datagram(hunting.to_bytes(), address_fixture)[0])
+            self.assertFalse(challenge.confirmed)
+            self.assertIsNone(control.registry.get_node(1))
+            hunting = replace(hunting, session=challenge.session)
+            confirmed = HeartbeatAck.from_bytes(
+                control.handle_datagram(hunting.to_bytes(), address_fixture)[0])
+            self.assertTrue(confirmed.confirmed)
+            idle = replace(hunting, state="IDLE", timestamp_ms=999)
+            control.handle_datagram(idle.to_bytes(), address_fixture)
             entered_callback = threading.Event()
             original_callback = control.on_heartbeat_received
 
@@ -291,6 +322,7 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                         txpower_dbm=12,
                         uplink_mcs=6,
                         timestamp_ms=1000,
+                        boot_id=hunting.boot_id, session=hunting.session,
                     )
                     with daemon._lock:
                         client.sendto(heartbeat.to_bytes(), address)
@@ -321,6 +353,9 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                             "ack": True,
                             "heartbeat_timestamp_ms": 1000,
                             "channel": 157,
+                            "boot_id": hunting.boot_id,
+                            "session": hunting.session,
+                            "confirmed": True,
                         }, replies)
                         report_reply = next(reply for reply in replies if reply.get("type") == "TASK_READY_ACK")
                         self.assertTrue(report_reply["ok"])
@@ -383,20 +418,15 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         address = ("127.0.0.1", self.control_bind_port)
         try:
-            for state, timestamp in ((ClientNodeState.HUNTING.value, 1000), (ClientNodeState.IDLE.value, 1050)):
-                sock.sendto(
-                    NodeHeartbeat(
-                        node_id=node_id,
-                        state=state,
-                        elapsed_ms=0,
-                        current_channel=157,
-                        txpower_dbm=12,
-                        uplink_mcs=6,
-                        timestamp_ms=timestamp,
-                    ).to_bytes(),
-                    address,
-                )
-                time.sleep(0.05)
+            hunting = NodeHeartbeat(
+                node_id=node_id, state=ClientNodeState.HUNTING.value,
+                elapsed_ms=0, current_channel=157, txpower_dbm=12,
+                uplink_mcs=6, timestamp_ms=1000,
+            )
+            hunting = confirm_hunting(self, sock, address, hunting)
+            idle = replace(hunting, state=ClientNodeState.IDLE.value, timestamp_ms=1050)
+            sock.sendto(idle.to_bytes(), address)
+            self.assertTrue(HeartbeatAck.from_bytes(sock.recv(4096)).confirmed)
         finally:
             sock.close()
 
@@ -513,21 +543,14 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
     def test_hunting_node_is_not_a_training_candidate(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            sock.sendto(
-                NodeHeartbeat(
-                    node_id=1,
-                    state=ClientNodeState.HUNTING.value,
-                    elapsed_ms=0,
-                    current_channel=157,
-                    txpower_dbm=12,
-                    uplink_mcs=6,
-                    timestamp_ms=407,
-                ).to_bytes(),
-                ("127.0.0.1", self.control_bind_port),
+            heartbeat = NodeHeartbeat(
+                node_id=1, state=ClientNodeState.HUNTING.value, elapsed_ms=0,
+                current_channel=157, txpower_dbm=12, uplink_mcs=6,
+                timestamp_ms=407,
             )
+            confirm_hunting(self, sock, ("127.0.0.1", self.control_bind_port), heartbeat)
         finally:
             sock.close()
-        time.sleep(0.05)
         with self.assertRaises(FLRuntimeError) as caught:
             self.daemon.start_job(self._job_payload(job_id="job-hunting"))
         self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
@@ -596,33 +619,23 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
                 self.assertEqual(caught.exception.error_code, "invalid_job_config")
         self.assertIsNone(self.daemon.active_job)
 
-    def test_unsolicited_idle_is_held_in_connecting(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            sock.sendto(
-                NodeHeartbeat(
-                    node_id=3,
-                    state=ClientNodeState.IDLE.value,
-                    elapsed_ms=0,
-                    current_channel=157,
-                    txpower_dbm=12,
-                    uplink_mcs=6,
-                    timestamp_ms=640,
-                ).to_bytes(),
-                ("127.0.0.1", self.control_bind_port),
-            )
-        finally:
-            sock.close()
-        time.sleep(0.05)
-        node = self.daemon.control_plane.registry.get_node(3)
-        self.assertIsNotNone(node)
-        self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
+    def test_unsolicited_idle_does_not_update_registry(self):
+        # 未握手 IDLE 不应创建节点，也不能进入训练候选列表。
+        replies = self.daemon.control_plane.handle_datagram(
+            NodeHeartbeat(
+                node_id=3, state=ClientNodeState.IDLE.value, elapsed_ms=0,
+                current_channel=157, txpower_dbm=12, uplink_mcs=6,
+                timestamp_ms=640,
+            ).to_bytes(), ("127.0.0.1", 50003),
+        )
+        self.assertFalse(HeartbeatAck.from_bytes(replies[0]).confirmed)
+        self.assertIsNone(self.daemon.control_plane.registry.get_node(3))
         with self.assertRaises(FLRuntimeError) as caught:
             self.daemon.start_job(
                 self._job_payload(target_nodes=[3], job_id="job-unsolicited")
             )
         self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
-        self.assertEqual(caught.exception.details["unready_nodes"]["3"]["readiness"], "CONNECTING")
+        self.assertEqual(caught.exception.details["unready_nodes"]["3"]["readiness"], "OFFLINE")
 
     def test_uftp_control_port_conflict_is_rejected(self):
         self._simulate_client_handshake(1)

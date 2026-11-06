@@ -4,6 +4,7 @@ Server tests inject uplink datagrams at the public reconfigure_radio seam.
 Client tests dispatch full transactions through the public broadcast entrypoint;
 test_fl_radio_switch additionally covers complete real UDP delivery.
 """
+from dataclasses import replace
 import json
 import threading
 import time
@@ -14,6 +15,20 @@ from unittest.mock import Mock, patch
 from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, ControlPlaneServer
 from wfb_ng.fl.radio import RadioConfig
 from wfb_ng.fl.errors import FLRuntimeError
+
+
+def _session_heartbeat(server, channel):
+    """先通过真实心跳协议建立会话，再验证射频对齐策略。"""
+    from wfb_ng.fl.control import NodeHeartbeat, HeartbeatAck
+    addr = ("10.80.0.11", 9001)
+    request = NodeHeartbeat(1, "HUNTING", 0, server.active_radio_config.channel,
+                            15, 5, timestamp_ms=1999)
+    challenge = HeartbeatAck.from_bytes(server.handle_datagram(request.to_bytes(), addr)[0])
+    assert not challenge.confirmed
+    request = replace(request, session=challenge.session)
+    ack = HeartbeatAck.from_bytes(server.handle_datagram(request.to_bytes(), addr)[0])
+    assert ack.confirmed
+    return replace(request, state="IDLE", current_channel=channel, timestamp_ms=2000)
 
 
 class TestBroadcastCallbackLocking(unittest.TestCase):
@@ -175,7 +190,7 @@ class TestRadioTransaction(unittest.TestCase):
                 result, server, _ = self.run_switch(drop="RADIO_SWITCH_CONFIRMED", adapter=adapter)
                 self.assertEqual(result.status, "radio_error")
                 self.assertTrue(server.radio_error)
-                hb = NodeHeartbeat(1, "IDLE", 0, 157, 15, 5, timestamp_ms=2000)
+                hb = _session_heartbeat(server, 157)
                 replies = server.handle_datagram(hb.to_bytes(), ("10.80.0.11", 9001))
                 self.assertEqual(len(replies), 1)
 
@@ -628,7 +643,7 @@ class TestHeartbeatIsolation(unittest.TestCase):
         from dataclasses import replace
         from wfb_ng.fl.control import NodeHeartbeat
         server = ControlPlaneServer(RadioConfig(channel=157, radio_txpower_dbm=12))
-        hb = NodeHeartbeat(1, "IDLE", 0, 149, 15, 5, timestamp_ms=2000)
+        hb = _session_heartbeat(server, 149)
         observed = []
 
         def heartbeat():

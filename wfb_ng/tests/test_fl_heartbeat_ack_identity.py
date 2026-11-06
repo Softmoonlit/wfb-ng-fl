@@ -1,5 +1,6 @@
 """通过真实回环 UDP 验证心跳回执身份与单次等待窗口。"""
 
+from dataclasses import replace
 import ipaddress
 import json
 import socket
@@ -8,8 +9,25 @@ import time
 
 import pytest
 
-from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, NodeHeartbeat
+from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, NodeHeartbeat, HeartbeatAck
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
+
+
+def receive_heartbeat(sock):
+    """先通过公开协议完成启动挑战，再测试普通心跳 ACK。"""
+    raw, address = sock.recvfrom(4096)
+    if json.loads(raw).get("type") != "NODE_HEARTBEAT":
+        return raw, address
+    heartbeat = NodeHeartbeat.from_bytes(raw)
+    if heartbeat.session is None:
+        sock.sendto(HeartbeatAck(heartbeat.timestamp_ms, heartbeat.current_channel,
+                    heartbeat.boot_id, "loopback-session", False).to_bytes(), address)
+        raw, echoed_address = sock.recvfrom(4096)
+        assert echoed_address == address
+        echoed = NodeHeartbeat.from_bytes(raw)
+        assert echoed == replace(heartbeat, session="loopback-session")
+        return raw, address
+    return raw, address
 
 
 @pytest.fixture
@@ -85,7 +103,7 @@ def test_late_149_ack_cannot_lock_157(loopback_network):
 
         def delayed_ack_peer():
             try:
-                raw, first_address = server.recvfrom(4096)
+                raw, first_address = receive_heartbeat(server)
                 first = NodeHeartbeat.from_bytes(raw)
                 received.append((first.current_channel, first.state))
                 assert received == [(149, "HUNTING")]
@@ -93,10 +111,11 @@ def test_late_149_ack_cannot_lock_157(loopback_network):
                 stale_ack = json.dumps({
                     "ack": True,
                     "heartbeat_timestamp_ms": first.timestamp_ms,
+                    "boot_id": first.boot_id, "session": first.session, "confirmed": True,
                     "channel": first.current_channel,
                 }).encode("utf-8")
                 # 不回复 149；收到 157 表示寻频已排空 socket，依收包序列释放回执。
-                raw, second_address = server.recvfrom(4096)
+                raw, second_address = receive_heartbeat(server)
                 second = NodeHeartbeat.from_bytes(raw)
                 received.append((second.current_channel, second.state))
                 assert received == [(149, "HUNTING"), (157, "HUNTING")]
@@ -143,18 +162,20 @@ def test_old_ack_then_current_ack_succeeds_in_same_window(loopback_network, oper
 
         def reply():
             try:
-                raw, address = server.recvfrom(4096)
+                raw, address = receive_heartbeat(server)
                 heartbeat = NodeHeartbeat.from_bytes(raw)
                 heartbeats.append(heartbeat)
                 server.sendto(json.dumps({
                     "ack": True,
                     "heartbeat_timestamp_ms": heartbeat.timestamp_ms - 1,
+                    "boot_id": heartbeat.boot_id, "session": heartbeat.session, "confirmed": True,
                     "channel": 157,
                 }).encode(), address)
                 # 同一窗口内夹入错信道、无关和非法消息，均不能提前结束等待。
                 for invalid in (
                     json.dumps({"ack": True,
                                 "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
+                                "boot_id": heartbeat.boot_id, "session": heartbeat.session, "confirmed": True,
                                 "channel": 149}).encode(),
                     b'{"type":"UNRELATED"}', b'not-json', b'\xff', b'[]',
                     b'{"ack": true}',
@@ -163,15 +184,17 @@ def test_old_ack_then_current_ack_succeeds_in_same_window(loopback_network, oper
                 server.sendto(json.dumps({
                     "ack": True,
                     "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
+                    "boot_id": heartbeat.boot_id, "session": heartbeat.session, "confirmed": True,
                     "channel": 157,
                 }).encode(), address)
                 if operation == "hunt":
                     # 寻频成功后，用公开协议确认客户端立即发出的 IDLE 心跳。
-                    raw, address = server.recvfrom(4096)
+                    raw, address = receive_heartbeat(server)
                     idle = NodeHeartbeat.from_bytes(raw)
                     assert idle.state == "IDLE"
                     server.sendto(json.dumps({
                         "ack": True, "heartbeat_timestamp_ms": idle.timestamp_ms,
+                        "boot_id": idle.boot_id, "session": idle.session, "confirmed": True,
                         "channel": 157,
                     }).encode(), address)
             except BaseException as exc:
@@ -190,6 +213,7 @@ def test_old_ack_then_current_ack_succeeds_in_same_window(loopback_network, oper
                 assert ack.to_dict() == {
                     "ack": True,
                     "heartbeat_timestamp_ms": heartbeats[0].timestamp_ms,
+                    "boot_id": heartbeats[0].boot_id, "session": heartbeats[0].session, "confirmed": True,
                     "channel": 157,
                 }
         finally:
@@ -200,7 +224,7 @@ def test_old_ack_then_current_ack_succeeds_in_same_window(loopback_network, oper
 
 
 @pytest.mark.parametrize("operation", ["hunt", "send"])
-@pytest.mark.parametrize("mismatch", ["request", "channel", "port", "host", "old-protocol"])
+@pytest.mark.parametrize("mismatch", ["request", "channel", "boot", "session", "port", "host", "old-protocol"])
 def test_mismatched_ack_cannot_establish_contact(loopback_network, operation, mismatch):
     """即使其他字段正确，身份或来源任一不符也不能建立联系。"""
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server, \
@@ -220,15 +244,20 @@ def test_mismatched_ack_cannot_establish_contact(loopback_network, operation, mi
 
         def reply():
             try:
-                raw, address = server.recvfrom(4096)
+                raw, address = receive_heartbeat(server)
                 heartbeat = NodeHeartbeat.from_bytes(raw)
                 payload = {"ack": True,
                            "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
+                    "boot_id": heartbeat.boot_id, "session": heartbeat.session, "confirmed": True,
                            "channel": 157}
                 if mismatch == "request":
                     payload["heartbeat_timestamp_ms"] -= 1
                 elif mismatch == "channel":
                     payload["channel"] = 149
+                elif mismatch == "boot":
+                    payload["boot_id"] = "previous-boot"
+                elif mismatch == "session":
+                    payload["session"] = "previous-session"
                 elif mismatch == "old-protocol":
                     payload = {"ack": True}
                 sender = impostor if mismatch in ("port", "host") else server
@@ -271,7 +300,7 @@ def test_invalid_stream_does_not_restart_single_deadline(loopback_network, opera
 
         def reply():
             try:
-                _, address = server.recvfrom(4096)
+                _, address = receive_heartbeat(server)
                 deadline = time.monotonic() + 0.4
                 while time.monotonic() < deadline:
                     server.sendto(b'{"type":"UNRELATED"}', address)

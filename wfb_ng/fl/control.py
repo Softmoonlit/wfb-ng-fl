@@ -5,6 +5,8 @@ and NodeHorizon registry for WFB-ng Stage 2 (ADR-0012, ADR-0014, Ticket 03).
 
 from contextlib import contextmanager
 from copy import deepcopy
+import hashlib
+import hmac
 import json
 import logging
 import math
@@ -112,7 +114,11 @@ def build_hunting_ladder(cached_channel: Optional[int] = None) -> List[int]:
 
 @dataclass(frozen=True)
 class NodeHeartbeat:
-    """Uplink heartbeat datagram payload sent by clients to 10.80.0.1:9001."""
+    """上行心跳；boot_id 在同一客户端实例内保持不变。
+
+    空 session 请求服务端挑战，只有 HUNTING 回传挑战才能建立新会话。
+    timestamp_ms 用于对同一会话内的请求排序。
+    """
     node_id: int
     state: str
     elapsed_ms: int
@@ -125,10 +131,14 @@ class NodeHeartbeat:
     downlink_mcs: int = 3
     uftp_rate_kbps: int = 15000
     calibration: bool = False
+    boot_id: str = field(default_factory=lambda: uuid.uuid4().hex)
+    session: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         res: Dict[str, Any] = {
             "type": "NODE_HEARTBEAT",
+            "boot_id": self.boot_id,
+            "session": self.session,
             "node_id": self.node_id,
             "state": self.state,
             "elapsed_ms": self.elapsed_ms,
@@ -179,6 +189,12 @@ class NodeHeartbeat:
         if type(data.get("timestamp_ms")) is not int or data["timestamp_ms"] <= 0:
             raise ValueError(f"Invalid or missing timestamp_ms: {data.get('timestamp_ms')}")
 
+        if not isinstance(data.get("boot_id"), str) or not data["boot_id"]:
+            raise ValueError("Invalid or missing boot_id")
+        if "session" not in data or (data["session"] is not None and
+                (not isinstance(data["session"], str) or not data["session"])):
+            raise ValueError("Invalid or missing session")
+
         # Strict validation of RF parameters using existing canonical validator
         if type(data.get("calibration")) is not bool:
             raise ValueError("calibration must be a boolean")
@@ -205,6 +221,7 @@ class NodeHeartbeat:
             calibration=data["calibration"],
             error_code=data.get("error_code"),
             timestamp_ms=data["timestamp_ms"],
+            boot_id=data["boot_id"], session=data["session"],
         )
 
     @classmethod
@@ -217,18 +234,28 @@ class HeartbeatAck:
     """绑定心跳请求身份和服务端生效信道的下行回执。"""
     heartbeat_timestamp_ms: int
     channel: int
+    boot_id: str
+    session: str
+    confirmed: bool
     ack: bool = True
 
     def __post_init__(self) -> None:
         if type(self.ack) is not bool or self.ack is not True:
             raise ValueError("ack 必须为 true")
+        if not isinstance(self.boot_id, str) or not self.boot_id:
+            raise ValueError("boot_id 必须为非空字符串")
+        if not isinstance(self.session, str) or not self.session:
+            raise ValueError("session 必须为非空字符串")
+        if type(self.confirmed) is not bool:
+            raise ValueError("confirmed 必须为 boolean")
         for name in ("heartbeat_timestamp_ms", "channel"):
             value = getattr(self, name)
             if type(value) is not int or value <= 0:
                 raise ValueError(f"{name} 必须为正整数")
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"ack": self.ack,
+        return {"ack": self.ack, "boot_id": self.boot_id,
+                "session": self.session, "confirmed": self.confirmed,
                 "heartbeat_timestamp_ms": self.heartbeat_timestamp_ms,
                 "channel": self.channel}
 
@@ -239,11 +266,12 @@ class HeartbeatAck:
     def from_dict(cls, data: Dict[str, Any]) -> "HeartbeatAck":
         if not isinstance(data, dict):
             raise TypeError(f"回执必须为对象，实际为 {type(data).__name__}")
-        if not {"ack", "heartbeat_timestamp_ms", "channel"}.issubset(data):
+        if not {"ack", "heartbeat_timestamp_ms", "channel", "boot_id", "session", "confirmed"}.issubset(data):
             raise ValueError("心跳回执缺少身份字段")
         return cls(ack=data["ack"],
                    heartbeat_timestamp_ms=data["heartbeat_timestamp_ms"],
-                   channel=data["channel"])
+                   channel=data["channel"], boot_id=data["boot_id"],
+                   session=data["session"], confirmed=data["confirmed"])
 
     @classmethod
     def from_bytes(cls, raw: bytes) -> "HeartbeatAck":
@@ -551,6 +579,9 @@ class NodeHorizonRegistry:
         self._verified_nodes: Set[int] = set()
         self._awaiting_idle_confirmation: Dict[int, bool] = {}
         self._hunting_timestamps: Dict[int, int] = {}
+        # 只保存已接纳会话；启动密钥用于签发无状态挑战，无待确认槽或历史 UUID 集合。
+        self._sessions: Dict[int, Tuple[str, str]] = {}
+        self._heartbeat_cookie_secret = os.urandom(32)
         self._lock = threading.RLock()
 
     def update_heartbeat(
@@ -564,19 +595,47 @@ class NodeHorizonRegistry:
         Returns:
             Tuple of (HeartbeatAck, optional alignment patch).
         """
-        if heartbeat.timestamp_ms is None:
-            raise ValueError("心跳缺少 timestamp_ms")
-        ack = HeartbeatAck(heartbeat_timestamp_ms=heartbeat.timestamp_ms,
-                           channel=server_radio.channel)
+        if type(heartbeat.timestamp_ms) is not int or heartbeat.timestamp_ms <= 0:
+            raise ValueError("心跳 timestamp_ms 必须为正整数")
+        if not isinstance(heartbeat.boot_id, str) or not heartbeat.boot_id:
+            raise ValueError("心跳缺少 boot_id")
         with self._lock:
             now = time.monotonic()
             node_id = heartbeat.node_id
+            current = self._sessions.get(node_id)
+            identity = (heartbeat.boot_id, heartbeat.session)
+            if identity != current:
+                # cookie 绑定当前会话和完整请求身份；切代或服务端重启后旧 cookie 失效。
+                payload = json.dumps(
+                    [node_id, heartbeat.boot_id, current, client_addr,
+                     heartbeat.current_channel, heartbeat.timestamp_ms],
+                    ensure_ascii=True, separators=(",", ":"),
+                ).encode("utf-8")
+                token = hmac.new(self._heartbeat_cookie_secret, payload, hashlib.sha256).hexdigest()
+                if (heartbeat.state == ClientNodeState.HUNTING.value
+                        and heartbeat.current_channel == server_radio.channel
+                        and isinstance(heartbeat.session, str)
+                        and hmac.compare_digest(heartbeat.session.encode("utf-8", errors="surrogatepass"), token.encode("ascii"))):
+                    self._sessions[node_id] = identity
+                    self._verified_nodes.discard(node_id)
+                    self._awaiting_idle_confirmation.pop(node_id, None)
+                    self._hunting_timestamps.pop(node_id, None)
+                    new_session = True
+                else:
+                    # 重复请求得到相同 cookie；其他代际的请求无法覆盖或撤销它。
+                    return HeartbeatAck(heartbeat.timestamp_ms, server_radio.channel,
+                                        heartbeat.boot_id, token, False), None
+            else:
+                new_session = False
+            ack = HeartbeatAck(heartbeat.timestamp_ms, server_radio.channel,
+                               heartbeat.boot_id, heartbeat.session, True)
             tun_ip = f"10.80.0.{10 + node_id}"
 
             existing_node = self.get_node(node_id)
             # Replay and disorder protection: ignore stale or duplicate heartbeats
             if (
                 existing_node is not None
+                and not new_session
                 and heartbeat.timestamp_ms is not None
                 and existing_node.timestamp_ms is not None
                 and heartbeat.timestamp_ms <= existing_node.timestamp_ms
@@ -1940,6 +1999,9 @@ class ControlPlaneServer:
                 heartbeat=hb, client_addr=client_addr,
                 server_radio=self.active_radio_config,
             )
+            if not ack_res.confirmed:
+                # 启动协商不构成可供业务代码使用的有效心跳事实。
+                return [ack_res.to_bytes()]
             self._liveness_condition.notify_all()
             if self.radio_error or (
                 self._active_switch_session is not None and hb.node_id in self._expected_target_nodes
@@ -2447,6 +2509,8 @@ class ControlPlaneClient:
         self.missed_acks: int = 0
         self._state_enter_time: float = time.monotonic()
         self._last_sent_ts_ms: int = 0
+        self.boot_id = uuid.uuid4().hex
+        self._heartbeat_session: Optional[str] = None
         # 有效回执对应的本机发送时间；首次待命探测只授予有限观察窗口。
         self._idle_liveness_anchor: Optional[float] = None
 
@@ -2655,6 +2719,8 @@ class ControlPlaneClient:
         with self._lock:
             if not self._can_hunt_locked():
                 return False
+            # 新一轮寻频从空会话发起，在原有截止时间内重新协商。
+            self._heartbeat_session = None
         channels = ladder if ladder is not None else build_hunting_ladder(self.cached_channel)
         sock = self._get_uplink_sock()
 
@@ -2679,6 +2745,7 @@ class ControlPlaneClient:
                     self._drain_sock(sock)
                     hb = NodeHeartbeat(
                         node_id=self.node_id,
+                        boot_id=self.boot_id, session=self._heartbeat_session,
                         state=ClientNodeState.HUNTING.value,
                         elapsed_ms=self.get_elapsed_ms(),
                         current_channel=ch,
@@ -2748,8 +2815,20 @@ class ControlPlaneClient:
                 ack = HeartbeatAck.from_bytes(data)
             except (ValueError, TypeError):
                 continue
-            if (ack.heartbeat_timestamp_ms == heartbeat.timestamp_ms
+            if (ack.boot_id == heartbeat.boot_id
+                    and ack.heartbeat_timestamp_ms == heartbeat.timestamp_ms
                     and ack.channel == heartbeat.current_channel):
+                if not ack.confirmed:
+                    with self._lock:
+                        if (heartbeat.state != ClientNodeState.HUNTING.value
+                                or not self._can_hunt_locked()):
+                            return None
+                        heartbeat = replace(heartbeat, session=ack.session)
+                        sock.sendto(heartbeat.to_bytes(), self._get_server_endpoint())
+                    continue
+                if ack.session != heartbeat.session:
+                    continue
+                self._heartbeat_session = ack.session
                 return ack
         return None
 
@@ -2782,6 +2861,7 @@ class ControlPlaneClient:
 
         hb = NodeHeartbeat(
             node_id=self.node_id,
+            boot_id=self.boot_id, session=self._heartbeat_session,
             state=state,
             elapsed_ms=elapsed_ms,
             current_channel=self.current_channel,

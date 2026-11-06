@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_old_null_duplicate_cannot_invalidate_new_generation_confirmation _____
+
+    def test_old_null_duplicate_cannot_invalidate_new_generation_confirmation():
+        registry = NodeHorizonRegistry()
+        old = heartbeat("unseen-old", 9038344)
+        old_challenge, _ = registry.update_heartbeat(old, ADDR, RADIO)
+        new = heartbeat("new", 62406)
+        new_challenge, _ = registry.update_heartbeat(new, ADDR, RADIO)
+        registry.update_heartbeat(old, ADDR, RADIO)
+        ack, _ = registry.update_heartbeat(replace(new, session=new_challenge.session), ADDR, RADIO)
+>       assert ack.confirmed
+E       AssertionError: assert False
+E        +  where False = HeartbeatAck(heartbeat_timestamp_ms=62406, channel=157, boot_id='new', session='b235584293ca4b159afd7c682d28b812', confirmed=False, ack=True).confirmed
+
+wfb_ng/tests/test_fl_heartbeat_restart.py:376: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  Warning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  Warning: SelectableGroups dict interface is deprecated. Use select.
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_restart.py::test_old_null_duplicate_cannot_invalidate_new_generation_confirmation
+1 failed, 18 deselected, 2 warnings in 0.67s

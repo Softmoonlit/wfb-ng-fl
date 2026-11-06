@@ -208,6 +208,7 @@ def test_round_barrier_does_not_accept_heartbeat_ack():
     heartbeat_ack = _decode_reply(server.handle_datagram(heartbeat.to_bytes(), ("10.0.0.1", 1)))
     assert heartbeat_ack == {
         "ack": True, "heartbeat_timestamp_ms": 1, "channel": 157,
+        "boot_id": heartbeat.boot_id, "session": heartbeat_ack["session"], "confirmed": False,
     }
     assert server.wait_for_round_completion("job-1", 1, 0) is False
 
@@ -430,6 +431,7 @@ def test_client_retries_same_report_id_until_matching_dedicated_ack():
                     # 普通心跳 ACK 不能确认 TASK_READY。
                     receiver.sendto(json.dumps({
                         "ack": True, "heartbeat_timestamp_ms": 1, "channel": 157,
+                        "boot_id": "unrelated", "session": "unrelated", "confirmed": True,
                     }).encode(), source)
                     continue
                 receiver.sendto(json.dumps({

@@ -4,6 +4,7 @@ No sockets, hardware, sleeps, or registry internals are needed: only the server
 clock is controlled. Verified identity survives offline liveness projections.
 """
 
+from dataclasses import replace
 import json
 import unittest
 from unittest.mock import patch
@@ -12,6 +13,7 @@ from wfb_ng.fl.control import (
     ClientNodeState,
     ControlPlaneServer,
     NodeHeartbeat,
+    HeartbeatAck,
     NodeReadiness,
 )
 from wfb_ng.fl.radio import RadioConfig
@@ -30,20 +32,23 @@ class TestTerminalRegistry(unittest.TestCase):
             broadcast_addr="127.0.0.1", broadcast_port=0,
         )
         self.addr = ("10.80.0.11", 50000)
+        self.session = None
 
     def heartbeat(self, state, timestamp_ms):
-        replies = self.server.handle_datagram(
-            NodeHeartbeat(
-                node_id=1, state=state.value, elapsed_ms=0,
-                current_channel=157, txpower_dbm=12, uplink_mcs=6,
-                timestamp_ms=timestamp_ms,
-            ).to_bytes(),
-            self.addr,
-        )
-        self.assertEqual(len(replies), 1)
-        self.assertEqual(json.loads(replies[0]), {
-            "ack": True, "heartbeat_timestamp_ms": timestamp_ms, "channel": 157,
-        })
+        request = NodeHeartbeat(
+            node_id=1, state=state.value, elapsed_ms=0,
+            current_channel=157, txpower_dbm=12, uplink_mcs=6,
+            timestamp_ms=timestamp_ms, boot_id="test", session=self.session)
+        replies = self.server.handle_datagram(request.to_bytes(), self.addr)
+        ack = HeartbeatAck.from_bytes(replies[0])
+        if not ack.confirmed and state == ClientNodeState.HUNTING:
+            request = replace(request, session=ack.session)
+            replies = self.server.handle_datagram(request.to_bytes(), self.addr)
+            ack = HeartbeatAck.from_bytes(replies[0])
+            self.session = ack.session
+        self.assertEqual(ack.boot_id, "test")
+        self.assertEqual(ack.heartbeat_timestamp_ms, timestamp_ms)
+        self.assertEqual(ack.channel, 157)
         return self.server.registry.get_node(1)
 
     def establish(self, active=False):
@@ -116,28 +121,14 @@ class TestTerminalRegistry(unittest.TestCase):
         )
         self.assertTrue(self.server.registry.is_node_ready(1))
 
-    def test_unverified_idle_remains_connecting(self):
+    def test_unverified_idle_cannot_create_registry_record(self):
         for timestamp_ms in (1000, 1001, 1002):
-            self.assertEqual(
-                self.heartbeat(ClientNodeState.IDLE, timestamp_ms).readiness,
-                NodeReadiness.CONNECTING,
-            )
+            self.assertIsNone(self.heartbeat(ClientNodeState.IDLE, timestamp_ms))
         self.assertFalse(self.server.registry.is_node_ready(1))
 
     def test_unverified_running_does_not_grant_persistent_verified_identity(self):
-        self.assertEqual(
-            self.heartbeat(ClientNodeState.RUNNING, 1000).readiness,
-            NodeReadiness.ACTIVE,
-        )
-        self.assertEqual(
-            self.heartbeat(ClientNodeState.IDLE, 1001).readiness,
-            NodeReadiness.CONNECTING,
-        )
-        self.go_offline()
-        self.assertEqual(
-            self.heartbeat(ClientNodeState.IDLE, 1002).readiness,
-            NodeReadiness.CONNECTING,
-        )
+        self.assertIsNone(self.heartbeat(ClientNodeState.RUNNING, 1000))
+        self.assertIsNone(self.heartbeat(ClientNodeState.IDLE, 1001))
         self.assertFalse(self.server.registry.is_node_ready(1))
 
     def test_invalid_timestamp_rejected_before_registry_update(self):

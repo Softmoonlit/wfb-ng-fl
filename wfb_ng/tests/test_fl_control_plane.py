@@ -1,5 +1,6 @@
 """验证双向 UDP 控制面、三级寻频与防失步状态机。"""
 
+from dataclasses import replace
 import ipaddress
 import json
 import socket
@@ -150,9 +151,11 @@ class TestControlMessagesSerialization(unittest.TestCase):
 
     def test_heartbeat_ack_identity_roundtrip(self):
         """回执序列化必须完整保留请求身份与服务端信道。"""
-        ack = HeartbeatAck(heartbeat_timestamp_ms=1000, channel=157)
+        ack = HeartbeatAck(heartbeat_timestamp_ms=1000, channel=157,
+                           boot_id="test", session="session", confirmed=True)
         self.assertEqual(json.loads(ack.to_bytes()), {
             "ack": True, "heartbeat_timestamp_ms": 1000, "channel": 157,
+            "boot_id": "test", "session": "session", "confirmed": True,
         })
         self.assertEqual(HeartbeatAck.from_bytes(ack.to_bytes()), ack)
 
@@ -206,7 +209,8 @@ class TestControlMessagesSerialization(unittest.TestCase):
 
     def test_heartbeat_ack_requires_strict_complete_identity(self):
         """拒绝旧协议、缺失字段、假值、布尔整数及非正数。"""
-        valid = {"ack": True, "heartbeat_timestamp_ms": 1000, "channel": 157}
+        valid = {"ack": True, "heartbeat_timestamp_ms": 1000, "channel": 157,
+                 "boot_id": "test", "session": "session", "confirmed": True}
         for field in valid:
             incomplete = dict(valid)
             del incomplete[field]
@@ -255,12 +259,22 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
 
     def setUp(self):
         self.registry = NodeHorizonRegistry()
+        self.sessions = {}
         self.server_radio = RadioConfig(
             channel=157,
             radio_txpower_dbm=12,
             downlink_mcs=3,
             uplink_mcs=6,
         )
+
+    def update_heartbeat(self, heartbeat, client_addr, server_radio):
+        heartbeat = replace(heartbeat, boot_id="test", session=self.sessions.get(heartbeat.node_id))
+        ack, patch = self.registry.update_heartbeat(heartbeat, client_addr, server_radio)
+        if not ack.confirmed and heartbeat.state == "HUNTING":
+            heartbeat = replace(heartbeat, session=ack.session)
+            ack, patch = self.registry.update_heartbeat(heartbeat, client_addr, server_radio)
+            self.sessions[heartbeat.node_id] = ack.session
+        return ack, patch
 
     def test_hunting_state_keeps_node_in_connecting(self):
         hb = NodeHeartbeat(
@@ -272,11 +286,12 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=211,
         )
-        ack, patch = self.registry.update_heartbeat(
+        ack, patch = self.update_heartbeat(
             hb, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
         self.assertEqual(ack.to_dict(), {
             "ack": True, "heartbeat_timestamp_ms": 211, "channel": 157,
+            "boot_id": "test", "session": ack.session, "confirmed": True,
         })
         self.assertIsNone(patch)
 
@@ -298,7 +313,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=234,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_hunting, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
         self.assertEqual(self.registry.get_node(1).readiness, NodeReadiness.CONNECTING)
@@ -313,7 +328,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=248,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_idle, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
         node = self.registry.get_node(1)
@@ -333,14 +348,13 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=271,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_unsolicited_idle,
             client_addr=("10.80.0.13", 50000),
             server_radio=self.server_radio,
         )
         node = self.registry.get_node(3)
-        self.assertIsNotNone(node)
-        self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
+        self.assertIsNone(node)
         self.assertFalse(self.registry.is_node_ready(3))
 
     def test_radio_mismatch_triggers_alignment_directive(self):
@@ -354,11 +368,12 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=3,
             timestamp_ms=291,
         )
-        ack, patch = self.registry.update_heartbeat(
+        ack, patch = self.update_heartbeat(
             hb_mismatch, client_addr=("10.80.0.12", 50000), server_radio=self.server_radio
         )
         self.assertEqual(ack.to_dict(), {
             "ack": True, "heartbeat_timestamp_ms": 291, "channel": 157,
+            "boot_id": "test", "session": ack.session, "confirmed": True,
         })
         self.assertIsNotNone(patch)
         # 服务端自动计算射频对齐补丁。
@@ -378,7 +393,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=312,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_hunt, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
         hb_idle = NodeHeartbeat(
@@ -390,7 +405,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=323,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_idle, client_addr=("10.80.0.11", 50000), server_radio=self.server_radio
         )
         self.assertTrue(self.registry.is_node_ready(1))
@@ -414,7 +429,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=1000,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_hunt, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.CONNECTING)
@@ -429,11 +444,12 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=500,
         )
-        ack, _ = self.registry.update_heartbeat(
+        ack, _ = self.update_heartbeat(
             hb_stale_idle, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
         self.assertEqual(ack.to_dict(), {
             "ack": True, "heartbeat_timestamp_ms": 500, "channel": 157,
+            "boot_id": "test", "session": ack.session, "confirmed": True,
         })
         # 此时仍须保持连接中，不能就绪。
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.CONNECTING)
@@ -449,7 +465,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=1050,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_valid_idle, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
         # 现在才允许进入就绪状态。
@@ -466,7 +482,7 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
             uplink_mcs=6,
             timestamp_ms=900,
         )
-        self.registry.update_heartbeat(
+        self.update_heartbeat(
             hb_old_hunt, client_addr=("10.80.0.14", 50000), server_radio=self.server_radio
         )
         self.assertEqual(self.registry.get_node(4).readiness, NodeReadiness.READY)
@@ -490,9 +506,12 @@ class TestControlPlaneServerReceipts(unittest.TestCase):
         )
         replies = self.server.handle_datagram(heartbeat.to_bytes(), ("127.0.0.1", 1))
         self.assertIsNotNone(replies)
-        self.assertEqual(json.loads(replies[0]), {
-            "ack": True, "heartbeat_timestamp_ms": 1000, "channel": 153,
-        })
+        ack = HeartbeatAck.from_bytes(replies[0])
+        self.assertEqual(ack.heartbeat_timestamp_ms, 1000)
+        self.assertEqual(ack.channel, 153)
+        self.assertEqual(ack.boot_id, heartbeat.boot_id)
+        self.assertFalse(ack.confirmed)
+        self.assertIsNone(self.server.registry.get_node(4))
 
     def test_radio_reports_do_not_generate_heartbeat_receipts(self):
         """射频准备和提交报告不应生成没有心跳身份的通用回执。"""
@@ -593,11 +612,9 @@ class TestControlPlaneNetworkLoop(unittest.TestCase):
         self.assertFalse(found)
         self.assertEqual(client.state, ClientNodeState.HUNTING)
 
-        # 服务端收到寻频心跳，但回执被丢弃。
+        # 未回传挑战时，节点尚未建立会话。
         node = self.server.registry.get_node(1)
-        self.assertIsNotNone(node)
-        self.assertEqual(node.reported_state, "HUNTING")
-        self.assertEqual(node.readiness, NodeReadiness.CONNECTING)
+        self.assertIsNone(node)
         self.assertFalse(self.server.registry.is_node_ready(1))
 
         # 恢复下行回执。

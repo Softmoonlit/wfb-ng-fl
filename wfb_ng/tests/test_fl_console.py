@@ -146,12 +146,25 @@ def test_address_ownership_rejects_wireless_and_tun_and_accepts_ethernet():
 
 
 def register_idle(daemon):
-    hb = _heartbeat()
     from dataclasses import replace
-    hb = replace(hb, state='HUNTING', timestamp_ms=1)
-    daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
+    from wfb_ng.fl.control import HeartbeatAck
+    control = daemon.control_plane
+    address = ('127.0.0.1', 50001)
+    hb = replace(_heartbeat(), state='HUNTING', timestamp_ms=1)
+    # 经公共数据报入口回显 challenge，未确认身份不能成为候选节点。
+    challenge = HeartbeatAck.from_bytes(control.handle_datagram(hb.to_bytes(), address)[0])
+    assert not challenge.confirmed
+    assert control.registry.get_node(1) is None
+    hb = replace(hb, session=challenge.session)
+    confirmed = HeartbeatAck.from_bytes(control.handle_datagram(hb.to_bytes(), address)[0])
+    assert confirmed.confirmed
+    assert confirmed.boot_id == hb.boot_id
+    assert control.registry.get_node(1).readiness.value == 'CONNECTING'
+    assert not daemon.console.snapshot()['server']['can_start_job']
     hb = replace(hb, state='IDLE', timestamp_ms=2)
-    daemon.control_plane.registry.update_heartbeat(hb, ('127.0.0.1', 0), daemon.radio_config)
+    ack = HeartbeatAck.from_bytes(control.handle_datagram(hb.to_bytes(), address)[0])
+    assert ack.confirmed
+    assert control.registry.get_node(1).readiness.value == 'READY'
 
 
 def test_lifecycle_changes_advance_version_even_between_reads():

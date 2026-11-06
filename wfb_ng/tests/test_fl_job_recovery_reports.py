@@ -61,7 +61,7 @@ def _recovery(
     }
 
 
-def _heartbeat(node_id, state, timestamp_ms):
+def _heartbeat(node_id, state, timestamp_ms, session=None):
     return NodeHeartbeat(
         node_id=node_id,
         state=state,
@@ -69,19 +69,25 @@ def _heartbeat(node_id, state, timestamp_ms):
         current_channel=157,
         txpower_dbm=12,
         uplink_mcs=6,
-        timestamp_ms=timestamp_ms,
+        timestamp_ms=timestamp_ms, boot_id="liveness-test", session=session,
     ).to_bytes()
 
 
 def _establish_ready(server, node_id=1, timestamp=1000):
     address = (f"10.80.0.{10 + node_id}", 9001)
-    server.handle_datagram(
+    challenge = _reply(server.handle_datagram(
         _heartbeat(node_id, ClientNodeState.HUNTING.value, timestamp), address
-    )
+    ))
+    session = challenge["session"]
+    assert not challenge["confirmed"]
+    ack = _reply(server.handle_datagram(
+        _heartbeat(node_id, ClientNodeState.HUNTING.value, timestamp, session), address
+    ))
+    assert ack["confirmed"]
     server.handle_datagram(
-        _heartbeat(node_id, ClientNodeState.IDLE.value, timestamp + 1), address
+        _heartbeat(node_id, ClientNodeState.IDLE.value, timestamp + 1, session), address
     )
-    return address
+    return address, session
 
 
 def test_recovery_report_uses_envelope_and_dedicated_ack():
@@ -265,7 +271,7 @@ def test_daemon_stop_cancels_active_recovery_wait():
 
 def test_liveness_watcher_emits_edges_without_blocking_datagram_handler():
     server = _server(offline_threshold_seconds=0.05)
-    address = _establish_ready(server)
+    address, session = _establish_ready(server)
     events = []
     offline = threading.Event()
     online = threading.Event()
@@ -285,7 +291,7 @@ def test_liveness_watcher_emits_edges_without_blocking_datagram_handler():
 
         started = time.monotonic()
         server.handle_datagram(
-            _heartbeat(1, ClientNodeState.IDLE.value, 1002), address
+            _heartbeat(1, ClientNodeState.IDLE.value, 1002, session), address
         )
         assert time.monotonic() - started < 0.5
         assert online.wait(1)

@@ -9,7 +9,7 @@ import pytest
 from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, ControlPlaneServer, NodeHeartbeat
 from wfb_ng.fl.radio import RadioConfig
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
-from wfb_ng.tests.test_fl_heartbeat_ack_identity import loopback_network
+from wfb_ng.tests.test_fl_heartbeat_ack_identity import loopback_network, receive_heartbeat
 
 
 @pytest.mark.parametrize("failure", [None, "physical", "native"])
@@ -82,11 +82,12 @@ def test_localhost_resolves_to_matching_udp_endpoint(loopback_network, operation
         def reply():
             try:
                 for _ in range(2 if operation == "hunt" else 1):
-                    data, address = server.recvfrom(4096)
+                    data, address = receive_heartbeat(server)
                     heartbeat = NodeHeartbeat.from_bytes(data)
                     server.sendto(json.dumps({
                         "ack": True, "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
                         "channel": heartbeat.current_channel,
+                        "boot_id": heartbeat.boot_id, "session": heartbeat.session, "confirmed": True,
                     }).encode(), address)
             except BaseException as exc:
                 errors.append(exc)
@@ -141,6 +142,7 @@ def test_task_takeover_stops_hunt_without_retuning_or_overwriting_state(loopback
                     server.sendto(json.dumps({
                         "ack": True, "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
                         "channel": heartbeat.current_channel,
+                        "boot_id": heartbeat.boot_id, "session": "challenge", "confirmed": False,
                     }).encode(), address)
             except BaseException as exc:
                 errors.append(exc)

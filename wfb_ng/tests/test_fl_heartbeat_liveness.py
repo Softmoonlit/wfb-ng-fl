@@ -12,7 +12,7 @@ import pytest
 from wfb_ng.fl import control
 from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, NodeHeartbeat
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter
-from wfb_ng.tests.test_fl_heartbeat_ack_identity import loopback_network
+from wfb_ng.tests.test_fl_heartbeat_ack_identity import loopback_network, receive_heartbeat
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def heartbeat_peer(loopback_network, monkeypatch):
         try:
             while not finished.is_set():
                 try:
-                    raw, address = server.recvfrom(4096)
+                    raw, address = receive_heartbeat(server)
                 except socket.timeout:
                     continue
                 message = json.loads(raw)
@@ -59,7 +59,8 @@ def heartbeat_peer(loopback_network, monkeypatch):
                 if arrival is not None:
                     clock.now = arrival
                 payload = {"ack": True, "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
-                           "channel": heartbeat.current_channel}
+                           "channel": heartbeat.current_channel, "boot_id": heartbeat.boot_id,
+                           "session": heartbeat.session, "confirmed": True}
                 sender = server
                 if mode == "drop":
                     # 无关数据报只唤醒接收，时钟到达本次截止时间后结束探测。
@@ -67,6 +68,8 @@ def heartbeat_peer(loopback_network, monkeypatch):
                     payload = {"type": "UNRELATED"}
                 elif mode == "old-ts":
                     payload["heartbeat_timestamp_ms"] -= 1
+                elif mode == "boot":
+                    payload["boot_id"] = "previous-boot"
                 elif mode == "channel":
                     payload["channel"] = 157
                 elif mode == "source":
@@ -77,6 +80,10 @@ def heartbeat_peer(loopback_network, monkeypatch):
 
     peer = threading.Thread(target=reply, daemon=True)
     peer.start()
+    # 通过真实 HUNTING 往返建立新协议会话；下列场景均在已确认会话中验证活性。
+    actions.put(("valid", None))
+    assert client.send_heartbeat_once() is not None
+    received.clear()
 
     def exchange(at, mode="drop", arrival=None, operation=None):
         clock.now = at
@@ -124,7 +131,7 @@ def test_valid_ack_renews_from_request_send_time(heartbeat_peer):
     assert p.client.state == ClientNodeState.HUNTING
 
 
-@pytest.mark.parametrize("mode", ["old-ts", "channel", "source"])
+@pytest.mark.parametrize("mode", ["old-ts", "channel", "source", "boot"])
 def test_invalid_ack_cannot_renew_liveness(heartbeat_peer, mode):
     """旧请求、错信道及错来源不能续期，即使其他身份均有效。"""
     p = heartbeat_peer

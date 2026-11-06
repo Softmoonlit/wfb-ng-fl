@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_reboot_monotonic_reset_cannot_leave_registry_on_old_sequence _______
+
+    def test_reboot_monotonic_reset_cannot_leave_registry_on_old_sequence():
+        registry = NodeHorizonRegistry()
+        addr = ("127.0.0.1", 12345)
+        radio = RadioConfig()
+        old = NodeHeartbeat(1, "HUNTING", 0, 157, 12, 6, timestamp_ms=9038343)
+        registry.update_heartbeat(old, addr, radio)
+        registry.update_heartbeat(replace(old, state="IDLE", timestamp_ms=9038344), addr, radio)
+        assert registry.get_node(1).readiness == NodeReadiness.READY
+        reboot = NodeHeartbeat(1, "HUNTING", 0, 157, 12, 6, timestamp_ms=62406)
+        registry.update_heartbeat(reboot, addr, radio)
+>       assert registry.get_node(1).timestamp_ms == 62406
+E       AssertionError: assert 9038344 == 62406
+E        +  where 9038344 = NodeRecord(node_id=1, tun_ip='10.80.0.11', reported_state='IDLE', readiness=<NodeReadiness.READY: 'READY'>, elapsed_ms...93967799.7120879, addr=('127.0.0.1', 12345), bandwidth_mhz=40, downlink_mcs=3, uftp_rate_kbps=15000, calibration=False).timestamp_ms
+E        +    where NodeRecord(node_id=1, tun_ip='10.80.0.11', reported_state='IDLE', readiness=<NodeReadiness.READY: 'READY'>, elapsed_ms...93967799.7120879, addr=('127.0.0.1', 12345), bandwidth_mhz=40, downlink_mcs=3, uftp_rate_kbps=15000, calibration=False) = <bound method NodeHorizonRegistry.get_node of <wfb_ng.fl.control.NodeHorizonRegistry object at 0xffff83dc30a0>>(1)
+E        +      where <bound method NodeHorizonRegistry.get_node of <wfb_ng.fl.control.NodeHorizonRegistry object at 0xffff83dc30a0>> = <wfb_ng.fl.control.NodeHorizonRegistry object at 0xffff83dc30a0>.get_node
+
+wfb_ng/tests/test_fl_heartbeat_restart.py:18: AssertionError
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_restart.py::test_reboot_monotonic_reset_cannot_leave_registry_on_old_sequence
+1 failed in 0.40s
