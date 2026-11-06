@@ -183,8 +183,13 @@ class Node:
         if self.node == 0:
             status = self.registry_gate()
             self.original = {key: status['radio'][key] for key in self.patch}
-            require(self.original == dict(self.patch, channel=self.original['channel'])
-                    and self.original['channel'] in (149, 157), 'original radio baseline mismatch')
+            require(self.original['channel'] in (149, 157)
+                    and self.original['bandwidth_mhz'] == 40
+                    and self.original['downlink_mcs'] == 3
+                    and self.original['uplink_mcs'] == 4
+                    and self.original['radio_txpower_dbm'] == 18
+                    and 12000 <= self.original['uftp_rate_kbps'] <= 18000,
+                    'original radio baseline mismatch')
         sockets = run(['ss', '-H', '-lntu'])
         require(not re.search(r':(?:1144|18080)\s', sockets), 'communication port occupied')
         self.role_module = role_module
