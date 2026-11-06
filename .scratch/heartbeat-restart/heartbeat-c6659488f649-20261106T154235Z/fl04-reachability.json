@@ -1,0 +1,42 @@
+{
+  "ping": {
+    "exit": 1,
+    "stdout": "PING 192.168.0.194 (192.168.0.194) 56(84) bytes of data.\n\n--- 192.168.0.194 ping statistics ---\n3 packets transmitted, 0 received, 100% packet loss, time 2053ms\n\n",
+    "stderr": ""
+  },
+  "neighbor": {
+    "exit": 0,
+    "stdout": "192.168.0.194 dev enP8p1s0  INCOMPLETE\n",
+    "stderr": ""
+  },
+  "ssh": {
+    "exit": 255,
+    "stdout": "",
+    "stderr": "ssh: connect to host 192.168.0.194 port 22: No route to host\n"
+  },
+  "server": {
+    "server_state": "IDLE",
+    "active_job": null,
+    "fl04": {
+      "node_id": 4,
+      "tun_ip": "10.80.0.14",
+      "reported_state": "IDLE",
+      "readiness": "OFFLINE",
+      "elapsed_ms": 307241,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 7847.334674507,
+      "last_heartbeat_timestamp_ms": 1793978855400,
+      "last_heartbeat_ago_seconds": 1130.76,
+      "error_code": null,
+      "can_select": false,
+      "selection_blockers": [
+        {
+          "code": "NODE_OFFLINE",
+          "message": "节点未上线或心跳已超时"
+        }
+      ]
+    }
+  }
+}
