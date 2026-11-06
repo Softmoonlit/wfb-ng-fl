@@ -1,0 +1,51 @@
+{
+  "samples": 24,
+  "nodes": {
+    "1": {
+      "OFFLINE": 1,
+      "CONNECTING": 2,
+      "READY": 21
+    },
+    "2": {
+      "READY": 24
+    },
+    "4": {
+      "READY": 24
+    },
+    "5": {
+      "READY": 24
+    },
+    "6": {
+      "READY": 24
+    }
+  },
+  "heartbeat": {
+    "fl01": {
+      "requests": 27,
+      "matched_confirmed_ack": 15,
+      "within_230ms": 10,
+      "median_ms": 180.66834999990533,
+      "max_ms": 1371.8562320009369,
+      "boot_ids": [
+        "477aa837e4384c89bc535a9b28787001"
+      ],
+      "request_states": {
+        "HUNTING": 8,
+        "IDLE": 19
+      }
+    },
+    "fl05": {
+      "requests": 18,
+      "matched_confirmed_ack": 18,
+      "within_230ms": 17,
+      "median_ms": 191.20445249973272,
+      "max_ms": 1362.9457589995582,
+      "boot_ids": [
+        "f6f397cf9a314118b0071553da998721"
+      ],
+      "request_states": {
+        "IDLE": 18
+      }
+    }
+  }
+}

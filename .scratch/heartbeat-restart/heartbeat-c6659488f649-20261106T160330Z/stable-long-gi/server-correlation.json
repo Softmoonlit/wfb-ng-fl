@@ -1,0 +1,22 @@
+{
+  "fl01": {
+    "client_distinct_requests": 30,
+    "server_seen": 13,
+    "server_confirmed_ack_sent": 8,
+    "server_processing_median_ms": 2.9356984996411484,
+    "server_processing_max_ms": 3.6934479994670255,
+    "client_idle_requests": 16,
+    "server_seen_idle_requests": 8,
+    "server_confirmed_ack_for_idle": 8
+  },
+  "fl05": {
+    "client_distinct_requests": 19,
+    "server_seen": 15,
+    "server_confirmed_ack_sent": 15,
+    "server_processing_median_ms": 2.8386720005073585,
+    "server_processing_max_ms": 11.855758999445243,
+    "client_idle_requests": 18,
+    "server_seen_idle_requests": 14,
+    "server_confirmed_ack_for_idle": 14
+  }
+}

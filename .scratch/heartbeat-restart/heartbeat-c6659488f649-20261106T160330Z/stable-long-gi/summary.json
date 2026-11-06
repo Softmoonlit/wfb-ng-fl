@@ -1,0 +1,50 @@
+{
+  "samples": 24,
+  "nodes": {
+    "1": {
+      "READY": 24
+    },
+    "2": {
+      "READY": 24
+    },
+    "4": {
+      "READY": 24
+    },
+    "5": {
+      "READY": 24
+    },
+    "6": {
+      "READY": 24
+    }
+  },
+  "heartbeat": {
+    "fl01": {
+      "requests": 30,
+      "matched_confirmed_ack": 8,
+      "within_230ms": 6,
+      "median_ms": 182.14301700027136,
+      "max_ms": 2731.5662130004057,
+      "boot_ids": [
+        "477aa837e4384c89bc535a9b28787001"
+      ],
+      "request_states": {
+        "IDLE": 16,
+        "HUNTING": 14
+      }
+    },
+    "fl05": {
+      "requests": 20,
+      "matched_confirmed_ack": 15,
+      "within_230ms": 5,
+      "median_ms": 376.0624540009303,
+      "max_ms": 3320.6221899999946,
+      "boot_ids": [
+        "f6f397cf9a314118b0071553da998721"
+      ],
+      "request_states": {
+        "IDLE": 18,
+        "HUNTING": 2
+      }
+    }
+  }
+}
