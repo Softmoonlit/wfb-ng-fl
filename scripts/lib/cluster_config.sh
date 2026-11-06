@@ -268,9 +268,9 @@ validate_cluster_config() {
         return 1
     fi
 
-    # 3. WIRELESS_TXPOWER_DBM 校验 (10 ~ 20 dBm)
-    if ! [[ "$WIRELESS_TXPOWER_DBM" =~ ^[0-9]+$ ]] || [ "$WIRELESS_TXPOWER_DBM" -lt 10 ] || [ "$WIRELESS_TXPOWER_DBM" -gt 20 ]; then
-        log_fail "发射功率 WIRELESS_TXPOWER_DBM ($WIRELESS_TXPOWER_DBM) 超出合法范围 [10, 20] dBm (默认推荐 12 dBm)"
+    # 3. WIRELESS_TXPOWER_DBM 校验（驱动固定功率索引 1..63）
+    if ! [[ "$WIRELESS_TXPOWER_DBM" =~ ^[0-9]+$ ]] || [ "$WIRELESS_TXPOWER_DBM" -lt 1 ] || [ "$WIRELESS_TXPOWER_DBM" -gt 63 ]; then
+        log_fail "WIRELESS_TXPOWER_DBM ($WIRELESS_TXPOWER_DBM) 必须为驱动固定功率索引 [1, 63]，不表示物理 dBm"
         return 1
     fi
 
@@ -312,9 +312,9 @@ validate_cluster_config() {
         return 1
     fi
 
-    # 9. 客户端列表校验 (3 ~ 7 台 Client)
-    if [ "$CLIENT_COUNT" -lt 3 ] || [ "$CLIENT_COUNT" -gt 7 ]; then
-        log_fail "集群 Client 节点数量必须在 3~7 台之间（当前配置了 $CLIENT_COUNT 台）"
+    # 9. 客户端列表校验（平台支持 1~10 个节点）
+    if [ "$CLIENT_COUNT" -lt 1 ] || [ "$CLIENT_COUNT" -gt 10 ]; then
+        log_fail "集群 Client 节点数量必须在 1~10 台之间（当前配置了 $CLIENT_COUNT 台）"
         return 1
     fi
 
@@ -350,9 +350,9 @@ validate_cluster_config() {
             return 1
         fi
 
-        # node_id 范围与唯一性
-        if ! [[ "$nid" =~ ^[0-9]+$ ]] || [ "$nid" -le 0 ] || [ "$nid" -ge 255 ]; then
-            log_fail "Client $r 的 node_id ($nid) 不合法，必须为 1~254 之间的整数"
+        # node_id 为平台通用的 1~10 节点编号，保持唯一。
+        if ! [[ "$nid" =~ ^[0-9]+$ ]] || [ "$nid" -lt 1 ] || [ "$nid" -gt 10 ]; then
+            log_fail "Client $r 的 node_id ($nid) 不合法，必须为 1~10 之间的整数"
             return 1
         fi
         if [[ " ${seen_node_ids[*]} " =~ " ${nid} " ]]; then
@@ -361,7 +361,12 @@ validate_cluster_config() {
         fi
         seen_node_ids+=("$nid")
 
-        # tun_ip 格式与唯一性
+        # TUN 地址按 node_id 固定为 10.80.0.(10+node_id)。
+        local expected_tip="10.80.0.$((10 + nid))"
+        if [ "$tip_clean" != "$expected_tip" ]; then
+            log_fail "Client $r 的 tun_ip ($tip) 必须为 node_id=$nid 对应的 $expected_tip"
+            return 1
+        fi
         if ! validate_ipv4 "$tip_clean"; then
             log_fail "Client $r 的 tun_ip ($tip) 不是合法的 IPv4 地址"
             return 1
@@ -385,7 +390,7 @@ print_cluster_config() {
     echo ""
     echo "${C_BOLD}${C_CYAN}=== WFB-FL 集群配置参数概要 ===${C_RESET}"
     echo "  ${C_BOLD}无线信道 (Channel):${C_RESET}       $WIRELESS_CHANNEL (频宽: $WIRELESS_CHANNEL_WIDTH)"
-    echo "  ${C_BOLD}发射功率 (TxPower):${C_RESET}       $WIRELESS_TXPOWER_DBM dBm"
+    echo "  ${C_BOLD}驱动功率索引:${C_RESET}           $WIRELESS_TXPOWER_DBM"
     echo "  ${C_BOLD}下行组播调制 (Downlink):${C_RESET}  MCS $DOWNLINK_MCS (UFTP 速率: $UFTP_RATE_KBPS Kbps)"
     echo "  ${C_BOLD}上行单播调制 (Uplink):${C_RESET}    MCS $UPLINK_MCS"
     echo "  ${C_BOLD}服务端节点 (Server):${C_RESET}      Node ID: $SERVER_NODE_ID, TUN IP: $SERVER_TUN_IP"

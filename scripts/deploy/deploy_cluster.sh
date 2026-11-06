@@ -179,7 +179,7 @@ resolve_local_rtl8812au_dir() {
 step1_load_config() {
     log_step "1" "读取并解析集群配置文件: $CONFIG_FILE"
     load_cluster_config "$CONFIG_FILE"
-    log_pass "配置解析完成，登记 Client 节点共 $CLIENT_COUNT 台 (信道: $WIRELESS_CHANNEL, 功率: ${WIRELESS_TXPOWER_DBM}dBm)"
+    log_pass "配置解析完成，登记 Client 节点共 $CLIENT_COUNT 台 (信道: $WIRELESS_CHANNEL, 功率索引: ${WIRELESS_TXPOWER_DBM})"
 }
 
 # 3. 探测 Client 在线状态（遇到离线节点给出黄色告警并安全跳过）
