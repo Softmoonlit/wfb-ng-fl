@@ -492,7 +492,7 @@ def test_console_snapshot_projects_radio_transaction_facts_with_unknown_effectiv
                                   'checkpoint': '/private/target'},
                 'target_nodes': [2, 1, 2], 'confirmed_nodes': [1, 2], 'unconfirmed_nodes': [],
                 'effective_config': {'channel': 157, 'bandwidth_mhz': 20, 'downlink_mcs': 0,
-                                     'uftp_rate_kbps': 9000,
+                                     'uftp_rate_kbps': 9000, 'guard_interval': 'long',
                                      'path': '/private/effective'},
                 'recovery_state': 'ready', 'error_code': None, 'reason': None,
                 'secret': {'path': '/private/secret'},
@@ -531,7 +531,8 @@ def test_console_snapshot_projects_radio_transaction_facts_with_unknown_effectiv
     assert results[0]['target_nodes'] == [1, 2]
     assert results[0]['confirmed_nodes'] == [1, 2]
     assert results[0]['effective_config'] == {
-        'channel': 157, 'bandwidth_mhz': 20, 'downlink_mcs': 0, 'uftp_rate_kbps': 9000}
+        'channel': 157, 'bandwidth_mhz': 20, 'downlink_mcs': 0,
+        'uftp_rate_kbps': 9000, 'guard_interval': 'long'}
     assert results[1]['effective_config'] is None
     assert results[1]['unconfirmed_nodes'] == [2]
     assert results[1]['recovery_state'] == 'blocked'

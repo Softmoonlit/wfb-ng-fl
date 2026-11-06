@@ -18,7 +18,7 @@ from wfb_ng.fl.client_daemon import ClientDaemon, ClientDaemonConfig, JobSandbox
 from wfb_ng.fl.errors import FLRuntimeError
 from wfb_ng.fl.link_radio import apply_link_radio
 from wfb_ng.fl.radio import RadioConfig
-from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, NodeHeartbeat
+from wfb_ng.fl.control import ClientNodeState, ControlPlaneClient, HeartbeatAck, NodeHeartbeat
 from wfb_ng.tests.test_fl_client_daemon import MockNetworkAdapter, _make_client_job
 
 
@@ -166,12 +166,14 @@ class TestClientRadioApplication(unittest.TestCase):
         peer.settimeout(.05)
         self.daemon.config = replace(self.daemon.config, server_control_host='127.0.0.1',
                                      server_control_port=peer.getsockname()[1], broadcast_port=0)
+        session = None
         received = []
         errors = []
         idle = threading.Event()
         stopped = threading.Event()
 
         def receive():
+            nonlocal session
             while not stopped.is_set():
                 try:
                     raw, addr = peer.recvfrom(4096)
@@ -180,12 +182,22 @@ class TestClientRadioApplication(unittest.TestCase):
                 try:
                     heartbeat = NodeHeartbeat.from_bytes(raw)
                     received.append(heartbeat)
-                    peer.sendto(json.dumps({
-                        "ack": True,
-                        "heartbeat_timestamp_ms": heartbeat.timestamp_ms,
-                        "channel": self.daemon.config.channel,
-                    }).encode(), addr)
-                    if heartbeat.state == 'IDLE':
+                    if heartbeat.session is None:
+                        session = session or 'test-session'
+                        confirmed = False
+                        ack_session = session
+                    else:
+                        self.assertEqual(heartbeat.session, session)
+                        confirmed = True
+                        ack_session = session
+                    peer.sendto(HeartbeatAck(
+                        heartbeat_timestamp_ms=heartbeat.timestamp_ms,
+                        channel=heartbeat.current_channel,
+                        boot_id=heartbeat.boot_id,
+                        session=ack_session,
+                        confirmed=confirmed,
+                    ).to_bytes(), addr)
+                    if heartbeat.state == 'IDLE' and confirmed:
                         idle.set()
                 except Exception as exc:
                     errors.append(str(exc))
@@ -453,11 +465,13 @@ class TestLinkRadioUDP(unittest.TestCase):
         return udp.getsockname()[1], requests
 
     def test_full_fixed_phy_payload_and_matching_success(self):
-        port, requests = self.exchange(lambda data: data[:4] + struct.pack('!I', 0))
-        apply_link_radio(port, 20, 5)
-        self.assertEqual(len(requests), 1)
-        request = struct.unpack('!IB7B', requests[0])
-        self.assertEqual(request[1:], (2, 0, 0, 1, 20, 5, 0, 1))
+        # 隔离 socket 系统边界，只验证完整配置报文，不绑定本机端口。
+        with mock.patch('wfb_ng.fl.link_radio.socket.socket') as socket_factory:
+            udp = socket_factory.return_value.__enter__.return_value
+            udp.recv.side_effect = lambda size: udp.send.call_args.args[0][:4] + struct.pack('!I', 0)
+            apply_link_radio(9200, 20, 5)
+        request = struct.unpack('!IB7B', udp.send.call_args.args[0])
+        self.assertEqual(request[1:], (2, 0, 0, 0, 20, 5, 0, 1))
 
     def test_rejected_or_unrelated_or_malformed_response_cannot_succeed(self):
         responses = (

@@ -36,14 +36,14 @@ class TestDownlinkRateBounds(unittest.TestCase):
         self.assertEqual(FORBIDDEN_CHANNELS, (161,))
         self.assertNotIn(161, ALLOWED_5GHZ_CHANNELS)
         self.assertEqual(DEFAULT_CHANNEL, 157)
-        self.assertEqual(DEFAULT_TXPOWER_DBM, 12)
+        self.assertEqual(DEFAULT_TXPOWER_DBM, 18)
         self.assertEqual(DEFAULT_DOWNLINK_MCS, 3)
         self.assertEqual(RECOMMENDED_UPLINK_MCS, 6)
         self.assertEqual(ALLOWED_MCS_VALUES, (3, 4, 5, 6))
         self.assertEqual(FIXED_FEC_K, 8)
         self.assertEqual(FIXED_FEC_N, 14)
         self.assertEqual(FIXED_BANDWIDTH, "HT40+")
-        self.assertEqual(FIXED_GUARD_INTERVAL, "short")
+        self.assertEqual(FIXED_GUARD_INTERVAL, "long")
 
     def test_mcs3_rate_bounds(self):
         bounds = get_downlink_rate_bounds(3)
@@ -100,14 +100,16 @@ class TestRadioConfigValidator(unittest.TestCase):
     def test_default_config_valid(self):
         config = validate_radio_config({})
         self.assertEqual(config.channel, 157)
-        self.assertEqual(config.radio_txpower_dbm, 12)
+        self.assertEqual(config.radio_txpower_dbm, 18)
         self.assertEqual(config.downlink_mcs, 3)
         self.assertEqual(config.uplink_mcs, 6)
         self.assertEqual(config.uftp_rate_kbps, 15000)
         self.assertEqual(config.fec_k, 8)
         self.assertEqual(config.fec_n, 14)
         self.assertEqual(config.channel_width, "HT40+")
-        self.assertEqual(config.guard_interval, "short")
+        self.assertEqual(config.guard_interval, "long")
+        self.assertEqual(config.to_dict()["guard_interval"], "long")
+        self.assertEqual(RadioConfig().guard_interval, "long")
 
     def test_bandwidth_and_channel_width(self):
         for channel, width in [(149, "HT40+"), (153, "HT40-"), (157, "HT40+")]:
@@ -125,7 +127,7 @@ class TestRadioConfigValidator(unittest.TestCase):
 
     def test_derived_and_fixed_fields_cannot_override_model(self):
         for field, value in [("channel_width", "HT20"), ("fec_k", 9),
-                             ("fec_n", 15), ("guard_interval", "long")]:
+                             ("fec_n", 15), ("guard_interval", "short")]:
             with self.subTest(field=field), self.assertRaises(ValueError):
                 validate_radio_config({field: value})
         config = validate_radio_config({})
@@ -175,15 +177,20 @@ class TestRadioConfigValidator(unittest.TestCase):
                 validate_radio_config({"channel": ch})
 
     def test_txpower_range_enforced(self):
-        with self.assertRaises(ValueError):
-            validate_radio_config({"radio_txpower_dbm": 9})
-        with self.assertRaises(ValueError):
-            validate_radio_config({"radio_txpower_dbm": 21})
-        # 10 and 20 are inclusive boundaries
-        c10 = validate_radio_config({"radio_txpower_dbm": 10})
-        self.assertEqual(c10.radio_txpower_dbm, 10)
-        c20 = validate_radio_config({"radio_txpower_dbm": 20})
-        self.assertEqual(c20.radio_txpower_dbm, 20)
+        # svpcom 驱动文档规定固定功率索引为 1..63，不是物理 dBm。
+        for invalid in (0, 64, -1, True, 25.0):
+            with self.subTest(value=invalid), self.assertRaises(ValueError):
+                validate_radio_config({"radio_txpower_dbm": invalid})
+        for index in (1, 18, 63):
+            with self.subTest(index=index):
+                config = validate_radio_config({"radio_txpower_dbm": index})
+                self.assertEqual(config.radio_txpower_dbm, index)
+        patched = validate_radio_patch({"radio_txpower_dbm": 18}, base=RadioConfig())
+        self.assertEqual(patched.radio_txpower_dbm, 18)
+        calibrated = validate_radio_calibration_patch(
+            {"radio_txpower_dbm": 18, "bandwidth_mhz": 20,
+             "downlink_mcs": 3, "uftp_rate_kbps": 1000}, base=RadioConfig())
+        self.assertEqual(calibrated.radio_txpower_dbm, 18)
 
     def test_mcs_range_enforced(self):
         with self.assertRaises(ValueError):
@@ -303,7 +310,7 @@ class TestRadioCalibrationValidator(unittest.TestCase):
             "downlink_mcs": [2, 7, True, 3.0],
             "uftp_rate_kbps": [None, True, 0, -1, 1.0, "1"],
             "channel": [161, 36],
-            "radio_txpower_dbm": [9, 21, True],
+            "radio_txpower_dbm": [0, 64, True],
             "uplink_mcs": [2, 7],
             "channel_width": ["HT20"],
             "calibration": [True],

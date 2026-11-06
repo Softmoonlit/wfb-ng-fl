@@ -10,7 +10,7 @@ Per ADR-0010, ADR-0012, ADR-0014, Ticket 05:
 - Pre-allocated Node Slot Pool: Launches wfb_v6_uplink with --known-clients 1..10 and
   static 10.80.0.{10+n} client targets, relying on built-in 120ms/10ms scheduling defaults.
 - Hardware Management: Takes over the dedicated WFB RTL8812AU adapter, configures Monitor mode,
-  txpower (12 dBm), Channel 157 (HT40+), and TUN interface with txqueuelen=5000.
+  txpower (driver index 18), Channel 157 (HT40+), and TUN interface with txqueuelen=5000.
 - Control Plane: Symmetric UDP control plane on 9001 (client uplink) and 9000 (server broadcast),
   maintaining in-memory NodeHorizonRegistry with two-army anti-desync gate.
 - Local REST IPC: Exposes http://127.0.0.1:9090 (/status, /survey, /jobs/start, /jobs/abort, /logs/stream).
@@ -357,7 +357,6 @@ def build_v6_uplink_server_command(
         "--radio-bandwidth", str(bandwidth_mhz),
         "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(downlink_mcs),
-        "--radio-short-gi",
         "--air-interface", air_interface,
         "--known-clients", ",".join(str(n) for n in known_clients),
     ]
@@ -2207,7 +2206,7 @@ class ServerDaemon:
                     txpower_dbm=self.config.radio_txpower_dbm,
                 )
                 logger.info(
-                    "网卡 %s 配置就绪 (信道=%d, 发射功率=%d dBm)",
+                    "网卡 %s 配置就绪 (信道=%d, 功率索引=%d)",
                     self.current_interface,
                     self.config.channel,
                     self.config.radio_txpower_dbm,
@@ -2368,7 +2367,7 @@ def main() -> None:
     parser.add_argument("--ipc-host", type=str, default=None, help="REST IPC bind host")
     parser.add_argument("--ipc-port", type=int, default=None, help="REST IPC bind port")
     parser.add_argument("--channel", type=int, default=None, help="5 GHz radio channel")
-    parser.add_argument("--txpower", type=int, default=None, help="Radio TX power in dBm")
+    parser.add_argument("--txpower", type=int, default=None, help="驱动固定功率索引 (1..63，不表示 dBm)")
     parser.add_argument("--downlink-mcs", type=int, default=None, help="Downlink MCS index (3..6)")
     parser.add_argument("--uplink-mcs", type=int, default=None, help="Uplink MCS index (3..6)")
     parser.add_argument("--bandwidth-mhz", type=int, choices=(20, 40), default=None)

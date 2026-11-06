@@ -8,7 +8,7 @@ Per ADR-0010, ADR-0012, ADR-0014:
 - Persistent systemd daemon: wfb-fl-client-daemon.
 - Identity: /etc/wfb-ng-fl/node.json (node_id 1..10, static tun_ip 10.80.0.{10+node_id}).
 - Hardware Polling: 3s suspended retry if WFB RTL8812AU interface is not detected; auto hot takeover.
-- Hardware Configuration: Monitor mode, Channel 157 (HT40+), TX power (12 dBm), TUN setup/cleanup.
+- Hardware Configuration: Monitor mode, Channel 157 (HT40+), TX power (driver index 18), TUN setup/cleanup.
 - Sandbox: Short-lifecycle RoleService(role='client') spawned via subprocess.Popen in isolated process group.
 - Resource Audit: Strict cleanup of child processes (SIGTERM/SIGKILL pgid) and TUN network devices upon completion/abort.
 """
@@ -86,7 +86,7 @@ def _hardware_radio_config(channel: int, bandwidth_mhz: int, txpower_dbm: int,
     if type(channel) is not int or channel not in ALLOWED_5GHZ_CHANNELS:
         raise ValueError("射频信道不在允许列表中")
     if type(txpower_dbm) is not int or not TXPOWER_MIN_DBM <= txpower_dbm <= TXPOWER_MAX_DBM:
-        raise ValueError("射频功率必须为 10..20 dBm 的整数")
+        raise ValueError("射频功率必须为 1..63 的驱动固定功率索引整数")
     if type(uplink_mcs) is not int or uplink_mcs not in ALLOWED_MCS_VALUES:
         raise ValueError("上行 MCS 必须为 3、4、5 或 6")
     radio = RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz,
@@ -130,7 +130,6 @@ def build_v6_uplink_client_command(
         "--radio-bandwidth", str(bandwidth_mhz),
         "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(uplink_mcs),
-        "--radio-short-gi",
         "--air-interface", air_interface,
         "--uplink-pause-threshold-bytes", "131072",
         "--uplink-resume-threshold-bytes", "65536",
@@ -609,7 +608,6 @@ class JobSandbox:
                     str(job.bandwidth_mhz),
                     "--radio-mcs-index",
                     str(job.uplink_mcs),
-                    "--radio-short-gi",
                     "--radio-control-port",
                     str(job.radio_control_port),
                     "--air-interface",
@@ -1142,7 +1140,7 @@ class ClientDaemon:
                     )
                     self.current_interface = target_iface
                     logger.info(
-                        "网卡 %s 接管就绪 (Channel=%d, TXPower=%d dBm, TUN=%s)",
+                        "网卡 %s 接管就绪 (Channel=%d, 功率索引=%d, TUN=%s)",
                         target_iface,
                         self._effective_radio.channel,
                         self._effective_radio.radio_txpower_dbm,
@@ -1902,7 +1900,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--radio-txpower-dbm",
         type=int,
         default=DEFAULT_TXPOWER_DBM,
-        help=f"发射功率 (dBm) (默认: {DEFAULT_TXPOWER_DBM})",
+        help=f"驱动固定功率索引 (1..63，默认: {DEFAULT_TXPOWER_DBM}，不表示 dBm)",
     )
     parser.add_argument(
         "--uplink-mcs",

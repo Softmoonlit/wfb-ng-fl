@@ -214,13 +214,13 @@ class TestNetworkAdapter(unittest.TestCase):
         adapter = LinuxNetworkAdapter(use_sudo=True)
 
         with mock.patch("os.path.exists", return_value=False):
-            adapter.configure_wireless("wlx_test", channel=157, channel_width="HT40+", txpower_dbm=12)
+            adapter.configure_wireless("wlx_test", channel=157, channel_width="HT40+", txpower_dbm=18)
 
         # Assert iw and ip commands were called
         calls = [c[0][0] for c in mock_run.call_args_list]
         self.assertTrue(any("monitor" in cmd for cmd in calls))
         self.assertTrue(any("channel" in cmd and "157" in cmd for cmd in calls))
-        self.assertTrue(any("txpower" in cmd and "-1200" in cmd for cmd in calls))
+        self.assertIn(["sudo", "iw", "dev", "wlx_test", "set", "txpower", "fixed", "-1800"], calls)
 
     @mock.patch("subprocess.run")
     def test_linux_adapter_allows_calibration_ht20_without_rate_table(self, run):
@@ -796,6 +796,12 @@ class TestClientDaemonLifecycle(unittest.TestCase):
             link_id=7669206,
         )
         self.assertEqual(cmd[cmd.index("--link-id") + 1], "7669206")
+        self.assertNotIn("--radio-short-gi", cmd)
+        for bandwidth in (20, 40):
+            narrow_cmd = build_v6_uplink_client_command(
+                "/usr/bin/wfb_v6_uplink", 2, "fl-c2", "10.80.0.12/24",
+                "wlx-test", 6, 7669206, bandwidth_mhz=bandwidth)
+            self.assertNotIn("--radio-short-gi", narrow_cmd)
         job = _make_client_job(
             job_id="link-id",
             node_id=2,
@@ -878,6 +884,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         with open(config_path, encoding='utf-8') as stream:
             role = json.load(stream)
         self.assertEqual(role['channel_width'], 'HT20')
+        self.assertNotIn('--radio-short-gi', role['link_args'])
         self.assertEqual(role['link_args'][role['link_args'].index('--radio-bandwidth') + 1], '20')
         parsed_config = _read_config(config_path)
         self.assertEqual(parsed_config["role"], "client")
@@ -1070,7 +1077,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
 
         # Out of range txpower
         with self.assertRaises(ValueError):
-            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=25)
+            ClientDaemonConfig(**client_network_kwargs(), node_id=1, tun_ip="10.80.0.11", radio_txpower_dbm=0)
 
         # Out of range uplink_mcs
         with self.assertRaises(ValueError):

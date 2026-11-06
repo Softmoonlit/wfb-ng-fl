@@ -351,9 +351,9 @@
     if (abortButton) abortButton.disabled = !state.current_job || server.state !== 'running';
 
     const radio = server.radio;
-    byId('radio').textContent = radio ? `信道 ${radio.channel} · ${radio.radio_txpower_dbm} dBm · 下行 MCS ${radio.downlink_mcs} · 上行 MCS ${radio.uplink_mcs}` : '射频配置未确认';
+    byId('radio').textContent = radio ? `信道 ${radio.channel} · 功率索引 ${radio.radio_txpower_dbm} · 下行 MCS ${radio.downlink_mcs} · 上行 MCS ${radio.uplink_mcs}` : '射频配置未确认';
     if (byId('hud-radio')) {
-      byId('hud-radio').textContent = radio ? `CH${radio.channel} · ${radio.radio_txpower_dbm}dBm · MCS${radio.downlink_mcs}` : '未确认';
+      byId('hud-radio').textContent = radio ? `CH${radio.channel} · 索引${radio.radio_txpower_dbm} · MCS${radio.downlink_mcs}` : '未确认';
     }
 
     const onlineNodes = renderTargets(state);

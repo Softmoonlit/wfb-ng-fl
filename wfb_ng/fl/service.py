@@ -352,9 +352,9 @@ def _read_config(path):
         config['server_http_host'] = validate_server_http_host(config['server_http_host'])
     if 'radio_txpower_dbm' in config and (
             type(config['radio_txpower_dbm']) is not int or
-            config['radio_txpower_dbm'] <= 0):
+            not 1 <= config['radio_txpower_dbm'] <= 63):
         raise FLRuntimeError(
-            'invalid_configuration', '角色服务整数参数无效')
+            'invalid_configuration', '角色服务功率必须为 1..63 的驱动固定功率索引')
     if role == 'server' and (type(config['uftp_rate_kbps']) is not int or
                              config['uftp_rate_kbps'] <= 0):
         raise FLRuntimeError('invalid_configuration', 'UFTP 发送速率配置无效')

@@ -56,7 +56,7 @@ class TestServerDaemonConfig(unittest.TestCase):
         self.assertEqual(cfg.ipc_host, "127.0.0.1")
         self.assertEqual(cfg.ipc_port, 9090)
         self.assertEqual(cfg.channel, 157)
-        self.assertEqual(cfg.radio_txpower_dbm, 12)
+        self.assertEqual(cfg.radio_txpower_dbm, 18)
         self.assertEqual(cfg.downlink_mcs, 3)
         self.assertEqual(cfg.uplink_mcs, 6)
         self.assertEqual(cfg.tun_name, "fl-s")
@@ -110,7 +110,7 @@ class TestServerDaemonConfig(unittest.TestCase):
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(radio_txpower_dbm=0)
         with self.assertRaises(FLRuntimeError):
-            ServerDaemonConfig(radio_txpower_dbm=35)
+            ServerDaemonConfig(radio_txpower_dbm=64)
         with self.assertRaises(FLRuntimeError):
             ServerDaemonConfig(downlink_mcs=2)
         with self.assertRaises(FLRuntimeError):
@@ -149,7 +149,7 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--fec-n") + 1], "14")
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "40")
         self.assertEqual(cmd[cmd.index("--radio-mcs-index") + 1], "3")
-        self.assertIn("--radio-short-gi", cmd)
+        self.assertNotIn("--radio-short-gi", cmd)
         self.assertEqual(
             cmd[cmd.index("--known-clients") + 1],
             "1,2,3,4,5,6,7,8,9,10",
@@ -174,6 +174,7 @@ class TestV6UplinkServerCommand(unittest.TestCase):
             downlink_mcs=3,
         )
         self.assertEqual(cmd[cmd.index("--radio-bandwidth") + 1], "20")
+        self.assertNotIn("--radio-short-gi", cmd)
 
 
 class TestServerRadioIsolation(unittest.TestCase):
@@ -285,8 +286,10 @@ class TestReportReadinessConcurrency(unittest.TestCase):
             control = daemon.control_plane
             address_fixture = ("127.0.0.1", 50001)
             hunting = NodeHeartbeat(
-                node_id=1, state="HUNTING", elapsed_ms=0, current_channel=157,
-                txpower_dbm=12, uplink_mcs=6, timestamp_ms=998,
+                node_id=1, state="HUNTING", elapsed_ms=0,
+                current_channel=daemon.config.channel,
+                txpower_dbm=daemon.config.radio_txpower_dbm,
+                uplink_mcs=daemon.config.uplink_mcs, timestamp_ms=998,
             )
             # 先完成身份握手和 IDLE；下方仅观察 PREPARING 的真实业务回调。
             challenge = HeartbeatAck.from_bytes(
@@ -318,9 +321,9 @@ class TestReportReadinessConcurrency(unittest.TestCase):
                         node_id=1,
                         state="PREPARING",
                         elapsed_ms=0,
-                        current_channel=157,
-                        txpower_dbm=12,
-                        uplink_mcs=6,
+                        current_channel=daemon.config.channel,
+                        txpower_dbm=daemon.config.radio_txpower_dbm,
+                        uplink_mcs=daemon.config.uplink_mcs,
                         timestamp_ms=1000,
                         boot_id=hunting.boot_id, session=hunting.session,
                     )

@@ -18,8 +18,8 @@ def apply_link_radio(port: int, bandwidth_mhz: int, mcs: int) -> None:
     if type(mcs) is not int or mcs not in (3, 4, 5, 6):
         raise ValueError("mcs 必须为整数 3、4、5 或 6")
     request_id = secrets.randbits(32)
-    # req_id、CMD_SET_RADIO、STBC、LDPC、short GI、带宽、MCS、VHT、NSS。
-    request = struct.pack("!IB7B", request_id, 2, 0, 0, 1, bandwidth_mhz, mcs, 0, 1)
+    # req_id、CMD_SET_RADIO、STBC、LDPC、固定 Long GI（short GI 位为 0）、带宽、MCS、VHT、NSS。
+    request = struct.pack("!IB7B", request_id, 2, 0, 0, 0, bandwidth_mhz, mcs, 0, 1)
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
             udp.settimeout(1.0)

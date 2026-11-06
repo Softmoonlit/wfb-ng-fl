@@ -59,26 +59,20 @@ class _LoopbackOnlyDatagramSocket(_REAL_SOCKET):
 
 
 class TestRadioPatchNormalizationAndDataclasses(unittest.TestCase):
-    """Test patch normalization aliases and radio switch datagram serialization."""
+    """验证规范patch字段和射频重配报文。"""
 
-    def test_normalize_radio_patch_aliases(self):
-        patch = {
-            "target_channel": 149,
-            "txpower_dbm": 12,
-            "uplink_mcs": 6,
-        }
+    def test_normalize_radio_patch_canonical_fields(self):
+        patch = {"channel": 149, "radio_txpower_dbm": 18, "uplink_mcs": 6}
         normalized = normalize_radio_patch(patch)
-        self.assertEqual(normalized["channel"], 149)
-        self.assertEqual(normalized["radio_txpower_dbm"], 12)
-        self.assertEqual(normalized["uplink_mcs"], 6)
-        self.assertNotIn("target_channel", normalized)
-        self.assertNotIn("txpower_dbm", normalized)
+        self.assertEqual(normalized, patch)
+        self.assertIsNot(normalized, patch)
 
-    def test_normalize_radio_patch_conflict_raises(self):
-        with self.assertRaises(ValueError):
-            normalize_radio_patch({"target_channel": 149, "channel": 153})
-        with self.assertRaises(ValueError):
-            normalize_radio_patch({"txpower_dbm": 12, "radio_txpower_dbm": 15})
+    def test_normalize_radio_patch_rejects_old_aliases(self):
+        for patch in ({"target_channel": 149}, {"txpower_dbm": 18},
+                      {"target_channel": 149, "channel": 149},
+                      {"txpower_dbm": 18, "radio_txpower_dbm": 18}):
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                normalize_radio_patch(patch)
 
     def test_prepare_ack_serialization_and_validation(self):
         ack = PrepareAck(
@@ -317,7 +311,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self._bring_clients_online()
 
         res = self.server.reconfigure_radio(
-            patch={"target_channel": 149},
+            patch={"channel": 149},
             target_nodes=[1, 2],
             prepare_timeout_seconds=1.0,
             commit_delay_seconds=0.1,
@@ -355,7 +349,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
 
         # 1. Reconfigure txpower only
         res_pwr = self.server.reconfigure_radio(
-            patch={"txpower_dbm": 15},
+            patch={"radio_txpower_dbm": 15},
             target_nodes=[1, 2],
             prepare_timeout_seconds=1.0,
             commit_delay_seconds=0.05,
@@ -402,7 +396,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.client2._broadcast_handlers["CONFIG_RADIO_PREPARE"] = []
 
         res = self.server.reconfigure_radio(
-            patch={"target_channel": 153},
+            patch={"channel": 153},
             target_nodes=[1, 2],
             prepare_timeout_seconds=0.25,
             commit_delay_seconds=0.1,
@@ -436,7 +430,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.client2._broadcast_handlers["CONFIG_RADIO_COMMIT"] = []
 
         res = self.server.reconfigure_radio(
-            patch={"target_channel": 149},
+            patch={"channel": 149},
             target_nodes=[1, 2],
             prepare_timeout_seconds=1.0,
             commit_delay_seconds=0.05,
@@ -496,7 +490,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self.client2._broadcast_handlers["CONFIG_RADIO_PREPARE"] = [_failing_prepare]
 
         res = self.server.reconfigure_radio(
-            patch={"target_channel": 153},
+            patch={"channel": 153},
             target_nodes=[1, 2],
             prepare_timeout_seconds=0.3,
             commit_delay_seconds=0.1,
@@ -513,7 +507,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self._bring_clients_online()
         with self.assertRaises(ValueError):
             self.server.reconfigure_radio(
-                patch={"target_channel": 161},
+                patch={"channel": 161},
                 target_nodes=[1, 2],
             )
 
@@ -522,7 +516,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
         self._bring_clients_online()
         with self.assertRaises(FLRuntimeError) as caught:
             self.server.reconfigure_radio(
-                patch={"target_channel": 149},
+                patch={"channel": 149},
                 target_nodes=None,  # type: ignore[arg-type]
             )
         self.assertEqual(caught.exception.error_code, "invalid_radio_targets")
@@ -574,7 +568,7 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
 
         # Target: change channel to 149 AND txpower to 18 dBm AND uplink MCS to 5
         res = self.server.reconfigure_radio(
-            patch={"target_channel": 149, "txpower_dbm": 18, "uplink_mcs": 5},
+            patch={"channel": 149, "radio_txpower_dbm": 18, "uplink_mcs": 5},
             target_nodes=[1, 2],
             prepare_timeout_seconds=1.0,
             commit_delay_seconds=0.05,

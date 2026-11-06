@@ -12,7 +12,7 @@
   const combination = () => `${byId('bandwidth_mhz').value}/${byId('downlink_mcs').value}`;
 
   function describe(config) {
-    return config ? `信道 ${config.channel} · ${config.bandwidth_mhz} MHz · ${config.radio_txpower_dbm} dBm · 下行 MCS ${config.downlink_mcs} · 上行 MCS ${config.uplink_mcs} · UFTP ${config.uftp_rate_kbps} kbps` : '射频配置未确认';
+    return config ? `信道 ${config.channel} · ${config.bandwidth_mhz} MHz · 功率索引 ${config.radio_txpower_dbm} · 下行 MCS ${config.downlink_mcs} · 上行 MCS ${config.uplink_mcs} · UFTP ${config.uftp_rate_kbps} kbps` : '射频配置未确认';
   }
   function showError(id, message) {
     byId(id).textContent = message;
@@ -97,7 +97,7 @@
     }
     if (byId('hud-radio')) {
       const radioConfig = state.server.radio;
-      byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.bandwidth_mhz}MHz · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
+      byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.bandwidth_mhz}MHz · 索引${radioConfig.radio_txpower_dbm} · MCS${radioConfig.downlink_mcs}` : '未确认';
     }
     if (byId('hud-job')) {
       if (state.current_job && state.server.state === 'running') {
@@ -153,7 +153,7 @@
     });
     if (![149,153,157,165].includes(config.channel)) throw new Error('仅允许信道 149、153、157、165；禁止 Channel 161。');
     if (![20,40].includes(config.bandwidth_mhz)) throw new Error('带宽必须为 20 或 40 MHz。');
-    if (config.radio_txpower_dbm < 10 || config.radio_txpower_dbm > 20) throw new Error('发射功率必须为 10–20 dBm。');
+    if (config.radio_txpower_dbm < 1 || config.radio_txpower_dbm > 63) throw new Error('驱动固定功率索引必须为 1–63。');
     if (![3,4,5,6].includes(config.downlink_mcs) || ![3,4,5,6].includes(config.uplink_mcs)) throw new Error('上下行 MCS 必须为 3–6。');
     if (config.uftp_rate_kbps <= 0) throw new Error('UFTP 速率必须为正整数。');
     return config;

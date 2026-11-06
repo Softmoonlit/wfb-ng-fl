@@ -80,7 +80,7 @@
 
       if (byId('hud-radio')) {
         const radioConfig = server.radio;
-        byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · ${radioConfig.radio_txpower_dbm}dBm · MCS${radioConfig.downlink_mcs}` : '未确认';
+        byId('hud-radio').textContent = radioConfig ? `CH${radioConfig.channel} · 驱动功率索引 ${radioConfig.radio_txpower_dbm} · MCS${radioConfig.downlink_mcs}` : '未确认';
       }
 
       if (byId('hud-job')) {

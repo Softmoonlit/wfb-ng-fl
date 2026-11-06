@@ -20,9 +20,10 @@ FORBIDDEN_CHANNELS: Tuple[int, ...] = (161,)
 
 DEFAULT_CHANNEL: int = 157
 
-TXPOWER_MIN_DBM: int = 10
-TXPOWER_MAX_DBM: int = 20
-DEFAULT_TXPOWER_DBM: int = 12
+# svpcom/rtl8812au 的固定功率索引范围；负 mBm 命令不表示物理 dBm。
+TXPOWER_MIN_DBM: int = 1
+TXPOWER_MAX_DBM: int = 63
+DEFAULT_TXPOWER_DBM: int = 18
 
 MCS_MIN: int = 3
 MCS_MAX: int = 6
@@ -35,7 +36,7 @@ FIXED_FEC_N: int = 14
 DEFAULT_BANDWIDTH_MHZ: int = 40
 ALLOWED_BANDWIDTH_MHZ: Tuple[int, ...] = (20, 40)
 FIXED_BANDWIDTH: str = "HT40+"
-FIXED_GUARD_INTERVAL: str = "short"
+FIXED_GUARD_INTERVAL: str = "long"
 
 ALLOWED_CONFIG_KEYS: Set[str] = {
     "channel",
@@ -246,7 +247,7 @@ def _validate_radio_config(config: Dict[str, Any], *, calibration: bool) -> Radi
         raise ValueError(f"radio_txpower_dbm must be an integer, got {raw_txpower!r}")
     if not (TXPOWER_MIN_DBM <= raw_txpower <= TXPOWER_MAX_DBM):
         raise ValueError(
-            f"radio_txpower_dbm={raw_txpower} out of valid range [{TXPOWER_MIN_DBM}, {TXPOWER_MAX_DBM}] dBm."
+            f"radio_txpower_dbm={raw_txpower} out of valid driver power index range [{TXPOWER_MIN_DBM}, {TXPOWER_MAX_DBM}]."
         )
 
     raw_downlink_mcs = config.get("downlink_mcs", DEFAULT_DOWNLINK_MCS)
@@ -295,26 +296,13 @@ def _validate_radio_config(config: Dict[str, Any], *, calibration: bool) -> Radi
 
 
 def normalize_radio_patch(patch: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Normalize radio reconfiguration patch field aliases:
-    - 'target_channel' -> 'channel'
-    - 'txpower_dbm' -> 'radio_txpower_dbm'
-    Preserves other fields as-is.
-    """
+    """校验并复制规范patch字段，不接受旧字段别名。"""
     if not isinstance(patch, dict):
         raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
-    normalized = dict(patch)
-    if "target_channel" in normalized:
-        val = normalized.pop("target_channel")
-        if "channel" in normalized and normalized["channel"] != val:
-            raise ValueError("Patch cannot specify conflicting 'target_channel' and 'channel'")
-        normalized["channel"] = val
-    if "txpower_dbm" in normalized:
-        val = normalized.pop("txpower_dbm")
-        if "radio_txpower_dbm" in normalized and normalized["radio_txpower_dbm"] != val:
-            raise ValueError("Patch cannot specify conflicting 'txpower_dbm' and 'radio_txpower_dbm'")
-        normalized["radio_txpower_dbm"] = val
-    return normalized
+    for key in patch:
+        if key not in ALLOWED_PATCH_KEYS:
+            raise ValueError(f"Unknown patch key: {key!r}")
+    return dict(patch)
 
 
 def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
@@ -824,7 +812,7 @@ def build_parser() -> argparse.ArgumentParser:
     # Subcommand: validate
     p_val = subparsers.add_parser("validate", help="校验扁平射频参数模型")
     p_val.add_argument("-c", "--channel", type=int, help=f"5 GHz 信道 {ALLOWED_5GHZ_CHANNELS}")
-    p_val.add_argument("-p", "--txpower", type=int, help="发射功率 dBm (10..20, 近距推荐 12)")
+    p_val.add_argument("-p", "--txpower", type=int, help="驱动固定功率索引 (1..63，不表示 dBm)")
     p_val.add_argument("-d", "--downlink-mcs", type=int, help="下行调制阶数 (3..6, 默认 3)")
     p_val.add_argument("-u", "--uplink-mcs", type=int, help="上行调制阶数 (3..6, 推荐 6)")
     p_val.add_argument("-r", "--uftp-rate", type=int, help="下行 UFTP 注入速率 Kbps")

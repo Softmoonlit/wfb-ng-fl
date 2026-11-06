@@ -121,7 +121,7 @@ def test_radio_transaction_applies_server_mcs_before_final_barrier_and_restores_
             if message['type'] == fail_at:
                 raise OSError('最终屏障广播失败')
             if message['type'] == 'RADIO_SWITCH_FINALIZED':
-                assert updates[-1] == (2, 0, 0, 1, 40, 4, 0, 1)
+                assert updates[-1] == (2, 0, 0, 0, 40, 4, 0, 1)
             peer.protocol_peer(message)
         with patch.object(daemon.control_plane, 'broadcast_downlink', side_effect=respond):
             result = daemon.reconfigure_radio({
@@ -196,7 +196,7 @@ def test_controlled_ht20_calibration_updates_hardware_and_link_without_restart(t
             result = daemon.calibrate_radio({'confirmed': True, 'target_nodes': [1],
                 'patch': {'bandwidth_mhz': 20, 'downlink_mcs': 4, 'uftp_rate_kbps': 1000}})
         assert result['status'] == 'finalized'
-        assert updates == [(2, 0, 0, 1, 20, 4, 0, 1)]
+        assert updates == [(2, 0, 0, 0, 20, 4, 0, 1)]
         assert daemon.adapter.wireless_states['wlx-test']['channel_width'] == 'HT20'
         assert len(commands) == 1
         assert daemon.console.snapshot()['server']['link_process'] == initial_link
@@ -317,7 +317,7 @@ def test_mcs_update_is_acknowledged_before_new_channel_ping(tmp_path):
 
         def respond(message):
             if message['type'] == 'NEW_CHANNEL_PING':
-                assert updates == [(2, 0, 0, 1, 40, 4, 0, 1)]
+                assert updates == [(2, 0, 0, 0, 40, 4, 0, 1)]
                 assert daemon.console.snapshot()['server']['link_process'] == initial_link
                 assert tun_snapshot(daemon) == initial_tun
                 pings.append(message)

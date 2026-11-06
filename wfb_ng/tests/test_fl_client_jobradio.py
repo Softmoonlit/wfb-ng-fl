@@ -64,7 +64,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
         assert (work / 'v6-ready').exists()
         owner = (process.pid, dict(adapter.tun_interfaces))
         apply_link_radio(config.radio_control_port, 40, 5)
-        assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 1, 40, 5, 0, 1]
+        assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 0, 40, 5, 0, 1]
         assert (process.pid, adapter.tun_interfaces) == owner
         assert process.poll() is None
         assert not daemon.is_idle_link_running
@@ -153,7 +153,7 @@ def test_prepared_notice_before_report_ack_allows_current_task_update(running_jo
     assert not daemon.sandbox._prepared, '服务端准备报告 ACK 尚未返回'
     daemon.control_plane.on_radio_prepare('radio-job', target)
     daemon.control_plane.on_radio_applied(target)
-    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 1, 40, 5, 0, 1]
+    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 0, 40, 5, 0, 1]
     assert (daemon.sandbox._process.pid, adapter.tun_interfaces) == owner
     assert process.poll() is None
     assert not daemon.is_idle_link_running
@@ -198,7 +198,7 @@ def test_round_notice_before_round_ready_ack_allows_task_update(running_job_radi
     target = replace(daemon._effective_radio, uplink_mcs=5)
     daemon.control_plane.on_radio_prepare('radio-job', target)
     daemon.control_plane.on_radio_applied(target)
-    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 1, 40, 5, 0, 1]
+    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 0, 40, 5, 0, 1]
     assert (process.pid, adapter.tun_interfaces) == owner
     assert not daemon.is_idle_link_running
 
@@ -310,7 +310,7 @@ def test_wire_transaction_updates_task_link_before_notice_ack(radio_wire):
     assert not daemon.control_plane.radio_switch_pending
     assert daemon._effective_radio == expected
     assert adapter.wireless_states['wlan0']['txpower_dbm'] == 14
-    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 1, 40, 5, 0, 1]
+    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 0, 40, 5, 0, 1]
     assert (process.pid, adapter.tun_interfaces) == owner
     assert process.poll() is None
     assert not daemon.is_idle_link_running
@@ -383,7 +383,7 @@ def test_wire_reversible_failure_restores_operator_channel_and_same_owner(radio_
     assert daemon._effective_radio == before
     assert adapter.wireless_states['wlan0']['channel'] == 153
     assert adapter.wireless_states['wlan0']['txpower_dbm'] == before.radio_txpower_dbm
-    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 1, 40, before.uplink_mcs, 0, 1]
+    assert json.loads((work / 'v6-update.json').read_text()) == [2, 0, 0, 0, 40, before.uplink_mcs, 0, 1]
     assert (process.pid, adapter.tun_interfaces) == owner
     assert process.poll() is None
     assert not daemon.is_idle_link_running
