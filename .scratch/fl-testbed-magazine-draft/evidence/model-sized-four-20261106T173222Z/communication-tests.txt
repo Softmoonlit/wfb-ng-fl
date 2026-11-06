@@ -1,0 +1,51 @@
+python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
+{"kind": "model-equivalent-communication", "hosts": ["fl00", "fl01", "fl02", "fl04", "fl05"], "nodes": [1, 2, 4, 5], "payload": {"path": "/tmp/tmpbjkw7ca_/model.fixture", "size_bytes": 460, "sha256": "083e9853a0ee292fbc993785aaa24f9f8b7a9681906e544aec078716e186d367"}, "bytes": 460, "rounds": 1, "model_manifest": {"path": "/tmp/tmpbjkw7ca_/manifest.json", "content": {"model_format": "cifar10-resnet18-fp32-v1", "size_bytes": 460, "sha256": "083e9853a0ee292fbc993785aaa24f9f8b7a9681906e544aec078716e186d367", "initialization": {"seed": 17, "source": "\u672c\u5730\u6d4b\u8bd5fixture"}}}, "model_manifest_matched": true, "model_semantics_validated_by_runner": false, "uftp_port": 1144, "http_port": 18080, "multicast": "239.80.41.1", "private_multicast": "239.80.42.1", "io_timeout": 300, "orchestration_timeout": 690, "node_timeout": 705, "recovery_budget": 60, "cleanup_timeout": 10, "unit_stop_timeout": 8, "close_restore_reserve": 40, "deadline": 690, "bundle_sha256": "c62e9fb72c465968e1ae16172258091f634704cf9dd5162dc7e352e3a2dcdc84", "execute": true, "boundary": "\u6821\u9a8cmanifest\u4e0e\u5b57\u8282\u8eab\u4efd\uff0c\u4e0d\u89e3\u6790\u5f20\u91cf\uff0c\u4e0d\u627f\u8bfa\u6b63\u5f0fFL\u751f\u547d\u5468\u671f\u6216update\u7b49\u91cf\uff1b\u516c\u5171load\u7531\u8c03\u7528\u65b9\u53e6\u9a8c\uff1b\u65e0\u8bad\u7ec3\u3001\u805a\u5408"}
+test_all_prepare_and_publish_overlap_then_submit (test_mock.MockTests) ... ok
+test_cleanup_retains_route_when_interface_identity_changes (test_mock.MockTests) ... ok
+test_cli_requires_manifest (test_mock.MockTests) ... usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: the following arguments are required: --model-manifest
+ok
+test_cli_requires_payload_before_any_process (test_mock.MockTests) ... usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: the following arguments are required: --payload, --model-manifest
+ok
+test_client_resubmits_received_file_without_generation (test_mock.MockTests) ... ok
+test_dry_run_never_starts_ssh (test_mock.MockTests) ... ok
+test_failed_prepare_stops_all_test_actions (test_mock.MockTests) ... ok
+test_final_audit_requires_all_five_success_and_deadline (test_mock.MockTests) ... ok
+test_manifest_initialization_validation (test_mock.MockTests) ... ok
+test_manifest_mismatch_rejected_before_ssh (test_mock.MockTests) ... usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest size mismatch
+usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest SHA mismatch
+usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest format mismatch
+ok
+test_missing_target_rejected_before_prepare (test_mock.MockTests) ... ok
+test_node_final_audit_reads_actual_and_rejects_clock_or_pid_drift (test_mock.MockTests) ... ok
+test_payload_must_exist_and_be_nonempty (test_mock.MockTests) ... ok
+test_radio_request_carries_full_patch_and_targets (test_mock.MockTests) ... ok
+test_radio_request_rejects_incorrect_calibration_flag (test_mock.MockTests) ... ok
+test_server_copies_verified_real_bytes_before_publish (test_mock.MockTests) ... ok
+test_server_rejects_missing_update (test_mock.MockTests) ... ok
+test_streamed_metadata_and_integrity_reject_wrong_sha_or_size (test_mock.MockTests) ... ok
+test_unit_uses_same_node_deadline_as_prepare (test_mock.MockTests) ... ok
+test_unreviewed_execution_does_not_start_ssh (test_mock.MockTests) ... usage: runner [-h] --payload PAYLOAD --model-manifest MODEL_MANIFEST
+              [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: --execute 要求 --reviewed-sha 与当前 bundle SHA 完全匹配
+ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.095s
+
+OK

@@ -1,6 +1,6 @@
 # 04：冻结CIFAR-10 ResNet-18制品并执行四端等量闭环
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 
 ## 目标
@@ -27,5 +27,7 @@ Type: task
 
 第三组角色独立功率、HT20受控标定以及正式CIFAR训练/聚合入口不混入本票。它们在三组筛选和正式训练各自阶段实施。本票不宣称全九端或完整FL生命周期验收。
 
-## Comments
-
+- 真实制品已由提交`f15de65`实现并验证；seed7制品格式为`cifar10-resnet18-fp32-v1`，序列化大小44,770,302字节，SHA与manifest见`evidence/model-sized-four-20261106T173222Z/model-manifest.json`。
+- 149/HT40/MCS3/Long GI/索引18/12,000kbps在固定四端[1,2,4,5]上连续两次完成完整下行、四份等量HTTP上行、服务端独立hash校验，并通过清理、恢复和15W实际审计；证据见`evidence/model-sized-ht40-149-12-20261107T0220Z/`。
+- 157/HT40/MCS3/15,000kbps一次传输中发生fl00 USB网卡reset并导致UFTP退出码9；后续切157因fl02未上线而租约回退149。两项均保留为失败/阻塞事实，不计入149/12成功次数。
+- 当前结果只确认诊断信道149的等量通信候选可执行，不表示正式信道157或三组配置已验收。
