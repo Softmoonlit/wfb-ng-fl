@@ -1,0 +1,14 @@
+[
+  {
+    "host": "fl01",
+    "exit": 255,
+    "out": "",
+    "err": "ssh: connect to host 192.168.0.191 port 22: No route to host\n"
+  },
+  {
+    "host": "fl05",
+    "exit": 0,
+    "out": "{\"host\": \"fl05\", \"limits\": {\"cpu\": \"1497600\", \"gpu\": \"612000000\", \"emc\": \"3199000000\", \"override\": \"0\"}, \"nvpmodel_service\": \"Result=success\\nExecMainStatus=0\\n\"}\n",
+    "err": ""
+  }
+]

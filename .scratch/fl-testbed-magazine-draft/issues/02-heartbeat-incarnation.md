@@ -1,13 +1,13 @@
 # 修复客户端重启后的心跳代际判定
 
-Status: need-for-review
+Status: resolved
 Type: task
 
 ## 问题与证据
 
 fl01 换回原卡并断电重启后，19份独立心跳均配对ACK，但服务端24/24样本仍OFFLINE。原始抓包位于 `../evidence/fl01-card-b-20261106T114401Z/`（重启前请求timestamp约9038344）和 `../evidence/fl01-card-a-return-20261106T115822Z/`（重启后62406..101038）。
 
-`ControlPlaneClient._next_timestamp_ms` 使用本机单调时钟；主机重启后数值下降。`NodeRegistry.update_heartbeat` 将所有较小值当旧包，返回ACK却不更新last_seen。
+`ControlPlaneClient._next_timestamp_ms` 使用本机单调时钟；主机重启后数值下降。`NodeHorizonRegistry.update_heartbeat` 将所有较小值当旧包，返回ACK却不更新last_seen。
 
 注意：`get_status_report.last_heartbeat_timestamp_ms` 是服务端接收的墙上时钟投影，不是线上请求排序值；不得以其1.79e12与请求值比较作为证据。
 
@@ -24,6 +24,10 @@ fl01 换回原卡并断电重启后，19份独立心跳均配对ACK，但服务�
 ## 验证边界
 
 主机重启、守护进程重启、旧代际迟到、同代际乱序/重复、ACK身份、信道/来源校验、正常HUNTING到IDLE闭环。实机统一发布仅使用已提交源码，先核对准确运行身份。fl08/fl10当前断电，不能宣称全10台发布或全9客户端验收。
+
+## Answer
+
+修复提交c7d99b6已在用户授权的在线集合fl00/fl01/fl02/fl04/fl05/fl06统一部署。运行中Python实际加载路径/文件摘要、native摘要及149/HT40/索引18均核验。fl01/fl05在服务端保持PID4270、不清注册表条件下，完成daemon重启和主机重启恢复；原始新序列低于旧序列仍正确接纳。fl01随后断电经用户确认，恢复供电后再完成2分钟24/24 READY补测；五在线客户端均24/24 READY。详见`../../heartbeat-restart/heartbeat-c7d99b691f1c-20261106T131409Z/README.md`。偶发ACK尾延迟、离线四板补发布和完整九客户端验收属于后续，未作为本缺陷全部解决的证据。
 
 ## Comments
 

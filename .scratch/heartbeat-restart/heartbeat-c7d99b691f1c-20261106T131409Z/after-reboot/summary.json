@@ -1,0 +1,36 @@
+{
+  "samples": 24,
+  "nodes": {
+    "1": {
+      "READY": 9,
+      "OFFLINE": 15
+    },
+    "2": {
+      "READY": 24
+    },
+    "4": {
+      "READY": 24
+    },
+    "5": {
+      "READY": 24
+    },
+    "6": {
+      "READY": 24
+    }
+  },
+  "heartbeat": {
+    "fl05": {
+      "requests": 18,
+      "matched_confirmed_ack": 18,
+      "within_230ms": 13,
+      "median_ms": 182.21182400000657,
+      "max_ms": 1221.470801999999,
+      "boot_ids": [
+        "a29350d4c2054163a630034e5b41ffb1"
+      ],
+      "request_states": {
+        "IDLE": 18
+      }
+    }
+  }
+}

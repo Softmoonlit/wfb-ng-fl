@@ -1,0 +1,24 @@
+{
+  "commit": "c7d99b691f1cebae0af9ea5f695fab95351b51c1",
+  "release_id": "heartbeat-c7d99b691f1c-20261106T131409Z",
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl04",
+    "fl05",
+    "fl06"
+  ],
+  "archive_sha": "a4b82b746f2ae123b52e4dda19a5b413aeb455c4ad83af250ef53c6a76bae7b6",
+  "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+  "helper_sha": "c7615c55eb601744ddc2508d681e2d8cc75232b9938be8eafc0a4de86508f18e",
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ]
+}
