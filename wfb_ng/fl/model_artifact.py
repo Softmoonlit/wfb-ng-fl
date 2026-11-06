@@ -49,14 +49,20 @@ def _seed(seed: int, definition: ModelDefinition) -> int:
 
 
 def validate_state_dict(state, definition: ModelDefinition) -> None:
-    """严格检查一个模型格式的 CPU、FP32、稠密且有限参数。"""
+    """严格检查CPU/FP32参数，并按模型结构保留非负int64计数buffer。"""
     with torch.random.fork_rng(devices=[]):
-        expected = definition.model_factory().state_dict()
+        model = definition.model_factory()
+        expected = model.state_dict()
+        integer_buffers = {name for name, value in model.named_buffers()
+                           if value.dtype == torch.int64}
     if type(state) is not dict or set(state) != set(expected):
         raise FLRuntimeError(definition.error_code, f'{definition.artifact_label}参数键不匹配')
     for name, tensor in state.items():
         if (type(tensor) is not torch.Tensor or tensor.layout != torch.strided
-                or tensor.device.type != 'cpu' or tensor.dtype != torch.float32
+                or tensor.device.type != 'cpu' or tensor.dtype != expected[name].dtype
+                or not (tensor.dtype == torch.float32
+                        or (name in integer_buffers and tensor.dtype == torch.int64
+                            and (tensor >= 0).all().item()))
                 or tensor.shape != expected[name].shape
                 or not torch.isfinite(tensor).all().item()):
             raise FLRuntimeError(
@@ -150,7 +156,7 @@ def load_model(model_path: ModelPath, definition: ModelDefinition) -> ModelArtif
     if len(data) > definition.max_model_bytes:
         raise FLRuntimeError(
             definition.error_code,
-            f'{definition.artifact_label}文件超过 1 MiB',
+            f'{definition.artifact_label}文件超过 {definition.max_model_bytes} 字节',
         )
     def cpu_storage(storage: Storage, location: str) -> Storage:
         if location != 'cpu':
