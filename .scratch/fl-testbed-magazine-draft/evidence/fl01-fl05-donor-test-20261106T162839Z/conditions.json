@@ -1,0 +1,22 @@
+{
+  "participants": [
+    1,
+    2,
+    4,
+    5
+  ],
+  "server": "fl00",
+  "excluded_power_off": [
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "replacement": {
+    "fl01": "fl08 donor fc:22:1c:30:0e:99",
+    "fl05": "fl10 donor fc:22:1c:50:0a:88"
+  },
+  "power_change": "用户将fl06电源移给fl05，fl06关机",
+  "comparison_limit": "较前窗口减少fl06，且fl05电源及主机启动已变化，不是严格单变量硬件因果对照"
+}

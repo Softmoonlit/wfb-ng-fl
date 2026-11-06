@@ -1,0 +1,38 @@
+{
+  "duration": {
+    "participants": [
+      "1",
+      "2",
+      "4",
+      "5"
+    ],
+    "duration_seconds": 600,
+    "completed": true,
+    "samples": 120,
+    "elapsed_seconds": 600.0051369590001
+  },
+  "readiness": {
+    "1": {
+      "READY": 120
+    },
+    "2": {
+      "READY": 120
+    },
+    "4": {
+      "READY": 120
+    },
+    "5": {
+      "READY": 120
+    }
+  },
+  "client_hunting_warnings": {
+    "1": 0,
+    "2": 1,
+    "4": 1,
+    "5": 0
+  },
+  "status_projection_pass": true,
+  "client_no_hunting_pass": false,
+  "recipient_processes_unchanged": true,
+  "overall_standby_pass": false
+}
