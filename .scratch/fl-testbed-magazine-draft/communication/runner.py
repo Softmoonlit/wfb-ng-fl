@@ -17,6 +17,8 @@ DIRECTORY = Path(__file__).resolve().parent
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
 TIMING = dict(io_timeout=300, orchestration_timeout=690, node_timeout=705,
               recovery_budget=60, cleanup_timeout=10, unit_stop_timeout=8, close_restore_reserve=40)
+PATCH_DEFAULT = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
+                     radio_txpower_dbm=18, uftp_rate_kbps=15000)
 
 
 def payload_info(path):
@@ -148,7 +150,9 @@ class Session:
         self.stderr.close()
 
 
-def orchestrate(sessions, record, deadline, run_id, payload):
+def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
+    if radio_patch is None:
+        radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
         raise RuntimeError("固定五节点会话不齐")
     def phase(action, hosts=HOSTS, **params):
@@ -170,7 +174,7 @@ def orchestrate(sessions, record, deadline, run_id, payload):
     for host in HOSTS:
         metadata = payload if host == 'fl00' else {k: payload[k] for k in ('size_bytes', 'sha256')}
         pending[host] = sessions[host].call('prepare', run_id=run_id,
-                                         payload=metadata, timing=TIMING)
+                                         payload=metadata, timing=TIMING, patch=radio_patch)
     failures = []
     for host, future in pending.items():
         try:
@@ -197,6 +201,9 @@ def main():
     parser.add_argument('--model-manifest', required=True, type=Path, help='模型 CLI 输出的 JSON manifest')
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
+    parser.add_argument('--uftp-rate-kbps', type=int, default=15000,
+                        choices=range(12000, 18001), metavar='KBIT/S',
+                        help='HT40/MCS3 下行注入速率')
     parser.add_argument('--run-id', default=time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
     parser.add_argument('--output', type=Path, default=DIRECTORY / 'runs')
     args = parser.parse_args()
@@ -205,8 +212,11 @@ def main():
         manifest = model_manifest_info(args.model_manifest, payload)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
+    radio_patch = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3,
+                       uplink_mcs=4, radio_txpower_dbm=18,
+                       uftp_rate_kbps=args.uftp_rate_kbps)
     plan = dict(kind='model-equivalent-communication', hosts=HOSTS, nodes=[1, 2, 4, 5],
-        payload=payload, bytes=payload['size_bytes'], rounds=1, model_manifest=manifest,
+        payload=payload, bytes=payload['size_bytes'], rounds=1, radio_patch=radio_patch, model_manifest=manifest,
         model_manifest_matched=True, model_semantics_validated_by_runner=False, uftp_port=1144,
         http_port=18080, multicast='239.80.41.1', private_multicast='239.80.42.1',
         **TIMING, deadline=TIMING['orchestration_timeout'], bundle_sha256=bundle_sha(), execute=args.execute,
@@ -241,7 +251,7 @@ def main():
             code = (DIRECTORY / 'node_agent.py').read_text()
             for host in HOSTS:
                 sessions[host] = Session(host, code, root, deadline)
-            orchestrate(sessions, record, deadline - TIMING['close_restore_reserve'], args.run_id, payload)
+            orchestrate(sessions, record, deadline - TIMING['close_restore_reserve'], args.run_id, payload, radio_patch)
             transfer_ok = True
         except (Exception, KeyboardInterrupt) as exc:
             record(dict(phase='run', ok=False, error=repr(exc)))

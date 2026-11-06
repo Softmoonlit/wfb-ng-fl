@@ -97,8 +97,16 @@ class Node:
         temporary.write_text(json.dumps(state))
         os.replace(temporary, self.root / 'cleanup-state.json')
 
-    def prepare(self, run_id, payload, timing):
+    def prepare(self, run_id, payload, timing, patch=None):
         # 生命周期从代理启动起算；清理不得再次延长节点总期限。
+        self.patch = dict(PATCH)
+        if patch is not None:
+            require(isinstance(patch, dict), 'invalid radio patch')
+            self.patch.update(patch)
+        require(self.patch['bandwidth_mhz'] == 40 and self.patch['downlink_mcs'] == 3
+                and self.patch['uplink_mcs'] == 4
+                and 12000 <= self.patch['uftp_rate_kbps'] <= 18000,
+                'unsupported HT40 MCS3 patch')
         self.timing = timing
         self.expires = self.started_at + timing['node_timeout']
         signal.setitimer(signal.ITIMER_REAL, max(.001, self.expires - time.monotonic()))
@@ -174,8 +182,8 @@ class Node:
         self.daemon_pid = pid
         if self.node == 0:
             status = self.registry_gate()
-            self.original = {key: status['radio'][key] for key in PATCH}
-            require(self.original == dict(PATCH, channel=self.original['channel'])
+            self.original = {key: status['radio'][key] for key in self.patch}
+            require(self.original == dict(self.patch, channel=self.original['channel'])
                     and self.original['channel'] in (149, 157), 'original radio baseline mismatch')
         sockets = run(['ss', '-H', '-lntu'])
         require(not re.search(r':(?:1144|18080)\s', sockets), 'communication port occupied')
@@ -246,7 +254,7 @@ class Node:
         self.radio_attempted = True
         self.persist_cleanup()
         self.fact('radio_attempted', original=self.original)
-        result = self.radio_transaction('reconfigure', PATCH)
+        result = self.radio_transaction('reconfigure', self.patch)
         return self.fact('radio_acquired', response=result,
                          proof='普通重配事务，不持有守护进程作业准入租约')
 
@@ -255,7 +263,7 @@ class Node:
         result = self.read_radio()
         if self.node == 0:
             status = self.registry_gate()
-            require(all(status['radio'][key] == value for key, value in PATCH.items()), 'server radio configuration mismatch')
+            require(all(status['radio'][key] == value for key, value in self.patch.items()), 'server radio configuration mismatch')
         self.radio_verified = True
         return self.fact('radio_verified', **result)
 
