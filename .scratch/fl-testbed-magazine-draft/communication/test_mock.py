@@ -299,7 +299,7 @@ class MockTests(unittest.TestCase):
             result = node.audit_final()
             self.assertTrue(result['ok'])
             self.assertEqual(result['actual']['resident'], node.resident)
-            read_radio.assert_called_once_with(channels=(149,))
+            read_radio.assert_called_once_with(channels=(149,), expected_bandwidth=40)
             def drift(path, *args, **kwargs):
                 return '1' if str(path).endswith('/mrq_rate_locked') else read(path)
             with patch.object(Path, 'read_text', drift):

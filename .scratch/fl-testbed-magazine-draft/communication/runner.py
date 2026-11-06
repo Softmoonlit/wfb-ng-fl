@@ -202,9 +202,10 @@ def main():
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
     parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
+    parser.add_argument('--bandwidth-mhz', type=int, choices=(20, 40), default=40)
     parser.add_argument('--uftp-rate-kbps', type=int, default=15000,
-                        choices=range(12000, 18001), metavar='KBIT/S',
-                        help='HT40/MCS3 下行注入速率')
+                        choices=range(1, 18001), metavar='KBIT/S',
+                        help='下行注入速率；HT20使用受控标定候选')
     parser.add_argument('--run-id', default=time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
     parser.add_argument('--output', type=Path, default=DIRECTORY / 'runs')
     args = parser.parse_args()
@@ -213,7 +214,7 @@ def main():
         manifest = model_manifest_info(args.model_manifest, payload)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
-    radio_patch = dict(channel=args.channel, bandwidth_mhz=40, downlink_mcs=3,
+    radio_patch = dict(channel=args.channel, bandwidth_mhz=args.bandwidth_mhz, downlink_mcs=3,
                        uplink_mcs=4, radio_txpower_dbm=18,
                        uftp_rate_kbps=args.uftp_rate_kbps)
     plan = dict(kind='model-equivalent-communication', hosts=HOSTS, nodes=[1, 2, 4, 5],

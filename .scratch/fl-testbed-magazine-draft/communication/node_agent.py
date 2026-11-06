@@ -103,10 +103,11 @@ class Node:
         if patch is not None:
             require(isinstance(patch, dict), 'invalid radio patch')
             self.patch.update(patch)
-        require(self.patch['bandwidth_mhz'] == 40 and self.patch['downlink_mcs'] == 3
-                and self.patch['uplink_mcs'] == 4
-                and 12000 <= self.patch['uftp_rate_kbps'] <= 18000,
-                'unsupported HT40 MCS3 patch')
+        require(self.patch['bandwidth_mhz'] in (20, 40) and self.patch['downlink_mcs'] == 3
+                and self.patch['uplink_mcs'] == 4 and 0 < self.patch['uftp_rate_kbps'] <= 18000,
+                'unsupported radio patch')
+        if self.patch['bandwidth_mhz'] == 40:
+            require(12000 <= self.patch['uftp_rate_kbps'] <= 18000, 'unsupported HT40 MCS3 rate')
         self.timing = timing
         self.expires = self.started_at + timing['node_timeout']
         signal.setitimer(signal.ITIMER_REAL, max(.001, self.expires - time.monotonic()))
@@ -174,7 +175,7 @@ class Node:
         require(option(argv, '--tun-addr') == self.ip + '/24', 'native TUN IP mismatch')
         self.interface = option(argv, '--air-interface')
         self.control_port = int(option(argv, '--radio-control-port'))
-        radio_fact = self.read_radio(channels=(149, 157))
+        radio_fact = self.read_radio(channels=(149, 157), expected_bandwidth=40)
         self.original_channel = int(re.search(r'\bchannel (\d+) ', radio_fact['iw']).group(1))
         links = json.loads(run(['ip', '-j', 'addr', 'show', 'dev', self.tun]))
         require(any(a.get('local') == self.ip for a in links[0]['addr_info']), 'actual TUN IP mismatch')
@@ -201,21 +202,28 @@ class Node:
                          payload=self.payload, timing=self.timing,
                          scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
 
-    def read_radio(self, channels=None):
+    def read_radio(self, channels=None, expected_bandwidth=None):
         if channels is None:
             channels = (self.patch['channel'],)
+        if expected_bandwidth is None:
+            expected_bandwidth = self.patch['bandwidth_mhz']
+        expected_mcs = self.patch['downlink_mcs'] if self.node == 0 else self.patch['uplink_mcs']
         require(Path('/sys/class/net', self.interface, 'device/driver').resolve().name == 'rtl88xxau_wfb', 'driver mismatch')
         iw = run(['iw', 'dev', self.interface, 'info'])
         require(any('channel ' + str(channel) + ' ' in iw for channel in channels)
-                and all(text in iw for text in ['width: 40 MHz', 'txpower -18.00 dBm', 'type monitor']), 'iw mismatch')
+                and f'width: {expected_bandwidth} MHz' in iw
+                and all(text in iw for text in ['txpower -18.00 dBm', 'type monitor']), 'iw mismatch')
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.settimeout(3)
             sock.sendto(struct.pack('!IB', 0x434f4d4d, 4), ('127.0.0.1', self.control_port))
             raw, address = sock.recvfrom(4096)
         radio = struct.unpack('!II7B', raw)
         require(address == ('127.0.0.1', self.control_port) and radio[:2] == (0x434f4d4d, 0)
-                and radio[4:7] == (0, 40, 3 if self.node == 0 else 4), 'GET radio mismatch')
+                and radio[5:7] == (expected_bandwidth, expected_mcs), 'GET radio mismatch')
         return dict(iw=iw, get_radio=list(radio))
+
+    def _old_read_radio_removed(self):
+        raise AssertionError()
 
     def registry_gate(self):
         require(self.node == 0, 'registry IPC is server localhost only')
@@ -261,7 +269,8 @@ class Node:
         self.radio_attempted = True
         self.persist_cleanup()
         self.fact('radio_attempted', original=self.original)
-        result = self.radio_transaction('reconfigure', self.patch)
+        endpoint = 'calibrate' if self.patch['bandwidth_mhz'] == 20 else 'reconfigure'
+        result = self.radio_transaction(endpoint, self.patch)
         return self.fact('radio_acquired', response=result,
                          proof='普通重配事务，不持有守护进程作业准入租约')
 
@@ -354,7 +363,7 @@ class Node:
         require(self.prepared and self.closed, 'audit requires prepared/closed')
         actual = {}
         try:
-            actual['radio'] = self.read_radio(channels=(self.original_channel,))
+            actual['radio'] = self.read_radio(channels=(self.original_channel,), expected_bandwidth=40)
             actual['resident'] = {}
             for pid, tick in self.resident.items():
                 current = Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()[19]
