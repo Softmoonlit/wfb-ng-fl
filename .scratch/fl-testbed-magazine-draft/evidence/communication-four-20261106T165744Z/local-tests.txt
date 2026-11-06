@@ -1,0 +1,17 @@
+{"kind": "basic-communication-smoke", "hosts": ["fl00", "fl01", "fl02", "fl04", "fl05"], "nodes": [1, 2, 4, 5], "bytes": 1048576, "rounds": 1, "formal_resnet_equivalent": false, "uftp_port": 1144, "http_port": 18080, "multicast": "239.80.41.1", "private_multicast": "239.80.42.1", "io_timeout": 60, "deadline": 210, "recovery_budget": 60, "bundle_sha256": "a4638926dae73388fcc3db61b241369db335459c2568d53669abd6f0cad3caf1", "execute": false, "boundary": "\u4ec5\u57fa\u7840 transport\uff1b\u4e0d\u9a8c\u6536\u6b63\u5f0f\u4f5c\u4e1a\u751f\u547d\u5468\u671f\u6216\u5c04\u9891\u6240\u6709\u6743\uff1b\u666e\u901a\u91cd\u914d\u4e0d\u6301\u6709\u4f5c\u4e1a\u51c6\u5165\u79df\u7ea6"}
+{"kind": "basic-communication-smoke", "hosts": ["fl00", "fl01", "fl02", "fl04", "fl05"], "nodes": [1, 2, 4, 5], "bytes": 1048576, "rounds": 1, "formal_resnet_equivalent": false, "uftp_port": 1144, "http_port": 18080, "multicast": "239.80.41.1", "private_multicast": "239.80.42.1", "io_timeout": 60, "deadline": 210, "recovery_budget": 60, "bundle_sha256": "a4638926dae73388fcc3db61b241369db335459c2568d53669abd6f0cad3caf1", "execute": true, "boundary": "\u4ec5\u57fa\u7840 transport\uff1b\u4e0d\u9a8c\u6536\u6b63\u5f0f\u4f5c\u4e1a\u751f\u547d\u5468\u671f\u6216\u5c04\u9891\u6240\u6709\u6743\uff1b\u666e\u901a\u91cd\u914d\u4e0d\u6301\u6709\u4f5c\u4e1a\u51c6\u5165\u79df\u7ea6"}
+test_all_prepare_and_publish_overlap_then_submit (test_mock.MockTests) ... ok
+test_cleanup_retains_route_when_interface_identity_changes (test_mock.MockTests) ... ok
+test_dry_run_never_starts_ssh (test_mock.MockTests) ... ok
+test_failed_prepare_stops_all_test_actions (test_mock.MockTests) ... ok
+test_radio_request_carries_full_patch_and_targets (test_mock.MockTests) ... ok
+test_radio_request_rejects_incorrect_calibration_flag (test_mock.MockTests) ... ok
+test_unreviewed_execution_does_not_start_ssh (test_mock.MockTests) ... usage: runner [-h] [--execute] [--reviewed-sha REVIEWED_SHA] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: --execute 要求 --reviewed-sha 与当前 bundle SHA 完全匹配
+ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.020s
+
+OK

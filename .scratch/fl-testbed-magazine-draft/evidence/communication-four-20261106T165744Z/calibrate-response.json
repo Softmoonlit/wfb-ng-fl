@@ -1,0 +1,8 @@
+{
+  "http": 400,
+  "body": {
+    "error": "invalid_radio_request",
+    "message": "Calibration requires explicit bandwidth_mhz, downlink_mcs and uftp_rate_kbps"
+  },
+  "elapsed_seconds": 0.0020967029995517805
+}

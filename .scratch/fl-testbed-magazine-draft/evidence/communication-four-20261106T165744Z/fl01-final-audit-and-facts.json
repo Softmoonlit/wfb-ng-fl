@@ -1,0 +1,35 @@
+{
+  "host": "fl01",
+  "native_pid": "5867",
+  "interface": "wlxfc221c300e99",
+  "iw": "Interface wlxfc221c300e99\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+  "radio": [
+    812347,
+    0,
+    0,
+    0,
+    0,
+    40,
+    4,
+    0,
+    1
+  ],
+  "routes": {
+    "239.80.41.1/32": [],
+    "239.80.42.1/32": []
+  },
+  "nvpmodel": "NV Power Mode: 15W\n0\n",
+  "files": {
+    "cleanup-state.json": "{\"host\": \"fl01\", \"tun\": \"fl-c1\", \"ifindex\": 16, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c1\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c1\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"5847\": \"1017632\", \"5867\": \"1018004\"}, \"daemon_pid\": 5847, \"radio_attempted\": false, \"original\": null}",
+    "facts.jsonl": "{\"event\": \"prepared\", \"monotonic\": 12887.496579011, \"daemon_pid\": 5847, \"native_pid\": 5867, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c1\", \"ifindex\": 16, \"radio\": {\"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261106T160330Z/source/wfb_ng/fl\", \"scope\": \"transport only; no job lifecycle or RF ownership claim\"}\n{\"event\": \"radio_verified\", \"monotonic\": 12893.524782638, \"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 12893.993047248}\n{\"event\": \"receive_verified\", \"monotonic\": 12898.668164076, \"path\": \"/srv/wfb-ng-fl/comm-smoke-157-1m/role/rounds/681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.bin\", \"size\": 1048576, \"sha256\": \"fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83\"}\n{\"event\": \"update_sent\", \"monotonic\": 12903.116778214, \"node\": 1}\n{\"event\": \"cleanup\", \"monotonic\": 12903.176270788, \"ok\": true, \"errors\": [], \"resident_pids\": [\"5847\", \"5867\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+    "independent-cleanup.json": "{\"ok\": true, \"unit\": \"comm-smoke-smoke-157-1m-fl01.service\", \"active\": \"inactive\", \"errors\": []}",
+    "role/current-round.json": "{\"role\":\"client\",\"round_id\":\"681cf4e4-3656-4327-91df-1e27bd8b1dc5\",\"schema_version\":1}\n",
+    "role/inbox/681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.manifest.json": "{\"artifact_type\":\"model\",\"participant_node_ids\":[1,2,4,5],\"round_id\":\"681cf4e4-3656-4327-91df-1e27bd8b1dc5\",\"schema_version\":1,\"sha256\":\"fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83\",\"size_bytes\":1048576}\n",
+    "role/rounds/681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.manifest.json": "{\"artifact_type\":\"model\",\"participant_node_ids\":[1,2,4,5],\"round_id\":\"681cf4e4-3656-4327-91df-1e27bd8b1dc5\",\"schema_version\":1,\"sha256\":\"fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83\",\"size_bytes\":1048576}\n",
+    "role/rounds/681cf4e4-3656-4327-91df-1e27bd8b1dc5/round-state.json": "{\"role\":\"client\",\"round_id\":\"681cf4e4-3656-4327-91df-1e27bd8b1dc5\",\"schema_version\":1,\"state\":\"succeeded\"}\n",
+    "role/rounds/681cf4e4-3656-4327-91df-1e27bd8b1dc5/update.manifest.json": "{\"artifact_type\":\"update\",\"node_id\":1,\"round_id\":\"681cf4e4-3656-4327-91df-1e27bd8b1dc5\",\"schema_version\":1,\"sha256\":\"fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83\",\"size_bytes\":1048576}\n",
+    "role/runtime.lock": "",
+    "role/uftpd.log": "2026/11/07 01:15:56.140424: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/11/07 01:15:56.141016: Loaded ECDSA key with curve prime256v1 and fingerprint 78:7B:DA:63:2A:9F:76:D0:4E:59:5C:36:13:22:4B:E5:D8:B8:9C:3D\n2026/11/07 01:15:56.285655: [03BE0622/00:0]: Received request from 00000064 at 10.80.0.1 (10.80.0.1)\n2026/11/07 01:15:56.285731: [03BE0622/00:0]: Using private multicast address 239.80.42.1\n2026/11/07 01:15:56.286073: [03BE0622/00:0]: REGISTER sent\n2026/11/07 01:15:56.642721: [03BE0622/00:0]: Registration confirmed\n2026/11/07 01:15:56.997796: [03BE0622/00:0001]: Name of file to receive: 681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.bin\n2026/11/07 01:15:56.997900: [03BE0622/00:0001]: Bytes: 1048576, Blocks: 807, Sections: 1\n2026/11/07 01:15:56.998822: [03BE0622/00:0001]: FILEINFO_ACK sent\n2026/11/07 01:15:57.859057: [03BE0622/00:0001]: Got DONE message for section 0\n2026/11/07 01:15:57.863549: [03BE0622/00:0001]: File transfer complete\n2026/11/07 01:15:57.863847: [03BE0622/00:0001]: COMPLETE sent\n2026/11/07 01:15:57.863939: [03BE0622/00:0001]: starting file close\n2026/11/07 01:15:57.863996: [03BE0622/00:0001]: done file close\n2026/11/07 01:15:58.818988: [03BE0622/00:0001]: Got DONE message for section 0\n2026/11/07 01:15:59.293063: [03BE0622/00:0001]: Got DONE message for section 0\n2026/11/07 01:15:59.375104: [03BE0622/00:0002]: Name of file to receive: 681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.manifest.json\n2026/11/07 01:15:59.375204: [03BE0622/00:0002]: Bytes: 225, Blocks: 1, Sections: 1\n2026/11/07 01:15:59.376151: [03BE0622/00:0002]: FILEINFO_ACK sent\n2026/11/07 01:15:59.892961: [03BE0622/00:0002]: Got DONE message for section 0\n2026/11/07 01:15:59.895000: [03BE0622/00:0002]: File transfer complete\n2026/11/07 01:15:59.895196: [03BE0622/00:0002]: COMPLETE sent\n2026/11/07 01:15:59.895326: [03BE0622/00:0002]: starting file close\n2026/11/07 01:15:59.895372: [03BE0622/00:0002]: done file close\n2026/11/07 01:16:00.285572: [03BE0622/00:0]: Got DONE message for group\n2026/11/07 01:16:00.285680: [03BE0622/00:0]: Group complete\n2026/11/07 01:16:00.285801: [03BE0622/00:0]: COMPLETE sent\n2026/11/07 01:16:00.676068: [03BE0622/00:0]: Group file transfer confirmed\n2026/11/07 01:16:05.291998: Exiting on signal 15\n",
+    "role/uftpd.status": "CONNECT;2026/11/07-01:15:56;00000064;03BE0622;10.80.0.1;10.80.0.1\nRESULT;2026/11/07-01:15:57;00000064;03BE0622;681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.bin;1024KB;copied\nRESULT;2026/11/07-01:15:59;00000064;03BE0622;681cf4e4-3656-4327-91df-1e27bd8b1dc5/model.manifest.json;0KB;copied\n"
+  }
+}
