@@ -39,7 +39,7 @@ fl01/fl05最后功耗和射频读回见fl01-final-power-radio.txt、fl05-final-p
 
 ## 收尾状态变化
 
-最后2分钟窗口五客户端均24/24 READY；之后收尾快照fl02转OFFLINE，心跳年龄约202秒，管理SSH超时且ping无响应，原因待确认（未直接认定断电）。fl01/fl04/fl05/fl06仍READY。证据fl02-final-reachability.json及final-status.json。本报告的2分钟通过结论仅针对采样窗口，不能推断收尾全体稳定。
+最后2分钟窗口五客户端均24/24 READY；之后收尾快照fl02转OFFLINE，心跳年龄约202秒，管理SSH超时且ping无响应。用户随后确认fl02电池没电，将稍后充电，明确本轮不再处理，因此按供电中断记录，不计作无线故障，不再尝试连接。fl01/fl04/fl05/fl06仍READY。证据fl02-final-reachability.json及final-status.json。本报告的2分钟通过结论仅针对采样窗口，不能推断收尾全体在线。
 
 ## 边界
 
