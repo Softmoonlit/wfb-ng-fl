@@ -16,9 +16,13 @@ preflight：fl00、fl01、fl05、fl06通过；fl04 SSH连接超时。按完整�
 
 没有执行stage/prepare/stop/install/start/audit任何后续阶段，没有停止任何节点服务，没有混合发布。当前运行仍是已发布c7d99b6，GI仍Short；本轮未宣称Long GI实机验收成功。
 
+## 后续恢复
+
+用户恢复fl02/fl04供电后，该五目标preflight已重新通过，state记录仅完成preflight。因为在线集合增加fl02，本轮改建完整六目标发布批次，本目录不再推进后续阶段；没有在此批次停服或安装。初次失败输出保留在Git历史及fl04-reachability.json中。
+
 ## 恢复入口
 
-fl04供电及管理网络恢复后，保持本轮五目标完整，不删目标；重新执行：
+以下命令是当时五目标批次的恢复入口；当前发布器已显式冻结新六目标，不再用它继续本批次。
 
 ```bash
 python3 .scratch/heartbeat-restart/release-online.py preflight \

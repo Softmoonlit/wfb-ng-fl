@@ -9,7 +9,7 @@ import subprocess
 import sys
 import tarfile
 
-TARGETS = {'fl00', 'fl01', 'fl04', 'fl05', 'fl06'}
+TARGETS = {'fl00', 'fl01', 'fl02', 'fl04', 'fl05', 'fl06'}
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 BASE = pathlib.Path(__file__).resolve().parent
 PHASES = ['preflight', 'stage', 'prepare', 'stop', 'install', 'start', 'audit']
@@ -32,7 +32,7 @@ if len(sys.argv) >= 2 and sys.argv[1] == 'init':
     if not targets or len(set(targets)) != len(targets) or targets[0] != 'fl00':
         raise SystemExit('targets 必须去重且必须包含首位 fl00')
     if set(targets) != TARGETS:
-        raise SystemExit('本轮 targets 必须精确为 fl00 fl01 fl04 fl05 fl06')
+        raise SystemExit('本轮 targets 必须精确为 fl00 fl01 fl02 fl04 fl05 fl06')
     checked(['git', 'diff', '--exit-code', '--', 'src'])
     checked(['git', 'diff', '--cached', '--exit-code', '--', 'src'])
     checked(['git', 'diff', '--exit-code', 'd898d21', commit, '--', 'src', 'fec.c', 'fec.h'])
