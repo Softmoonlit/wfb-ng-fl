@@ -29,5 +29,5 @@ Type: task
 
 - 真实制品已由提交`f15de65`实现并验证；seed7制品格式为`cifar10-resnet18-fp32-v1`，序列化大小44,770,302字节，SHA与manifest见`evidence/model-sized-four-20261106T173222Z/model-manifest.json`。
 - 149/HT40/MCS3/Long GI/索引18/12,000kbps在固定四端[1,2,4,5]上连续两次完成完整下行、四份等量HTTP上行、服务端独立hash校验，并通过清理、恢复和15W实际审计；证据见`evidence/model-sized-ht40-149-12-20261107T0220Z/`。
-- 157/HT40/MCS3/15,000kbps一次传输中发生fl00 USB网卡reset并导致UFTP退出码9；后续切157因fl02未上线而租约回退149。两项均保留为失败/阻塞事实，不计入149/12成功次数。
-- 当前结果只确认诊断信道149的等量通信候选可执行，不表示正式信道157或三组配置已验收。
+- 157/HT40/MCS3/12,000kbps、157/HT20/MCS3/6,000kbps及149/HT20/MCS3/6,000kbps的真实模型下行均触发fl00同一USB SuperSpeed设备reset并以UFTP退出码9失败；三次均未进入完整HTTP上传闭环，详见`evidence/model-sized-failures-20261107T0304Z/README.md`。
+- 每次失败后均标准重启五台服务并恢复149/HT40/15,000kbps和四端READY/IDLE。带宽受限组和正式157均未通过通信验收，不能继续重复长流尝试。
