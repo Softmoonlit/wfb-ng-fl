@@ -201,7 +201,9 @@ class Node:
                          payload=self.payload, timing=self.timing,
                          scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
 
-    def read_radio(self, channels=(157,)):
+    def read_radio(self, channels=None):
+        if channels is None:
+            channels = (self.patch['channel'],)
         require(Path('/sys/class/net', self.interface, 'device/driver').resolve().name == 'rtl88xxau_wfb', 'driver mismatch')
         iw = run(['iw', 'dev', self.interface, 'info'])
         require(any('channel ' + str(channel) + ' ' in iw for channel in channels)
