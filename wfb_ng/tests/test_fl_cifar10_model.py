@@ -1,12 +1,12 @@
 """验证 CIFAR10 ResNet18 初始模型制品的公开边界。"""
 
+import json
 import subprocess
 import sys
 
 import pytest
 
 torch = pytest.importorskip('torch')
-torch.set_num_threads(1)
 
 from wfb_ng.fl.artifacts import file_sha256
 from wfb_ng.fl.cifar10_model import (
@@ -18,12 +18,22 @@ from wfb_ng.fl.cifar10_model import (
 from wfb_ng.fl.errors import FLRuntimeError
 
 
+@pytest.fixture(scope='module', autouse=True)
+def bounded_cpu_threads():
+    previous = torch.get_num_threads()
+    torch.set_num_threads(1)
+    yield
+    torch.set_num_threads(previous)
+
+
 def test_cifar10_resnet18_roundtrip_and_structure(tmp_path):
+    random_state = torch.get_rng_state().clone()
     first, second = tmp_path / 'first.pt', tmp_path / 'second.pt'
     digest = initialize_model(first, seed=7)
     initialize_model(second, seed=7)
     artifact = load_model(first)
     repeated = load_model(second)
+    assert torch.equal(torch.get_rng_state(), random_state)
 
     assert artifact.sha256 == digest == file_sha256(first)
     assert artifact.initialization_seed == 7
@@ -82,6 +92,10 @@ def test_cifar10_resnet18_cli_generates_identified_model(tmp_path):
     result = subprocess.run(command, text=True, capture_output=True, timeout=30)
 
     assert result.returncode == 0, result.stderr
-    assert MODEL_FORMAT in result.stdout
-    assert 'size_bytes' in result.stdout
-    assert file_sha256(path)
+    metadata = json.loads(result.stdout)
+    assert metadata['model_format'] == MODEL_FORMAT
+    assert metadata['size_bytes'] == path.stat().st_size
+    assert metadata['sha256'] == file_sha256(path)
+    assert metadata['initialization']['seed'] == 7
+    assert metadata['parameter_count'] == 11173962
+    assert metadata['dtype_statistics']['int64'] == {'elements': 20, 'bytes': 160}

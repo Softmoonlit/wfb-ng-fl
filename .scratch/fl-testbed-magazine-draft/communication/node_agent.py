@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import shutil
 import socket
 import struct
 import subprocess
@@ -21,9 +22,6 @@ NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 WRAPPER_SHA = 'd68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6'
 NODES = [1, 2, 4, 5]
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
-SIZE = 1048576
-PAYLOAD = bytes(range(256)) * (SIZE // 256)
-DIGEST = hashlib.sha256(PAYLOAD).hexdigest()
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
              radio_txpower_dbm=18, uftp_rate_kbps=15000)
 
@@ -34,7 +32,11 @@ def require(value, message):
 
 
 def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def run(argv):
@@ -72,6 +74,9 @@ class Node:
         self.release_result = None
         self.radio_verified = False
         self.closing = False
+        self.started_at = time.monotonic()
+        self.expires = None
+        self.timing = None
 
     def fact(self, event, **data):
         record = dict(event=event, monotonic=time.monotonic(), **data)
@@ -86,12 +91,30 @@ class Node:
                      ifindex=getattr(self, 'ifindex', None), routes=self.routes,
                      resident=self.resident, daemon_pid=getattr(self, 'daemon_pid', None),
                      radio_attempted=self.radio_attempted,
-                     original=getattr(self, 'original', None))
+                     original=getattr(self, 'original', None),
+                     original_channel=getattr(self, 'original_channel', None))
         temporary = self.root / 'cleanup-state.tmp'
         temporary.write_text(json.dumps(state))
         os.replace(temporary, self.root / 'cleanup-state.json')
 
-    def prepare(self, run_id):
+    def prepare(self, run_id, payload, timing):
+        # 生命周期从代理启动起算；清理不得再次延长节点总期限。
+        self.timing = timing
+        self.expires = self.started_at + timing['node_timeout']
+        signal.setitimer(signal.ITIMER_REAL, max(.001, self.expires - time.monotonic()))
+        require(type(payload.get('size_bytes')) is int
+                and 1 <= payload['size_bytes'] <= 64 * 1024 * 1024,
+                'invalid payload size')
+        require(isinstance(payload.get('sha256'), str)
+                and re.fullmatch(r'[0-9a-f]{64}', payload['sha256']), 'invalid payload SHA')
+        self.payload = dict(payload)
+        if self.node == 0:
+            require(isinstance(payload.get('path'), str) and Path(payload['path']).is_absolute(),
+                    'server payload path required')
+            require(Path(payload['path']).is_file(), 'server payload file absent')
+            self.check_file(payload['path'])
+        else:
+            require(set(payload) == {'size_bytes', 'sha256'}, 'client metadata only')
         require(not self.root and re.fullmatch(r'[A-Za-z0-9_-]{1,64}', run_id), 'invalid run id/state')
         require(os.geteuid() == 0, 'root required')
         self.lock = open('/srv/wfb-ng-fl/communication.lock', 'a')
@@ -144,6 +167,7 @@ class Node:
         self.interface = option(argv, '--air-interface')
         self.control_port = int(option(argv, '--radio-control-port'))
         radio_fact = self.read_radio(channels=(149, 157))
+        self.original_channel = int(re.search(r'\bchannel (\d+) ', radio_fact['iw']).group(1))
         links = json.loads(run(['ip', '-j', 'addr', 'show', 'dev', self.tun]))
         require(any(a.get('local') == self.ip for a in links[0]['addr_info']), 'actual TUN IP mismatch')
         self.ifindex = links[0]['ifindex']
@@ -161,7 +185,8 @@ class Node:
         return self.fact('prepared', daemon_pid=pid, native_pid=int(proc.name), native_sha=NATIVE_SHA,
                          tun=self.tun, ifindex=self.ifindex, radio=radio_fact,
                          wrapper_sha=WRAPPER_SHA, installed=str(base), source=str(source),
-                         scope='transport only; no job lifecycle or RF ownership claim')
+                         payload=self.payload, timing=self.timing,
+                         scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
 
     def read_radio(self, channels=(157,)):
         require(Path('/sys/class/net', self.interface, 'device/driver').resolve().name == 'rtl88xxau_wfb', 'driver mismatch')
@@ -263,8 +288,8 @@ class Node:
                 self.routes[group] = json.loads(run(['ip', '-j', 'route', 'show', 'exact', group]))
                 self.persist_cleanup()
         common = dict(work_dir=str(self.root / 'role'), uftp_port=1144,
-                      max_update_size_bytes=SIZE, uftp_bind_host=self.ip,
-                      uftp_multicast_host='239.80.41.1', io_timeout=60)
+                      max_update_size_bytes=self.payload['size_bytes'], uftp_bind_host=self.ip,
+                      uftp_multicast_host='239.80.41.1', io_timeout=self.timing['io_timeout'])
         if self.node == 0:
             self.role = self.role_module.ServerRole(participant_node_id=NODES, participant_uftp_uid=NODES,
                 server_uftp_uid=100, http_port=18080, http_host=self.ip,
@@ -278,14 +303,18 @@ class Node:
 
     def check_file(self, path):
         path = Path(path)
-        require(path.stat().st_size == SIZE and sha(path) == DIGEST, 'payload integrity mismatch')
-        return dict(path=str(path), size=SIZE, sha256=DIGEST)
+        require(path.stat().st_size == self.payload['size_bytes']
+                and sha(path) == self.payload['sha256'], 'payload integrity mismatch')
+        return dict(path=str(path), size_bytes=path.stat().st_size, sha256=self.payload['sha256'])
 
     def publish(self):
         require(self.started and not self.closed, 'role not running')
         if self.node == 0:
             path = self.root / 'payload.bin'
-            path.write_bytes(PAYLOAD)
+            # 只服务端复制真实字节；复制前后校验，避免源文件变动漏检。
+            self.check_file(self.payload['path'])
+            shutil.copyfile(self.payload['path'], path)
+            self.check_file(path)
             self.runtime.publish_model(str(path))
             return self.fact('send_complete', round_id=self.runtime.round_id, **self.check_file(path))
         self.received = self.runtime.wait_for_model()
@@ -294,7 +323,7 @@ class Node:
     def submit(self):
         require(self.started and not self.closed, 'role not running')
         if self.node == 0:
-            self.updates = self.runtime.wait_for_updates(min_updates=4, timeout=60)
+            self.updates = self.runtime.wait_for_updates(min_updates=4, timeout=self.timing['io_timeout'])
             require(set(self.updates) == set(NODES), 'missing updates')
             return self.fact('updates_received', nodes=sorted(self.updates))
         require(self.received is not None, 'receive barrier absent')
@@ -305,6 +334,33 @@ class Node:
     def verify(self):
         require(self.node == 0 and self.updates is not None and not self.closed, 'update verify gate')
         return self.fact('updates_verified', files={str(n): self.check_file(self.updates[n]) for n in NODES})
+
+    def audit_final(self):
+        require(self.prepared and self.closed, 'audit requires prepared/closed')
+        actual = {}
+        try:
+            actual['radio'] = self.read_radio(channels=(self.original_channel,))
+            actual['resident'] = {}
+            for pid, tick in self.resident.items():
+                current = Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()[19]
+                actual['resident'][pid] = current
+                require(current == tick, 'resident identity changed: ' + pid)
+            actual['nvpmodel'] = run(['nvpmodel', '-q'])
+            require(actual['nvpmodel'].strip() == 'NV Power Mode: 15W\n0', 'nvpmodel mismatch')
+            # 路径来自既有五端 board-power 审计及 audit-jtop.py，仅只读。
+            expected = {'/sys/devices/system/cpu/online': '0-5',
+                        '/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq': '612000000',
+                        '/sys/kernel/nvpmodel_clk_cap/emc': '2133000000',
+                        '/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked': '0'}
+            for core in range(6):
+                base = '/sys/devices/system/cpu/cpu' + str(core)
+                expected[base + '/online'] = '1'
+                expected[base + '/cpufreq/scaling_max_freq'] = '1497600'
+            actual['files'] = {path: Path(path).read_text().strip() for path in expected}
+            require(actual['files'] == expected, 'power/clock mismatch')
+            return self.fact('audit_final', ok=True, actual=actual)
+        except Exception as exc:
+            return self.fact('audit_final', ok=False, actual=actual, error=repr(exc))
 
     def close(self):
         if self.cleanup_result is not None:
@@ -343,21 +399,21 @@ def main():
     protocol = sys.stdout
     def hard_timeout(signum, frame):
         if node.root:
-            (node.root / 'cleanup_timeout').write_text('清理超过十秒；临时 unit 回收剩余自有进程\n')
+            (node.root / 'cleanup_timeout').write_text('清理期限届满；临时 unit 回收剩余自有进程\n')
         os._exit(124)
     def begin_cleanup():
         if not node.closing:
             node.closing = True
             signal.signal(signal.SIGALRM, hard_timeout)
-            signal.alarm(10)
+            remaining = max(.001, node.expires - time.monotonic()) if node.expires else .001
+            signal.setitimer(signal.ITIMER_REAL, min(node.timing['cleanup_timeout'], remaining)
+                             if node.timing else remaining)
     def interrupted(signum, frame):
         raise SystemExit(128 + signum)
     for sig in [signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGALRM]:
         signal.signal(sig, interrupted)
-    signal.alarm(225)  # 整体期限届满后，finally 最多再清理十秒。
-    expires = time.monotonic() + 225
     actions = ['prepare', 'acquire_radio', 'verify_radio', 'start_receive',
-               'publish', 'submit', 'verify', 'close', 'release_radio']
+               'publish', 'submit', 'verify', 'close', 'release_radio', 'audit_final']
     try:
         for line in sys.stdin:
             request = json.loads(line)
@@ -372,10 +428,10 @@ def main():
             except Exception as exc:
                 response = dict(id=request['id'], ok=False, error=repr(exc))
             finally:
-                if request.get('action') == 'close' and node.closed:
+                if request.get('action') == 'close' and node.closed and node.expires is not None:
                     node.closing = False
                     signal.signal(signal.SIGALRM, interrupted)
-                    signal.alarm(max(1, int(expires - time.monotonic())))
+                    signal.setitimer(signal.ITIMER_REAL, max(.001, node.expires - time.monotonic()))
             protocol.write(json.dumps(response) + '\n')
             protocol.flush()
     finally:
@@ -387,7 +443,7 @@ def main():
                 # 跨节点角色关闭和射频恢复由父编排及独立回收统一协调。
                 if node.lock:
                     node.lock.close()
-        signal.alarm(0)
+        signal.setitimer(signal.ITIMER_REAL, 0)
 
 
 if __name__ == '__main__':

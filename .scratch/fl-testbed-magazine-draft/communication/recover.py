@@ -44,7 +44,8 @@ def main():
             result = json.load(response)
         ok = result.get('status') == 'finalized' and result.get('calibration') is False
         ok = ok and all(result['effective_config'][k] == v for k, v in state['original'].items())
-        output = dict(ok=ok, attempted=True, response=result)
+        # 独立恢复缺少原代理五端审计，RF 响应成功不能宣称最终恢复通过。
+        output = dict(ok=False, rf_response_ok=ok, audited=False, attempted=True, response=result)
         (root / 'independent-restore.json').write_text(json.dumps(output))
         return output
     unit = 'comm-smoke-' + run_id + '-' + host + '.service'
