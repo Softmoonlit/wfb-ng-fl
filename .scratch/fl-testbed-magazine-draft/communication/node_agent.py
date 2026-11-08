@@ -17,8 +17,8 @@ import sys
 import time
 import urllib.request
 
-COMMIT = 'c98853fa008a945e3a87503051bae49f5d0083bd'
-RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-c98853fa008a-20261108T093030Z'
+COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
+RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 # fl00 实际 PATH 中的 UFTP 5.0.3；运行依赖独立于 release 源码 manifest。
 UFTP_SHA256 = {
@@ -140,7 +140,7 @@ class Node:
         temporary.write_text(json.dumps(state))
         os.replace(temporary, self.root / 'cleanup-state.json')
 
-    def prepare(self, run_id, payload, timing, patch=None, expected_native=None, release_root=RELEASE_ROOT):
+    def prepare(self, run_id, payload, timing, patch=None, expected_native=None, release_root=RELEASE_ROOT, release_commit=COMMIT):
         # 生命周期从代理启动起算；清理不得再次延长节点总期限。
         self.expected_native = dict(expected_native) if expected_native is not None else dict(
             fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
@@ -185,7 +185,7 @@ class Node:
         pid = int(run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip())
         require(pid > 0, 'daemon absent')
         daemon_argv = Path('/proc', str(pid), 'cmdline').read_bytes().decode().rstrip('\0').split('\0')
-        release_identity = self.verify_standard_release(pid, daemon_argv, release_root)
+        release_identity = self.verify_standard_release(pid, daemon_argv, release_root, release_commit)
         base = Path(release_identity['installed'])
         source = Path(release_root) / 'source/wfb_ng/fl'
         role_module = importlib.import_module('wfb_ng.fl.role')
@@ -241,10 +241,12 @@ class Node:
                          runtime_dependencies=self.runtime_dependencies,
                          scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
 
-    def verify_standard_release(self, pid, daemon_argv, release_root):
+    def verify_standard_release(self, pid, daemon_argv, release_root, release_commit=COMMIT):
+        require(isinstance(release_commit, str) and re.fullmatch(r'[0-9a-f]{40}', release_commit),
+                'invalid release commit')
         release = Path(release_root)
         require(release.is_absolute() and release.parent == Path('/srv/wfb-ng-fl/releases')
-                and release.name.startswith('heartbeat-' + COMMIT[:12] + '-'), 'unexpected release')
+                and re.fullmatch('heartbeat-' + release_commit[:12] + r'-[0-9]{8}T[0-9]{6}Z', release.name), 'unexpected release')
         module = 'wfb_ng.fl.' + ('server' if self.node == 0 else 'client') + '_daemon'
         require(daemon_argv[:5] == ['/usr/bin/python3', '-I', '-B', '-m', module],
                 'standard isolated daemon entry required')
@@ -253,14 +255,14 @@ class Node:
         require(daemon_argv == json.loads((release / 'actualargs.json').read_text()),
                 'release actualargs mismatch')
         manifest = json.loads((release / 'manifest.json').read_text())
-        require(manifest['commit'] == COMMIT and manifest['native_sha'] == NATIVE_SHA,
+        require(manifest['commit'] == release_commit and manifest['native_sha'] == NATIVE_SHA,
                 'release identity mismatch')
         base = Path(manifest['installed']).resolve()
         require(str(base).startswith('/usr/') and base.parts[-2:] == ('wfb_ng', 'fl'),
                 'installed source required')
         verify_source_files(base, release / 'source/wfb_ng/fl', manifest['files'])
         identity = json.loads((base / 'build_identity.json').read_text())
-        require(identity['commit'] == COMMIT, 'installed build identity mismatch')
+        require(identity['commit'] == release_commit, 'installed build identity mismatch')
         probe = ('import importlib,json; names=' + repr([module, 'wfb_ng.fl.role']) +
                  '; print(json.dumps({name:importlib.import_module(name).__file__ for name in names}))')
         resolved = json.loads(run(['/usr/bin/python3', '-I', '-B', '-c', probe]))
@@ -268,7 +270,7 @@ class Node:
             path = Path(resolved[name]).resolve()
             require(path == base / (name.rsplit('.', 1)[1] + '.py'), 'isolated module origin mismatch')
             require(sha(path) == manifest['files'][path.name], 'isolated module SHA mismatch')
-        return dict(commit=COMMIT, release_root=str(release), installed=str(base),
+        return dict(commit=release_commit, release_root=str(release), installed=str(base),
                     files=manifest['files'], pid=pid, actualargs=daemon_argv, resolved=resolved,
                     verification='current proc argv/executable plus isolated module resolution and SHA')
 

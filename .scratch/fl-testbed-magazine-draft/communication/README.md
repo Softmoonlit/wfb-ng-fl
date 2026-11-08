@@ -1,8 +1,8 @@
 # 十客户端通信 runner
 
-服务端固定 fl00，客户端固定 fl01/fl02/fl03/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,3,4,5,6,7,8,9,10]`。使用已安装 c98853f 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。c98853f commit、release 路径、完整安装身份、native SHA 门槛保留，库存不符会拒绝 prepare。
+服务端固定 fl00，客户端固定 fl01/fl02/fl03/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,3,4,5,6,7,8,9,10]`。使用已安装 88099f0 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。88099f0 commit、release 路径、完整安装身份、native SHA 门槛保留，库存不符会拒绝 prepare。
 
-标准部署身份只接受 `/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon/client_daemon`。`--release-root` 默认 `/srv/wfb-ng-fl/releases/heartbeat-c98853fa008a-20261108T093030Z`，用于读取 manifest、actualargs 和冻结 source；commit 固定 `c98853fa008a945e3a87503051bae49f5d0083bd`。prepare 核对当前 MainPID 的 proc argv 与 executable、发布 actualargs、完整安装/源码 SHA、build identity，再用独立 `-I -B` 解释器导入 daemon/role 核对解析路径和 SHA。此证据不宣称读取活进程 sys.modules；不读取历史 loaded.json，不支持 daemon.py wrapper。当前 native 期望 grant15/guard5。
+标准部署身份只接受 `/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon/client_daemon`。`--release-commit` 默认 `88099f04ffaee56c576bb35a9e50baec5f1113d7`，`--release-root` 默认 `/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z`。后续发布可显式传入二者，无需改源码；commit 必须为完整 40 位小写 SHA，root 必须为 `/srv/wfb-ng-fl/releases/heartbeat-<commit前12位>-<UTC时间戳>`，两层均严格校验。prepare 核对当前 MainPID 的 proc argv 与 executable、发布 actualargs、完整安装/源码 SHA，以及 manifest/build identity 与期望 commit 精确一致，再用独立 `-I -B` 解释器导入 daemon/role 核对解析路径和 SHA。此证据不宣称读取活进程 sys.modules；不读取历史 loaded.json，不支持 daemon.py wrapper。当前 native 期望 grant15/guard5。
 
 ## 载荷与执行门槛
 
@@ -48,4 +48,4 @@ HT40 下行 MCS4、12000kbps 候选的 acquire_radio 使用专用 calibrate endp
 python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
 ```
 
-49 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
+52 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。

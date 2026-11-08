@@ -240,14 +240,71 @@ class MockTests(unittest.TestCase):
                 node.acquire_radio()
             transaction.assert_called_once_with(endpoint, node.patch)
 
+    def test_release_cli_maps_exact_commit_root_and_rejects_mismatch_before_processes(self):
+        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        candidate = 'b' * 40
+        root = '/srv/wfb-ng-fl/releases/heartbeat-' + candidate[:12] + '-20300101T000000Z'
+        self.assertEqual(runner.RELEASE_COMMIT, node_agent.COMMIT)
+        self.assertEqual(runner.RELEASE_ROOT, node_agent.RELEASE_ROOT)
+        with patch('sys.argv', argv + ['--release-commit', candidate, '--release-root', root]), patch(
+                'sys.stdout', new_callable=io.StringIO) as output, patch('runner.subprocess.Popen') as spawn:
+            self.assertEqual(runner.main(), 0)
+        plan = json.loads(output.getvalue())
+        self.assertEqual(plan['release_commit'], candidate)
+        self.assertEqual(plan['release_root'], root)
+        self.assertEqual(plan['expected_native']['fec_k'], 8)
+        spawn.assert_not_called()
+        for commit, path in [(candidate, runner.RELEASE_ROOT), ('short', root),
+                (candidate.upper(), root), (candidate, '/tmp/' + Path(root).name),
+                (candidate, root + '-extra')]:
+            with patch('sys.argv', argv + ['--release-commit', commit, '--release-root', path]), patch(
+                    'sys.stderr', new_callable=io.StringIO), patch('runner.subprocess.Popen') as spawn:
+                with self.assertRaises(SystemExit) as error:
+                    runner.main()
+                self.assertEqual(error.exception.code, 2)
+                spawn.assert_not_called()
+
+    def test_explicit_release_and_fec_metadata_reach_all_prepare_calls(self):
+        commit = 'e' * 40
+        root = '/srv/wfb-ng-fl/releases/heartbeat-' + commit[:12] + '-20300101T000000Z'
+        expected = dict(fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=5)
+        radio = dict(runner.PATCH_DEFAULT, downlink_mcs=4, uftp_rate_kbps=12000)
+        sessions = {host: Mock() for host in runner.HOSTS}
+        for session in sessions.values():
+            def reply(action, **params):
+                future = futures.Future()
+                future.set_result(dict(ok=True))
+                return future
+            session.call.side_effect = reply
+        runner.orchestrate(sessions, lambda value: None, time.monotonic() + 1,
+                           'mapping', self.payload, radio, expected, root, commit)
+        for host, session in sessions.items():
+            call = session.call.call_args_list[0]
+            self.assertEqual(call.args, ('prepare',))
+            self.assertEqual(call.kwargs['release_root'], root)
+            self.assertEqual(call.kwargs['release_commit'], commit)
+            self.assertEqual(call.kwargs['expected_native'], expected)
+            self.assertEqual(call.kwargs['patch'], radio)
+
+    def test_agent_rejects_commit_root_mismatch_before_reading_release(self):
+        node = self.node()
+        with patch.object(Path, 'read_text') as read:
+            with self.assertRaisesRegex(RuntimeError, 'unexpected release'):
+                node.verify_standard_release(123, [], node_agent.RELEASE_ROOT, 'c' * 40)
+            with self.assertRaisesRegex(RuntimeError, 'invalid release commit'):
+                node.verify_standard_release(123, [], node_agent.RELEASE_ROOT, 'short')
+        read.assert_not_called()
+
     def test_standard_release_checks_current_process_and_ignores_historical_loaded(self):
         base = Path('/usr/local/lib/python3.10/dist-packages/wfb_ng/fl')
-        release = Path(node_agent.RELEASE_ROOT)
+        candidate_commit = 'a' * 40
+        release = Path('/srv/wfb-ng-fl/releases') / ('heartbeat-' + candidate_commit[:12] + '-20300101T000000Z')
         for host, role in [('fl00', 'server'), ('fl03', 'client')]:
             node = self.node(host)
             module = 'wfb_ng.fl.' + role + '_daemon'
             argv = ['/usr/bin/python3', '-I', '-B', '-m', module, '--config', '/etc/node.json']
-            manifest = dict(commit=node_agent.COMMIT, native_sha=node_agent.NATIVE_SHA,
+            build_commit = [candidate_commit]
+            manifest = dict(commit=candidate_commit, native_sha=node_agent.NATIVE_SHA,
                 installed=str(base), files={role + '_daemon.py': 'digest', 'role.py': 'digest'})
             def read(path, *args, **kwargs):
                 if path == release / 'actualargs.json':
@@ -255,7 +312,7 @@ class MockTests(unittest.TestCase):
                 if path == release / 'manifest.json':
                     return json.dumps(manifest)
                 if path == base / 'build_identity.json':
-                    return json.dumps(dict(commit=node_agent.COMMIT))
+                    return json.dumps(dict(commit=build_commit[0]))
                 raise AssertionError('unexpected identity file: ' + str(path))
             def resolve(path, *args, **kwargs):
                 return Path('/usr/bin/python3') if path == Path('/proc/123/exe') else path
@@ -263,19 +320,23 @@ class MockTests(unittest.TestCase):
             with patch.object(Path, 'read_text', read), patch.object(Path, 'resolve', resolve), patch(
                     'node_agent.verify_source_files') as sources, patch('node_agent.sha', return_value='digest'), patch(
                     'node_agent.run', return_value=json.dumps(resolved)) as command:
-                result = node.verify_standard_release(123, argv, str(release))
+                result = node.verify_standard_release(123, argv, str(release), candidate_commit)
                 self.assertEqual(result['pid'], 123)
                 sources.assert_called_once_with(base, release / 'source/wfb_ng/fl', manifest['files'])
                 self.assertEqual(command.call_args.args[0][:4], ['/usr/bin/python3', '-I', '-B', '-c'])
                 with self.assertRaisesRegex(RuntimeError, 'standard isolated daemon entry'):
-                    node.verify_standard_release(123, ['/usr/bin/python3', '-I', '-B', str(release / 'daemon.py')], str(release))
+                    node.verify_standard_release(123, ['/usr/bin/python3', '-I', '-B', str(release / 'daemon.py')], str(release), candidate_commit)
                 command.return_value = json.dumps({**resolved, module: '/tmp/daemon.py'})
                 with self.assertRaisesRegex(RuntimeError, 'isolated module origin'):
-                    node.verify_standard_release(123, argv, str(release))
+                    node.verify_standard_release(123, argv, str(release), candidate_commit)
                 command.return_value = json.dumps(resolved)
+                build_commit[0] = 'd' * 40
+                with self.assertRaisesRegex(RuntimeError, 'installed build identity'):
+                    node.verify_standard_release(123, argv, str(release), candidate_commit)
+                build_commit[0] = candidate_commit
                 manifest['commit'] = 'old-commit'
                 with self.assertRaisesRegex(RuntimeError, 'release identity'):
-                    node.verify_standard_release(123, argv, str(release))
+                    node.verify_standard_release(123, argv, str(release), candidate_commit)
 
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
@@ -370,6 +431,7 @@ class MockTests(unittest.TestCase):
                             assert params['timing'] == runner.TIMING
                             assert params['expected_native'] == dict(fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
                             assert params['release_root'] == runner.RELEASE_ROOT
+                            assert params['release_commit'] == runner.RELEASE_COMMIT
                             expected = dict(self_test.payload)
                             if self.host != 'fl00':
                                 expected.pop('path')

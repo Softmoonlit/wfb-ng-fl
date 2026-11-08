@@ -17,7 +17,8 @@ import time
 NODES = list(range(1, 11))
 HOSTS = [f'fl{node:02d}' for node in range(11)]
 DIRECTORY = Path(__file__).resolve().parent
-RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-c98853fa008a-20261108T093030Z'
+RELEASE_COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
+RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
 DIRECTION_TIMEOUT = 600
 ORCHESTRATION_TIMEOUT = 2 * DIRECTION_TIMEOUT + 90
@@ -241,7 +242,7 @@ def wait_submit(pending, deadline, run_id, record):
             next_sample = now + 5
 
 
-def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, expected_native=None, release_root=RELEASE_ROOT):
+def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, expected_native=None, release_root=RELEASE_ROOT, release_commit=RELEASE_COMMIT):
     if radio_patch is None:
         radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
@@ -272,7 +273,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
         pending[host] = sessions[host].call('prepare', run_id=run_id,
                                          payload=metadata, timing=TIMING, patch=radio_patch,
                                          expected_native=expected_native or dict(fec_k=8, fec_n=14,
-                                             grant_duration_ms=15, guard_interval_ms=5), release_root=release_root)
+                                             grant_duration_ms=15, guard_interval_ms=5), release_root=release_root, release_commit=release_commit)
     by_future = {future: host for host, future in pending.items()}
     for future in futures.as_completed(by_future, timeout=max(.01, deadline - time.monotonic())):
         host = by_future[future]
@@ -305,6 +306,7 @@ def main():
     parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
     parser.add_argument('--bandwidth-mhz', type=int, choices=(20, 40), default=40)
     parser.add_argument('--release-root', default=RELEASE_ROOT)
+    parser.add_argument('--release-commit', default=RELEASE_COMMIT)
     parser.add_argument('--fec-n', type=int, choices=(12, 14), default=14)
     parser.add_argument('--grant-duration-ms', type=int, default=15)
     parser.add_argument('--guard-interval-ms', type=int, default=5)
@@ -318,9 +320,14 @@ def main():
     args = parser.parse_args()
     if args.grant_duration_ms <= 0 or args.guard_interval_ms < 0:
         parser.error('grant duration must be positive and guard interval nonnegative')
+    if not re.fullmatch(r'[0-9a-f]{40}', args.release_commit):
+        parser.error('--release-commit must be a full lowercase commit SHA')
+    release = Path(args.release_root)
+    if (not release.is_absolute() or release.parent != Path('/srv/wfb-ng-fl/releases')
+            or not re.fullmatch('heartbeat-' + args.release_commit[:12] + r'-[0-9]{8}T[0-9]{6}Z', release.name)):
+        parser.error('--release-root must match --release-commit under /srv/wfb-ng-fl/releases')
     expected_native = dict(fec_k=8, fec_n=args.fec_n, grant_duration_ms=args.grant_duration_ms,
                            guard_interval_ms=args.guard_interval_ms)
-    import re
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', args.run_id):
         parser.error('invalid run id')
     if args.smoke and args.model_manifest:
@@ -351,7 +358,7 @@ def main():
                        uftp_rate_kbps=args.uftp_rate_kbps)
     plan = dict(kind='synthetic-smoke-communication' if args.smoke else 'model-equivalent-communication',
         payload_mode='smoke' if args.smoke else 'model', generated_payload=args.smoke, hosts=HOSTS, nodes=NODES,
-        payload=payload, bytes=payload['size_bytes'], rounds=1, radio_patch=radio_patch, expected_native=expected_native, release_root=args.release_root, model_manifest=manifest,
+        payload=payload, bytes=payload['size_bytes'], rounds=1, radio_patch=radio_patch, expected_native=expected_native, release_root=args.release_root, release_commit=args.release_commit, model_manifest=manifest,
         model_manifest_matched=not args.smoke, model_semantics_validated_by_runner=False, uftp_port=1144,
         http_port=18080, multicast='239.80.41.1', private_multicast='239.80.42.1',
         **TIMING, deadline=TIMING['orchestration_timeout'], bundle_sha256=bundle_sha(), execute=args.execute,
@@ -383,7 +390,7 @@ def main():
             code = (DIRECTORY / 'node_agent.py').read_text()
             for host in HOSTS:
                 sessions[host] = Session(host, code, root, deadline)
-            orchestrate(sessions, record, deadline - TIMING['close_restore_reserve'], args.run_id, payload, radio_patch, expected_native, args.release_root)
+            orchestrate(sessions, record, deadline - TIMING['close_restore_reserve'], args.run_id, payload, radio_patch, expected_native, args.release_root, args.release_commit)
             transfer_ok = True
         except (Exception, KeyboardInterrupt) as exc:
             record(dict(phase='run', ok=False, error=repr(exc)))
