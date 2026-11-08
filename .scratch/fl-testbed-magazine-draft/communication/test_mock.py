@@ -262,7 +262,7 @@ class MockTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
                 node.registry_gate()
 
-    def test_prepare_source_identity_rejects_extra_missing_non_python_and_tampering(self):
+    def test_prepare_source_identity_with_build_identity_rejects_extra_missing_and_tampering(self):
         installed = Path(self.temporary.name) / 'installed'
         source = Path(self.temporary.name) / 'source'
         installed.mkdir()
@@ -272,7 +272,17 @@ class MockTests(unittest.TestCase):
         for directory in (installed, source):
             for name in files:
                 (directory / name).write_bytes(b'# frozen')
+        identity = json.dumps(dict(commit=node_agent.COMMIT, dirty=False)).encode()
+        (installed / 'build_identity.json').write_bytes(identity)
+        files['build_identity.json'] = hashlib.sha256(identity).hexdigest()
         node_agent.verify_source_files(installed, source, files)
+        (installed / 'build_identity.json').write_bytes(b'{}')
+        with self.assertRaisesRegex(RuntimeError, 'installed manifest mismatch build_identity.json'):
+            node_agent.verify_source_files(installed, source, files)
+        (installed / 'build_identity.json').unlink()
+        with self.assertRaises(FileNotFoundError):
+            node_agent.verify_source_files(installed, source, files)
+        (installed / 'build_identity.json').write_bytes(identity)
         for directory in (installed, source):
             with self.subTest(directory=str(directory)):
                 extra = directory / 'extra.py'
@@ -288,8 +298,8 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'manifest mismatch|source mismatch'):
                     node_agent.verify_source_files(installed, source, files)
                 missing.write_bytes(b'# frozen')
-        for name in ('extra.txt', 'nested/role.py', '../role.py'):
-            with self.subTest(manifest_name=name), self.assertRaisesRegex(RuntimeError, 'only top-level Python'):
+        for name in ('nested/role.py', '../role.py', '..', '.'):
+            with self.subTest(manifest_name=name), self.assertRaisesRegex(RuntimeError, 'only top-level files'):
                 node_agent.verify_source_files(installed, source, dict(files, **{name: '0' * 64}))
         with self.assertRaisesRegex(RuntimeError, 'file set mismatch'):
             node_agent.verify_source_files(installed, source, dict(files, **{'extra.py': '0' * 64}))

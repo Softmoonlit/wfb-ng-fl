@@ -25,7 +25,7 @@ model 计划使用 `kind=model-equivalent-communication`、`model_manifest_match
 
 ## 无线与回收边界
 
-- 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 文件集合三者严格相等，manifest 只能包含顶层 `.py` 文件；服务端要求完整九客户端 READY/IDLE 且无活动作业。十节点 prepare 全通过后才重配和启动角色。
+- 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 中 `.py` 条目集合三者严格相等；manifest 允许 `build_identity.json` 等顶层非 Python 文件，所有 manifest 条目都逐文件核验安装 SHA，Python 文件另核验冻结源码 SHA；服务端要求完整九客户端 READY/IDLE 且无活动作业。十节点 prepare 全通过后才重配和启动角色。
 - 默认 157/40MHz/Long GI/功率索引18、MCS3/4、RS(8,14)、UFTP 12000kbps，使用普通 reconfigure。现有 HT20 选项保持 calibrate 行为。工具不持有 daemon 的作业准入租约，测试期间不得并发启动其他 FL 任务。
 - GET 必须实际返回 `short_gi=0`，并验证带宽和 MCS；不能仅凭计划宣称 Long GI。UFTP 1144、HTTP 18080 和 239.80.41.1/239.80.42.1 保持固定。
 - 期限集中在 `TIMING`：阶段 I/O 300 秒，主编排 690 秒，节点信号及临时 unit 生命周期 705 秒，独立回收预算 60 秒。回收使用编排开始后 750 秒绝对截止点，不逐次重置预算。

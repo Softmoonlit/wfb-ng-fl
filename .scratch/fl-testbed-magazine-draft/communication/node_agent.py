@@ -41,16 +41,17 @@ def sha(path):
 
 def verify_source_files(base, source, files):
     """安装目录、冻结源码与 manifest 必须包含完全相同的顶层 Python 文件。"""
-    require(isinstance(files, dict) and bool(files), 'Python manifest files required')
-    require(all(isinstance(name, str) and Path(name).name == name and name.endswith('.py')
-                for name in files), 'manifest must contain only top-level Python files')
+    require(isinstance(files, dict) and bool(files), 'manifest files required')
+    require(all(isinstance(name, str) and Path(name).name == name and name not in ('.', '..')
+                for name in files), 'manifest must contain only top-level files')
     require(source.is_dir(), 'frozen release source absent')
     installed_names = {path.name for path in base.glob('*.py')}
     source_names = {path.name for path in source.glob('*.py')}
-    require(installed_names == source_names == set(files), 'Python source file set mismatch')
+    require(installed_names == source_names == {name for name in files if name.endswith('.py')}, 'Python source file set mismatch')
     for name, digest in files.items():
         require(sha(base / name) == digest, 'installed manifest mismatch ' + name)
-        require(sha(source / name) == digest, 'release source mismatch ' + name)
+        if name.endswith('.py'):
+            require(sha(source / name) == digest, 'release source mismatch ' + name)
 
 
 def run(argv):
