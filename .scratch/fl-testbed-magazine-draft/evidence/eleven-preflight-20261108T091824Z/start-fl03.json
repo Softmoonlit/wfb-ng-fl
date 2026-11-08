@@ -1,0 +1,17 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=6",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "fl03",
+    "sudo -n /usr/bin/python3 -"
+  ],
+  "utc": "2026-11-08T09:23:02.258899+00:00",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl03\", \"phase\": \"start\"}\n",
+  "stderr": ""
+}

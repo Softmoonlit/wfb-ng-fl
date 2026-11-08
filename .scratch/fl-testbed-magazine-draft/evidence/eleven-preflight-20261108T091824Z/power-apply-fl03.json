@@ -1,0 +1,17 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=6",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "fl03",
+    "sudo -n /usr/bin/python3 -"
+  ],
+  "utc": "2026-11-08T09:23:12.640470+00:00",
+  "exit": 0,
+  "stdout": "{\"boot\": \"c65dc463-dc5c-4223-9e78-568228c720f6\\n\", \"disable-jtop\": {\"exit\": 0, \"out\": \"\", \"err\": \"Removed /etc/systemd/system/multi-user.target.wants/jtop.service.\\n\"}, \"apply-mode0\": {\"exit\": 234, \"out\": \"NVPM WARN: Golden image context is already created\\nNVPM WARN: Reboot required for changing to this power mode: 0\\nNVPM WARN: DO YOU WANT TO REBOOT NOW? enter YES/yes to confirm:\\nNVPM ERROR: optMask is 1, no request for power mode\\n\", \"err\": \"\"}, \"query\": {\"exit\": 0, \"out\": \"NVPM VERB: Config file: /etc/nvpmodel.conf\\nNVPM VERB: parsing done for /etc/nvpmodel.conf\\nNVPM VERB: Using default settings.\\nNVPM WARN: power mode is not set!\\nNVPM VERB: Using default settings.\\n\", \"err\": \"\"}, \"service\": {\"exit\": 0, \"out\": \"Result=exit-code\\nExecMainStatus=234\\n\", \"err\": \"\"}}\n",
+  "stderr": ""
+}

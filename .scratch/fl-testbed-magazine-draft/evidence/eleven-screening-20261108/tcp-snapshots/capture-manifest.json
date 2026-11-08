@@ -1,0 +1,44 @@
+{
+  "directory": ".scratch/fl-testbed-magazine-draft/evidence/eleven-screening-20261108/tcp-snapshots",
+  "run": "eleven-A-g18d2-model-20261108-1",
+  "recovery_only": true,
+  "remote_recollection_performed": false,
+  "source": "prior tool output in conversation",
+  "stream_limitation": "tool display did not expose independent stdout/stderr streams",
+  "captures": [
+    {
+      "host": "fl03",
+      "timestamp_utc": "2026-11-08T10:01:37.201741158Z",
+      "command": "ss -tinop dst 10.80.0.1 dport = :18080",
+      "stdout_file": "fl03.ss.stdout.recovered",
+      "stderr_file": "fl03.ss.stderr.recovered",
+      "wrapper_stderr_file": "fl03.wrapper.stderr.recovered"
+    },
+    {
+      "host": "fl08",
+      "timestamp_utc": "2026-11-08T10:01:37.788505682Z",
+      "command": "ss -tinop dst 10.80.0.1 dport = :18080",
+      "stdout_file": "fl08.ss.stdout.recovered",
+      "stderr_file": "fl08.ss.stderr.recovered",
+      "wrapper_stderr_file": "fl08.wrapper.stderr.recovered"
+    },
+    {
+      "host": "fl04",
+      "timestamp_utc": "2026-11-08T10:01:37.901178903Z",
+      "command": "ss -tinop dst 10.80.0.1 dport = :18080",
+      "stdout_file": "fl04.ss.stdout.recovered",
+      "stderr_file": "fl04.ss.stderr.recovered",
+      "wrapper_stderr_file": "fl04.wrapper.stderr.recovered"
+    },
+    {
+      "host": "fl00",
+      "timestamp_utc": "2026-11-08T10:03:46.836797347Z",
+      "command": "ss -tinop src 10.80.0.1 sport = :18080",
+      "stdout_file": "fl00.ss.stdout.recovered",
+      "stderr_file": "fl00.ss.stderr.recovered",
+      "followup_stdout_file": "fl00.unfiltered-followup.ss.stdout.recovered",
+      "note": "Local fl00 read after upload termination; no active 18080 socket was visible. This is not a synchronized in-upload receiver snapshot."
+    }
+  ],
+  "access_failures_preserved_file": "access-failures.recovered"
+}

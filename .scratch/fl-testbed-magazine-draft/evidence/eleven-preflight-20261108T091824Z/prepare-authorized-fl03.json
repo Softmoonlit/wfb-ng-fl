@@ -1,0 +1,17 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=6",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "fl03",
+    "sudo -n /usr/bin/python3 -"
+  ],
+  "utc": "2026-11-08T09:22:59.982462+00:00",
+  "exit": 0,
+  "stdout": "{\"root\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z\", \"iface\": \"wlx5cffffaf6d8c\", \"files\": [\"__init__.py\", \"algorithm.py\", \"artifacts.py\", \"cifar10_model.py\", \"client_daemon.py\", \"console.py\", \"console_http.py\", \"control.py\", \"coordinator.py\", \"errors.py\", \"evidence.py\", \"fp64_audit.py\", \"issue41_fixtures.py\", \"link_radio.py\", \"mnist.py\", \"mnist_cnn_32_64.py\", \"mnist_cnn_model.py\", \"mnist_data.py\", \"mnist_deployment.py\", \"model_artifact.py\", \"model_library.py\", \"observation.py\", \"radio.py\", \"reference_model.py\", \"role.py\", \"runtime.py\", \"server_daemon.py\", \"service.py\", \"static/console.css\", \"static/console.js\", \"static/evaluation-curves.js\", \"static/index.html\", \"static/models.css\", \"static/models.html\", \"static/models.js\", \"static/radio.css\", \"static/radio.html\", \"static/radio.js\", \"transport.py\"], \"binaries\": {\"wfb_v6_uplink\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"uftp\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"uftpd\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\"}}\n",
+  "stderr": ""
+}

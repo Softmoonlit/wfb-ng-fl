@@ -1,0 +1,13 @@
+{
+  "command": [
+    "scp",
+    ".scratch/heartbeat-restart/heartbeat-98dda459fb9a-20261108T073921Z/source.tar",
+    "/usr/bin/wfb_v6_uplink",
+    "/usr/bin/uftp",
+    "/usr/bin/uftpd",
+    "fl03:/tmp/heartbeat-98dda459fb9a-20261108T073921Z/"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

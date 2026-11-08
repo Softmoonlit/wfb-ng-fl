@@ -1,0 +1,17 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=6",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "fl04",
+    "sudo -n /usr/bin/python3 -"
+  ],
+  "utc": "2026-11-08T09:22:05.836067+00:00",
+  "exit": 0,
+  "stdout": "MainPID=13618\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c300f04 ; ignore_errors=no ; start_time=[Sun 2026-11-08 17:22:05 CST] ; stop_time=[n/a] ; pid=13618 ; code=(null) ; status=0/0 }\n\nInterface wlxfc221c300f04\n\tifindex 25\n\twdev 0x300000001\n\taddr fc:22:1c:30:0f:04\n\ttype managed\n\twiphy 3\n\ttxpower -18.00 dBm\n\n",
+  "stderr": ""
+}

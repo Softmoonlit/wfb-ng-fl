@@ -1,0 +1,17 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=6",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "fl03",
+    "sudo -n /usr/bin/python3 -"
+  ],
+  "utc": "2026-11-08T09:23:24.595444+00:00",
+  "exit": 255,
+  "stdout": "",
+  "stderr": "Connection to 192.168.0.193 closed by remote host.\n"
+}
