@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "matrix": "five ordered FEC14/guard10 candidates with exactly one execute each, durations, verification/cleanup/restore, source/native/tool SHA and original_stop_error/recoveryhistory",
+  "checkpoint": "last controller stage; wall/monotonic and controller PID; updated on every transition and each 5s runner poll",
+  "execution_summary": "verified aggregate and exact-nine update set validation",
+  "candidate_raw": "runner progress.jsonl and logs, scheduler diff, gate snapshots, frozen bundle, before/after actual baseline audits",
+  "driver": "v1 original power-recovery controller; v2 startup recovery; v3 explicit 15s state probe with preserved metadata issue; v4 actual final controller; raw errors kept separately",
+  "limits": "small payload timings are screening, not model-capacity results; FEC14 only; fl04 excluded and not contacted in this batch"
+}

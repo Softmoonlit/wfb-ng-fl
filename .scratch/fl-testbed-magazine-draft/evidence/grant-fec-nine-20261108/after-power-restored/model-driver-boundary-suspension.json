@@ -1,0 +1,15 @@
+{
+  "driver_pid": 116223,
+  "runner_pid": 147474,
+  "runner_state": "Z",
+  "raw_final": {
+    "wall": 1794145597.5172827,
+    "monotonic": 26311.624810101,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false
+  },
+  "wall": 1794145597.5550952,
+  "note": "No signal sent to runner or residents; local sequencing driver suspended after final result to prevent next schedule"
+}

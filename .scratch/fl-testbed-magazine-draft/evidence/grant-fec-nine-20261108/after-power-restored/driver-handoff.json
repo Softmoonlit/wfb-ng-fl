@@ -1,0 +1,13 @@
+{
+  "reason": "explicit 15s readiness gate handoff only after candidate40 result; no active RF transaction interrupted",
+  "runner_result": {
+    "wall": 1794142900.5097146,
+    "monotonic": 23614.617241786,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  },
+  "driver_pid": 105070,
+  "wall": 1794142902.1306303
+}

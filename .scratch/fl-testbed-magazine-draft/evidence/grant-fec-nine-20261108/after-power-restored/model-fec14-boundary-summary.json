@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "status": "stopped",
+  "reason": "model30 upload600 deadline; fl09 SSH cleanup timed out and later No route to host; all-stop gate failed, so RF restore not attempted; reachable boards remain157",
+  "tested": [
+    {
+      "grant": 10,
+      "guard": 10,
+      "execute_count": 1,
+      "DLduration": 115.99194141800035,
+      "ULduration": 559.4092499639992,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "verified_server_files": {
+        "1": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/1/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "2": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/2/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "3": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/3/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "5": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/5/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "6": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/6/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "7": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/7/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "8": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/8/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "9": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/9/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "10": {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/updates/10/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      },
+      "last_observable_upload_snapshot": {
+        "wall": 1794144072.5521157,
+        "monotonic": 24786.659643073,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 1,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 2,
+              "bytes": 44564480,
+              "partial_bytes": 44564480,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 3,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 5,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 6,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 7,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 8,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 9,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "c26f3c4d-a2f6-400e-a85a-c784c45a2607",
+              "node": 10,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/model-fec14-g10-d10"
+    },
+    {
+      "grant": 20,
+      "guard": 10,
+      "execute_count": 1,
+      "DLduration": 128.09338332699917,
+      "ULduration": 600.0405782199996,
+      "raw_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "independent_restore_ok": true,
+      "verified_server_files": {},
+      "last_observable_upload_snapshot": {
+        "wall": 1794144835.7176983,
+        "monotonic": 25549.825225953,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 1,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 2,
+              "bytes": 29294592,
+              "partial_bytes": 29294592,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 3,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 5,
+              "bytes": 11730944,
+              "partial_bytes": 11730944,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 6,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 7,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 8,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 9,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "391d429f-ed7d-4d7c-904f-ac506f01c861",
+              "node": 10,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/model-fec14-g20-d10"
+    },
+    {
+      "grant": 30,
+      "guard": 10,
+      "execute_count": 1,
+      "DLduration": 110.51858389399786,
+      "ULduration": 600.0252042380016,
+      "raw_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": false,
+        "restore_ok": false
+      },
+      "independent_restore_ok": false,
+      "verified_server_files": {},
+      "last_observable_upload_snapshot": {
+        "wall": 1794145583.5782838,
+        "monotonic": 26297.685811763,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 1,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 2,
+              "bytes": 3866624,
+              "partial_bytes": 3866624,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 3,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 5,
+              "bytes": 16121856,
+              "partial_bytes": 16121856,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 6,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 7,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 8,
+              "bytes": 9240576,
+              "partial_bytes": 9240576,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 9,
+              "bytes": 16842752,
+              "partial_bytes": 16842752,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "d927359d-0b66-4231-a0f5-865628b93c0c",
+              "node": 10,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/model-fec14-g30-d10"
+    }
+  ],
+  "pending_grants": [
+    40,
+    60
+  ],
+  "total_model_executes": 3,
+  "driver_and_local_runners_exited": true,
+  "fl09_remote_unit_unconfirmed": true,
+  "radio_on_reachable_boards": 157,
+  "server_schedule": "30/10",
+  "new_guard5_started": false,
+  "models_retried": false,
+  "FEC_changed": false,
+  "tool_bundle_unchanged": true,
+  "pause_mechanism": "external supervisor observed raw final result; suspended sequencer PID116223 only; audited after runner exit; terminated sequencer after audit; no runner/native signals",
+  "wall": 1794145654.6714213
+}

@@ -1,0 +1,205 @@
+{
+  "partial_recovery": true,
+  "reachable_recovered": false,
+  "complete_batch_restore": false,
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl10"
+  ],
+  "fl09_management": {
+    "started_monotonic": 26464.276806277,
+    "finished_monotonic": 26467.363865255,
+    "ping": {
+      "returncode": 1,
+      "stdout": "PING 192.168.0.199 (192.168.0.199) 56(84) bytes of data.\n\n--- 192.168.0.199 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1027ms\n\n",
+      "stderr": ""
+    },
+    "ssh": {
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.199 port 22: No route to host\n"
+    },
+    "neighbor": {
+      "returncode": 0,
+      "stdout": "192.168.0.199 dev enP8p1s0  INCOMPLETE\n",
+      "stderr": ""
+    }
+  },
+  "fl09_owned_unit": "unknown; not contacted again",
+  "excluded_fl04_not_contacted": true,
+  "server_schedule": "10/10",
+  "target_channel": 149,
+  "grant5_executed": false,
+  "payload_sent": false,
+  "FEC_changed": false,
+  "elapsed": 77.34147762700013,
+  "deadline_seconds": 90,
+  "audit_checks": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true,
+        "schedule": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": false
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "checks": {
+        "native_count": false,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": true
+      },
+      "error": null,
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "checks": {
+        "native_count": true,
+        "service_active": true,
+        "owned_inactive": true,
+        "power": true,
+        "manifest": true,
+        "source_sha": true,
+        "proc_sha": true,
+        "radio": true,
+        "fec": true,
+        "iw": false
+      },
+      "error": null,
+      "stderr": ""
+    }
+  ]
+}

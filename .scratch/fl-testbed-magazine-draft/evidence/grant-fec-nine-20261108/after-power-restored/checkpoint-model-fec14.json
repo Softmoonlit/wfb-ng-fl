@@ -1,0 +1,21 @@
+{
+  "status": "stopped",
+  "stage": "partial_fault_closeout_not_fully_verified",
+  "wall": 1794145873.9266677,
+  "monotonic": 26588.03419629,
+  "server_schedule": "10/10",
+  "unreachable": [
+    "fl09"
+  ],
+  "audit_incomplete": [
+    "fl01",
+    "fl07",
+    "fl10"
+  ],
+  "pending_grants": [
+    40,
+    60
+  ],
+  "new_guard5_started": false,
+  "no_active_local_runner": true
+}

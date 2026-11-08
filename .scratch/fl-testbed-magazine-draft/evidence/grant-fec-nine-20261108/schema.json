@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "matrix": "ordered five FEC14 candidates; each stage/outcome and exact execution count; pending entries unattempted",
+  "checkpoint": "wall/monotonic/pid/current stage, refreshed at stage changes and during waits",
+  "candidate_files": {
+    "scheduler-change.json": "only grant/guard configuration diff and server PID readback",
+    "readiness-observations.jsonl": "raw status snapshots during the single <=30s readiness window",
+    "gate-result.json": "last status, exact fail nodes and gate duration",
+    "after-audit.json": "all participating host probes, raw errors, GET radio/FEC, source/native SHA, 15W and fl04 service check"
+  },
+  "duration_semantics": "DLduration/ULduration are null when no publish/submit was dispatched; transfer_verified=false is not evidence of a measured RF file failure",
+  "restore_semantics": "restore_ok=false indicates independent full baseline health could not be confirmed; no smoke radio changes occurred"
+}

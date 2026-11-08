@@ -1,0 +1,67 @@
+{"monotonic": 23441.019977779, "status": "running", "grant": 20, "stage": "resume_candidate_before_execute"}
+{"monotonic": 23441.021946407, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 23442.349488466, "status": "running", "grant": 20, "stage": "audit_before"}
+{"monotonic": 23443.367715881, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23443.371502094, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23448.379956607, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23453.388719891, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23458.395948249, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23463.403897004, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23468.40824844, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23473.415420393, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23478.424480965, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23483.431899277, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23488.440567277, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 23493.454444273, "status": "running", "grant": 20, "stage": "audit_after"}
+{"monotonic": 23494.721279322, "status": "running", "grant": 20, "stage": "complete"}
+{"monotonic": 23494.723886208, "status": "running", "grant": 30, "stage": "resume_candidate_before_execute"}
+{"monotonic": 23494.72619939, "status": "running", "grant": 30, "stage": "configure_30"}
+{"monotonic": 23495.407894101, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23495.410991881, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23497.420945573, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23499.429958097, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23501.438778624, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23503.446969478, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23505.456513338, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 23508.518472122, "status": "running", "grant": 30, "stage": "audit_before"}
+{"monotonic": 23509.620655483, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23509.624491715, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23514.631472015, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23519.639450441, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23524.648108298, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23529.655025903, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23534.663583282, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23539.672181737, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23544.680831987, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23549.690066141, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23554.698773834, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 23559.712253224, "status": "running", "grant": 30, "stage": "audit_after"}
+{"monotonic": 23560.198639133, "status": "running", "grant": 30, "stage": "complete"}
+{"monotonic": 23560.201051742, "status": "running", "grant": 40, "stage": "resume_candidate_before_execute"}
+{"monotonic": 23560.202993042, "status": "running", "grant": 40, "stage": "configure_40"}
+{"monotonic": 23560.926804022, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23560.929373692, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23562.938016223, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23564.945903348, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23566.954452356, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23568.961780538, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23570.970228629, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23572.979023362, "status": "running", "grant": 40, "stage": "readiness_gate"}
+{"monotonic": 23576.724721783, "status": "running", "grant": 40, "stage": "audit_before"}
+{"monotonic": 23577.681305578, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23577.685116785, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23582.693747651, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23587.698837059, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23592.703394529, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23597.711489388, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23602.719972621, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23607.728983337, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23612.736355972, "status": "running", "grant": 40, "stage": "execute"}
+{"monotonic": 23616.240228771, "status": "stopped", "grant": 40, "stage": "stopped"}
+KeyboardInterrupt()
+Traceback (most recent call last):
+  File "/tmp/grant_fec14_resume.py", line 219, in <module>
+    run_id=run_smoke(root,grant)
+  File "/tmp/grant_fec14_resume.py", line 186, in run_smoke
+    time.sleep(5)
+KeyboardInterrupt

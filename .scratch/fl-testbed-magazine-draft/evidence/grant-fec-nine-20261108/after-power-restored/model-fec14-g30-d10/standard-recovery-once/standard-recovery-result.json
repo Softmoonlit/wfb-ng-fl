@@ -1,0 +1,135 @@
+{
+  "attempt": 1,
+  "runid": "model-fec14-g30-d10",
+  "started_monotonic": 26425.17265027,
+  "finished_monotonic": 26428.288982119,
+  "all_cleanup_confirmed": false,
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl00.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl00.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl01.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl01.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl02.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl02.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl03.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl03.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl05.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl05.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl06.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl06.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl07.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl07.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl08.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl08.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    },
+    {
+      "host": "fl09",
+      "returncode": 255,
+      "result": null,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.199 port 22: No route to host\n",
+      "ok": false
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-model-fec14-g30-d10-fl10.service",
+        "active": "inactive",
+        "errors": []
+      },
+      "stdout": "{\"ok\": true, \"unit\": \"comm-smoke-model-fec14-g30-d10-fl10.service\", \"active\": \"inactive\", \"errors\": []}\n",
+      "stderr": "",
+      "ok": true
+    }
+  ],
+  "restore_attempted": false
+}

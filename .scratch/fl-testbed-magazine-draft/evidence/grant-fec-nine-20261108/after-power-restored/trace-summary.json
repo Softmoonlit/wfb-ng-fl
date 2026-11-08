@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "grant": 10,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g10-d10/fec14-g10-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    },
+    {
+      "grant": 20,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10/fec14-g20-d10-smoke/progress.jsonl",
+      "notes": [
+        "intentional server restart briefly refused API; controller error occurred before execute; retained original stop snapshot; actual ready/native verified before exactly one real smoke"
+      ]
+    },
+    {
+      "grant": 30,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g30-d10/fec14-g30-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    },
+    {
+      "grant": 40,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g40-d10/fec14-g40-d10-smoke/progress.jsonl",
+      "notes": [
+        "driver handoff performed after raw result already successful; handoff metadata KeyError stopped only temporary controller; original raw restore_ok=true preserved; later independent audit passed separately"
+      ]
+    },
+    {
+      "grant": 60,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g60-d10/fec14-g60-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    }
+  ],
+  "history": [
+    {
+      "kind": "previous_batch",
+      "reason": "user powered off01/05; original first batch execute_total=0 preserved outside after-power-restored"
+    },
+    {
+      "kind": "power_recovery",
+      "evidence": "power-restored-identities.json",
+      "reason": "new boot IDs and uptime captured; no extra client restart"
+    },
+    {
+      "kind": "tool_startup_race",
+      "grant": 20,
+      "evidence": "matrix-before-startup-tool-correction.json",
+      "reason": "HTTP refusal immediately after authorized server restart; no real smoke repeated"
+    },
+    {
+      "kind": "tool_handoff",
+      "grant": 40,
+      "evidence": [
+        "driver-handoff.json",
+        "matrix-before-v4-handoff-metadata-fix.json",
+        "matrix-worker-v3.log"
+      ],
+      "reason": "after completed raw successful result; metadata key fixed from immutable progress wall timestamp"
+    },
+    {
+      "kind": "explicit_ready_gate",
+      "evidence": [
+        "fec14-g60-d10/server-readiness.json",
+        "final-server-readiness.json"
+      ],
+      "reason": "<=15s deadline probes HTTP IDLE/nojob plus native schedule/FEC/SHA; transient connection errors recorded"
+    },
+    {
+      "kind": "final_state",
+      "reason": "server restored10/10, ten participating boards actual149/HT40/LGI/index18/MCS3or4/FEC14/15W, exact nine READY/IDLE,04OFFLINE; no models or FEC switch"
+    }
+  ],
+  "raw_flags_unchanged": true,
+  "eligible_grants": [
+    10,
+    20,
+    30,
+    40,
+    60
+  ],
+  "selection": "all complete passes eligible for model only on subsequent parent command",
+  "finished_wall": 1794143167.5299742
+}

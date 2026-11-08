@@ -1,0 +1,905 @@
+{
+  "ok": true,
+  "elapsed": 0.9890883309999481,
+  "checks": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "fl04": "excluded; not contacted per current authorization",
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "boot_id": "f664e1ec-18d4-48e2-8319-fac6d139b585",
+        "uptime": "23442.48 120763.96",
+        "service": "MainPID=104895\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "104962",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "server",
+              "--tun-name",
+              "fl-s",
+              "--tun-addr",
+              "10.80.0.1/24",
+              "--node-id",
+              "255",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "3",
+              "--air-interface",
+              "wlxfc221c100119",
+              "--known-clients",
+              "1,2,3,4,5,6,7,8,9,10",
+              "--grant-duration-ms",
+              "20",
+              "--guard-interval-ms",
+              "10",
+              "--client-target",
+              "1:10.80.0.11:127.0.0.1:1",
+              "--client-target",
+              "2:10.80.0.12:127.0.0.1:1",
+              "--client-target",
+              "3:10.80.0.13:127.0.0.1:1",
+              "--client-target",
+              "4:10.80.0.14:127.0.0.1:1",
+              "--client-target",
+              "5:10.80.0.15:127.0.0.1:1",
+              "--client-target",
+              "6:10.80.0.16:127.0.0.1:1",
+              "--client-target",
+              "7:10.80.0.17:127.0.0.1:1",
+              "--client-target",
+              "8:10.80.0.18:127.0.0.1:1",
+              "--client-target",
+              "9:10.80.0.19:127.0.0.1:1",
+              "--client-target",
+              "10:10.80.0.20:127.0.0.1:1",
+              "--downlink-pause-threshold-bytes",
+              "131072",
+              "--downlink-resume-threshold-bytes",
+              "65536",
+              "--downlink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                3,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23442.482521147
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "boot_id": "dd7b4a26-916d-46e9-9d8f-478e56d402b3",
+        "uptime": "287.45 1487.42",
+        "service": "MainPID=855\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "1488",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c1",
+              "--tun-addr",
+              "10.80.0.11/24",
+              "--node-id",
+              "1",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500bfe",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 287.460107265
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "boot_id": "77b1f550-450a-4390-8a9a-453cec1b86b9",
+        "uptime": "23313.81 136805.17",
+        "service": "MainPID=19386\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "19402",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c2",
+              "--tun-addr",
+              "10.80.0.12/24",
+              "--node-id",
+              "2",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300f04",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300f04\n\tifindex 30\n\twdev 0x400000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 4\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23313.818385509
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "boot_id": "f9f63f20-1ad1-4e79-8a9d-d267afe44387",
+        "uptime": "3153.76 18393.69",
+        "service": "MainPID=4049\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "4065",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c3",
+              "--tun-addr",
+              "10.80.0.13/24",
+              "--node-id",
+              "3",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx5cffffaf6d8c",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 3153.763405639
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "boot_id": "3f813c07-e4ee-4a3c-9233-e0f09c397ad9",
+        "uptime": "268.36 1378.37",
+        "service": "MainPID=849\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "1450",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c5",
+              "--tun-addr",
+              "10.80.0.15/24",
+              "--node-id",
+              "5",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c100157",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 268.370613612
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "boot_id": "badee745-101d-4c98-8563-f2ea22a62e60",
+        "uptime": "23404.76 136943.23",
+        "service": "MainPID=22009\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "22024",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c6",
+              "--tun-addr",
+              "10.80.0.16/24",
+              "--node-id",
+              "6",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300cbb",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300cbb\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23404.762536153
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "boot_id": "08f4d138-507f-4b7c-a19e-68c6eaf899be",
+        "uptime": "23402.72 136956.45",
+        "service": "MainPID=22221\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "22238",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c7",
+              "--tun-addr",
+              "10.80.0.17/24",
+              "--node-id",
+              "7",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300e99",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300e99\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23402.729318289
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "boot_id": "bb793f6c-db3f-4d41-898f-cdeb76887c38",
+        "uptime": "23399.51 136922.28",
+        "service": "MainPID=23335\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "23351",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c8",
+              "--tun-addr",
+              "10.80.0.18/24",
+              "--node-id",
+              "8",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500a88",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23399.514605142
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "boot_id": "0ac4ed65-f4dd-4db2-a3e2-b1307312583e",
+        "uptime": "23375.29 136893.13",
+        "service": "MainPID=23939\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "23956",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c9",
+              "--tun-addr",
+              "10.80.0.19/24",
+              "--node-id",
+              "9",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx88e62852aae4",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlx88e62852aae4\n\tifindex 14\n\twdev 0x200000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23375.29551137
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "boot_id": "b57b120b-7b10-472a-9f6c-83c50fa317a2",
+        "uptime": "23251.14 136296.55",
+        "service": "MainPID=20964\nActiveState=active\n",
+        "native": [
+          {
+            "pid": "20980",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c10",
+              "--tun-addr",
+              "10.80.0.20/24",
+              "--node-id",
+              "10",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfca386b38672",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 23251.148074525
+      },
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "profile": "fec14-guard10",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    10,
+    20,
+    30,
+    40,
+    60
+  ],
+  "status": "stopped",
+  "candidates": [
+    {
+      "grant_duration_ms": 10,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "stopped",
+      "readiness_fail_nodes": [
+        1,
+        5
+      ],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/fec14-g10-d10",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0,
+      "started_wall": 1794142190.4145746,
+      "outcome": "readiness_preflight_failed",
+      "independent_restore_ok": false,
+      "audit_failures": [
+        {
+          "host": "fl00",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl01",
+          "ok": false,
+          "errors": [
+            "management/probe failed"
+          ]
+        },
+        {
+          "host": "fl02",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl03",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl05",
+          "ok": false,
+          "errors": [
+            "management/probe failed"
+          ]
+        },
+        {
+          "host": "fl06",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl07",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl08",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl09",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl10",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "error": "RuntimeError('independent final health audit failed; matrix halted')"
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/fec14-g20-d10",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/fec14-g30-d10",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/fec14-g40-d10",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/fec14-g60-d10",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    }
+  ],
+  "updated_wall": 1794142228.5893395,
+  "updated_monotonic": 22942.696868246,
+  "error": "RuntimeError('independent final health audit failed; matrix halted')",
+  "stop_details": {
+    "worker_process_state": "absent",
+    "execute_total": 0,
+    "server_unchanged_at_10_10": true,
+    "not_attempted": [
+      20,
+      30,
+      40,
+      60
+    ],
+    "radio_or_payload_started": false,
+    "fl04_management_unconfirmed": true
+  }
+}

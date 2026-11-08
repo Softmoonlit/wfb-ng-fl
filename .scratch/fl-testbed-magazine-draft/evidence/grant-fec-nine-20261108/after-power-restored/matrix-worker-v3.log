@@ -1,0 +1,6 @@
+{"monotonic": 23686.189640907, "status": "stopped", "grant": 40, "stage": "stopped"}
+KeyError('started_wall')
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/orchestration-driver-v3.py", line 255, in <module>
+    after=audit(root,'after',grant,run_id=run_id,since=int(CURRENT['started_wall']))
+KeyError: 'started_wall'

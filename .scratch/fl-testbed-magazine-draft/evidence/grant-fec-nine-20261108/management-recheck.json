@@ -1,0 +1,40 @@
+[
+  {
+    "host": "fl01",
+    "monotonic": 23068.539223158,
+    "ping": {
+      "exit": 1,
+      "stdout": "PING 192.168.0.191 (192.168.0.191) 56(84) bytes of data.\n\n--- 192.168.0.191 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1018ms\n\n",
+      "stderr": ""
+    },
+    "ssh": {
+      "exit": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.191 port 22: No route to host\n"
+    },
+    "neighbor": {
+      "exit": 0,
+      "stdout": "192.168.0.191 dev enP8p1s0  INCOMPLETE\n",
+      "stderr": ""
+    }
+  },
+  {
+    "host": "fl05",
+    "monotonic": 23068.539571774,
+    "ping": {
+      "exit": 1,
+      "stdout": "PING 192.168.0.195 (192.168.0.195) 56(84) bytes of data.\n\n--- 192.168.0.195 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1017ms\n\n",
+      "stderr": ""
+    },
+    "ssh": {
+      "exit": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.195 port 22: No route to host\n"
+    },
+    "neighbor": {
+      "exit": 0,
+      "stdout": "192.168.0.195 dev enP8p1s0  INCOMPLETE\n",
+      "stderr": ""
+    }
+  }
+]

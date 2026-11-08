@@ -1,0 +1,66 @@
+{"monotonic": 23266.068993889, "status": "running", "grant": null, "stage": "waiting_power_restored"}
+{"monotonic": 23267.539881994, "status": "running", "grant": null, "stage": "waiting_power_restored"}
+{"monotonic": 23267.541296943, "status": "running", "grant": null, "stage": "audit_initial-power-restored"}
+{"monotonic": 23268.755874642, "status": "running", "grant": 10, "stage": "starting_candidate"}
+{"monotonic": 23268.75833813, "status": "running", "grant": 10, "stage": "configure_10"}
+{"monotonic": 23268.885477663, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 23269.832760247, "status": "running", "grant": 10, "stage": "audit_before"}
+{"monotonic": 23270.356640893, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23270.360313213, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23275.362893252, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23280.366492664, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23285.374105672, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23290.381152794, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23295.389074645, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23300.394371994, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23305.398929978, "status": "running", "grant": 10, "stage": "execute"}
+{"monotonic": 23310.410525091, "status": "running", "grant": 10, "stage": "audit_after"}
+{"monotonic": 23311.602781888, "status": "running", "grant": 10, "stage": "complete"}
+{"monotonic": 23311.605180671, "status": "running", "grant": 20, "stage": "starting_candidate"}
+{"monotonic": 23311.607012655, "status": "running", "grant": 20, "stage": "configure_20"}
+{"monotonic": 23312.348791382, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 23312.351487453, "status": "stopped", "grant": 20, "stage": "stopped"}
+URLError(ConnectionRefusedError(111, 'Connection refused'))
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/urllib/request.py", line 1348, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/usr/lib/python3.10/http/client.py", line 1283, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1329, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1278, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.10/http/client.py", line 1038, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.10/http/client.py", line 976, in send
+    self.connect()
+  File "/usr/lib/python3.10/http/client.py", line 942, in connect
+    self.sock = self._create_connection(
+  File "/usr/lib/python3.10/socket.py", line 845, in create_connection
+    raise err
+  File "/usr/lib/python3.10/socket.py", line 833, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/grant_fec14_after_power.py", line 217, in <module>
+    gate_result=gate(root);CURRENT['readiness_fail_nodes']=gate_result['fail_nodes']
+  File "/tmp/grant_fec14_after_power.py", line 139, in gate
+    last=status();online=sorted(int(k) for k,v in last['nodes'].items() if v.get('readiness')!='OFFLINE')
+  File "/tmp/grant_fec14_after_power.py", line 44, in status
+    with urllib.request.urlopen('http://127.0.0.1:9090/api/v1/status', timeout=4) as response:
+  File "/usr/lib/python3.10/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "/usr/lib/python3.10/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+  File "/usr/lib/python3.10/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/usr/lib/python3.10/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+  File "/usr/lib/python3.10/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/usr/lib/python3.10/urllib/request.py", line 1351, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno 111] Connection refused>

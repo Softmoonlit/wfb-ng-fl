@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "results": [
+    {
+      "grant": 10,
+      "guard": 10,
+      "fec": "8/14",
+      "DL_seconds": 6.512721552000585,
+      "UL_seconds": 11.195699629002775,
+      "verified_updates": 9,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "independent_restore_ok": true,
+      "execute_count": 1
+    },
+    {
+      "grant": 20,
+      "guard": 10,
+      "fec": "8/14",
+      "DL_seconds": 5.628326681002363,
+      "UL_seconds": 21.29593997900156,
+      "verified_updates": 9,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "independent_restore_ok": true,
+      "execute_count": 1
+    },
+    {
+      "grant": 30,
+      "guard": 10,
+      "fec": "8/14",
+      "DL_seconds": 18.578644520002854,
+      "UL_seconds": 14.915913344000728,
+      "verified_updates": 9,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "independent_restore_ok": true,
+      "execute_count": 1
+    },
+    {
+      "grant": 40,
+      "guard": 10,
+      "fec": "8/14",
+      "DL_seconds": 5.557397558000957,
+      "UL_seconds": 10.841564132002532,
+      "verified_updates": 9,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "independent_restore_ok": true,
+      "execute_count": 1
+    },
+    {
+      "grant": 60,
+      "guard": 10,
+      "fec": "8/14",
+      "DL_seconds": 5.2441825269997935,
+      "UL_seconds": 9.302986590002547,
+      "verified_updates": 9,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "independent_restore_ok": true,
+      "execute_count": 1
+    }
+  ],
+  "execute_total": 5,
+  "models_executed": 0,
+  "fec_switches": 0,
+  "client_restarts_by_controller": 0,
+  "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "final_schedule": "10/10",
+  "final_baseline_audit_ok": true,
+  "tool_bundle_unchanged": true,
+  "final_registry_summary": {
+    "1": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "2": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "3": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "4": {
+      "readiness": "OFFLINE",
+      "reported_state": null,
+      "channel": null
+    },
+    "5": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "6": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "7": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "8": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "9": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "10": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    }
+  },
+  "duration_definition": "runner host dispatch_start to last successful phase completion; publish includes local copy/verification and UFTP, submit includes all nine uploads; 1MiB smoke results are screening evidence only",
+  "eligible_model_grants": [
+    10,
+    20,
+    30,
+    40,
+    60
+  ],
+  "models_not_started": true,
+  "raw_flags_unchanged": true,
+  "trace_evidence": "trace-summary.json"
+}

@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "profile": "fec14-guard10",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    10,
+    20,
+    30,
+    40,
+    60
+  ],
+  "status": "complete",
+  "candidates": [
+    {
+      "grant_duration_ms": 10,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "complete",
+      "readiness_fail_nodes": [],
+      "DLduration": 6.512721552000585,
+      "ULduration": 11.195699629002775,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g10-d10",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794142554.6468692,
+      "runner_last_phase": "audit_final",
+      "runner_last_monotonic": 23305.390117554,
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g10-d10/fec14-g10-d10-smoke/progress.jsonl",
+      "elapsed": 40.05037383400122,
+      "failures": [],
+      "bundle_unchanged": true,
+      "independent_restore_ok": true,
+      "outcome": "passed",
+      "finished_wall": 1794142597.4931984,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "original_runner_final_monotonic": 23307.449699593,
+      "independent_restore_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g10-d10/after-audit.json",
+      "model_capacity_eligible": true,
+      "selection_rule": "all full smoke+restore passes remain eligible; do not rank/exclude by 1MiB timing",
+      "runner_process_state_at_end": "absent"
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "complete",
+      "readiness_fail_nodes": [],
+      "DLduration": 5.628326681002363,
+      "ULduration": 21.29593997900156,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794142597.4956121,
+      "runner_last_phase": "independent_cleanup",
+      "runner_last_monotonic": 23488.248245309,
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10/fec14-g20-d10-smoke/progress.jsonl",
+      "elapsed": 50.08230830500179,
+      "failures": [],
+      "bundle_unchanged": true,
+      "independent_restore_ok": true,
+      "outcome": "passed",
+      "finished_wall": 1794142780.6110804,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "original_runner_final_monotonic": 23488.942638529,
+      "independent_restore_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10/after-audit.json",
+      "model_capacity_eligible": true,
+      "selection_rule": "all full smoke+restore passes remain eligible; do not rank/exclude by 1MiB timing",
+      "runner_process_state_at_end": "absent"
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "complete",
+      "readiness_fail_nodes": [],
+      "DLduration": 18.578644520002854,
+      "ULduration": 14.915913344000728,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g30-d10",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "runner_last_phase": "cleanup",
+      "runner_last_monotonic": 23551.089158219,
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g30-d10/fec14-g30-d10-smoke/progress.jsonl",
+      "elapsed": 50.08733132100315,
+      "failures": [],
+      "bundle_unchanged": true,
+      "independent_restore_ok": true,
+      "outcome": "passed",
+      "finished_wall": 1794142846.089159,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "original_runner_final_monotonic": 23559.448123721,
+      "independent_restore_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g30-d10/after-audit.json",
+      "model_capacity_eligible": true,
+      "selection_rule": "all full smoke+restore passes remain eligible; do not rank/exclude by 1MiB timing",
+      "runner_process_state_at_end": "absent"
+    },
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "complete",
+      "readiness_fail_nodes": [],
+      "DLduration": 5.557397558000957,
+      "ULduration": 10.841564132002532,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g40-d10",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "runner_last_phase": "audit_final",
+      "runner_last_monotonic": 23612.591587151,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g40-d10/fec14-g40-d10-smoke/progress.jsonl",
+      "recovered_finished_result": true,
+      "bundle_unchanged": true,
+      "independent_restore_ok": true,
+      "outcome": "passed",
+      "finished_wall": 1794143042.2526689,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "original_runner_final_monotonic": 23614.617241786,
+      "independent_restore_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g40-d10/after-audit.json",
+      "model_capacity_eligible": true,
+      "selection_rule": "all full smoke+restore passes remain eligible; do not rank/exclude by 1MiB timing",
+      "runner_process_state_at_end": "absent"
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "stage": "complete",
+      "readiness_fail_nodes": [],
+      "DLduration": 5.2441825269997935,
+      "ULduration": 9.302986590002547,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g60-d10",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794143042.2554312,
+      "runner_last_phase": "audit_final",
+      "runner_last_monotonic": 23802.454719714,
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g60-d10/fec14-g60-d10-smoke/progress.jsonl",
+      "elapsed": 35.060636850001174,
+      "failures": [],
+      "bundle_unchanged": true,
+      "independent_restore_ok": true,
+      "outcome": "passed",
+      "finished_wall": 1794143095.0447865,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "original_runner_final_monotonic": 23804.029000425,
+      "independent_restore_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g60-d10/after-audit.json",
+      "model_capacity_eligible": true,
+      "selection_rule": "all full smoke+restore passes remain eligible; do not rank/exclude by 1MiB timing",
+      "runner_process_state_at_end": "absent"
+    }
+  ],
+  "updated_wall": 1794143097.3017995,
+  "updated_monotonic": 23811.409327851,
+  "initial_power_restored_audit_ok": true,
+  "tool_events": [
+    {
+      "stage": "g20 readiness API startup",
+      "error": "URLError(ConnectionRefusedError(111, 'Connection refused'))",
+      "classification": "intentional server restart transient API refusal; no execute, no client restart, source unchanged"
+    }
+  ],
+  "recoveryhistory": [
+    {
+      "reason": "intentional g20 server restart API startup race, not RF/retransmission",
+      "original_stop_snapshot": "matrix-before-startup-tool-correction.json",
+      "source_unchanged": true
+    },
+    {
+      "reason": "driver handoff after successful g40 result; preserve all completed experiments, add explicit 15s HTTP/native startup gate",
+      "handoff": "driver-handoff.json",
+      "wall": 1794142972.0773647
+    },
+    {
+      "reason": "intentional g20 server restart API startup race, not RF/retransmission",
+      "original_stop_snapshot": "matrix-before-startup-tool-correction.json",
+      "source_unchanged": true
+    },
+    {
+      "reason": "driver handoff after successful g40 result; preserve all completed experiments, add explicit 15s HTTP/native startup gate",
+      "handoff": "driver-handoff.json",
+      "wall": 1794143040.9377794
+    },
+    {
+      "reason": "handoff metadata key fix: use preserved raw progress wall timestamp; completed g40 smoke never repeated",
+      "error": "KeyError('started_wall')",
+      "wall": 1794143040.9377825
+    }
+  ],
+  "final_schedule": "10/10",
+  "original_stop_error": "URLError(ConnectionRefusedError(111, 'Connection refused'))",
+  "execute_total": 5,
+  "all_five_complete_once": true,
+  "all_verified_update_sets_exact_nine": true,
+  "final_native_schedule": "10/10",
+  "tool_bundle_unchanged": true,
+  "final_registry_summary": {
+    "1": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "2": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "3": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "4": {
+      "readiness": "OFFLINE",
+      "reported_state": null,
+      "channel": null
+    },
+    "5": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "6": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "7": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "8": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "9": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    },
+    "10": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "channel": 149
+    }
+  },
+  "orchestration_driver_files": [
+    "orchestration-driver-v1.py",
+    "orchestration-driver-v2.py",
+    "orchestration-driver-v3.py",
+    "orchestration-driver-v4.py"
+  ],
+  "completed_wall": 1794143135.80137,
+  "model_capacity_eligible_grants": [
+    10,
+    20,
+    30,
+    40,
+    60
+  ],
+  "model_execution_authorized_for_this_controller": false,
+  "timing_selection_applied": false,
+  "trace_summary": [
+    {
+      "grant": 10,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g10-d10/fec14-g10-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    },
+    {
+      "grant": 20,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10/fec14-g20-d10-smoke/progress.jsonl",
+      "notes": [
+        "intentional server restart briefly refused API; controller error occurred before execute; retained original stop snapshot; actual ready/native verified before exactly one real smoke"
+      ]
+    },
+    {
+      "grant": 30,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g30-d10/fec14-g30-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    },
+    {
+      "grant": 40,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g40-d10/fec14-g40-d10-smoke/progress.jsonl",
+      "notes": [
+        "driver handoff performed after raw result already successful; handoff metadata KeyError stopped only temporary controller; original raw restore_ok=true preserved; later independent audit passed separately"
+      ]
+    },
+    {
+      "grant": 60,
+      "guard": 10,
+      "fec_n": 14,
+      "execute_count": 1,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "model_capacity_eligible": true,
+      "raw_progress": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g60-d10/fec14-g60-d10-smoke/progress.jsonl",
+      "notes": [
+        "single smoke and independent full baseline audit passed"
+      ]
+    }
+  ],
+  "raw_restore_flags_preserved": true
+}

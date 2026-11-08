@@ -1,0 +1,18 @@
+{
+  "ready": true,
+  "hosts": {
+    "fl01": {
+      "host": "fl01",
+      "boot_id": "dd7b4a26-916d-46e9-9d8f-478e56d402b3",
+      "uptime": "111.82 572.78",
+      "service": "MainPID=855\nActiveState=active\n"
+    },
+    "fl05": {
+      "host": "fl05",
+      "boot_id": "3f813c07-e4ee-4a3c-9233-e0f09c397ad9",
+      "uptime": "91.98 456.40",
+      "service": "MainPID=849\nActiveState=active\n"
+    }
+  },
+  "note": "Current boot IDs and uptime captured after user power cycle; no pre-power boot ID was recorded by the prior matrix; no client restart performed by this controller."
+}

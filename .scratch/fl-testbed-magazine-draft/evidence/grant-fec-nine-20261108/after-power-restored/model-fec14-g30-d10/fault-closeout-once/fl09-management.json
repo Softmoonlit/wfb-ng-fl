@@ -1,0 +1,19 @@
+{
+  "started_monotonic": 26464.276806277,
+  "finished_monotonic": 26467.363865255,
+  "ping": {
+    "returncode": 1,
+    "stdout": "PING 192.168.0.199 (192.168.0.199) 56(84) bytes of data.\n\n--- 192.168.0.199 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1027ms\n\n",
+    "stderr": ""
+  },
+  "ssh": {
+    "returncode": 255,
+    "stdout": "",
+    "stderr": "ssh: connect to host 192.168.0.199 port 22: No route to host\n"
+  },
+  "neighbor": {
+    "returncode": 0,
+    "stdout": "192.168.0.199 dev enP8p1s0  INCOMPLETE\n",
+    "stderr": ""
+  }
+}

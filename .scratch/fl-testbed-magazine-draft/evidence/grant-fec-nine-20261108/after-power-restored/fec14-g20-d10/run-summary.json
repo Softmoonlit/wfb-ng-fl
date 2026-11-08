@@ -1,0 +1,36 @@
+{
+  "candidate": {
+    "grant_duration_ms": 20,
+    "guard_interval_ms": 10,
+    "fec_n": 14,
+    "stage": "execute",
+    "readiness_fail_nodes": [],
+    "DLduration": 5.628326681002363,
+    "ULduration": 21.29593997900156,
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10",
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "execute_count": 1,
+    "started_wall": 1794142597.4956121,
+    "runner_last_phase": "independent_cleanup",
+    "runner_last_monotonic": 23488.248245309,
+    "runner_returncode": 0,
+    "runner_restore_ok": true,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-power-restored/fec14-g20-d10/fec14-g20-d10-smoke/progress.jsonl",
+    "elapsed": 50.08230830500179,
+    "failures": [],
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794142774.8351116,
+    "monotonic": 23488.942638529,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  }
+}
