@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""九客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
+"""十客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
 import argparse
 import concurrent.futures as futures
 import hashlib
 import json
+import inspect
+import re
 from pathlib import Path
 import queue
 import shlex
@@ -12,11 +14,14 @@ import subprocess
 import threading
 import time
 
-NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
-HOSTS = ['fl00', 'fl01', 'fl02', 'fl04', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10']
+NODES = list(range(1, 11))
+HOSTS = [f'fl{node:02d}' for node in range(11)]
 DIRECTORY = Path(__file__).resolve().parent
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
-TIMING = dict(io_timeout=300, orchestration_timeout=690, node_timeout=705,
+DIRECTION_TIMEOUT = 600
+ORCHESTRATION_TIMEOUT = 2 * DIRECTION_TIMEOUT + 90
+TIMING = dict(io_timeout=DIRECTION_TIMEOUT, orchestration_timeout=ORCHESTRATION_TIMEOUT,
+              node_timeout=ORCHESTRATION_TIMEOUT + 15,
               recovery_budget=60, cleanup_timeout=10, unit_stop_timeout=8, close_restore_reserve=40)
 PATCH_DEFAULT = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
                      radio_txpower_dbm=18, uftp_rate_kbps=12000)
@@ -60,7 +65,7 @@ def model_manifest_info(path, payload):
 
 
 def audit_final(sessions, record, deadline):
-    """十端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
+    """十一端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
     if set(sessions) != set(HOSTS):
         return False
     pending = {h: sessions[h].call('audit_final') for h in HOSTS}
@@ -152,14 +157,101 @@ class Session:
         self.stderr.close()
 
 
+def scan_upload_progress(run_root):
+    """只读本轮固定层级；缺失文件不代表已接收零字节。"""
+    from pathlib import Path
+    import stat
+
+    def directories(parent):
+        try:
+            return [path for path in parent.iterdir()
+                    if not path.is_symlink() and path.is_dir()]
+        except FileNotFoundError:
+            return []
+
+    root = Path(run_root)
+    role, rounds = root / 'role', root / 'role' / 'rounds'
+    if any(path.is_symlink() for path in (root, role, rounds)):
+        raise ValueError('symlink run directory')
+    records = []
+    for round_dir in directories(rounds):
+        updates = round_dir / 'updates'
+        if updates.is_symlink():
+            continue
+        observed = {path.name: path for path in directories(updates)}
+        for node in range(1, 11):
+            partial, committed_bytes = [], None
+            node_dir = observed.get(str(node))
+            if node_dir is not None:
+                try:
+                    for path in node_dir.iterdir():
+                        if path.name != 'update.bin' and not path.name.startswith('.update.bin.'):
+                            continue
+                        try:
+                            info = path.lstat()
+                        except FileNotFoundError:
+                            continue
+                        if not stat.S_ISREG(info.st_mode):
+                            continue
+                        if path.name == 'update.bin':
+                            committed_bytes = info.st_size
+                        else:
+                            partial.append(info.st_size)
+                except FileNotFoundError:
+                    pass
+            sizes = partial + ([committed_bytes] if committed_bytes is not None else [])
+            records.append(dict(round=round_dir.name, node=node,
+                bytes=max(sizes) if sizes else None, partial_bytes=sum(partial) if partial else None,
+                committed=committed_bytes is not None, observed=bool(sizes)))
+    return dict(nodes=records, observation='filesystem_snapshot',
+                note='Missing temporary files are unobservable, not zero bytes; cleanup may remove them. '
+                     'Committed means update.bin is present, not independently verified.')
+
+
+def sample_upload_progress(run_id, record, timeout=3):
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', run_id):
+        raise ValueError('invalid run id')
+    code = inspect.getsource(scan_upload_progress) + (
+        '\nimport json, sys\nprint(json.dumps(scan_upload_progress(sys.argv[1])))\n')
+    try:
+        result = subprocess.run(['sudo', '-n', '/usr/bin/python3', '-I', '-B', '-c', code,
+            '/srv/wfb-ng-fl/comm-' + run_id], capture_output=True, text=True,
+            check=True, timeout=timeout)
+        record(dict(phase='upload_progress', host='fl00', ok=True, result=json.loads(result.stdout)))
+    except Exception as exc:
+        record(dict(phase='upload_progress', host='fl00', ok=False, error=repr(exc)))
+
+
+def wait_submit(pending, deadline, run_id, record):
+    remaining = set(pending)
+    next_sample = time.monotonic() + 5
+    while remaining:
+        now = time.monotonic()
+        if now >= deadline:
+            raise TimeoutError('submit deadline')
+        done, remaining = futures.wait(remaining, timeout=max(0, min(next_sample, deadline) - now),
+                                       return_when=futures.FIRST_COMPLETED)
+        # 先处理失败，避免额外采样延误清理。
+        for future in sorted(done, key=lambda item: item.exception() is None):
+            yield future
+        now = time.monotonic()
+        if remaining and now >= next_sample and now < deadline:
+            sample_upload_progress(run_id, record, timeout=min(3, deadline - now))
+            next_sample = now + 5
+
+
 def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
     if radio_patch is None:
         radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
-        raise RuntimeError("固定十节点会话不齐")
+        raise RuntimeError("固定十一节点会话不齐")
     def phase(action, hosts=HOSTS, **params):
+        dispatch_start = time.monotonic()
+        record(dict(phase=action, event='dispatch_start', dispatch_start=dispatch_start, hosts=list(hosts)))
         pending = {sessions[host].call(action, **params): host for host in hosts}
-        for future in futures.as_completed(pending, timeout=max(.01, deadline - time.monotonic())):
+        completed = (wait_submit(pending, deadline, run_id, record) if action == 'submit' else
+                     futures.as_completed(pending, timeout=max(.01, deadline - time.monotonic())))
+        for future in completed:
             host = pending[future]
             try:
                 result = future.result()
@@ -169,8 +261,10 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
                 for other in pending:
                     other.cancel()
                 raise RuntimeError(action + ' failed: ' + host) from exc
-    # 全十目标准备成功后，才允许重配事务及角色启动。
+    # 全十一目标准备成功后，才允许重配事务及角色启动。
     # 客户端不获知本机源路径，更不会经管理网获取文件内容。
+    dispatch_start = time.monotonic()
+    record(dict(phase='prepare', event='dispatch_start', dispatch_start=dispatch_start, hosts=HOSTS))
     pending = {}
     for host in HOSTS:
         metadata = payload if host == 'fl00' else {k: payload[k] for k in ('size_bytes', 'sha256')}
@@ -207,8 +301,10 @@ def main():
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
     parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
     parser.add_argument('--bandwidth-mhz', type=int, choices=(20, 40), default=40)
+    parser.add_argument('--downlink-mcs', type=int, choices=(3, 4), default=3)
+    parser.add_argument('--uplink-mcs', type=int, choices=(4, 6), default=4)
     parser.add_argument('--uftp-rate-kbps', type=int, default=12000,
-                        choices=range(1, 18001), metavar='KBIT/S',
+                        choices=range(1, 26001), metavar='KBIT/S',
                         help='下行注入速率；HT20使用受控标定候选')
     parser.add_argument('--run-id', default=time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
     parser.add_argument('--output', type=Path, default=DIRECTORY / 'runs')
@@ -239,8 +335,8 @@ def main():
             manifest = model_manifest_info(args.model_manifest, payload)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
-    radio_patch = dict(channel=args.channel, bandwidth_mhz=args.bandwidth_mhz, downlink_mcs=3,
-                       uplink_mcs=4, radio_txpower_dbm=18,
+    radio_patch = dict(channel=args.channel, bandwidth_mhz=args.bandwidth_mhz, downlink_mcs=args.downlink_mcs,
+                       uplink_mcs=args.uplink_mcs, radio_txpower_dbm=18,
                        uftp_rate_kbps=args.uftp_rate_kbps)
     plan = dict(kind='synthetic-smoke-communication' if args.smoke else 'model-equivalent-communication',
         payload_mode='smoke' if args.smoke else 'model', generated_payload=args.smoke, hosts=HOSTS, nodes=NODES,
@@ -351,7 +447,7 @@ def main():
                     rf_response_ok = restored.get('rf_response_ok', result.returncode == 0 and restored['ok'])
                     record(dict(phase='independent_restore', result=restored,
                                 rf_response_ok=rf_response_ok, audited=False))
-                    # 原代理已退出，独立恢复不具备十端最终审计，保守保持失败。
+                    # 原代理已退出，独立恢复不具备十一端最终审计，保守保持失败。
                     restore_ok = False
                 except Exception as exc:
                     record(dict(phase='independent_restore', ok=False, error=repr(exc)))

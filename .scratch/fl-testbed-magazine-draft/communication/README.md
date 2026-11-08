@@ -1,6 +1,6 @@
-# 九客户端通信 runner
+# 十客户端通信 runner
 
-服务端固定 fl00，客户端固定 fl01/fl02/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,4,5,6,7,8,9,10]`。使用已安装 c665948 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。c665 commit、release 路径、完整安装身份、wrapper/native SHA 门槛保留，库存不符会拒绝 prepare。
+服务端固定 fl00，客户端固定 fl01/fl02/fl03/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,3,4,5,6,7,8,9,10]`。使用已安装 c665948 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。c665 commit、release 路径、完整安装身份、wrapper/native SHA 门槛保留，库存不符会拒绝 prepare。
 
 ## 载荷与执行门槛
 
@@ -21,18 +21,20 @@ model 计划使用 `kind=model-equivalent-communication`、`model_manifest_match
 
 执行仍要求 `--execute --reviewed-sha <bundle_sha256>`。摘要覆盖 runner.py、node_agent.py、recover.py 三文件，修改任一文件都必须重新核验。制品 SHA 与代码冻结 SHA 分别记录。
 
-只有服务端 prepare 收到 `{path,size_bytes,sha256}`；九客户端仅收到大小和摘要。fl00 必须能直接读取载荷路径，管理网不传载荷。服务端 publish 校验源文件，复制到本轮自有工作目录，再验 SHA，随后 UFTP 下发。全部客户端接收校验成功后才统一上传原接收文件；服务端必须收到并独立验证完整九份更新。`max_update_size_bytes` 精确等于载荷实际大小。
+只有服务端 prepare 收到 `{path,size_bytes,sha256}`；十客户端仅收到大小和摘要。fl00 必须能直接读取载荷路径，管理网不传载荷。服务端 publish 校验源文件，复制到本轮自有工作目录，再验 SHA，随后 UFTP 下发。全部客户端接收校验成功后才统一上传原接收文件；服务端必须收到并独立验证完整十份更新。`max_update_size_bytes` 精确等于载荷实际大小。
 
 ## 无线与回收边界
 
-- 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 中 `.py` 条目集合三者严格相等；manifest 允许 `build_identity.json` 等顶层非 Python 文件，所有 manifest 条目都逐文件核验安装 SHA，Python 文件另核验冻结源码 SHA；服务端要求完整九客户端 READY/IDLE 且无活动作业。十节点 prepare 全通过后才重配和启动角色。
-- 默认 157/40MHz/Long GI/功率索引18、MCS3/4、RS(8,14)、UFTP 12000kbps，使用普通 reconfigure。现有 HT20 选项保持 calibrate 行为。工具不持有 daemon 的作业准入租约，测试期间不得并发启动其他 FL 任务。
+- 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 中 `.py` 条目集合三者严格相等；manifest 允许 `build_identity.json` 等顶层非 Python 文件，所有 manifest 条目都逐文件核验安装 SHA，Python 文件另核验冻结源码 SHA；服务端要求完整十客户端 READY/IDLE 且无活动作业。十一节点 prepare 全通过后才重配和启动角色。
+- 默认 157/40MHz/Long GI/功率索引18、MCS3/4、RS(8,14)、UFTP 12000kbps，使用普通 reconfigure。可选 `--downlink-mcs {3,4}`、`--uplink-mcs {4,6}` 和 `--uftp-rate-kbps 1..26000`，默认仍为 MCS3/4、12000kbps；API 准入另行检查。现有 HT20 选项保持 calibrate 行为。工具不持有 daemon 的作业准入租约，测试期间不得并发启动其他 FL 任务。
 - GET 必须实际返回 `short_gi=0`，并验证带宽和 MCS；不能仅凭计划宣称 Long GI。UFTP 1144、HTTP 18080 和 239.80.41.1/239.80.42.1 保持固定。
-- 期限集中在 `TIMING`：阶段 I/O 300 秒，主编排 690 秒，节点信号及临时 unit 生命周期 705 秒，独立回收预算 60 秒。回收使用编排开始后 750 秒绝对截止点，不逐次重置预算。
-- prepare 或任意 phase 首个失败即退出编排。传输失败时不把 close 排到阻塞 RPC 后面；dispose 唤醒本机 RPC 工作线程、关闭自有会话，随后独立停止本轮临时 unit。清理线程池显式 `shutdown(wait=false, cancel_futures=true)`，不通过上下文管理器退出等待挂起 future。不会等待其他 publish 到 690 秒，也不会杀 resident。
+- 期限集中在 `TIMING`：阶段 I/O 每方向 600 秒，主编排 2×600+90=1290 秒，节点信号及临时 unit 生命周期 1305 秒，独立回收预算 60 秒。回收使用编排开始后 1350 秒绝对截止点，不逐次重置预算。
+- prepare 或任意 phase 首个失败即退出编排。传输失败时不把 close 排到阻塞 RPC 后面；dispose 唤醒本机 RPC 工作线程、关闭自有会话，随后独立停止本轮临时 unit。清理线程池显式 `shutdown(wait=false, cancel_futures=true)`，不通过上下文管理器退出等待挂起 future。不会等待其他 publish 到 1290 秒，也不会杀 resident。
 - 临时 unit 使用 `KillMode=control-group`、`TimeoutStopSec=8`；范围只含本轮代理及后代。独立回收只停止 `comm-smoke-<run-id>-<host>.service`。专有组播路由标记 proto186，按同一 ifindex 和路由快照回收；接口或路由身份改变则保留现场。常驻进程只核验 PID/starttime。
-- 正常全角色 close 后恢复原六项无线配置，然后十端并发 `audit_final`。每端验证原信道/40MHz/-18dBm、GET Long GI/MCS3或4、resident PID/starttime、15W/mode0 及既有 CPU/GPU/EMC 基线。仅全部按时审计成功才设置 `restore_ok=true`。
+- 正常全角色 close 后恢复原六项无线配置，然后十一端并发 `audit_final`。每端验证原信道/40MHz/-18dBm、GET Long GI/MCS3或4、resident PID/starttime、15W/mode0 及既有 CPU/GPU/EMC 基线。仅全部按时审计成功才设置 `restore_ok=true`。
 - 正常恢复或最终审计失败时，独立 recover 先确认全部测试 unit 结束，且每端返回的 `ok` 必须严格为布尔 `true`，再按持久化身份尝试恢复。独立恢复仅报告 `rf_response_ok` 与 `audited=false`，保持最终恢复失败；传输验证、清理、恢复分别记录。
+
+上传阶段主线程使用 `futures.wait` 等待，每 5 秒在 fl00 本机同步调用一次 `sudo -n python3`，单次超时最多 3 秒且受编排绝对截止限制；不增加采样线程。只读本轮 `/srv/wfb-ng-fl/comm-<run-id>/role/rounds/*/updates/<1..10>/` 下的 `.update.bin.*` 与 `update.bin`，跳过符号链接，记录 `phase=upload_progress`。`bytes` 是可见文件的最大大小，`partial_bytes` 是可见临时文件大小总和，`committed` 仅表示 `update.bin` 存在，最终完整性仍由 verify 确认。缺失文件记录 `bytes=null, observed=false`，不能推断为零字节：临时文件可能已被 cleanup 删除。采样失败独立记录，不替代传输结果。
 
 ## 本地验证
 
@@ -40,4 +42,4 @@ model 计划使用 `kind=model-equivalent-communication`、`model_manifest_match
 python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
 ```
 
-28 项本地测试覆盖完整固定集合、完整 READY 门槛、十端 prepare、并行 publish 与上传屏障、九份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
+44 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。

@@ -25,7 +25,7 @@ UFTP_SHA256 = {
     'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
     'uftpd': '0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9',
 }
-NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
+NODES = list(range(1, 11))
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
              radio_txpower_dbm=18, uftp_rate_kbps=12000)
@@ -100,7 +100,7 @@ def get_json(host, path):
 class Node:
     def __init__(self):
         self.host = socket.gethostname()
-        require(self.host in ['fl00', 'fl01', 'fl02', 'fl04', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10'], 'unexpected host')
+        require(self.host in [f'fl{node:02d}' for node in range(11)], 'unexpected host')
         self.node = int(self.host[2:])
         self.root = None
         self.role = None
@@ -146,11 +146,9 @@ class Node:
         if patch is not None:
             require(isinstance(patch, dict), 'invalid radio patch')
             self.patch.update(patch)
-        require(self.patch['bandwidth_mhz'] in (20, 40) and self.patch['downlink_mcs'] == 3
-                and self.patch['uplink_mcs'] == 4 and 0 < self.patch['uftp_rate_kbps'] <= 18000,
+        require(self.patch['bandwidth_mhz'] in (20, 40) and self.patch['downlink_mcs'] in (3, 4)
+                and self.patch['uplink_mcs'] in (4, 6) and 0 < self.patch['uftp_rate_kbps'] <= 26000,
                 'unsupported radio patch')
-        if self.patch['bandwidth_mhz'] == 40:
-            require(12000 <= self.patch['uftp_rate_kbps'] <= 18000, 'unsupported HT40 MCS3 rate')
         self.timing = timing
         self.expires = self.started_at + timing['node_timeout']
         signal.setitimer(signal.ITIMER_REAL, max(.001, self.expires - time.monotonic()))
@@ -417,7 +415,7 @@ class Node:
                 require(current == tick, 'resident identity changed: ' + pid)
             actual['nvpmodel'] = run(['nvpmodel', '-q'])
             require(actual['nvpmodel'].strip() == 'NV Power Mode: 15W\n0', 'nvpmodel mismatch')
-            # 路径来自既有十端 board-power 审计及 audit-jtop.py，仅只读。
+            # 路径来自既有十一端 board-power 审计及 audit-jtop.py，仅只读。
             expected = {'/sys/devices/system/cpu/online': '0-5',
                         '/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq': '612000000',
                         '/sys/kernel/nvpmodel_clk_cap/emc': '2133000000',

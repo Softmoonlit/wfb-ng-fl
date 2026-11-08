@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""只读检查完整九客户端是否真正可开始通信，失败返回非零。"""
+"""只读检查完整十客户端是否真正可开始通信，失败返回非零。"""
 import concurrent.futures
 import json
 import subprocess
 import sys
 import urllib.request
 
-NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
+NODES = list(range(1, 11))
 with urllib.request.urlopen('http://127.0.0.1:9090/api/v1/status', timeout=4) as response:
     status = json.load(response)
 
@@ -18,7 +18,7 @@ def inspect(node):
     ok = result.returncode == 0 and 'channel 149 ' in result.stdout and 'width: 40 MHz' in result.stdout and record.get('readiness') == 'READY' and record.get('reported_state') == 'IDLE'
     return dict(node=node, ok=ok, readiness=record.get('readiness'), iw=result.stdout, error=result.stderr)
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=9) as pool:
+with concurrent.futures.ThreadPoolExecutor(max_workers=len(NODES)) as pool:
     records = list(pool.map(inspect, NODES))
 print(json.dumps(records, ensure_ascii=False, indent=2))
 sys.exit(0 if all(record['ok'] for record in records) else 1)

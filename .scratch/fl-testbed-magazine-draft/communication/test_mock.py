@@ -43,6 +43,145 @@ class MockTests(unittest.TestCase):
             paths[name] = str(path)
         return paths, {name: node_agent.sha(path) for name, path in paths.items()}
 
+    def test_complete_eleven_board_scope_and_600_second_budgets(self):
+        self.assertEqual(runner.HOSTS, [f'fl{n:02d}' for n in range(11)])
+        self.assertEqual(runner.NODES, list(range(1, 11)))
+        self.assertEqual(node_agent.NODES, runner.NODES)
+        self.assertEqual(self.node('fl03').node, 3)
+        timing = runner.TIMING
+        self.assertEqual(timing['io_timeout'], 600)
+        self.assertEqual(timing['orchestration_timeout'], 2 * 600 + 90)
+        self.assertGreaterEqual(timing['orchestration_timeout'] - timing['close_restore_reserve'], 1200)
+        self.assertEqual(timing['node_timeout'], timing['orchestration_timeout'] + 15)
+        self.assertEqual(timing['orchestration_timeout'] + timing['recovery_budget'], 1350)
+
+    def test_each_transfer_phase_records_dispatch_before_rpc(self):
+        records, calls = [], []
+        class Session:
+            def call(self, action, **params):
+                starts = [record for record in records if record.get('event') == 'dispatch_start']
+                self_test.assertEqual(starts[-1]['phase'], action)
+                self_test.assertLessEqual(starts[-1]['dispatch_start'], time.monotonic())
+                calls.append(action)
+                future = futures.Future()
+                future.set_result(dict(ok=True))
+                return future
+        self_test = self
+        runner.orchestrate({host: Session() for host in runner.HOSTS}, records.append,
+                           time.monotonic() + 1, 'dispatch-test', self.payload)
+        starts = [record for record in records if record.get('event') == 'dispatch_start']
+        self.assertEqual([record['phase'] for record in starts], [
+            'prepare', 'acquire_radio', 'verify_radio', 'start_receive', 'publish', 'submit', 'verify'])
+        self.assertEqual(len(calls), 5 * 11 + 2)
+
+    def test_upload_scanner_real_files_missing_cleanup_and_isolation(self):
+        root = Path(self.temporary.name) / 'run'
+        updates = root / 'role/rounds/round-1/updates'
+        (updates / '3').mkdir(parents=True)
+        partial = updates / '3/.update.bin.partial'
+        partial.write_bytes(b'a' * 17)
+        (updates / '4').mkdir()
+        (updates / '4/update.bin').write_bytes(b'b' * 31)
+        outside = Path(self.temporary.name) / 'outside'
+        outside.mkdir()
+        (outside / 'update.bin').write_bytes(b'outside')
+        (updates / '5').symlink_to(outside, target_is_directory=True)
+        (updates / '3/.update.bin.link').symlink_to(outside / 'update.bin')
+        (updates / '3/ignored').write_bytes(b'ignored')
+        snapshot = runner.scan_upload_progress(root)
+        nodes = {record['node']: record for record in snapshot['nodes']}
+        self.assertEqual(nodes[3]['bytes'], 17)
+        self.assertFalse(nodes[3]['committed'])
+        self.assertEqual(nodes[4]['bytes'], 31)
+        self.assertTrue(nodes[4]['committed'])
+        for node in (1, 5):
+            self.assertIsNone(nodes[node]['bytes'])
+            self.assertFalse(nodes[node]['observed'])
+        partial.unlink()
+        cleaned = {record['node']: record for record in runner.scan_upload_progress(root)['nodes']}
+        self.assertIsNone(cleaned[3]['bytes'])
+        self.assertIn('cleanup', snapshot['note'])
+        self.assertEqual(runner.scan_upload_progress(root / 'missing')['nodes'], [])
+
+    def test_upload_sampling_command_is_bounded_and_only_local_run_root(self):
+        records = []
+        reply = Mock(stdout=json.dumps(dict(nodes=[])))
+        with patch('runner.subprocess.run', return_value=reply) as run:
+            runner.sample_upload_progress('sample-1', records.append)
+        argv = run.call_args.args[0]
+        self.assertEqual(argv[:3], ['sudo', '-n', '/usr/bin/python3'])
+        self.assertEqual(argv[-1], '/srv/wfb-ng-fl/comm-sample-1')
+        self.assertEqual(run.call_args.kwargs['timeout'], 3)
+        # 执行实际发送的 scanner 源码；测试替换根目录且不执行 sudo。
+        with patch('sys.argv', ['scanner', self.temporary.name]), patch(
+                'sys.stdout', new_callable=io.StringIO) as output:
+            exec(compile(argv[-2], '<upload-scanner>', 'exec'), {})
+        self.assertEqual(json.loads(output.getvalue())['nodes'], [])
+        self.assertEqual(records[0]['phase'], 'upload_progress')
+        with patch('runner.subprocess.run', side_effect=TimeoutError('sample timeout')):
+            runner.sample_upload_progress('sample-1', records.append)
+        self.assertFalse(records[-1]['ok'])
+        with patch('runner.subprocess.run') as run:
+            with self.assertRaises(ValueError):
+                runner.sample_upload_progress('../outside', records.append)
+            run.assert_not_called()
+
+    def test_submit_wait_samples_every_five_seconds_without_threads(self):
+        future = futures.Future()
+        clock = [0.0]
+        def wait(pending, timeout, return_when):
+            self.assertEqual(return_when, futures.FIRST_COMPLETED)
+            self.assertEqual(timeout, 5)
+            clock[0] += timeout
+            if clock[0] == 15:
+                future.set_result(dict(ok=True))
+                return {future}, set()
+            return set(), {future}
+        records = []
+        with patch('runner.time.monotonic', side_effect=lambda: clock[0]), patch(
+                'runner.futures.wait', side_effect=wait), patch(
+                'runner.sample_upload_progress') as sample:
+            self.assertEqual(list(runner.wait_submit({future: 'fl00'}, 600, 'wait-test', records.append)), [future])
+        self.assertEqual(sample.call_count, 2)
+        self.assertTrue(all(call.kwargs['timeout'] == 3 for call in sample.call_args_list))
+
+    def test_submit_wait_keeps_absolute_deadline(self):
+        future = futures.Future()
+        clock = [0.0]
+        def wait(pending, timeout, return_when):
+            clock[0] += timeout
+            return set(), set(pending)
+        with patch('runner.time.monotonic', side_effect=lambda: clock[0]), patch(
+                'runner.futures.wait', side_effect=wait), patch(
+                'runner.sample_upload_progress') as sample:
+            with self.assertRaisesRegex(TimeoutError, 'submit deadline'):
+                list(runner.wait_submit({future: 'fl00'}, 2, 'wait-test', lambda value: None))
+        sample.assert_not_called()
+
+    def test_node_prepare_accepts_expanded_radio_patch_before_payload_gate(self):
+        for downlink in (3, 4):
+            for uplink in (4, 6):
+                for rate in (1, 26000):
+                    node = self.node('fl03')
+                    with patch('node_agent.signal.setitimer'):
+                        with self.assertRaisesRegex(RuntimeError, 'invalid payload size'):
+                            node.prepare('radio-test', {}, runner.TIMING,
+                                dict(downlink_mcs=downlink, uplink_mcs=uplink, uftp_rate_kbps=rate))
+
+    def test_radio_cli_expanded_mcs_and_positive_rate(self):
+        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        for rate in (1, 26000):
+            with patch('sys.argv', argv + ['--downlink-mcs', '4', '--uplink-mcs', '6',
+                       '--uftp-rate-kbps', str(rate)]), patch('sys.stdout', new_callable=io.StringIO) as output:
+                self.assertEqual(runner.main(), 0)
+            radio = json.loads(output.getvalue())['radio_patch']
+            self.assertEqual((radio['downlink_mcs'], radio['uplink_mcs'], radio['uftp_rate_kbps']), (4, 6, rate))
+        for option, value in [('--downlink-mcs', '6'), ('--uplink-mcs', '3'),
+                              ('--uftp-rate-kbps', '0'), ('--uftp-rate-kbps', '26001')]:
+            with patch('sys.argv', argv + [option, value]), patch('sys.stderr', new_callable=io.StringIO):
+                with self.assertRaises(SystemExit):
+                    runner.main()
+
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
             'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -178,7 +317,7 @@ class MockTests(unittest.TestCase):
                 'node_agent.urllib.request.urlopen', return_value=reply) as http:
             result = node.radio_transaction('reconfigure', node_agent.PATCH)
         body = json.loads(http.call_args.args[0].data)
-        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 4, 5, 6, 7, 8, 9, 10], patch=node_agent.PATCH))
+        self.assertEqual(body, dict(confirmed=True, target_nodes=list(range(1, 11)), patch=node_agent.PATCH))
         self.assertIs(result['calibration'], False)
 
     def test_start_receive_passes_configured_rate_to_server_role(self):
@@ -284,8 +423,8 @@ class MockTests(unittest.TestCase):
             self.assertFalse(plan['model_semantics_validated_by_runner'])
             self.assertNotIn('formal_resnet_equivalent', plan)
             self.assertEqual(plan['model_manifest'], dict(path=str(self.manifest_path), content=self.manifest))
-            self.assertEqual(plan['io_timeout'], 300)
-            self.assertEqual(plan['deadline'] + plan['recovery_budget'], 750)
+            self.assertEqual(plan['io_timeout'], 600)
+            self.assertEqual(plan['deadline'] + plan['recovery_budget'], 1350)
             spawn.assert_not_called()
 
     def test_unit_uses_same_node_deadline_as_prepare(self):
@@ -326,7 +465,7 @@ class MockTests(unittest.TestCase):
             spawn.assert_not_called()
 
     def test_missing_target_rejected_before_prepare(self):
-        with self.assertRaisesRegex(RuntimeError, '十节点会话不齐'):
+        with self.assertRaisesRegex(RuntimeError, '十一节点会话不齐'):
             runner.orchestrate({h: None for h in runner.HOSTS if h != 'fl04'},
                                lambda v: None, time.monotonic() + 1, 'mock', self.payload)
 
@@ -382,13 +521,13 @@ class MockTests(unittest.TestCase):
         node.runtime.wait_for_updates.return_value = {1: 'a', 2: 'b', 4: 'c'}
         with self.assertRaisesRegex(RuntimeError, 'missing updates'):
             node.submit()
-        node.runtime.wait_for_updates.assert_called_once_with(min_updates=9, timeout=300)
+        node.runtime.wait_for_updates.assert_called_once_with(min_updates=10, timeout=600)
         node.runtime.wait_for_updates.return_value = {n: self.payload_path for n in runner.NODES}
         node.submit()
         self.assertEqual(set(node.verify()['files']), {str(n) for n in runner.NODES})
 
     def test_fixed_complete_topology_and_registry(self):
-        expected = [1, 2, 4, 5, 6, 7, 8, 9, 10]
+        expected = list(range(1, 11))
         self.assertEqual(runner.NODES, expected)
         self.assertEqual(node_agent.NODES, expected)
         self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in expected])
@@ -402,7 +541,7 @@ class MockTests(unittest.TestCase):
             status['nodes'].pop('10')
             with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
                 node.registry_gate()
-            status['nodes']['3'] = dict(readiness='READY')
+            status['nodes']['11'] = dict(readiness='READY')
             with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
                 node.registry_gate()
 
@@ -519,9 +658,9 @@ class MockTests(unittest.TestCase):
                 events.append((self.host, 'dispose'))
         reply = Mock(returncode=0, stdout=json.dumps(dict(ok=cleanup_result)), stderr='')
         def independent(argv, **kwargs):
-            self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
+            self.assertEqual(sum(action == 'dispose' for _, action in events), 11)
             if '--restore' in argv:
-                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 10)
+                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 11)
                 events.append(('fl00', 'independent_restore'))
             else:
                 events.append(('owned-unit', 'independent_stop'))
@@ -535,15 +674,15 @@ class MockTests(unittest.TestCase):
                 'sys.stdout', new_callable=io.StringIO):
             self.assertEqual(runner.main(), 1)
         self.assertLess(time.monotonic() - started, 2)
-        self.assertEqual(len(blocked), 9)
+        self.assertEqual(len(blocked), 10)
         self.assertTrue(all(not future.done() for future in blocked))
         self.assertFalse(any(action in ('submit', 'verify', 'close', 'release_radio') for _, action in events))
-        self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
-        self.assertEqual(run.call_count, 11 if cleanup_result is True else 10)
+        self.assertEqual(sum(action == 'dispose' for _, action in events), 11)
+        self.assertEqual(run.call_count, 12 if cleanup_result is True else 11)
         if cleanup_result is not True:
             self.assertFalse(any(action == 'independent_restore' for _, action in events))
         records = [json.loads(line) for line in (Path(self.temporary.name) / run_id / 'progress.jsonl').read_text().splitlines()]
-        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 10)
+        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 11)
         self.assertFalse(records[-1]['transfer_verified'])
         self.assertFalse(records[-1]['restore_ok'])
 
