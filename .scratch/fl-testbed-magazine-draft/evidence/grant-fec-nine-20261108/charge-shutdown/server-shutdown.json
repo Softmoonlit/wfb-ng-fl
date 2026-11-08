@@ -1,0 +1,10 @@
+{
+  "host": "fl00",
+  "command": "sudo -n shutdown --poweroff +1",
+  "scheduled": true,
+  "scheduled_local_time": "2026-11-08 22:29:08 CST",
+  "verification": "/run/systemd/shutdown/scheduled",
+  "verified_mode": "poweroff",
+  "verified_usec": 1794148148226374,
+  "note": "当前板子承载会话，使用系统标准一分钟定时关机；shutdown --show不受当前版本支持，已改读systemd调度文件确认。"
+}

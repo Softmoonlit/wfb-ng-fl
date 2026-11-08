@@ -1,0 +1,76 @@
+{
+  "wall": 1794148043.9441323,
+  "user_requested_all_boards": true,
+  "results": [
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl04",
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.194 port 22: No route to host\n",
+      "command_accepted": false
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl06",
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.196 port 22: No route to host\n",
+      "command_accepted": false
+    },
+    {
+      "host": "fl07",
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.197 port 22: No route to host\n",
+      "command_accepted": false
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "command_accepted": true
+    }
+  ]
+}
