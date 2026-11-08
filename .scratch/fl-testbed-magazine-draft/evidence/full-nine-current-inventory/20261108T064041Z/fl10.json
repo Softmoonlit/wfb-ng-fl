@@ -1,0 +1,117 @@
+{
+  "hostname": "fl10",
+  "utc": "2026-11-08T06:40:41.779240+00:00",
+  "boot_id": "b57b120b-7b10-472a-9f6c-83c50fa317a2",
+  "unit": "wfb-fl-client-daemon.service",
+  "service": {
+    "exit": 0,
+    "stdout": "MainPID=906\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 ; ignore_errors=no ; start_time=[Fri 2026-11-06 19:13:16 CST] ; stop_time=[n/a] ; pid=906 ; code=(null) ; status=0/0 }\nActiveState=active\nSubState=running\n",
+    "stderr": ""
+  },
+  "main_pid": "906",
+  "daemon_cmdline": [
+    "python3",
+    "/usr/bin/wfb-fl-client-daemon",
+    "--config",
+    "/etc/wfb-ng-fl/node.json",
+    "--work-dir",
+    "/srv/wfb-ng-fl/client",
+    "--channel",
+    "149",
+    "--bandwidth-mhz",
+    "40",
+    "--radio-txpower-dbm",
+    "14",
+    "--uplink-mcs",
+    "4"
+  ],
+  "natives": [
+    {
+      "pid": 1521,
+      "cmdline": [
+        "/usr/bin/wfb_v6_uplink",
+        "--role",
+        "client",
+        "--tun-name",
+        "fl-c10",
+        "--tun-addr",
+        "10.80.0.20/24",
+        "--node-id",
+        "10",
+        "--link-id",
+        "7669206",
+        "--uplink-stream",
+        "1",
+        "--downlink-stream",
+        "2",
+        "--fec-k",
+        "8",
+        "--fec-n",
+        "14",
+        "--radio-bandwidth",
+        "40",
+        "--radio-control-port",
+        "9200",
+        "--radio-mcs-index",
+        "4",
+        "--radio-short-gi",
+        "--air-interface",
+        "wlxfca386b38672",
+        "--uplink-pause-threshold-bytes",
+        "131072",
+        "--uplink-resume-threshold-bytes",
+        "65536",
+        "--uplink-queue-packets-limit",
+        "64"
+      ],
+      "exe": "/usr/bin/wfb_v6_uplink",
+      "exe_sha256": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56"
+    }
+  ],
+  "interfaces": [
+    {
+      "interface": "wlxfca386b38672",
+      "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+      "mac": "fc:a3:86:b3:86:72",
+      "iw_info": {
+        "exit": 0,
+        "stdout": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -14.00 dBm\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "nvpmodel_config": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf",
+  "nvpmodel_q": {
+    "exit": 0,
+    "stdout": "NV Power Mode: 15W\n0\n",
+    "stderr": ""
+  },
+  "nvpmodel_verbose": {
+    "exit": 0,
+    "stdout": "NVPM VERB: Config file: /etc/nvpmodel.conf\nNVPM VERB: parsing done for /etc/nvpmodel.conf\nNVPM VERB: Current mode: NV Power Mode: 15W\n0\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_0: PATH /sys/devices/system/cpu/cpu0/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_1: PATH /sys/devices/system/cpu/cpu1/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_2: PATH /sys/devices/system/cpu/cpu2/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_3: PATH /sys/devices/system/cpu/cpu3/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_4: PATH /sys/devices/system/cpu/cpu4/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM CPU_ONLINE: ARG CORE_5: PATH /sys/devices/system/cpu/cpu5/online: REAL_VAL: 1 CONF_VAL: 1\nNVPM VERB: PARAM FBP_POWER_GATING: ARG FBP_PG_MASK: PATH /sys/devices/platform/gpu.0/fbp_pg_mask: REAL_VAL: 2 CONF_VAL: 2\nNVPM VERB: PARAM TPC_POWER_GATING: ARG TPC_PG_MASK: PATH /sys/devices/platform/gpu.0/tpc_pg_mask: REAL_VAL: 240 CONF_VAL: 240\nNVPM VERB: PARAM GPU_POWER_CONTROL_ENABLE: ARG GPU_PWR_CNTL_EN: PATH /sys/devices/platform/gpu.0/power/control: REAL_VAL: auto CONF_VAL: on\nNVPM VERB: PARAM CPU_A78_0: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_0: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM CPU_A78_1: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_1: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM CPU_A78_2: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_2: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM CPU_A78_3: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_3: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM CPU_A78_4: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_4: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM CPU_A78_5: ARG MIN_FREQ: PATH /sys/devices/system/cpu/cpu5/cpufreq/scaling_min_freq: REAL_VAL: 729600 CONF_VAL: 729600\nNVPM VERB: PARAM CPU_A78_5: ARG MAX_FREQ: PATH /sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq: REAL_VAL: 1497600 CONF_VAL: 1497600\nNVPM VERB: PARAM GPU: ARG MIN_FREQ: PATH /sys/devices/platform/17000000.gpu/devfreq_dev/min_freq: REAL_VAL: 306000000 CONF_VAL: 0\nNVPM VERB: PARAM GPU: ARG MAX_FREQ: PATH /sys/devices/platform/17000000.gpu/devfreq_dev/max_freq: REAL_VAL: 612000000 CONF_VAL: 612000000\nNVPM VERB: PARAM GPU_POWER_CONTROL_DISABLE: ARG GPU_PWR_CNTL_DIS: PATH /sys/devices/platform/gpu.0/power/control: REAL_VAL: auto CONF_VAL: auto\nNVPM VERB: PARAM EMC: ARG MAX_FREQ: PATH /sys/kernel/nvpmodel_clk_cap/emc: REAL_VAL: 2133000000 CONF_VAL: 2133000000\n",
+    "stderr": ""
+  },
+  "power_service": {
+    "exit": 0,
+    "stdout": "Result=success\nExecMainStatus=0\n",
+    "stderr": ""
+  },
+  "cpu_online": "0-5",
+  "limits": {
+    "/sys/devices/system/cpu/cpufreq/policy4/scaling_min_freq": "729600",
+    "/sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq": "729600",
+    "/sys/devices/system/cpu/cpufreq/policy4/scaling_max_freq": "1497600",
+    "/sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq": "1497600",
+    "/sys/devices/platform/gpu.0/devfreq_dev/min_freq": "306000000",
+    "/sys/devices/platform/17000000.gpu/devfreq_dev/min_freq": "306000000",
+    "/sys/devices/platform/gpu.0/devfreq_dev/max_freq": "612000000",
+    "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+    "/sys/class/devfreq/17000000.gpu/min_freq": "306000000",
+    "/sys/class/devfreq/17000000.gpu/max_freq": "612000000",
+    "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+    "/sys/kernel/debug/bpmp/debug/clk/emc/rate": "204000000",
+    "/sys/kernel/debug/bpmp/debug/clk/emc/min_rate": "204000000",
+    "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+    "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0"
+  }
+}

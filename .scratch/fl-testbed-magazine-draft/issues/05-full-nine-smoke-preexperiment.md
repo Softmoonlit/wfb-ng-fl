@@ -15,4 +15,7 @@ Status: ready-for-agent
 
 ## Comments
 
-- 初盘十台全部SSH可达、15W实际限制通过。fl07～fl10仍为旧Python版本，fl05绑定旧接口且native未运行，统一部署处理中。
+- 初盘十台全部SSH可达、15W实际限制通过。fl07～fl10仍为旧Python版本，fl05绑定旧接口且native未运行，已统一修复。
+- 本轮十台已统一加载c665948，native摘要一致，Long GI/40MHz/索引18启动和GET审计通过；部分客户端持续寻频，完整信道审计不通过。
+- 30秒七次快照：fl07/fl09始终OFFLINE，fl06反复READY/OFFLINE，其余六客户端READY。冒烟入口在prepare以`online target set mismatch`拒绝；未切频、未启动UFTP/HTTP或模型预实验。全十台临时unit均回收。见`../evidence/full-nine-current-inventory/README.md`。
+- 首次工具尝试因错误拒绝manifest中的build_identity.json停止，已修复并保留原记录，不计作无线失败。

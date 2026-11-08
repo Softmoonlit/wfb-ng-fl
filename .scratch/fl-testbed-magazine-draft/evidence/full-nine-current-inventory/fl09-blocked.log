@@ -1,0 +1,17 @@
+Started WFB-ng FL client persistent daemon.
+2026-11-06 20:12:43,683 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=9, TUN IP=10.80.0.19)
+2026-11-06 20:12:43,685 [INFO] [client-daemon] 检测到无线网卡 wlxbcec23372588，开始接管配置...
+2026-11-06 20:12:46,795 [INFO] [client-daemon] 网卡 wlxbcec23372588 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c9)
+2026-11-06 20:12:46,841 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c9 --tun-addr 10.80.0.19/24 --node-id 9 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxbcec23372588 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+Stopping WFB-ng FL client persistent daemon...
+2026-11-08 14:45:47,750 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+2026-11-08 14:45:48,083 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+wfb-fl-client-daemon.service: Deactivated successfully.
+Stopped WFB-ng FL client persistent daemon.
+wfb-fl-client-daemon.service: Consumed 54.183s CPU time.
+Started WFB-ng FL client persistent daemon.
+2026-11-08 14:46:01,908 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=9, TUN IP=10.80.0.19)
+2026-11-08 14:46:01,910 [INFO] [client-daemon] 检测到无线网卡 wlxbcec23372588，开始接管配置...
+2026-11-08 14:46:01,940 [INFO] [client-daemon] 网卡 wlxbcec23372588 接管就绪 (Channel=149, 功率索引=18, TUN=fl-c9)
+2026-11-08 14:46:01,979 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c9 --tun-addr 10.80.0.19/24 --node-id 9 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxbcec23372588 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+ExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261108T064511Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxbcec23372588 ; ignore_errors=no ; start_time=[Sun 2026-11-08 14:46:01 CST] ; stop_time=[n/a] ; pid=7792 ; code=(null) ; status=0/0 }

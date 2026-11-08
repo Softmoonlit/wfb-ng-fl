@@ -1,0 +1,32 @@
+Started WFB-ng FL client persistent daemon.
+2026-11-07 00:15:22,785 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=6, TUN IP=10.80.0.16)
+2026-11-07 00:15:22,788 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500bfe，开始接管配置...
+2026-11-07 00:15:26,108 [INFO] [client-daemon] 网卡 wlxfc221c500bfe 接管就绪 (Channel=149, 功率索引=18, TUN=fl-c6)
+2026-11-07 00:15:26,147 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c6 --tun-addr 10.80.0.16/24 --node-id 6 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c500bfe --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+2026-11-08 14:30:35,008 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:30:46,531 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:31:28,858 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:31:46,960 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:32:00,473 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:32:14,190 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:32:50,393 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:33:19,271 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:33:43,463 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:33:58,883 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:43:13,729 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:44:12,511 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+Stopping WFB-ng FL client persistent daemon...
+2026-11-08 14:45:47,713 [INFO] [client-daemon] 收到退出信号 (15)，正在优雅退出...
+2026-11-08 14:45:47,942 [INFO] [client-daemon] wfb-fl-client-daemon 已安全停止
+wfb-fl-client-daemon.service: Deactivated successfully.
+Stopped WFB-ng FL client persistent daemon.
+wfb-fl-client-daemon.service: Consumed 46.671s CPU time.
+Started WFB-ng FL client persistent daemon.
+2026-11-08 14:46:01,941 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=6, TUN IP=10.80.0.16)
+2026-11-08 14:46:01,942 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500bfe，开始接管配置...
+2026-11-08 14:46:02,305 [INFO] [client-daemon] 网卡 wlxfc221c500bfe 接管就绪 (Channel=149, 功率索引=18, TUN=fl-c6)
+2026-11-08 14:46:02,359 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c6 --tun-addr 10.80.0.16/24 --node-id 6 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c500bfe --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+2026-11-08 14:46:56,867 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:48:59,300 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 14:49:37,463 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+ExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261108T064511Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c500bfe ; ignore_errors=no ; start_time=[Sun 2026-11-08 14:46:01 CST] ; stop_time=[n/a] ; pid=7295 ; code=(null) ; status=0/0 }

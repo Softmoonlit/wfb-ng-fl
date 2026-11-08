@@ -1,0 +1,53 @@
+{
+  "hostname": "fl08",
+  "disk_hashes": {
+    "console.py": "0be60dda2798db654e120706883552471cb181bb689489c4c05d0c9858aa7a12",
+    "algorithm.py": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+    "coordinator.py": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+    "mnist.py": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+    "mnist_cnn_model.py": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+    "artifacts.py": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+    "reference_model.py": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+    "errors.py": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+    "runtime.py": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+    "evidence.py": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+    "model_artifact.py": "f4e64dc61daf68dca0c8f074f12521bf37dd03f8c55aa90bc40cb11d31f37acc",
+    "__init__.py": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+    "mnist_data.py": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+    "mnist_cnn_32_64.py": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+    "issue41_fixtures.py": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+    "model_library.py": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+    "server_daemon.py": "e124fa5e5205e90e0fe4b5769b5b6e0174e3dbd684b4fb9917d94b3c3ca2a092",
+    "service.py": "ccb9ea667057f28b301fee504849fa52b21c5230d6d22dadd6cfd2dc0298ee4b",
+    "control.py": "198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec",
+    "role.py": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+    "console_http.py": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+    "observation.py": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+    "fp64_audit.py": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+    "client_daemon.py": "39ab1e25e8d6f72c573672658b403411eb84e02f665b020d8cd877b15bbbde38",
+    "mnist_deployment.py": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+    "radio.py": "cc68fe35ee107b038b5b097e22463d3c93ddec2533e5cd1ab16d1dda112a6334",
+    "link_radio.py": "62b0fb0e64362aa483f59e57af742ccb48bb621573113f2db500f77e659e4d69",
+    "build_identity.json": "5d09591e5fb0602044eb9363a55ddfa5ab9ec46b8b5a7d18aadaa5415599b334",
+    "transport.py": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+  },
+  "disk_diff_vs_fl00_manifest": [
+    "console.py",
+    "server_daemon.py",
+    "service.py",
+    "control.py",
+    "client_daemon.py",
+    "radio.py",
+    "link_radio.py",
+    "build_identity.json"
+  ],
+  "disk_build_identity": {
+    "commit": "5443ca22658202805317a9a974c261cde7c751b9",
+    "schema_version": 1
+  },
+  "journal": {
+    "exit": 0,
+    "stdout": "2026-11-06T19:30:35+0800 fl08 systemd[1]: Started WFB-ng FL client persistent daemon.\n2026-11-06T19:30:41+0800 fl08 wfb-fl-client-daemon[859]: 2026-11-06 19:30:41,817 [INFO] [client-daemon] wfb-fl-client-daemon 启动 (Node ID=8, TUN IP=10.80.0.18)\n2026-11-06T19:30:41+0800 fl08 wfb-fl-client-daemon[859]: 2026-11-06 19:30:41,820 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500a88，开始接管配置...\n2026-11-06T19:30:45+0800 fl08 wfb-fl-client-daemon[859]: 2026-11-06 19:30:45,094 [INFO] [client-daemon] 网卡 wlxfc221c500a88 接管就绪 (Channel=149, TXPower=14 dBm, TUN=fl-c8)\n2026-11-06T19:30:45+0800 fl08 wfb-fl-client-daemon[859]: 2026-11-06 19:30:45,123 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c8 --tun-addr 10.80.0.18/24 --node-id 8 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --radio-short-gi --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64\n",
+    "stderr": ""
+  }
+}
