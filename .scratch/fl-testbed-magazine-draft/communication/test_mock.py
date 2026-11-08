@@ -360,11 +360,40 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'manifest mismatch|source mismatch'):
                     node_agent.verify_source_files(installed, source, files)
                 missing.write_bytes(b'# frozen')
-        for name in ('nested/role.py', '../role.py', '..', '.'):
-            with self.subTest(manifest_name=name), self.assertRaisesRegex(RuntimeError, 'only top-level files'):
+        for name in ('../role.py', '..', '.', '/role.py', 'static/../../role.py',
+                     'static/../role.py', '', 'static//role.py'):
+            with self.subTest(manifest_name=name), self.assertRaisesRegex(RuntimeError, 'safe relative paths'):
                 node_agent.verify_source_files(installed, source, dict(files, **{name: '0' * 64}))
         with self.assertRaisesRegex(RuntimeError, 'file set mismatch'):
             node_agent.verify_source_files(installed, source, dict(files, **{'extra.py': '0' * 64}))
+
+    def test_prepare_source_identity_accepts_safe_nested_assets_and_checks_all_hashes(self):
+        installed = Path(self.temporary.name) / 'installed'
+        source = Path(self.temporary.name) / 'source'
+        contents = {'role.py': b'# frozen', 'static/index.html': b'<html></html>',
+                    'static/css/app.css': b'body {}', 'static/js/app.js': b'boot();',
+                    'nested/helper.py': b'# nested frozen'}
+        files = {name: hashlib.sha256(content).hexdigest()
+                 for name, content in contents.items()}
+        for directory in (installed, source):
+            for name, content in contents.items():
+                path = directory / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(content)
+        node_agent.verify_source_files(installed, source, files)
+        for directory in (installed, source):
+            for name, content in contents.items():
+                with self.subTest(directory=str(directory), name=name):
+                    path = directory / name
+                    path.write_bytes(b'tampered')
+                    with self.assertRaisesRegex(RuntimeError, 'manifest mismatch|source mismatch'):
+                        node_agent.verify_source_files(installed, source, files)
+                    path.write_bytes(content)
+                    if '/' in name:
+                        path.unlink()
+                        with self.assertRaises(FileNotFoundError):
+                            node_agent.verify_source_files(installed, source, files)
+                        path.write_bytes(content)
 
     def test_smoke_dry_run_generates_exact_1mib_without_process(self):
         argv = ['runner', '--smoke', '--output', self.temporary.name, '--run-id', 'smoke-test']
