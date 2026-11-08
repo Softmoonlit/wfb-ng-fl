@@ -1,5 +1,6 @@
 """在线目标的冻结源码发布节点执行器；不含软件依赖或驱动变更。"""
 import hashlib
+import ast
 import importlib
 import json
 import os
@@ -66,8 +67,15 @@ def interfaces():
 
 
 cards = interfaces()
-assert len(cards) == 1, [str(p) for p in cards]
-iface = cards[0].name
+pid = run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip()
+if phase in {'install', 'start'}:
+    iface = (root / 'interface').read_text().strip()
+else:
+    assert int(pid) > 0
+    bound_args = (pathlib.Path('/proc') / pid / 'cmdline').read_bytes().split(b'\0')
+    assert b'--interface' in bound_args, bound_args
+    iface = bound_args[bound_args.index(b'--interface') + 1].decode()
+assert iface in {p.name for p in cards}, {'bound': iface, 'cards': [p.name for p in cards]}
 assert sha('/usr/bin/wfb_v6_uplink') == native_sha
 if phase == 'preflight':
     assert not root.exists()
@@ -84,27 +92,17 @@ if phase == 'preflight':
         assert identity['tun_ip'].split('/')[0] == '10.80.0.' + str(10 + int(host[2:]))
     native_pids = [p for p in pathlib.Path('/proc').iterdir() if p.name.isdigit()
                    and (p / 'exe').exists() and (p / 'exe').resolve() == pathlib.Path('/usr/bin/wfb_v6_uplink')]
-    repair = None
-    if not native_pids:
-        # 本轮 fl05 已换卡：仅接受旧服务明确绑定已消失网卡的可核实状态。
-        pid = run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip()
-        daemon_args = (pathlib.Path('/proc') / pid / 'cmdline').read_bytes().split(b'\0')
-        assert host == 'fl05' and b'--interface' in daemon_args, daemon_args
-        old_iface = daemon_args[daemon_args.index(b'--interface') + 1].decode()
-        assert old_iface != iface and not (pathlib.Path('/sys/class/net') / old_iface).exists()
-        repair = {'reason': 'replaced_card_stale_interface', 'old_iface': old_iface,
-                  'current_iface': iface, 'daemon_pid': pid, 'daemon_args': [s.decode() for s in daemon_args if s]}
-    else:
-        assert len(native_pids) == 1
-        assert sha(native_pids[0] / 'exe') == native_sha
+    assert len(native_pids) == 1
+    assert sha(native_pids[0] / 'exe') == native_sha
     emit({'host': host, 'unit': state, 'iface': iface,
-          'native_pid': native_pids[0].name if native_pids else None, 'repair': repair,
+          'native_pid': native_pids[0].name,
           'native_sha': native_sha, 'control_sha': sha(installed / 'control.py'),
           'radio': run(['iw', 'dev', iface, 'info']),
           'nvpmodel': run(['/usr/sbin/nvpmodel', '-q'])})
 elif phase == 'prepare':
     assert sha(stage / 'source.tar') == archive_sha
     root.mkdir(parents=True)
+    (root / 'interface').write_text(iface + '\n')
     backup = root / 'backup'
     backup.mkdir()
     shutil.copytree(installed, backup / 'fl')
@@ -126,7 +124,28 @@ elif phase == 'prepare':
         assert all((source / name).exists() and (not m.isfile() or (source / name).stat().st_size == m.size)
                    for m, name in zip(members, names))
     shutil.copy2('/usr/bin/wfb_v6_uplink', source / 'wfb_v6_uplink')
-    emit({'host': host, 'phase': phase, 'archive_sha': archive_sha, 'root': str(root)})
+    for name in ('uftp', 'uftpd', 'make'):
+        assert shutil.which(name), name
+    runtime_files = sorted(str(p.relative_to(source / 'wfb_ng/fl'))
+                           for p in (source / 'wfb_ng/fl').rglob('*') if p.is_file()
+                           and p.suffix in {'.py', '.html', '.css', '.js'})
+    assert 'cifar10_model.py' in runtime_files
+    for name in runtime_files:
+        if name.endswith('.py'):
+            ast.parse((source / 'wfb_ng/fl' / name).read_text(), filename=name)
+    check = """import sys,types,pathlib,importlib,importlib.util,json
+base=pathlib.Path(sys.argv[1])
+pkg=types.ModuleType('wfb_ng');pkg.__path__=[str(base/'wfb_ng')];sys.modules['wfb_ng']=pkg
+importlib.import_module('wfb_ng.fl.server_daemon')
+importlib.import_module('wfb_ng.fl.client_daemon')
+assert 'torch' not in sys.modules and 'torchvision' not in sys.modules
+import setuptools
+print(json.dumps({'daemon_import_without_torch':True,'model_dependencies':{n:importlib.util.find_spec(n) is not None for n in ['torch','torchvision']}}))
+"""
+    deps = json.loads(run(['/usr/bin/python3', '-I', '-B', '-c', check, str(source)]))
+    (root / 'runtime-files.json').write_text(json.dumps(runtime_files))
+    emit({'host': host, 'phase': phase, 'archive_sha': archive_sha, 'root': str(root),
+          'runtime_files': runtime_files, 'dependencies': deps, 'iface': iface})
 elif phase == 'stop':
     run(['systemctl', 'stop', unit])
     assert run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip() == '0'
@@ -145,8 +164,14 @@ elif phase == 'install':
     env = dict(os.environ, COMMIT=commit, VERSION='26.11.6', PREFIX='/usr',
                PYTHON='/usr/bin/python3', PYTHONDONTWRITEBYTECODE='1')
     run(['sh', 'scripts/install/install-v8.sh'], cwd=source, env=env)
+    runtime_files = json.loads((root / 'runtime-files.json').read_text())
+    actual_files = sorted(str(p.relative_to(installed)) for p in installed.rglob('*')
+                          if p.is_file() and p.suffix in {'.py', '.html', '.css', '.js'})
+    assert actual_files == runtime_files, {'actual': actual_files, 'expected': runtime_files}
+    for name in runtime_files:
+        assert sha(source / 'wfb_ng/fl' / name) == sha(installed / name), name
     expected = {str(p.relative_to(installed)): sha(p) for p in installed.rglob('*')
-                if p.is_file() and p.suffix in {'.py', '.json'}}
+                if p.is_file() and p.suffix in {'.py', '.json', '.html', '.css', '.js'}}
     for path in (source / 'wfb_ng/fl').glob('*.py'):
         assert sha(path) == sha(installed / path.name)
     assert json.loads((installed / 'build_identity.json').read_text())['commit'] == commit
@@ -190,6 +215,7 @@ elif phase == 'start':
 elif phase == 'audit':
     pid = int(run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip())
     assert pid > 0
+    assert run(['systemctl', 'is-active', unit]).strip() == 'active'
     loaded = json.loads((root / 'loaded.json').read_text())
     assert loaded['pid'] == pid and loaded['commit'] == commit
     native = []
@@ -204,6 +230,10 @@ elif phase == 'audit':
     path, args = native[0]
     assert sha(path / 'exe') == native_sha
     assert args[args.index(b'--air-interface') + 1].decode() == iface
+    if role == 'server':
+        assert args[args.index(b'--grant-duration-ms') + 1] == b'10'
+        assert args[args.index(b'--guard-interval-ms') + 1] == b'10'
+        assert b'/usr/bin/wfb_v6_uplink' == args[0]
     assert b'--radio-short-gi' not in args
     assert b'--radio-control-port' in args
     control_port = int(args[args.index(b'--radio-control-port') + 1])

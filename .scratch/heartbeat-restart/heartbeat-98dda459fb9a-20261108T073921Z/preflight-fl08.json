@@ -1,0 +1,6 @@
+{
+  "host": "fl08",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl08\", \"unit\": \"MainPID=8552\\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261108T064511Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c500a88 ; ignore_errors=no ; start_time=[Sun 2026-11-08 14:46:01 CST] ; stop_time=[n/a] ; pid=8552 ; code=(null) ; status=0/0 }\\nActiveState=active\\n\", \"iface\": \"wlxfc221c500a88\", \"native_pid\": \"8569\", \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"control_sha\": \"9db50568ebeccc3e8c8e0417e485611c01acb090c0fe1c4e354732be08b15864\", \"radio\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"nvpmodel\": \"NV Power Mode: 15W\\n0\\n\"}\n",
+  "stderr": ""
+}

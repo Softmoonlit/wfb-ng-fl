@@ -1,0 +1,198 @@
+{
+  "commit": "98dda459fb9a1cecf64fd03e224427b8b7f689fe",
+  "release_id": "heartbeat-98dda459fb9a-20261108T073921Z",
+  "targets": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl04",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "batches": 1,
+  "allRF": true,
+  "all_active": true,
+  "all_nine_ready_at_each_postcheck": true,
+  "observation_utc": [
+    "2026-11-08T07:42:34.841775+00:00",
+    "2026-11-08T07:42:49.866199+00:00",
+    "2026-11-08T07:43:04.900541+00:00"
+  ],
+  "nodes": [
+    {
+      "host": "fl00",
+      "interface": "wlxfc221c100119",
+      "pid": 30460,
+      "native_pid": "30514",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": true
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl01",
+      "interface": "wlxfc221c500bfe",
+      "pid": 6987,
+      "native_pid": "7003",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl02",
+      "interface": "wlxbcec23372588",
+      "pid": 7355,
+      "native_pid": "7371",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl04",
+      "interface": "wlxfc221c300cbc",
+      "pid": 6871,
+      "native_pid": "6887",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 1
+    },
+    {
+      "host": "fl05",
+      "interface": "wlxfc221c100157",
+      "pid": 6156,
+      "native_pid": "6172",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl06",
+      "interface": "wlxfc221c300cbb",
+      "pid": 12434,
+      "native_pid": "12450",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl07",
+      "interface": "wlxfc221c300e99",
+      "pid": 12582,
+      "native_pid": "12598",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl08",
+      "interface": "wlxfc221c500a88",
+      "pid": 11781,
+      "native_pid": "11798",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl09",
+      "interface": "wlx88e62852aae4",
+      "pid": 13434,
+      "native_pid": "13451",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": true,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    },
+    {
+      "host": "fl10",
+      "interface": "wlxfca386b38672",
+      "pid": 9722,
+      "native_pid": "9738",
+      "allRF": true,
+      "active": true,
+      "power": "15W",
+      "dependencies": {
+        "daemon_import_without_torch": true,
+        "model_dependencies": {
+          "torch": false,
+          "torchvision": false
+        }
+      },
+      "ack_recovery_warnings": 0
+    }
+  ],
+  "limitation": "fl04启动后曾缺5次ACK并寻频；后续三次快照READY，不能据此证明长期稳定；未执行模型或通信测试"
+}
