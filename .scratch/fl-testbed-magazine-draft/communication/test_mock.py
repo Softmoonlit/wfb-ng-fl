@@ -182,6 +182,101 @@ class MockTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     runner.main()
 
+    def test_native_candidate_metadata_defaults_and_overrides(self):
+        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        for flags, expected in [([], dict(fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)),
+                (['--fec-n', '12', '--grant-duration-ms', '15', '--guard-interval-ms', '0'],
+                 dict(fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=0))]:
+            with patch('sys.argv', argv + flags), patch('sys.stdout', new_callable=io.StringIO) as output:
+                self.assertEqual(runner.main(), 0)
+            self.assertEqual(json.loads(output.getvalue())['expected_native'], expected)
+
+    def test_resident_candidate_argv_requires_fec_everywhere_and_server_schedule_only(self):
+        expected = dict(fec_k=8, fec_n=12, grant_duration_ms=10, guard_interval_ms=10)
+        fec = ['--fec-k', '8', '--fec-n', '12']
+        for host in runner.HOSTS:
+            node = self.node(host)
+            node.expected_native = expected
+            argv = fec + (['--grant-duration-ms', '10', '--guard-interval-ms', '10'] if host == 'fl00' else [])
+            self.assertEqual(node.verify_native_parameters(argv)['fec_n'], 12)
+            with self.assertRaisesRegex(RuntimeError, 'parameters mismatch'):
+                node.verify_native_parameters([('14' if value == '12' else value) for value in argv])
+        server = self.node()
+        server.expected_native = expected
+        with self.assertRaisesRegex(RuntimeError, 'missing/duplicate option'):
+            server.verify_native_parameters(fec)
+        for key in ('--grant-duration-ms', '--guard-interval-ms'):
+            argv = fec + ['--grant-duration-ms', '10', '--guard-interval-ms', '10']
+            argv[argv.index(key) + 1] = '20'
+            with self.assertRaisesRegex(RuntimeError, 'parameters mismatch'):
+                server.verify_native_parameters(argv)
+
+    def test_get_fec_checks_command_peer_identity_return_code_and_active_values(self):
+        node = self.node('fl03')
+        node.control_port = 8000
+        node.expected_native = dict(fec_k=8, fec_n=12)
+        sock = Mock()
+        with patch('node_agent.socket.socket') as socket:
+            socket.return_value.__enter__.return_value = sock
+            sock.recvfrom.return_value = (struct.pack('!II2B', 0x434f4d4d, 0, 8, 12), ('127.0.0.1', 8000))
+            self.assertEqual(node.read_fec(), dict(k=8, n=12))
+            sock.sendto.assert_called_with(struct.pack('!IB', 0x434f4d4d, 3), ('127.0.0.1', 8000))
+            for ident, rc, k, n, port in [(1, 0, 8, 12, 8000), (0x434f4d4d, 1, 8, 12, 8000),
+                    (0x434f4d4d, 0, 8, 14, 8000), (0x434f4d4d, 0, 8, 12, 8001)]:
+                sock.recvfrom.return_value = (struct.pack('!II2B', ident, rc, k, n), ('127.0.0.1', port))
+                with self.assertRaisesRegex(RuntimeError, 'GET FEC mismatch'):
+                    node.read_fec()
+
+    def test_acquire_routes_ht40_mcs4_12m_to_calibration_and_18m_to_ordinary(self):
+        for bandwidth, mcs, rate, endpoint in [(40, 4, 12000, 'calibrate'),
+                (40, 4, 18000, 'reconfigure'), (40, 4, 26000, 'reconfigure'),
+                (40, 3, 12000, 'reconfigure'), (20, 3, 6000, 'calibrate')]:
+            node = self.node()
+            node.prepared = True
+            node.original = {}
+            node.patch = dict(node_agent.PATCH, bandwidth_mhz=bandwidth, downlink_mcs=mcs, uftp_rate_kbps=rate)
+            with patch.object(node, 'registry_gate'), patch.object(node, 'persist_cleanup'), patch.object(
+                    node, 'radio_transaction', return_value=dict(ok=True)) as transaction:
+                node.acquire_radio()
+            transaction.assert_called_once_with(endpoint, node.patch)
+
+    def test_standard_release_checks_current_process_and_ignores_historical_loaded(self):
+        base = Path('/usr/local/lib/python3.10/dist-packages/wfb_ng/fl')
+        release = Path(node_agent.RELEASE_ROOT)
+        for host, role in [('fl00', 'server'), ('fl03', 'client')]:
+            node = self.node(host)
+            module = 'wfb_ng.fl.' + role + '_daemon'
+            argv = ['/usr/bin/python3', '-I', '-B', '-m', module, '--config', '/etc/node.json']
+            manifest = dict(commit=node_agent.COMMIT, native_sha=node_agent.NATIVE_SHA,
+                installed=str(base), files={role + '_daemon.py': 'digest', 'role.py': 'digest'})
+            def read(path, *args, **kwargs):
+                if path == release / 'actualargs.json':
+                    return json.dumps(argv)
+                if path == release / 'manifest.json':
+                    return json.dumps(manifest)
+                if path == base / 'build_identity.json':
+                    return json.dumps(dict(commit=node_agent.COMMIT))
+                raise AssertionError('unexpected identity file: ' + str(path))
+            def resolve(path, *args, **kwargs):
+                return Path('/usr/bin/python3') if path == Path('/proc/123/exe') else path
+            resolved = {module: str(base / (role + '_daemon.py')), 'wfb_ng.fl.role': str(base / 'role.py')}
+            with patch.object(Path, 'read_text', read), patch.object(Path, 'resolve', resolve), patch(
+                    'node_agent.verify_source_files') as sources, patch('node_agent.sha', return_value='digest'), patch(
+                    'node_agent.run', return_value=json.dumps(resolved)) as command:
+                result = node.verify_standard_release(123, argv, str(release))
+                self.assertEqual(result['pid'], 123)
+                sources.assert_called_once_with(base, release / 'source/wfb_ng/fl', manifest['files'])
+                self.assertEqual(command.call_args.args[0][:4], ['/usr/bin/python3', '-I', '-B', '-c'])
+                with self.assertRaisesRegex(RuntimeError, 'standard isolated daemon entry'):
+                    node.verify_standard_release(123, ['/usr/bin/python3', '-I', '-B', str(release / 'daemon.py')], str(release))
+                command.return_value = json.dumps({**resolved, module: '/tmp/daemon.py'})
+                with self.assertRaisesRegex(RuntimeError, 'isolated module origin'):
+                    node.verify_standard_release(123, argv, str(release))
+                command.return_value = json.dumps(resolved)
+                manifest['commit'] = 'old-commit'
+                with self.assertRaisesRegex(RuntimeError, 'release identity'):
+                    node.verify_standard_release(123, argv, str(release))
+
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
             'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -273,6 +368,8 @@ class MockTests(unittest.TestCase):
                         events.append((self.host, action))
                         if action == 'prepare':
                             assert params['timing'] == runner.TIMING
+                            assert params['expected_native'] == dict(fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
+                            assert params['release_root'] == runner.RELEASE_ROOT
                             expected = dict(self_test.payload)
                             if self.host != 'fl00':
                                 expected.pop('path')

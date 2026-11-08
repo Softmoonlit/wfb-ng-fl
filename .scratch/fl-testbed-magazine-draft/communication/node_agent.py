@@ -17,9 +17,9 @@ import sys
 import time
 import urllib.request
 
-COMMIT = '98dda459fb9a1cecf64fd03e224427b8b7f689fe'
+COMMIT = 'c98853fa008a945e3a87503051bae49f5d0083bd'
+RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-c98853fa008a-20261108T093030Z'
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
-WRAPPER_SHA = 'd68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6'
 # fl00 实际 PATH 中的 UFTP 5.0.3；运行依赖独立于 release 源码 manifest。
 UFTP_SHA256 = {
     'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -140,8 +140,16 @@ class Node:
         temporary.write_text(json.dumps(state))
         os.replace(temporary, self.root / 'cleanup-state.json')
 
-    def prepare(self, run_id, payload, timing, patch=None):
+    def prepare(self, run_id, payload, timing, patch=None, expected_native=None, release_root=RELEASE_ROOT):
         # 生命周期从代理启动起算；清理不得再次延长节点总期限。
+        self.expected_native = dict(expected_native) if expected_native is not None else dict(
+            fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
+        require(self.expected_native.get('fec_k') == 8
+                and self.expected_native.get('fec_n') in (12, 14)
+                and type(self.expected_native.get('grant_duration_ms')) is int
+                and self.expected_native['grant_duration_ms'] > 0
+                and type(self.expected_native.get('guard_interval_ms')) is int
+                and self.expected_native['guard_interval_ms'] >= 0, 'invalid expected native parameters')
         self.patch = dict(PATCH)
         if patch is not None:
             require(isinstance(patch, dict), 'invalid radio patch')
@@ -177,24 +185,12 @@ class Node:
         pid = int(run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip())
         require(pid > 0, 'daemon absent')
         daemon_argv = Path('/proc', str(pid), 'cmdline').read_bytes().decode().rstrip('\0').split('\0')
-        wrappers = [Path(a) for a in daemon_argv if a.endswith('/daemon.py')]
-        require(len(wrappers) == 1, 'release wrapper absent')
-        release = wrappers[0].parent
-        require(str(release).startswith('/srv/wfb-ng-fl/releases/heartbeat-' + COMMIT[:12] + '-'), 'unexpected release')
-        require(sha(wrappers[0]) == WRAPPER_SHA, 'release wrapper SHA mismatch')
-        manifest = json.loads((release / 'manifest.json').read_text())
-        loaded = json.loads((release / 'loaded.json').read_text())
-        require(manifest['commit'] == loaded['commit'] == COMMIT and loaded['pid'] == pid, 'release identity mismatch')
-        base = Path(manifest['installed']).resolve()
-        require(str(base).startswith('/usr/') and base.parts[-2:] == ('wfb_ng', 'fl'), 'installed source required')
-        source = release / 'source/wfb_ng/fl'
-        verify_source_files(base, source, manifest['files'])
-        for item in loaded['modules'].values():
-            require(Path(item['path']).resolve().parent == base and sha(item['path']) == item['sha256'], 'loaded mismatch')
-        # 严格复用包装器的安装来源，排除当前目录及 PYTHONPATH 遮蔽。
-        sys.path[:] = [str(base.parent.parent)] + [p for p in sys.path if p.startswith('/usr/')]
+        release_identity = self.verify_standard_release(pid, daemon_argv, release_root)
+        base = Path(release_identity['installed'])
+        source = Path(release_root) / 'source/wfb_ng/fl'
         role_module = importlib.import_module('wfb_ng.fl.role')
-        require(Path(role_module.__file__).resolve().parent == base, 'role import origin mismatch')
+        require(Path(role_module.__file__).resolve() == base / 'role.py', 'role import origin mismatch')
+        require(sha(role_module.__file__) == release_identity['files']['role.py'], 'role import SHA mismatch')
         natives = []
         for proc in Path('/proc').glob('[0-9]*/cmdline'):
             try:
@@ -206,6 +202,7 @@ class Node:
         require(len(natives) == 1, 'native must be unique')
         proc, argv = natives[0]
         require(sha(proc / 'exe') == NATIVE_SHA, 'native hash mismatch')
+        native_parameters = self.verify_native_parameters(argv)
         self.resident = {str(pid): Path('/proc', str(pid), 'stat').read_text().rsplit(')', 1)[1].split()[19],
                          proc.name: (proc / 'stat').read_text().rsplit(')', 1)[1].split()[19]}
         self.tun = option(argv, '--tun-name')
@@ -214,6 +211,7 @@ class Node:
         require(option(argv, '--tun-addr') == self.ip + '/24', 'native TUN IP mismatch')
         self.interface = option(argv, '--air-interface')
         self.control_port = int(option(argv, '--radio-control-port'))
+        fec_fact = self.read_fec()
         radio_fact = self.read_radio(channels=(149, 157), expected_bandwidth=40)
         self.original_channel = int(re.search(r'\bchannel (\d+) ', radio_fact['iw']).group(1))
         links = json.loads(run(['ip', '-j', 'addr', 'show', 'dev', self.tun]))
@@ -236,11 +234,65 @@ class Node:
         self.prepared = True
         self.persist_cleanup()
         return self.fact('prepared', daemon_pid=pid, native_pid=int(proc.name), native_sha=NATIVE_SHA,
-                         tun=self.tun, ifindex=self.ifindex, radio=radio_fact,
-                         wrapper_sha=WRAPPER_SHA, installed=str(base), source=str(source),
+                         tun=self.tun, ifindex=self.ifindex, radio=radio_fact, fec=fec_fact,
+                         expected_native=self.expected_native, native_parameters=native_parameters,
+                         release_identity=release_identity, installed=str(base), source=str(source),
                          payload=self.payload, timing=self.timing,
                          runtime_dependencies=self.runtime_dependencies,
                          scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
+
+    def verify_standard_release(self, pid, daemon_argv, release_root):
+        release = Path(release_root)
+        require(release.is_absolute() and release.parent == Path('/srv/wfb-ng-fl/releases')
+                and release.name.startswith('heartbeat-' + COMMIT[:12] + '-'), 'unexpected release')
+        module = 'wfb_ng.fl.' + ('server' if self.node == 0 else 'client') + '_daemon'
+        require(daemon_argv[:5] == ['/usr/bin/python3', '-I', '-B', '-m', module],
+                'standard isolated daemon entry required')
+        require(Path('/proc', str(pid), 'exe').resolve() == Path('/usr/bin/python3').resolve(),
+                'daemon interpreter mismatch')
+        require(daemon_argv == json.loads((release / 'actualargs.json').read_text()),
+                'release actualargs mismatch')
+        manifest = json.loads((release / 'manifest.json').read_text())
+        require(manifest['commit'] == COMMIT and manifest['native_sha'] == NATIVE_SHA,
+                'release identity mismatch')
+        base = Path(manifest['installed']).resolve()
+        require(str(base).startswith('/usr/') and base.parts[-2:] == ('wfb_ng', 'fl'),
+                'installed source required')
+        verify_source_files(base, release / 'source/wfb_ng/fl', manifest['files'])
+        identity = json.loads((base / 'build_identity.json').read_text())
+        require(identity['commit'] == COMMIT, 'installed build identity mismatch')
+        probe = ('import importlib,json; names=' + repr([module, 'wfb_ng.fl.role']) +
+                 '; print(json.dumps({name:importlib.import_module(name).__file__ for name in names}))')
+        resolved = json.loads(run(['/usr/bin/python3', '-I', '-B', '-c', probe]))
+        for name in (module, 'wfb_ng.fl.role'):
+            path = Path(resolved[name]).resolve()
+            require(path == base / (name.rsplit('.', 1)[1] + '.py'), 'isolated module origin mismatch')
+            require(sha(path) == manifest['files'][path.name], 'isolated module SHA mismatch')
+        return dict(commit=COMMIT, release_root=str(release), installed=str(base),
+                    files=manifest['files'], pid=pid, actualargs=daemon_argv, resolved=resolved,
+                    verification='current proc argv/executable plus isolated module resolution and SHA')
+
+    def verify_native_parameters(self, argv):
+        keys = ['fec_k', 'fec_n']
+        if self.node == 0:
+            keys += ['grant_duration_ms', 'guard_interval_ms']
+        actual = {key: int(option(argv, '--' + key.replace('_', '-'))) for key in keys}
+        require(all(actual[key] == self.expected_native[key] for key in keys),
+                'resident native parameters mismatch')
+        return actual
+
+    def read_fec(self):
+        # tx_cmd.h: CMD_GET_FEC=3; response req_id/rc + uint8 k,n.
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.settimeout(3)
+            sock.sendto(struct.pack('!IB', 0x434f4d4d, 3), ('127.0.0.1', self.control_port))
+            raw, address = sock.recvfrom(4096)
+        require(len(raw) == struct.calcsize('!II2B'), 'GET FEC response size mismatch')
+        fec = struct.unpack('!II2B', raw)
+        require(address == ('127.0.0.1', self.control_port) and fec[:2] == (0x434f4d4d, 0)
+                and fec[2:] == (self.expected_native['fec_k'], self.expected_native['fec_n']),
+                'GET FEC mismatch')
+        return dict(k=fec[2], n=fec[3])
 
     def read_radio(self, channels=None, expected_bandwidth=None):
         if channels is None:
@@ -309,7 +361,10 @@ class Node:
         self.radio_attempted = True
         self.persist_cleanup()
         self.fact('radio_attempted', original=self.original)
-        endpoint = 'calibrate' if self.patch['bandwidth_mhz'] == 20 else 'reconfigure'
+        calibration = (self.patch['bandwidth_mhz'] == 20 or
+                       (self.patch['bandwidth_mhz'] == 40 and self.patch['downlink_mcs'] == 4
+                        and self.patch['uftp_rate_kbps'] == 12000))
+        endpoint = 'calibrate' if calibration else 'reconfigure'
         result = self.radio_transaction(endpoint, self.patch)
         return self.fact('radio_acquired', response=result,
                          proof='普通重配事务，不持有守护进程作业准入租约')

@@ -1,6 +1,8 @@
 # 十客户端通信 runner
 
-服务端固定 fl00，客户端固定 fl01/fl02/fl03/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,3,4,5,6,7,8,9,10]`。使用已安装 c665948 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。c665 commit、release 路径、完整安装身份、wrapper/native SHA 门槛保留，库存不符会拒绝 prepare。
+服务端固定 fl00，客户端固定 fl01/fl02/fl03/fl04/fl05/fl06/fl07/fl08/fl09/fl10，节点集合为 `[1,2,3,4,5,6,7,8,9,10]`。使用已安装 c98853f 的 ServerRole/ClientRole 和正式 UFTP/HTTP 传输；客户端接收载荷后上传同一文件，无训练、聚合或评估。c98853f commit、release 路径、完整安装身份、native SHA 门槛保留，库存不符会拒绝 prepare。
+
+标准部署身份只接受 `/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon/client_daemon`。`--release-root` 默认 `/srv/wfb-ng-fl/releases/heartbeat-c98853fa008a-20261108T093030Z`，用于读取 manifest、actualargs 和冻结 source；commit 固定 `c98853fa008a945e3a87503051bae49f5d0083bd`。prepare 核对当前 MainPID 的 proc argv 与 executable、发布 actualargs、完整安装/源码 SHA、build identity，再用独立 `-I -B` 解释器导入 daemon/role 核对解析路径和 SHA。此证据不宣称读取活进程 sys.modules；不读取历史 loaded.json，不支持 daemon.py wrapper。当前 native 期望 grant15/guard5。
 
 ## 载荷与执行门槛
 
@@ -23,6 +25,10 @@ model 计划使用 `kind=model-equivalent-communication`、`model_manifest_match
 
 只有服务端 prepare 收到 `{path,size_bytes,sha256}`；十客户端仅收到大小和摘要。fl00 必须能直接读取载荷路径，管理网不传载荷。服务端 publish 校验源文件，复制到本轮自有工作目录，再验 SHA，随后 UFTP 下发。全部客户端接收校验成功后才统一上传原接收文件；服务端必须收到并独立验证完整十份更新。`max_update_size_bytes` 精确等于载荷实际大小。
 
+`--fec-n {12,14}` 默认 14，`--grant-duration-ms` 默认 15（正整数），`--guard-interval-ms` 默认 5（非负整数）。plan 的 `expected_native` 固定 `fec_k=8` 并记录这三个期望值；它们表示 resident 的实际启动参数，runner 不动态修改。prepare 在保留 native SHA 校验的同时，要求十一端真实 `/proc/<pid>/cmdline` 的 `--fec-k/--fec-n` 匹配，并只在服务端核对 grant/guard；客户端不要求 grant 参数。另用只读 GET_FEC（cmd 3）核对实际活动 FEC。切换 FEC14/FEC12 必须由外部正式部署工具统一重启全部十一板服务。
+
+HT40 下行 MCS4、12000kbps 候选的 acquire_radio 使用专用 calibrate endpoint；HT40、速率 >=18000kbps 使用普通 reconfigure。HT20 保留 calibrate；生产 API 准入另行检查。
+
 ## 无线与回收边界
 
 - 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 中 `.py` 条目集合三者严格相等；manifest 允许 `build_identity.json` 等顶层非 Python 文件，所有 manifest 条目都逐文件核验安装 SHA，Python 文件另核验冻结源码 SHA；服务端要求完整十客户端 READY/IDLE 且无活动作业。十一节点 prepare 全通过后才重配和启动角色。
@@ -42,4 +48,4 @@ model 计划使用 `kind=model-equivalent-communication`、`model_manifest_match
 python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
 ```
 
-44 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
+49 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
