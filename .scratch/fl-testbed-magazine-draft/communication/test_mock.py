@@ -338,6 +338,45 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'release identity'):
                     node.verify_standard_release(123, argv, str(release), candidate_commit)
 
+    def test_candidate_mcs_4_6_captures_baseline_3_4_then_verifies_candidate_and_restore(self):
+        for host, baseline, candidate in [('fl00', 3, 4), ('fl03', 4, 6)]:
+            node = self.node(host)
+            node.interface, node.control_port = 'wlan-test', 8000
+            node.patch = dict(node_agent.PATCH, downlink_mcs=4, uplink_mcs=6)
+            node.prepared = True
+            sock = Mock()
+            def response(mcs):
+                sock.recvfrom.return_value = (struct.pack('!II7B', 0x434f4d4d, 0,
+                    0, 0, 0, 40, mcs, 0, 1), ('127.0.0.1', 8000))
+            with patch('node_agent.run', return_value='channel 149 width: 40 MHz txpower -18.00 dBm type monitor'), patch.object(
+                    Path, 'resolve', return_value=Path('/drivers/rtl88xxau_wfb')), patch(
+                    'node_agent.socket.socket') as socket, patch.object(node, 'registry_gate', return_value=dict(radio=node.patch)):
+                socket.return_value.__enter__.return_value = sock
+                response(baseline)
+                node.capture_original_radio(['--radio-mcs-index', str(baseline)])
+                self.assertEqual(node.original_mcs, baseline)
+                with self.assertRaisesRegex(RuntimeError, 'already captured'):
+                    node.capture_original_radio(['--radio-mcs-index', str(baseline)])
+                # 尚未切换时不得将基线误判为候选已生效。
+                node.patch['channel'] = 149
+                with self.assertRaisesRegex(RuntimeError, 'GET radio mismatch'):
+                    node.verify_radio()
+                response(candidate)
+                node.verify_radio()
+                self.assertEqual(node.original_mcs, baseline)
+                with self.assertRaisesRegex(RuntimeError, 'GET radio mismatch'):
+                    node.read_radio(channels=(149,), expected_bandwidth=40, expected_mcs=node.original_mcs)
+                response(baseline)
+                self.assertEqual(node.read_radio(channels=(149,), expected_bandwidth=40,
+                    expected_mcs=node.original_mcs)['get_radio'][6], baseline)
+
+    def test_prepare_radio_baseline_rejects_candidate_or_drift_in_startup(self):
+        node = self.node('fl03')
+        with patch.object(node, 'read_radio') as read:
+            with self.assertRaisesRegex(RuntimeError, 'startup radio baseline mismatch'):
+                node.capture_original_radio(['--radio-mcs-index', '6'])
+        read.assert_not_called()
+
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
             'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -941,6 +980,7 @@ class MockTests(unittest.TestCase):
         node = self.node()
         node.prepared = node.closed = True
         node.original_channel = 149
+        node.original_mcs = 3
         node.resident = {'123': '99', '456': '99'}
         radio = dict(iw='channel 149', get_radio=[0, 0, 0, 0, 0, 40, 3, 0, 1])
         def read(path, *args, **kwargs):
@@ -965,7 +1005,7 @@ class MockTests(unittest.TestCase):
             result = node.audit_final()
             self.assertTrue(result['ok'])
             self.assertEqual(result['actual']['resident'], node.resident)
-            read_radio.assert_called_once_with(channels=(149,), expected_bandwidth=40)
+            read_radio.assert_called_once_with(channels=(149,), expected_bandwidth=40, expected_mcs=3)
             def drift(path, *args, **kwargs):
                 return '1' if str(path).endswith('/mrq_rate_locked') else read(path)
             with patch.object(Path, 'read_text', drift):

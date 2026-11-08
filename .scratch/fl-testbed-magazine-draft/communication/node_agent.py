@@ -135,7 +135,8 @@ class Node:
                      resident=self.resident, daemon_pid=getattr(self, 'daemon_pid', None),
                      radio_attempted=self.radio_attempted,
                      original=getattr(self, 'original', None),
-                     original_channel=getattr(self, 'original_channel', None))
+                     original_channel=getattr(self, 'original_channel', None),
+                     original_mcs=getattr(self, 'original_mcs', None))
         temporary = self.root / 'cleanup-state.tmp'
         temporary.write_text(json.dumps(state))
         os.replace(temporary, self.root / 'cleanup-state.json')
@@ -212,8 +213,7 @@ class Node:
         self.interface = option(argv, '--air-interface')
         self.control_port = int(option(argv, '--radio-control-port'))
         fec_fact = self.read_fec()
-        radio_fact = self.read_radio(channels=(149, 157), expected_bandwidth=40)
-        self.original_channel = int(re.search(r'\bchannel (\d+) ', radio_fact['iw']).group(1))
+        radio_fact = self.capture_original_radio(argv)
         links = json.loads(run(['ip', '-j', 'addr', 'show', 'dev', self.tun]))
         require(any(a.get('local') == self.ip for a in links[0]['addr_info']), 'actual TUN IP mismatch')
         self.ifindex = links[0]['ifindex']
@@ -296,12 +296,26 @@ class Node:
                 'GET FEC mismatch')
         return dict(k=fec[2], n=fec[3])
 
-    def read_radio(self, channels=None, expected_bandwidth=None):
+    def capture_original_radio(self, native_argv):
+        require(not hasattr(self, 'original_mcs'), 'original radio already captured')
+        startup_mcs = int(option(native_argv, '--radio-mcs-index'))
+        require(startup_mcs == (3 if self.node == 0 else 4), 'startup radio baseline mismatch')
+        snapshot = self.read_radio(channels=(149, 157), expected_bandwidth=40,
+                                   expected_mcs=startup_mcs)
+        # 来自实际 GET 的已验证快照；候选切换不覆盖原始恢复目标。
+        self.original_mcs = snapshot['get_radio'][6]
+        self.original_channel = int(re.search(r'\bchannel (\d+) ', snapshot['iw']).group(1))
+        self.fact('original_radio', native_startup_mcs=startup_mcs,
+                  original_mcs=self.original_mcs, radio=snapshot)
+        return snapshot
+
+    def read_radio(self, channels=None, expected_bandwidth=None, expected_mcs=None):
         if channels is None:
             channels = (self.patch['channel'],)
         if expected_bandwidth is None:
             expected_bandwidth = self.patch['bandwidth_mhz']
-        expected_mcs = self.patch['downlink_mcs'] if self.node == 0 else self.patch['uplink_mcs']
+        if expected_mcs is None:
+            expected_mcs = self.patch['downlink_mcs'] if self.node == 0 else self.patch['uplink_mcs']
         require(Path('/sys/class/net', self.interface, 'device/driver').resolve().name == 'rtl88xxau_wfb', 'driver mismatch')
         iw = run(['iw', 'dev', self.interface, 'info'])
         require(any('channel ' + str(channel) + ' ' in iw for channel in channels)
@@ -315,9 +329,6 @@ class Node:
         require(address == ('127.0.0.1', self.control_port) and radio[:2] == (0x434f4d4d, 0)
                 and radio[4] == 0 and radio[5:7] == (expected_bandwidth, expected_mcs), 'GET radio mismatch')
         return dict(iw=iw, get_radio=list(radio))
-
-    def _old_read_radio_removed(self):
-        raise AssertionError()
 
     def registry_gate(self):
         require(self.node == 0, 'registry IPC is server localhost only')
@@ -464,7 +475,8 @@ class Node:
         require(self.prepared and self.closed, 'audit requires prepared/closed')
         actual = {}
         try:
-            actual['radio'] = self.read_radio(channels=(self.original_channel,), expected_bandwidth=40)
+            actual['radio'] = self.read_radio(channels=(self.original_channel,), expected_bandwidth=40,
+                                              expected_mcs=self.original_mcs)
             actual['resident'] = {}
             for pid, tick in self.resident.items():
                 current = Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()[19]
