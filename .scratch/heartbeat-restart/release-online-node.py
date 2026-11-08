@@ -16,7 +16,7 @@ import urllib.request
 
 phase, commit, release_id, archive_sha, native_sha = sys.argv[1:]
 host = socket.gethostname()
-assert host in {'fl00', *(f'fl{i:02d}' for i in range(1, 11))}
+assert host in {'fl00', 'fl01', 'fl02', *(f'fl{i:02d}' for i in range(4, 11))}
 assert os.geteuid() == 0
 assert len(commit) == 40 and all(c in '0123456789abcdef' for c in commit)
 assert release_id.replace('-', '').isalnum()
@@ -84,9 +84,21 @@ if phase == 'preflight':
         assert identity['tun_ip'].split('/')[0] == '10.80.0.' + str(10 + int(host[2:]))
     native_pids = [p for p in pathlib.Path('/proc').iterdir() if p.name.isdigit()
                    and (p / 'exe').exists() and (p / 'exe').resolve() == pathlib.Path('/usr/bin/wfb_v6_uplink')]
-    assert len(native_pids) == 1
-    assert sha(native_pids[0] / 'exe') == native_sha
-    emit({'host': host, 'unit': state, 'iface': iface, 'native_pid': native_pids[0].name,
+    repair = None
+    if not native_pids:
+        # 本轮 fl05 已换卡：仅接受旧服务明确绑定已消失网卡的可核实状态。
+        pid = run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip()
+        daemon_args = (pathlib.Path('/proc') / pid / 'cmdline').read_bytes().split(b'\0')
+        assert host == 'fl05' and b'--interface' in daemon_args, daemon_args
+        old_iface = daemon_args[daemon_args.index(b'--interface') + 1].decode()
+        assert old_iface != iface and not (pathlib.Path('/sys/class/net') / old_iface).exists()
+        repair = {'reason': 'replaced_card_stale_interface', 'old_iface': old_iface,
+                  'current_iface': iface, 'daemon_pid': pid, 'daemon_args': [s.decode() for s in daemon_args if s]}
+    else:
+        assert len(native_pids) == 1
+        assert sha(native_pids[0] / 'exe') == native_sha
+    emit({'host': host, 'unit': state, 'iface': iface,
+          'native_pid': native_pids[0].name if native_pids else None, 'repair': repair,
           'native_sha': native_sha, 'control_sha': sha(installed / 'control.py'),
           'radio': run(['iw', 'dev', iface, 'info']),
           'nvpmodel': run(['/usr/sbin/nvpmodel', '-q'])})
@@ -160,7 +172,7 @@ module.main()
     if role == 'server':
         args += ['--config', '/etc/wfb-ng-fl/server.json', '--channel', '149',
                  '--bandwidth-mhz', '40', '--txpower', '18', '--downlink-mcs', '3',
-                 '--uplink-mcs', '4', '--uftp-rate-kbps', '15000']
+                 '--uplink-mcs', '4', '--uftp-rate-kbps', '15000', '--interface', iface]
     else:
         args += ['--config', '/etc/wfb-ng-fl/node.json', '--work-dir', '/srv/wfb-ng-fl/client',
                  '--channel', '149', '--bandwidth-mhz', '40', '--radio-txpower-dbm', '18',
