@@ -35,6 +35,88 @@ class MockTests(unittest.TestCase):
         node.timing = runner.TIMING
         return node
 
+    def uftp_fixture(self):
+        paths = {}
+        for name in ('uftp', 'uftpd'):
+            path = Path(self.temporary.name) / name
+            path.write_bytes(b'ELF fixture\x00UFTP version 5.0.3  Copyright\x00')
+            paths[name] = str(path)
+        return paths, {name: node_agent.sha(path) for name, path in paths.items()}
+
+    def test_uftp_pins_match_fl00_503(self):
+        self.assertEqual(node_agent.UFTP_SHA256, {
+            'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
+            'uftpd': '0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9',
+        })
+
+    def test_uftp_identity_records_actual_which_paths_hashes_and_binary_versions(self):
+        paths, digests = self.uftp_fixture()
+        # PATH 可指向符号链接，记录 which 返回值及其最终目标。
+        link = Path(self.temporary.name) / 'path-uftp'
+        link.symlink_to(paths['uftp'])
+        paths['uftp'] = str(link)
+        with patch('node_agent.shutil.which', side_effect=paths.get) as which, patch.dict(
+                node_agent.UFTP_SHA256, digests), patch('node_agent.subprocess.run') as command:
+            tools = node_agent.verify_uftp_tools()
+        self.assertEqual([call.args for call in which.call_args_list], [('uftp',), ('uftpd',)])
+        command.assert_not_called()
+        for name, identity in tools.items():
+            self.assertEqual(identity, dict(path=paths[name],
+                resolved_path=str(Path(paths[name]).resolve()), sha256=digests[name],
+                version='5.0.3', version_source='binary_banner'))
+
+    def test_uftp_identity_rejects_missing_or_changed_tools_including_same_version(self):
+        for name in ('uftp', 'uftpd'):
+            for failure in ('missing', 'changed'):
+                with self.subTest(tool=name, failure=failure):
+                    paths, digests = self.uftp_fixture()
+                    if failure == 'missing':
+                        paths[name] = None
+                    else:
+                        # 版本仍为 5.0.3；只比较版本会漏过这个变化。
+                        with Path(paths[name]).open('ab') as stream:
+                            stream.write(b'changed binary')
+                    with patch('node_agent.shutil.which', side_effect=paths.get), patch.dict(
+                            node_agent.UFTP_SHA256, digests):
+                        with self.assertRaisesRegex(RuntimeError,
+                                ('missing UFTP executable ' if failure == 'missing'
+                                 else 'UFTP SHA mismatch ') + name):
+                            node_agent.verify_uftp_tools()
+
+    def test_uftp_identity_does_not_require_version_probe_output_or_success(self):
+        paths, digests = self.uftp_fixture()
+        # usage 长度及是否存在版本 banner 均不是准入条件，SHA 严格匹配即可。
+        Path(paths['uftpd']).write_bytes(b'usage\n' * 20000)
+        digests['uftpd'] = node_agent.sha(paths['uftpd'])
+        with patch('node_agent.shutil.which', side_effect=paths.get), patch.dict(
+                node_agent.UFTP_SHA256, digests), patch('node_agent.subprocess.run',
+                side_effect=AssertionError('must not execute version probes')):
+            tools = node_agent.verify_uftp_tools()
+        self.assertIsNone(tools['uftpd']['version'])
+        self.assertEqual(tools['uftpd']['sha256'], digests['uftpd'])
+
+    def test_prepare_rejects_uftp_hash_before_frozen_release_checks(self):
+        node = self.node('fl10')
+        paths, digests = self.uftp_fixture()
+        Path(paths['uftpd']).write_bytes(b'UFTP version 4.10.2\x00wrong executable')
+        root = Path(self.temporary.name)
+        real_path = Path
+
+        def local_path(*args):
+            return root if args == ('/srv/wfb-ng-fl',) else real_path(*args)
+
+        with patch('node_agent.Path', side_effect=local_path), patch(
+                'node_agent.os.geteuid', return_value=0), patch(
+                'node_agent.signal.setitimer'), patch('node_agent.fcntl.flock'), patch(
+                'builtins.open', return_value=io.StringIO()), patch(
+                'node_agent.shutil.which', side_effect=paths.get), patch.dict(
+                node_agent.UFTP_SHA256, digests), patch('node_agent.run') as command:
+            with self.assertRaisesRegex(RuntimeError, 'UFTP SHA mismatch uftpd'):
+                node.prepare('hashreject', {key: self.payload[key]
+                    for key in ('size_bytes', 'sha256')}, runner.TIMING)
+        self.assertFalse(node.prepared)
+        command.assert_not_called()
+
     def exercise(self, fail_prepare=False):
         events = []
         lock = threading.Lock()

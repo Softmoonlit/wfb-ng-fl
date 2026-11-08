@@ -20,6 +20,11 @@ import urllib.request
 COMMIT = '98dda459fb9a1cecf64fd03e224427b8b7f689fe'
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 WRAPPER_SHA = 'd68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6'
+# fl00 实际 PATH 中的 UFTP 5.0.3；运行依赖独立于 release 源码 manifest。
+UFTP_SHA256 = {
+    'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
+    'uftpd': '0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9',
+}
 NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
@@ -37,6 +42,26 @@ def sha(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_uftp_tools():
+    """与 transport 使用相同 PATH 解析；SHA 是准入条件，版本仅作证据。"""
+    tools = {}
+    for name, expected_sha in UFTP_SHA256.items():
+        executable = shutil.which(name)
+        require(executable, 'missing UFTP executable ' + name)
+        digest = sha(executable)
+        require(digest == expected_sha, 'UFTP SHA mismatch ' + name + ': ' + executable
+                + ' actual=' + digest + ' expected=' + expected_sha)
+        # 5.0.3 的帮助参数不提供可靠版本/退出码。读取实际文件内的版本
+        # banner，避免启动 sender/daemon，也不会把超长 usage 或退出码当失败。
+        banner = re.search(rb'UFTP version ([0-9]+\.[0-9]+\.[0-9]+)',
+                           Path(executable).read_bytes())
+        tools[name] = dict(path=executable, resolved_path=str(Path(executable).resolve()),
+                           sha256=digest,
+                           version=banner.group(1).decode('ascii') if banner else None,
+                           version_source='binary_banner')
+    return tools
 
 
 def verify_source_files(base, source, files):
@@ -148,6 +173,8 @@ class Node:
         fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         self.root = Path('/srv/wfb-ng-fl') / ('comm-' + run_id)
         self.root.mkdir(mode=0o700)
+        self.runtime_dependencies = verify_uftp_tools()
+        self.fact('runtime_dependencies', tools=self.runtime_dependencies)
         unit = 'wfb-fl-' + ('server' if self.node == 0 else 'client') + '-daemon.service'
         pid = int(run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip())
         require(pid > 0, 'daemon absent')
@@ -214,6 +241,7 @@ class Node:
                          tun=self.tun, ifindex=self.ifindex, radio=radio_fact,
                          wrapper_sha=WRAPPER_SHA, installed=str(base), source=str(source),
                          payload=self.payload, timing=self.timing,
+                         runtime_dependencies=self.runtime_dependencies,
                          scope='等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺')
 
     def read_radio(self, channels=None, expected_bandwidth=None):
