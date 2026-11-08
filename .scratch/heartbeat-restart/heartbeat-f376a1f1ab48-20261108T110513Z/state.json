@@ -1,0 +1,34 @@
+{
+  "commit": "f376a1f1ab4896a00163938784fe36d664058550",
+  "release_id": "heartbeat-f376a1f1ab48-20261108T110513Z",
+  "targets": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl04",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "archive_sha": "fb0737aef0d4cb1105381d1ee91aa39d8a14347aa3a59102010a41ebfa346733",
+  "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+  "helperSHA": "b22d879afb9cb96a035c1ff0cdcadccd71bbba8ed614845764f5582e36f9ed2b",
+  "expected": {
+    "grant_duration_ms": 18,
+    "guard_interval_ms": 2,
+    "fec_n": 14
+  },
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ]
+}
