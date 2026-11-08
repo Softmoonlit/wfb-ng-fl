@@ -59,8 +59,8 @@ class TestBroadcastCallbackLocking(unittest.TestCase):
 
 class TestRadioTransaction(unittest.TestCase):
 
-    def run_switch(self, drop=None, fail=None, adapter=None, ack_transform=None):
-        server = ControlPlaneServer(RadioConfig(channel=157, radio_txpower_dbm=12),
+    def run_switch(self, drop=None, fail=None, adapter=None, ack_transform=None, fec_n=14):
+        server = ControlPlaneServer(RadioConfig(channel=157, radio_txpower_dbm=12, fec_n=fec_n),
                                     network_adapter=adapter, air_interface="wlx-test")
         messages = []
 
@@ -89,6 +89,17 @@ class TestRadioTransaction(unittest.TestCase):
             prepare_timeout_seconds=.01, commit_delay_seconds=0,
             commit_timeout_seconds=.02, lease_timeout_seconds=.03, ping_interval_seconds=.005)
         return result, server, messages
+
+    def test_fec12_survives_transaction_and_rejects_online_change(self):
+        result, server, messages = self.run_switch(fec_n=12)
+        self.assertTrue(result.success)
+        self.assertEqual(result.effective_config.fec_n, 12)
+        with self.assertRaises(ValueError):
+            server.reconfigure_radio({"fec_n": 14}, [1])
+        self.assertEqual(server.active_radio_config.fec_n, 12)
+        client = ControlPlaneClient(1, "10.80.0.11", initial_radio_config=RadioConfig(fec_n=12))
+        client.apply_alignment({"uplink_mcs": 5})
+        self.assertEqual(client._current_radio_config().fec_n, 12)
 
     def test_rollback_ack_requires_full_config_and_mode(self):
         for mutation in ({'config': {}}, {'calibration': True}, {'session_id': 'stale'},

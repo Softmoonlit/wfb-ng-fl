@@ -11,7 +11,7 @@ from wfb_ng.fl.radio import (
     DEFAULT_DOWNLINK_MCS,
     RECOMMENDED_UPLINK_MCS,
     FIXED_FEC_K,
-    FIXED_FEC_N,
+    DEFAULT_FEC_N,
     FIXED_BANDWIDTH,
     FIXED_GUARD_INTERVAL,
     RateBounds,
@@ -41,7 +41,7 @@ class TestDownlinkRateBounds(unittest.TestCase):
         self.assertEqual(RECOMMENDED_UPLINK_MCS, 6)
         self.assertEqual(ALLOWED_MCS_VALUES, (3, 4, 5, 6))
         self.assertEqual(FIXED_FEC_K, 8)
-        self.assertEqual(FIXED_FEC_N, 14)
+        self.assertEqual(DEFAULT_FEC_N, 14)
         self.assertEqual(FIXED_BANDWIDTH, "HT40+")
         self.assertEqual(FIXED_GUARD_INTERVAL, "long")
 
@@ -289,7 +289,7 @@ class TestRadioCalibrationValidator(unittest.TestCase):
             self.assertEqual(candidate.channel_width, "HT20")
             self.assertEqual(candidate.uftp_rate_kbps, 1)
             self.assertEqual(candidate.fec_k, FIXED_FEC_K)
-            self.assertEqual(candidate.fec_n, FIXED_FEC_N)
+            self.assertEqual(candidate.fec_n, DEFAULT_FEC_N)
             self.assertEqual(candidate.guard_interval, FIXED_GUARD_INTERVAL)
             self.assertNotIn("calibration", candidate.to_dict())
             with self.assertRaisesRegex(ValueError, "calibration table unavailable"):
@@ -306,7 +306,7 @@ class TestRadioCalibrationValidator(unittest.TestCase):
             with self.subTest(key=key), self.assertRaises(ValueError):
                 validate_radio_calibration_patch(incomplete, base)
         for key, values in {
-            "bandwidth_mhz": [40, True, 20.0],
+            "bandwidth_mhz": [80, True, 20.0],
             "downlink_mcs": [2, 7, True, 3.0],
             "uftp_rate_kbps": [None, True, 0, -1, 1.0, "1"],
             "channel": [161, 36],
@@ -756,3 +756,25 @@ class TestForeignFrameInspection(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStartupFec(unittest.TestCase):
+    def test_roundtrip_and_mcs_patch_preserve_fec(self):
+        base = validate_radio_config({"fec_n": 12})
+        self.assertEqual(validate_radio_config(base.to_dict()), base)
+        self.assertEqual(validate_radio_patch({"downlink_mcs": 4}, base).fec_n, 12)
+        for value in (True, 12.0, "12", None, 13):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                validate_radio_config({"fec_n": value})
+        for patch in ({"fec_n": 14}, {"fec_n": 12}, {"fec_k": 8}):
+            with self.assertRaises(ValueError):
+                validate_radio_patch(patch, base)
+
+    def test_ht40_mcs4_12mbps_requires_calibration(self):
+        patch = {"bandwidth_mhz": 40, "downlink_mcs": 4, "uftp_rate_kbps": 12000}
+        base = RadioConfig(fec_n=12)
+        candidate = validate_radio_calibration_patch(patch, base)
+        self.assertEqual(candidate.fec_n, 12)
+        self.assertEqual(candidate.uftp_rate_kbps, 12000)
+        with self.assertRaises(ValueError):
+            validate_radio_patch(patch, base)

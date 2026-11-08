@@ -13,7 +13,7 @@ from .errors import FLRuntimeError
 from .model_library import ModelLibrary, ModelLibraryError
 from .mnist_deployment import get_mnist_deployment
 from .radio import (ALLOWED_5GHZ_CHANNELS, ALLOWED_BANDWIDTH_MHZ, ALLOWED_MCS_VALUES,
-                    ALLOWED_PATCH_KEYS, FIXED_FEC_K, FIXED_FEC_N, TXPOWER_MAX_DBM, TXPOWER_MIN_DBM,
+                    ALLOWED_PATCH_KEYS, FIXED_FEC_K, ALLOWED_FEC_N, TXPOWER_MAX_DBM, TXPOWER_MIN_DBM,
                     get_downlink_rate_bounds, validate_radio_config)
 
 
@@ -127,7 +127,7 @@ def _project_radio_config(value: Any) -> Optional[Dict[str, Any]]:
         elif key == 'fec_k':
             projected = item if type(item) is int and item == FIXED_FEC_K else None
         elif key == 'fec_n':
-            projected = item if type(item) is int and item == FIXED_FEC_N else None
+            projected = item if type(item) is int and item in ALLOWED_FEC_N else None
         elif key == 'channel_width':
             projected = item if isinstance(item, str) and item in _RADIO_RESULT_CHANNEL_WIDTHS else None
         elif key == 'guard_interval':

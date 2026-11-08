@@ -865,6 +865,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         )
         job_config = _make_client_job(
             job_id="conformance_01",
+            fec_n=12,
             node_id=3,
             tun_name="tun_test_conf",
             tun_ip="10.80.0.13",
@@ -884,6 +885,7 @@ class TestClientDaemonLifecycle(unittest.TestCase):
         with open(config_path, encoding='utf-8') as stream:
             role = json.load(stream)
         self.assertEqual(role['channel_width'], 'HT20')
+        self.assertEqual(role['link_args'][role['link_args'].index('--fec-n') + 1], '12')
         self.assertNotIn('--radio-short-gi', role['link_args'])
         self.assertEqual(role['link_args'][role['link_args'].index('--radio-bandwidth') + 1], '20')
         parsed_config = _read_config(config_path)
@@ -1106,3 +1108,18 @@ class TestClientDaemonLifecycle(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStartupFecClient(unittest.TestCase):
+    def test_real_builder_and_config(self):
+        for fec_n in (12, 14):
+            config = ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", fec_n=fec_n)
+            daemon = ClientDaemon(config=config, network_adapter=mock.MagicMock())
+            self.assertEqual(daemon._effective_radio.fec_n, fec_n)
+            cmd = build_v6_uplink_client_command("wfb_v6_uplink", 1, "fl-c1", "10.80.0.11/24",
+                                                  "wlan0", 6, 7669206, fec_n=fec_n)
+            self.assertEqual(cmd[cmd.index("--fec-k") + 1], "8")
+            self.assertEqual(cmd[cmd.index("--fec-n") + 1], str(fec_n))
+        for value in (True, 12.0, "12", None, 13):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                ClientDaemonConfig(node_id=1, tun_ip="10.80.0.11", fec_n=value)

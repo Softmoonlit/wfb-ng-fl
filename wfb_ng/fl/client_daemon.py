@@ -114,8 +114,10 @@ def build_v6_uplink_client_command(
     link_id: int,
     bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ,
     radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT,
+    fec_n: int = 14,
 ) -> List[str]:
     """Build the persistent client link command used by the control plane."""
+    RadioConfig(fec_n=fec_n)
     return [
         executable_path,
         "--role", "client",
@@ -126,7 +128,7 @@ def build_v6_uplink_client_command(
         "--uplink-stream", "1",
         "--downlink-stream", "2",
         "--fec-k", "8",
-        "--fec-n", "14",
+        "--fec-n", str(fec_n),
         "--radio-bandwidth", str(bandwidth_mhz),
         "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(uplink_mcs),
@@ -410,6 +412,7 @@ class ClientDaemonConfig:
     tun_name: str = ""
     channel: int = DEFAULT_CHANNEL
     bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
+    fec_n: int = 14
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     work_dir: str = DEFAULT_WORK_DIR
@@ -425,6 +428,7 @@ class ClientDaemonConfig:
     mnist_data_dir: Optional[str] = None
 
     def __post_init__(self):
+        RadioConfig(fec_n=self.fec_n)
         if not self.tun_cidr:
             object.__setattr__(self, "tun_cidr", f"{self.tun_ip}/24")
         if not self.tun_name:
@@ -438,7 +442,7 @@ class ClientDaemonConfig:
 
     @property
     def channel_width(self) -> str:
-        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz).channel_width
+        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz, fec_n=self.fec_n).channel_width
 
 
 @dataclass(frozen=True)
@@ -459,6 +463,7 @@ class ClientJobConfig:
     uftp_private_multicast_host: str = DEFAULT_UFTP_PRIVATE_MULTICAST_HOST
     channel: int = DEFAULT_CHANNEL
     bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
+    fec_n: int = 14
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     max_update_size_bytes: int = 1073741824
@@ -470,6 +475,7 @@ class ClientJobConfig:
     preparation_timeout_seconds: float = 30.0
 
     def __post_init__(self):
+        RadioConfig(fec_n=self.fec_n)
         if (type(self.rounds) is not int or self.rounds <= 0 or
                 isinstance(self.preparation_timeout_seconds, bool) or
                 not isinstance(self.preparation_timeout_seconds, (int, float)) or
@@ -500,7 +506,7 @@ class ClientJobConfig:
 
     @property
     def channel_width(self) -> str:
-        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz).channel_width
+        return RadioConfig(channel=self.channel, bandwidth_mhz=self.bandwidth_mhz, fec_n=self.fec_n).channel_width
 
 
 class JobSandbox:
@@ -603,7 +609,7 @@ class JobSandbox:
                     "--fec-k",
                     "8",
                     "--fec-n",
-                    "14",
+                    str(job.fec_n),
                     "--radio-bandwidth",
                     str(job.bandwidth_mhz),
                     "--radio-mcs-index",
@@ -1021,6 +1027,7 @@ class ClientDaemon:
         self._effective_radio = RadioConfig(
             channel=config.channel, radio_txpower_dbm=config.radio_txpower_dbm,
             uplink_mcs=config.uplink_mcs, bandwidth_mhz=config.bandwidth_mhz,
+            fec_n=config.fec_n,
         )
         self._effective_radio_calibration = False
         self.network_adapter = network_adapter or LinuxNetworkAdapter()
@@ -1194,6 +1201,7 @@ class ClientDaemon:
                 uplink_mcs=self._effective_radio.uplink_mcs,
                 link_id=self.config.link_id,
                 bandwidth_mhz=self._effective_radio.bandwidth_mhz,
+                fec_n=self._effective_radio.fec_n,
                 radio_control_port=self.config.radio_control_port,
             )
             os.makedirs(self.config.work_dir, exist_ok=True)
@@ -1336,6 +1344,7 @@ class ClientDaemon:
                     job_config,
                     channel=channel,
                     bandwidth_mhz=self._effective_radio.bandwidth_mhz,
+                    fec_n=self._effective_radio.fec_n,
                     radio_txpower_dbm=self._effective_radio.radio_txpower_dbm,
                     uplink_mcs=self._effective_radio.uplink_mcs,
                     radio_control_port=self.config.radio_control_port,
@@ -1743,6 +1752,8 @@ class ClientDaemon:
     def _on_radio_applied(self, new_config: RadioConfig) -> None:
         """本机在线更新成功后才发布生效配置，失败交由原事务租约恢复。"""
         with self._lock:
+            if new_config.fec_n != self.config.fec_n:
+                raise FLRuntimeError("invalid_radio_configuration", "FEC 变更必须统一重启")
             if self._current_job_id is not None:
                 job, process = self.sandbox._active_job, self.sandbox._process
                 if (job is None or job.job_id != self._current_job_id or
@@ -1908,6 +1919,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         default=RECOMMENDED_UPLINK_MCS,
         help=f"上行 MCS 调制索引 (默认: {RECOMMENDED_UPLINK_MCS})",
     )
+    parser.add_argument("--fec-n", type=int, choices=(12, 14), default=14)
     parser.add_argument("--bandwidth-mhz", type=int, choices=(20, 40), default=DEFAULT_BANDWIDTH_MHZ)
     parser.add_argument("--radio-control-port", type=int, default=DEFAULT_RADIO_CONTROL_PORT)
     parser.add_argument("--mnist-data-dir", help="本机预置 MNIST IDX 数据目录")
@@ -1963,6 +1975,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         radio_txpower_dbm=args.radio_txpower_dbm,
         uplink_mcs=args.uplink_mcs,
         bandwidth_mhz=args.bandwidth_mhz,
+        fec_n=args.fec_n,
         radio_control_port=args.radio_control_port,
         mnist_data_dir=args.mnist_data_dir,
         link_id=args.link_id,

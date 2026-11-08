@@ -172,6 +172,7 @@ class ServerDaemonConfig:
     radio_txpower_dbm: int = DEFAULT_TXPOWER_DBM
     downlink_mcs: int = DEFAULT_DOWNLINK_MCS
     uplink_mcs: int = DEFAULT_UPLINK_MCS
+    fec_n: int = 14
     bandwidth_mhz: int = 40
     grant_duration_ms: int = 10
     guard_interval_ms: int = 10
@@ -222,6 +223,7 @@ class ServerDaemonConfig:
             radio = validate_radio_config({
                 "channel": self.channel,
                 "bandwidth_mhz": self.bandwidth_mhz,
+                "fec_n": self.fec_n,
                 "radio_txpower_dbm": self.radio_txpower_dbm,
                 "downlink_mcs": self.downlink_mcs,
                 "uplink_mcs": self.uplink_mcs,
@@ -297,18 +299,24 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
             "invalid_server_config", f"服务端配置必须为 JSON object: {path}"
         )
 
+    try:
+        validate_radio_config({key: data[key] for key in ("fec_k", "fec_n") if key in data})
+    except (TypeError, ValueError) as exc:
+        raise FLRuntimeError("invalid_radio_configuration", str(exc)) from exc
+
     return ServerDaemonConfig(
         startup_config_path=path,
         ipc_host=data.get("ipc_host", DEFAULT_IPC_HOST),
         ipc_port=int(data.get("ipc_port", DEFAULT_IPC_PORT)),
         web_host=data.get("web_host"),
         web_port=int(data.get("web_port", DEFAULT_WEB_PORT)),
-        channel=int(data.get("channel", DEFAULT_CHANNEL)),
-        radio_txpower_dbm=int(data.get("radio_txpower_dbm", DEFAULT_TXPOWER_DBM)),
-        downlink_mcs=int(data.get("downlink_mcs", DEFAULT_DOWNLINK_MCS)),
-        uplink_mcs=int(data.get("uplink_mcs", DEFAULT_UPLINK_MCS)),
+        channel=data.get("channel", DEFAULT_CHANNEL),
+        radio_txpower_dbm=data.get("radio_txpower_dbm", DEFAULT_TXPOWER_DBM),
+        downlink_mcs=data.get("downlink_mcs", DEFAULT_DOWNLINK_MCS),
+        uplink_mcs=data.get("uplink_mcs", DEFAULT_UPLINK_MCS),
         radio_control_port=data.get("radio_control_port", DEFAULT_RADIO_CONTROL_PORT),
         bandwidth_mhz=data.get("bandwidth_mhz", 40),
+        fec_n=data.get("fec_n", 14),
         grant_duration_ms=data.get("grant_duration_ms", 10),
         guard_interval_ms=data.get("guard_interval_ms", 10),
         uftp_rate_kbps=data.get("uftp_rate_kbps"),
@@ -353,6 +361,7 @@ def build_v6_uplink_server_command(
     radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT,
     grant_duration_ms: int = 10,
     guard_interval_ms: int = 10,
+    fec_n: int = 14,
 ) -> List[str]:
     """
     Construct command line arguments for wfb_v6_uplink running as server.
@@ -363,7 +372,7 @@ def build_v6_uplink_server_command(
       配置值不承诺实际调度周期或端到端 ACK 时限。
     """
     _validate_server_schedule(grant_duration_ms, guard_interval_ms)
-    RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz).channel_width
+    RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz, fec_n=fec_n).channel_width
     cmd = [
         executable_path,
         "--role", "server",
@@ -374,7 +383,7 @@ def build_v6_uplink_server_command(
         "--uplink-stream", "1",
         "--downlink-stream", "2",
         "--fec-k", "8",
-        "--fec-n", "14",
+        "--fec-n", str(fec_n),
         "--radio-bandwidth", str(bandwidth_mhz),
         "--radio-control-port", str(radio_control_port),
         "--radio-mcs-index", str(downlink_mcs),
@@ -750,6 +759,7 @@ class ServerDaemon:
         self.radio_config = validate_radio_config({
             "channel": self.config.channel,
             "bandwidth_mhz": self.config.bandwidth_mhz,
+            "fec_n": self.config.fec_n,
             "uftp_rate_kbps": self.config.uftp_rate_kbps,
             "radio_txpower_dbm": self.config.radio_txpower_dbm,
             "downlink_mcs": self.config.downlink_mcs,
@@ -1037,7 +1047,7 @@ class ServerDaemon:
                 if not isinstance(data, dict):
                     raise ValueError("启动配置必须为 JSON object")
                 data.update({key: value for key, value in radio.to_dict().items()
-                             if key in {"channel", "bandwidth_mhz", "radio_txpower_dbm", "downlink_mcs", "uplink_mcs", "uftp_rate_kbps"}})
+                             if key in {"channel", "bandwidth_mhz", "radio_txpower_dbm", "downlink_mcs", "uplink_mcs", "uftp_rate_kbps", "fec_n"}})
                 write_json_atomic(str(path), data)
             except (OSError, ValueError) as exc:
                 raise FLRuntimeError("radio_config_save_failed", f"保存启动配置失败: {exc}") from exc
@@ -2082,6 +2092,8 @@ class ServerDaemon:
     def _apply_radio_runtime(self, config: RadioConfig) -> None:
         """在线应用完整发射配置，保留链路进程、TUN 和调度会话。"""
         with self._lock:
+            if config.fec_n != self.config.fec_n:
+                raise FLRuntimeError("invalid_radio_configuration", "FEC 变更必须统一重启")
             if self.server_state == ServerState.STOPPED:
                 raise FLRuntimeError('daemon_stopped', 'Server 已停止，无法应用射频')
             if self.config.enable_link_process:
@@ -2115,6 +2127,7 @@ class ServerDaemon:
             link_id=self.config.link_id,
             known_clients=self.config.known_clients,
             bandwidth_mhz=radio.bandwidth_mhz,
+            fec_n=radio.fec_n,
             radio_control_port=self.config.radio_control_port,
             grant_duration_ms=self.config.grant_duration_ms,
             guard_interval_ms=self.config.guard_interval_ms,
@@ -2433,7 +2446,7 @@ def main() -> None:
 
     if overrides:
         radio_keys = {"channel", "bandwidth_mhz", "radio_txpower_dbm", "downlink_mcs", "uplink_mcs", "uftp_rate_kbps"}
-        base_radio = validate_radio_config({key: value for key, value in config.__dict__.items() if key in radio_keys})
+        base_radio = validate_radio_config({key: value for key, value in config.__dict__.items() if key in radio_keys | {"fec_n"}})
         target_radio = validate_radio_patch({key: value for key, value in overrides.items() if key in radio_keys}, base_radio)
         merged = {**config.__dict__, **overrides,
                   **{key: value for key, value in target_radio.to_dict().items() if key in radio_keys}}

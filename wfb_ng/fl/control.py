@@ -2472,13 +2472,14 @@ class ControlPlaneClient:
                              if k in ("channel", "radio_txpower_dbm", "downlink_mcs",
                                       "uplink_mcs", "bandwidth_mhz", "uftp_rate_kbps")}
             validator = validate_radio_calibration_patch if calibration else validate_radio_patch
-            initial_radio_config = validator(initial_patch, base=RadioConfig())
+            initial_radio_config = validator(initial_patch, base=initial_radio_config)
             initial_channel = initial_radio_config.channel
             txpower_dbm = initial_radio_config.radio_txpower_dbm
             uplink_mcs = initial_radio_config.uplink_mcs
             bandwidth_mhz = initial_radio_config.bandwidth_mhz
             downlink_mcs = initial_radio_config.downlink_mcs
             uftp_rate_kbps = initial_radio_config.uftp_rate_kbps
+        self.fec_n = initial_radio_config.fec_n if initial_radio_config is not None else 14
         self.node_id = node_id
         self.tun_ip = tun_ip
         self.network_adapter = network_adapter
@@ -3417,7 +3418,8 @@ class ControlPlaneClient:
         """读取当前完整逻辑配置；标定状态单独保存在控制协议中。"""
         return RadioConfig(channel=self.current_channel, radio_txpower_dbm=self.txpower_dbm,
                            downlink_mcs=self.downlink_mcs, uplink_mcs=self.uplink_mcs,
-                           bandwidth_mhz=self.bandwidth_mhz, uftp_rate_kbps=self.uftp_rate_kbps)
+                           bandwidth_mhz=self.bandwidth_mhz, uftp_rate_kbps=self.uftp_rate_kbps,
+                           fec_n=self.fec_n)
 
     def _set_radio_fields(self, config: RadioConfig) -> None:
         """同步完整逻辑配置，避免回调和租约恢复丢失带宽或下行参数。"""

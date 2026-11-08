@@ -32,7 +32,8 @@ DEFAULT_DOWNLINK_MCS: int = 3
 RECOMMENDED_UPLINK_MCS: int = 6
 
 FIXED_FEC_K: int = 8
-FIXED_FEC_N: int = 14
+DEFAULT_FEC_N: int = 14
+ALLOWED_FEC_N: Tuple[int, ...] = (12, 14)
 DEFAULT_BANDWIDTH_MHZ: int = 40
 ALLOWED_BANDWIDTH_MHZ: Tuple[int, ...] = (20, 40)
 FIXED_BANDWIDTH: str = "HT40+"
@@ -113,7 +114,8 @@ __all__ = (
     "DEFAULT_DOWNLINK_MCS",
     "RECOMMENDED_UPLINK_MCS",
     "FIXED_FEC_K",
-    "FIXED_FEC_N",
+    "DEFAULT_FEC_N",
+    "ALLOWED_FEC_N",
     "FIXED_BANDWIDTH",
     "FIXED_GUARD_INTERVAL",
     "RateBounds",
@@ -172,14 +174,15 @@ class RadioConfig:
     uplink_mcs: int = RECOMMENDED_UPLINK_MCS
     uftp_rate_kbps: int = field(default=15000)
     bandwidth_mhz: int = DEFAULT_BANDWIDTH_MHZ
+    fec_n: int = DEFAULT_FEC_N
 
     @property
     def fec_k(self) -> int:
         return FIXED_FEC_K
 
-    @property
-    def fec_n(self) -> int:
-        return FIXED_FEC_N
+    def __post_init__(self) -> None:
+        if type(self.fec_n) is not int or self.fec_n not in ALLOWED_FEC_N:
+            raise ValueError("fec_n must be integer 12 or 14")
 
     @property
     def channel_width(self) -> str:
@@ -238,7 +241,7 @@ def _validate_radio_config(config: Dict[str, Any], *, calibration: bool) -> Radi
     channel_width = _derive_channel_width(raw_channel, bandwidth_mhz)
     # 接受完整快照回读，但派生字段与固定参数不能形成第二套配置真值。
     for key, expected in {"channel_width": channel_width, "fec_k": FIXED_FEC_K,
-                          "fec_n": FIXED_FEC_N, "guard_interval": FIXED_GUARD_INTERVAL}.items():
+                          "guard_interval": FIXED_GUARD_INTERVAL}.items():
         if key in config and (type(config[key]) is not type(expected) or config[key] != expected):
             raise ValueError(f"{key} must be {expected!r}")
 
@@ -292,6 +295,7 @@ def _validate_radio_config(config: Dict[str, Any], *, calibration: bool) -> Radi
         downlink_mcs=raw_downlink_mcs,
         uplink_mcs=raw_uplink_mcs,
         uftp_rate_kbps=rate,
+        fec_n=config.get("fec_n", DEFAULT_FEC_N),
     )
 
 
@@ -329,7 +333,7 @@ def validate_radio_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfi
 
 
 def validate_radio_calibration_patch(patch: Dict[str, Any], base: RadioConfig) -> RadioConfig:
-    """校验专用 HT20 测量候选；空闲、确认及消息标记由守护进程专用入口负责。"""
+    """校验专用 HT20/HT40 测量候选；空闲、确认及消息标记由守护进程专用入口负责。"""
     if not isinstance(patch, dict):
         raise TypeError(f"Patch must be a dict, got {type(patch).__name__}")
     if not isinstance(base, RadioConfig):
@@ -337,8 +341,8 @@ def validate_radio_calibration_patch(patch: Dict[str, Any], base: RadioConfig) -
     required = {"bandwidth_mhz", "downlink_mcs", "uftp_rate_kbps"}
     if not required.issubset(patch):
         raise ValueError("Calibration requires explicit bandwidth_mhz, downlink_mcs and uftp_rate_kbps")
-    if type(patch["bandwidth_mhz"]) is not int or patch["bandwidth_mhz"] != 20:
-        raise ValueError("Calibration requires bandwidth_mhz=20")
+    if type(patch["bandwidth_mhz"]) is not int or patch["bandwidth_mhz"] not in ALLOWED_BANDWIDTH_MHZ:
+        raise ValueError("Calibration requires bandwidth_mhz=20 or 40")
     # 专用入口只接受规范字段，不扩张历史 alias 兼容范围。
     for key in patch:
         if key not in ALLOWED_PATCH_KEYS:

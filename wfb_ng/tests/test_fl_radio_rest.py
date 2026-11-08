@@ -43,11 +43,16 @@ class TestRadioReconfigureREST(unittest.TestCase):
             return response.code, json.loads(response.read())
 
     def ready_node(self, node_id=1):
-        for state in (ClientNodeState.HUNTING, ClientNodeState.IDLE):
-            self.daemon.control_plane.handle_datagram(
-                NodeHeartbeat(node_id, state.value, 0, 157, 12, 6, timestamp_ms=1000 + (state == ClientNodeState.IDLE)).to_bytes(),
-                ("127.0.0.1", 10000 + node_id),
-            )
+        from dataclasses import replace
+        from wfb_ng.fl.control import HeartbeatAck
+        server = self.daemon.control_plane
+        address = ("127.0.0.1", 10000 + node_id)
+        heartbeat = NodeHeartbeat(node_id, "HUNTING", 0, 157, 12, 6, timestamp_ms=1000)
+        challenge = HeartbeatAck.from_bytes(server.handle_datagram(heartbeat.to_bytes(), address)[0])
+        heartbeat = replace(heartbeat, session=challenge.session)
+        server.handle_datagram(heartbeat.to_bytes(), address)
+        heartbeat = replace(heartbeat, state="IDLE", timestamp_ms=1001)
+        server.handle_datagram(heartbeat.to_bytes(), address)
 
     def test_cannot_exclude_an_online_client_from_cluster_configuration(self):
         self.ready_node(1)
@@ -84,20 +89,41 @@ class TestRadioReconfigureREST(unittest.TestCase):
         self.assertFalse(result["calibration"])
         self.assertEqual(result["effective_config"]["uftp_rate_kbps"], 15000)
 
+    def test_ht40_mcs4_low_rate_is_only_available_through_calibrate(self):
+        self.ready_node()
+        payload = {"confirmed": True, "patch": {"bandwidth_mhz": 40, "downlink_mcs": 4,
+                    "uftp_rate_kbps": 12000}, "target_nodes": [1]}
+        self.assertEqual(self.request(payload)[0], 400)
+        with patch.object(self.daemon.control_plane, "broadcast_downlink", side_effect=self.protocol_peer):
+            code, result = self.request(payload, "/api/v1/radio/calibrate")
+        self.assertEqual(code, 200, result)
+        self.assertTrue(result["calibration"])
+        self.assertEqual(result["effective_config"]["uftp_rate_kbps"], 12000)
+        with self.assertRaises(FLRuntimeError) as raised:
+            self.daemon.start_job({"job_id": "cal-job", "run_id": "cal-run", "target_nodes": [1],
+                "model_path": "/missing/model", "model_size_bytes": 1,
+                "io_timeout_seconds": 120, "live_observation": False})
+        self.assertEqual(raised.exception.error_code, "radio_calibration_active")
+
     def test_saved_operator_configuration_is_used_after_restart(self):
         import tempfile
         from pathlib import Path
+        from dataclasses import replace
         from wfb_ng.fl.server_daemon import load_server_config
         with tempfile.TemporaryDirectory() as work:
             path = Path(work) / "server.json"
             path.write_text('{"channel":157,"downlink_mcs":3,"model_library_dir":"/keep/models"}')
-            daemon = ServerDaemon(load_server_config(str(path)), MockNetworkAdapter(["wlx-test"]))
+            config = replace(load_server_config(str(path)), fec_n=12)
+            daemon = ServerDaemon(config, MockNetworkAdapter(["wlx-test"]))
             daemon.server_state = ServerState.IDLE
             daemon.radio_config = RadioConfig(
-                channel=153, downlink_mcs=4, uftp_rate_kbps=22000)
+                channel=153, downlink_mcs=4, uftp_rate_kbps=22000, fec_n=12)
             result = daemon.save_radio_configuration({"confirmed": True})
             self.assertEqual(result["saved_config"]["channel"], 153)
+            self.assertEqual(result["saved_config"]["fec_n"], 12)
+            self.assertEqual(json.loads(path.read_text())["fec_n"], 12)
             restarted = load_server_config(str(path))
+            self.assertEqual(restarted.fec_n, 12)
             self.assertEqual(restarted.channel, 153)
             self.assertEqual(restarted.downlink_mcs, 4)
             self.assertEqual(restarted.uftp_rate_kbps, 22000)
@@ -216,7 +242,7 @@ class TestRadioReconfigureREST(unittest.TestCase):
         for failed_kind, expected_status, expected_phase, expected_channel in (
             ("CONFIG_RADIO_PREPARE", "rolled_back", "PREPARE", 157),
             ("RADIO_SWITCH_FINALIZED", "rolled_back", "FINALIZED", 157),
-            ("RADIO_SWITCH_CONFIRMED", "radio_error", "CONFIRMED", 149),
+            ("RADIO_SWITCH_CONFIRMED", "radio_error", "CONFIRMED", None),
         ):
             with self.subTest(phase=expected_phase):
                 def peer(message):
@@ -229,7 +255,10 @@ class TestRadioReconfigureREST(unittest.TestCase):
                 self.assertEqual(result["status"], expected_status)
                 self.assertEqual(result["failed_phase"], expected_phase)
                 _, report = self.request(None, "/api/v1/status", "GET")
-                self.assertEqual(report["radio"]["channel"], expected_channel)
+                if expected_channel is None:
+                    self.assertIsNone(report["radio"])
+                else:
+                    self.assertEqual(report["radio"]["channel"], expected_channel)
                 self.assertEqual(report["radio"], result["effective_config"])
                 self.assertEqual(report["server_state"], "RADIO_ERROR" if expected_status == "radio_error" else "IDLE")
 

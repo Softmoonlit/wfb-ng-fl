@@ -181,10 +181,10 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = os.path.join(directory, "server.json")
             with open(path, "w") as stream:
-                json.dump(dict(grant_duration_ms=18, guard_interval_ms=2, work_dir=directory), stream)
+                json.dump(dict(grant_duration_ms=18, guard_interval_ms=2, fec_n=12, work_dir=directory), stream)
             daemon = object.__new__(ServerDaemon)
             daemon.config = load_server_config(path)
-            daemon.radio_config = MagicMock(channel=157, downlink_mcs=3, bandwidth_mhz=40)
+            daemon.radio_config = MagicMock(channel=157, downlink_mcs=3, bandwidth_mhz=40, fec_n=daemon.config.fec_n)
             daemon.current_interface = "wlan0"
             daemon.adapter = MagicMock()
             daemon.adapter.is_tun_ready.return_value = True
@@ -195,6 +195,7 @@ class TestV6UplinkServerCommand(unittest.TestCase):
                 try:
                     daemon._start_link_process()
                     cmd = popen.call_args.args[0]
+                    self.assertEqual(cmd[cmd.index("--fec-n") + 1], "12")
                     self.assertEqual(cmd[cmd.index("--grant-duration-ms") + 1], "18")
                     self.assertEqual(cmd[cmd.index("--guard-interval-ms") + 1], "2")
                 finally:
@@ -778,3 +779,14 @@ class TestSystemdUnitAndPackage(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStartupFecConfig(unittest.TestCase):
+    def test_json_fec_requires_integer(self):
+        for value in (True, 12.0, "12", None, 13):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                path = os.path.join(directory, "server.json")
+                with open(path, "w") as stream:
+                    json.dump({"fec_n": value}, stream)
+                with self.assertRaises(FLRuntimeError):
+                    load_server_config(path)
