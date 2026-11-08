@@ -1,0 +1,16 @@
+{
+  "host": "fl00",
+  "log": "/srv/wfb-ng-fl/server/wfb_uplink.log",
+  "offset": 637734775,
+  "before_monotonic": 18794.81555437,
+  "iw_before": "phy#1\n\tInterface wlxfc221c100119\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:19\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -18.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm",
+  "pid": "77897",
+  "window_start_monotonic": 18794.913420156,
+  "stop_monotonic": 18814.913977617,
+  "tun": {
+    "start_monotonic": 18794.913412795,
+    "count": 18
+  },
+  "iw_after": "phy#1\n\tInterface wlxfc221c100119\n\t\tifindex 8\n\t\twdev 0x100000001\n\t\taddr fc:22:1c:10:01:19\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -18.00 dBm\nphy#0\n\tInterface wlP1p1s0\n\t\tifindex 2\n\t\twdev 0x1\n\t\taddr dc:4a:9e:e2:3c:48\n\t\ttype managed\n\t\ttxpower -100.00 dBm",
+  "after_monotonic": 18814.966362199
+}

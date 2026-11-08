@@ -1,0 +1,1531 @@
+grant seq=105396 node_id=8 duration_ms=18 kind=normal active_queue=[8,2] cursor=1 cursor_node_id=2
+grant seq=105397 node_id=2 duration_ms=18 kind=normal active_queue=[8,2] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=139 consecutive_silent_grants=6 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105398 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105399 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105400 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105401 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105402 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=10 active_queue=[2,10] cursor=0 cursor_node_id=2
+grant seq=105403 node_id=2 duration_ms=18 kind=normal active_queue=[2,10] cursor=1 cursor_node_id=10
+grant seq=105404 node_id=10 duration_ms=18 kind=normal active_queue=[2,10] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=135 consecutive_silent_grants=6 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105405 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=9 active_queue=[10,9] cursor=0 cursor_node_id=10
+grant seq=105406 node_id=10 duration_ms=18 kind=normal active_queue=[10,9] cursor=1 cursor_node_id=9
+grant seq=105407 node_id=9 duration_ms=18 kind=normal active_queue=[10,9] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=57 consecutive_silent_grants=2 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105408 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+18795077	RX_ANT	5745:4:40	1	92:-62:-54:-50:3:10:16
+18795077	RX_ANT	5745:4:40	0	92:-58:-50:-46:4:10:15
+18795077	PKT	97:18395:0:0:92:92:10:0:0:8:3009
+18795077	RX_BATCH	41:97:1185:69:7
+18795077	PKT_SRC	1:0:0:0:0:0:0
+18795077	PKT_SRC	2:12:2712:2:0:1:406
+18795077	PKT_SRC	3:0:0:0:0:0:0
+18795077	PKT_SRC	4:0:0:0:0:0:0
+18795077	PKT_SRC	5:0:0:0:0:0:0
+18795077	PKT_SRC	6:0:0:0:0:0:0
+18795077	PKT_SRC	7:14:3164:0:0:1:406
+18795077	PKT_SRC	8:38:6064:8:0:4:1384
+18795077	PKT_SRC	9:14:3164:0:0:1:406
+18795077	PKT_SRC	10:14:3171:0:0:1:407
+18795077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18795077	READY_FILTER	9548:9548:0:0:0
+18795077	REASSEMBLY	0:40
+grant seq=105409 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=3 active_queue=[9,3] cursor=0 cursor_node_id=9
+grant seq=105410 node_id=9 duration_ms=18 kind=normal active_queue=[9,3] cursor=1 cursor_node_id=3
+grant seq=105411 node_id=3 duration_ms=18 kind=normal active_queue=[9,3] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=77 consecutive_silent_grants=3 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105412 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105413 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105414 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=8 active_queue=[3,8] cursor=0 cursor_node_id=3
+grant seq=105415 node_id=3 duration_ms=18 kind=normal active_queue=[3,8] cursor=1 cursor_node_id=8
+grant seq=105416 node_id=8 duration_ms=18 kind=normal active_queue=[3,8] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=98 consecutive_silent_grants=4 active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=1 active_queue=[8,1] cursor=0 cursor_node_id=8
+grant seq=105417 node_id=8 duration_ms=18 kind=normal active_queue=[8,1] cursor=1 cursor_node_id=1
+grant seq=105418 node_id=1 duration_ms=18 kind=normal active_queue=[8,1] cursor=0 cursor_node_id=8
+grant seq=105419 node_id=8 duration_ms=18 kind=normal active_queue=[8,1] cursor=1 cursor_node_id=1
+grant seq=105420 node_id=1 duration_ms=18 kind=normal active_queue=[8,1] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=65 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105421 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105422 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105423 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105424 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105425 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=8 active_queue=[1,8] cursor=0 cursor_node_id=1
+grant seq=105426 node_id=1 duration_ms=18 kind=normal active_queue=[1,8] cursor=1 cursor_node_id=8
+grant seq=105427 node_id=8 duration_ms=18 kind=normal active_queue=[1,8] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=178 consecutive_silent_grants=7 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105428 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105429 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105430 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105431 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105432 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105433 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105434 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105435 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105436 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105437 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105438 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105439 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=5 active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=105440 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=105441 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=133 consecutive_silent_grants=6 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105442 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105443 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105444 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105445 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105446 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105447 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105448 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105449 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105450 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105451 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105452 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105453 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105454 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105455 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105456 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=6 active_queue=[5,6] cursor=0 cursor_node_id=5
+grant seq=105457 node_id=5 duration_ms=18 kind=normal active_queue=[5,6] cursor=1 cursor_node_id=6
+grant seq=105458 node_id=6 duration_ms=18 kind=normal active_queue=[5,6] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=340 consecutive_silent_grants=16 active_queue=[6] cursor=0 cursor_node_id=6
+18796077	RX_ANT	5745:4:40	1	113:-62:-51:-46:4:11:19
+18796077	RX_ANT	5745:4:40	0	113:-58:-50:-42:2:11:18
+18796077	PKT	119:25207:0:0:113:113:8:0:0:9:3532
+18796077	RX_BATCH	34:119:1459:126:8
+18796077	PKT_SRC	1:14:3164:0:0:1:406
+18796077	PKT_SRC	2:0:0:0:0:0:0
+18796077	PKT_SRC	3:14:3157:0:0:1:405
+18796077	PKT_SRC	4:0:0:0:0:0:0
+18796077	PKT_SRC	5:13:2735:0:0:1:406
+18796077	PKT_SRC	6:14:3164:0:0:1:406
+18796077	PKT_SRC	7:0:0:0:0:0:0
+18796077	PKT_SRC	8:58:12843:8:0:5:1909
+18796077	PKT_SRC	9:0:0:0:0:0:0
+18796077	PKT_SRC	10:0:0:0:0:0:0
+18796077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18796077	READY_FILTER	9554:9554:0:0:0
+18796077	REASSEMBLY	0:40
+grant seq=105459 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105460 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105461 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105462 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105463 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105464 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105465 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105466 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105467 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105468 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105469 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105470 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105471 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=7 active_queue=[6,7] cursor=0 cursor_node_id=6
+grant seq=105472 node_id=6 duration_ms=18 kind=normal active_queue=[6,7] cursor=1 cursor_node_id=7
+grant seq=105473 node_id=7 duration_ms=18 kind=normal active_queue=[6,7] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=299 consecutive_silent_grants=14 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105474 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105475 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105476 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105477 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105478 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105479 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105480 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105481 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105482 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105483 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105484 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105485 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105486 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105487 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105488 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105489 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105490 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105491 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105492 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105493 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105494 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105495 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105496 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105497 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105498 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105499 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105500 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105501 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105502 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105503 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105504 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105505 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+grant seq=105506 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+grant seq=105507 node_id=10 duration_ms=18 kind=normal active_queue=[7,10] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=679 consecutive_silent_grants=33 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105508 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+18797077	RX_ANT	5745:4:40	1	28:-56:-54:-52:8:10:14
+18797077	RX_ANT	5745:4:40	0	28:-52:-49:-46:8:10:13
+18797077	PKT	30:6383:0:0:28:28:0:0:0:2:813
+18797077	RX_BATCH	9:30:356:68:9
+18797077	PKT_SRC	1:0:0:0:0:0:0
+18797077	PKT_SRC	2:0:0:0:0:0:0
+18797077	PKT_SRC	3:0:0:0:0:0:0
+18797077	PKT_SRC	4:0:0:0:0:0:0
+18797077	PKT_SRC	5:0:0:0:0:0:0
+18797077	PKT_SRC	6:0:0:0:0:0:0
+18797077	PKT_SRC	7:14:3164:0:0:1:406
+18797077	PKT_SRC	8:0:0:0:0:0:0
+18797077	PKT_SRC	9:0:0:0:0:0:0
+18797077	PKT_SRC	10:14:3171:0:0:1:407
+18797077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18797077	READY_FILTER	9556:9556:0:0:0
+18797077	REASSEMBLY	0:40
+grant seq=105509 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105510 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105511 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105512 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=3 active_queue=[10,3] cursor=0 cursor_node_id=10
+grant seq=105513 node_id=10 duration_ms=18 kind=normal active_queue=[10,3] cursor=1 cursor_node_id=3
+grant seq=105514 node_id=3 duration_ms=18 kind=normal active_queue=[10,3] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=138 consecutive_silent_grants=6 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105515 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105516 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=9 active_queue=[3,9] cursor=0 cursor_node_id=3
+grant seq=105517 node_id=3 duration_ms=18 kind=normal active_queue=[3,9] cursor=1 cursor_node_id=9
+grant seq=105518 node_id=9 duration_ms=18 kind=normal active_queue=[3,9] cursor=0 cursor_node_id=3
+grant seq=105519 node_id=3 duration_ms=18 kind=normal active_queue=[3,9] cursor=1 cursor_node_id=9
+ready_accept node_id=1 active_queue=[3,9,1] cursor=1 cursor_node_id=9
+grant seq=105520 node_id=9 duration_ms=18 kind=normal active_queue=[3,9,1] cursor=2 cursor_node_id=1
+silent_remove node_id=3 silence_ms=78 consecutive_silent_grants=2 active_queue=[9,1] cursor=1 cursor_node_id=1
+grant seq=105521 node_id=1 duration_ms=18 kind=normal active_queue=[9,1] cursor=0 cursor_node_id=9
+grant seq=105522 node_id=9 duration_ms=18 kind=normal active_queue=[9,1] cursor=1 cursor_node_id=1
+grant seq=105523 node_id=1 duration_ms=18 kind=normal active_queue=[9,1] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=97 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105524 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105525 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105526 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105527 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105528 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105529 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105530 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105531 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105532 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105533 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105534 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105535 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105536 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105537 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105538 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105539 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105540 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105541 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105542 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=5 active_queue=[1,5] cursor=0 cursor_node_id=1
+grant seq=105543 node_id=1 duration_ms=18 kind=normal active_queue=[1,5] cursor=1 cursor_node_id=5
+grant seq=105544 node_id=5 duration_ms=18 kind=normal active_queue=[1,5] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=460 consecutive_silent_grants=21 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105545 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105546 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105547 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105548 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=2 active_queue=[5,2] cursor=0 cursor_node_id=5
+grant seq=105549 node_id=5 duration_ms=18 kind=normal active_queue=[5,2] cursor=1 cursor_node_id=2
+grant seq=105550 node_id=2 duration_ms=18 kind=normal active_queue=[5,2] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=118 consecutive_silent_grants=5 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105551 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105552 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105553 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105554 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105555 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105556 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105557 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105558 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+18798077	RX_ANT	5745:4:40	1	69:-66:-54:-46:3:10:18
+18798077	RX_ANT	5745:4:40	0	69:-56:-48:-42:8:11:18
+18798077	PKT	74:15505:0:0:69:69:0:0:0:5:2029
+18798077	RX_BATCH	25:74:841:82:8
+18798077	PKT_SRC	1:14:3164:0:0:1:406
+18798077	PKT_SRC	2:14:3164:0:0:1:406
+18798077	PKT_SRC	3:13:2729:0:0:1:405
+18798077	PKT_SRC	4:0:0:0:0:0:0
+18798077	PKT_SRC	5:14:3164:0:0:1:406
+18798077	PKT_SRC	6:0:0:0:0:0:0
+18798077	PKT_SRC	7:0:0:0:0:0:0
+18798077	PKT_SRC	8:0:0:0:0:0:0
+18798077	PKT_SRC	9:14:3164:0:0:1:406
+18798077	PKT_SRC	10:0:0:0:0:0:0
+18798077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18798077	READY_FILTER	9561:9561:0:0:0
+18798077	REASSEMBLY	0:40
+grant seq=105559 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=6 active_queue=[2,6] cursor=0 cursor_node_id=2
+grant seq=105560 node_id=2 duration_ms=18 kind=normal active_queue=[2,6] cursor=1 cursor_node_id=6
+grant seq=105561 node_id=6 duration_ms=18 kind=normal active_queue=[2,6] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=219 consecutive_silent_grants=10 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105562 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105563 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105564 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105565 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105566 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105567 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105568 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105569 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105570 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105571 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105572 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105573 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105574 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=7 active_queue=[6,7] cursor=0 cursor_node_id=6
+grant seq=105575 node_id=6 duration_ms=18 kind=normal active_queue=[6,7] cursor=1 cursor_node_id=7
+grant seq=105576 node_id=7 duration_ms=18 kind=normal active_queue=[6,7] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=299 consecutive_silent_grants=14 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105577 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105578 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105579 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105580 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105581 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105582 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105583 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105584 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105585 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105586 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105587 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105588 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105589 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105590 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105591 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105592 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105593 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105594 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105595 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105596 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105597 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105598 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105599 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105600 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105601 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105602 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105603 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105604 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105605 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105606 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105607 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105608 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+18799077	RX_ANT	5745:4:40	1	28:-56:-52:-50:9:11:14
+18799077	RX_ANT	5745:4:40	0	28:-52:-51:-50:8:11:14
+18799077	PKT	31:6400:0:0:28:28:0:0:0:2:812
+18799077	RX_BATCH	9:31:353:69:8
+18799077	PKT_SRC	1:0:0:0:0:0:0
+18799077	PKT_SRC	2:0:0:0:0:0:0
+18799077	PKT_SRC	3:0:0:0:0:0:0
+18799077	PKT_SRC	4:0:0:0:0:0:0
+18799077	PKT_SRC	5:0:0:0:0:0:0
+18799077	PKT_SRC	6:14:3164:0:0:1:406
+18799077	PKT_SRC	7:14:3164:0:0:1:406
+18799077	PKT_SRC	8:0:0:0:0:0:0
+18799077	PKT_SRC	9:0:0:0:0:0:0
+18799077	PKT_SRC	10:0:0:0:0:0:0
+18799077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18799077	READY_FILTER	9564:9564:0:0:0
+18799077	REASSEMBLY	0:40
+grant seq=105609 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+ready_accept node_id=2 active_queue=[7,10,2] cursor=1 cursor_node_id=10
+grant seq=105610 node_id=10 duration_ms=18 kind=normal active_queue=[7,10,2] cursor=2 cursor_node_id=2
+silent_remove node_id=7 silence_ms=682 consecutive_silent_grants=33 active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105611 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105612 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105613 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105614 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105615 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=97 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105616 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105617 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=105618 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=105619 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=119 consecutive_silent_grants=4 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105620 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105621 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=1 active_queue=[3,1] cursor=0 cursor_node_id=3
+grant seq=105622 node_id=3 duration_ms=18 kind=normal active_queue=[3,1] cursor=1 cursor_node_id=1
+grant seq=105623 node_id=1 duration_ms=18 kind=normal active_queue=[3,1] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=79 consecutive_silent_grants=3 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105624 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105625 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105626 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105627 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=105628 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=105629 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=118 consecutive_silent_grants=5 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105630 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105631 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105632 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105633 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105634 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105635 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105636 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105637 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105638 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105639 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105640 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105641 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=8 active_queue=[9,8] cursor=0 cursor_node_id=9
+grant seq=105642 node_id=9 duration_ms=18 kind=normal active_queue=[9,8] cursor=1 cursor_node_id=8
+grant seq=105643 node_id=8 duration_ms=18 kind=normal active_queue=[9,8] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=236 consecutive_silent_grants=11 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105644 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105645 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=5 active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=105646 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=105647 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=61 consecutive_silent_grants=3 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105648 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105649 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105650 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105651 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105652 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105653 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105654 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105655 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105656 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105657 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+18800077	RX_ANT	5745:4:40	1	88:-70:-53:-46:-3:10:15
+18800077	RX_ANT	5745:4:40	0	88:-60:-48:-42:-2:10:15
+18800077	PKT	94:19214:0:0:88:88:4:0:0:7:2840
+18800077	RX_BATCH	30:94:1220:104:9
+18800077	PKT_SRC	1:14:3164:0:0:1:406
+18800077	PKT_SRC	2:12:2712:1:0:1:406
+18800077	PKT_SRC	3:14:3157:0:0:1:405
+18800077	PKT_SRC	4:0:0:0:0:0:0
+18800077	PKT_SRC	5:11:2283:1:0:1:406
+18800077	PKT_SRC	6:0:0:0:0:0:0
+18800077	PKT_SRC	7:0:0:0:0:0:0
+18800077	PKT_SRC	8:9:1419:2:0:1:404
+18800077	PKT_SRC	9:14:3164:0:0:1:406
+18800077	PKT_SRC	10:14:3171:0:0:1:407
+18800077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18800077	READY_FILTER	9570:9570:0:0:0
+18800077	REASSEMBLY	0:40
+grant seq=105658 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105659 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105660 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105661 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=6 active_queue=[5,6] cursor=0 cursor_node_id=5
+grant seq=105662 node_id=5 duration_ms=18 kind=normal active_queue=[5,6] cursor=1 cursor_node_id=6
+grant seq=105663 node_id=6 duration_ms=18 kind=normal active_queue=[5,6] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=320 consecutive_silent_grants=15 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105664 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105665 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105666 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105667 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105668 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105669 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105670 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105671 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105672 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105673 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105674 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105675 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105676 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105677 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=7 active_queue=[6,7] cursor=0 cursor_node_id=6
+grant seq=105678 node_id=6 duration_ms=18 kind=normal active_queue=[6,7] cursor=1 cursor_node_id=7
+grant seq=105679 node_id=7 duration_ms=18 kind=normal active_queue=[6,7] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=319 consecutive_silent_grants=15 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105680 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105681 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105682 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105683 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105684 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105685 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105686 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105687 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105688 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105689 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105690 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105691 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105692 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105693 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105694 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105695 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105696 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105697 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105698 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105699 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105700 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105701 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105702 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105703 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=8 active_queue=[7,8] cursor=0 cursor_node_id=7
+grant seq=105704 node_id=7 duration_ms=18 kind=normal active_queue=[7,8] cursor=1 cursor_node_id=8
+grant seq=105705 node_id=8 duration_ms=18 kind=normal active_queue=[7,8] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=519 consecutive_silent_grants=25 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105706 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105707 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+18801077	RX_ANT	5745:4:40	1	28:-56:-53:-52:9:11:14
+18801077	RX_ANT	5745:4:40	0	28:-54:-51:-50:9:11:14
+18801077	PKT	31:6400:0:0:28:28:0:0:0:2:812
+18801077	RX_BATCH	10:31:491:85:8
+18801077	PKT_SRC	1:0:0:0:0:0:0
+18801077	PKT_SRC	2:0:0:0:0:0:0
+18801077	PKT_SRC	3:0:0:0:0:0:0
+18801077	PKT_SRC	4:0:0:0:0:0:0
+18801077	PKT_SRC	5:0:0:0:0:0:0
+18801077	PKT_SRC	6:14:3164:0:0:1:406
+18801077	PKT_SRC	7:14:3164:0:0:1:406
+18801077	PKT_SRC	8:0:0:0:0:0:0
+18801077	PKT_SRC	9:0:0:0:0:0:0
+18801077	PKT_SRC	10:0:0:0:0:0:0
+18801077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18801077	READY_FILTER	9573:9573:0:0:0
+18801077	REASSEMBLY	0:40
+grant seq=105708 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105709 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105710 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105711 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=10 active_queue=[8,10] cursor=0 cursor_node_id=8
+grant seq=105712 node_id=8 duration_ms=18 kind=normal active_queue=[8,10] cursor=1 cursor_node_id=10
+grant seq=105713 node_id=10 duration_ms=18 kind=normal active_queue=[8,10] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=196 consecutive_silent_grants=8 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105714 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105715 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105716 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=58 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105717 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105718 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105719 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105720 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=105721 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=105722 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=118 consecutive_silent_grants=5 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105723 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105724 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=1 active_queue=[3,1] cursor=0 cursor_node_id=3
+grant seq=105725 node_id=3 duration_ms=18 kind=normal active_queue=[3,1] cursor=1 cursor_node_id=1
+grant seq=105726 node_id=1 duration_ms=18 kind=normal active_queue=[3,1] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=57 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105727 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105728 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105729 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105730 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105731 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105732 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=105733 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=105734 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=155 consecutive_silent_grants=7 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105735 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105736 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105737 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105738 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105739 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105740 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105741 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105742 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105743 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105744 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105745 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105746 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105747 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105748 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=5 active_queue=[9,5] cursor=0 cursor_node_id=9
+grant seq=105749 node_id=9 duration_ms=18 kind=normal active_queue=[9,5] cursor=1 cursor_node_id=5
+grant seq=105750 node_id=5 duration_ms=18 kind=normal active_queue=[9,5] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=320 consecutive_silent_grants=15 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105751 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105752 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105753 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=8 active_queue=[5,8] cursor=0 cursor_node_id=5
+grant seq=105754 node_id=5 duration_ms=18 kind=normal active_queue=[5,8] cursor=1 cursor_node_id=8
+grant seq=105755 node_id=8 duration_ms=18 kind=normal active_queue=[5,8] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=98 consecutive_silent_grants=4 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105756 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105757 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+18802077	RX_ANT	5745:4:40	1	82:-64:-54:-46:-1:10:15
+18802077	RX_ANT	5745:4:40	0	82:-56:-48:-42:8:11:16
+18802077	PKT	89:18294:0:0:82:82:1:0:0:6:2436
+18802077	RX_BATCH	33:89:1114:92:8
+18802077	PKT_SRC	1:13:2735:1:0:1:406
+18802077	PKT_SRC	2:14:3164:0:0:1:406
+18802077	PKT_SRC	3:14:3157:0:0:1:405
+18802077	PKT_SRC	4:0:0:0:0:0:0
+18802077	PKT_SRC	5:14:3164:0:0:1:406
+18802077	PKT_SRC	6:0:0:0:0:0:0
+18802077	PKT_SRC	7:0:0:0:0:0:0
+18802077	PKT_SRC	8:0:0:0:0:0:0
+18802077	PKT_SRC	9:13:2735:0:0:1:406
+18802077	PKT_SRC	10:14:3171:0:0:1:407
+18802077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18802077	READY_FILTER	9580:9580:0:0:0
+18802077	REASSEMBLY	0:40
+grant seq=105758 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105759 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105760 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105761 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105762 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105763 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105764 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=6 active_queue=[8,6] cursor=0 cursor_node_id=8
+PACKET_LOSS source_node=8 previous_seq=16351 current_seq=16360 lost_count=8
+grant seq=105765 node_id=8 duration_ms=18 kind=normal active_queue=[8,6] cursor=1 cursor_node_id=6
+grant seq=105766 node_id=6 duration_ms=18 kind=normal active_queue=[8,6] cursor=0 cursor_node_id=8
+grant seq=105767 node_id=8 duration_ms=18 kind=normal active_queue=[8,6] cursor=1 cursor_node_id=6
+grant seq=105768 node_id=6 duration_ms=18 kind=normal active_queue=[8,6] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=62 consecutive_silent_grants=2 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105769 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105770 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105771 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105772 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105773 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105774 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105775 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105776 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105777 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105778 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105779 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105780 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=7 active_queue=[6,7] cursor=0 cursor_node_id=6
+grant seq=105781 node_id=6 duration_ms=18 kind=normal active_queue=[6,7] cursor=1 cursor_node_id=7
+grant seq=105782 node_id=7 duration_ms=18 kind=normal active_queue=[6,7] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=321 consecutive_silent_grants=14 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105783 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105784 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105785 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105786 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105787 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105788 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105789 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105790 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105791 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105792 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105793 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105794 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105795 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105796 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105797 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105798 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105799 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105800 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105801 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105802 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105803 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105804 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105805 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105806 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105807 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+18803077	RX_ANT	5745:4:40	1	35:-60:-53:-50:2:10:13
+18803077	RX_ANT	5745:4:40	0	35:-54:-52:-50:5:10:13
+18803077	PKT	37:7745:0:0:35:35:3:8:0:3:1216
+18803077	RX_BATCH	15:37:445:107:6
+18803077	PKT_SRC	1:0:0:0:0:0:0
+18803077	PKT_SRC	2:0:0:0:0:0:0
+18803077	PKT_SRC	3:0:0:0:0:0:0
+18803077	PKT_SRC	4:0:0:0:0:0:0
+18803077	PKT_SRC	5:0:0:0:0:0:0
+18803077	PKT_SRC	6:13:2735:0:0:1:406
+18803077	PKT_SRC	7:12:2712:1:0:1:406
+18803077	PKT_SRC	8:10:2250:2:8:1:404
+18803077	PKT_SRC	9:0:0:0:0:0:0
+18803077	PKT_SRC	10:0:0:0:0:0:0
+18803077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18803077	READY_FILTER	9582:9582:0:0:0
+18803077	REASSEMBLY	0:40
+8 packets lost
+grant seq=105808 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105809 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105810 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105811 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105812 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105813 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105814 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+grant seq=105815 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+grant seq=105816 node_id=10 duration_ms=18 kind=normal active_queue=[7,10] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=681 consecutive_silent_grants=33 active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105817 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105818 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105819 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105820 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=78 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105821 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105822 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105823 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105824 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=105825 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=105826 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=114 consecutive_silent_grants=5 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105827 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=1 active_queue=[3,1] cursor=0 cursor_node_id=3
+grant seq=105828 node_id=3 duration_ms=18 kind=normal active_queue=[3,1] cursor=1 cursor_node_id=1
+grant seq=105829 node_id=1 duration_ms=18 kind=normal active_queue=[3,1] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=58 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105830 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105831 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105832 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105833 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105834 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105835 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105836 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105837 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105838 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105839 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105840 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105841 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105842 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105843 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=105844 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=105845 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=319 consecutive_silent_grants=15 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105846 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105847 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105848 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105849 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105850 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105851 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=5 active_queue=[9,5] cursor=0 cursor_node_id=9
+grant seq=105852 node_id=9 duration_ms=18 kind=normal active_queue=[9,5] cursor=1 cursor_node_id=5
+grant seq=105853 node_id=5 duration_ms=18 kind=normal active_queue=[9,5] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=158 consecutive_silent_grants=7 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105854 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105855 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105856 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105857 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+18804077	RX_ANT	5745:4:40	1	79:-70:-54:-46:3:10:16
+18804077	RX_ANT	5745:4:40	0	79:-56:-47:-42:9:11:15
+18804077	PKT	85:18201:0:0:79:79:4:0:0:6:2436
+18804077	RX_BATCH	24:85:1095:109:8
+18804077	PKT_SRC	1:13:3141:1:0:1:406
+18804077	PKT_SRC	2:10:2260:3:0:1:406
+18804077	PKT_SRC	3:14:3157:0:0:1:405
+18804077	PKT_SRC	4:0:0:0:0:0:0
+18804077	PKT_SRC	5:14:3164:0:0:1:406
+18804077	PKT_SRC	6:0:0:0:0:0:0
+18804077	PKT_SRC	7:0:0:0:0:0:0
+18804077	PKT_SRC	8:0:0:0:0:0:0
+18804077	PKT_SRC	9:14:3164:0:0:1:406
+18804077	PKT_SRC	10:14:3171:0:0:1:407
+18804077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18804077	READY_FILTER	9588:9588:0:0:0
+18804077	REASSEMBLY	0:40
+grant seq=105858 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105859 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105860 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105861 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105862 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105863 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105864 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105865 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105866 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=6 active_queue=[5,6] cursor=0 cursor_node_id=5
+grant seq=105867 node_id=5 duration_ms=18 kind=normal active_queue=[5,6] cursor=1 cursor_node_id=6
+grant seq=105868 node_id=6 duration_ms=18 kind=normal active_queue=[5,6] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=298 consecutive_silent_grants=14 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105869 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105870 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105871 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105872 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105873 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105874 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105875 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105876 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=8 active_queue=[6,8] cursor=0 cursor_node_id=6
+grant seq=105877 node_id=6 duration_ms=18 kind=normal active_queue=[6,8] cursor=1 cursor_node_id=8
+grant seq=105878 node_id=8 duration_ms=18 kind=normal active_queue=[6,8] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=199 consecutive_silent_grants=9 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105879 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105880 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105881 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105882 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=105883 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=7 active_queue=[8,7] cursor=0 cursor_node_id=8
+grant seq=105884 node_id=8 duration_ms=18 kind=normal active_queue=[8,7] cursor=1 cursor_node_id=7
+grant seq=105885 node_id=7 duration_ms=18 kind=normal active_queue=[8,7] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=139 consecutive_silent_grants=6 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105886 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105887 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105888 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105889 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105890 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105891 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105892 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105893 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105894 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105895 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105896 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105897 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105898 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105899 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105900 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105901 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105902 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105903 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105904 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105905 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105906 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+18805077	RX_ANT	5745:4:40	1	38:-56:-53:-50:9:11:16
+18805077	RX_ANT	5745:4:40	0	38:-52:-51:-50:9:11:14
+18805077	PKT	41:9054:0:0:38:38:3:0:0:3:1216
+18805077	RX_BATCH	19:41:512:75:8
+18805077	PKT_SRC	1:0:0:0:0:0:0
+18805077	PKT_SRC	2:0:0:0:0:0:0
+18805077	PKT_SRC	3:0:0:0:0:0:0
+18805077	PKT_SRC	4:0:0:0:0:0:0
+18805077	PKT_SRC	5:0:0:0:0:0:0
+18805077	PKT_SRC	6:14:3164:0:0:1:406
+18805077	PKT_SRC	7:14:3164:0:0:1:406
+18805077	PKT_SRC	8:10:2654:3:0:1:404
+18805077	PKT_SRC	9:0:0:0:0:0:0
+18805077	PKT_SRC	10:0:0:0:0:0:0
+18805077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18805077	READY_FILTER	9591:9591:0:0:0
+18805077	REASSEMBLY	0:40
+grant seq=105907 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105908 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105909 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105910 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105911 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105912 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105913 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105914 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105915 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105916 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105917 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+grant seq=105918 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+grant seq=105919 node_id=10 duration_ms=18 kind=normal active_queue=[7,10] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=659 consecutive_silent_grants=32 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105920 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=105921 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=105922 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=105923 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=79 consecutive_silent_grants=3 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105924 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105925 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105926 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=105927 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=105928 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=105929 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=118 consecutive_silent_grants=5 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=105930 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=1 active_queue=[3,1] cursor=0 cursor_node_id=3
+grant seq=105931 node_id=3 duration_ms=18 kind=normal active_queue=[3,1] cursor=1 cursor_node_id=1
+grant seq=105932 node_id=1 duration_ms=18 kind=normal active_queue=[3,1] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=59 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105933 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105934 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105935 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105936 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105937 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105938 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105939 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105940 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105941 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105942 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105943 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105944 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105945 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=105946 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=105947 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=105948 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=318 consecutive_silent_grants=15 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105949 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105950 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105951 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105952 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105953 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=105954 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=5 active_queue=[9,5] cursor=0 cursor_node_id=9
+grant seq=105955 node_id=9 duration_ms=18 kind=normal active_queue=[9,5] cursor=1 cursor_node_id=5
+grant seq=105956 node_id=5 duration_ms=18 kind=normal active_queue=[9,5] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=160 consecutive_silent_grants=7 active_queue=[5] cursor=0 cursor_node_id=5
+18806077	RX_ANT	5745:4:40	1	84:-62:-53:-46:9:11:15
+18806077	RX_ANT	5745:4:40	0	84:-56:-48:-42:9:10:14
+18806077	PKT	90:19128:0:0:84:84:0:0:0:6:2436
+18806077	RX_BATCH	28:90:1064:82:8
+18806077	PKT_SRC	1:14:3164:0:0:1:406
+18806077	PKT_SRC	2:14:3164:0:0:1:406
+18806077	PKT_SRC	3:14:3157:0:0:1:405
+18806077	PKT_SRC	4:0:0:0:0:0:0
+18806077	PKT_SRC	5:14:3164:0:0:1:406
+18806077	PKT_SRC	6:0:0:0:0:0:0
+18806077	PKT_SRC	7:0:0:0:0:0:0
+18806077	PKT_SRC	8:0:0:0:0:0:0
+18806077	PKT_SRC	9:14:3164:0:0:1:406
+18806077	PKT_SRC	10:14:3171:0:0:1:407
+18806077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18806077	READY_FILTER	9597:9597:0:0:0
+18806077	REASSEMBLY	0:40
+grant seq=105957 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105958 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105959 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105960 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105961 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105962 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105963 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105964 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105965 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105966 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105967 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105968 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=105969 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=6 active_queue=[5,6] cursor=0 cursor_node_id=5
+grant seq=105970 node_id=5 duration_ms=18 kind=normal active_queue=[5,6] cursor=1 cursor_node_id=6
+grant seq=105971 node_id=6 duration_ms=18 kind=normal active_queue=[5,6] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=298 consecutive_silent_grants=14 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105972 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105973 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105974 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105975 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105976 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105977 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105978 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105979 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105980 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105981 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105982 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105983 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105984 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105985 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=105986 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=8 active_queue=[6,8] cursor=0 cursor_node_id=6
+grant seq=105987 node_id=6 duration_ms=18 kind=normal active_queue=[6,8] cursor=1 cursor_node_id=8
+ready_accept node_id=7 active_queue=[6,8,7] cursor=1 cursor_node_id=8
+grant seq=105988 node_id=8 duration_ms=18 kind=normal active_queue=[6,8,7] cursor=2 cursor_node_id=7
+silent_remove node_id=6 silence_ms=339 consecutive_silent_grants=16 active_queue=[8,7] cursor=1 cursor_node_id=7
+grant seq=105989 node_id=7 duration_ms=18 kind=normal active_queue=[8,7] cursor=0 cursor_node_id=8
+grant seq=105990 node_id=8 duration_ms=18 kind=normal active_queue=[8,7] cursor=1 cursor_node_id=7
+grant seq=105991 node_id=7 duration_ms=18 kind=normal active_queue=[8,7] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=83 consecutive_silent_grants=2 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105992 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105993 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105994 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105995 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105996 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105997 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105998 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=105999 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106000 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106001 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106002 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106003 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106004 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106005 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106006 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+18807077	RX_ANT	5745:4:40	1	28:-56:-53:-50:0:11:15
+18807077	RX_ANT	5745:4:40	0	28:-54:-51:-50:0:10:13
+18807077	PKT	31:6400:0:0:28:28:0:0:0:2:812
+18807077	RX_BATCH	9:31:400:71:7
+18807077	PKT_SRC	1:0:0:0:0:0:0
+18807077	PKT_SRC	2:0:0:0:0:0:0
+18807077	PKT_SRC	3:0:0:0:0:0:0
+18807077	PKT_SRC	4:0:0:0:0:0:0
+18807077	PKT_SRC	5:0:0:0:0:0:0
+18807077	PKT_SRC	6:14:3164:0:0:1:406
+18807077	PKT_SRC	7:14:3164:0:0:1:406
+18807077	PKT_SRC	8:0:0:0:0:0:0
+18807077	PKT_SRC	9:0:0:0:0:0:0
+18807077	PKT_SRC	10:0:0:0:0:0:0
+18807077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18807077	READY_FILTER	9600:9600:0:0:0
+18807077	REASSEMBLY	0:40
+grant seq=106007 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106008 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106009 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106010 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106011 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106012 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106013 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106014 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106015 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106016 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106017 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106018 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106019 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106020 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+grant seq=106021 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+grant seq=106022 node_id=10 duration_ms=18 kind=normal active_queue=[7,10] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=660 consecutive_silent_grants=31 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106023 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106024 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=106025 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=106026 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=77 consecutive_silent_grants=3 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106027 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106028 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106029 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106030 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=106031 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=106032 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=117 consecutive_silent_grants=5 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106033 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=1 active_queue=[3,1] cursor=0 cursor_node_id=3
+grant seq=106034 node_id=3 duration_ms=18 kind=normal active_queue=[3,1] cursor=1 cursor_node_id=1
+grant seq=106035 node_id=1 duration_ms=18 kind=normal active_queue=[3,1] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=57 consecutive_silent_grants=2 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106036 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106037 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106038 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106039 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106040 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106041 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106042 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106043 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106044 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106045 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106046 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106047 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106048 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106049 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106050 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106051 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106052 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106053 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106054 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106055 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106056 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+18808077	RX_ANT	5745:4:40	1	51:-62:-52:-46:7:10:14
+18808077	RX_ANT	5745:4:40	0	51:-50:-46:-42:7:10:14
+18808077	PKT	55:11826:0:0:51:51:3:0:0:4:1624
+18808077	RX_BATCH	18:55:725:99:8
+18808077	PKT_SRC	1:14:3164:0:0:1:406
+18808077	PKT_SRC	2:12:2712:1:0:1:406
+18808077	PKT_SRC	3:11:2683:2:0:1:405
+18808077	PKT_SRC	4:0:0:0:0:0:0
+18808077	PKT_SRC	5:0:0:0:0:0:0
+18808077	PKT_SRC	6:0:0:0:0:0:0
+18808077	PKT_SRC	7:0:0:0:0:0:0
+18808077	PKT_SRC	8:0:0:0:0:0:0
+18808077	PKT_SRC	9:0:0:0:0:0:0
+18808077	PKT_SRC	10:14:3171:0:0:1:407
+18808077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18808077	READY_FILTER	9604:9604:0:0:0
+18808077	REASSEMBLY	0:40
+grant seq=106057 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=106058 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=106059 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=481 consecutive_silent_grants=23 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106060 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106061 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106062 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106063 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106064 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106065 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106066 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106067 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106068 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106069 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106070 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106071 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106072 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=6 active_queue=[9,6] cursor=0 cursor_node_id=9
+grant seq=106073 node_id=9 duration_ms=18 kind=normal active_queue=[9,6] cursor=1 cursor_node_id=6
+grant seq=106074 node_id=6 duration_ms=18 kind=normal active_queue=[9,6] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=279 consecutive_silent_grants=13 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106075 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106076 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106077 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106078 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106079 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106080 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106081 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106082 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106083 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106084 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106085 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106086 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106087 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106088 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106089 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106090 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=7 active_queue=[6,7] cursor=0 cursor_node_id=6
+grant seq=106091 node_id=6 duration_ms=18 kind=normal active_queue=[6,7] cursor=1 cursor_node_id=7
+grant seq=106092 node_id=7 duration_ms=18 kind=normal active_queue=[6,7] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=361 consecutive_silent_grants=17 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106093 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106094 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106095 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106096 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106097 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106098 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106099 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106100 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106101 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=8 active_queue=[7,8] cursor=0 cursor_node_id=7
+grant seq=106102 node_id=7 duration_ms=18 kind=normal active_queue=[7,8] cursor=1 cursor_node_id=8
+grant seq=106103 node_id=8 duration_ms=18 kind=normal active_queue=[7,8] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=216 consecutive_silent_grants=10 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106104 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106105 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106106 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+18809077	RX_ANT	5745:4:40	1	38:-60:-53:-50:2:11:13
+18809077	RX_ANT	5745:4:40	0	38:-52:-50:-48:9:10:13
+18809077	PKT	42:8278:0:0:38:38:2:0:0:3:1218
+18809077	RX_BATCH	16:42:596:88:8
+18809077	PKT_SRC	1:0:0:0:0:0:0
+18809077	PKT_SRC	2:0:0:0:0:0:0
+18809077	PKT_SRC	3:0:0:0:0:0:0
+18809077	PKT_SRC	4:0:0:0:0:0:0
+18809077	PKT_SRC	5:0:0:0:0:0:0
+18809077	PKT_SRC	6:13:3141:1:0:1:406
+18809077	PKT_SRC	7:13:2735:1:0:1:406
+18809077	PKT_SRC	8:0:0:0:0:0:0
+18809077	PKT_SRC	9:12:2306:0:0:1:406
+18809077	PKT_SRC	10:0:0:0:0:0:0
+18809077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18809077	READY_FILTER	9608:9608:0:0:0
+18809077	REASSEMBLY	0:40
+grant seq=106107 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=5 active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106108 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=106109 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106110 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=106111 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106112 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+PACKET_LOSS source_node=8 previous_seq=16376 current_seq=16379 lost_count=2
+PACKET_LOSS source_node=8 previous_seq=16382 current_seq=16389 lost_count=6
+PACKET_LOSS source_node=8 previous_seq=16389 current_seq=16392 lost_count=2
+grant seq=106113 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+PACKET_LOSS source_node=8 previous_seq=16400 current_seq=16408 lost_count=7
+grant seq=106114 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+silent_remove node_id=5 silence_ms=98 consecutive_silent_grants=2 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106115 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106116 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106117 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106118 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106119 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106120 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106121 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106122 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106123 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=10 active_queue=[8,10] cursor=0 cursor_node_id=8
+grant seq=106124 node_id=8 duration_ms=18 kind=normal active_queue=[8,10] cursor=1 cursor_node_id=10
+grant seq=106125 node_id=10 duration_ms=18 kind=normal active_queue=[8,10] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=227 consecutive_silent_grants=11 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106126 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106127 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=106128 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=106129 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=58 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106130 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106131 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106132 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=106133 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=106134 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=97 consecutive_silent_grants=4 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106135 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106136 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106137 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106138 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106139 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106140 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106141 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106142 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106143 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106144 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106145 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106146 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106147 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106148 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106149 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106150 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106151 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106152 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106153 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106154 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106155 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+18810077	RX_ANT	5745:4:40	1	97:-62:-54:-46:4:11:15
+18810077	RX_ANT	5745:4:40	0	97:-56:-50:-44:8:11:15
+18810077	PKT	101:21965:0:0:97:97:4:17:0:9:3406
+18810077	RX_BATCH	46:101:1362:115:8
+18810077	PKT_SRC	1:0:0:0:0:0:0
+18810077	PKT_SRC	2:14:3164:0:0:1:406
+18810077	PKT_SRC	3:13:3134:1:0:1:405
+18810077	PKT_SRC	4:0:0:0:0:0:0
+18810077	PKT_SRC	5:13:2735:0:0:1:406
+18810077	PKT_SRC	6:0:0:0:0:0:0
+18810077	PKT_SRC	7:0:0:0:0:0:0
+18810077	PKT_SRC	8:44:10095:3:17:5:1782
+18810077	PKT_SRC	9:0:0:0:0:0:0
+18810077	PKT_SRC	10:13:2741:0:0:1:407
+18810077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18810077	READY_FILTER	9612:9612:0:0:0
+18810077	REASSEMBLY	0:40
+17 packets lost
+grant seq=106156 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106157 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106158 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106159 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106160 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106161 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=9 active_queue=[3,9] cursor=0 cursor_node_id=3
+grant seq=106162 node_id=3 duration_ms=18 kind=normal active_queue=[3,9] cursor=1 cursor_node_id=9
+grant seq=106163 node_id=9 duration_ms=18 kind=normal active_queue=[3,9] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=582 consecutive_silent_grants=28 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106164 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106165 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106166 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=8 active_queue=[9,8] cursor=0 cursor_node_id=9
+grant seq=106167 node_id=9 duration_ms=18 kind=normal active_queue=[9,8] cursor=1 cursor_node_id=8
+grant seq=106168 node_id=8 duration_ms=18 kind=normal active_queue=[9,8] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=98 consecutive_silent_grants=4 active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=5 active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106169 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+PACKET_LOSS source_node=8 previous_seq=16415 current_seq=16425 lost_count=9
+PACKET_LOSS source_node=8 previous_seq=16425 current_seq=16440 lost_count=14
+grant seq=106170 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106171 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=106172 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106173 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+grant seq=106174 node_id=5 duration_ms=18 kind=normal active_queue=[8,5] cursor=0 cursor_node_id=8
+grant seq=106175 node_id=8 duration_ms=18 kind=normal active_queue=[8,5] cursor=1 cursor_node_id=5
+silent_remove node_id=5 silence_ms=98 consecutive_silent_grants=2 active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=6 active_queue=[8,6] cursor=0 cursor_node_id=8
+grant seq=106176 node_id=8 duration_ms=18 kind=normal active_queue=[8,6] cursor=1 cursor_node_id=6
+grant seq=106177 node_id=6 duration_ms=18 kind=normal active_queue=[8,6] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=117 consecutive_silent_grants=3 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106178 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=8 active_queue=[6,8] cursor=0 cursor_node_id=6
+grant seq=106179 node_id=6 duration_ms=18 kind=normal active_queue=[6,8] cursor=1 cursor_node_id=8
+grant seq=106180 node_id=8 duration_ms=18 kind=normal active_queue=[6,8] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=58 consecutive_silent_grants=2 active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106181 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106182 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106183 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106184 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106185 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=1 active_queue=[8,1] cursor=0 cursor_node_id=8
+grant seq=106186 node_id=8 duration_ms=18 kind=normal active_queue=[8,1] cursor=1 cursor_node_id=1
+grant seq=106187 node_id=1 duration_ms=18 kind=normal active_queue=[8,1] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=169 consecutive_silent_grants=7 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106188 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106189 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106190 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106191 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106192 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106193 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=7 active_queue=[1,7] cursor=0 cursor_node_id=1
+grant seq=106194 node_id=1 duration_ms=18 kind=normal active_queue=[1,7] cursor=1 cursor_node_id=7
+grant seq=106195 node_id=7 duration_ms=18 kind=normal active_queue=[1,7] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=159 consecutive_silent_grants=7 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106196 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106197 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106198 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106199 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106200 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106201 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106202 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106203 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=8 active_queue=[7,8] cursor=0 cursor_node_id=7
+grant seq=106204 node_id=7 duration_ms=18 kind=normal active_queue=[7,8] cursor=1 cursor_node_id=8
+grant seq=106205 node_id=8 duration_ms=18 kind=normal active_queue=[7,8] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=179 consecutive_silent_grants=8 active_queue=[8] cursor=0 cursor_node_id=8
+18811077	RX_ANT	5745:4:40	1	93:-62:-53:-46:5:11:15
+18811077	RX_ANT	5745:4:40	0	93:-56:-50:-42:7:10:15
+18811077	PKT	101:17961:0:0:93:93:4:23:0:8:3065
+18811077	RX_BATCH	41:101:1544:117:9
+18811077	PKT_SRC	1:13:3141:1:0:1:406
+18811077	PKT_SRC	2:0:0:0:0:0:0
+18811077	PKT_SRC	3:0:0:0:0:0:0
+18811077	PKT_SRC	4:0:0:0:0:0:0
+18811077	PKT_SRC	5:12:2712:1:0:1:406
+18811077	PKT_SRC	6:10:1448:0:0:1:406
+18811077	PKT_SRC	7:14:3164:0:0:1:406
+18811077	PKT_SRC	8:30:4140:2:23:3:1035
+18811077	PKT_SRC	9:14:3164:0:0:1:406
+18811077	PKT_SRC	10:0:0:0:0:0:0
+18811077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18811077	READY_FILTER	9620:9620:0:0:0
+18811077	REASSEMBLY	0:40
+23 packets lost
+grant seq=106206 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106207 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106208 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106209 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106210 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106211 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106212 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106213 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106214 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106215 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106216 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106217 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106218 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106219 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106220 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106221 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106222 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106223 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106224 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106225 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106226 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+grant seq=106227 node_id=8 duration_ms=18 kind=normal active_queue=[8] cursor=0 cursor_node_id=8
+ready_accept node_id=10 active_queue=[8,10] cursor=0 cursor_node_id=8
+grant seq=106228 node_id=8 duration_ms=18 kind=normal active_queue=[8,10] cursor=1 cursor_node_id=10
+grant seq=106229 node_id=10 duration_ms=18 kind=normal active_queue=[8,10] cursor=0 cursor_node_id=8
+silent_remove node_id=8 silence_ms=513 consecutive_silent_grants=24 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106230 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=2 active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=106231 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=106232 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+grant seq=106233 node_id=10 duration_ms=18 kind=normal active_queue=[10,2] cursor=1 cursor_node_id=2
+grant seq=106234 node_id=2 duration_ms=18 kind=normal active_queue=[10,2] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=78 consecutive_silent_grants=2 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106235 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106236 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106237 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106238 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106239 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106240 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106241 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106242 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106243 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106244 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106245 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106246 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106247 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=1 active_queue=[2,1] cursor=0 cursor_node_id=2
+grant seq=106248 node_id=2 duration_ms=18 kind=normal active_queue=[2,1] cursor=1 cursor_node_id=1
+grant seq=106249 node_id=1 duration_ms=18 kind=normal active_queue=[2,1] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=338 consecutive_silent_grants=15 active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106250 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106251 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106252 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106253 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106254 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106255 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+18812077	RX_ANT	5745:4:40	1	50:-62:-53:-46:-1:11:18
+18812077	RX_ANT	5745:4:40	0	50:-54:-47:-42:8:11:18
+18812077	PKT	53:11703:0:0:50:50:1:0:0:3:1219
+18812077	RX_BATCH	19:53:702:121:8
+18812077	PKT_SRC	1:13:2735:0:0:1:406
+18812077	PKT_SRC	2:12:2712:1:0:1:406
+18812077	PKT_SRC	3:0:0:0:0:0:0
+18812077	PKT_SRC	4:0:0:0:0:0:0
+18812077	PKT_SRC	5:0:0:0:0:0:0
+18812077	PKT_SRC	6:0:0:0:0:0:0
+18812077	PKT_SRC	7:0:0:0:0:0:0
+18812077	PKT_SRC	8:11:3013:0:0:0:0
+18812077	PKT_SRC	9:0:0:0:0:0:0
+18812077	PKT_SRC	10:14:3171:0:0:1:407
+18812077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18812077	READY_FILTER	9623:9623:0:0:0
+18812077	REASSEMBLY	0:40
+grant seq=106256 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106257 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106258 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106259 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106260 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106261 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106262 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106263 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+grant seq=106264 node_id=1 duration_ms=18 kind=normal active_queue=[1] cursor=0 cursor_node_id=1
+ready_accept node_id=9 active_queue=[1,9] cursor=0 cursor_node_id=1
+grant seq=106265 node_id=1 duration_ms=18 kind=normal active_queue=[1,9] cursor=1 cursor_node_id=9
+grant seq=106266 node_id=9 duration_ms=18 kind=normal active_queue=[1,9] cursor=0 cursor_node_id=1
+silent_remove node_id=1 silence_ms=340 consecutive_silent_grants=16 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106267 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106268 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106269 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106270 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106271 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=5 active_queue=[9,5] cursor=0 cursor_node_id=9
+grant seq=106272 node_id=9 duration_ms=18 kind=normal active_queue=[9,5] cursor=1 cursor_node_id=5
+grant seq=106273 node_id=5 duration_ms=18 kind=normal active_queue=[9,5] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=137 consecutive_silent_grants=6 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106274 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106275 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106276 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106277 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106278 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106279 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106280 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106281 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106282 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106283 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106284 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=3 active_queue=[5,3] cursor=0 cursor_node_id=5
+grant seq=106285 node_id=5 duration_ms=18 kind=normal active_queue=[5,3] cursor=1 cursor_node_id=3
+grant seq=106286 node_id=3 duration_ms=18 kind=normal active_queue=[5,3] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=259 consecutive_silent_grants=12 active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106287 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106288 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106289 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106290 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106291 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106292 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106293 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106294 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106295 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+grant seq=106296 node_id=3 duration_ms=18 kind=normal active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=7 active_queue=[3,7] cursor=0 cursor_node_id=3
+grant seq=106297 node_id=3 duration_ms=18 kind=normal active_queue=[3,7] cursor=1 cursor_node_id=7
+grant seq=106298 node_id=7 duration_ms=18 kind=normal active_queue=[3,7] cursor=0 cursor_node_id=3
+silent_remove node_id=3 silence_ms=238 consecutive_silent_grants=11 active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106299 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106300 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106301 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106302 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106303 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106304 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106305 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+18813077	RX_ANT	5745:4:40	1	55:-60:-54:-46:8:11:15
+18813077	RX_ANT	5745:4:40	0	55:-56:-50:-44:8:10:15
+18813077	PKT	59:12722:0:0:55:55:1:0:0:4:1623
+18813077	RX_BATCH	18:59:892:84:8
+18813077	PKT_SRC	1:0:0:0:0:0:0
+18813077	PKT_SRC	2:0:0:0:0:0:0
+18813077	PKT_SRC	3:13:3134:1:0:1:405
+18813077	PKT_SRC	4:0:0:0:0:0:0
+18813077	PKT_SRC	5:14:3164:0:0:1:406
+18813077	PKT_SRC	6:0:0:0:0:0:0
+18813077	PKT_SRC	7:14:3164:0:0:1:406
+18813077	PKT_SRC	8:0:0:0:0:0:0
+18813077	PKT_SRC	9:14:3164:0:0:1:406
+18813077	PKT_SRC	10:0:0:0:0:0:0
+18813077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18813077	READY_FILTER	9627:9627:0:0:0
+18813077	REASSEMBLY	0:40
+grant seq=106306 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106307 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106308 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106309 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106310 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106311 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106312 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106313 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106314 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106315 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106316 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106317 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106318 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106319 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106320 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106321 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106322 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106323 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106324 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106325 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106326 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106327 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106328 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106329 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106330 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+grant seq=106331 node_id=7 duration_ms=18 kind=normal active_queue=[7] cursor=0 cursor_node_id=7
+ready_accept node_id=10 active_queue=[7,10] cursor=0 cursor_node_id=7
+grant seq=106332 node_id=7 duration_ms=18 kind=normal active_queue=[7,10] cursor=1 cursor_node_id=10
+grant seq=106333 node_id=10 duration_ms=18 kind=normal active_queue=[7,10] cursor=0 cursor_node_id=7
+silent_remove node_id=7 silence_ms=703 consecutive_silent_grants=34 active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106334 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106335 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+grant seq=106336 node_id=10 duration_ms=18 kind=normal active_queue=[10] cursor=0 cursor_node_id=10
+ready_accept node_id=6 active_queue=[10,6] cursor=0 cursor_node_id=10
+grant seq=106337 node_id=10 duration_ms=18 kind=normal active_queue=[10,6] cursor=1 cursor_node_id=6
+grant seq=106338 node_id=6 duration_ms=18 kind=normal active_queue=[10,6] cursor=0 cursor_node_id=10
+silent_remove node_id=10 silence_ms=98 consecutive_silent_grants=4 active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106339 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106340 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106341 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106342 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106343 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106344 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106345 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106346 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106347 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106348 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106349 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106350 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106351 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106352 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106353 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106354 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+18814077	RX_ANT	5745:4:40	1	20:-54:-53:-52:9:11:14
+18814077	RX_ANT	5745:4:40	0	20:-52:-48:-46:9:10:14
+18814077	PKT	22:3761:0:0:20:20:2:0:0:2:813
+18814077	RX_BATCH	9:22:342:80:6
+18814077	PKT_SRC	1:0:0:0:0:0:0
+18814077	PKT_SRC	2:0:0:0:0:0:0
+18814077	PKT_SRC	3:0:0:0:0:0:0
+18814077	PKT_SRC	4:0:0:0:0:0:0
+18814077	PKT_SRC	5:0:0:0:0:0:0
+18814077	PKT_SRC	6:8:1402:2:0:1:406
+18814077	PKT_SRC	7:0:0:0:0:0:0
+18814077	PKT_SRC	8:0:0:0:0:0:0
+18814077	PKT_SRC	9:0:0:0:0:0:0
+18814077	PKT_SRC	10:12:2311:0:0:1:407
+18814077	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+18814077	READY_FILTER	9629:9629:0:0:0
+18814077	REASSEMBLY	0:40
+grant seq=106355 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106356 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106357 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106358 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106359 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106360 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106361 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106362 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106363 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106364 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106365 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106366 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+grant seq=106367 node_id=6 duration_ms=18 kind=normal active_queue=[6] cursor=0 cursor_node_id=6
+ready_accept node_id=9 active_queue=[6,9] cursor=0 cursor_node_id=6
+grant seq=106368 node_id=6 duration_ms=18 kind=normal active_queue=[6,9] cursor=1 cursor_node_id=9
+grant seq=106369 node_id=9 duration_ms=18 kind=normal active_queue=[6,9] cursor=0 cursor_node_id=6
+silent_remove node_id=6 silence_ms=621 consecutive_silent_grants=30 active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106370 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106371 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106372 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106373 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+grant seq=106374 node_id=9 duration_ms=18 kind=normal active_queue=[9] cursor=0 cursor_node_id=9
+ready_accept node_id=5 active_queue=[9,5] cursor=0 cursor_node_id=9
+grant seq=106375 node_id=9 duration_ms=18 kind=normal active_queue=[9,5] cursor=1 cursor_node_id=5
+grant seq=106376 node_id=5 duration_ms=18 kind=normal active_queue=[9,5] cursor=0 cursor_node_id=9
+silent_remove node_id=9 silence_ms=139 consecutive_silent_grants=6 active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106377 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106378 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106379 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106380 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106381 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+grant seq=106382 node_id=5 duration_ms=18 kind=normal active_queue=[5] cursor=0 cursor_node_id=5
+ready_accept node_id=2 active_queue=[5,2] cursor=0 cursor_node_id=5
+grant seq=106383 node_id=5 duration_ms=18 kind=normal active_queue=[5,2] cursor=1 cursor_node_id=2
+grant seq=106384 node_id=2 duration_ms=18 kind=normal active_queue=[5,2] cursor=0 cursor_node_id=5
+silent_remove node_id=5 silence_ms=159 consecutive_silent_grants=7 active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106385 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106386 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106387 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106388 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106389 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106390 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106391 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106392 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106393 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106394 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+grant seq=106395 node_id=2 duration_ms=18 kind=normal active_queue=[2] cursor=0 cursor_node_id=2
+ready_accept node_id=3 active_queue=[2,3] cursor=0 cursor_node_id=2
+grant seq=106396 node_id=2 duration_ms=18 kind=normal active_queue=[2,3] cursor=1 cursor_node_id=3
+grant seq=106397 node_id=3 duration_ms=18 kind=normal active_queue=[2,3] cursor=0 cursor_node_id=2
+silent_remove node_id=2 silence_ms=217 consecutive_silent_grants=10 active_queue=[3] cursor=0 cursor_node_id=3
+ready_accept node_id=6 active_queue=[3,6] cursor=0 cursor_node_id=3
+grant seq=106398 node_id=3 duration_ms=18 kind=normal active_queue=[3,6] cursor=1 cursor_node_id=6
+ready_accept node_id=7 active_queue=[3,6,7] cursor=1 cursor_node_id=6
+grant seq=106399 node_id=6 duration_ms=18 kind=normal active_queue=[3,6,7] cursor=2 cursor_node_id=7

@@ -1,0 +1,12 @@
+{
+  "before": {
+    "grant_duration_ms": 18,
+    "guard_interval_ms": 2
+  },
+  "after": {
+    "grant_duration_ms": 10,
+    "guard_interval_ms": 10
+  },
+  "reason": "用户指出不能无依据从10ms保护间隔直接跳1/2ms；撤回新候选，恢复10/10仅作已知对照，不认最优、不启动传输",
+  "monotonic": 21752.673361049
+}

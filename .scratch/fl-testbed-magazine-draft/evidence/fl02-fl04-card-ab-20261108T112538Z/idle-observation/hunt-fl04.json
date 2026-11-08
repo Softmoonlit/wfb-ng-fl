@@ -1,0 +1,31 @@
+{
+  "current_daemon_since_start": [
+    {
+      "_COMM": "python3",
+      "_PID": "22394",
+      "_SYSTEMD_UNIT": "wfb-fl-client-daemon.service",
+      "_GID": "0",
+      "_TRANSPORT": "stdout",
+      "_UID": "0",
+      "_BOOT_ID": "af56a6fc52b44929827b030c82266135",
+      "_HOSTNAME": "fl04",
+      "MESSAGE": "2026-11-08 19:25:59,180 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK",
+      "SYSLOG_IDENTIFIER": "python3",
+      "_EXE": "/usr/bin/python3.10",
+      "SYSLOG_FACILITY": "3",
+      "_SELINUX_CONTEXT": "kernel",
+      "__REALTIME_TIMESTAMP": "1794137159182066",
+      "_STREAM_ID": "671ec57db35147a5ac58a7ad3cf8c0b1",
+      "_MACHINE_ID": "5dbfb12414a3456d9014d88183e338b1",
+      "_SYSTEMD_CGROUP": "/system.slice/wfb-fl-client-daemon.service",
+      "_CMDLINE": "/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxbcec23372588 --fec-n 14",
+      "_SYSTEMD_INVOCATION_ID": "c4a95b72d30241ddbcbf65ec80c7b7d2",
+      "PRIORITY": "6",
+      "_SYSTEMD_SLICE": "system.slice",
+      "__MONOTONIC_TIMESTAMP": "17803530319",
+      "_CAP_EFFECTIVE": "1ffffffffff",
+      "__CURSOR": "s=777444d3842f4f3d977f392be884b6c0;i=1cea;b=af56a6fc52b44929827b030c82266135;m=4252c504f;t=65fc21c0d26f2;x=5b6779163078c400"
+    }
+  ],
+  "observation_events": []
+}

@@ -1,0 +1,340 @@
+[
+  {
+    "node": "fl00",
+    "daemonPID": 91372,
+    "nativePID": 91533,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "91533": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": null,
+    "HUNT_since_daemon_start": 0,
+    "HUNT_observation": 0,
+    "previous_HUNT_observation": 0,
+    "HUNT_delta": 0,
+    "usb": [
+      [
+        "wlxfc221c100119",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20110.561224575,
+    "end_monotonic": 20228.478078242
+  },
+  {
+    "node": "fl01",
+    "daemonPID": 15066,
+    "nativePID": 15118,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "15118": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 22,
+      "combined_ok": 22,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 4,
+    "HUNT_observation": 1,
+    "previous_HUNT_observation": 3,
+    "HUNT_delta": -2,
+    "usb": [
+      [
+        "wlxfc221c500bfe",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20080.04769438,
+    "end_monotonic": 20197.39785576
+  },
+  {
+    "node": "fl02",
+    "daemonPID": 16734,
+    "nativePID": 16786,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "16786": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 24,
+      "combined_ok": 23,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 0
+    },
+    "HUNT_since_daemon_start": 7,
+    "HUNT_observation": 2,
+    "previous_HUNT_observation": 2,
+    "HUNT_delta": 0,
+    "usb": [
+      [
+        "wlxfc221c300f04",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 20100266,
+        "radio": "5765:3:40",
+        "values": "23:-76:-66:-64:1:11:17",
+        "age_at_capture_end_seconds": 0.025,
+        "within_observation": true
+      },
+      "0": {
+        "monotonic_ms": 20100266,
+        "radio": "5765:3:40",
+        "values": "23:-56:-55:-54:5:15:23",
+        "age_at_capture_end_seconds": 0.025,
+        "within_observation": true
+      }
+    },
+    "initial_monotonic": 19982.843385974,
+    "end_monotonic": 20100.291179763
+  },
+  {
+    "node": "fl03",
+    "daemonPID": 5383,
+    "nativePID": 5434,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "5434": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 18,
+      "actual149_HT40": 19,
+      "combined_ok": 16,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 5
+    },
+    "HUNT_since_daemon_start": 12,
+    "HUNT_observation": 3,
+    "previous_HUNT_observation": 2,
+    "HUNT_delta": 1,
+    "usb": [
+      [
+        "wlx5cffffaf6d8c",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 2584.45397416,
+    "end_monotonic": 2702.031126108
+  },
+  {
+    "node": "fl04",
+    "daemonPID": 29737,
+    "nativePID": 29784,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "29784": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 0,
+      "actual149_HT40": 24,
+      "combined_ok": 0,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 0
+    },
+    "HUNT_since_daemon_start": 0,
+    "HUNT_observation": 0,
+    "previous_HUNT_observation": 0,
+    "HUNT_delta": 0,
+    "usb": [
+      [
+        "wlxbcec23372588",
+        "480"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20041.681683511,
+    "end_monotonic": 20159.549452097
+  },
+  {
+    "node": "fl05",
+    "daemonPID": 14384,
+    "nativePID": 14431,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "14431": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 23,
+      "combined_ok": 23,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 1
+    },
+    "HUNT_since_daemon_start": 8,
+    "HUNT_observation": 0,
+    "previous_HUNT_observation": 2,
+    "HUNT_delta": -2,
+    "usb": [
+      [
+        "wlxfc221c100157",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20112.433349677,
+    "end_monotonic": 20230.0066481
+  },
+  {
+    "node": "fl06",
+    "daemonPID": 19426,
+    "nativePID": 19477,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "19477": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 23,
+      "combined_ok": 22,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 1
+    },
+    "HUNT_since_daemon_start": 7,
+    "HUNT_observation": 1,
+    "previous_HUNT_observation": 3,
+    "HUNT_delta": -2,
+    "usb": [
+      [
+        "wlxfc221c300cbb",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20073.910819871,
+    "end_monotonic": 20191.132916838
+  },
+  {
+    "node": "fl07",
+    "daemonPID": 19700,
+    "nativePID": 19750,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "19750": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 22,
+      "actual149_HT40": 22,
+      "combined_ok": 22,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 6,
+    "HUNT_observation": 1,
+    "previous_HUNT_observation": 3,
+    "HUNT_delta": -2,
+    "usb": [
+      [
+        "wlxfc221c300e99",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20071.221067461,
+    "end_monotonic": 20188.296550783
+  },
+  {
+    "node": "fl08",
+    "daemonPID": 20058,
+    "nativePID": 20109,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "20109": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 19,
+      "actual149_HT40": 19,
+      "combined_ok": 19,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 5
+    },
+    "HUNT_since_daemon_start": 10,
+    "HUNT_observation": 3,
+    "previous_HUNT_observation": 3,
+    "HUNT_delta": 0,
+    "usb": [
+      [
+        "wlxfc221c500a88",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20067.897977202,
+    "end_monotonic": 20185.512531323
+  },
+  {
+    "node": "fl09",
+    "daemonPID": 20796,
+    "nativePID": 20848,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "20848": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 21,
+      "actual149_HT40": 20,
+      "combined_ok": 19,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 4
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 2,
+    "previous_HUNT_observation": 2,
+    "HUNT_delta": 0,
+    "usb": [
+      [
+        "wlx88e62852aae4",
+        "5000"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 20043.865285802,
+    "end_monotonic": 20161.283687707
+  },
+  {
+    "node": "fl10",
+    "daemonPID": 18410,
+    "nativePID": 18456,
+    "pid_unchanged": true,
+    "native_sha256": {
+      "18456": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "counts": {
+      "registry_READY": 24,
+      "actual149_HT40": 22,
+      "combined_ok": 22,
+      "management_error": 0,
+      "unknown": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 6,
+    "HUNT_observation": 1,
+    "previous_HUNT_observation": 4,
+    "HUNT_delta": -3,
+    "usb": [
+      [
+        "wlxfca386b38672",
+        "480"
+      ]
+    ],
+    "latest_current_native_rx": {},
+    "initial_monotonic": 19919.015675088,
+    "end_monotonic": 20036.424045552
+  }
+]

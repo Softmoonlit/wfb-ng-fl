@@ -1,0 +1,20 @@
+{
+  "host": "fl04",
+  "log": "/srv/wfb-ng-fl/client/wfb_uplink.log",
+  "offset": 209480998,
+  "before_monotonic": 18725.774751008,
+  "iw_before": "phy#4\n\tInterface wlxbcec23372588\n\t\tifindex 43\n\t\twdev 0x400000001\n\t\taddr bc:ec:23:37:25:88\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -18.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:8a:9c\n\t\tssid iPhone 18 Pro Max\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm",
+  "pid": "22452",
+  "window_start_monotonic": 18725.909063634,
+  "stop_monotonic": 18745.909661839,
+  "monitor": {
+    "start_monotonic": 18725.885625847,
+    "count": 0
+  },
+  "tun": {
+    "start_monotonic": 18725.909057938,
+    "count": 80
+  },
+  "iw_after": "phy#4\n\tInterface wlxbcec23372588\n\t\tifindex 43\n\t\twdev 0x400000001\n\t\taddr bc:ec:23:37:25:88\n\t\ttype monitor\n\t\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\t\ttxpower -18.00 dBm\nphy#0\n\tInterface wlP4p1s0\n\t\tifindex 4\n\t\twdev 0x1\n\t\taddr dc:4a:9e:31:8a:9c\n\t\tssid iPhone 18 Pro Max\n\t\ttype managed\n\t\tchannel 40 (5200 MHz), width: 80 MHz, center1: 5210 MHz\n\t\ttxpower 13.00 dBm",
+  "after_monotonic": 18746.025939141
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "candidate": {
+    "schedule": "18/2",
+    "fec": "8/14",
+    "clients": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "bytes": 1048576
+  },
+  "outcome": "prepare_registry_gate_failed_node9",
+  "last_result": {
+    "wall": 1794140786.5588768,
+    "monotonic": 21500.66640384,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "radio_acquire_dispatched": false,
+  "file_transfer_dispatched": false,
+  "attempt_count": 1,
+  "automatic_retry": false,
+  "model_executed": false,
+  "baseline_readonly_checks": [
+    {
+      "host": "fl00",
+      "ok": true
+    },
+    {
+      "host": "fl01",
+      "ok": true
+    },
+    {
+      "host": "fl02",
+      "ok": true
+    },
+    {
+      "host": "fl03",
+      "ok": true
+    },
+    {
+      "host": "fl05",
+      "ok": true
+    },
+    {
+      "host": "fl06",
+      "ok": true
+    },
+    {
+      "host": "fl07",
+      "ok": true
+    },
+    {
+      "host": "fl08",
+      "ok": true
+    },
+    {
+      "host": "fl09",
+      "ok": true
+    },
+    {
+      "host": "fl10",
+      "ok": true
+    }
+  ],
+  "baseline_all_ok": true,
+  "bundle_unchanged": true,
+  "bundle_sha256": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "runner_pid": 98713,
+  "runner_process_state": "absent",
+  "fl04_inactive": true,
+  "elapsed_runner_seconds": 2.0930665930027317,
+  "note": "prepare node9 registry field mismatch; exact transient state was not captured at failing RPC. Final snapshot READY/IDLE does not override that failure. restore_ok=false retained; separate read-only audit confirms unchanged baseline; radio was never acquired.",
+  "finished_monotonic": 21583.339566598
+}

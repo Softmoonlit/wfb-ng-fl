@@ -1,0 +1,257 @@
+{
+  "scope": "post-swap interface-only client repair; historical release evidence unchanged",
+  "initial_post_probe": "native processes had not started yet; immediate follow-up completed",
+  "nodes": {
+    "fl02": {
+      "args_diff": [
+        {
+          "index": 18,
+          "before": "wlxbcec23372588",
+          "after": "wlxfc221c300f04"
+        }
+      ],
+      "actualargs": [
+        "/usr/bin/python3",
+        "-I",
+        "-B",
+        "-m",
+        "wfb_ng.fl.client_daemon",
+        "--config",
+        "/etc/wfb-ng-fl/node.json",
+        "--work-dir",
+        "/srv/wfb-ng-fl/client",
+        "--channel",
+        "149",
+        "--bandwidth-mhz",
+        "40",
+        "--radio-txpower-dbm",
+        "18",
+        "--uplink-mcs",
+        "4",
+        "--interface",
+        "wlxfc221c300f04",
+        "--fec-n",
+        "14"
+      ],
+      "native": {
+        "pid": 14237,
+        "args": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "client",
+          "--tun-name",
+          "fl-c2",
+          "--tun-addr",
+          "10.80.0.12/24",
+          "--node-id",
+          "2",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "4",
+          "--air-interface",
+          "wlxfc221c300f04",
+          "--uplink-pause-threshold-bytes",
+          "131072",
+          "--uplink-resume-threshold-bytes",
+          "65536",
+          "--uplink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56"
+      },
+      "config": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12/24"
+      },
+      "config_sha256": "6160ef254d33c6c39de36b911de46b5f3b50f38bb98e995718b2c400ca8d5524",
+      "runtime": {
+        "fec": {
+          "raw": "5246454300000000080e",
+          "values": [
+            1380336963,
+            0,
+            8,
+            14
+          ],
+          "address": [
+            "127.0.0.1",
+            9200
+          ]
+        },
+        "radio": {
+          "raw": "524749180000000000000028040001",
+          "values": [
+            1380403480,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ],
+          "address": [
+            "127.0.0.1",
+            9200
+          ]
+        }
+      },
+      "iw": {
+        "rc": 0,
+        "out": "Interface wlxfc221c300f04\n\tifindex 30\n\twdev 0x400000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 4\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "err": ""
+      },
+      "power": {
+        "rc": 0,
+        "out": "NV Power Mode: 15W\n0\n",
+        "err": ""
+      },
+      "device": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+      "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+      "usb_speed": "5000\n",
+      "dropin_only_interface_change": true,
+      "service_active": true
+    },
+    "fl04": {
+      "args_diff": [
+        {
+          "index": 18,
+          "before": "wlxfc221c300f04",
+          "after": "wlxbcec23372588"
+        }
+      ],
+      "actualargs": [
+        "/usr/bin/python3",
+        "-I",
+        "-B",
+        "-m",
+        "wfb_ng.fl.client_daemon",
+        "--config",
+        "/etc/wfb-ng-fl/node.json",
+        "--work-dir",
+        "/srv/wfb-ng-fl/client",
+        "--channel",
+        "149",
+        "--bandwidth-mhz",
+        "40",
+        "--radio-txpower-dbm",
+        "18",
+        "--uplink-mcs",
+        "4",
+        "--interface",
+        "wlxbcec23372588",
+        "--fec-n",
+        "14"
+      ],
+      "native": {
+        "pid": 22452,
+        "args": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "client",
+          "--tun-name",
+          "fl-c4",
+          "--tun-addr",
+          "10.80.0.14/24",
+          "--node-id",
+          "4",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "14",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "4",
+          "--air-interface",
+          "wlxbcec23372588",
+          "--uplink-pause-threshold-bytes",
+          "131072",
+          "--uplink-resume-threshold-bytes",
+          "65536",
+          "--uplink-queue-packets-limit",
+          "64"
+        ],
+        "exe": "/usr/bin/wfb_v6_uplink",
+        "sha256": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56"
+      },
+      "config": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14/24"
+      },
+      "config_sha256": "df7cf811396a210430dd743f080d3f8c55788bb2ea249d882aaf080a012478ad",
+      "runtime": {
+        "fec": {
+          "raw": "5246454300000000080e",
+          "values": [
+            1380336963,
+            0,
+            8,
+            14
+          ],
+          "address": [
+            "127.0.0.1",
+            9200
+          ]
+        },
+        "radio": {
+          "raw": "524749180000000000000028040001",
+          "values": [
+            1380403480,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ],
+          "address": [
+            "127.0.0.1",
+            9200
+          ]
+        }
+      },
+      "iw": {
+        "rc": 0,
+        "out": "Interface wlxbcec23372588\n\tifindex 43\n\twdev 0x400000001\n\taddr bc:ec:23:37:25:88\n\ttype monitor\n\twiphy 4\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "err": ""
+      },
+      "power": {
+        "rc": 0,
+        "out": "NV Power Mode: 15W\n0\n",
+        "err": ""
+      },
+      "device": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3/1-2.3:1.0",
+      "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+      "usb_speed": "480\n",
+      "dropin_only_interface_change": true,
+      "service_active": true
+    }
+  },
+  "usb_note": "fl04 current usb1/1-2/1-2.3 reads 480 Mbit/s; previous user record was USB2 5000 Mbit/s; paths/speeds are not equivalent."
+}

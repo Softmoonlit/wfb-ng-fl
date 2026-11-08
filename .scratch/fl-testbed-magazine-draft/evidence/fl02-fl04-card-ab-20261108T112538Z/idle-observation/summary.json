@@ -1,0 +1,425 @@
+[
+  {
+    "node": "fl00",
+    "daemonPID": 77712,
+    "nativePID": 77897,
+    "pid_unchanged": true,
+    "counts": null,
+    "HUNT_since_daemon_start": 0,
+    "HUNT_observation": 0,
+    "usb": [
+      [
+        "wlxfc221c100119",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "77712": 1.77,
+      "77897": 0.88
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18347043,
+        "radio": "5745:4:40",
+        "values": "79:-58:-50:-42:2:10:18",
+        "age_seconds": -0.043
+      },
+      "0": {
+        "monotonic_ms": 18347043,
+        "radio": "5745:4:40",
+        "values": "79:-56:-48:-44:2:10:17",
+        "age_seconds": -0.043
+      }
+    }
+  },
+  {
+    "node": "fl01",
+    "daemonPID": 12870,
+    "nativePID": 12919,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 24,
+      "combined_ok": 23,
+      "management_error": 0,
+      "actual_other": 0
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 3,
+    "usb": [
+      [
+        "wlxfc221c500bfe",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "12870": 3.92,
+      "12919": 0.41
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18303888,
+        "radio": "5745:3:40",
+        "values": "27:-50:-49:-48:10:11:14",
+        "age_seconds": 0.505
+      },
+      "0": {
+        "monotonic_ms": 18303888,
+        "radio": "5745:3:40",
+        "values": "27:-48:-46:-46:9:10:13",
+        "age_seconds": 0.505
+      }
+    }
+  },
+  {
+    "node": "fl02",
+    "daemonPID": 14181,
+    "nativePID": 14237,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 23,
+      "combined_ok": 22,
+      "management_error": 0,
+      "actual_other": 1
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 2,
+    "usb": [
+      [
+        "wlxfc221c300f04",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "14181": 4.02,
+      "14237": 0.39
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18207296,
+        "radio": "5745:3:40",
+        "values": "99:-54:-52:-52:8:13:18",
+        "age_seconds": -0.055
+      },
+      "0": {
+        "monotonic_ms": 18207296,
+        "radio": "5745:3:40",
+        "values": "99:-50:-49:-48:10:13:19",
+        "age_seconds": -0.055
+      }
+    }
+  },
+  {
+    "node": "fl03",
+    "daemonPID": 856,
+    "nativePID": 1444,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 24,
+      "actual149_HT40": 21,
+      "combined_ok": 21,
+      "management_error": 0,
+      "actual_other": 3
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 2,
+    "usb": [
+      [
+        "wlx5cffffaf6d8c",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "856": 3.94,
+      "1444": 0.27
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 808978,
+        "radio": "5745:3:40",
+        "values": "88:-70:-54:-52:-6:11:15",
+        "age_seconds": -0.008
+      },
+      "0": {
+        "monotonic_ms": 808978,
+        "radio": "5745:3:40",
+        "values": "88:-56:-50:-50:3:12:16",
+        "age_seconds": -0.008
+      }
+    }
+  },
+  {
+    "node": "fl04",
+    "daemonPID": 22394,
+    "nativePID": 22452,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 0,
+      "actual149_HT40": 24,
+      "combined_ok": 0,
+      "management_error": 0,
+      "actual_other": 0
+    },
+    "HUNT_since_daemon_start": 1,
+    "HUNT_observation": 0,
+    "usb": [
+      [
+        "wlxbcec23372588",
+        "480"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "22394": 4.75,
+      "22452": 0.09
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 17794126,
+        "radio": "5745:3:40",
+        "values": "39:-56:-55:-54:13:22:28",
+        "age_seconds": 471.696
+      },
+      "0": {
+        "monotonic_ms": 17794126,
+        "radio": "5745:3:40",
+        "values": "39:-56:-55:-52:14:22:27",
+        "age_seconds": 471.696
+      }
+    }
+  },
+  {
+    "node": "fl05",
+    "daemonPID": 11852,
+    "nativePID": 11898,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 20,
+      "actual149_HT40": 21,
+      "combined_ok": 19,
+      "management_error": 0,
+      "actual_other": 3
+    },
+    "HUNT_since_daemon_start": 8,
+    "HUNT_observation": 2,
+    "usb": [
+      [
+        "wlxfc221c100157",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "11852": 3.85,
+      "11898": 0.49
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18335846,
+        "radio": "5765:3:40",
+        "values": "28:-56:-54:-54:12:15:19",
+        "age_seconds": 0.571
+      },
+      "0": {
+        "monotonic_ms": 18335846,
+        "radio": "5765:3:40",
+        "values": "28:-54:-53:-52:12:15:19",
+        "age_seconds": 0.571
+      }
+    }
+  },
+  {
+    "node": "fl06",
+    "daemonPID": 17104,
+    "nativePID": 17150,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 22,
+      "combined_ok": 21,
+      "management_error": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 8,
+    "HUNT_observation": 3,
+    "usb": [
+      [
+        "wlxfc221c300cbb",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "17104": 3.92,
+      "17150": 0.41
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18297128,
+        "radio": "5745:3:40",
+        "values": "28:-54:-52:-52:11:14:20",
+        "age_seconds": 0.857
+      },
+      "0": {
+        "monotonic_ms": 18297128,
+        "radio": "5745:3:40",
+        "values": "28:-52:-52:-52:10:12:15",
+        "age_seconds": 0.857
+      }
+    }
+  },
+  {
+    "node": "fl07",
+    "daemonPID": 17407,
+    "nativePID": 17453,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 22,
+      "actual149_HT40": 22,
+      "combined_ok": 20,
+      "management_error": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 13,
+    "HUNT_observation": 3,
+    "usb": [
+      [
+        "wlxfc221c300e99",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "17407": 3.9,
+      "17453": 0.26
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18294852,
+        "radio": "5745:3:40",
+        "values": "27:-42:-42:-42:8:14:19",
+        "age_seconds": 0.387
+      },
+      "0": {
+        "monotonic_ms": 18294852,
+        "radio": "5745:3:40",
+        "values": "27:-52:-50:-50:9:14:20",
+        "age_seconds": 0.387
+      }
+    }
+  },
+  {
+    "node": "fl08",
+    "daemonPID": 16546,
+    "nativePID": 16593,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 13,
+      "actual149_HT40": 14,
+      "combined_ok": 12,
+      "management_error": 0,
+      "actual_other": 10
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 3,
+    "usb": [
+      [
+        "wlxfc221c500a88",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "16546": 3.78,
+      "16593": 0.32
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18291955,
+        "radio": "5765:3:40",
+        "values": "5:-50:-50:-50:9:12:15",
+        "age_seconds": 0.361
+      },
+      "0": {
+        "monotonic_ms": 18291955,
+        "radio": "5765:3:40",
+        "values": "5:-50:-50:-50:10:12:15",
+        "age_seconds": 0.361
+      }
+    }
+  },
+  {
+    "node": "fl09",
+    "daemonPID": 18013,
+    "nativePID": 18057,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 21,
+      "actual149_HT40": 22,
+      "combined_ok": 19,
+      "management_error": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 2,
+    "usb": [
+      [
+        "wlx88e62852aae4",
+        "5000"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "18013": 3.99,
+      "18057": 0.34
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18267676,
+        "radio": "5745:3:40",
+        "values": "23:-52:-52:-52:10:13:17",
+        "age_seconds": 0.495
+      },
+      "0": {
+        "monotonic_ms": 18267676,
+        "radio": "5745:3:40",
+        "values": "23:-56:-53:-50:9:12:15",
+        "age_seconds": 0.495
+      }
+    }
+  },
+  {
+    "node": "fl10",
+    "daemonPID": 16229,
+    "nativePID": 16275,
+    "pid_unchanged": true,
+    "counts": {
+      "registry_READY": 23,
+      "actual149_HT40": 22,
+      "combined_ok": 22,
+      "management_error": 0,
+      "actual_other": 2
+    },
+    "HUNT_since_daemon_start": 9,
+    "HUNT_observation": 4,
+    "usb": [
+      [
+        "wlxfca386b38672",
+        "480"
+      ]
+    ],
+    "CPU_one_core_percent": {
+      "16229": 3.94,
+      "16275": 0.41
+    },
+    "latest_current_native_rx": {
+      "1": {
+        "monotonic_ms": 18143126,
+        "radio": "5765:3:40",
+        "values": "28:-44:-44:-44:19:24:28",
+        "age_seconds": 0.389
+      },
+      "0": {
+        "monotonic_ms": 18143126,
+        "radio": "5765:3:40",
+        "values": "28:-46:-46:-46:19:23:27",
+        "age_seconds": 0.389
+      }
+    }
+  }
+]

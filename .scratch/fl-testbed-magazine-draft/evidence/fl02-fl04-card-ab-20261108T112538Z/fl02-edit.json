@@ -1,0 +1,7 @@
+{
+  "host": "fl02",
+  "phase": "edit",
+  "exit": 0,
+  "stdout": "{\"before\": \"[Service]\\nExecStart=\\nExecStart=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxbcec23372588 --fec-n 14\\nWorkingDirectory=/\\nUnsetEnvironment=PYTHONPATH PYTHONHOME\\nKillMode=control-group\\n\", \"after\": \"[Service]\\nExecStart=\\nExecStart=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c300f04 --fec-n 14\\nWorkingDirectory=/\\nUnsetEnvironment=PYTHONPATH PYTHONHOME\\nKillMode=control-group\\n\", \"only_interface_change\": true, \"reload\": {\"rc\": 0, \"out\": \"\", \"err\": \"\"}}\n",
+  "stderr": ""
+}

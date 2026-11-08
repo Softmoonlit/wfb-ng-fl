@@ -1,0 +1,227 @@
+{
+  "sample": 15,
+  "target_monotonic": 20181.999225276,
+  "start_monotonic": 20182.003021888,
+  "lateness": 0.0037966119998600334,
+  "registry_snapshot": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100119",
+    "link_process": {
+      "running": true,
+      "pid": 91533
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20180.654211208,
+        "last_heartbeat_timestamp_ms": 1794139466546,
+        "last_heartbeat_ago_seconds": 1.35,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 95958,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20179.906028299,
+        "last_heartbeat_timestamp_ms": 1794139465798,
+        "last_heartbeat_ago_seconds": 2.1,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 8926,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20175.228533948,
+        "last_heartbeat_timestamp_ms": 1794139461121,
+        "last_heartbeat_ago_seconds": 6.78,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 66596,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20180.174235488,
+        "last_heartbeat_timestamp_ms": 1794139466066,
+        "last_heartbeat_ago_seconds": 1.83,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "HUNTING",
+        "readiness": "CONNECTING",
+        "elapsed_ms": 8169,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20180.117014404,
+        "last_heartbeat_timestamp_ms": 1794139466009,
+        "last_heartbeat_ago_seconds": 1.89,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "基础未就绪: CONNECTING"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "节点尚未待命: HUNTING"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2086,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20180.550661328,
+        "last_heartbeat_timestamp_ms": 1794139466443,
+        "last_heartbeat_ago_seconds": 1.45,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "HUNTING",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 4086,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20167.121044104,
+        "last_heartbeat_timestamp_ms": 1794139453013,
+        "last_heartbeat_ago_seconds": 14.88,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 78471,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20178.936178685,
+        "last_heartbeat_timestamp_ms": 1794139464828,
+        "last_heartbeat_ago_seconds": 3.07,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 124262,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20173.556043825,
+        "last_heartbeat_timestamp_ms": 1794139459448,
+        "last_heartbeat_ago_seconds": 8.45,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  },
+  "check_rc": 1,
+  "stdout": "[\n  {\n    \"node\": 1,\n    \"ok\": true,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlxfc221c500bfe\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:50:0b:fe\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 2,\n    \"ok\": true,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlxfc221c300f04\\n\\tifindex 30\\n\\twdev 0x400000001\\n\\taddr fc:22:1c:30:0f:04\\n\\ttype monitor\\n\\twiphy 4\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 3,\n    \"ok\": true,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlx5cffffaf6d8c\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr 5c:ff:ff:af:6d:8c\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 4,\n    \"ok\": false,\n    \"readiness\": \"OFFLINE\",\n    \"iw\": \"Interface wlxbcec23372588\\n\\tifindex 46\\n\\twdev 0x500000001\\n\\taddr bc:ec:23:37:25:88\\n\\ttype monitor\\n\\twiphy 5\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 5,\n    \"ok\": true,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlxfc221c100157\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:57\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 6,\n    \"ok\": false,\n    \"readiness\": \"CONNECTING\",\n    \"iw\": \"Interface wlxfc221c300cbb\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0c:bb\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 7,\n    \"ok\": true,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 8,\n    \"ok\": false,\n    \"readiness\": \"OFFLINE\",\n    \"iw\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 9,\n    \"ok\": false,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlx88e62852aae4\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr 88:e6:28:52:aa:e4\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  },\n  {\n    \"node\": 10,\n    \"ok\": false,\n    \"readiness\": \"READY\",\n    \"iw\": \"Interface wlxfca386b38672\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr fc:a3:86:b3:86:72\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 153 (5765 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\",\n    \"error\": \"\"\n  }\n]\n",
+  "stderr": "",
+  "end_monotonic": 20183.442410887
+}

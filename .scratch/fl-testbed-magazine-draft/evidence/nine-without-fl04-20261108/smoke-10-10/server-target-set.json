@@ -1,0 +1,42 @@
+{
+  "expected": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "actual_known_clients": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "actual_client_targets": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "exact_match": false,
+  "grant_duration_ms": 10,
+  "guard_interval_ms": 10,
+  "server_pid": "96365",
+  "native_pid": "96375"
+}

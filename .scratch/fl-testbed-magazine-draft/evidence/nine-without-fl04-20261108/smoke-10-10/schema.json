@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "files": {
+    "check-all-ready-result.json": "returncode, started_monotonic, finished_monotonic",
+    "check-all-ready.stdout.json": "per-node ok/readiness/iw/error",
+    "status-before.json": "raw daemon status snapshot",
+    "management-snapshot.json": "bounded client services/native argv, server proc argv, raw status",
+    "server-target-set.json": "expected vs actual known_clients/client_targets, grant/guard, PIDs",
+    "execution-summary.json": "outcome, gates, execution flags and evidence limits"
+  }
+}

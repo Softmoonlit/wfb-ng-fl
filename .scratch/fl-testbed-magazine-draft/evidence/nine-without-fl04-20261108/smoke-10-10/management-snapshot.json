@@ -1,0 +1,280 @@
+{
+  "started_monotonic": 20827.033348356,
+  "finished_monotonic": 20830.003968608,
+  "clients": [
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "stdout": "MainPID=15066\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c500bfe --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "MainPID=16734\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c2 --tun-addr 10.80.0.12/24 --node-id 2 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c300f04 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "stdout": "MainPID=858\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c3 --tun-addr 10.80.0.13/24 --node-id 3 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlx5cffffaf6d8c --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl04",
+      "returncode": 0,
+      "stdout": "MainPID=0\nActiveState=inactive\n",
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "stdout": "MainPID=14384\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c5 --tun-addr 10.80.0.15/24 --node-id 5 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c100157 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "stdout": "MainPID=19426\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c6 --tun-addr 10.80.0.16/24 --node-id 6 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c300cbb --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "stdout": "MainPID=19700\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c7 --tun-addr 10.80.0.17/24 --node-id 7 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c300e99 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "stdout": "MainPID=20058\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c8 --tun-addr 10.80.0.18/24 --node-id 8 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c500a88 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "stdout": "MainPID=20796\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c9 --tun-addr 10.80.0.19/24 --node-id 9 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlx88e62852aae4 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "stdout": "MainPID=18410\nActiveState=active\n/usr/bin/wfb_v6_uplink --role client --tun-name fl-c10 --tun-addr 10.80.0.20/24 --node-id 10 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfca386b38672 --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64 \n",
+      "stderr": ""
+    }
+  ],
+  "server": "{\"pid\": \"96365\", \"argv\": [\"/usr/bin/python3\", \"-I\", \"-B\", \"-m\", \"wfb_ng.fl.server_daemon\", \"--config\", \"/etc/wfb-ng-fl/server.json\", \"--channel\", \"149\", \"--bandwidth-mhz\", \"40\", \"--txpower\", \"18\", \"--downlink-mcs\", \"3\", \"--uplink-mcs\", \"4\", \"--uftp-rate-kbps\", \"15000\", \"--interface\", \"wlxfc221c100119\", \"\"], \"native\": [{\"pid\": \"96375\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"server\", \"--tun-name\", \"fl-s\", \"--tun-addr\", \"10.80.0.1/24\", \"--node-id\", \"255\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"14\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"3\", \"--air-interface\", \"wlxfc221c100119\", \"--known-clients\", \"1,2,3,4,5,6,7,8,9,10\", \"--grant-duration-ms\", \"10\", \"--guard-interval-ms\", \"10\", \"--client-target\", \"1:10.80.0.11:127.0.0.1:1\", \"--client-target\", \"2:10.80.0.12:127.0.0.1:1\", \"--client-target\", \"3:10.80.0.13:127.0.0.1:1\", \"--client-target\", \"4:10.80.0.14:127.0.0.1:1\", \"--client-target\", \"5:10.80.0.15:127.0.0.1:1\", \"--client-target\", \"6:10.80.0.16:127.0.0.1:1\", \"--client-target\", \"7:10.80.0.17:127.0.0.1:1\", \"--client-target\", \"8:10.80.0.18:127.0.0.1:1\", \"--client-target\", \"9:10.80.0.19:127.0.0.1:1\", \"--client-target\", \"10:10.80.0.20:127.0.0.1:1\", \"--downlink-pause-threshold-bytes\", \"131072\", \"--downlink-resume-threshold-bytes\", \"65536\", \"--downlink-queue-packets-limit\", \"64\", \"\"]}]}\n",
+  "server_error": "",
+  "status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfc221c100119",
+    "link_process": {
+      "running": true,
+      "pid": 96375
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 207896,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20828.158885309,
+        "last_heartbeat_timestamp_ms": 1794140114051,
+        "last_heartbeat_ago_seconds": 1.73,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 207467,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20829.282723874,
+        "last_heartbeat_timestamp_ms": 1794140115175,
+        "last_heartbeat_ago_seconds": 0.6,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 96235,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20827.960748683,
+        "last_heartbeat_timestamp_ms": 1794140113853,
+        "last_heartbeat_ago_seconds": 1.92,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 212937,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20827.819578292,
+        "last_heartbeat_timestamp_ms": 1794140113712,
+        "last_heartbeat_ago_seconds": 2.07,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 211866,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20829.625483007,
+        "last_heartbeat_timestamp_ms": 1794140115518,
+        "last_heartbeat_ago_seconds": 0.26,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 212529,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20828.600991866,
+        "last_heartbeat_timestamp_ms": 1794140114493,
+        "last_heartbeat_ago_seconds": 1.28,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 0,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20828.660893227,
+        "last_heartbeat_timestamp_ms": 1794140114553,
+        "last_heartbeat_ago_seconds": 1.22,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "HUNTING",
+        "readiness": "CONNECTING",
+        "elapsed_ms": 18778,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20825.733687117,
+        "last_heartbeat_timestamp_ms": 1794140111626,
+        "last_heartbeat_ago_seconds": 4.15,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_NOT_READY",
+            "message": "\u57fa\u7840\u672a\u5c31\u7eea: CONNECTING"
+          },
+          {
+            "code": "NODE_NOT_IDLE",
+            "message": "\u8282\u70b9\u5c1a\u672a\u5f85\u547d: HUNTING"
+          }
+        ]
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 213490,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 20829.242618687,
+        "last_heartbeat_timestamp_ms": 1794140115135,
+        "last_heartbeat_ago_seconds": 0.64,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  }
+}

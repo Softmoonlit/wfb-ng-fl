@@ -1,0 +1,11 @@
+{
+  "fl02": {
+    "exit": 1,
+    "stderr": "AssertionError: native process count was not yet 1 immediately after systemctl start"
+  },
+  "fl04": {
+    "exit": 1,
+    "stderr": "AssertionError: native process count was not yet 1 immediately after systemctl start"
+  },
+  "followup": "Both post snapshots succeeded on immediate follow-up; fl02-post.json and fl04-post.json hold successful snapshots."
+}
