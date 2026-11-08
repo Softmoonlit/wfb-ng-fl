@@ -337,10 +337,11 @@ def build_v6_uplink_server_command(
 ) -> List[str]:
     """
     Construct command line arguments for wfb_v6_uplink running as server.
-    Per ADR-0012, ADR-0014, and Ticket 05:
+    Per ADR-0012, ADR-0014, ADR-0018, and Ticket 05:
     - Pre-allocates all 1..10 known clients (--known-clients 1,2,3,4,5,6,7,8,9,10)
     - Pre-allocates all client-target mappings (--client-target nid:10.80.0.{10+nid}:127.0.0.1:1)
-    - OMIT --grant-duration-ms and --guard-interval-ms to rely on built-in 120ms/10ms defaults.
+    - Fix grant/guard at 10ms/10ms: ten nodes cycle in 200ms, leaving 30ms
+      of the 230ms heartbeat ACK budget for processing (ADR-0018).
     """
     RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz).channel_width
     cmd = [
@@ -359,6 +360,8 @@ def build_v6_uplink_server_command(
         "--radio-mcs-index", str(downlink_mcs),
         "--air-interface", air_interface,
         "--known-clients", ",".join(str(n) for n in known_clients),
+        "--grant-duration-ms", "10",
+        "--guard-interval-ms", "10",
     ]
 
     for nid in known_clients:

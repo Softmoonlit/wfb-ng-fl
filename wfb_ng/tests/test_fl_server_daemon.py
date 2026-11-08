@@ -16,6 +16,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from wfb_ng.fl.control import (
+    HUNTING_ATTEMPT_TIMEOUT_SECONDS,
     ClientNodeState,
     HeartbeatAck,
     NodeHeartbeat,
@@ -128,7 +129,25 @@ class TestServerDaemonConfig(unittest.TestCase):
 class TestV6UplinkServerCommand(unittest.TestCase):
     """Pre-allocated slot command construction remains server-owned."""
 
-    def test_command_generation_preallocated_slots_and_no_slot_flags(self):
+    def test_fixed_slots_fit_maximum_node_cycle_within_ack_budget(self):
+        cmd = build_v6_uplink_server_command(
+            "/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0"
+        )
+        self.assertIn("--grant-duration-ms", cmd)
+        self.assertIn("--guard-interval-ms", cmd)
+        grant_ms = int(cmd[cmd.index("--grant-duration-ms") + 1])
+        guard_ms = int(cmd[cmd.index("--guard-interval-ms") + 1])
+        self.assertEqual((grant_ms, guard_ms), (10, 10))
+        node_ids = cmd[cmd.index("--known-clients") + 1].split(",")
+        self.assertEqual(node_ids, [str(n) for n in range(1, 11)])
+        worst_cycle_ms = len(node_ids) * (grant_ms + guard_ms)
+        self.assertEqual(worst_cycle_ms, 200)
+        ack_budget_ms = HUNTING_ATTEMPT_TIMEOUT_SECONDS * 1000
+        self.assertEqual(ack_budget_ms, 230)
+        self.assertLess(worst_cycle_ms, ack_budget_ms)
+        self.assertEqual(ack_budget_ms - worst_cycle_ms, 30)
+
+    def test_command_generation_preallocated_slots_and_fixed_slot_flags(self):
         cmd = build_v6_uplink_server_command(
             executable_path="/usr/bin/wfb_v6_uplink",
             tun_name="fl-s",
@@ -156,8 +175,8 @@ class TestV6UplinkServerCommand(unittest.TestCase):
         )
         for node_id in range(1, 11):
             self.assertIn(f"{node_id}:10.80.0.{10 + node_id}:127.0.0.1:1", cmd)
-        self.assertNotIn("--grant-duration-ms", cmd)
-        self.assertNotIn("--guard-interval-ms", cmd)
+        self.assertEqual(cmd[cmd.index("--grant-duration-ms") + 1], "10")
+        self.assertEqual(cmd[cmd.index("--guard-interval-ms") + 1], "10")
 
     def test_channel_165_requires_explicit_narrow_bandwidth(self):
         with self.assertRaises(ValueError):
