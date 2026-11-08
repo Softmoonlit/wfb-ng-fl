@@ -22,7 +22,7 @@ assert 1 <= expected['grant_duration_ms'] <= 120
 assert 0 <= expected['guard_interval_ms'] <= 10
 assert expected['fec_n'] in (12, 14)
 host = socket.gethostname()
-assert host in {f'fl{i:02d}' for i in range(11)}
+assert host in {'fl00', 'fl01', 'fl02', 'fl03', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10'}
 assert os.geteuid() == 0
 assert len(commit) == 40 and all(c in '0123456789abcdef' for c in commit)
 assert release_id.replace('-', '').isalnum()

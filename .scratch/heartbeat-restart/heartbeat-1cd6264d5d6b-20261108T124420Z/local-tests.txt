@@ -1,0 +1,26 @@
+test_abi_checks_locale_and_rejects_missing_dependencies (__main__.NativeArtifactTests) ... ok
+test_fixed_ten_targets_reject_fl04_and_arbitrary_subsets (__main__.NativeArtifactTests) ... ok
+test_installer_replaces_inode_and_preserves_open_old_binary (__main__.NativeArtifactTests) ... ok
+test_new_batch_requires_explicit_artifact (__main__.NativeArtifactTests) ... ok
+test_wrong_sha_preserves_old_binary (__main__.NativeArtifactTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.637s
+
+OK
+test_client_12_and_14_match_actual_native (__main__.ExpectedRuntimeTests) ... ok
+test_client_startup_duplicate_or_missing_value_rejected (__main__.ExpectedRuntimeTests) ... ok
+test_client_startup_explicit_fec_keeps_other_parameters (__main__.ExpectedRuntimeTests) ... ok
+test_get_fec_response_matches_actual_expectation (__main__.ExpectedRuntimeTests) ... ok
+test_install_server_fec12_atomic_preserves_other_json_and_mode (__main__.ExpectedRuntimeTests) ... ok
+test_install_server_fec_rejects_schedule_mismatch_without_write (__main__.ExpectedRuntimeTests) ... ok
+test_json_schedule_and_fec_must_match_explicit_state (__main__.ExpectedRuntimeTests) ... ok
+test_legacy_schedule_defaults_are_only_10_10 (__main__.ExpectedRuntimeTests) ... ok
+test_missing_duplicate_or_dangling_native_arg_rejected (__main__.ExpectedRuntimeTests) ... ok
+test_server_18_2_14_text_and_proc_bytes (__main__.ExpectedRuntimeTests) ... ok
+test_wrong_native_schedule_or_fec_rejected (__main__.ExpectedRuntimeTests) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.013s
+
+OK

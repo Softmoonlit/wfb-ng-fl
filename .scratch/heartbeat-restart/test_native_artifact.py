@@ -18,6 +18,18 @@ class NativeArtifactTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn('--native-artifact', result.stderr)
 
+    def test_fixed_ten_targets_reject_fl04_and_arbitrary_subsets(self):
+        fixed = ['fl00', 'fl01', 'fl02', 'fl03', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10']
+        for targets in (fixed + ['fl04'], fixed[:-1], fixed + ['fl01'], fixed[1:] + ['fl00']):
+            with self.subTest(targets=targets):
+                result = subprocess.run(['python3', str(BASE / 'release-online.py'), 'init',
+                                         'a' * 40, *targets,
+                                         '--native-artifact', '/does-not-exist',
+                                         '--native-before-sha', '0' * 64], capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('targets 必须', result.stderr)
+                self.assertNotIn('FileNotFoundError', result.stderr)
+
     def atomic_replace(self):
         tree = ast.parse((BASE / 'release-online-node.py').read_text())
         function = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'atomic_native_replace')

@@ -1,0 +1,27 @@
+{
+  "commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_id": "heartbeat-1cd6264d5d6b-20261108T124420Z",
+  "targets": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "archive_sha": "29c6ef9fbdc87141d851cb0bb1fd8a226a85016697bac5c7726c05da3cc64c5b",
+  "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "native_before_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "native_artifact_input": "/home/fl/projects/wfb-ng-fl/.scratch/heartbeat-restart/native-1cd6264d5d6b/wfb_v6_uplink",
+  "helperSHA": "9676532e8c178d05986b0c6bde96687de2afccaf5b751c0ea20a89e8864111e5",
+  "expected": {
+    "grant_duration_ms": 10,
+    "guard_interval_ms": 10,
+    "fec_n": 12
+  },
+  "completed": []
+}
