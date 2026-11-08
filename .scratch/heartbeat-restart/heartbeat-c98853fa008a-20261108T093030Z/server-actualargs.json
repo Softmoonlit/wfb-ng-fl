@@ -1,0 +1,1 @@
+["/usr/bin/python3", "-I", "-B", "-m", "wfb_ng.fl.server_daemon", "--config", "/etc/wfb-ng-fl/server.json", "--channel", "149", "--bandwidth-mhz", "40", "--txpower", "18", "--downlink-mcs", "3", "--uplink-mcs", "4", "--uftp-rate-kbps", "15000", "--interface", "wlxfc221c100119"]

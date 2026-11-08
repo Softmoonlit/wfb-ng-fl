@@ -17,7 +17,7 @@ import urllib.request
 
 phase, commit, release_id, archive_sha, native_sha = sys.argv[1:]
 host = socket.gethostname()
-assert host in {'fl00', 'fl01', 'fl02', *(f'fl{i:02d}' for i in range(4, 11))}
+assert host in {f'fl{i:02d}' for i in range(11)}
 assert os.geteuid() == 0
 assert len(commit) == 40 and all(c in '0123456789abcdef' for c in commit)
 assert release_id.replace('-', '').isalnum()
@@ -103,6 +103,11 @@ elif phase == 'prepare':
     assert sha(stage / 'source.tar') == archive_sha
     root.mkdir(parents=True)
     (root / 'interface').write_text(iface + '\n')
+    old_args = [s.decode() for s in bound_args if s]
+    options = old_args[old_args.index('--config'):]
+    (root / 'actualargs.json').write_text(json.dumps(['/usr/bin/python3', '-I', '-B', '-m', 'wfb_ng.fl.' + role + '_daemon', *options]))
+    (root / 'configuration-before.json').write_text(pathlib.Path('/etc/wfb-ng-fl/' + ('server.json' if role == 'server' else 'node.json')).read_text())
+    (root / 'uftp-before.json').write_text(json.dumps({n: {'path': shutil.which(n), 'sha256': sha(shutil.which(n))} for n in ('uftp', 'uftpd')}))
     backup = root / 'backup'
     backup.mkdir()
     shutil.copytree(installed, backup / 'fl')
@@ -177,31 +182,7 @@ elif phase == 'install':
     assert json.loads((installed / 'build_identity.json').read_text())['commit'] == commit
     (root / 'manifest.json').write_text(json.dumps({'commit': commit, 'files': expected,
         'installed': str(installed), 'native_sha': native_sha}, indent=2))
-    wrapper = '''import hashlib,importlib,json,pathlib,sys,os
-root=pathlib.Path(__file__).resolve().parent
-manifest=json.loads((root/'manifest.json').read_text())
-base=pathlib.Path(manifest['installed'])
-for name,digest in manifest['files'].items():
- assert hashlib.sha256((base/name).read_bytes()).hexdigest()==digest,name
-role=sys.argv.pop(1)
-module=importlib.import_module('wfb_ng.fl.'+role+'_daemon')
-loaded={name:{'path':m.__file__,'sha256':hashlib.sha256(pathlib.Path(m.__file__).read_bytes()).hexdigest()} for name,m in sys.modules.items() if name.startswith('wfb_ng.fl.') and getattr(m,'__file__',None) and m.__file__.endswith('.py')}
-for name,item in loaded.items():
- assert pathlib.Path(item['path']).parent==base,(name,item['path'])
- assert item['sha256']==manifest['files'][pathlib.Path(item['path']).name]
-(root/'loaded.json').write_text(json.dumps({'pid':os.getpid(),'commit':manifest['commit'],'modules':loaded}))
-module.main()
-'''
-    (root / 'daemon.py').write_text(wrapper)
-    args = ['/usr/bin/python3', '-I', '-B', str(root / 'daemon.py'), role]
-    if role == 'server':
-        args += ['--config', '/etc/wfb-ng-fl/server.json', '--channel', '149',
-                 '--bandwidth-mhz', '40', '--txpower', '18', '--downlink-mcs', '3',
-                 '--uplink-mcs', '4', '--uftp-rate-kbps', '15000', '--interface', iface]
-    else:
-        args += ['--config', '/etc/wfb-ng-fl/node.json', '--work-dir', '/srv/wfb-ng-fl/client',
-                 '--channel', '149', '--bandwidth-mhz', '40', '--radio-txpower-dbm', '18',
-                 '--uplink-mcs', '4', '--interface', iface]
+    args = json.loads((root / 'actualargs.json').read_text())
     drop = pathlib.Path('/etc/systemd/system') / (unit + '.d') / 'zzzzz-heartbeat-release.conf'
     drop.parent.mkdir(parents=True, exist_ok=True)
     drop.write_text('[Service]\nExecStart=\nExecStart=' + ' '.join(args) +
@@ -216,8 +197,16 @@ elif phase == 'audit':
     pid = int(run(['systemctl', 'show', unit, '-p', 'MainPID', '--value']).strip())
     assert pid > 0
     assert run(['systemctl', 'is-active', unit]).strip() == 'active'
-    loaded = json.loads((root / 'loaded.json').read_text())
-    assert loaded['pid'] == pid and loaded['commit'] == commit
+    actualargs = [s.decode() for s in (pathlib.Path('/proc') / str(pid) / 'cmdline').read_bytes().split(b'\0') if s]
+    assert actualargs == json.loads((root / 'actualargs.json').read_text()), actualargs
+    assert (pathlib.Path('/proc') / str(pid) / 'exe').resolve() == pathlib.Path('/usr/bin/python3').resolve()
+    probe = 'import importlib,json; m=importlib.import_module("wfb_ng.fl.' + role + '_daemon"); print(json.dumps({"module":m.__file__}))'
+    loaded = json.loads(run(['/usr/bin/python3', '-I', '-B', '-c', probe]))
+    assert pathlib.Path(loaded['module']).parent == installed
+    config_path = pathlib.Path('/etc/wfb-ng-fl/' + ('server.json' if role == 'server' else 'node.json'))
+    config = json.loads(config_path.read_text())
+    loaded.update(pid=pid, commit=commit, actualargs=actualargs, config=config, config_sha256=sha(config_path), verification='standard module process arguments plus isolated interpreter source resolution')
+    (root / 'loaded.json').write_text(json.dumps(loaded, indent=2))
     native = []
     for p in pathlib.Path('/proc').glob('[0-9]*/cmdline'):
         try:
@@ -231,8 +220,8 @@ elif phase == 'audit':
     assert sha(path / 'exe') == native_sha
     assert args[args.index(b'--air-interface') + 1].decode() == iface
     if role == 'server':
-        assert args[args.index(b'--grant-duration-ms') + 1] == b'10'
-        assert args[args.index(b'--guard-interval-ms') + 1] == b'10'
+        assert args[args.index(b'--grant-duration-ms') + 1] == str(config.get('grant_duration_ms', 10)).encode()
+        assert args[args.index(b'--guard-interval-ms') + 1] == str(config.get('guard_interval_ms', 10)).encode()
         assert b'/usr/bin/wfb_v6_uplink' == args[0]
     assert b'--radio-short-gi' not in args
     assert b'--radio-control-port' in args
@@ -249,7 +238,13 @@ elif phase == 'audit':
     info = run(['iw', 'dev', iface, 'info'])
     assert 'txpower -18.00 dBm' in info
     assert 'channel 149 ' in info and 'width: 40 MHz' in info
-    emit({'host': host, 'pid': pid, 'native_pid': path.name, 'loaded': loaded,
+    power = run(['/usr/sbin/nvpmodel', '-q'])
+    assert '15W' in power, power
+    uftp = {n: {'path': shutil.which(n), 'sha256': sha(shutil.which(n))} for n in ('uftp', 'uftpd')}
+    assert uftp == json.loads((root / 'uftp-before.json').read_text())
+    assert sha(root / 'source/wfb_v6_uplink') == native_sha
+    assert all(sha(root / 'source/wfb_ng/fl' / n) == sha(installed / n) for n in json.loads((root / 'runtime-files.json').read_text()))
+    emit({'host': host, 'pid': pid, 'power': power, 'uftp': uftp, 'actualargs': actualargs, 'native_pid': path.name, 'loaded': loaded,
           'native_sha': native_sha, 'native_args': [s.decode() for s in args if s],
           'radio_runtime': radio_runtime, 'radio': info})
 else:
