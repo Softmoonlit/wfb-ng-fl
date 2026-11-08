@@ -272,8 +272,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
         metadata = payload if host == 'fl00' else {k: payload[k] for k in ('size_bytes', 'sha256')}
         pending[host] = sessions[host].call('prepare', run_id=run_id,
                                          payload=metadata, timing=TIMING, patch=radio_patch,
-                                         expected_native=expected_native or dict(fec_k=8, fec_n=14,
-                                             grant_duration_ms=15, guard_interval_ms=5), release_root=release_root, release_commit=release_commit)
+                                         expected_native=expected_native, release_root=release_root, release_commit=release_commit)
     by_future = {future: host for host, future in pending.items()}
     for future in futures.as_completed(by_future, timeout=max(.01, deadline - time.monotonic())):
         host = by_future[future]
@@ -305,6 +304,7 @@ def main():
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
     parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
     parser.add_argument('--bandwidth-mhz', type=int, choices=(20, 40), default=40)
+    parser.add_argument('--native-sha', required=True, help='本批次显式声明的 native 制品 SHA-256')
     parser.add_argument('--release-root', default=RELEASE_ROOT)
     parser.add_argument('--release-commit', default=RELEASE_COMMIT)
     parser.add_argument('--fec-n', type=int, choices=(12, 14), default=14)
@@ -318,6 +318,8 @@ def main():
     parser.add_argument('--run-id', default=time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
     parser.add_argument('--output', type=Path, default=DIRECTORY / 'runs')
     args = parser.parse_args()
+    if not re.fullmatch(r'[0-9a-f]{64}', args.native_sha):
+        parser.error('--native-sha must be 64 lowercase hex characters')
     if args.grant_duration_ms <= 0 or args.guard_interval_ms < 0:
         parser.error('grant duration must be positive and guard interval nonnegative')
     if not re.fullmatch(r'[0-9a-f]{40}', args.release_commit):
@@ -326,7 +328,7 @@ def main():
     if (not release.is_absolute() or release.parent != Path('/srv/wfb-ng-fl/releases')
             or not re.fullmatch('heartbeat-' + args.release_commit[:12] + r'-[0-9]{8}T[0-9]{6}Z', release.name)):
         parser.error('--release-root must match --release-commit under /srv/wfb-ng-fl/releases')
-    expected_native = dict(fec_k=8, fec_n=args.fec_n, grant_duration_ms=args.grant_duration_ms,
+    expected_native = dict(native_sha=args.native_sha, fec_k=8, fec_n=args.fec_n, grant_duration_ms=args.grant_duration_ms,
                            guard_interval_ms=args.guard_interval_ms)
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', args.run_id):
         parser.error('invalid run id')

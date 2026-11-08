@@ -15,6 +15,11 @@ import runner
 import node_agent
 
 
+NATIVE_FIXTURE_SHA = hashlib.sha256(b'local native fixture').hexdigest()
+EXPECTED_NATIVE = dict(native_sha=NATIVE_FIXTURE_SHA, fec_k=8, fec_n=14,
+                       grant_duration_ms=15, guard_interval_ms=5)
+
+
 class MockTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -68,7 +73,7 @@ class MockTests(unittest.TestCase):
                 return future
         self_test = self
         runner.orchestrate({host: Session() for host in runner.HOSTS}, records.append,
-                           time.monotonic() + 1, 'dispatch-test', self.payload)
+                           time.monotonic() + 1, 'dispatch-test', self.payload, expected_native=EXPECTED_NATIVE)
         starts = [record for record in records if record.get('event') == 'dispatch_start']
         self.assertEqual([record['phase'] for record in starts], [
             'prepare', 'acquire_radio', 'verify_radio', 'start_receive', 'publish', 'submit', 'verify'])
@@ -166,10 +171,11 @@ class MockTests(unittest.TestCase):
                     with patch('node_agent.signal.setitimer'):
                         with self.assertRaisesRegex(RuntimeError, 'invalid payload size'):
                             node.prepare('radio-test', {}, runner.TIMING,
-                                dict(downlink_mcs=downlink, uplink_mcs=uplink, uftp_rate_kbps=rate))
+                                dict(downlink_mcs=downlink, uplink_mcs=uplink, uftp_rate_kbps=rate),
+                                expected_native=EXPECTED_NATIVE)
 
     def test_radio_cli_expanded_mcs_and_positive_rate(self):
-        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
         for rate in (1, 26000):
             with patch('sys.argv', argv + ['--downlink-mcs', '4', '--uplink-mcs', '6',
                        '--uftp-rate-kbps', str(rate)]), patch('sys.stdout', new_callable=io.StringIO) as output:
@@ -183,10 +189,10 @@ class MockTests(unittest.TestCase):
                     runner.main()
 
     def test_native_candidate_metadata_defaults_and_overrides(self):
-        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
-        for flags, expected in [([], dict(fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)),
+        argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        for flags, expected in [([], dict(EXPECTED_NATIVE)),
                 (['--fec-n', '12', '--grant-duration-ms', '15', '--guard-interval-ms', '0'],
-                 dict(fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=0))]:
+                 dict(native_sha=NATIVE_FIXTURE_SHA, fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=0))]:
             with patch('sys.argv', argv + flags), patch('sys.stdout', new_callable=io.StringIO) as output:
                 self.assertEqual(runner.main(), 0)
             self.assertEqual(json.loads(output.getvalue())['expected_native'], expected)
@@ -241,7 +247,7 @@ class MockTests(unittest.TestCase):
             transaction.assert_called_once_with(endpoint, node.patch)
 
     def test_release_cli_maps_exact_commit_root_and_rejects_mismatch_before_processes(self):
-        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
         candidate = 'b' * 40
         root = '/srv/wfb-ng-fl/releases/heartbeat-' + candidate[:12] + '-20300101T000000Z'
         self.assertEqual(runner.RELEASE_COMMIT, node_agent.COMMIT)
@@ -267,7 +273,7 @@ class MockTests(unittest.TestCase):
     def test_explicit_release_and_fec_metadata_reach_all_prepare_calls(self):
         commit = 'e' * 40
         root = '/srv/wfb-ng-fl/releases/heartbeat-' + commit[:12] + '-20300101T000000Z'
-        expected = dict(fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=5)
+        expected = dict(native_sha=NATIVE_FIXTURE_SHA, fec_k=8, fec_n=12, grant_duration_ms=15, guard_interval_ms=5)
         radio = dict(runner.PATCH_DEFAULT, downlink_mcs=4, uftp_rate_kbps=12000)
         sessions = {host: Mock() for host in runner.HOSTS}
         for session in sessions.values():
@@ -301,10 +307,11 @@ class MockTests(unittest.TestCase):
         release = Path('/srv/wfb-ng-fl/releases') / ('heartbeat-' + candidate_commit[:12] + '-20300101T000000Z')
         for host, role in [('fl00', 'server'), ('fl03', 'client')]:
             node = self.node(host)
+            node.expected_native = dict(EXPECTED_NATIVE)
             module = 'wfb_ng.fl.' + role + '_daemon'
             argv = ['/usr/bin/python3', '-I', '-B', '-m', module, '--config', '/etc/node.json']
             build_commit = [candidate_commit]
-            manifest = dict(commit=candidate_commit, native_sha=node_agent.NATIVE_SHA,
+            manifest = dict(commit=candidate_commit, native_sha=NATIVE_FIXTURE_SHA,
                 installed=str(base), files={role + '_daemon.py': 'digest', 'role.py': 'digest'})
             def read(path, *args, **kwargs):
                 if path == release / 'actualargs.json':
@@ -334,6 +341,10 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'installed build identity'):
                     node.verify_standard_release(123, argv, str(release), candidate_commit)
                 build_commit[0] = candidate_commit
+                manifest['native_sha'] = '0' * 64
+                with self.assertRaisesRegex(RuntimeError, 'release identity'):
+                    node.verify_standard_release(123, argv, str(release), candidate_commit)
+                manifest['native_sha'] = NATIVE_FIXTURE_SHA
                 manifest['commit'] = 'old-commit'
                 with self.assertRaisesRegex(RuntimeError, 'release identity'):
                     node.verify_standard_release(123, argv, str(release), candidate_commit)
@@ -376,6 +387,39 @@ class MockTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'startup radio baseline mismatch'):
                 node.capture_original_radio(['--radio-mcs-index', '6'])
         read.assert_not_called()
+
+    def test_native_sha_required_and_strict_before_any_process(self):
+        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]
+        for flags in ([], ['--native-sha', 'a' * 63], ['--native-sha', 'A' * 64],
+                      ['--native-sha', 'g' * 64], ['--native-sha', 'a' * 65]):
+            with patch('sys.argv', argv + flags), patch('sys.stderr', new_callable=io.StringIO), patch(
+                    'runner.subprocess.Popen') as spawn:
+                with self.assertRaises(SystemExit) as error:
+                    runner.main()
+                self.assertEqual(error.exception.code, 2)
+                spawn.assert_not_called()
+        with patch('sys.argv', argv + ['--native-sha', NATIVE_FIXTURE_SHA]), patch(
+                'sys.stdout', new_callable=io.StringIO) as output:
+            self.assertEqual(runner.main(), 0)
+        self.assertEqual(json.loads(output.getvalue())['expected_native']['native_sha'], NATIVE_FIXTURE_SHA)
+
+    def test_native_artifacts_all_match_explicit_expectation_with_no_fallback(self):
+        node = self.node()
+        node.expected_native = dict(EXPECTED_NATIVE)
+        root = Path(self.temporary.name)
+        proc = root / 'proc/123'
+        paths = [Path('/usr/bin/wfb_v6_uplink'), proc / 'exe', root / 'source/wfb_v6_uplink']
+        with patch('node_agent.sha', return_value=NATIVE_FIXTURE_SHA) as digest:
+            node.verify_native_artifacts(root, proc)
+        self.assertEqual([call.args[0] for call in digest.call_args_list], paths)
+        for mismatch in paths:
+            with patch('node_agent.sha', side_effect=lambda path: '0' * 64 if path == mismatch else NATIVE_FIXTURE_SHA):
+                with self.assertRaisesRegex(RuntimeError, 'native hash mismatch'):
+                    node.verify_native_artifacts(root, proc)
+        with patch('node_agent.signal.setitimer'):
+            for metadata in (None, {**EXPECTED_NATIVE, 'native_sha': 'A' * 64}):
+                with self.assertRaisesRegex(RuntimeError, 'expected native'):
+                    node.prepare('rejectsha', {}, runner.TIMING, expected_native=metadata)
 
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
@@ -447,7 +491,7 @@ class MockTests(unittest.TestCase):
                 node_agent.UFTP_SHA256, digests), patch('node_agent.run') as command:
             with self.assertRaisesRegex(RuntimeError, 'UFTP SHA mismatch uftpd'):
                 node.prepare('hashreject', {key: self.payload[key]
-                    for key in ('size_bytes', 'sha256')}, runner.TIMING)
+                    for key in ('size_bytes', 'sha256')}, runner.TIMING, expected_native=EXPECTED_NATIVE)
         self.assertFalse(node.prepared)
         command.assert_not_called()
 
@@ -468,7 +512,7 @@ class MockTests(unittest.TestCase):
                         events.append((self.host, action))
                         if action == 'prepare':
                             assert params['timing'] == runner.TIMING
-                            assert params['expected_native'] == dict(fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
+                            assert params['expected_native'] == dict(EXPECTED_NATIVE)
                             assert params['release_root'] == runner.RELEASE_ROOT
                             assert params['release_commit'] == runner.RELEASE_COMMIT
                             expected = dict(self_test.payload)
@@ -490,7 +534,7 @@ class MockTests(unittest.TestCase):
                 return pool.submit(invoke)
         try:
             runner.orchestrate({h: Session(h) for h in runner.HOSTS}, lambda v: None,
-                               time.monotonic() + 5, 'mock', self.payload)
+                               time.monotonic() + 5, 'mock', self.payload, expected_native=EXPECTED_NATIVE)
         finally:
             pool.shutdown()
             self.events = events
@@ -603,7 +647,7 @@ class MockTests(unittest.TestCase):
             self.assertNotIn('del', command.call_args.args[0])
 
     def test_unreviewed_execution_does_not_start_ssh(self):
-        with patch('sys.argv', ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path), '--execute', '--reviewed-sha', 'invalid']), patch(
+        with patch('sys.argv', ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path), '--execute', '--reviewed-sha', 'invalid']), patch(
                 'subprocess.Popen') as spawn:
             with self.assertRaises(SystemExit) as error:
                 runner.main()
@@ -611,7 +655,7 @@ class MockTests(unittest.TestCase):
             spawn.assert_not_called()
 
     def test_dry_run_never_starts_ssh(self):
-        with patch('sys.argv', ['runner', '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]), patch('subprocess.Popen') as spawn:
+        with patch('sys.argv', ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest', str(self.manifest_path)]), patch('subprocess.Popen') as spawn:
             with patch('sys.stdout', new_callable=io.StringIO) as output:
                 self.assertEqual(runner.main(), 0)
             plan = json.loads(output.getvalue())
@@ -815,7 +859,7 @@ class MockTests(unittest.TestCase):
                         path.write_bytes(content)
 
     def test_smoke_dry_run_generates_exact_1mib_without_process(self):
-        argv = ['runner', '--smoke', '--output', self.temporary.name, '--run-id', 'smoke-test']
+        argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--smoke', '--output', self.temporary.name, '--run-id', 'smoke-test']
         with patch('sys.argv', argv), patch('subprocess.Popen') as spawn, patch(
                 'subprocess.run') as run, patch('sys.stdout', new_callable=io.StringIO) as output:
             self.assertEqual(runner.main(), 0)
@@ -863,7 +907,7 @@ class MockTests(unittest.TestCase):
             else:
                 events.append(('owned-unit', 'independent_stop'))
             return reply
-        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest',
+        argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path), '--model-manifest',
                 str(self.manifest_path), '--execute', '--reviewed-sha', 'reviewed',
                 '--output', self.temporary.name, '--run-id', run_id]
         started = time.monotonic()
@@ -928,7 +972,7 @@ class MockTests(unittest.TestCase):
                            ('sha256', '0' * 64), ('model_format', 'other')]:
             with self.subTest(key=key):
                 self.manifest_path.write_text(json.dumps(dict(self.manifest, **{key: value})))
-                argv = ['runner', '--payload', str(self.payload_path),
+                argv = ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path),
                         '--model-manifest', str(self.manifest_path), '--execute']
                 with patch('sys.argv', argv), patch('subprocess.Popen') as spawn:
                     with self.assertRaises(SystemExit) as error:
@@ -948,7 +992,7 @@ class MockTests(unittest.TestCase):
             runner.model_manifest_info(self.manifest_path, self.payload)
 
     def test_cli_requires_manifest(self):
-        with patch('sys.argv', ['runner', '--payload', str(self.payload_path)]), patch('subprocess.Popen') as spawn:
+        with patch('sys.argv', ['runner', '--native-sha', NATIVE_FIXTURE_SHA, '--payload', str(self.payload_path)]), patch('subprocess.Popen') as spawn:
             with self.assertRaises(SystemExit) as error:
                 runner.main()
             self.assertEqual(error.exception.code, 2)

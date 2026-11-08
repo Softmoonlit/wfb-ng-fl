@@ -19,7 +19,6 @@ import urllib.request
 
 COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
 RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
-NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 # fl00 实际 PATH 中的 UFTP 5.0.3；运行依赖独立于 release 源码 manifest。
 UFTP_SHA256 = {
     'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -143,8 +142,11 @@ class Node:
 
     def prepare(self, run_id, payload, timing, patch=None, expected_native=None, release_root=RELEASE_ROOT, release_commit=COMMIT):
         # 生命周期从代理启动起算；清理不得再次延长节点总期限。
-        self.expected_native = dict(expected_native) if expected_native is not None else dict(
-            fec_k=8, fec_n=14, grant_duration_ms=15, guard_interval_ms=5)
+        require(isinstance(expected_native, dict), 'expected native metadata required')
+        self.expected_native = dict(expected_native)
+        require(isinstance(self.expected_native.get('native_sha'), str)
+                and re.fullmatch(r'[0-9a-f]{64}', self.expected_native['native_sha']),
+                'invalid expected native SHA')
         require(self.expected_native.get('fec_k') == 8
                 and self.expected_native.get('fec_n') in (12, 14)
                 and type(self.expected_native.get('grant_duration_ms')) is int
@@ -202,7 +204,7 @@ class Node:
                 continue
         require(len(natives) == 1, 'native must be unique')
         proc, argv = natives[0]
-        require(sha(proc / 'exe') == NATIVE_SHA, 'native hash mismatch')
+        self.verify_native_artifacts(release_root, proc)
         native_parameters = self.verify_native_parameters(argv)
         self.resident = {str(pid): Path('/proc', str(pid), 'stat').read_text().rsplit(')', 1)[1].split()[19],
                          proc.name: (proc / 'stat').read_text().rsplit(')', 1)[1].split()[19]}
@@ -233,7 +235,7 @@ class Node:
         self.role_module = role_module
         self.prepared = True
         self.persist_cleanup()
-        return self.fact('prepared', daemon_pid=pid, native_pid=int(proc.name), native_sha=NATIVE_SHA,
+        return self.fact('prepared', daemon_pid=pid, native_pid=int(proc.name), native_sha=self.expected_native['native_sha'],
                          tun=self.tun, ifindex=self.ifindex, radio=radio_fact, fec=fec_fact,
                          expected_native=self.expected_native, native_parameters=native_parameters,
                          release_identity=release_identity, installed=str(base), source=str(source),
@@ -255,7 +257,7 @@ class Node:
         require(daemon_argv == json.loads((release / 'actualargs.json').read_text()),
                 'release actualargs mismatch')
         manifest = json.loads((release / 'manifest.json').read_text())
-        require(manifest['commit'] == release_commit and manifest['native_sha'] == NATIVE_SHA,
+        require(manifest['commit'] == release_commit and manifest['native_sha'] == self.expected_native['native_sha'],
                 'release identity mismatch')
         base = Path(manifest['installed']).resolve()
         require(str(base).startswith('/usr/') and base.parts[-2:] == ('wfb_ng', 'fl'),
@@ -273,6 +275,12 @@ class Node:
         return dict(commit=release_commit, release_root=str(release), installed=str(base),
                     files=manifest['files'], pid=pid, actualargs=daemon_argv, resolved=resolved,
                     verification='current proc argv/executable plus isolated module resolution and SHA')
+
+    def verify_native_artifacts(self, release_root, proc):
+        expected = self.expected_native['native_sha']
+        for path in (Path('/usr/bin/wfb_v6_uplink'), proc / 'exe',
+                     Path(release_root) / 'source/wfb_v6_uplink'):
+            require(sha(path) == expected, 'native hash mismatch: ' + str(path))
 
     def verify_native_parameters(self, argv):
         keys = ['fec_k', 'fec_n']

@@ -4,6 +4,8 @@
 
 标准部署身份只接受 `/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon/client_daemon`。`--release-commit` 默认 `88099f04ffaee56c576bb35a9e50baec5f1113d7`，`--release-root` 默认 `/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z`。后续发布可显式传入二者，无需改源码；commit 必须为完整 40 位小写 SHA，root 必须为 `/srv/wfb-ng-fl/releases/heartbeat-<commit前12位>-<UTC时间戳>`，两层均严格校验。prepare 核对当前 MainPID 的 proc argv 与 executable、发布 actualargs、完整安装/源码 SHA，以及 manifest/build identity 与期望 commit 精确一致，再用独立 `-I -B` 解释器导入 daemon/role 核对解析路径和 SHA。此证据不宣称读取活进程 sys.modules；不读取历史 loaded.json，不支持 daemon.py wrapper。当前 native 期望 grant15/guard5。
 
+每批次必须显式传入 `--native-sha <64位小写十六进制SHA256>`，dry-run 同样必填。plan 与 prepare 的 `expected_native.native_sha` 保留调用方声明；manifest.native_sha、已安装 `/usr/bin/wfb_v6_uplink`、当前 `/proc/<pid>/exe`、本 release 的 `source/wfb_v6_uplink` 必须全部精确匹配。没有内置旧 SHA、fallback 或从 manifest 自动采信的路径。新 release 通过既有 `--release-commit/--release-root` 显式指定，不改变候选参数默认值。始终要求全部十客户端（含 fl04）通过 preflight，故障节点不得跳过。
+
 ## 载荷与执行门槛
 
 model 模式同时必填 `--payload <本机已存在制品>` 和 `--model-manifest <JSON路径>`。载荷接受 1 字节至 64MiB（含上界）的普通文件，在连接前分块计算实际 `size_bytes` 和 SHA-256。manifest 要求 `model_format="cifar10-resnet18-fp32-v1"`、大小和摘要精确匹配；`initialization.seed` 必须为非 bool 的整数且在 0..2**63-1，`initialization.source` 必须为非空字符串。计划记录 manifest 的绝对路径和完整 JSON 内容。
@@ -13,8 +15,8 @@ model 模式同时必填 `--payload <本机已存在制品>` 和 `--model-manife
 默认只生成文件（smoke）及打印本地计划，不启动 SSH、临时 unit 或角色：
 
 ```sh
-python3 .scratch/fl-testbed-magazine-draft/communication/runner.py --smoke --run-id nine-smoke
-python3 .scratch/fl-testbed-magazine-draft/communication/runner.py --payload /absolute/path/to/model-artifact --model-manifest /absolute/path/to/model-manifest.json
+python3 .scratch/fl-testbed-magazine-draft/communication/runner.py --native-sha <64位小写SHA256> --smoke --run-id nine-smoke
+python3 .scratch/fl-testbed-magazine-draft/communication/runner.py --native-sha <64位小写SHA256> --payload /absolute/path/to/model-artifact --model-manifest /absolute/path/to/model-manifest.json
 ```
 
 model 计划使用 `kind=model-equivalent-communication`、`model_manifest_matched=true`、`model_semantics_validated_by_runner=false`。工具只校验 manifest 与字节身份，不解析张量、不导入 torch，不承诺正式 FL 生命周期或正式 update 等量。模型公共 load、模型语义及真实 CLI manifest 由调用方另行验证。
@@ -49,4 +51,4 @@ HT40 下行 MCS4、12000kbps 候选的 acquire_radio 使用专用 calibrate endp
 python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
 ```
 
-54 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
+56 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
