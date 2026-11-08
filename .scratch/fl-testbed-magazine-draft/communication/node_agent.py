@@ -20,10 +20,10 @@ import urllib.request
 COMMIT = 'c6659488f64976185ffe02a7c856f7fd8c821ee0'
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 WRAPPER_SHA = 'd68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6'
-NODES = [1, 2, 4, 5]
+NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
-             radio_txpower_dbm=18, uftp_rate_kbps=15000)
+             radio_txpower_dbm=18, uftp_rate_kbps=12000)
 
 
 def require(value, message):
@@ -37,6 +37,20 @@ def sha(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_source_files(base, source, files):
+    """安装目录、冻结源码与 manifest 必须包含完全相同的顶层 Python 文件。"""
+    require(isinstance(files, dict) and bool(files), 'Python manifest files required')
+    require(all(isinstance(name, str) and Path(name).name == name and name.endswith('.py')
+                for name in files), 'manifest must contain only top-level Python files')
+    require(source.is_dir(), 'frozen release source absent')
+    installed_names = {path.name for path in base.glob('*.py')}
+    source_names = {path.name for path in source.glob('*.py')}
+    require(installed_names == source_names == set(files), 'Python source file set mismatch')
+    for name, digest in files.items():
+        require(sha(base / name) == digest, 'installed manifest mismatch ' + name)
+        require(sha(source / name) == digest, 'release source mismatch ' + name)
 
 
 def run(argv):
@@ -57,7 +71,7 @@ def get_json(host, path):
 class Node:
     def __init__(self):
         self.host = socket.gethostname()
-        require(self.host in ['fl00', 'fl01', 'fl02', 'fl04', 'fl05'], 'unexpected host')
+        require(self.host in ['fl00', 'fl01', 'fl02', 'fl04', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10'], 'unexpected host')
         self.node = int(self.host[2:])
         self.root = None
         self.role = None
@@ -144,12 +158,8 @@ class Node:
         require(manifest['commit'] == loaded['commit'] == COMMIT and loaded['pid'] == pid, 'release identity mismatch')
         base = Path(manifest['installed']).resolve()
         require(str(base).startswith('/usr/') and base.parts[-2:] == ('wfb_ng', 'fl'), 'installed source required')
-        for name, digest in manifest['files'].items():
-            require(sha(base / name) == digest, 'installed manifest mismatch ' + name)
         source = release / 'source/wfb_ng/fl'
-        require(source.is_dir(), 'frozen release source absent')
-        for path in source.glob('*.py'):
-            require(sha(path) == manifest['files'].get(path.name), 'release source mismatch ' + path.name)
+        verify_source_files(base, source, manifest['files'])
         for item in loaded['modules'].values():
             require(Path(item['path']).resolve().parent == base and sha(item['path']) == item['sha256'], 'loaded mismatch')
         # 严格复用包装器的安装来源，排除当前目录及 PYTHONPATH 遮蔽。
@@ -219,7 +229,7 @@ class Node:
             raw, address = sock.recvfrom(4096)
         radio = struct.unpack('!II7B', raw)
         require(address == ('127.0.0.1', self.control_port) and radio[:2] == (0x434f4d4d, 0)
-                and radio[5:7] == (expected_bandwidth, expected_mcs), 'GET radio mismatch')
+                and radio[4] == 0 and radio[5:7] == (expected_bandwidth, expected_mcs), 'GET radio mismatch')
         return dict(iw=iw, get_radio=list(radio))
 
     def _old_read_radio_removed(self):
@@ -347,7 +357,7 @@ class Node:
     def submit(self):
         require(self.started and not self.closed, 'role not running')
         if self.node == 0:
-            self.updates = self.runtime.wait_for_updates(min_updates=4, timeout=self.timing['io_timeout'])
+            self.updates = self.runtime.wait_for_updates(min_updates=len(NODES), timeout=self.timing['io_timeout'])
             require(set(self.updates) == set(NODES), 'missing updates')
             return self.fact('updates_received', nodes=sorted(self.updates))
         require(self.received is not None, 'receive barrier absent')
@@ -371,7 +381,7 @@ class Node:
                 require(current == tick, 'resident identity changed: ' + pid)
             actual['nvpmodel'] = run(['nvpmodel', '-q'])
             require(actual['nvpmodel'].strip() == 'NV Power Mode: 15W\n0', 'nvpmodel mismatch')
-            # 路径来自既有五端 board-power 审计及 audit-jtop.py，仅只读。
+            # 路径来自既有十端 board-power 审计及 audit-jtop.py，仅只读。
             expected = {'/sys/devices/system/cpu/online': '0-5',
                         '/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq': '612000000',
                         '/sys/kernel/nvpmodel_clk_cap/emc': '2133000000',

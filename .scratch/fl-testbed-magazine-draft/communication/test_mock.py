@@ -3,6 +3,8 @@ import io
 import hashlib
 import json
 import tempfile
+import struct
+import recover
 from pathlib import Path
 import concurrent.futures as futures
 import threading
@@ -36,10 +38,10 @@ class MockTests(unittest.TestCase):
     def exercise(self, fail_prepare=False):
         events = []
         lock = threading.Lock()
-        publish = threading.Barrier(5, timeout=2)
+        publish = threading.Barrier(len(runner.HOSTS), timeout=2)
         prepared = set()
         received = set()
-        pool = futures.ThreadPoolExecutor(max_workers=5)
+        pool = futures.ThreadPoolExecutor(max_workers=len(runner.HOSTS))
         self_test = self
         class Session:
             def __init__(self, host):
@@ -76,13 +78,14 @@ class MockTests(unittest.TestCase):
 
     def test_all_prepare_and_publish_overlap_then_submit(self):
         self.exercise()
-        self.assertEqual(sum(a == 'publish' for h, a in self.events), 5)
+        self.assertEqual(sum(a == 'publish' for h, a in self.events), len(runner.HOSTS))
         self.assertEqual(self.events[-1], ('fl00', 'verify'))
 
     def test_failed_prepare_stops_all_test_actions(self):
         with self.assertRaises(RuntimeError):
             self.exercise(True)
-        self.assertEqual(len(self.events), 5)
+        self.assertLessEqual(len(self.events), len(runner.HOSTS))
+        self.assertIn(('fl04', 'prepare'), self.events)
         self.assertTrue(all(a == 'prepare' for h, a in self.events))
 
     def test_radio_request_carries_full_patch_and_targets(self):
@@ -93,7 +96,7 @@ class MockTests(unittest.TestCase):
                 'node_agent.urllib.request.urlopen', return_value=reply) as http:
             result = node.radio_transaction('reconfigure', node_agent.PATCH)
         body = json.loads(http.call_args.args[0].data)
-        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 4, 5], patch=node_agent.PATCH))
+        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 4, 5, 6, 7, 8, 9, 10], patch=node_agent.PATCH))
         self.assertIs(result['calibration'], False)
 
     def test_radio_request_rejects_incorrect_calibration_flag(self):
@@ -152,6 +155,25 @@ class MockTests(unittest.TestCase):
         self.assertIn('--property=RuntimeMaxSec=' + str(runner.TIMING['node_timeout']), argv)
         self.assertIn('--property=TimeoutStopSec=' + str(runner.TIMING['unit_stop_timeout']), argv)
 
+    def test_dispose_unblocks_actual_rpc_worker_without_deadline_wait(self):
+        process = Mock()
+        sent = threading.Event()
+        process.stdin.flush.side_effect = sent.set
+        with patch('runner.subprocess.Popen', return_value=process), patch('runner.threading.Thread'):
+            session = runner.Session('fl00', '# mock', Path(self.temporary.name),
+                                     time.monotonic() + 690)
+        future = session.call('publish')
+        self.assertTrue(sent.wait(timeout=1))
+        try:
+            session.dispose()
+            with self.assertRaisesRegex(EOFError, 'session disposed'):
+                future.result(timeout=1)
+        finally:
+            session.worker.shutdown(wait=True, cancel_futures=True)
+            session.stderr.close()
+        process.terminate.assert_not_called()
+        process.kill.assert_not_called()
+
     def test_cli_requires_payload_before_any_process(self):
         with patch('sys.argv', ['runner']), patch('subprocess.Popen') as spawn:
             with self.assertRaises(SystemExit) as error:
@@ -160,7 +182,7 @@ class MockTests(unittest.TestCase):
             spawn.assert_not_called()
 
     def test_missing_target_rejected_before_prepare(self):
-        with self.assertRaisesRegex(RuntimeError, '五节点会话不齐'):
+        with self.assertRaisesRegex(RuntimeError, '十节点会话不齐'):
             runner.orchestrate({h: None for h in runner.HOSTS if h != 'fl04'},
                                lambda v: None, time.monotonic() + 1, 'mock', self.payload)
 
@@ -216,7 +238,170 @@ class MockTests(unittest.TestCase):
         node.runtime.wait_for_updates.return_value = {1: 'a', 2: 'b', 4: 'c'}
         with self.assertRaisesRegex(RuntimeError, 'missing updates'):
             node.submit()
-        node.runtime.wait_for_updates.assert_called_once_with(min_updates=4, timeout=300)
+        node.runtime.wait_for_updates.assert_called_once_with(min_updates=9, timeout=300)
+        node.runtime.wait_for_updates.return_value = {n: self.payload_path for n in runner.NODES}
+        node.submit()
+        self.assertEqual(set(node.verify()['files']), {str(n) for n in runner.NODES})
+
+    def test_fixed_complete_topology_and_registry(self):
+        expected = [1, 2, 4, 5, 6, 7, 8, 9, 10]
+        self.assertEqual(runner.NODES, expected)
+        self.assertEqual(node_agent.NODES, expected)
+        self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in expected])
+        for host in runner.HOSTS:
+            self.assertEqual(self.node(host).node, int(host[2:]))
+        node = self.node()
+        status = dict(active_job=None, server_state='IDLE', nodes={str(n): dict(
+            readiness='READY', reported_state='IDLE', error_code=None) for n in expected})
+        with patch('node_agent.get_json', return_value=status):
+            node.registry_gate()
+            status['nodes'].pop('10')
+            with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
+                node.registry_gate()
+            status['nodes']['3'] = dict(readiness='READY')
+            with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
+                node.registry_gate()
+
+    def test_prepare_source_identity_rejects_extra_missing_non_python_and_tampering(self):
+        installed = Path(self.temporary.name) / 'installed'
+        source = Path(self.temporary.name) / 'source'
+        installed.mkdir()
+        source.mkdir()
+        files = {'__init__.py': hashlib.sha256(b'# frozen').hexdigest(),
+                 'role.py': hashlib.sha256(b'# frozen').hexdigest()}
+        for directory in (installed, source):
+            for name in files:
+                (directory / name).write_bytes(b'# frozen')
+        node_agent.verify_source_files(installed, source, files)
+        for directory in (installed, source):
+            with self.subTest(directory=str(directory)):
+                extra = directory / 'extra.py'
+                extra.write_bytes(b'# extra')
+                with self.assertRaisesRegex(RuntimeError, 'file set mismatch'):
+                    node_agent.verify_source_files(installed, source, files)
+                extra.unlink()
+                missing = directory / 'role.py'
+                missing.unlink()
+                with self.assertRaisesRegex(RuntimeError, 'file set mismatch'):
+                    node_agent.verify_source_files(installed, source, files)
+                missing.write_bytes(b'# altered')
+                with self.assertRaisesRegex(RuntimeError, 'manifest mismatch|source mismatch'):
+                    node_agent.verify_source_files(installed, source, files)
+                missing.write_bytes(b'# frozen')
+        for name in ('extra.txt', 'nested/role.py', '../role.py'):
+            with self.subTest(manifest_name=name), self.assertRaisesRegex(RuntimeError, 'only top-level Python'):
+                node_agent.verify_source_files(installed, source, dict(files, **{name: '0' * 64}))
+        with self.assertRaisesRegex(RuntimeError, 'file set mismatch'):
+            node_agent.verify_source_files(installed, source, dict(files, **{'extra.py': '0' * 64}))
+
+    def test_smoke_dry_run_generates_exact_1mib_without_process(self):
+        argv = ['runner', '--smoke', '--output', self.temporary.name, '--run-id', 'smoke-test']
+        with patch('sys.argv', argv), patch('subprocess.Popen') as spawn, patch(
+                'subprocess.run') as run, patch('sys.stdout', new_callable=io.StringIO) as output:
+            self.assertEqual(runner.main(), 0)
+        plan = json.loads(output.getvalue())
+        self.assertEqual(plan['kind'], 'synthetic-smoke-communication')
+        self.assertEqual(plan['payload_mode'], 'smoke')
+        self.assertTrue(plan['generated_payload'])
+        self.assertIsNone(plan['model_manifest'])
+        self.assertFalse(plan['model_manifest_matched'])
+        self.assertEqual(plan['nodes'], node_agent.NODES)
+        self.assertEqual(plan['hosts'], runner.HOSTS)
+        self.assertEqual(Path(plan['payload']['path']).read_bytes(), bytes(1024 * 1024))
+        self.assertEqual(plan['bytes'], 1024 * 1024)
+        self.assertEqual(plan['radio_patch']['channel'], 157)
+        self.assertEqual(plan['radio_patch']['uftp_rate_kbps'], 12000)
+        spawn.assert_not_called()
+        run.assert_not_called()
+
+    def exercise_publish_failure(self, cleanup_result=True):
+        run_id = "fail-fast-" + str(cleanup_result)
+        events, records, blocked = [], [], []
+        class Session:
+            def __init__(self, host, *args):
+                self.host = host
+            def call(self, action, **params):
+                events.append((self.host, action))
+                future = futures.Future()
+                if action == 'publish':
+                    if self.host == 'fl10':
+                        future.set_exception(RuntimeError('publish failed'))
+                    else:
+                        future.set_running_or_notify_cancel()
+                        blocked.append(future)
+                else:
+                    future.set_result(dict(ok=True))
+                return future
+            def dispose(self):
+                events.append((self.host, 'dispose'))
+        reply = Mock(returncode=0, stdout=json.dumps(dict(ok=cleanup_result)), stderr='')
+        def independent(argv, **kwargs):
+            self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
+            if '--restore' in argv:
+                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 10)
+                events.append(('fl00', 'independent_restore'))
+            else:
+                events.append(('owned-unit', 'independent_stop'))
+            return reply
+        argv = ['runner', '--payload', str(self.payload_path), '--model-manifest',
+                str(self.manifest_path), '--execute', '--reviewed-sha', 'reviewed',
+                '--output', self.temporary.name, '--run-id', run_id]
+        started = time.monotonic()
+        with patch('sys.argv', argv), patch('runner.bundle_sha', return_value='reviewed'), patch(
+                'runner.Session', Session), patch('runner.subprocess.run', side_effect=independent) as run, patch(
+                'sys.stdout', new_callable=io.StringIO):
+            self.assertEqual(runner.main(), 1)
+        self.assertLess(time.monotonic() - started, 2)
+        self.assertEqual(len(blocked), 9)
+        self.assertTrue(all(not future.done() for future in blocked))
+        self.assertFalse(any(action in ('submit', 'verify', 'close', 'release_radio') for _, action in events))
+        self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
+        self.assertEqual(run.call_count, 11 if cleanup_result is True else 10)
+        if cleanup_result is not True:
+            self.assertFalse(any(action == 'independent_restore' for _, action in events))
+        records = [json.loads(line) for line in (Path(self.temporary.name) / run_id / 'progress.jsonl').read_text().splitlines()]
+        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 10)
+        self.assertFalse(records[-1]['transfer_verified'])
+        self.assertFalse(records[-1]['restore_ok'])
+
+    def test_publish_failure_exits_and_recovers_without_waiting_for_peers(self):
+        self.exercise_publish_failure()
+
+    def test_independent_cleanup_requires_explicit_true_before_restore(self):
+        for value in (False, 1):
+            with self.subTest(cleanup_ok=value):
+                self.exercise_publish_failure(cleanup_result=value)
+
+    def test_independent_recovery_stops_only_owned_unit_on_every_host(self):
+        for host in runner.HOSTS:
+            with self.subTest(host=host), patch('sys.argv', ['recover', 'local-test']), patch(
+                    'recover.socket.gethostname', return_value=host), patch(
+                    'recover.os.geteuid', return_value=0), patch.object(Path, 'exists', return_value=False), patch.object(
+                    Path, 'is_dir', return_value=False), patch('recover.run') as command:
+                command.side_effect = [Mock(stdout='', stderr=''), Mock(stdout='inactive')]
+                self.assertTrue(recover.main()['ok'])
+                unit = 'comm-smoke-local-test-' + host + '.service'
+                self.assertEqual([call.args[0] for call in command.call_args_list], [
+                    ['systemctl', 'stop', unit], ['systemctl', 'is-active', unit]])
+
+    def test_get_radio_asserts_long_gi(self):
+        node = self.node()
+        node.interface, node.control_port = 'wlan-test', 8000
+        node.patch = dict(node_agent.PATCH)
+        iw = 'channel 157 width: 40 MHz txpower -18.00 dBm type monitor'
+        sock = Mock()
+        with patch('node_agent.run', return_value=iw), patch.object(
+                Path, 'resolve', return_value=Path('/drivers/rtl88xxau_wfb')), patch(
+                'node_agent.socket.socket') as socket:
+            socket.return_value.__enter__.return_value = sock
+            for short_gi in (0, 1):
+                sock.recvfrom.return_value = (struct.pack('!II7B', 0x434f4d4d, 0,
+                    0, 0, short_gi, 40, 3, 0, 1), ('127.0.0.1', 8000))
+                if short_gi:
+                    with self.assertRaisesRegex(RuntimeError, 'GET radio mismatch'):
+                        node.read_radio()
+                else:
+                    self.assertEqual(node.read_radio()['get_radio'][4], 0)
 
     def test_manifest_mismatch_rejected_before_ssh(self):
         for key, value in [('size_bytes', self.payload['size_bytes'] + 1),
@@ -264,7 +449,7 @@ class MockTests(unittest.TestCase):
         self.assertTrue(runner.audit_final(group, records.append, time.monotonic() + 1))
         for session in group.values():
             session.call.assert_called_once_with('audit_final')
-        self.assertEqual(len(records), 5)
+        self.assertEqual(len(records), len(runner.HOSTS))
         self.assertFalse(runner.audit_final(sessions('fl04'), lambda v: None, time.monotonic() + 1))
         self.assertFalse(runner.audit_final(sessions(pending=True), lambda v: None, time.monotonic() + .01))
         self.assertFalse(runner.audit_final(sessions(), lambda v: None, time.monotonic() - 1))

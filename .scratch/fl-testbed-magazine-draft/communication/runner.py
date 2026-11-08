@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""真实模型制品等量通信；默认仅打印本地计划，不连接任何节点。"""
+"""九客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
 import argparse
 import concurrent.futures as futures
 import hashlib
@@ -12,13 +12,14 @@ import subprocess
 import threading
 import time
 
-HOSTS = ['fl00', 'fl01', 'fl02', 'fl04', 'fl05']
+NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
+HOSTS = ['fl00', 'fl01', 'fl02', 'fl04', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10']
 DIRECTORY = Path(__file__).resolve().parent
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
 TIMING = dict(io_timeout=300, orchestration_timeout=690, node_timeout=705,
               recovery_budget=60, cleanup_timeout=10, unit_stop_timeout=8, close_restore_reserve=40)
 PATCH_DEFAULT = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
-                     radio_txpower_dbm=18, uftp_rate_kbps=15000)
+                     radio_txpower_dbm=18, uftp_rate_kbps=12000)
 
 
 def payload_info(path):
@@ -59,7 +60,7 @@ def model_manifest_info(path, payload):
 
 
 def audit_final(sessions, record, deadline):
-    """五端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
+    """十端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
     if set(sessions) != set(HOSTS):
         return False
     pending = {h: sessions[h].call('audit_final') for h in HOSTS}
@@ -136,6 +137,8 @@ class Session:
 
     def dispose(self):
         # EOF 触发节点 finally；这里只终止自有会话，临时 unit 负责后代清理。
+        self.responses.put(EOFError('session disposed: ' + self.host))
+        self.worker.shutdown(wait=False, cancel_futures=True)
         self.process.stdin.close()
         try:
             self.process.wait(timeout=max(.1, min(5, self.deadline - time.monotonic())))
@@ -146,7 +149,6 @@ class Session:
             except subprocess.TimeoutExpired:
                 self.process.kill()
                 self.process.wait()
-        self.worker.shutdown(wait=False, cancel_futures=True)
         self.stderr.close()
 
 
@@ -154,10 +156,9 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
     if radio_patch is None:
         radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
-        raise RuntimeError("固定五节点会话不齐")
+        raise RuntimeError("固定十节点会话不齐")
     def phase(action, hosts=HOSTS, **params):
         pending = {sessions[host].call(action, **params): host for host in hosts}
-        failures = []
         for future in futures.as_completed(pending, timeout=max(.01, deadline - time.monotonic())):
             host = pending[future]
             try:
@@ -165,26 +166,27 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
                 record(dict(host=host, phase=action, ok=True, result=result))
             except Exception as exc:
                 record(dict(host=host, phase=action, ok=False, error=repr(exc)))
-                failures.append(host)
-        if failures:
-            raise RuntimeError(action + ' failed: ' + ','.join(failures))
-    # 全五目标准备成功后，才允许重配事务及角色启动。
+                for other in pending:
+                    other.cancel()
+                raise RuntimeError(action + ' failed: ' + host) from exc
+    # 全十目标准备成功后，才允许重配事务及角色启动。
     # 客户端不获知本机源路径，更不会经管理网获取文件内容。
     pending = {}
     for host in HOSTS:
         metadata = payload if host == 'fl00' else {k: payload[k] for k in ('size_bytes', 'sha256')}
         pending[host] = sessions[host].call('prepare', run_id=run_id,
                                          payload=metadata, timing=TIMING, patch=radio_patch)
-    failures = []
-    for host, future in pending.items():
+    by_future = {future: host for host, future in pending.items()}
+    for future in futures.as_completed(by_future, timeout=max(.01, deadline - time.monotonic())):
+        host = by_future[future]
         try:
-            result = future.result(timeout=max(.01, deadline - time.monotonic()))
+            result = future.result()
             record(dict(host=host, phase='prepare', ok=True, result=result))
         except Exception as exc:
             record(dict(host=host, phase='prepare', ok=False, error=repr(exc)))
-            failures.append(host)
-    if failures:
-        raise RuntimeError('prepare failed: ' + ','.join(failures))
+            for other in by_future:
+                other.cancel()
+            raise RuntimeError('prepare failed: ' + host) from exc
     phase('acquire_radio', hosts=['fl00'])
     phase('verify_radio')
     phase('start_receive')
@@ -197,40 +199,61 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--payload', required=True, type=Path, help='本机已存在的模型制品（1..64MiB 字节）')
-    parser.add_argument('--model-manifest', required=True, type=Path, help='模型 CLI 输出的 JSON manifest')
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--payload', type=Path, help='本机已存在的模型制品（1..64MiB 字节）')
+    mode.add_argument('--smoke', action='store_true', help='显式生成 1MiB 合成字节文件，仅作通信冒烟')
+    parser.add_argument('--model-manifest', type=Path, help='model 模式必填：模型 CLI 输出的 JSON manifest')
     parser.add_argument('--execute', action='store_true')
     parser.add_argument('--reviewed-sha', help='必须匹配 runner、node_agent、recover 三文件冻结摘要')
     parser.add_argument('--channel', type=int, choices=(149, 157), default=157)
     parser.add_argument('--bandwidth-mhz', type=int, choices=(20, 40), default=40)
-    parser.add_argument('--uftp-rate-kbps', type=int, default=15000,
+    parser.add_argument('--uftp-rate-kbps', type=int, default=12000,
                         choices=range(1, 18001), metavar='KBIT/S',
                         help='下行注入速率；HT20使用受控标定候选')
     parser.add_argument('--run-id', default=time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
     parser.add_argument('--output', type=Path, default=DIRECTORY / 'runs')
     args = parser.parse_args()
+    import re
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', args.run_id):
+        parser.error('invalid run id')
+    if args.smoke and args.model_manifest:
+        parser.error('--smoke 不接受模型 manifest')
+    if not args.smoke and args.model_manifest is None:
+        parser.error('model 模式要求 --model-manifest')
     try:
-        payload = payload_info(args.payload)
-        manifest = model_manifest_info(args.model_manifest, payload)
+        if args.smoke:
+            args.output.mkdir(parents=True, exist_ok=True)
+            smoke_path = args.output / ('smoke-' + args.run_id + '.bin')
+            generated = bytes(1024 * 1024)
+            try:
+                with smoke_path.open('xb') as stream:
+                    stream.write(generated)
+            except FileExistsError:
+                pass
+            payload = payload_info(smoke_path)
+            if payload['size_bytes'] != len(generated) or payload['sha256'] != hashlib.sha256(generated).hexdigest():
+                raise ValueError('existing smoke file mismatch')
+            manifest = None
+        else:
+            payload = payload_info(args.payload)
+            manifest = model_manifest_info(args.model_manifest, payload)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
     radio_patch = dict(channel=args.channel, bandwidth_mhz=args.bandwidth_mhz, downlink_mcs=3,
                        uplink_mcs=4, radio_txpower_dbm=18,
                        uftp_rate_kbps=args.uftp_rate_kbps)
-    plan = dict(kind='model-equivalent-communication', hosts=HOSTS, nodes=[1, 2, 4, 5],
+    plan = dict(kind='synthetic-smoke-communication' if args.smoke else 'model-equivalent-communication',
+        payload_mode='smoke' if args.smoke else 'model', generated_payload=args.smoke, hosts=HOSTS, nodes=NODES,
         payload=payload, bytes=payload['size_bytes'], rounds=1, radio_patch=radio_patch, model_manifest=manifest,
-        model_manifest_matched=True, model_semantics_validated_by_runner=False, uftp_port=1144,
+        model_manifest_matched=not args.smoke, model_semantics_validated_by_runner=False, uftp_port=1144,
         http_port=18080, multicast='239.80.41.1', private_multicast='239.80.42.1',
         **TIMING, deadline=TIMING['orchestration_timeout'], bundle_sha256=bundle_sha(), execute=args.execute,
-        boundary='校验manifest与字节身份，不解析张量，不承诺正式FL生命周期或update等量；公共load由调用方另验；无训练、聚合')
+        boundary='1MiB合成字节通信冒烟，不是模型，无训练、聚合' if args.smoke else '校验manifest与字节身份，不解析张量，不承诺正式FL生命周期或update等量；公共load由调用方另验；无训练、聚合')
     print(json.dumps(plan), flush=True)
     if not args.execute:
         return 0
     if args.reviewed_sha != plan['bundle_sha256']:
         parser.error('--execute 要求 --reviewed-sha 与当前 bundle SHA 完全匹配')
-    import re
-    if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', args.run_id):
-        parser.error('invalid run id')
     root = args.output / args.run_id
     root.mkdir(parents=True, exist_ok=False)
     deadline = time.monotonic() + TIMING['orchestration_timeout']
@@ -258,8 +281,9 @@ def main():
         except (Exception, KeyboardInterrupt) as exc:
             record(dict(phase='run', ok=False, error=repr(exc)))
         finally:
-            closing = {session.call('close'): host for host, session in sessions.items()}
-            roles_closed = len(sessions) == 5
+            # 失败时 RPC 可能仍阻塞；不排队 close，直接独立回收本轮 unit。
+            closing = {session.call('close'): host for host, session in sessions.items()} if transfer_ok else {}
+            roles_closed = transfer_ok and set(sessions) == set(HOSTS)
             for future, host in closing.items():
                 try:
                     result = future.result(timeout=max(.01, deadline - time.monotonic() - 5))
@@ -281,7 +305,8 @@ def main():
                     record(dict(phase='restore', ok=False, error=repr(exc)))
             else:
                 record(dict(phase='restore', ok=False, error='全角色 close 未确认；先独立回收再恢复'))
-            with futures.ThreadPoolExecutor(max_workers=5) as disposal:
+            disposal = futures.ThreadPoolExecutor(max_workers=len(HOSTS))
+            try:
                 disposing = {disposal.submit(s.dispose): h for h, s in sessions.items()}
                 for future, host in disposing.items():
                     try:
@@ -289,6 +314,8 @@ def main():
                     except Exception as exc:
                         cleanup_ok = False
                         record(dict(phase='dispose', host=host, ok=False, error=repr(exc)))
+            finally:
+                disposal.shutdown(wait=False, cancel_futures=True)
             # 独立回收不依赖原 RPC 或 role.close，可清理被强制结束的自有 unit 和路由。
             code = (DIRECTORY / 'recover.py').read_text()
             def recover(host):
@@ -300,18 +327,22 @@ def main():
                     raise RuntimeError(result.stdout + result.stderr)
                 return json.loads(result.stdout)
             all_stopped = True
-            with futures.ThreadPoolExecutor(max_workers=5) as recovery:
+            recovery = futures.ThreadPoolExecutor(max_workers=len(HOSTS))
+            try:
                 pending = {recovery.submit(recover, h): h for h in sessions}
                 for future, host in pending.items():
                     try:
                         result = future.result(timeout=max(.01, recovery_deadline - time.monotonic()))
-                        cleanup_ok = cleanup_ok and result['ok']
+                        cleanup_ok = cleanup_ok and result['ok'] is True
+                        all_stopped &= result['ok'] is True
                         record(dict(phase='independent_cleanup', host=host, result=result))
                     except Exception as exc:
                         cleanup_ok = False
                         all_stopped = False
                         record(dict(phase='independent_cleanup', host=host, ok=False, error=repr(exc)))
-            if not restore_ok and all_stopped and len(sessions) == 5:
+            finally:
+                recovery.shutdown(wait=False, cancel_futures=True)
+            if not restore_ok and all_stopped and set(sessions) == set(HOSTS):
                 # 全测试 unit 已结束后，才允许独立恢复射频，避免在传输中切频。
                 try:
                     command = ['sudo', '-n', '/usr/bin/python3', '-I', '-B', '-c', code, args.run_id, '--restore']
@@ -320,7 +351,7 @@ def main():
                     rf_response_ok = restored.get('rf_response_ok', result.returncode == 0 and restored['ok'])
                     record(dict(phase='independent_restore', result=restored,
                                 rf_response_ok=rf_response_ok, audited=False))
-                    # 原代理已退出，独立恢复不具备五端最终审计，保守保持失败。
+                    # 原代理已退出，独立恢复不具备十端最终审计，保守保持失败。
                     restore_ok = False
                 except Exception as exc:
                     record(dict(phase='independent_restore', ok=False, error=repr(exc)))
