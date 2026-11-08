@@ -2090,6 +2090,23 @@ class ControlPlaneServer:
         closed and keeps the newly applied local configuration.
         """
         with self._switch_lock:
+            # 在取得事务 owner、作业租约或发送任何报文前拒绝非法时间参数。
+            for name, value in (
+                ("ping_interval_seconds", ping_interval_seconds),
+                ("prepare_timeout_seconds", prepare_timeout_seconds),
+                ("commit_timeout_seconds", commit_timeout_seconds),
+                ("lease_timeout_seconds", lease_timeout_seconds),
+                ("commit_delay_seconds", commit_delay_seconds),
+            ):
+                allow_zero = name == "commit_delay_seconds"
+                try:
+                    valid = (type(value) in (int, float) and math.isfinite(value)
+                             and (value >= 0 if allow_zero else value > 0))
+                except OverflowError:
+                    valid = False
+                if not valid:
+                    requirement = "有限非负数" if allow_zero else "有限正数"
+                    raise FLRuntimeError("invalid_radio_timing", f"{name} 必须为{requirement}，不接受 bool")
             if not isinstance(job_id, (str, type(None))) or (job_id is not None and not job_id):
                 raise FLRuntimeError("invalid_radio_job", "job_id 无效")
             if stop_event is not None and not callable(getattr(stop_event, "is_set", None)):
@@ -2178,7 +2195,12 @@ class ControlPlaneServer:
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         return event.is_set()
-                    if event.wait(min(ping_interval_seconds, remaining)):
+                    # ACK 与取消使用有界 Event 等待，取消不受广播间隔拖延。
+                    interval = min(ping_interval_seconds, remaining)
+                    if stop_event is not None:
+                        interval = min(interval, 0.05)
+                    if event.wait(interval):
+                        check_cancelled()
                         return True
 
             def wait_barrier(kind: str, acks: Set[int]) -> bool:
@@ -2203,9 +2225,25 @@ class ControlPlaneServer:
 
             try:
                 logger.info("射频重配 PREPARE session=%s targets=%s patch=%s", session_id, sorted(targets), norm_patch)
-                self.broadcast_downlink(message("CONFIG_RADIO_PREPARE", patch=transaction_patch,
-                                                timeout_seconds=prepare_timeout_seconds))
-                wait_control_event(self._prepare_event, prepare_timeout_seconds)
+                # 同一 proposal 仅有一个准备截止；重发不重建 owner 或租约。
+                prepare_deadline = time.monotonic() + prepare_timeout_seconds
+                prepare_message = message("CONFIG_RADIO_PREPARE", patch=transaction_patch,
+                                          timeout_seconds=prepare_timeout_seconds)
+                while True:
+                    check_cancelled()
+                    if time.monotonic() >= prepare_deadline:
+                        break
+                    self.broadcast_downlink(prepare_message)
+                    with self._lock:
+                        rollback_targets = {
+                            nid for nid, ack in self._prepare_acks.items() if ack.ok
+                        }
+                        missing = sorted(targets - rollback_targets)
+                        if not missing:
+                            break
+                        self._prepare_event.clear()
+                    wait_control_event(self._prepare_event, min(
+                        ping_interval_seconds, max(0.0, prepare_deadline - time.monotonic())))
                 with self._lock:
                     rollback_targets = {
                         nid for nid, ack in self._prepare_acks.items() if ack.ok
@@ -2219,14 +2257,24 @@ class ControlPlaneServer:
                     self._switch_phase = phase
                 # Set before sending: a send may partly succeed before raising.
                 commit_sent = True
-                self.broadcast_downlink(message("CONFIG_RADIO_COMMIT", patch=transaction_patch,
-                    delay_ms=int(commit_delay_seconds * 1000), lease_timeout_seconds=lease_timeout_seconds))
-                if commit_delay_seconds > 0:
+                # 所有重发共享服务器本机截止，只传递剩余相对延迟。
+                switch_deadline = time.monotonic() + commit_delay_seconds
+                while True:
+                    check_cancelled()
+                    remaining = max(0.0, switch_deadline - time.monotonic())
+                    self.broadcast_downlink(message("CONFIG_RADIO_COMMIT", patch=transaction_patch,
+                        delay_ms=int(remaining * 1000), lease_timeout_seconds=lease_timeout_seconds))
+                    remaining = switch_deadline - time.monotonic()
+                    if remaining <= 0:
+                        break
+                    interval = min(ping_interval_seconds, remaining)
                     if stop_event is not None:
-                        if stop_event.wait(commit_delay_seconds):
+                        if stop_event.wait(interval):
                             raise _RadioSwitchCancelled()
                     else:
-                        time.sleep(commit_delay_seconds)
+                        time.sleep(interval)
+                    if time.monotonic() >= switch_deadline:
+                        break
                 check_cancelled()
                 if (updated.channel, updated.bandwidth_mhz) != (previous.channel, previous.bandwidth_mhz):
                     self._apply_channel_switch(updated.channel, updated.bandwidth_mhz)
