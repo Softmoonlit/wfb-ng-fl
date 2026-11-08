@@ -25,6 +25,8 @@
 
 本批执行结果：十台已统一加载c665948，fl05旧接口绑定已修复；fl07/fl09持续OFFLINE、fl06间歇失确认，完整无线信道审计不通过。1MiB冒烟入口在prepare以`online target set mismatch`拒绝，未切频或发送文件；因此模型等量预实验未启动。十台临时unit均已回收、常驻服务active。详见`evidence/full-nine-current-inventory/README.md`；不得将管理在线或七台READY记为完整九端通过。
 
+后续参数审查纠正：历史通信工具未将`uftp_rate_kbps`传入ServerRole，故标为12Mbps及6Mbps的旧运行实际使用角色默认15Mbps。原始传输成功/失败事实保留，但这些结果不构成12Mbps或6Mbps候选验收，不支持关于降低注入速率的因果结论。本轮修复显式传参，并在新批次重新记录实际发送参数。
+
 ### 2.1.2 历史四客户端批次
 
 - **服务端**：1 台 Jetson Orin Nano（fl00，固定角色 Server）。

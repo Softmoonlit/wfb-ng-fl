@@ -328,13 +328,17 @@ class Node:
         if self.node == 0:
             self.role = self.role_module.ServerRole(participant_node_id=NODES, participant_uftp_uid=NODES,
                 server_uftp_uid=100, http_port=18080, http_host=self.ip,
-                uftp_private_multicast_host='239.80.42.1', **common)
+                uftp_private_multicast_host='239.80.42.1',
+                uftp_rate_kbps=self.patch['uftp_rate_kbps'], **common)
         else:
             self.role = self.role_module.ClientRole(node_id=self.node, uftp_uid=self.node,
                 server_http_address=('10.80.0.1', 18080), **common)
         self.runtime = self.role.start()
         self.started = True
-        return self.fact('receive_started')
+        actual_rate = self.role.transport.uftp_rate_kbps if self.node == 0 else None
+        if self.node == 0:
+            require(actual_rate == self.patch['uftp_rate_kbps'], 'actual UFTP rate mismatch')
+        return self.fact('receive_started', actual_uftp_rate_kbps=actual_rate)
 
     def check_file(self, path):
         path = Path(path)

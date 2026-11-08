@@ -99,6 +99,68 @@ class MockTests(unittest.TestCase):
         self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 4, 5, 6, 7, 8, 9, 10], patch=node_agent.PATCH))
         self.assertIs(result['calibration'], False)
 
+    def test_start_receive_passes_configured_rate_to_server_role(self):
+        for bandwidth, rate in ((40, 12000), (20, 6000)):
+            with self.subTest(bandwidth_mhz=bandwidth, uftp_rate_kbps=rate):
+                node = self.node()
+                node.root = Path(self.temporary.name)
+                node.tun, node.ip = 'fl-s', '10.80.0.1'
+                node.prepared = node.radio_verified = True
+                node.patch = dict(node_agent.PATCH, bandwidth_mhz=bandwidth,
+                                  uftp_rate_kbps=rate)
+                node.role_module = Mock()
+                node.role_module.ServerRole.return_value.transport.uftp_rate_kbps = rate
+                routes = {}
+
+                def route_command(argv):
+                    if len(argv) == 6 and argv[:5] == ['ip', '-j', 'route', 'show', 'exact']:
+                        self.assertIn(argv[-1], node_agent.GROUPS)
+                        return json.dumps(routes.get(argv[-1], []))
+                    self.assertEqual(argv, ['ip', 'route', 'add', argv[3],
+                                            'dev', node.tun, 'proto', '186'])
+                    self.assertIn(argv[3], node_agent.GROUPS)
+                    routes[argv[3]] = [dict(dst=argv[3], dev=node.tun,
+                                           protocol='186', scope='link', flags=[])]
+                    return ''
+
+                with patch('node_agent.run', side_effect=route_command):
+                    result = node.start_receive()
+
+                node.role_module.ServerRole.assert_called_once_with(
+                    participant_node_id=node_agent.NODES,
+                    participant_uftp_uid=node_agent.NODES,
+                    server_uftp_uid=100, http_port=18080, http_host=node.ip,
+                    uftp_private_multicast_host='239.80.42.1',
+                    uftp_rate_kbps=rate, work_dir=str(node.root / 'role'),
+                    uftp_port=1144, max_update_size_bytes=self.payload['size_bytes'],
+                    uftp_bind_host=node.ip, uftp_multicast_host='239.80.41.1',
+                    io_timeout=runner.TIMING['io_timeout'])
+                node.role_module.ClientRole.assert_not_called()
+                node.role.start.assert_called_once_with()
+                self.assertIs(node.runtime, node.role.start.return_value)
+                self.assertTrue(node.started)
+                self.assertEqual(result['event'], 'receive_started')
+                self.assertEqual(result['actual_uftp_rate_kbps'], rate)
+                self.assertEqual(set(routes), set(node_agent.GROUPS))
+                self.assertEqual(node.routes, routes)
+
+    def test_start_receive_rejects_actual_server_rate_mismatch(self):
+        for rate in (12000, 6000):
+            with self.subTest(uftp_rate_kbps=rate):
+                node = self.node()
+                node.root = Path(self.temporary.name)
+                node.tun, node.ip = 'fl-s', '10.80.0.1'
+                node.prepared = node.radio_verified = True
+                node.patch = dict(node_agent.PATCH, uftp_rate_kbps=rate)
+                node.role_module = Mock()
+                node.role_module.ServerRole.return_value.transport.uftp_rate_kbps = 15000
+                with patch('node_agent.run', return_value=json.dumps([dict(dev=node.tun)])), patch.object(
+                        node, 'fact') as fact:
+                    with self.assertRaisesRegex(RuntimeError, 'actual UFTP rate mismatch'):
+                        node.start_receive()
+                self.assertEqual(node.role_module.ServerRole.call_args.kwargs['uftp_rate_kbps'], rate)
+                fact.assert_not_called()
+
     def test_radio_request_rejects_incorrect_calibration_flag(self):
         with patch('node_agent.socket.gethostname', return_value='fl00'):
             node = node_agent.Node()
