@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""十客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
+"""九客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
 import argparse
 import concurrent.futures as futures
 import hashlib
@@ -14,8 +14,8 @@ import subprocess
 import threading
 import time
 
-NODES = list(range(1, 11))
-HOSTS = [f'fl{node:02d}' for node in range(11)]
+NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+HOSTS = ['fl00'] + [f'fl{node:02d}' for node in NODES]
 DIRECTORY = Path(__file__).resolve().parent
 RELEASE_COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
 RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
@@ -67,7 +67,7 @@ def model_manifest_info(path, payload):
 
 
 def audit_final(sessions, record, deadline):
-    """十一端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
+    """十端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
     if set(sessions) != set(HOSTS):
         return False
     pending = {h: sessions[h].call('audit_final') for h in HOSTS}
@@ -181,7 +181,7 @@ def scan_upload_progress(run_root):
         if updates.is_symlink():
             continue
         observed = {path.name: path for path in directories(updates)}
-        for node in range(1, 11):
+        for node in (1, 2, 3, 5, 6, 7, 8, 9, 10):
             partial, committed_bytes = [], None
             node_dir = observed.get(str(node))
             if node_dir is not None:
@@ -246,7 +246,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
     if radio_patch is None:
         radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
-        raise RuntimeError("固定十一节点会话不齐")
+        raise RuntimeError("固定十节点会话不齐")
     def phase(action, hosts=HOSTS, **params):
         dispatch_start = time.monotonic()
         record(dict(phase=action, event='dispatch_start', dispatch_start=dispatch_start, hosts=list(hosts)))
@@ -263,7 +263,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
                 for other in pending:
                     other.cancel()
                 raise RuntimeError(action + ' failed: ' + host) from exc
-    # 全十一目标准备成功后，才允许重配事务及角色启动。
+    # 全十目标准备成功后，才允许重配事务及角色启动。
     # 客户端不获知本机源路径，更不会经管理网获取文件内容。
     dispatch_start = time.monotonic()
     record(dict(phase='prepare', event='dispatch_start', dispatch_start=dispatch_start, hosts=HOSTS))
@@ -467,7 +467,7 @@ def main():
                     rf_response_ok = restored.get('rf_response_ok', result.returncode == 0 and restored['ok'])
                     record(dict(phase='independent_restore', result=restored,
                                 rf_response_ok=rf_response_ok, audited=False))
-                    # 原代理已退出，独立恢复不具备十一端最终审计，保守保持失败。
+                    # 原代理已退出，独立恢复不具备十端最终审计，保守保持失败。
                     restore_ok = False
                 except Exception as exc:
                     record(dict(phase='independent_restore', ok=False, error=repr(exc)))

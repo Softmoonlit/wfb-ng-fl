@@ -1,5 +1,7 @@
 """本地编排与回收测试；不导入生产模块，不连接 socket 或 SSH。"""
 import io
+import ast
+import runpy
 import hashlib
 import json
 import tempfile
@@ -48,9 +50,9 @@ class MockTests(unittest.TestCase):
             paths[name] = str(path)
         return paths, {name: node_agent.sha(path) for name, path in paths.items()}
 
-    def test_complete_eleven_board_scope_and_600_second_budgets(self):
-        self.assertEqual(runner.HOSTS, [f'fl{n:02d}' for n in range(11)])
-        self.assertEqual(runner.NODES, list(range(1, 11)))
+    def test_complete_fixed_nine_client_scope_and_600_second_budgets(self):
+        self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in [1, 2, 3, 5, 6, 7, 8, 9, 10]])
+        self.assertEqual(runner.NODES, [1, 2, 3, 5, 6, 7, 8, 9, 10])
         self.assertEqual(node_agent.NODES, runner.NODES)
         self.assertEqual(self.node('fl03').node, 3)
         timing = runner.TIMING
@@ -77,7 +79,7 @@ class MockTests(unittest.TestCase):
         starts = [record for record in records if record.get('event') == 'dispatch_start']
         self.assertEqual([record['phase'] for record in starts], [
             'prepare', 'acquire_radio', 'verify_radio', 'start_receive', 'publish', 'submit', 'verify'])
-        self.assertEqual(len(calls), 5 * 11 + 2)
+        self.assertEqual(len(calls), 5 * 10 + 2)
 
     def test_upload_scanner_real_files_missing_cleanup_and_isolation(self):
         root = Path(self.temporary.name) / 'run'
@@ -85,21 +87,21 @@ class MockTests(unittest.TestCase):
         (updates / '3').mkdir(parents=True)
         partial = updates / '3/.update.bin.partial'
         partial.write_bytes(b'a' * 17)
-        (updates / '4').mkdir()
-        (updates / '4/update.bin').write_bytes(b'b' * 31)
+        (updates / '5').mkdir()
+        (updates / '5/update.bin').write_bytes(b'b' * 31)
         outside = Path(self.temporary.name) / 'outside'
         outside.mkdir()
         (outside / 'update.bin').write_bytes(b'outside')
-        (updates / '5').symlink_to(outside, target_is_directory=True)
+        (updates / '6').symlink_to(outside, target_is_directory=True)
         (updates / '3/.update.bin.link').symlink_to(outside / 'update.bin')
         (updates / '3/ignored').write_bytes(b'ignored')
         snapshot = runner.scan_upload_progress(root)
         nodes = {record['node']: record for record in snapshot['nodes']}
         self.assertEqual(nodes[3]['bytes'], 17)
         self.assertFalse(nodes[3]['committed'])
-        self.assertEqual(nodes[4]['bytes'], 31)
-        self.assertTrue(nodes[4]['committed'])
-        for node in (1, 5):
+        self.assertEqual(nodes[5]['bytes'], 31)
+        self.assertTrue(nodes[5]['committed'])
+        for node in (1, 6):
             self.assertIsNone(nodes[node]['bytes'])
             self.assertFalse(nodes[node]['observed'])
         partial.unlink()
@@ -421,6 +423,70 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'expected native'):
                     node.prepare('rejectsha', {}, runner.TIMING, expected_native=metadata)
 
+    def test_fixed_nine_scope_rejects_missing_nine_extra_four_and_hunt_with_fresh_facts(self):
+        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+        self.assertEqual(recover.NODES, expected)
+        self.assertNotIn('fl04', runner.HOSTS)
+        with self.assertRaisesRegex(RuntimeError, 'unexpected host'):
+            self.node('fl04')
+        for hosts in ([host for host in runner.HOSTS if host != 'fl09'], runner.HOSTS + ['fl04']):
+            with self.assertRaisesRegex(RuntimeError, '固定十节点会话不齐'):
+                runner.orchestrate(dict.fromkeys(hosts), lambda value: None,
+                                   time.monotonic() + 1, 'fixed-scope', self.payload)
+        node = self.node()
+        def status():
+            return dict(active_job=None, server_state='IDLE', nodes={str(n): dict(
+                readiness='READY', reported_state='IDLE', error_code=None) for n in expected})
+        good = status()
+        good['nodes']['4'] = dict(readiness='OFFLINE')
+        variants = []
+        missing = status()
+        missing['nodes'].pop('9')
+        variants.append(missing)
+        extra = status()
+        extra['nodes']['4'] = dict(readiness='READY', reported_state='IDLE')
+        variants.append(extra)
+        for field, value in [('reported_state', 'HUNT'), ('readiness', 'OFFLINE')]:
+            bad = status()
+            bad['nodes']['9'][field] = value
+            variants.append(bad)
+        with patch.object(node, 'fact') as fact, patch('node_agent.get_json', return_value=good):
+            node.registry_gate()
+        self.assertEqual(fact.call_args.kwargs['online'], expected)
+        self.assertEqual(fact.call_args.kwargs['status'], good)
+        for bad in variants:
+            with patch('node_agent.get_json', return_value=bad), self.assertRaises(RuntimeError):
+                node.registry_gate()
+        # scanner 源码为独立子进程执行；结果也必须使用同一个固定集合。
+        root = Path(self.temporary.name) / 'scope'
+        (root / 'role/rounds/1/updates/4').mkdir(parents=True)
+        (root / 'role/rounds/1/updates/4/update.bin').write_bytes(b'excluded')
+        self.assertEqual([row['node'] for row in runner.scan_upload_progress(root)['nodes']], expected)
+
+    def test_check_all_ready_fixed_scope_requires_all_ready_and_rejects_extra_four(self):
+        source = runner.DIRECTORY / 'check-all-ready.py'
+        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+        for assignment in ast.parse(source.read_text()).body:
+            if isinstance(assignment, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'NODES' for t in assignment.targets):
+                self.assertEqual(ast.literal_eval(assignment.value), expected)
+        good = dict(active_job=None, server_state='IDLE', nodes={str(n): dict(
+            readiness='READY', reported_state='IDLE') for n in expected})
+        for change, exit_code in [('ready', 0), ('missing9', 1), ('extra4', 1), ('hunt9', 1)]:
+            status = json.loads(json.dumps(good))
+            if change == 'missing9':
+                status['nodes'].pop('9')
+            elif change == 'extra4':
+                status['nodes']['4'] = dict(readiness='READY', reported_state='IDLE')
+            elif change == 'hunt9':
+                status['nodes']['9']['reported_state'] = 'HUNT'
+            reply = io.BytesIO(json.dumps(status).encode())
+            with patch('urllib.request.urlopen', return_value=reply), patch('subprocess.run', return_value=Mock(
+                    returncode=0, stdout='channel 149 width: 40 MHz', stderr='')) as command, patch(
+                    'sys.stdout', new_callable=io.StringIO), self.assertRaises(SystemExit) as error:
+                runpy.run_path(str(source), run_name='__main__')
+            self.assertEqual(error.exception.code, exit_code)
+            self.assertEqual({call.args[0][4] for call in command.call_args_list}, set(runner.HOSTS) - {'fl00'})
+
     def test_uftp_pins_match_fl00_503(self):
         self.assertEqual(node_agent.UFTP_SHA256, {
             'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
@@ -520,7 +586,7 @@ class MockTests(unittest.TestCase):
                                 expected.pop('path')
                             assert params['payload'] == expected
                             prepared.add(self.host)
-                            if fail_prepare and self.host == 'fl04':
+                            if fail_prepare and self.host == 'fl05':
                                 raise RuntimeError('preflight failed')
                         else:
                             assert prepared == set(runner.HOSTS)
@@ -548,7 +614,7 @@ class MockTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.exercise(True)
         self.assertLessEqual(len(self.events), len(runner.HOSTS))
-        self.assertIn(('fl04', 'prepare'), self.events)
+        self.assertIn(('fl05', 'prepare'), self.events)
         self.assertTrue(all(a == 'prepare' for h, a in self.events))
 
     def test_radio_request_carries_full_patch_and_targets(self):
@@ -559,7 +625,7 @@ class MockTests(unittest.TestCase):
                 'node_agent.urllib.request.urlopen', return_value=reply) as http:
             result = node.radio_transaction('reconfigure', node_agent.PATCH)
         body = json.loads(http.call_args.args[0].data)
-        self.assertEqual(body, dict(confirmed=True, target_nodes=list(range(1, 11)), patch=node_agent.PATCH))
+        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9, 10], patch=node_agent.PATCH))
         self.assertIs(result['calibration'], False)
 
     def test_start_receive_passes_configured_rate_to_server_role(self):
@@ -707,8 +773,8 @@ class MockTests(unittest.TestCase):
             spawn.assert_not_called()
 
     def test_missing_target_rejected_before_prepare(self):
-        with self.assertRaisesRegex(RuntimeError, '十一节点会话不齐'):
-            runner.orchestrate({h: None for h in runner.HOSTS if h != 'fl04'},
+        with self.assertRaisesRegex(RuntimeError, '十节点会话不齐'):
+            runner.orchestrate({h: None for h in runner.HOSTS if h != 'fl09'},
                                lambda v: None, time.monotonic() + 1, 'mock', self.payload)
 
     def test_streamed_metadata_and_integrity_reject_wrong_sha_or_size(self):
@@ -763,13 +829,13 @@ class MockTests(unittest.TestCase):
         node.runtime.wait_for_updates.return_value = {1: 'a', 2: 'b', 4: 'c'}
         with self.assertRaisesRegex(RuntimeError, 'missing updates'):
             node.submit()
-        node.runtime.wait_for_updates.assert_called_once_with(min_updates=10, timeout=600)
+        node.runtime.wait_for_updates.assert_called_once_with(min_updates=9, timeout=600)
         node.runtime.wait_for_updates.return_value = {n: self.payload_path for n in runner.NODES}
         node.submit()
         self.assertEqual(set(node.verify()['files']), {str(n) for n in runner.NODES})
 
     def test_fixed_complete_topology_and_registry(self):
-        expected = list(range(1, 11))
+        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
         self.assertEqual(runner.NODES, expected)
         self.assertEqual(node_agent.NODES, expected)
         self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in expected])
@@ -900,9 +966,9 @@ class MockTests(unittest.TestCase):
                 events.append((self.host, 'dispose'))
         reply = Mock(returncode=0, stdout=json.dumps(dict(ok=cleanup_result)), stderr='')
         def independent(argv, **kwargs):
-            self.assertEqual(sum(action == 'dispose' for _, action in events), 11)
+            self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
             if '--restore' in argv:
-                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 11)
+                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 10)
                 events.append(('fl00', 'independent_restore'))
             else:
                 events.append(('owned-unit', 'independent_stop'))
@@ -916,15 +982,15 @@ class MockTests(unittest.TestCase):
                 'sys.stdout', new_callable=io.StringIO):
             self.assertEqual(runner.main(), 1)
         self.assertLess(time.monotonic() - started, 2)
-        self.assertEqual(len(blocked), 10)
+        self.assertEqual(len(blocked), 9)
         self.assertTrue(all(not future.done() for future in blocked))
         self.assertFalse(any(action in ('submit', 'verify', 'close', 'release_radio') for _, action in events))
-        self.assertEqual(sum(action == 'dispose' for _, action in events), 11)
-        self.assertEqual(run.call_count, 12 if cleanup_result is True else 11)
+        self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
+        self.assertEqual(run.call_count, 11 if cleanup_result is True else 10)
         if cleanup_result is not True:
             self.assertFalse(any(action == 'independent_restore' for _, action in events))
         records = [json.loads(line) for line in (Path(self.temporary.name) / run_id / 'progress.jsonl').read_text().splitlines()]
-        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 11)
+        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 10)
         self.assertFalse(records[-1]['transfer_verified'])
         self.assertFalse(records[-1]['restore_ok'])
 
@@ -1014,7 +1080,7 @@ class MockTests(unittest.TestCase):
         for session in group.values():
             session.call.assert_called_once_with('audit_final')
         self.assertEqual(len(records), len(runner.HOSTS))
-        self.assertFalse(runner.audit_final(sessions('fl04'), lambda v: None, time.monotonic() + 1))
+        self.assertFalse(runner.audit_final(sessions('fl05'), lambda v: None, time.monotonic() + 1))
         self.assertFalse(runner.audit_final(sessions(pending=True), lambda v: None, time.monotonic() + .01))
         self.assertFalse(runner.audit_final(sessions(), lambda v: None, time.monotonic() - 1))
         group.pop('fl05')

@@ -10,6 +10,9 @@ import sys
 import urllib.request
 
 
+NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+
+
 def run(argv, check=True, timeout=10):
     return subprocess.run(argv, capture_output=True, text=True, check=check, timeout=timeout)
 
@@ -19,7 +22,7 @@ def main():
     if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', run_id):
         raise ValueError('非法批次')
     host = socket.gethostname()
-    if host not in [f'fl{node:02d}' for node in range(11)] or os.geteuid() != 0:
+    if host not in ['fl00'] + [f'fl{node:02d}' for node in NODES] or os.geteuid() != 0:
         raise ValueError('节点或权限不符')
     root = Path('/srv/wfb-ng-fl') / ('comm-' + run_id)
     state_path = root / 'cleanup-state.json'
@@ -38,13 +41,13 @@ def main():
         if current != pid or tick != state['resident'][pid]:
             raise ValueError('服务端身份已改变，拒绝沿用旧批次恢复')
         request = urllib.request.Request('http://127.0.0.1:9090/api/v1/radio/reconfigure',
-            data=json.dumps(dict(confirmed=True, target_nodes=list(range(1, 11)), patch=state['original'])).encode(),
+            data=json.dumps(dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9, 10], patch=state['original'])).encode(),
             headers={'Content-Type': 'application/json'}, method='POST')
         with urllib.request.urlopen(request, timeout=30) as response:
             result = json.load(response)
         ok = result.get('status') == 'finalized' and result.get('calibration') is False
         ok = ok and all(result['effective_config'][k] == v for k, v in state['original'].items())
-        # 独立恢复缺少原代理十一端审计，RF 响应成功不能宣称最终恢复通过。
+        # 独立恢复缺少原代理十端审计，RF 响应成功不能宣称最终恢复通过。
         output = dict(ok=False, rf_response_ok=ok, audited=False, attempted=True, response=result)
         (root / 'independent-restore.json').write_text(json.dumps(output))
         return output

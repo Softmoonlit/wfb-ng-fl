@@ -24,7 +24,7 @@ UFTP_SHA256 = {
     'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
     'uftpd': '0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9',
 }
-NODES = list(range(1, 11))
+NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
              radio_txpower_dbm=18, uftp_rate_kbps=12000)
@@ -99,7 +99,7 @@ def get_json(host, path):
 class Node:
     def __init__(self):
         self.host = socket.gethostname()
-        require(self.host in [f'fl{node:02d}' for node in range(11)], 'unexpected host')
+        require(self.host in ['fl00'] + [f'fl{node:02d}' for node in NODES], 'unexpected host')
         self.node = int(self.host[2:])
         self.root = None
         self.role = None
@@ -496,7 +496,7 @@ class Node:
                 require(current == tick, 'resident identity changed: ' + pid)
             actual['nvpmodel'] = run(['nvpmodel', '-q'])
             require(actual['nvpmodel'].strip() == 'NV Power Mode: 15W\n0', 'nvpmodel mismatch')
-            # 路径来自既有十一端 board-power 审计及 audit-jtop.py，仅只读。
+            # 路径来自既有十端 board-power 审计及 audit-jtop.py，仅只读。
             expected = {'/sys/devices/system/cpu/online': '0-5',
                         '/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq': '612000000',
                         '/sys/kernel/nvpmodel_clk_cap/emc': '2133000000',
