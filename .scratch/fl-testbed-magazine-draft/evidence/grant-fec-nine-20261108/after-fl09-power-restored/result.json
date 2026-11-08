@@ -1,0 +1,30 @@
+{
+  "status": "stopped_infrastructure_power_failure",
+  "user_confirmed_power_cause": "fl08 powered off during old prepare; now booting",
+  "raw_flags": {
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false
+  },
+  "runner_pid": 165184,
+  "controller_pid": 164220,
+  "local_processes_exited": true,
+  "radio_attempted": false,
+  "DL_bytes": 0,
+  "UL_bytes": 0,
+  "unit_inactive_confirmed": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl09",
+    "fl10"
+  ],
+  "fl08_unit_unknown": true,
+  "parameter_inference_valid": false,
+  "new_experiment_root": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored",
+  "wall": 1794147116.9777002
+}

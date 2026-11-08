@@ -1,0 +1,148 @@
+{
+  "candidate": {
+    "grant_duration_ms": 20,
+    "guard_interval_ms": 5,
+    "fec_n": 14,
+    "mode": "smoke",
+    "stage": "execute",
+    "readiness_fail_nodes": [],
+    "DLduration": null,
+    "ULduration": null,
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g20-d5-smoke",
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "execute_count": 1,
+    "started_wall": 1794147222.507561,
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "6": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      }
+    },
+    "runner_last_phase": "restore",
+    "runner_last_monotonic": 28019.907180869,
+    "currentphase": "prepare",
+    "completed_hosts": {
+      "publish": [],
+      "submit": []
+    },
+    "prepare_watchdog": {
+      "wall": 1794147305.795875,
+      "monotonic": 28019.903402958,
+      "prepare_elapsed": 69.02771630799907,
+      "pending_hosts": [
+        "fl06"
+      ],
+      "management": [
+        {
+          "host": "fl06",
+          "returncode": 255,
+          "stdout": "",
+          "stderr": "ssh: connect to host 192.168.0.196 port 22: Connection timed out\n"
+        }
+      ]
+    },
+    "controlled_prepare_abort": {
+      "pid": 172679,
+      "signal": "SIGINT",
+      "failed_hosts": [
+        "fl06"
+      ],
+      "radio_attempted": false,
+      "payload_dispatched": false,
+      "wall": 1794147305.7988596
+    },
+    "runner_returncode": 1,
+    "runner_restore_ok": false,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g20-d5-smoke/p8-fec14-g20-d5-smoke/progress.jsonl",
+    "elapsed": 79.2493275099987,
+    "failures": [
+      {
+        "wall": 1794147305.7990355,
+        "monotonic": 28019.906564209,
+        "phase": "run",
+        "ok": false,
+        "error": "KeyboardInterrupt()"
+      },
+      {
+        "wall": 1794147305.7996535,
+        "monotonic": 28019.907180869,
+        "phase": "restore",
+        "ok": false,
+        "error": "全角色 close 未确认；先独立回收再恢复"
+      },
+      {
+        "wall": 1794147314.8406315,
+        "monotonic": 28028.948159904,
+        "phase": "independent_cleanup",
+        "host": "fl06",
+        "ok": false,
+        "error": "RuntimeError('ssh: connect to host 192.168.0.196 port 22: Connection timed out\\n')"
+      }
+    ],
+    "original_runner_final_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": false,
+      "restore_ok": false
+    },
+    "server_verified_files": {},
+    "phase_completion_seconds": {
+      "publish": {},
+      "submit": {}
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794147314.8415375,
+    "monotonic": 28028.949064604,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false
+  }
+}

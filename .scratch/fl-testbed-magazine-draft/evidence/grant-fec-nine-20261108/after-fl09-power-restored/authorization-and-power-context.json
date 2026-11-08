@@ -1,0 +1,20 @@
+{
+  "user_confirmed_power_cause": "fl09 was powered off; now booting",
+  "old_model30_10": "invalid pure schedule comparator; raw failure unchanged",
+  "schedules": [
+    [
+      20,
+      5
+    ],
+    [
+      30,
+      5
+    ]
+  ],
+  "fec_n": 14,
+  "max_executions": 4,
+  "sequence": "per schedule smoke then model only on smoke full pass+restore",
+  "other_candidates_authorized": false,
+  "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "started_wall": 1794146259.6477005
+}

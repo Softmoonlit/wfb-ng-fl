@@ -1,0 +1,41 @@
+{
+  "payload": {
+    "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "manifest": {
+    "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/model-sized-four-20261106T173222Z/model-manifest.json",
+    "content": {
+      "dtype_statistics": {
+        "float32": {
+          "bytes": 44734248,
+          "elements": 11183562
+        },
+        "int64": {
+          "bytes": 160,
+          "elements": 20
+        }
+      },
+      "initialization": {
+        "seed": 7,
+        "source": "torchvision-resnet18-basicblock-cifar10-kaiming-normal-fan-out-relu-bn-standard-kaiming-uniform-a-sqrt5-v1"
+      },
+      "model_format": "cifar10-resnet18-fp32-v1",
+      "parameter_count": 11173962,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "size_bytes": 44770302,
+      "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "torch_version": "2.5.0a0+872d972e41.nv24.08",
+      "torchvision_version": "0.20.0a0+afc54f7",
+      "model_source_commit": "f15de6517acbc3ebbf8d1e1defe78900c81fd2ca",
+      "public_load_verified": true
+    }
+  },
+  "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "files": {
+    "runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "node_agent.py": "772557fc3524ea8b3d1404a0456c567e9667e1436232b837791c330632d6f5cc",
+    "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147"
+  }
+}

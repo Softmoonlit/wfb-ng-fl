@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "status": "stopped_infrastructure_management_failure",
+  "host": "fl06",
+  "power_cause_confirmed": false,
+  "old_fl08_power_recovery_verified": true,
+  "fl08_boot_identity": {
+    "host": "fl08",
+    "pid": "858",
+    "active": "active",
+    "owned_unit": "inactive",
+    "boot_id": "c9ee4fde-f987-4bb3-9ae7-b9377fe4442c",
+    "uptime": "204.00 958.33"
+  },
+  "initial_ten_actual_baseline_pass": true,
+  "initial_nine_ready_gate_pass": true,
+  "watchdog": {
+    "wall": 1794147305.795875,
+    "monotonic": 28019.903402958,
+    "prepare_elapsed": 69.02771630799907,
+    "pending_hosts": [
+      "fl06"
+    ],
+    "management": [
+      {
+        "host": "fl06",
+        "returncode": 255,
+        "stdout": "",
+        "stderr": "ssh: connect to host 192.168.0.196 port 22: Connection timed out\n"
+      }
+    ]
+  },
+  "controlled_abort": {
+    "pid": 172679,
+    "signal": "SIGINT",
+    "failed_hosts": [
+      "fl06"
+    ],
+    "radio_attempted": false,
+    "payload_dispatched": false,
+    "wall": 1794147305.7988596
+  },
+  "raw_final_flags": {
+    "wall": 1794147314.8415375,
+    "monotonic": 28028.949064604,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false
+  },
+  "independent_restore_ok": false,
+  "radio_attempted": false,
+  "DL_bytes": 0,
+  "UL_bytes": 0,
+  "parameter_inference_valid": false,
+  "units_confirmed_inactive": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "fl06_unit_state": "unknown; cleanup SSH failed",
+  "unexecuted": [
+    {
+      "grant": 20,
+      "guard": 5,
+      "mode": "model",
+      "execute_count": 0,
+      "stage": "pending"
+    },
+    {
+      "grant": 30,
+      "guard": 5,
+      "mode": "smoke",
+      "execute_count": 0,
+      "stage": "pending"
+    },
+    {
+      "grant": 30,
+      "guard": 5,
+      "mode": "model",
+      "execute_count": 0,
+      "stage": "pending"
+    }
+  ],
+  "server_schedule": "10/10",
+  "reachable_baseline_audit": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl06",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "local_processes": {
+    "171329": "absent",
+    "172679": "absent"
+  },
+  "bundle_unchanged": true,
+  "no_payload_sent": true,
+  "no_git_operations": true,
+  "wall": 1794147365.0710888,
+  "execute_total": 1,
+  "further_execution_blocked": true,
+  "unexecuted_count": 3,
+  "final_closeout": "final-closeout/result.json",
+  "final_unreachable": [
+    "fl06",
+    "fl07"
+  ],
+  "complete_batch_restore": false
+}

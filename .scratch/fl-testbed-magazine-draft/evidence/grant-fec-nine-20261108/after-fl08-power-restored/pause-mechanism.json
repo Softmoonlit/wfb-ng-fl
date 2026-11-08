@@ -1,0 +1,13 @@
+{
+  "markers": [
+    ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/PAUSE",
+    ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/STOP"
+  ],
+  "effect": "Executing driver checks markers before every configure/execute and after real runner plus full independent recovery audit; no automatic later candidate after marker. Preparation watchdog>=60s unanswered + failed SSH triggers exactly runner SIGINT before radio, preserving frozen bundle.",
+  "installed_before_start": true,
+  "prepare_no_progress_seconds": 60,
+  "management_probe_timeout_seconds": 5,
+  "ssh_connect_timeout_seconds": 4,
+  "unique_run_prefix": "p8-fec14",
+  "frozen_runner_unchanged": true
+}

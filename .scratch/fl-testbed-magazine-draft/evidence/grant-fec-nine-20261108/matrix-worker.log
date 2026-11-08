@@ -1,0 +1,26 @@
+{"monotonic": 22904.521863035, "status": "running", "grant": null, "stage": "starting"}
+{"monotonic": 22904.523094169, "status": "running", "grant": 10, "stage": "starting_candidate"}
+{"monotonic": 22904.525837852, "status": "running", "grant": 10, "stage": "configure_10"}
+{"monotonic": 22904.637111105, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22904.647681668, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22906.654623216, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22908.660678658, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22910.670259749, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22912.67935164, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22914.685760708, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22916.69474913, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22918.702737139, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22920.709415574, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22922.718189576, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22924.727380959, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22926.735010793, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22928.742670991, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22930.751403306, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22932.760396389, "status": "running", "grant": 10, "stage": "readiness_gate"}
+{"monotonic": 22934.643209423, "status": "running", "grant": 10, "stage": "audit_after"}
+{"monotonic": 22942.699207472, "status": "stopped", "grant": 10, "stage": "stopped"}
+RuntimeError('independent final health audit failed; matrix halted')
+Traceback (most recent call last):
+  File "/tmp/grant_fec14_matrix.py", line 212, in <module>
+    CURRENT['audit_failures']=after['checks'];raise RuntimeError('independent final health audit failed; matrix halted')
+RuntimeError: independent final health audit failed; matrix halted

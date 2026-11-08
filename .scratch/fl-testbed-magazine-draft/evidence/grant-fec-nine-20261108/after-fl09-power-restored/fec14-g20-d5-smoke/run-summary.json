@@ -1,0 +1,122 @@
+{
+  "candidate": {
+    "grant_duration_ms": 20,
+    "guard_interval_ms": 5,
+    "fec_n": 14,
+    "mode": "smoke",
+    "stage": "execute",
+    "readiness_fail_nodes": [],
+    "DLduration": null,
+    "ULduration": null,
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl09-power-restored/fec14-g20-d5-smoke",
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "execute_count": 1,
+    "started_wall": 1794146437.6517425,
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "8": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      }
+    },
+    "runner_last_phase": "independent_cleanup",
+    "runner_last_monotonic": 27647.403085801,
+    "currentphase": "prepare",
+    "completed_hosts": {
+      "publish": [],
+      "submit": []
+    },
+    "runner_returncode": 1,
+    "runner_restore_ok": false,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl09-power-restored/fec14-g20-d5-smoke/fec14-g20-d5-smoke/progress.jsonl",
+    "elapsed": 486.2497116279992,
+    "failures": [
+      {
+        "wall": 1794146927.7975547,
+        "monotonic": 27641.905083374,
+        "phase": "run",
+        "ok": false,
+        "error": "KeyboardInterrupt()"
+      },
+      {
+        "wall": 1794146927.7981975,
+        "monotonic": 27641.905724355,
+        "phase": "restore",
+        "ok": false,
+        "error": "全角色 close 未确认；先独立回收再恢复"
+      },
+      {
+        "wall": 1794146933.8604975,
+        "monotonic": 27647.968025732,
+        "phase": "independent_cleanup",
+        "host": "fl08",
+        "ok": false,
+        "error": "RuntimeError('ssh: connect to host 192.168.0.198 port 22: No route to host\\n')"
+      }
+    ],
+    "original_runner_final_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": false,
+      "restore_ok": false
+    },
+    "server_verified_files": {},
+    "phase_completion_seconds": {
+      "publish": {},
+      "submit": {}
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794146933.8610997,
+    "monotonic": 27647.968626968,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": false,
+    "restore_ok": false
+  }
+}

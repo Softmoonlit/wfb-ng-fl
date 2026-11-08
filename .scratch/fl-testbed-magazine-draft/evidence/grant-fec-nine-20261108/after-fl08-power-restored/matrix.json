@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "profile": "fec14-new-guard5",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    20,
+    30
+  ],
+  "guard_interval_ms": 5,
+  "status": "stopped",
+  "max_executions": 4,
+  "candidates": [
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "stopped",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": false,
+      "restore_ok": false,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g20-d5-smoke",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794147222.507561,
+      "latest_registry_states": {
+        "1": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "2": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "3": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "5": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "6": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "7": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "8": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "9": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        },
+        "10": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 149
+        }
+      },
+      "runner_last_phase": "restore",
+      "runner_last_monotonic": 28019.907180869,
+      "currentphase": "prepare",
+      "completed_hosts": {
+        "publish": [],
+        "submit": []
+      },
+      "prepare_watchdog": {
+        "wall": 1794147305.795875,
+        "monotonic": 28019.903402958,
+        "prepare_elapsed": 69.02771630799907,
+        "pending_hosts": [
+          "fl06"
+        ],
+        "management": [
+          {
+            "host": "fl06",
+            "returncode": 255,
+            "stdout": "",
+            "stderr": "ssh: connect to host 192.168.0.196 port 22: Connection timed out\n"
+          }
+        ]
+      },
+      "controlled_prepare_abort": {
+        "pid": 172679,
+        "signal": "SIGINT",
+        "failed_hosts": [
+          "fl06"
+        ],
+        "radio_attempted": false,
+        "payload_dispatched": false,
+        "wall": 1794147305.7988596
+      },
+      "runner_returncode": 1,
+      "runner_restore_ok": false,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g20-d5-smoke/p8-fec14-g20-d5-smoke/progress.jsonl",
+      "elapsed": 79.2493275099987,
+      "failures": [
+        {
+          "wall": 1794147305.7990355,
+          "monotonic": 28019.906564209,
+          "phase": "run",
+          "ok": false,
+          "error": "KeyboardInterrupt()"
+        },
+        {
+          "wall": 1794147305.7996535,
+          "monotonic": 28019.907180869,
+          "phase": "restore",
+          "ok": false,
+          "error": "全角色 close 未确认；先独立回收再恢复"
+        },
+        {
+          "wall": 1794147314.8406315,
+          "monotonic": 28028.948159904,
+          "phase": "independent_cleanup",
+          "host": "fl06",
+          "ok": false,
+          "error": "RuntimeError('ssh: connect to host 192.168.0.196 port 22: Connection timed out\\n')"
+        }
+      ],
+      "original_runner_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": false,
+        "restore_ok": false
+      },
+      "server_verified_files": {},
+      "phase_completion_seconds": {
+        "publish": {},
+        "submit": {}
+      },
+      "bundle_unchanged": true,
+      "independent_restore_ok": false,
+      "audit_failures": [
+        {
+          "host": "fl00",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl01",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl02",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl03",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl05",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl06",
+          "ok": false,
+          "errors": [
+            "management/probe failed"
+          ]
+        },
+        {
+          "host": "fl07",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl08",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl09",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl10",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "error": "RuntimeError('independent final baseline health audit failed; stop')"
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g20-d5-model",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g30-d5-smoke",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/fec14-g30-d5-model",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    }
+  ],
+  "power_context": "User confirmed fl08 powered off during prior20/5 prepare; zero DL/UL infrastructure failure, oldraw unchanged. Previous model30/10 also power-confounded by09. New unique p8 run IDs; no pure parameter inference from priorfailures",
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "pause_requested": true,
+  "updated_wall": 1794147541.855834,
+  "updated_monotonic": 28255.963363113,
+  "initial_full_recovery_ok": true,
+  "fl08_boot_identity": {
+    "host": "fl08",
+    "pid": "858",
+    "active": "active",
+    "owned_unit": "inactive",
+    "boot_id": "c9ee4fde-f987-4bb3-9ae7-b9377fe4442c",
+    "uptime": "204.00 958.33"
+  },
+  "error": "RuntimeError('independent final baseline health audit failed; stop')",
+  "failure_classification": "single-host prepare timeout>=60s plus fl06 SSH management loss; user power cause not established",
+  "radio_payload_started": false,
+  "DL_bytes": 0,
+  "UL_bytes": 0,
+  "parameter_inference_valid": false,
+  "all_later_experiments_blocked": true,
+  "final_closeout": {
+    "complete_batch_restore": false,
+    "reachable_baseline_ok": true,
+    "server_schedule": "10/10",
+    "unreachable": [
+      "fl06",
+      "fl07"
+    ],
+    "unknown_cause": true,
+    "rawpath": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/final-closeout"
+  }
+}

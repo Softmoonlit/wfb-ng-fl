@@ -1,0 +1,9 @@
+{
+  "markers": [
+    ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl09-power-restored/PAUSE",
+    ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl09-power-restored/STOP"
+  ],
+  "effect": "Marker is checked by this executing driver before each configure/execute and after current runner final result plus independent audit. During transfer it only records pause_requested; no signal or parameter change. Matrix exits paused at boundary.",
+  "installed_before_start": true,
+  "frozen_runner_unchanged": true
+}

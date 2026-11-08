@@ -1,0 +1,47 @@
+{"monotonic": 27924.114948538, "status": "running", "grant": null, "stage": "waiting_fl08_power_recovery"}
+{"monotonic": 27924.522858071, "status": "running", "grant": null, "stage": "waiting_fl08_power_recovery"}
+{"monotonic": 27924.525470954, "status": "running", "grant": null, "stage": "configure_10"}
+{"monotonic": 27925.060111649, "status": "running", "grant": null, "stage": "server_readiness_15s"}
+{"monotonic": 27925.069580206, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27925.573642359, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27926.18314146, "status": "running", "grant": null, "stage": "audit_initial-baseline"}
+{"monotonic": 27927.397309646, "status": "running", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 27927.40316068, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27929.412467668, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27931.420874256, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27933.429883629, "status": "running", "grant": null, "stage": null}
+{"monotonic": 27936.617026405, "status": "running", "grant": 20, "stage": "starting_candidate"}
+{"monotonic": 27936.619839198, "status": "running", "grant": 20, "stage": "configure_20"}
+{"monotonic": 27937.497816955, "status": "running", "grant": 20, "stage": "server_readiness_15s"}
+{"monotonic": 27937.501358699, "status": "running", "grant": 20, "stage": "server_readiness_15s"}
+{"monotonic": 27938.004799652, "status": "running", "grant": 20, "stage": "server_readiness_15s"}
+{"monotonic": 27938.614935857, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27938.621123253, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27940.629079788, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27942.638023312, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27944.64706074, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27946.655762971, "status": "running", "grant": 20, "stage": "readiness_gate"}
+{"monotonic": 27950.175617522, "status": "running", "grant": 20, "stage": "audit_before"}
+{"monotonic": 27950.681788003, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27950.689859554, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27955.705261398, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27960.724197513, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27965.740605691, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27970.753861243, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27975.769815234, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27980.7832171, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27985.799522309, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27990.812713906, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 27995.828892115, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28000.84325253, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28005.860398241, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28010.876855123, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28019.913294212, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28024.923739488, "status": "running", "grant": 20, "stage": "execute"}
+{"monotonic": 28029.93771476, "status": "running", "grant": 20, "stage": "audit_after"}
+{"monotonic": 28033.969427805, "status": "stopped", "grant": 20, "stage": "stopped"}
+RuntimeError('independent final baseline health audit failed; stop')
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-fl08-power-restored/orchestration-fec14-guard5.py", line 378, in <module>
+    CURRENT['audit_failures']=after['checks'];raise RuntimeError('independent final baseline health audit failed; stop')
+RuntimeError: independent final baseline health audit failed; stop

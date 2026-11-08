@@ -1,0 +1,96 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 0,
+    "result": {
+      "host": "fl00",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl00.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl01",
+    "returncode": 0,
+    "result": {
+      "host": "fl01",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl01.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl02",
+    "returncode": 0,
+    "result": {
+      "host": "fl02",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl02.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl03",
+    "returncode": 0,
+    "result": {
+      "host": "fl03",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl03.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl05",
+    "returncode": 0,
+    "result": {
+      "host": "fl05",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl05.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl07",
+    "returncode": 255,
+    "result": "",
+    "stderr": "ssh: connect to host 192.168.0.197 port 22: Connection timed out\n"
+  },
+  {
+    "host": "fl08",
+    "returncode": 0,
+    "result": {
+      "host": "fl08",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl08.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl09",
+    "returncode": 0,
+    "result": {
+      "host": "fl09",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl09.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl10",
+    "returncode": 0,
+    "result": {
+      "host": "fl10",
+      "unit": "comm-smoke-p8-fec14-g20-d5-smoke-fl10.service",
+      "state": "inactive",
+      "returncode": 3
+    },
+    "stderr": ""
+  }
+]

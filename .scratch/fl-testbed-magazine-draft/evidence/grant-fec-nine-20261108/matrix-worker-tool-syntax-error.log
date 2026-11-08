@@ -1,0 +1,4 @@
+  File "/tmp/grant_fec14_matrix.py", line 41
+    print(json.dumps(dict(monotonic=time.monotonic(), status=MATRIX['status'], grant=(CURRENT or {}).get('grant_duration_ms'), stage=stage or (CURRENT or {}).get('stage')), flush=True)
+         ^
+SyntaxError: '(' was never closed

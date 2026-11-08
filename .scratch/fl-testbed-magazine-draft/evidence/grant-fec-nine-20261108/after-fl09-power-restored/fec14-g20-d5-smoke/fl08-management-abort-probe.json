@@ -1,0 +1,18 @@
+{
+  "wall": 1794146927.7212505,
+  "ping": {
+    "returncode": 1,
+    "stdout": "PING 192.168.0.198 (192.168.0.198) 56(84) bytes of data.\n\n--- 192.168.0.198 ping statistics ---\n2 packets transmitted, 0 received, 100% packet loss, time 1024ms\n\n",
+    "stderr": ""
+  },
+  "ssh": {
+    "returncode": 255,
+    "stdout": "",
+    "stderr": "ssh: connect to host 192.168.0.198 port 22: No route to host\n"
+  },
+  "neighbor": {
+    "returncode": 0,
+    "stdout": "192.168.0.198 dev enP8p1s0  INCOMPLETE\n",
+    "stderr": ""
+  }
+}
