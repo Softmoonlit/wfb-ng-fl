@@ -1,0 +1,2 @@
+g++  -Wall -O2 -fno-strict-aliasing -DZFEX_UNROLL_ADDMUL_SIMD=8 -DZFEX_USE_INTEL_SSSE3 -DZFEX_USE_ARM_NEON -DZFEX_INLINE_ADDMUL -DZFEX_INLINE_ADDMUL_SIMD -DWFB_VERSION='"26.11.8.40689-51f405ae"' -std=gnu++11 -c -o src/v6_uplink.o src/v6_uplink.cpp
+g++ -o wfb_v6_uplink src/v6_uplink.o src/v6_radio_control.o src/v6_plaintext_fec_tx.o src/tx.link.o src/rx.link.o src/radiotap.o src/zfex.o src/wifibroadcast.o src/control_envelope.o src/token_scheduler.o src/token_authorization.o src/token_authorization_ipc.o src/token_event_ipc.o src/tx_token_gate.o  -lrt -lsodium -lpcap

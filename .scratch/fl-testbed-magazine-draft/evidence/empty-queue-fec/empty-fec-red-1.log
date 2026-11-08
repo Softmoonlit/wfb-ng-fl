@@ -1,0 +1,8 @@
+v6_radio_frame kind=data generation=0 bandwidth=40 mcs_index=3 short_gi=1
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=0 short_gi=1
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_frame kind=data generation=1 bandwidth=20 mcs_index=5 short_gi=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+v6 radio control loopback port=56575
+EMPTY partial FEC: payload=1 ready=0 unauthorized_data=0 filler=1 parity=1 seal_elapsed_ms=1 zero_timeout_polls=0 cpu_us=1960
+v6_radio_update_test: tests/cpp/v6_uplink_rearm_test.hpp:176: void test_native_empty_queue_partial_fec_reauthorization(): Assertion `ready && "empty queue with due partial FEC must request a seal grant"' failed.

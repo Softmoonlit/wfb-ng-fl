@@ -96,6 +96,100 @@ static bool rearm_receive_data_frame(int fd, int timeout_ms, uint64_t *nonce, ui
     return true;
 }
 
+// Empty TUN queue still owes the receiver a partial block seal after grant expiry.
+static void test_native_empty_queue_partial_fec_reauthorization() {
+    uint16_t air_port, input_port, unused;
+    int air = rearm_udp(&air_port), reservation = rearm_udp(&input_port);
+    int command = rearm_udp(&unused), output[2], tun[2];
+    assert(pipe(output) == 0);
+    assert(socketpair(AF_UNIX, SOCK_DGRAM, 0, tun) == 0);
+    Config config; config.node_id = 9; config.link_id = 1;
+    config.uplink_stream = 1; config.downlink_stream = 2;
+    config.air_listen_port = input_port; config.radio_control_port = 0;
+    config.air_target_host = "127.0.0.1"; config.air_target_port = air_port;
+    config.plaintext_fec_k = 2; config.plaintext_fec_n = 3;
+    // FEC wakeup must not depend on the one-second log timer.
+    config.log_interval = 1000;
+    close(reservation);
+    pid_t child = fork(); assert(child >= 0);
+    if (child == 0) {
+        prctl(PR_SET_PDEATHSIG, SIGKILL); close(tun[0]); close(output[0]);
+        assert(dup2(output[1], STDOUT_FILENO) >= 0); close(output[1]);
+        rearm_tun_fd = tun[1]; run_client(config, 42); _exit(0);
+    }
+    struct ChildCleanup { pid_t pid; ~ChildCleanup() {
+        if (pid > 0) { kill(pid, SIGKILL); waitpid(pid, nullptr, 0); }
+    } } cleanup{child};
+    close(tun[1]); close(output[1]);
+    uint64_t previous_block = 0;
+    for (unsigned round = 0; round < 2; ++round) {
+        const uint8_t data = 0x45;
+        assert(send(tun[0], &data, 1, 0) == 1);
+        // Round two also proves the previous seal cleared declaration_in_flight.
+        assert(rearm_receive(air, 150, WFB_CONTROL_TYPE_READY));
+        rearm_grant(command, input_port, round * 2 + 1, 100, 1);
+        uint64_t nonce = 0; uint8_t flags = 0;
+        const bool payload_observed = rearm_receive_data_frame(air, 150, &nonce, &flags);
+        assert(payload_observed && "SETUP: 1ms grant must actually send the TUN payload");
+        assert((nonce & 0xff) == 0 && flags == 0);
+        const uint64_t block = nonce >> 8;
+        if (round > 0) assert(block == previous_block + 1);
+        previous_block = block;
+        bool ready = false, unauthorized_data = false;
+        const uint64_t observed_ms = get_time_ms();
+        uint64_t ready_elapsed_ms = 150;
+        while (get_time_ms() - observed_ms < 150) {
+            pollfd p = {air, POLLIN, 0};
+            if (poll(&p, 1, 5) != 1) continue;
+            uint8_t packet[4096] = {};
+            ssize_t n = recv(air, packet, sizeof(packet), 0);
+            assert(n > static_cast<ssize_t>(sizeof(wrxfwd_t)));
+            const auto *h = reinterpret_cast<const wcontrol_envelope_hdr_t *>(packet + sizeof(wrxfwd_t));
+            unauthorized_data |= h->packet_type == WFB_PACKET_DATA;
+            if (h->packet_type == WFB_PACKET_CONTROL && h->control_type == WFB_CONTROL_TYPE_READY) {
+                if (!ready) ready_elapsed_ms = get_time_ms() - observed_ms;
+                ready = true;
+            }
+        }
+        assert(!unauthorized_data);
+        assert(ready && ready_elapsed_ms < 150);
+        const uint64_t seal_grant_sent_ms = get_time_ms();
+        rearm_grant(command, input_port, round * 2 + 2, 100, 100);
+        uint64_t seal[2] = {}; uint8_t seal_flags[2] = {};
+        assert(rearm_receive_data_frame(air, 80, &seal[0], &seal_flags[0]));
+        assert(rearm_receive_data_frame(air, 80, &seal[1], &seal_flags[1]));
+        assert(get_time_ms() - seal_grant_sent_ms < 100);
+        assert((seal[0] >> 8) == block && (seal[0] & 0xff) == 1);
+        assert((seal[1] >> 8) == block && (seal[1] & 0xff) == 2);
+        assert(seal_flags[0] == WFB_PACKET_FEC_ONLY);
+        // Drain through grant expiry: EMPTY without FEC must stay silent.
+        pollfd empty = {air, POLLIN, 0};
+        assert(poll(&empty, 1, 120) == 0);
+        std::cerr << "EMPTY partial FEC round=" << round + 1
+                  << " ready_elapsed_ms=" << ready_elapsed_ms
+                  << " unauthorized_data=0 old_block_sealed=1" << std::endl;
+    }
+    // Observe a post-expiry loop statistics sample, not just startup counters.
+    pollfd empty = {air, POLLIN, 0};
+    assert(poll(&empty, 1, 1100) == 0);
+    kill(child, SIGKILL);
+    rusage usage = {}; assert(wait4(child, nullptr, 0, &usage) == child);
+    cleanup.pid = -1;
+    std::string logs; char buf[4096]; ssize_t n;
+    while ((n = read(output[0], buf, sizeof(buf))) > 0) logs.append(buf, n);
+    uint64_t zero_polls = 0; size_t at = 0; unsigned loop_stats = 0;
+    while ((at = logs.find("zero_timeout_polls=", at)) != std::string::npos) {
+        at += strlen("zero_timeout_polls="); ++loop_stats;
+        zero_polls = std::max(zero_polls, static_cast<uint64_t>(strtoull(logs.c_str() + at, nullptr, 10)));
+    }
+    const long cpu_us = usage.ru_utime.tv_sec * 1000000L + usage.ru_utime.tv_usec +
+                        usage.ru_stime.tv_sec * 1000000L + usage.ru_stime.tv_usec;
+    close(output[0]); close(tun[0]); close(air); close(command);
+    std::cerr << "EMPTY partial FEC: zero_timeout_polls=" << zero_polls
+              << " cpu_us=" << cpu_us << " log_samples=" << loop_stats << std::endl;
+    assert(loop_stats >= 2 && zero_polls < 10 && cpu_us > 0 && cpu_us < 50000);
+}
+
 static void test_native_unauthorized_fec_deadline() {
     uint16_t air_port, input_port, unused;
     int air = rearm_udp(&air_port), input_reservation = rearm_udp(&input_port);

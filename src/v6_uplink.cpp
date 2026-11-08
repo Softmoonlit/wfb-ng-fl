@@ -1745,13 +1745,15 @@ void run_client(const Config &config, uint64_t session_id)
 
         uint64_t now_ms = get_time_ms();
         uint64_t next_wakeup = log_send_ts;
-        if (uplink_queue.front() != nullptr && !authorization_state.is_authorized(now_ms) &&
+        const uint64_t uplink_flush_deadline_ms = uplink->next_flush_deadline_ms();
+        if ((uplink_queue.front() != nullptr || uplink_flush_deadline_ms > 0) &&
+            !authorization_state.is_authorized(now_ms) &&
             ready_state.declaration_in_flight)
         {
             next_wakeup = min(next_wakeup, ready_state.last_declare_at_ms + kReadyRedeclareTimeoutMs);
         }
-        const uint64_t uplink_flush_deadline_ms = uplink->next_flush_deadline_ms();
-        if (uplink_flush_deadline_ms > 0 && authorization_state.is_authorized(now_ms))
+        if (uplink_flush_deadline_ms > 0 &&
+            (now_ms < uplink_flush_deadline_ms || authorization_state.is_authorized(now_ms)))
         {
             next_wakeup = min(next_wakeup, uplink_flush_deadline_ms);
         }
@@ -1873,9 +1875,19 @@ void run_client(const Config &config, uint64_t session_id)
         const QueuedTunPacket *pending_packet = uplink_queue.front();
         if (pending_packet == NULL)
         {
-            if (authorization_state.is_authorized(now_ms))
+            if (current_flush_deadline_ms > 0 && now_ms >= current_flush_deadline_ms)
             {
-                uplink->flush_data_block_if_due(now_ms);
+                if (authorization_state.is_authorized(now_ms))
+                {
+                    if (uplink->flush_data_block_if_due(now_ms))
+                    {
+                        apply_grant_seen(now_ms, &ready_state);
+                    }
+                }
+                else
+                {
+                    maybe_send_ready(*uplink, now_ms, &ready_state);
+                }
             }
             continue;
         }
