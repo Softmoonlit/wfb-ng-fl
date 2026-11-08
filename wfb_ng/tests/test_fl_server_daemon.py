@@ -16,7 +16,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from wfb_ng.fl.control import (
-    HUNTING_ATTEMPT_TIMEOUT_SECONDS,
     ClientNodeState,
     HeartbeatAck,
     NodeHeartbeat,
@@ -54,6 +53,7 @@ class TestServerDaemonConfig(unittest.TestCase):
 
     def test_default_config(self):
         cfg = ServerDaemonConfig()
+        self.assertEqual((cfg.grant_duration_ms, cfg.guard_interval_ms), (10, 10))
         self.assertEqual(cfg.ipc_host, "127.0.0.1")
         self.assertEqual(cfg.ipc_port, 9090)
         self.assertEqual(cfg.channel, 157)
@@ -100,6 +100,29 @@ class TestServerDaemonConfig(unittest.TestCase):
             if os.path.exists(temp_path):
                 os.remove(temp_path)
 
+    def test_schedule_config_load_and_reject(self):
+        # 通过真实 JSON 入口验证，布尔值、字符串和浮点数不得被强转成整数。
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "server.json")
+            for grant, guard in ((10, 10), (15, 5), (18, 2), (120, 0)):
+                with self.subTest(grant=grant, guard=guard):
+                    with open(path, "w") as stream:
+                        json.dump(dict(grant_duration_ms=grant, guard_interval_ms=guard), stream)
+                    cfg = load_server_config(path)
+                    self.assertEqual((cfg.grant_duration_ms, cfg.guard_interval_ms), (grant, guard))
+            for name, values in (
+                ("grant_duration_ms", (True, False, "15", 15.0, None, 0, -1, 121)),
+                ("guard_interval_ms", (True, False, "5", 5.0, None, -1, 11)),
+            ):
+                for value in values:
+                    with self.subTest(name=name, value=value):
+                        with open(path, "w") as stream:
+                            json.dump({name: value}, stream)
+                        with self.assertRaises(FLRuntimeError):
+                            load_server_config(path)
+                        with self.assertRaises(FLRuntimeError):
+                            ServerDaemonConfig(**{name: value})
+
     def test_load_nonexistent_custom_config_fails_closed(self):
         with self.assertRaises(FLRuntimeError) as caught:
             load_server_config("/nonexistent/path/server.json")
@@ -129,23 +152,54 @@ class TestServerDaemonConfig(unittest.TestCase):
 class TestV6UplinkServerCommand(unittest.TestCase):
     """Pre-allocated slot command construction remains server-owned."""
 
-    def test_fixed_slots_fit_maximum_node_cycle_within_ack_budget(self):
-        cmd = build_v6_uplink_server_command(
-            "/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0"
-        )
-        self.assertIn("--grant-duration-ms", cmd)
-        self.assertIn("--guard-interval-ms", cmd)
-        grant_ms = int(cmd[cmd.index("--grant-duration-ms") + 1])
-        guard_ms = int(cmd[cmd.index("--guard-interval-ms") + 1])
-        self.assertEqual((grant_ms, guard_ms), (10, 10))
-        node_ids = cmd[cmd.index("--known-clients") + 1].split(",")
-        self.assertEqual(node_ids, [str(n) for n in range(1, 11)])
-        worst_cycle_ms = len(node_ids) * (grant_ms + guard_ms)
-        self.assertEqual(worst_cycle_ms, 200)
-        ack_budget_ms = HUNTING_ATTEMPT_TIMEOUT_SECONDS * 1000
-        self.assertEqual(ack_budget_ms, 230)
-        self.assertLess(worst_cycle_ms, ack_budget_ms)
-        self.assertEqual(ack_budget_ms - worst_cycle_ms, 30)
+    def test_configurable_schedule_flags(self):
+        # 默认与候选值均检查真实 builder 产出的命令，不推断实际调度周期。
+        for grant, guard in ((10, 10), (15, 5), (18, 2), (120, 0)):
+            with self.subTest(grant=grant, guard=guard):
+                cmd = build_v6_uplink_server_command(
+                    "/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0",
+                    grant_duration_ms=grant, guard_interval_ms=guard,
+                )
+                self.assertEqual(cmd[cmd.index("--grant-duration-ms") + 1], str(grant))
+                self.assertEqual(cmd[cmd.index("--guard-interval-ms") + 1], str(guard))
+
+    def test_builder_rejects_invalid_schedule(self):
+        for name, values in (
+            ("grant_duration_ms", (True, False, "15", 15.0, None, 0, -1, 121)),
+            ("guard_interval_ms", (True, False, "5", 5.0, None, -1, 11)),
+        ):
+            for value in values:
+                with self.subTest(name=name, value=value):
+                    with self.assertRaises(FLRuntimeError):
+                        build_v6_uplink_server_command(
+                            "/usr/bin/wfb_v6_uplink", "fl-s", "10.80.0.1/24", "wlan0",
+                            **{name: value},
+                        )
+
+    def test_start_link_passes_loaded_schedule_to_real_builder(self):
+        # 仅替代进程和硬件边界，保留配置加载及真实命令生成路径。
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "server.json")
+            with open(path, "w") as stream:
+                json.dump(dict(grant_duration_ms=18, guard_interval_ms=2, work_dir=directory), stream)
+            daemon = object.__new__(ServerDaemon)
+            daemon.config = load_server_config(path)
+            daemon.radio_config = MagicMock(channel=157, downlink_mcs=3, bandwidth_mhz=40)
+            daemon.current_interface = "wlan0"
+            daemon.adapter = MagicMock()
+            daemon.adapter.is_tun_ready.return_value = True
+            daemon.control_plane = MagicMock()
+            with patch("wfb_ng.fl.server_daemon.shutil.which", return_value="/usr/bin/wfb_v6_uplink"), \
+                    patch("wfb_ng.fl.server_daemon.subprocess.Popen") as popen:
+                popen.return_value.poll.return_value = None
+                try:
+                    daemon._start_link_process()
+                    cmd = popen.call_args.args[0]
+                    self.assertEqual(cmd[cmd.index("--grant-duration-ms") + 1], "18")
+                    self.assertEqual(cmd[cmd.index("--guard-interval-ms") + 1], "2")
+                finally:
+                    if getattr(daemon, "_link_log_file", None):
+                        daemon._link_log_file.close()
 
     def test_command_generation_preallocated_slots_and_fixed_slot_flags(self):
         cmd = build_v6_uplink_server_command(

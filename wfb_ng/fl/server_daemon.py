@@ -149,6 +149,18 @@ def calculate_file_sha256(path: str, cancel_event: Optional[threading.Event] = N
     return hasher.hexdigest()
 
 
+def _validate_server_schedule(grant_duration_ms: int, guard_interval_ms: int) -> None:
+    # 启动配置与命令生成共用校验，拒绝布尔值及隐式数值转换。
+    for name, value, minimum, maximum in (
+        ("grant_duration_ms", grant_duration_ms, 1, 120),
+        ("guard_interval_ms", guard_interval_ms, 0, 10),
+    ):
+        if type(value) is not int or not minimum <= value <= maximum:
+            raise FLRuntimeError(
+                "invalid_" + name, f"{name} 必须为 {minimum}..{maximum} 的整数"
+            )
+
+
 @dataclass(frozen=True)
 class ServerDaemonConfig:
     ipc_host: str = DEFAULT_IPC_HOST
@@ -161,6 +173,8 @@ class ServerDaemonConfig:
     downlink_mcs: int = DEFAULT_DOWNLINK_MCS
     uplink_mcs: int = DEFAULT_UPLINK_MCS
     bandwidth_mhz: int = 40
+    grant_duration_ms: int = 10
+    guard_interval_ms: int = 10
     radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT
     uftp_rate_kbps: Optional[int] = None
     tun_name: str = DEFAULT_TUN_NAME
@@ -189,6 +203,7 @@ class ServerDaemonConfig:
     algorithm_config: Dict[str, Any] = field(default_factory=lambda: {'data_seed': 2026})
 
     def __post_init__(self) -> None:
+        _validate_server_schedule(self.grant_duration_ms, self.guard_interval_ms)
         object.__setattr__(self, 'algorithm_config', validate_algorithm_config(self.algorithm_config))
         entries: Tuple[str, ...] = (self.client_entry, self.aggregate_entry, self.evaluate_entry)
         if self.radio_policy_entry is not None:
@@ -294,6 +309,8 @@ def load_server_config(path: str = DEFAULT_SERVER_CONFIG_PATH) -> ServerDaemonCo
         uplink_mcs=int(data.get("uplink_mcs", DEFAULT_UPLINK_MCS)),
         radio_control_port=data.get("radio_control_port", DEFAULT_RADIO_CONTROL_PORT),
         bandwidth_mhz=data.get("bandwidth_mhz", 40),
+        grant_duration_ms=data.get("grant_duration_ms", 10),
+        guard_interval_ms=data.get("guard_interval_ms", 10),
         uftp_rate_kbps=data.get("uftp_rate_kbps"),
         tun_name=data.get("tun_name", DEFAULT_TUN_NAME),
         tun_ip=data.get("tun_ip", DEFAULT_TUN_IP),
@@ -334,15 +351,18 @@ def build_v6_uplink_server_command(
     epoch: Optional[int] = None,
     bandwidth_mhz: int = 40,
     radio_control_port: int = DEFAULT_RADIO_CONTROL_PORT,
+    grant_duration_ms: int = 10,
+    guard_interval_ms: int = 10,
 ) -> List[str]:
     """
     Construct command line arguments for wfb_v6_uplink running as server.
     Per ADR-0012, ADR-0014, ADR-0018, and Ticket 05:
     - Pre-allocates all 1..10 known clients (--known-clients 1,2,3,4,5,6,7,8,9,10)
     - Pre-allocates all client-target mappings (--client-target nid:10.80.0.{10+nid}:127.0.0.1:1)
-    - Fix grant/guard at 10ms/10ms: ten nodes cycle in 200ms, leaving 30ms
-      of the 230ms heartbeat ACK budget for processing (ADR-0018).
+    - 授权时隙及保护间隔默认 10ms/10ms，可通过受控启动配置调整（ADR-0018）。
+      配置值不承诺实际调度周期或端到端 ACK 时限。
     """
+    _validate_server_schedule(grant_duration_ms, guard_interval_ms)
     RadioConfig(channel=channel, bandwidth_mhz=bandwidth_mhz).channel_width
     cmd = [
         executable_path,
@@ -360,8 +380,8 @@ def build_v6_uplink_server_command(
         "--radio-mcs-index", str(downlink_mcs),
         "--air-interface", air_interface,
         "--known-clients", ",".join(str(n) for n in known_clients),
-        "--grant-duration-ms", "10",
-        "--guard-interval-ms", "10",
+        "--grant-duration-ms", str(grant_duration_ms),
+        "--guard-interval-ms", str(guard_interval_ms),
     ]
 
     for nid in known_clients:
@@ -2096,6 +2116,8 @@ class ServerDaemon:
             known_clients=self.config.known_clients,
             bandwidth_mhz=radio.bandwidth_mhz,
             radio_control_port=self.config.radio_control_port,
+            grant_duration_ms=self.config.grant_duration_ms,
+            guard_interval_ms=self.config.guard_interval_ms,
         )
 
         logger.info("启动 wfb_v6_uplink 链路底座: %s", " ".join(cmd))
