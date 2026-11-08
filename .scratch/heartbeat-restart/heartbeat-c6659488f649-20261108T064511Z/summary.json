@@ -1,0 +1,109 @@
+{
+  "release_id": "heartbeat-c6659488f649-20261108T064511Z",
+  "commit": "c6659488f64976185ffe02a7c856f7fd8c821ee0",
+  "tool_commit": "b5754a7",
+  "result": "audit_failed_channel_discovery",
+  "deployment_rounds": 1,
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start"
+  ],
+  "stopped_nodes": [],
+  "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+  "nodes": [
+    {
+      "host": "fl00",
+      "daemon_pid": 12081,
+      "native_pid": "12197",
+      "iface": "wlxfc221c100119",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 0
+    },
+    {
+      "host": "fl01",
+      "daemon_pid": 3912,
+      "native_pid": "3934",
+      "iface": "wlxfc221c300e99",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 1
+    },
+    {
+      "host": "fl02",
+      "daemon_pid": 4369,
+      "native_pid": "4388",
+      "iface": "wlx88e62852aae4",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 1
+    },
+    {
+      "host": "fl04",
+      "daemon_pid": 3652,
+      "native_pid": "3668",
+      "iface": "wlxfc221c300cbb",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 0
+    },
+    {
+      "host": "fl05",
+      "daemon_pid": 3456,
+      "native_pid": "3475",
+      "iface": "wlxfc221c100157",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 0
+    },
+    {
+      "host": "fl06",
+      "daemon_pid": 7295,
+      "native_pid": "7312",
+      "iface": "wlxfc221c500bfe",
+      "diagnostic_channel": 157,
+      "service_active": true,
+      "initial_audit_exit": 1
+    },
+    {
+      "host": "fl07",
+      "daemon_pid": 7549,
+      "native_pid": "7569",
+      "iface": "wlxfc221c300cbc",
+      "diagnostic_channel": 157,
+      "service_active": true,
+      "initial_audit_exit": 1
+    },
+    {
+      "host": "fl08",
+      "daemon_pid": 8552,
+      "native_pid": "8569",
+      "iface": "wlxfc221c500a88",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 0
+    },
+    {
+      "host": "fl09",
+      "daemon_pid": 7792,
+      "native_pid": "7814",
+      "iface": "wlxbcec23372588",
+      "diagnostic_channel": 153,
+      "service_active": true,
+      "initial_audit_exit": 1
+    },
+    {
+      "host": "fl10",
+      "daemon_pid": 6293,
+      "native_pid": "6312",
+      "iface": "wlxfca386b38672",
+      "diagnostic_channel": 149,
+      "service_active": true,
+      "initial_audit_exit": 0
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "host": "fl10",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl10\", \"unit\": \"MainPID=906\\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 ; ignore_errors=no ; start_time=[Fri 2026-11-06 19:13:16 CST] ; stop_time=[n/a] ; pid=906 ; code=(null) ; status=0/0 }\\nActiveState=active\\n\", \"iface\": \"wlxfca386b38672\", \"native_pid\": \"1521\", \"repair\": null, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"control_sha\": \"198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec\", \"radio\": \"Interface wlxfca386b38672\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr fc:a3:86:b3:86:72\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -14.00 dBm\\n\", \"nvpmodel\": \"NV Power Mode: 15W\\n0\\n\"}\n",
+  "stderr": ""
+}

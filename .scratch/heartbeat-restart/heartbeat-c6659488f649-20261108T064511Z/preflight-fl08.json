@@ -1,0 +1,6 @@
+{
+  "host": "fl08",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl08\", \"unit\": \"MainPID=859\\nExecStart={ path=/usr/bin/wfb-fl-client-daemon ; argv[]=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4 ; ignore_errors=no ; start_time=[Fri 2026-11-06 19:30:35 CST] ; stop_time=[n/a] ; pid=859 ; code=(null) ; status=0/0 }\\nActiveState=active\\n\", \"iface\": \"wlxfc221c500a88\", \"native_pid\": \"1451\", \"repair\": null, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"control_sha\": \"198cb9bccd9f97139a75fb93198090ec3dfdd132950ed444f3f060afdda2c7ec\", \"radio\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -14.00 dBm\\n\", \"nvpmodel\": \"NV Power Mode: 15W\\n0\\n\"}\n",
+  "stderr": ""
+}
