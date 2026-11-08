@@ -320,14 +320,18 @@ class Node:
         iw = run(['iw', 'dev', self.interface, 'info'])
         require(any('channel ' + str(channel) + ' ' in iw for channel in channels)
                 and f'width: {expected_bandwidth} MHz' in iw
-                and all(text in iw for text in ['txpower -18.00 dBm', 'type monitor']), 'iw mismatch')
+                and all(text in iw for text in ['txpower -18.00 dBm', 'type monitor']),
+                'iw mismatch: ' + json.dumps(dict(actual=iw, channels=list(channels),
+                    bandwidth_mhz=expected_bandwidth, mcs=expected_mcs), ensure_ascii=False))
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.settimeout(3)
             sock.sendto(struct.pack('!IB', 0x434f4d4d, 4), ('127.0.0.1', self.control_port))
             raw, address = sock.recvfrom(4096)
         radio = struct.unpack('!II7B', raw)
         require(address == ('127.0.0.1', self.control_port) and radio[:2] == (0x434f4d4d, 0)
-                and radio[4] == 0 and radio[5:7] == (expected_bandwidth, expected_mcs), 'GET radio mismatch')
+                and radio[4] == 0 and radio[5:7] == (expected_bandwidth, expected_mcs),
+                'GET radio mismatch: ' + json.dumps(dict(actual=list(radio), address=list(address),
+                    bandwidth_mhz=expected_bandwidth, mcs=expected_mcs), ensure_ascii=False))
         return dict(iw=iw, get_radio=list(radio))
 
     def registry_gate(self):

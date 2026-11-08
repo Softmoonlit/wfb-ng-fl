@@ -1,0 +1,111 @@
+{
+  "run_id": "eleven-C-g18d2-r12-smoke-20261108T1057Z",
+  "classification": "preflight failure; fl04 iw mismatch before candidate acquisition, not throughput failure",
+  "bundle_sha256": "0cb2eba112855a7f116b139ba19fc47e25a5a550873030ae68992349199927be",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-f376a1f1ab48-20261108T105344Z",
+  "failure": {
+    "wall": 1794135571.9172347,
+    "monotonic": 16286.02476347,
+    "host": "fl04",
+    "phase": "prepare",
+    "ok": false,
+    "error": "RuntimeError('{\\'id\\': 1, \\'ok\\': False, \\'error\\': \"RuntimeError(\\'iw mismatch\\')\"}')"
+  },
+  "result": {
+    "wall": 1794135572.9727402,
+    "monotonic": 16287.080267269,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "actualUFTPrate": null,
+  "actualUFTPrate_reason": "UFTP never started; prepare failed",
+  "requested_uftp_rate_kbps": 12000,
+  "higher_smokes_executed": false,
+  "model_executed": false,
+  "partials": {
+    "stage_entered": false,
+    "samples": [],
+    "reason": "No file transfer opened before prepare failure"
+  },
+  "recovery": {
+    "runner_restore_ok": false,
+    "independent_actual_restore_ok": true,
+    "rf_restore_attempted": false,
+    "baseline_fec_n": 12,
+    "note": "No candidate RF transaction attempted; terminal all11 baseline audited; no FEC14 change"
+  },
+  "GetFEC": {
+    "fl00": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl01": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl02": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl03": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl04": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl05": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl06": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl07": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl08": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl09": [
+      1129270605,
+      0,
+      8,
+      12
+    ],
+    "fl10": [
+      1129270605,
+      0,
+      8,
+      12
+    ]
+  },
+  "audit_all_11_ok": true,
+  "raw_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/C-bounded-20261108T1057Z",
+  "raw_remote": "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+  "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runs/eleven-C-g18d2-r12-smoke-20261108T1057Z/progress.jsonl"
+}

@@ -33,6 +33,7 @@ HT40 下行 MCS4、12000kbps 候选的 acquire_radio 使用专用 calibrate endp
 
 - 保留常驻 daemon、native 和 TUN。prepare 核对冻结安装身份及 native SHA，要求安装目录顶层 `*.py` 集合、冻结源码顶层 `*.py` 集合与 manifest 中 `.py` 条目集合三者严格相等；manifest 允许 `build_identity.json` 等顶层非 Python 文件，所有 manifest 条目都逐文件核验安装 SHA，Python 文件另核验冻结源码 SHA；服务端要求完整十客户端 READY/IDLE 且无活动作业。十一节点 prepare 全通过后才重配和启动角色。
 - 默认 157/40MHz/Long GI/功率索引18、MCS3/4、RS(8,14)、UFTP 12000kbps，使用普通 reconfigure。可选 `--downlink-mcs {3,4}`、`--uplink-mcs {4,6}` 和 `--uftp-rate-kbps 1..26000`，默认仍为 MCS3/4、12000kbps；API 准入另行检查。现有 HT20 选项保持 calibrate 行为。工具不持有 daemon 的作业准入租约，测试期间不得并发启动其他 FL 任务。
+- prepare 从真实 native argv 读取启动 MCS，严格要求服务端3/客户端4，再用 GET 验证相同当前基线并一次性记录 `original_mcs` 快照；如果在线 MCS 已偏离启动参数则拒绝 prepare，保留现场。verify_radio 核对候选 MCS（如4/6），audit_final 显式核对保存的原始 MCS（3/4），候选不得覆盖恢复目标。
 - GET 必须实际返回 `short_gi=0`，并验证带宽和 MCS；不能仅凭计划宣称 Long GI。UFTP 1144、HTTP 18080 和 239.80.41.1/239.80.42.1 保持固定。
 - 期限集中在 `TIMING`：阶段 I/O 每方向 600 秒，主编排 2×600+90=1290 秒，节点信号及临时 unit 生命周期 1305 秒，独立回收预算 60 秒。回收使用编排开始后 1350 秒绝对截止点，不逐次重置预算。
 - prepare 或任意 phase 首个失败即退出编排。传输失败时不把 close 排到阻塞 RPC 后面；dispose 唤醒本机 RPC 工作线程、关闭自有会话，随后独立停止本轮临时 unit。清理线程池显式 `shutdown(wait=false, cancel_futures=true)`，不通过上下文管理器退出等待挂起 future。不会等待其他 publish 到 1290 秒，也不会杀 resident。
@@ -48,4 +49,4 @@ HT40 下行 MCS4、12000kbps 候选的 acquire_radio 使用专用 calibrate endp
 python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -v
 ```
 
-52 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。
+54 项本地测试覆盖完整固定集合、完整 READY 门槛、十一端 prepare、并行 publish 与上传屏障、十份更新门槛、manifest 校验和缺失拒绝、model/smoke dry-run 不启动进程、显式生成恰好 1MiB、发布失败立即退出并独立回收、真实 RPC 工作线程唤醒、各节点只回收自有 unit、GET shortGI 实际断言、全员最终审计及硬件/PID 漂移拒绝、流式载荷校验、真实字节复制和篡改拦截、客户端原文件上传、路由身份保护。测试不导入 torch 或生产角色，不连接远端，也不调用生产 UDP。

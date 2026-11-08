@@ -1,0 +1,7 @@
+{
+  "host": "fl07",
+  "wall": 1794135052.656576,
+  "rc": 0,
+  "stdout": "{\"host\": \"fl07\", \"ok\": true, \"daemon_pid\": \"16101\", \"native_pid\": \"16116\", \"daemon_argv\": [\"/usr/bin/python3\", \"-I\", \"-B\", \"-m\", \"wfb_ng.fl.client_daemon\", \"--config\", \"/etc/wfb-ng-fl/node.json\", \"--work-dir\", \"/srv/wfb-ng-fl/client\", \"--channel\", \"149\", \"--bandwidth-mhz\", \"40\", \"--radio-txpower-dbm\", \"18\", \"--uplink-mcs\", \"4\", \"--interface\", \"wlxfc221c300e99\", \"--fec-n\", \"14\"], \"native_argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c7\", \"--tun-addr\", \"10.80.0.17/24\", \"--node-id\", \"7\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"14\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c300e99\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"GetFEC\": [1129270605, 0, 8, 14], \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\", \"comm_units\": \"\", \"owned_routes\": []}\n",
+  "stderr": ""
+}

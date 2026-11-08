@@ -1,0 +1,134 @@
+{
+  "run_id": "eleven-B-g18d2-r12-smoke-20261108T1055Z",
+  "bundle_sha256": "0cb2eba112855a7f116b139ba19fc47e25a5a550873030ae68992349199927be",
+  "prepare_all_11": true,
+  "result": {
+    "wall": 1794135001.2694614,
+    "monotonic": 15715.376988739,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "failure": {
+    "event": "calibrate_response",
+    "monotonic": 15703.255075933,
+    "response": {
+      "calibration": false,
+      "session_id": "switch_6a870c1ec81b480cbeea917189a6e138",
+      "status": "rolled_back",
+      "target_channel": 157,
+      "applied_patch": {
+        "channel": 157,
+        "bandwidth_mhz": 40,
+        "downlink_mcs": 4,
+        "uplink_mcs": 6,
+        "radio_txpower_dbm": 18,
+        "uftp_rate_kbps": 12000
+      },
+      "failed_phase": "COMMIT",
+      "unresponsive_nodes": [
+        4
+      ],
+      "error_message": "\u65b0\u4fe1\u9053\u4e0a\u7ebf\u8d85\u65f6: [4]",
+      "effective_config": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 14,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      },
+      "local_committed_config": null
+    },
+    "daemon_pid_after": 68547
+  },
+  "actualUFTPrate": null,
+  "actualUFTPrate_reason": "COMMIT failed before role open/publish; no UFTP sender launched",
+  "requested_uftp_rate_kbps": 12000,
+  "higher_smokes_executed": false,
+  "model_executed": false,
+  "independent_actual_restore_ok": true,
+  "GetFEC": {
+    "fl00": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl01": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl02": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl03": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl04": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl05": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl06": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl07": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl08": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl09": [
+      1129270605,
+      0,
+      8,
+      14
+    ],
+    "fl10": [
+      1129270605,
+      0,
+      8,
+      14
+    ]
+  },
+  "final_native_grant_guard": [
+    18,
+    2
+  ],
+  "raw_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/B-bounded-20261108T1055Z",
+  "raw_remote": "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+  "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runs/eleven-B-g18d2-r12-smoke-20261108T1055Z/progress.jsonl",
+  "classification": "UL6 candidate admission failure at COMMIT; not throughput failure",
+  "power_source_audit_all_11": true,
+  "journal_assessment": "Matched session fl04 COMMIT channel157 at 18:49:23.720+0800, watchdog rollback149 at 18:49:48.567; server COMMIT timeout missing4 at 18:49:33.516. COMMIT records application path success; no per-session GET_RADIO MCS6 sample and no positive server receive evidence for effective COMMIT_SUCCESS4. Do not infer receipt from send/application logs."
+}
