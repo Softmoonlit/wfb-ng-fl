@@ -22,5 +22,13 @@
     "guard_interval_ms": 2,
     "fec_n": 14
   },
-  "completed": []
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ]
 }
