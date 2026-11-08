@@ -12,6 +12,7 @@ import subprocess
 import sys
 import sysconfig
 import tarfile
+import tempfile
 import time
 import urllib.request
 
@@ -64,6 +65,37 @@ def client_startup_options(options, expected_fec_n):
     else:
         result += ['--fec-n', str(expected_fec_n)]
     return result
+
+
+def install_server_fec(config_path, record_path, expected):
+    """仅在 install 屏障内原子更新 FEC，保留其它配置与文件权限。"""
+    before = json.loads(config_path.read_text())
+    assert expected['fec_n'] in (12, 14)
+    assert before.get('grant_duration_ms', 10) == expected['grant_duration_ms']
+    assert before.get('guard_interval_ms', 10) == expected['guard_interval_ms']
+    after = dict(before, fec_n=expected['fec_n'])
+    record_path.write_text(json.dumps({'before': before, 'after': after, 'expected': expected}, indent=2) + '\n')
+    metadata = config_path.stat()
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode='w', dir=config_path.parent,
+                                         prefix='.server-fec-', delete=False) as stream:
+            temporary = pathlib.Path(stream.name)
+            os.fchown(stream.fileno(), metadata.st_uid, metadata.st_gid)
+            os.fchmod(stream.fileno(), metadata.st_mode & 0o7777)
+            stream.write(json.dumps(after, ensure_ascii=False, indent=2) + '\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, config_path)
+        descriptor = os.open(config_path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    assert json.loads(config_path.read_text()) == after
 
 
 def sha(path):
@@ -216,6 +248,7 @@ elif phase == 'stop':
     assert not natives, [str(p) for p in natives]
     emit({'host': host, 'phase': phase})
 elif phase == 'install':
+    assert pid == '0', 'install requires completed stop barrier'
     source = root / 'source'
     expected_names = {p.name for p in (source / 'wfb_ng/fl').glob('*.py')}
     for path in installed.glob('*.py'):
@@ -226,6 +259,9 @@ elif phase == 'install':
     env = dict(os.environ, COMMIT=commit, VERSION='26.11.6', PREFIX='/usr',
                PYTHON='/usr/bin/python3', PYTHONDONTWRITEBYTECODE='1')
     run(['sh', 'scripts/install/install-v8.sh'], cwd=source, env=env)
+    if role == 'server':
+        install_server_fec(pathlib.Path('/etc/wfb-ng-fl/server.json'),
+                           root / 'server-fec-configuration-change.json', expected)
     runtime_files = json.loads((root / 'runtime-files.json').read_text())
     actual_files = sorted(str(p.relative_to(installed)) for p in installed.rglob('*')
                           if p.is_file() and p.suffix in {'.py', '.html', '.css', '.js'})

@@ -3,12 +3,16 @@ import ast
 from pathlib import Path
 import unittest
 import struct
+import json
+import os
+import tempfile
+from unittest import mock
 
 BASE = Path(__file__).resolve().parent
-namespace = {'struct': struct}
+namespace = {'struct': struct, 'json': json, 'os': os, 'tempfile': tempfile, 'pathlib': __import__('pathlib')}
 tree = ast.parse((BASE / 'release-online-node.py').read_text())
 functions = [node for node in tree.body if isinstance(node, ast.FunctionDef)
-             and node.name in {'native_option', 'verify_native_expectations', 'client_startup_options', 'parse_fec_response'}]
+             and node.name in {'native_option', 'verify_native_expectations', 'client_startup_options', 'parse_fec_response', 'install_server_fec'}]
 exec(compile(ast.Module(body=functions, type_ignores=[]), '<helper-pure-functions>', 'exec'), namespace)
 verify = namespace['verify_native_expectations']
 startup = namespace['client_startup_options']
@@ -21,6 +25,38 @@ class ExpectedRuntimeTests(unittest.TestCase):
     def server_args(self, grant='18', guard='2', fec='14'):
         return ['/usr/bin/wfb_v6_uplink', '--fec-k', '8', '--fec-n', fec,
                 '--grant-duration-ms', grant, '--guard-interval-ms', guard]
+
+    def test_install_server_fec12_atomic_preserves_other_json_and_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'server.json'
+            record = Path(directory) / 'change.json'
+            before = dict(self.config, fec_n=14, channel=149, downlink_mcs=3,
+                          uplink_mcs=4, other={'keep': [1, 2]})
+            path.write_text(json.dumps(before))
+            path.chmod(0o640)
+            expected = dict(self.expected, fec_n=12)
+            replace = os.replace
+            def checked_replace(source, destination):
+                self.assertEqual(json.loads(path.read_text()), before)
+                self.assertEqual(Path(source).parent, path.parent)
+                self.assertEqual(json.loads(Path(source).read_text()), dict(before, fec_n=12))
+                replace(source, destination)
+            with mock.patch.object(os, 'replace', side_effect=checked_replace) as replacement:
+                namespace['install_server_fec'](path, record, expected)
+                replacement.assert_called_once()
+            self.assertEqual(json.loads(path.read_text()), dict(before, fec_n=12))
+            self.assertEqual(path.stat().st_mode & 0o777, 0o640)
+            self.assertEqual(json.loads(record.read_text()), dict(before=before, after=dict(before, fec_n=12), expected=expected))
+            self.assertEqual(list(Path(directory).glob('.server-fec-*')), [])
+
+    def test_install_server_fec_rejects_schedule_mismatch_without_write(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'server.json'
+            path.write_text(json.dumps(dict(grant_duration_ms=15, guard_interval_ms=5)))
+            before = path.read_bytes()
+            with self.assertRaises(AssertionError):
+                namespace['install_server_fec'](path, Path(directory) / 'change.json', dict(self.expected, fec_n=12))
+            self.assertEqual(path.read_bytes(), before)
 
     def test_get_fec_response_matches_actual_expectation(self):
         parse = namespace['parse_fec_response']
