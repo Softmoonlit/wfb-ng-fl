@@ -1,0 +1,484 @@
+{
+  "commit": "88099f04ffaee56c576bb35a9e50baec5f1113d7",
+  "baseline": "c98853fa008a945e3a87503051bae49f5d0083bd",
+  "archive_sha256": "6b0f1ebb80cc23343fced4ba3f323a498d04472e7ef03bf2bfa25265605903c4",
+  "native_sha_expected": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+  "unchanged_paths_vs_c988": [
+    "src",
+    "fec.c",
+    "fec.h",
+    "Makefile",
+    "scripts/install",
+    "scripts/systemd"
+  ],
+  "native_abi_prescan": "native source, Makefile, installer and systemd templates unchanged; static prescan only, no runtime or ABI execution claimed",
+  "python_ast_files": 116,
+  "files": [
+    {
+      "path": "scripts/export_docx.py",
+      "sha256": "5f7145b60b351c999cd7a0bcb798501ec3f562d6a0467ad402e460b040361116"
+    },
+    {
+      "path": "scripts/install/v8-wfb-ng-init.py",
+      "sha256": "15993d866eef06c2bc1b5ea936e829bad6ebac472262a25cfd744085309ca232"
+    },
+    {
+      "path": "setup.py",
+      "sha256": "448fe8cc6dd6b5de9381d561200cdd33e3392454ea474118a5662b6bde844d62"
+    },
+    {
+      "path": "version.py",
+      "sha256": "af6871d54dc7a5e0dd384f8119db2a443368d7fb40aa9944ae57787b1ed9a7e0"
+    },
+    {
+      "path": "wfb_ng/__init__.py",
+      "sha256": "17f14fd698ffb004c7b493797a25b1612eead46fbe4e057fce0ec17fc427db81"
+    },
+    {
+      "path": "wfb_ng/cli.py",
+      "sha256": "a39a4036f76c1771d1a0f8cc63d788c9d6095047072da4d6cdfee728f2f8e12c"
+    },
+    {
+      "path": "wfb_ng/cluster.py",
+      "sha256": "3b0714e1a917b294c9efdc60dfd917a3deb519e97e1dc27ae21404a7feb62201"
+    },
+    {
+      "path": "wfb_ng/common.py",
+      "sha256": "9f0ee214640e5961cd0ccad5cce28fd6e590efe625ff3adc871e314f2ef03bd0"
+    },
+    {
+      "path": "wfb_ng/conf/__init__.py",
+      "sha256": "cdc1c7f6405733e9bd4ed0166ce588b89f80b72e9b14363ce5482f9f74b99ae9"
+    },
+    {
+      "path": "wfb_ng/config_parser.py",
+      "sha256": "1681bbc10dc433bd01ce02ca8a3ac4bfa9d10a24da09a7ce5dc2d5153efe500b"
+    },
+    {
+      "path": "wfb_ng/fl/__init__.py",
+      "sha256": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+    },
+    {
+      "path": "wfb_ng/fl/algorithm.py",
+      "sha256": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+    },
+    {
+      "path": "wfb_ng/fl/artifacts.py",
+      "sha256": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+    },
+    {
+      "path": "wfb_ng/fl/cifar10_model.py",
+      "sha256": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+    },
+    {
+      "path": "wfb_ng/fl/client_daemon.py",
+      "sha256": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+    },
+    {
+      "path": "wfb_ng/fl/console.py",
+      "sha256": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+    },
+    {
+      "path": "wfb_ng/fl/console_http.py",
+      "sha256": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+    },
+    {
+      "path": "wfb_ng/fl/control.py",
+      "sha256": "ab2917d10f73a3e3bb428c5e8867cb59f91ebd70ddff9ed4c8f3c44796565e83"
+    },
+    {
+      "path": "wfb_ng/fl/coordinator.py",
+      "sha256": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+    },
+    {
+      "path": "wfb_ng/fl/errors.py",
+      "sha256": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+    },
+    {
+      "path": "wfb_ng/fl/evidence.py",
+      "sha256": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+    },
+    {
+      "path": "wfb_ng/fl/fp64_audit.py",
+      "sha256": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+    },
+    {
+      "path": "wfb_ng/fl/issue41_fixtures.py",
+      "sha256": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+    },
+    {
+      "path": "wfb_ng/fl/link_radio.py",
+      "sha256": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+    },
+    {
+      "path": "wfb_ng/fl/mnist.py",
+      "sha256": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+    },
+    {
+      "path": "wfb_ng/fl/mnist_cnn_32_64.py",
+      "sha256": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+    },
+    {
+      "path": "wfb_ng/fl/mnist_cnn_model.py",
+      "sha256": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+    },
+    {
+      "path": "wfb_ng/fl/mnist_data.py",
+      "sha256": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+    },
+    {
+      "path": "wfb_ng/fl/mnist_deployment.py",
+      "sha256": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+    },
+    {
+      "path": "wfb_ng/fl/model_artifact.py",
+      "sha256": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+    },
+    {
+      "path": "wfb_ng/fl/model_library.py",
+      "sha256": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+    },
+    {
+      "path": "wfb_ng/fl/observation.py",
+      "sha256": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+    },
+    {
+      "path": "wfb_ng/fl/radio.py",
+      "sha256": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+    },
+    {
+      "path": "wfb_ng/fl/reference_model.py",
+      "sha256": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+    },
+    {
+      "path": "wfb_ng/fl/role.py",
+      "sha256": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+    },
+    {
+      "path": "wfb_ng/fl/runtime.py",
+      "sha256": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+    },
+    {
+      "path": "wfb_ng/fl/server_daemon.py",
+      "sha256": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+    },
+    {
+      "path": "wfb_ng/fl/service.py",
+      "sha256": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+    },
+    {
+      "path": "wfb_ng/fl/transport.py",
+      "sha256": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+    },
+    {
+      "path": "wfb_ng/latency_test.py",
+      "sha256": "405ab30a05de4d4b283853cd8b0f8f87498081a84be258b52ffcaba5a2c31ae3"
+    },
+    {
+      "path": "wfb_ng/log_parser.py",
+      "sha256": "2e10884621f68a5d92d24e1fb5cd8357703e28a1c5351ea1fa8f4a132734d830"
+    },
+    {
+      "path": "wfb_ng/mavlink.py",
+      "sha256": "1988a09a97e9f830e571e7e17bf37131e777c264971c8aec40d69d90586d69cb"
+    },
+    {
+      "path": "wfb_ng/mavlink_protocol.py",
+      "sha256": "2291d8dc17188ad84519a5a2ea7793cbc4d5df8965e68d261683d86947df11d4"
+    },
+    {
+      "path": "wfb_ng/protocols.py",
+      "sha256": "c38975080a28755bba8aac98259c1b2f322a4c4604a1b59b343d5538e2cdcc0d"
+    },
+    {
+      "path": "wfb_ng/proxy.py",
+      "sha256": "675fc5f9214cad88b2461674f0702f71a73da13c2f681f2616c90d4419ff3df7"
+    },
+    {
+      "path": "wfb_ng/server.py",
+      "sha256": "4df18826774d02e5308409be3f2e7ca35dc9745806f0ab2f2b71d45245cf10ec"
+    },
+    {
+      "path": "wfb_ng/services.py",
+      "sha256": "8a95c61cb9f59abc08bb6c6823fb3cc4cfb57062385eba95ab8b4b37f48bae35"
+    },
+    {
+      "path": "wfb_ng/tests/__init__.py",
+      "sha256": "bdb8af98e967f727196a5336f6068b82a07fa7766ded0fdd770a34d598eb321a"
+    },
+    {
+      "path": "wfb_ng/tests/_client_test_network.py",
+      "sha256": "026b87132d4efe7d25b9519b54ff1b73fb8d7de346910c44a91ae64ee1ed5b06"
+    },
+    {
+      "path": "wfb_ng/tests/console_training_browser_check.py",
+      "sha256": "202d28d585c7da994003cbff4bedc68a99cc339f388b1393ba33a94604b66b9d"
+    },
+    {
+      "path": "wfb_ng/tests/mock_runtime.py",
+      "sha256": "7b64114da967361f68d21e8caa5ee3e2bf44abc5b0cba91bc31152b1453d7a44"
+    },
+    {
+      "path": "wfb_ng/tests/online_target_browser_check.py",
+      "sha256": "e835ddc3ce5a3f5b446cb02336431c5c542eada3d04ea83f04f375914fefb91e"
+    },
+    {
+      "path": "wfb_ng/tests/test_build_identity_packaging.py",
+      "sha256": "842849a9657f2e111952e01985f3cb71737ac96f630be842368ac8938a5bea98"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_algorithm_context.py",
+      "sha256": "cbfddca3e51382570c69caca875f82c4576cae18083d695e17dff8ecae74aca8"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_cifar10_model.py",
+      "sha256": "2083015c2b70d87758bf0ffc80ff1171c3d0e2cf30a1f85ca715465c3d1a4dc1"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_client_daemon.py",
+      "sha256": "abf54e2190c5d6fd9a117a7be6c4d8f6ad41b8f42404a060ebe37a92178a8768"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_client_jobradio.py",
+      "sha256": "d977cd6b2500f6d8ba89b308cd441762144973bcbd8e9dae11e751366df17c0f"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_client_radio_application.py",
+      "sha256": "7f03c3a0553e091cd80978241bd47974f1e8d4dbfc8fb89ef37ac0e327d69a67"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_client_recovery.py",
+      "sha256": "b36b0a71700b742b781be52d02a626bcd6ce1e202ef77ec65e954e8d02c38d73"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_client_service.py",
+      "sha256": "67386835b390bae2b425cd865f7d2109f6c4ac8884c6c73d0d0e0614bf107f2e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_console.py",
+      "sha256": "164c989409ef69048e1a290633eb9bf3209daee14330db65e53f8596b1c6ea96"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_control_plane.py",
+      "sha256": "456b668b25d1fd51be750d2f89ffdcfc833328ab7c4ca02fbb0e72e7b4459456"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_control_review.py",
+      "sha256": "cbe0c5885abb803514d2dd5667dea81232f39f8a70569c41e05cfc4cbd501f5f"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_control_routing.py",
+      "sha256": "35aaa3f6d38d386235c288fa85d30bcf81674381cd30cea15482ea3cc0718082"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_coordinator.py",
+      "sha256": "059e5ce278392f29b696470413e8e828a700f90c9475c059afa75d89ebcd80fd"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_desktop_workflow.py",
+      "sha256": "88309653347e3aa7e3bcb8413cbf90311e144112a80b0970c4f221f0c33d1008"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_e2e_airgapped.py",
+      "sha256": "fdac8ee951368c83a4661bb6201e3302b531fb0e95d150ac84cda41fbc2512e7"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_evidence.py",
+      "sha256": "3bc903bb8de8853f51d509780151e21fa2a5ab7976e685543be39b5d83d9ac69"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_file_job.py",
+      "sha256": "73b775adba6e012c62917900b6861680e38d736aea143189e75da83d3ae08d5b"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_fp64_audit.py",
+      "sha256": "cc05dcc1d5e74eacc57fa1172d05d8463da0c345f82fdfbbc05b3353f83598ab"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_hardware_helpers.py",
+      "sha256": "a2c69a057ec2f9d3e52c4871736e2b3a11ab24a1b0eac0b9348303c963d79217"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_heartbeat_ack_identity.py",
+      "sha256": "309dcb296d1c58f6b9b0b9004a5934e74978b2287d48f2e67057028169088595"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_heartbeat_liveness.py",
+      "sha256": "61a41c6e8e65266902d4359c1ad64469e20ce9fefad06a57aca32d268340ed62"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_heartbeat_restart.py",
+      "sha256": "c7df679a88f4bacd454aa45c681176c1393b7abb1ecfba3c02aaf085f34faa1e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_hunt_native_rearm.py",
+      "sha256": "4086111f769a6e831cdbfaad14c8c83165246acffa4ec0fffa3016c6e9903a77"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_job_contract_stage3.py",
+      "sha256": "ca324d737a1d7655ddc1937f12aacdfcb08a461c5bc4c725f4fc7a3566174a13"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_job_radio_policy.py",
+      "sha256": "4eb7f5b56ace4e85d35e140db5086cf635c694b7e7fe76993a81077e498429a5"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_job_recovery_reports.py",
+      "sha256": "bca5d16b584529d78b21617553355100ae912dad4459d365a80c2085b2fdd95e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_job_reports.py",
+      "sha256": "46ab39ebb010f323be56faee8c45f3814af04bf32a01e65ac461d5e54bb44b15"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_link_radio.py",
+      "sha256": "2bfbfb03aefe9e72294a7de3b97f0183ddc856057c359fcb8de7b85613b7704b"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist.py",
+      "sha256": "d1c16f2c73ff21be9932f73135a0841abf6bcccd840680e6985778ef549ae32e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist_cnn.py",
+      "sha256": "011534480e4a14f9451c8e517a0573697ccd19e2f7f8a46ffbbce56c26d1787e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist_cnn_model.py",
+      "sha256": "35512657964caea0318d0c825d94bd0c915343d313452aba398352fb45c1906f"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist_data.py",
+      "sha256": "0f954376d5650496849708d8776fda8a7b4b48282ef5174108a4ca468295524e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist_deployment.py",
+      "sha256": "dd63f8beb80cd7f9aa489c4e50853fa7624cac0c7aed73cea8917fc2b9f05684"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_mnist_update_metadata.py",
+      "sha256": "0ca8aca2f7bc7592f6affc3671bd2e0d604bf200cfc00fdfaa17b278b5cc9ce2"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_model_artifact.py",
+      "sha256": "f75f1ba2ede43b745a014dde18e358430a4999b6e8c3ee384fa65136552632a9"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_model_library.py",
+      "sha256": "432965c20385f571df9b9775e8f4ef42fe20deb8f85f177a4b51b3df542578f6"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_models_http.py",
+      "sha256": "0382f5aaab51e83e885c11b52b2fc0825a338c70e184e0438dc51c6d0298226f"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_models_page.py",
+      "sha256": "777a3084e9be857850b553fcbcb120417e69e53f785201c753fcadf2b0230e15"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_online_target_selection.py",
+      "sha256": "26ee2c4714fcef4e259465e6a02b6220383747e5ffda5720f5ce3771effb03c1"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio.py",
+      "sha256": "2158efd136fa58a46616f046efca492c36a7031fe10cbb9cfea146f2b9733e74"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_console.py",
+      "sha256": "cbb1cbd3870c4da3792630062679f4f78cfccb9ff8ad7d7a69bd37cff62729a4"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_console_http.py",
+      "sha256": "b67ca533a4c2da889734cd26dc59c52f23062f2edeea75b7f6692fec3fa44f7f"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_page.py",
+      "sha256": "6253217cf70b40990a3bd38a8f8905478a2a926f6df98bd796b2f924555c3bef"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_rest.py",
+      "sha256": "c8e82c70575006f7cb12f5967333eb1e75cd2e291abc1a9c0b580d91ed42e9ce"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_runtime_application.py",
+      "sha256": "e9d4ad43b3d240e1a6ac8eea22a63ea2ca5580a127e505824d52ac085c394b84"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_switch.py",
+      "sha256": "533c54cc08a6e6519a51d3509806038f01b2c9b3ed540e71d8fb083c3a00ab6b"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_radio_transactions.py",
+      "sha256": "647db6cd7dc7e774811fb45a5abaf16839949c79e73f0aee9ca580483e0e252d"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_real_job.py",
+      "sha256": "72dac4a1ba4f1fae6510392d7bed433fc394b4a1c8d8db035aa820a36fb92979"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_reference_model.py",
+      "sha256": "72c74613725e405e376aa2de57dc9bce29717887a297798d84e0ec24f5b1c8d6"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_server_daemon.py",
+      "sha256": "37e5e6ab72efcbf8610d55b3f19f527348ed8677b8fd503ac1421b5c4f1efb6c"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_service_deadlines.py",
+      "sha256": "f20ff3670b10fd2fd28a2e530abaad5671ff6278987c8ec1f653616aefafed4e"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_service_start_order.py",
+      "sha256": "c148a8fb21d09ffc0a6f6f97f9e970920f1681de18241b5b68bec55953867f00"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_sse_abort.py",
+      "sha256": "edd9cecf0b895cd493df7a4463dad7a8cbf327203c383428b340006444242c71"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_stage3_archive.py",
+      "sha256": "bbad5483a2b1b171b6e72323413629521613435f5f16371b097eb5256e0a3589"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_stage3_runner.py",
+      "sha256": "72e90d5da54fc12677e3ba9a90c90325d34f698fbe316fa5d79b5e5a1a8c803c"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_stage4_hardware_acceptance.py",
+      "sha256": "0796558dc9e7e9f935fab4cdfa66f691e813018a62ab72ca5d62ba34df682f02"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_stage4_radio_acceptance.py",
+      "sha256": "8d4334fec19b7aab09a27ef213d90ccd7136bc31c9cf05c5ae31229ac6b99e52"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_terminal_registry.py",
+      "sha256": "58c7fd25c187ce52ed12d7d64b4fbabf0b97419a9198f33ba0ab92e4bce55695"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_training_host.py",
+      "sha256": "0db64b1bc94d61f02c6ff7efd62c981fb18e5cfdcf08eae0f2cfa15e5c21a743"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_training_snapshot_host.py",
+      "sha256": "49c3604218a43168f84cd7328ae0e584b0e16ce7bd416da8e44e24fabb495d16"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_transport_deadlines.py",
+      "sha256": "0a240635d02596e2873a641faf5bd4a42c5f78d70835714ac19a67a47cec45de"
+    },
+    {
+      "path": "wfb_ng/tests/test_fl_tun_readiness.py",
+      "sha256": "ac9d1dfc4bdafab354ab2e88ce2131e395e0f254fed532caa5810883eb4ad6b7"
+    },
+    {
+      "path": "wfb_ng/tuntap.py",
+      "sha256": "e2f9662bc720b8b481fc17f0538d7633e024ef859641ab0bf06a46936b6aa77d"
+    },
+    {
+      "path": "wfb_ng/v6_startup.py",
+      "sha256": "0064de7b9e7e322b58ddccc7cc3572c3f49b5935f98242ef72fcb6bbe952a8d7"
+    }
+  ],
+  "remote_phases_executed": [],
+  "local_tests": "9 passed"
+}

@@ -1,4 +1,5 @@
 """分阶段发布入口；显式冻结 commit 和目标，所有目标必须通过每一阶段。"""
+import argparse
 import concurrent.futures
 import datetime
 import hashlib
@@ -23,10 +24,19 @@ def valid_commit(value):
     return len(value) == 40 and all(c in '0123456789abcdef' for c in value)
 
 
+if sys.argv[1:] == ['known-stages']:
+    print(' '.join(PHASES))
+    sys.exit()
+
 if len(sys.argv) >= 2 and sys.argv[1] == 'init':
-    if len(sys.argv) < 4:
-        raise SystemExit('用法: python release-online.py init <40hexcommit> fl00 fl01 ...')
-    commit, targets = sys.argv[2], sys.argv[3:]
+    parser = argparse.ArgumentParser(description='仅本地冻结源码与显式验收预期；不执行远端阶段')
+    parser.add_argument('commit')
+    parser.add_argument('targets', nargs='+')
+    parser.add_argument('--expected-grant-ms', type=int, choices=range(1, 121), default=10)
+    parser.add_argument('--expected-guard-ms', type=int, choices=range(11), default=10)
+    parser.add_argument('--expected-fec-n', type=int, choices=(12, 14), default=14)
+    options = parser.parse_args(sys.argv[2:])
+    commit, targets = options.commit, options.targets
     if not valid_commit(commit):
         raise SystemExit('commit 必须是 40 位小写十六进制值')
     if not targets or len(set(targets)) != len(targets) or targets[0] != 'fl00':
@@ -52,7 +62,9 @@ if len(sys.argv) >= 2 and sys.argv[1] == 'init':
     helper_sha = hashlib.sha256((BASE / 'release-online-node.py').read_bytes()).hexdigest()
     state = {'commit': commit, 'release_id': release_id, 'targets': targets,
              'archive_sha': archive_sha, 'native_sha': NATIVE_SHA,
-             'helperSHA': helper_sha, 'completed': []}
+             'helperSHA': helper_sha, 'expected': {'grant_duration_ms': options.expected_grant_ms,
+             'guard_interval_ms': options.expected_guard_ms, 'fec_n': options.expected_fec_n},
+             'completed': []}
     (evidence / 'state.json').write_text(json.dumps(state, indent=2) + '\n')
     print(evidence)
     sys.exit()
@@ -67,7 +79,11 @@ assert targets and targets[0] == 'fl00' and len(set(targets)) == len(targets)
 assert set(targets) == TARGETS and len(targets) == len(TARGETS)
 helper = (BASE / 'release-online-node.py').read_text()
 assert hashlib.sha256(helper.encode()).hexdigest() == state['helperSHA']
-assert phase in PHASES and phase == PHASES[len(state['completed'])], state['completed']
+assert phase in PHASES and len(state['completed']) < len(PHASES) and phase == PHASES[len(state['completed'])], state['completed']
+expected = state['expected']
+assert type(expected['grant_duration_ms']) is int and 1 <= expected['grant_duration_ms'] <= 120
+assert type(expected['guard_interval_ms']) is int and 0 <= expected['guard_interval_ms'] <= 10
+assert type(expected['fec_n']) is int and expected['fec_n'] in (12, 14)
 
 
 def on_host(host):
@@ -82,7 +98,8 @@ def on_host(host):
                 checked(['scp', '-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=6', str(evidence / 'source.tar'), host + ':' + remote_path + '/source.tar'], capture_output=True)
             result = {'host': host, 'exit': 0}
         else:
-            args = [phase, state['commit'], state['release_id'], state['archive_sha'], state['native_sha']]
+            args = [phase, state['commit'], state['release_id'], state['archive_sha'], state['native_sha'],
+                    str(expected['grant_duration_ms']), str(expected['guard_interval_ms']), str(expected['fec_n'])]
             command = (['sudo', '-n', '/usr/bin/python3', '-', *args] if host == 'fl00' else
                        ['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=6', host,
                         'sudo -n /usr/bin/python3 - ' + ' '.join(args)])

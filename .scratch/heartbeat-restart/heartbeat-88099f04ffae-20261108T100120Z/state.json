@@ -1,0 +1,26 @@
+{
+  "commit": "88099f04ffaee56c576bb35a9e50baec5f1113d7",
+  "release_id": "heartbeat-88099f04ffae-20261108T100120Z",
+  "targets": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl04",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "archive_sha": "6b0f1ebb80cc23343fced4ba3f323a498d04472e7ef03bf2bfa25265605903c4",
+  "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+  "helperSHA": "803d018cdf0ed250b670563ec3456d7d1fc93b2178c846804b98532a856a8b62",
+  "expected": {
+    "grant_duration_ms": 18,
+    "guard_interval_ms": 2,
+    "fec_n": 14
+  },
+  "completed": []
+}

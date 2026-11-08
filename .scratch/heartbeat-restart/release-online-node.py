@@ -15,7 +15,11 @@ import tarfile
 import time
 import urllib.request
 
-phase, commit, release_id, archive_sha, native_sha = sys.argv[1:]
+phase, commit, release_id, archive_sha, native_sha, grant_arg, guard_arg, fec_arg = sys.argv[1:]
+expected = {'grant_duration_ms': int(grant_arg), 'guard_interval_ms': int(guard_arg), 'fec_n': int(fec_arg)}
+assert 1 <= expected['grant_duration_ms'] <= 120
+assert 0 <= expected['guard_interval_ms'] <= 10
+assert expected['fec_n'] in (12, 14)
 host = socket.gethostname()
 assert host in {f'fl{i:02d}' for i in range(11)}
 assert os.geteuid() == 0
@@ -27,6 +31,39 @@ unit = 'wfb-fl-server-daemon.service' if host == 'fl00' else 'wfb-fl-client-daem
 role = 'server' if host == 'fl00' else 'client'
 purelib = pathlib.Path(sysconfig.get_path('purelib', vars={'base': '/usr', 'platbase': '/usr'}))
 installed = purelib / 'wfb_ng/fl'
+
+
+def native_option(args, name):
+    parts = [part.decode() if isinstance(part, bytes) else part for part in args if part]
+    assert parts.count(name) == 1, (name, parts)
+    index = parts.index(name)
+    assert index + 1 < len(parts), (name, parts)
+    return parts[index + 1]
+
+
+def verify_native_expectations(args, role, config, expected):
+    assert native_option(args, '--fec-k') == '8'
+    assert native_option(args, '--fec-n') == str(expected['fec_n'])
+    if role == 'server':
+        for key, option in (('grant_duration_ms', '--grant-duration-ms'),
+                            ('guard_interval_ms', '--guard-interval-ms')):
+            assert config.get(key, 10) == expected[key], (key, config.get(key, 10), expected[key])
+            assert native_option(args, option) == str(expected[key]), option
+        assert config.get('fec_n', 14) == expected['fec_n']
+
+
+def client_startup_options(options, expected_fec_n):
+    """保留其它参数，显式设置本批次客户端 FEC；差异由 prepare 记录。"""
+    assert expected_fec_n in (12, 14)
+    result = list(options)
+    assert result.count('--fec-n') <= 1, result
+    if '--fec-n' in result:
+        index = result.index('--fec-n')
+        assert index + 1 < len(result), result
+        result[index + 1] = str(expected_fec_n)
+    else:
+        result += ['--fec-n', str(expected_fec_n)]
+    return result
 
 
 def sha(path):
@@ -55,6 +92,22 @@ def get_radio_runtime(port):
             'req_id': response[0], 'rc': response[1], 'stbc': response[2],
             'ldpc': response[3], 'short_gi': response[4], 'bandwidth': response[5],
             'mcs_index': response[6], 'vht_mode': response[7], 'vht_nss': response[8]}
+
+
+def parse_fec_response(raw, address, port, expected_fec_n):
+    assert address == ('127.0.0.1', port)
+    assert len(raw) == struct.calcsize('!II2B')
+    request_id, rc, k, n = struct.unpack('!II2B', raw)
+    assert (request_id, rc, k, n) == (0x52464543, 0, 8, expected_fec_n)
+    return {'raw_hex': raw.hex(), 'req_id': request_id, 'rc': rc, 'k': k, 'n': n}
+
+
+def get_fec_runtime(port, expected_fec_n):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.settimeout(6)
+        sock.sendto(struct.pack('!IB', 0x52464543, 3), ('127.0.0.1', port))
+        raw, address = sock.recvfrom(4096)
+    return parse_fec_response(raw, address, port, expected_fec_n)
 
 
 def emit(data):
@@ -105,6 +158,10 @@ elif phase == 'prepare':
     (root / 'interface').write_text(iface + '\n')
     old_args = [s.decode() for s in bound_args if s]
     options = old_args[old_args.index('--config'):]
+    if role == 'client':
+        before_options = list(options)
+        options = client_startup_options(options, expected['fec_n'])
+        (root / 'startup-configuration-change.json').write_text(json.dumps({'before': before_options, 'after': options, 'expected': expected}, indent=2))
     (root / 'actualargs.json').write_text(json.dumps(['/usr/bin/python3', '-I', '-B', '-m', 'wfb_ng.fl.' + role + '_daemon', *options]))
     (root / 'configuration-before.json').write_text(pathlib.Path('/etc/wfb-ng-fl/' + ('server.json' if role == 'server' else 'node.json')).read_text())
     (root / 'uftp-before.json').write_text(json.dumps({n: {'path': shutil.which(n), 'sha256': sha(shutil.which(n))} for n in ('uftp', 'uftpd')}))
@@ -219,13 +276,11 @@ elif phase == 'audit':
     path, args = native[0]
     assert sha(path / 'exe') == native_sha
     assert args[args.index(b'--air-interface') + 1].decode() == iface
-    if role == 'server':
-        assert args[args.index(b'--grant-duration-ms') + 1] == str(config.get('grant_duration_ms', 10)).encode()
-        assert args[args.index(b'--guard-interval-ms') + 1] == str(config.get('guard_interval_ms', 10)).encode()
-        assert b'/usr/bin/wfb_v6_uplink' == args[0]
+    verify_native_expectations(args, role, config, expected)
     assert b'--radio-short-gi' not in args
     assert b'--radio-control-port' in args
     control_port = int(args[args.index(b'--radio-control-port') + 1])
+    fec_runtime = get_fec_runtime(control_port, expected['fec_n'])
     radio_runtime = get_radio_runtime(control_port)
     assert radio_runtime['short_gi'] == 0, radio_runtime
     assert radio_runtime['bandwidth'] == 40, radio_runtime
@@ -245,7 +300,7 @@ elif phase == 'audit':
     assert sha(root / 'source/wfb_v6_uplink') == native_sha
     assert all(sha(root / 'source/wfb_ng/fl' / n) == sha(installed / n) for n in json.loads((root / 'runtime-files.json').read_text()))
     emit({'host': host, 'pid': pid, 'power': power, 'uftp': uftp, 'actualargs': actualargs, 'native_pid': path.name, 'loaded': loaded,
-          'native_sha': native_sha, 'native_args': [s.decode() for s in args if s],
-          'radio_runtime': radio_runtime, 'radio': info})
+          'native_sha': native_sha, 'expected': expected, 'native_args': [s.decode() for s in args if s],
+          'fec_runtime': fec_runtime, 'radio_runtime': radio_runtime, 'radio': info})
 else:
     raise ValueError(phase)
