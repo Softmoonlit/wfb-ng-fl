@@ -16,7 +16,7 @@ import tempfile
 import time
 import urllib.request
 
-phase, commit, release_id, archive_sha, native_sha, grant_arg, guard_arg, fec_arg = sys.argv[1:]
+phase, commit, release_id, archive_sha, native_sha, grant_arg, guard_arg, fec_arg, native_before_sha = sys.argv[1:]
 expected = {'grant_duration_ms': int(grant_arg), 'guard_interval_ms': int(guard_arg), 'fec_n': int(fec_arg)}
 assert 1 <= expected['grant_duration_ms'] <= 120
 assert 0 <= expected['guard_interval_ms'] <= 10
@@ -98,6 +98,28 @@ def install_server_fec(config_path, record_path, expected):
     assert json.loads(config_path.read_text()) == after
 
 
+def atomic_native_replace(artifact, target, expected_sha):
+    assert hashlib.sha256(artifact.read_bytes()).hexdigest() == expected_sha
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=target.parent, prefix='.wfb-native-', delete=False) as stream:
+            temporary = pathlib.Path(stream.name)
+            stream.write(artifact.read_bytes())
+            os.fchmod(stream.fileno(), 0o755)
+            stream.flush()
+            os.fsync(stream.fileno())
+        assert hashlib.sha256(temporary.read_bytes()).hexdigest() == expected_sha
+        os.replace(temporary, target)
+        descriptor = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def sha(path):
     return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
 
@@ -108,6 +130,18 @@ def run(args, **kwargs):
         raise RuntimeError(json.dumps({'args': args, 'exit': result.returncode,
                                        'out': result.stdout, 'err': result.stderr}))
     return result.stdout
+
+
+def native_abi(artifact):
+    env = dict(os.environ, LC_ALL='C')
+    result = {flag: run(['readelf', flag, str(artifact)], env=env)
+              for flag in ('-h', '-l', '-d', '--version-info')}
+    assert 'ELF64' in result['-h'] and 'AArch64' in result['-h']
+    assert "2's complement, little endian" in result['-h']
+    assert '/lib/ld-linux-aarch64.so.1' in result['-l']
+    result['ldd'] = run(['ldd', '-v', str(artifact)], env=env)
+    assert 'not found' not in result['ldd']
+    return result
 
 
 def get_radio_runtime(port):
@@ -161,7 +195,7 @@ else:
     assert b'--interface' in bound_args, bound_args
     iface = bound_args[bound_args.index(b'--interface') + 1].decode()
 assert iface in {p.name for p in cards}, {'bound': iface, 'cards': [p.name for p in cards]}
-assert sha('/usr/bin/wfb_v6_uplink') == native_sha
+assert sha('/usr/bin/wfb_v6_uplink') == (native_sha if phase in {'start', 'audit'} else native_before_sha)
 if phase == 'preflight':
     assert not root.exists()
     state = run(['systemctl', 'show', unit, '-p', 'ActiveState', '-p', 'MainPID', '-p', 'ExecStart'])
@@ -178,14 +212,16 @@ if phase == 'preflight':
     native_pids = [p for p in pathlib.Path('/proc').iterdir() if p.name.isdigit()
                    and (p / 'exe').exists() and (p / 'exe').resolve() == pathlib.Path('/usr/bin/wfb_v6_uplink')]
     assert len(native_pids) == 1
-    assert sha(native_pids[0] / 'exe') == native_sha
+    assert sha(native_pids[0] / 'exe') == native_before_sha
     emit({'host': host, 'unit': state, 'iface': iface,
           'native_pid': native_pids[0].name,
-          'native_sha': native_sha, 'control_sha': sha(installed / 'control.py'),
+          'native_sha': native_before_sha, 'abi': native_abi(pathlib.Path('/usr/bin/wfb_v6_uplink')), 'control_sha': sha(installed / 'control.py'),
           'radio': run(['iw', 'dev', iface, 'info']),
           'nvpmodel': run(['/usr/sbin/nvpmodel', '-q'])})
 elif phase == 'prepare':
     assert sha(stage / 'source.tar') == archive_sha
+    assert sha(stage / 'wfb_v6_uplink') == native_sha
+    artifact_abi = native_abi(stage / 'wfb_v6_uplink')
     root.mkdir(parents=True)
     (root / 'interface').write_text(iface + '\n')
     old_args = [s.decode() for s in bound_args if s]
@@ -201,6 +237,8 @@ elif phase == 'prepare':
     backup.mkdir()
     shutil.copytree(installed, backup / 'fl')
     shutil.copy2('/usr/bin/wfb_v6_uplink', backup / 'wfb_v6_uplink')
+    assert sha(backup / 'wfb_v6_uplink') == native_before_sha
+    (root / 'native-before.json').write_text(json.dumps({'sha256': native_before_sha, 'artifact_sha256': native_sha, 'commit': commit, 'abi': artifact_abi}, indent=2))
     shutil.copytree('/etc/wfb-ng-fl', backup / 'config')
     unit_dir = pathlib.Path('/etc/systemd/system') / (unit + '.d')
     if unit_dir.exists():
@@ -217,7 +255,8 @@ elif phase == 'prepare':
         archive.extractall(source)
         assert all((source / name).exists() and (not m.isfile() or (source / name).stat().st_size == m.size)
                    for m, name in zip(members, names))
-    shutil.copy2('/usr/bin/wfb_v6_uplink', source / 'wfb_v6_uplink')
+    assert sha(source / 'wfb_v6_uplink') == native_sha
+    assert sha(stage / 'wfb_v6_uplink') == native_sha
     for name in ('uftp', 'uftpd', 'make'):
         assert shutil.which(name), name
     runtime_files = sorted(str(p.relative_to(source / 'wfb_ng/fl'))
@@ -250,6 +289,8 @@ elif phase == 'stop':
 elif phase == 'install':
     assert pid == '0', 'install requires completed stop barrier'
     source = root / 'source'
+    assert sha(root / 'backup/wfb_v6_uplink') == native_before_sha
+    assert sha(source / 'wfb_v6_uplink') == native_sha
     expected_names = {p.name for p in (source / 'wfb_ng/fl').glob('*.py')}
     for path in installed.glob('*.py'):
         if path.name not in expected_names:
@@ -258,7 +299,20 @@ elif phase == 'install':
         shutil.rmtree(cache)
     env = dict(os.environ, COMMIT=commit, VERSION='26.11.6', PREFIX='/usr',
                PYTHON='/usr/bin/python3', PYTHONDONTWRITEBYTECODE='1')
+    image = root / 'install-image'
+    env['DESTDIR'] = str(image)
     run(['sh', 'scripts/install/install-v8.sh'], cwd=source, env=env)
+    for path in sorted(image.rglob('*')):
+        assert not path.is_symlink(), path
+        target = pathlib.Path('/') / path.relative_to(image)
+        if path.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        elif target != pathlib.Path('/usr/bin/wfb_v6_uplink'):
+            if target.parent == pathlib.Path('/etc/wfb-ng-fl') and target.exists():
+                continue
+            shutil.copy2(path, target)
+    atomic_native_replace(image / 'usr/bin/wfb_v6_uplink', pathlib.Path('/usr/bin/wfb_v6_uplink'), native_sha)
+    assert sha('/usr/bin/wfb_v6_uplink') == native_sha
     if role == 'server':
         install_server_fec(pathlib.Path('/etc/wfb-ng-fl/server.json'),
                            root / 'server-fec-configuration-change.json', expected)

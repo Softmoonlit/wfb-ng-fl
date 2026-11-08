@@ -20,3 +20,6 @@
 /migrate.py
 # 冻结源码归档可从提交重建，摘要保存在state中。
 /heartbeat-*/source.tar
+
+# 新批次native artifact由显式输入冻结，SHA与ABI证据入库。
+/heartbeat-*/wfb_v6_uplink
