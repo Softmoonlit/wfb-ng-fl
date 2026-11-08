@@ -23,3 +23,5 @@
 
 # 新批次native artifact由显式输入冻结，SHA与ABI证据入库。
 /heartbeat-*/wfb_v6_uplink
+# 冻结native构建工作树可从提交重建，发布state保留输入SHA和ABI。
+/native-*/
