@@ -1,0 +1,50 @@
+{
+  "gate_passed": false,
+  "checks": {
+    "fl01": {
+      "unique_driver_interface": true,
+      "expected_mac": "fc:22:1c:50:0b:fe",
+      "actual_mac": "fc:22:1c:50:0b:fe",
+      "mapping_matches": true
+    },
+    "fl02": {
+      "unique_driver_interface": true,
+      "expected_mac": "fc:22:1c:30:0c:bc",
+      "actual_mac": "bc:ec:23:37:25:88",
+      "mapping_matches": false
+    },
+    "fl04": {
+      "unique_driver_interface": true,
+      "expected_mac": "bc:ec:23:37:25:88",
+      "actual_mac": "fc:22:1c:30:0c:bc",
+      "mapping_matches": false
+    },
+    "fl06": {
+      "unique_driver_interface": true,
+      "expected_mac": "fc:22:1c:30:0e:99",
+      "actual_mac": "fc:22:1c:30:0c:bb",
+      "mapping_matches": false
+    },
+    "fl07": {
+      "unique_driver_interface": true,
+      "expected_mac": "88:e6:28:52:aa:e4",
+      "actual_mac": "fc:22:1c:30:0e:99",
+      "mapping_matches": false
+    },
+    "fl09": {
+      "unique_driver_interface": true,
+      "expected_mac": "fc:22:1c:30:0c:bb",
+      "actual_mac": "88:e6:28:52:aa:e4",
+      "mapping_matches": false
+    }
+  },
+  "actions": {
+    "dropins_modified": false,
+    "services_restarted": false,
+    "communication_sent": false,
+    "fl03_connected": false,
+    "registry_modified": false,
+    "nine_client_sampling_performed": false
+  },
+  "stop_reason": "MAC mapping mismatch: stop before mutations or further sampling as instructed"
+}

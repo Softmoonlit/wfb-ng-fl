@@ -1,0 +1,24 @@
+Interface wlxfc221c500bfe
+	ifindex 14
+	wdev 0x200000001
+	addr fc:22:1c:50:0b:fe
+	type monitor
+	wiphy 2
+	channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz
+	txpower -18.00 dBm
+2026-11-08 15:08:57,985 [INFO] [client-daemon] 检测到无线网卡 wlxfc221c500bfe，开始接管配置...
+2026-11-08 15:09:01,212 [INFO] [client-daemon] 网卡 wlxfc221c500bfe 接管就绪 (Channel=149, 功率索引=18, TUN=fl-c1)
+2026-11-08 15:09:01,258 [INFO] [client-daemon] 启动客户端空闲链路底座: /usr/bin/wfb_v6_uplink --role client --tun-name fl-c1 --tun-addr 10.80.0.11/24 --node-id 1 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 14 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 4 --air-interface wlxfc221c500bfe --uplink-pause-threshold-bytes 131072 --uplink-resume-threshold-bytes 65536 --uplink-queue-packets-limit 64
+2026-11-08 15:09:14,817 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:09:28,392 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:09:45,971 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:10:03,513 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:10:23,393 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:10:40,998 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:10:58,574 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:11:16,149 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:11:33,694 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:11:51,277 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:12:08,849 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:12:33,131 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+2026-11-08 15:12:50,751 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK

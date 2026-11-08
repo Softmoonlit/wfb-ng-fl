@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "{\"backup\": \"/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf.card-swap-20261108T070828Z.bak\", \"old\": \"[Service]\\nExecStart=\\nExecStart=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261108T064511Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlx88e62852aae4\\nWorkingDirectory=/\\nUnsetEnvironment=PYTHONPATH PYTHONHOME\\nKillMode=control-group\\n\", \"new\": \"[Service]\\nExecStart=\\nExecStart=/usr/bin/python3 -I -B /srv/wfb-ng-fl/releases/heartbeat-c6659488f649-20261108T064511Z/daemon.py client --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxbcec23372588\\nWorkingDirectory=/\\nUnsetEnvironment=PYTHONPATH PYTHONHOME\\nKillMode=control-group\\n\", \"restart\": \"success\"}\n",
+  "stderr": ""
+}

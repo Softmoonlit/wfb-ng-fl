@@ -1,0 +1,74 @@
+{
+  "all_nine_parameters_passed": true,
+  "all_nine_ready_observed": false,
+  "sample_count": 29,
+  "last_sample_elapsed_seconds": 56.18286658899979,
+  "checks": {
+    "fl01": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 29
+      },
+      "final_readiness": "READY"
+    },
+    "fl02": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 29
+      },
+      "final_readiness": "READY"
+    },
+    "fl04": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "OFFLINE": 29
+      },
+      "final_readiness": "OFFLINE"
+    },
+    "fl05": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 29
+      },
+      "final_readiness": "READY"
+    },
+    "fl06": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 29
+      },
+      "final_readiness": "READY"
+    },
+    "fl07": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 26,
+        "CONNECTING": 3
+      },
+      "final_readiness": "READY"
+    },
+    "fl08": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 27,
+        "OFFLINE": 2
+      },
+      "final_readiness": "OFFLINE"
+    },
+    "fl09": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 29
+      },
+      "final_readiness": "READY"
+    },
+    "fl10": {
+      "parameters_passed": true,
+      "readiness_samples": {
+        "READY": 28,
+        "CONNECTING": 1
+      },
+      "final_readiness": "READY"
+    }
+  }
+}

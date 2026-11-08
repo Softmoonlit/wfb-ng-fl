@@ -15,6 +15,9 @@ Status: ready-for-agent
 
 ## Comments
 
+- 换卡后补测：已按六卡实际MAC重绑接口并重启六台。短暂出现全九READY，但冒烟prepare实读fl01信道153且连续失确认，故在切频与文件发送前停止。十台临时unit回收均通过，未启动模型预实验。实际映射及结果见`../evidence/card-swap-full-nine-20261108T070828Z/RESULT.md`。
+- 工具纠正：旧runner的ServerRole实际用默认15Mbps，不能沿用历史12/6Mbps速率标记；已显式传参、核验实际transport速率，30项本地测试通过。
+
 - 初盘十台全部SSH可达、15W实际限制通过。fl07～fl10仍为旧Python版本，fl05绑定旧接口且native未运行，已统一修复。
 - 本轮十台已统一加载c665948，native摘要一致，Long GI/40MHz/索引18启动和GET审计通过；部分客户端持续寻频，完整信道审计不通过。
 - 30秒七次快照：fl07/fl09始终OFFLINE，fl06反复READY/OFFLINE，其余六客户端READY。冒烟入口在prepare以`online target set mismatch`拒绝；未切频、未启动UFTP/HTTP或模型预实验。全十台临时unit均回收。见`../evidence/full-nine-current-inventory/README.md`。
