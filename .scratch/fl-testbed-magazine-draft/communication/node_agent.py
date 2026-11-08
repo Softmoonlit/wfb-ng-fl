@@ -17,7 +17,7 @@ import sys
 import time
 import urllib.request
 
-COMMIT = 'c6659488f64976185ffe02a7c856f7fd8c821ee0'
+COMMIT = '98dda459fb9a1cecf64fd03e224427b8b7f689fe'
 NATIVE_SHA = 'ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56'
 WRAPPER_SHA = 'd68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6'
 NODES = [1, 2, 4, 5, 6, 7, 8, 9, 10]
@@ -152,7 +152,7 @@ class Node:
         wrappers = [Path(a) for a in daemon_argv if a.endswith('/daemon.py')]
         require(len(wrappers) == 1, 'release wrapper absent')
         release = wrappers[0].parent
-        require(str(release).startswith('/srv/wfb-ng-fl/releases/heartbeat-c6659488f649-'), 'unexpected release')
+        require(str(release).startswith('/srv/wfb-ng-fl/releases/heartbeat-' + COMMIT[:12] + '-'), 'unexpected release')
         require(sha(wrappers[0]) == WRAPPER_SHA, 'release wrapper SHA mismatch')
         manifest = json.loads((release / 'manifest.json').read_text())
         loaded = json.loads((release / 'loaded.json').read_text())
