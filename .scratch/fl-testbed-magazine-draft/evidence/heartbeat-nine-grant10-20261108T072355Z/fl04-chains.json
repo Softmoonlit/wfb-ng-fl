@@ -1,0 +1,1170 @@
+[
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "36725930e6b58aa86d9c2ad1eaeeed7b5aa79c8313779c5c41a7ead3b9627d8d",
+    "timestamp_ms": 3280906,
+    "request_delta": 0.8239942299996983,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3281147,
+    "request_delta": 1.0644568999996409,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3281378,
+    "request_delta": 1.2953030719995695,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3281378,
+          "channel": 149
+        },
+        "RTT_ms": 46.511200000168174
+      },
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3281378,
+          "channel": 149
+        },
+        "RTT_ms": 63.483416000053694
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3281378,
+    "request_delta": 1.3418976969996947,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": true,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3281378,
+          "channel": 149
+        },
+        "RTT_ms": -0.08342499995706021
+      },
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3281378,
+          "channel": 149
+        },
+        "RTT_ms": 16.88879099992846
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3281463,
+    "request_delta": 1.3796241469999586,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": true,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3281463,
+          "channel": 149
+        },
+        "RTT_ms": 4.719657999885385
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3283488,
+    "request_delta": 3.4058687399997325,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3285720,
+    "request_delta": 5.637208048999582,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3285720,
+          "channel": 149
+        },
+        "RTT_ms": 3032.463693000409
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3287951,
+    "request_delta": 7.868339080999704,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3287951,
+          "channel": 149
+        },
+        "RTT_ms": 805.0672260001193
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3290182,
+    "request_delta": 10.09954986799994,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": true,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3290182,
+          "channel": 149
+        },
+        "RTT_ms": 38.06037499998638
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3292243,
+    "request_delta": 12.159861403999912,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": true,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3292243,
+          "channel": 149
+        },
+        "RTT_ms": 43.52776599989738
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3294309,
+    "request_delta": 14.225750845999755,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3296540,
+    "request_delta": 16.457201022999925,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3296540,
+          "channel": 149
+        },
+        "RTT_ms": 2037.5992449999103
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3298771,
+    "request_delta": 18.688508994999665,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3301003,
+    "request_delta": 20.920462445999874,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+    "timestamp_ms": 3303235,
+    "request_delta": 23.152677527999913,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9b488009c360780d0f5c5618b2fcf7fd0dc2c51694203002806a5b81cfa1c5a",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3303235,
+          "channel": 149
+        },
+        "RTT_ms": 285.40903499970227
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3303477,
+    "request_delta": 23.394325327999923,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b58c2e03b22a4770011ae6b780546b91bddf9edbcc92cd52774cc0473b8b7ad2",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3303477,
+          "channel": 149
+        },
+        "RTT_ms": 43.89730100001543
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "b58c2e03b22a4770011ae6b780546b91bddf9edbcc92cd52774cc0473b8b7ad2",
+    "timestamp_ms": 3303477,
+    "request_delta": 23.43881716399983,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b58c2e03b22a4770011ae6b780546b91bddf9edbcc92cd52774cc0473b8b7ad2",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3303477,
+          "channel": 149
+        },
+        "RTT_ms": -0.5945349998910388
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3303709,
+    "request_delta": 23.62586601699968,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3303709,
+          "channel": 149
+        },
+        "RTT_ms": 32.06625400025587
+      },
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3303709,
+          "channel": 149
+        },
+        "RTT_ms": 37.185897000199475
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3303709,
+    "request_delta": 23.658317395999802,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": true,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3303709,
+          "channel": 149
+        },
+        "RTT_ms": -0.3851249998660933
+      },
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3303709,
+          "channel": 149
+        },
+        "RTT_ms": 4.734518000077514
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3303767,
+    "request_delta": 23.684114393999607,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3305999,
+    "request_delta": 25.916350923999744,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3305999,
+          "channel": 149
+        },
+        "RTT_ms": 7724.988162000045
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3308230,
+    "request_delta": 28.14749415299957,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3308230,
+          "channel": 149
+        },
+        "RTT_ms": 5495.2933670001585
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3310462,
+    "request_delta": 30.378585284999645,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3312693,
+    "request_delta": 32.610169095999936,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3312693,
+          "channel": 149
+        },
+        "RTT_ms": 1034.5702569998139
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+    "timestamp_ms": 3314925,
+    "request_delta": 34.84169948099998,
+    "channel": 149,
+    "state": "IDLE",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "94ebea6825d5e6f0abe99a362388676e6309a91a0a987d8e8c5672f1de80fe10",
+          "confirmed": true,
+          "heartbeat_timestamp_ms": 3314925,
+          "channel": 149
+        },
+        "RTT_ms": 1589.6439389998704
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3315165,
+    "request_delta": 35.08230571199965,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "573b35e57c8d3bddcb39dd63cb31262d3baa32cb847e746f41e070fdecc600d0",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3315165,
+          "channel": 149
+        },
+        "RTT_ms": 1353.9800749999813
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3315396,
+    "request_delta": 35.31295681399979,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "50410ccf53af9b5ac1a8a1e514d3c1ab91d88c671ca50de4ed117825b85bfb13",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3315396,
+          "channel": 149
+        },
+        "RTT_ms": 1125.1371560001644
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3315819,
+    "request_delta": 35.73586224899964,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "675244571dfc6c400f19003aaa2416c4290f119d3339967bd3a7fa15dd45fc6c",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3315819,
+          "channel": 149
+        },
+        "RTT_ms": 714.2404510000233
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3316050,
+    "request_delta": 35.96647695399997,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "6ca970390717dc372b080243502a8f3e2b5ad49e6a195c43a08c55cb5e220a6c",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3316050,
+          "channel": 149
+        },
+        "RTT_ms": 483.7188989999959
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3316471,
+    "request_delta": 36.38816078699983,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "13b4f4bba24d587178b11e8f92ae06077ddb71db05c3013b7b1b855e762bc731",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3316471,
+          "channel": 149
+        },
+        "RTT_ms": 64.70694100016772
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3316703,
+    "request_delta": 36.61946928599991,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3317198,
+    "request_delta": 37.114940398999806,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "a6c1e71f0a87486808bf579ae48d13666273a59b1b5cdb6ae001d89cd1f9c1ca",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3317198,
+          "channel": 149
+        },
+        "RTT_ms": 2088.2427629999256
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3317429,
+    "request_delta": 37.345631713999865,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3317853,
+    "request_delta": 37.77032203099998,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "2142c001a40be27938f4d7cbef5cf5ae8c17d1dee58e82c45d60c347016bd78e",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3317853,
+          "channel": 149
+        },
+        "RTT_ms": 1437.1885479999946
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3318084,
+    "request_delta": 38.000882031999936,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3318506,
+    "request_delta": 38.422864105999906,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "a12a5fc36b4c83e407165d5f6eea43386559010b8c8b1be00ecbcc301063313f",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3318506,
+          "channel": 149
+        },
+        "RTT_ms": 784.7877859999244
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3318737,
+    "request_delta": 38.65348346099972,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3319231,
+    "request_delta": 39.148340015999565,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3319462,
+    "request_delta": 39.37921039399998,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3319888,
+    "request_delta": 39.804579913,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3320118,
+    "request_delta": 40.03508860299962,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "6ebeb36b3c207a0933025e8920c6074762ef341ba2fc92c10fe82a4bbb97deff",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3320118,
+          "channel": 149
+        },
+        "RTT_ms": 496.12359599996125
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3320552,
+    "request_delta": 40.46882638099987,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "b9fc570def208180dd213944a40889362d62ca06c1460b115c879cb5059cebe5",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3320552,
+          "channel": 149
+        },
+        "RTT_ms": 62.526747999982035
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3320782,
+    "request_delta": 40.69970981999995,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3321280,
+    "request_delta": 41.19680465399961,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "1101a7432f86af53f0e9b48b9e9d0d9c50f8b9c910fb0eda980d0811a075d453",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3321280,
+          "channel": 149
+        },
+        "RTT_ms": 33.565372000339266
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": "1101a7432f86af53f0e9b48b9e9d0d9c50f8b9c910fb0eda980d0811a075d453",
+    "timestamp_ms": 3321280,
+    "request_delta": 41.23093089699978,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "1101a7432f86af53f0e9b48b9e9d0d9c50f8b9c910fb0eda980d0811a075d453",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3321280,
+          "channel": 149
+        },
+        "RTT_ms": -0.560870999834151
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3321511,
+    "request_delta": 41.42755108399979,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "49d31e27e9e2e63d1056fe1b8a1f0abb06d7c0d926d7a1b300c628e5d3b23a29",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3321511,
+          "channel": 149
+        },
+        "RTT_ms": 1112.3606880000807
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3321933,
+    "request_delta": 41.84997066999995,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "39bb8488eb7085b974cfb169c11d0787f09d50b45a9a00e18620aeac75c56011",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3321933,
+          "channel": 149
+        },
+        "RTT_ms": 690.0596639998184
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3322164,
+    "request_delta": 42.08054120099996,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3322585,
+    "request_delta": 42.50243737999972,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3322816,
+    "request_delta": 42.733467685999585,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3323312,
+    "request_delta": 43.22876541599999,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3323542,
+    "request_delta": 43.459425112999725,
+    "channel": 149,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3323970,
+    "request_delta": 43.887054521999744,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3324201,
+    "request_delta": 44.117789871999776,
+    "channel": 157,
+    "state": "HUNTING",
+    "server_received": true,
+    "server_ACK": true,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "f43f72b19391cc69c94941e9c980fbac28d8cf6cf64819ae8d63718d443c27ad",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3324201,
+          "channel": 149
+        },
+        "RTT_ms": 485.87554499999897
+      }
+    ]
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3324623,
+    "request_delta": 44.53993168299985,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": false,
+    "valid_230ms_candidate": false,
+    "ACKs": []
+  },
+  {
+    "boot_id": "96c2788adea343ad861975c55311e647",
+    "session": null,
+    "timestamp_ms": 3324854,
+    "request_delta": 44.77064356899973,
+    "channel": 153,
+    "state": "HUNTING",
+    "server_received": false,
+    "server_ACK": false,
+    "client_ACK": true,
+    "valid_230ms_candidate": false,
+    "ACKs": [
+      {
+        "body": {
+          "ack": true,
+          "boot_id": "96c2788adea343ad861975c55311e647",
+          "session": "0d634275cbe49173dc5361b23e8d0d5fe0b1346cf7927e0ec1c498321f3e9580",
+          "confirmed": false,
+          "heartbeat_timestamp_ms": 3324854,
+          "channel": 149
+        },
+        "RTT_ms": 15.991386000223429
+      }
+    ]
+  }
+]

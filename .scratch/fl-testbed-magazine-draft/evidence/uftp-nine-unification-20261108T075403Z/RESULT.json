@@ -1,0 +1,57 @@
+{
+  "verified": true,
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl04",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "replaced": [
+    "fl01",
+    "fl02",
+    "fl04",
+    "fl05",
+    "fl10"
+  ],
+  "reference": {
+    "uftp": {
+      "which": "/usr/bin/uftp",
+      "real": "/usr/bin/uftp",
+      "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+      "version": {
+        "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+      },
+      "ldd": {
+        "rc": 0,
+        "out": "\tlinux-vdso.so.1 (0x0000ffff965a0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff94bf0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff947e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff94630000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff96567000)\n"
+      },
+      "file": {
+        "rc": 0,
+        "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+      }
+    },
+    "uftpd": {
+      "which": "/usr/bin/uftpd",
+      "real": "/usr/bin/uftpd",
+      "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+      "version": {
+        "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+      },
+      "ldd": {
+        "rc": 0,
+        "out": "\tlinux-vdso.so.1 (0x0000ffff9a84f000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9a6a0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff9a290000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9a0e0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9a816000)\n"
+      },
+      "file": {
+        "rc": 0,
+        "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+      }
+    }
+  },
+  "daemon_pids_unchanged": true
+}

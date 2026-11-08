@@ -1,0 +1,44 @@
+{
+  "fl01": {
+    "emitted": 83,
+    "server_received": 78,
+    "server_ACK": 78,
+    "client_ACK": 76,
+    "confirmed_session_match_RTT_le_230ms": 5,
+    "confirmed_session_match_RTT_gt_230ms": 10
+  },
+  "fl05": {
+    "emitted": 60,
+    "server_received": 57,
+    "server_ACK": 57,
+    "client_ACK": 57,
+    "confirmed_session_match_RTT_le_230ms": 6,
+    "confirmed_session_match_RTT_gt_230ms": 13
+  },
+  "fl04": {
+    "emitted": 82,
+    "server_received": 67,
+    "server_ACK": 67,
+    "client_ACK": 66,
+    "confirmed_session_match_RTT_le_230ms": 6,
+    "confirmed_session_match_RTT_gt_230ms": 9
+  },
+  "server_tail": {
+    "active_queues": {
+      "[1,2,6,5,9,8,7,10,4]": 287,
+      "[1,2,6,5,9,8,7,10]": 8
+    },
+    "ready_refresh_counts": {
+      "2": 15,
+      "8": 16,
+      "7": 16,
+      "6": 14,
+      "4": 12,
+      "9": 13,
+      "10": 15,
+      "5": 14,
+      "1": 15
+    },
+    "limitation": "45KB trailing log only; grant/READY lines lack exact timestamps, one-second statistics provide brackets; not full 45s frequency"
+  }
+}

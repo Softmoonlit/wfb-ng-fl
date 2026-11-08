@@ -1,0 +1,532 @@
+{
+  "fl00": {
+    "host": "fl00",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff965a0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff94bf0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff947e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff94630000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff96567000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff9a84f000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9a6a0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff9a290000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9a0e0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9a816000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "30460": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-11.scope                  loaded active running Session 11 of User fl\n  session-22.scope                  loaded active running Session 22 of User fl\n  session-4.scope                   loaded active running Session 4 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  bluetooth.service                 loaded active running Bluetooth service\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  snap.cups.cups-browsed.service    loaded active running Service for snap application cups.cups-browsed\n  snap.cups.cupsd.service           loaded active running Service for snap application cups.cupsd\n  snapd.service                     loaded active running Snap Daemon\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-server-daemon.service      loaded active running WFB-ng FL server persistent daemon\n  wfb-management-dhcp.service       loaded active running WFB management Ethernet DHCP server\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  snapd.socket                      loaded active running Socket activation for snappy daemon\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl01": {
+    "host": "fl01",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "5f7ba09526dce77480e97d347bef27cdf8301570efe2aca997d873fb37397c58",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff91b7e000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff901e0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff8fdd0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff8fc20000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff91b45000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=14b45d6034ae6e04d967db2ddc3f0a92fcca1642, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "d1ef1ab8c22ad5aa9da226a64a12e36ee922a9960b1f1d56a3fe4f1d22ce116d",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffa770c000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa7560000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa7150000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa6fa0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa76d3000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=9499140663ef2d049fea3d8d02a5578172309391, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "6987": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-53.scope                  loaded active running Session 53 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  lpd.service                       loaded active running LSB: BSD lpr/lpd line printer spooling system\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl02": {
+    "host": "fl02",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "5f7ba09526dce77480e97d347bef27cdf8301570efe2aca997d873fb37397c58",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffa1f57000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa05b0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa01a0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9fff0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa1f1e000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=14b45d6034ae6e04d967db2ddc3f0a92fcca1642, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "d1ef1ab8c22ad5aa9da226a64a12e36ee922a9960b1f1d56a3fe4f1d22ce116d",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffad28a000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffad0e0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffaccd0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffacb20000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffad251000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=9499140663ef2d049fea3d8d02a5578172309391, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "7355": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-48.scope                  loaded active running Session 48 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  lpd.service                       loaded active running LSB: BSD lpr/lpd line printer spooling system\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl04": {
+    "host": "fl04",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "5f7ba09526dce77480e97d347bef27cdf8301570efe2aca997d873fb37397c58",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffa436f000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa29d0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa25c0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa2410000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa4336000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=14b45d6034ae6e04d967db2ddc3f0a92fcca1642, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "d1ef1ab8c22ad5aa9da226a64a12e36ee922a9960b1f1d56a3fe4f1d22ce116d",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffbbb4f000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffbb9b0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffbb5a0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffbb3f0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbbb16000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=9499140663ef2d049fea3d8d02a5578172309391, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "6871": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-53.scope                  loaded active running Session 53 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl05": {
+    "host": "fl05",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "5f7ba09526dce77480e97d347bef27cdf8301570efe2aca997d873fb37397c58",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffbc4cf000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffbab30000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffba720000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffba570000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbc496000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=14b45d6034ae6e04d967db2ddc3f0a92fcca1642, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "d1ef1ab8c22ad5aa9da226a64a12e36ee922a9960b1f1d56a3fe4f1d22ce116d",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffa779a000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa75f0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa71e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa7030000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa7761000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=9499140663ef2d049fea3d8d02a5578172309391, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "6156": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-49.scope                  loaded active running Session 49 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl06": {
+    "host": "fl06",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff90e90000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff8f4f0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff8f100000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff8ef50000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff90e57000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffaf262000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffaf0c0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffaecd0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffaeb20000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffaf229000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "12434": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-50.scope                  loaded active running Session 50 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl07": {
+    "host": "fl07",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffb6c9f000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb5300000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffb4f10000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb4d60000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb6c66000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff8d7d2000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff8d630000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff8d240000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff8d090000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff8d799000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "12582": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-51.scope                  loaded active running Session 51 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl08": {
+    "host": "fl08",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffac377000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffaa9d0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffaa5e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffaa430000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffac33e000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffa15f2000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa1450000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa1060000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa0eb0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa15b9000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "11781": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-47.scope                  loaded active running Session 47 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl09": {
+    "host": "fl09",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff842ee000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff82940000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff82550000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff823a0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff842b5000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=831697b02a4866951eb96176d7b454e1b2a990d0, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+        "version": {
+          "out": "UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffff8c33b000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff8c190000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff8bda0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff8bbf0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff8c302000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=ae90873a90ccb8d360cc4c3e22ed32d7abc871f7, for GNU/Linux 3.7.0, with debug_info, not stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "13434": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-51.scope                  loaded active running Session 51 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  },
+  "fl10": {
+    "host": "fl10",
+    "arch": "aarch64",
+    "path": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+    "bins": {
+      "uftp": {
+        "which": "/usr/bin/uftp",
+        "real": "/usr/bin/uftp",
+        "sha256": "354f47491b30de6475db3671465dbd25b606e039df025d593d1d5b9079330cf6",
+        "version": {
+          "out": "UFTP version 4.10.2  Copyright (C) 2001-2020  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffaa05d000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa86c0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa82d0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa8120000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffaa024000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftp: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=66adcc71a9aed2d02f1c7276b0fa44caa388d77d, for GNU/Linux 3.7.0, stripped\n"
+        }
+      },
+      "uftpd": {
+        "which": "/usr/bin/uftpd",
+        "real": "/usr/bin/uftpd",
+        "sha256": "c9695cbc5684549addb019d57ad771c04e7b4435ed87f9e756fa9bd3dc90c9ca",
+        "version": {
+          "out": "UFTP version 4.10.2  Copyright (C) 2001-2020  Dennis A. Bush"
+        },
+        "ldd": {
+          "rc": 0,
+          "out": "\tlinux-vdso.so.1 (0x0000ffffb7419000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb7280000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffb6e90000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb6ce0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb73e0000)\n"
+        },
+        "file": {
+          "rc": 0,
+          "out": "/usr/bin/uftpd: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-aarch64.so.1, BuildID[sha1]=6360e1bb28f4b63a4c990d6f1d045d218a6935eb, for GNU/Linux 3.7.0, stripped\n"
+        }
+      }
+    },
+    "processes": [],
+    "daemon_paths": {
+      "9722": {
+        "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin",
+        "which": {
+          "uftp": "/usr/bin/uftp",
+          "uftpd": "/usr/bin/uftpd"
+        }
+      }
+    },
+    "units": {
+      "rc": 0,
+      "out": "  proc-sys-fs-binfmt_misc.automount loaded active running Arbitrary Executable File Formats File System Automount Point\n  init.scope                        loaded active running System and Service Manager\n  session-1.scope                   loaded active running Session 1 of User fl\n  session-49.scope                  loaded active running Session 49 of User fl\n  accounts-daemon.service           loaded active running Accounts Service\n  avahi-daemon.service              loaded active running Avahi mDNS/DNS-SD Stack\n  colord.service                    loaded active running Manage, Install and Generate Color Profiles\n  containerd.service                loaded active running containerd container runtime\n  cron.service                      loaded active running Regular background program processing daemon\n  dbus.service                      loaded active running D-Bus System Message Bus\n  docker.service                    loaded active running Docker Application Container Engine\n  fwupd.service                     loaded active running Firmware update daemon\n  gdm.service                       loaded active running GNOME Display Manager\n  haveged.service                   loaded active running Entropy Daemon based on the HAVEGE algorithm\n  kerneloops.service                loaded active running Tool to automatically collect and submit kernel crash signatures\n  lpd.service                       loaded active running LSB: BSD lpr/lpd line printer spooling system\n  ModemManager.service              loaded active running Modem Manager\n  networkd-dispatcher.service       loaded active running Dispatcher daemon for systemd-networkd\n  NetworkManager.service            loaded active running Network Manager\n  nv-tee-supplicant.service         loaded active running OP-TEE Client Supplicant\n  nvargus-daemon.service            loaded active running Argus daemon\n  nvfancontrol.service              loaded active running nvfancontrol service\n  nvidia-pva-allowd.service         loaded active running service for managing PVA allowlists\n  nvmemwarning.service              loaded active running Display Low memory warning\n  nvphs.service                     loaded active running PHS daemon\n  nvs-service.service               loaded active running NVS-SERVICE Embedded Sensor HAL Daemon\n  packagekit.service                loaded active running PackageKit Daemon\n  polkit.service                    loaded active running Authorization Manager\n  power-profiles-daemon.service     loaded active running Power Profiles daemon\n  rpcbind.service                   loaded active running RPC bind portmap service\n  rsyslog.service                   loaded active running System Logging Service\n  rtkit-daemon.service              loaded active running RealtimeKit Scheduling Policy Service\n  seatd.service                     loaded active running Seat management daemon\n  serial-getty@ttyGS0.service       loaded active running Serial Getty on ttyGS0\n  serial-getty@ttyTCU0.service      loaded active running Serial Getty on ttyTCU0\n  snapd.service                     loaded active running Snap Daemon\n  ssh.service                       loaded active running OpenBSD Secure Shell server\n  switcheroo-control.service        loaded active running Switcheroo Control Proxy service\n  systemd-journald.service          loaded active running Journal Service\n  systemd-logind.service            loaded active running User Login Management\n  systemd-resolved.service          loaded active running Network Name Resolution\n  systemd-timesyncd.service         loaded active running Network Time Synchronization\n  systemd-udevd.service             loaded active running Rule-based Manager for Device Events and Files\n  udisks2.service                   loaded active running Disk Manager\n  upower.service                    loaded active running Daemon for power management\n  user@1000.service                 loaded active running User Manager for UID 1000\n  wfb-fl-client-daemon.service      loaded active running WFB-ng FL client persistent daemon\n  wpa_supplicant.service            loaded active running WPA supplicant\n  avahi-daemon.socket               loaded active running Avahi mDNS/DNS-SD Stack Activation Socket\n  dbus.socket                       loaded active running D-Bus System Message Bus Socket\n  docker.socket                     loaded active running Docker Socket for the API\n  rpcbind.socket                    loaded active running RPCbind Server Activation Socket\n  snapd.socket                      loaded active running Socket activation for snappy daemon\n  syslog.socket                     loaded active running Syslog Socket\n  systemd-journald-audit.socket     loaded active running Journal Audit Socket\n  systemd-journald-dev-log.socket   loaded active running Journal Socket (/dev/log)\n  systemd-journald.socket           loaded active running Journal Socket\n  systemd-udevd-control.socket      loaded active running udev Control Socket\n  systemd-udevd-kernel.socket       loaded active running udev Kernel Socket\n"
+    }
+  }
+}

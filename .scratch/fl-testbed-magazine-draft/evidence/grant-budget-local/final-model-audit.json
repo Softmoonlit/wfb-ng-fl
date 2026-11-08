@@ -1,0 +1,2533 @@
+{
+  "run_id": "nine-grant10-model-20261108-1",
+  "collected_utc": "2026-11-08T08:17:13.550551+00:00",
+  "read_only": true,
+  "new_role_created": false,
+  "progress": [
+    {
+      "wall": 1794124964.322856,
+      "monotonic": 5678.430382916,
+      "phase": "plan",
+      "result": {
+        "kind": "model-equivalent-communication",
+        "payload_mode": "model",
+        "generated_payload": false,
+        "hosts": [
+          "fl00",
+          "fl01",
+          "fl02",
+          "fl04",
+          "fl05",
+          "fl06",
+          "fl07",
+          "fl08",
+          "fl09",
+          "fl10"
+        ],
+        "nodes": [
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "payload": {
+          "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "bytes": 44770302,
+        "rounds": 1,
+        "radio_patch": {
+          "channel": 157,
+          "bandwidth_mhz": 40,
+          "downlink_mcs": 3,
+          "uplink_mcs": 4,
+          "radio_txpower_dbm": 18,
+          "uftp_rate_kbps": 12000
+        },
+        "model_manifest": {
+          "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/model-sized-four-20261106T173222Z/model-manifest.json",
+          "content": {
+            "dtype_statistics": {
+              "float32": {
+                "bytes": 44734248,
+                "elements": 11183562
+              },
+              "int64": {
+                "bytes": 160,
+                "elements": 20
+              }
+            },
+            "initialization": {
+              "seed": 7,
+              "source": "torchvision-resnet18-basicblock-cifar10-kaiming-normal-fan-out-relu-bn-standard-kaiming-uniform-a-sqrt5-v1"
+            },
+            "model_format": "cifar10-resnet18-fp32-v1",
+            "parameter_count": 11173962,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "size_bytes": 44770302,
+            "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+            "torch_version": "2.5.0a0+872d972e41.nv24.08",
+            "torchvision_version": "0.20.0a0+afc54f7",
+            "model_source_commit": "f15de6517acbc3ebbf8d1e1defe78900c81fd2ca",
+            "public_load_verified": true
+          }
+        },
+        "model_manifest_matched": true,
+        "model_semantics_validated_by_runner": false,
+        "uftp_port": 1144,
+        "http_port": 18080,
+        "multicast": "239.80.41.1",
+        "private_multicast": "239.80.42.1",
+        "io_timeout": 300,
+        "orchestration_timeout": 690,
+        "node_timeout": 705,
+        "recovery_budget": 60,
+        "cleanup_timeout": 10,
+        "unit_stop_timeout": 8,
+        "close_restore_reserve": 40,
+        "deadline": 690,
+        "bundle_sha256": "8432e67984b1c1312180a9dddb405a613e1dde3f7d41f55b5df166bb4d979876",
+        "execute": true,
+        "boundary": "校验manifest与字节身份，不解析张量，不承诺正式FL生命周期或update等量；公共load由调用方另验；无训练、聚合"
+      }
+    },
+    {
+      "wall": 1794124964.7511013,
+      "monotonic": 5678.858629371,
+      "host": "fl00",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5678.857864839,
+        "daemon_pid": 30460,
+        "native_pid": 30514,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-s",
+        "ifindex": 12,
+        "radio": {
+          "iw": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            3,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.1126513,
+      "monotonic": 5679.220179615,
+      "host": "fl01",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5647.794002788,
+        "daemon_pid": 6987,
+        "native_pid": 7003,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c1",
+        "ifindex": 18,
+        "radio": {
+          "iw": "Interface wlxfc221c500bfe\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.3751996,
+      "monotonic": 5679.482727903,
+      "host": "fl04",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5609.641411097,
+        "daemon_pid": 6871,
+        "native_pid": 6887,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c4",
+        "ifindex": 20,
+        "radio": {
+          "iw": "Interface wlxfc221c300cbc\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bc\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.4773118,
+      "monotonic": 5679.584839699,
+      "host": "fl02",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5550.74820144,
+        "daemon_pid": 7355,
+        "native_pid": 7371,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c2",
+        "ifindex": 19,
+        "radio": {
+          "iw": "Interface wlxbcec23372588\n\tifindex 15\n\twdev 0x300000001\n\taddr bc:ec:23:37:25:88\n\ttype monitor\n\twiphy 3\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.5020025,
+      "monotonic": 5679.609531387,
+      "host": "fl05",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5680.387499833,
+        "daemon_pid": 6156,
+        "native_pid": 6172,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c5",
+        "ifindex": 13,
+        "radio": {
+          "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.6465552,
+      "monotonic": 5679.754084007,
+      "host": "fl08",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5636.420826711,
+        "daemon_pid": 11781,
+        "native_pid": 11798,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c8",
+        "ifindex": 15,
+        "radio": {
+          "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.6682434,
+      "monotonic": 5679.775770719,
+      "host": "fl06",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5641.773493827,
+        "daemon_pid": 12434,
+        "native_pid": 12450,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c6",
+        "ifindex": 18,
+        "radio": {
+          "iw": "Interface wlxfc221c300cbb\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.6689656,
+      "monotonic": 5679.776492658,
+      "host": "fl09",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5612.40944251,
+        "daemon_pid": 13434,
+        "native_pid": 13451,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c9",
+        "ifindex": 18,
+        "radio": {
+          "iw": "Interface wlx88e62852aae4\n\tifindex 14\n\twdev 0x200000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.9014177,
+      "monotonic": 5680.008946494,
+      "host": "fl07",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5639.595667718,
+        "daemon_pid": 12582,
+        "native_pid": 12598,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c7",
+        "ifindex": 18,
+        "radio": {
+          "iw": "Interface wlxfc221c300e99\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124965.9665513,
+      "monotonic": 5680.074078665,
+      "host": "fl10",
+      "phase": "prepare",
+      "ok": true,
+      "result": {
+        "event": "prepared",
+        "monotonic": 5487.89411635,
+        "daemon_pid": 9722,
+        "native_pid": 9738,
+        "native_sha": "ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56",
+        "tun": "fl-c10",
+        "ifindex": 15,
+        "radio": {
+          "iw": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+          "get_radio": [
+            1129270605,
+            0,
+            0,
+            0,
+            0,
+            40,
+            4,
+            0,
+            1
+          ]
+        },
+        "wrapper_sha": "d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6",
+        "installed": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+        "source": "/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl",
+        "payload": {
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "timing": {
+          "io_timeout": 300,
+          "orchestration_timeout": 690,
+          "node_timeout": 705,
+          "recovery_budget": 60,
+          "cleanup_timeout": 10,
+          "unit_stop_timeout": 8,
+          "close_restore_reserve": 40
+        },
+        "runtime_dependencies": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "resolved_path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "resolved_path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "version_source": "binary_banner"
+          }
+        },
+        "scope": "等量通信；无模型语义验证、正式FL生命周期或射频所有权承诺"
+      }
+    },
+    {
+      "wall": 1794124974.264654,
+      "monotonic": 5688.37218261,
+      "host": "fl00",
+      "phase": "acquire_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_acquired",
+        "monotonic": 5688.371190104,
+        "response": {
+          "calibration": false,
+          "session_id": "switch_e16499b34da14bbd8515a59166066d84",
+          "status": "finalized",
+          "target_channel": 157,
+          "applied_patch": {
+            "channel": 157,
+            "bandwidth_mhz": 40,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "radio_txpower_dbm": 18,
+            "uftp_rate_kbps": 12000
+          },
+          "failed_phase": null,
+          "unresponsive_nodes": [],
+          "error_message": null,
+          "effective_config": {
+            "channel": 157,
+            "bandwidth_mhz": 40,
+            "radio_txpower_dbm": 18,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "uftp_rate_kbps": 12000,
+            "fec_k": 8,
+            "fec_n": 14,
+            "channel_width": "HT40+",
+            "guard_interval": "long"
+          },
+          "local_committed_config": null
+        },
+        "proof": "普通重配事务，不持有守护进程作业准入租约"
+      }
+    },
+    {
+      "wall": 1794124974.2753336,
+      "monotonic": 5688.38286129,
+      "host": "fl00",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5688.382173432,
+        "iw": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.2846315,
+      "monotonic": 5688.39215971,
+      "host": "fl08",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5645.0592999,
+        "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.2851906,
+      "monotonic": 5688.392717709,
+      "host": "fl02",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5559.556716019,
+        "iw": "Interface wlxbcec23372588\n\tifindex 15\n\twdev 0x300000001\n\taddr bc:ec:23:37:25:88\n\ttype monitor\n\twiphy 3\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.3839405,
+      "monotonic": 5688.491468456,
+      "host": "fl10",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5496.322363213,
+        "iw": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.3865182,
+      "monotonic": 5688.49404558,
+      "host": "fl07",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5648.080791208,
+        "iw": "Interface wlxfc221c300e99\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.3877857,
+      "monotonic": 5688.495312909,
+      "host": "fl06",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5650.492819443,
+        "iw": "Interface wlxfc221c300cbb\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 2\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.485415,
+      "monotonic": 5688.592943435,
+      "host": "fl04",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5618.749413138,
+        "iw": "Interface wlxfc221c300cbc\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bc\n\ttype monitor\n\twiphy 2\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.4890413,
+      "monotonic": 5688.59656929,
+      "host": "fl01",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5657.171927079,
+        "iw": "Interface wlxfc221c500bfe\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 2\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.490891,
+      "monotonic": 5688.598418554,
+      "host": "fl09",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5621.236900002,
+        "iw": "Interface wlx88e62852aae4\n\tifindex 14\n\twdev 0x200000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 2\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.4914315,
+      "monotonic": 5688.598958153,
+      "host": "fl05",
+      "phase": "verify_radio",
+      "ok": true,
+      "result": {
+        "event": "radio_verified",
+        "monotonic": 5689.378325131,
+        "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\n\ttxpower -18.00 dBm\n",
+        "get_radio": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "wall": 1794124974.5296218,
+      "monotonic": 5688.637150833,
+      "host": "fl00",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5688.636279738,
+        "actual_uftp_rate_kbps": 12000
+      }
+    },
+    {
+      "wall": 1794124974.547889,
+      "monotonic": 5688.655416272,
+      "host": "fl01",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5657.2305082,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.5481086,
+      "monotonic": 5688.65563583,
+      "host": "fl05",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5689.435362773,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.550453,
+      "monotonic": 5688.657980275,
+      "host": "fl09",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5621.297528661,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.626657,
+      "monotonic": 5688.734185824,
+      "host": "fl02",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5559.897667036,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.6372216,
+      "monotonic": 5688.744749109,
+      "host": "fl04",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5618.902142345,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.6511376,
+      "monotonic": 5688.758664801,
+      "host": "fl08",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5645.425875464,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.7353537,
+      "monotonic": 5688.842882176,
+      "host": "fl06",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5650.840534887,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.7372077,
+      "monotonic": 5688.844735473,
+      "host": "fl10",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5496.676850375,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794124974.7539816,
+      "monotonic": 5688.861510568,
+      "host": "fl07",
+      "phase": "start_receive",
+      "ok": true,
+      "result": {
+        "event": "receive_started",
+        "monotonic": 5648.448352504,
+        "actual_uftp_rate_kbps": null
+      }
+    },
+    {
+      "wall": 1794125074.3610215,
+      "monotonic": 5788.468550326,
+      "host": "fl00",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "send_complete",
+        "monotonic": 5788.467285845,
+        "round_id": "923d6e06-36cf-4002-be7d-8e0c0b2954eb",
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/payload.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.0507216,
+      "monotonic": 5790.158250041,
+      "host": "fl05",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5790.941214853,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.0550437,
+      "monotonic": 5790.162571018,
+      "host": "fl02",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5661.326267577,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.0601063,
+      "monotonic": 5790.167634639,
+      "host": "fl06",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5752.162824773,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.064008,
+      "monotonic": 5790.171536117,
+      "host": "fl08",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5746.836284071,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.066817,
+      "monotonic": 5790.174344222,
+      "host": "fl01",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5758.754819357,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.0717058,
+      "monotonic": 5790.179233342,
+      "host": "fl07",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5749.76607589,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125076.1383913,
+      "monotonic": 5790.245919534,
+      "host": "fl04",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5720.38521086,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125077.110222,
+      "monotonic": 5791.217750873,
+      "host": "fl09",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5723.844995288,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125077.3580048,
+      "monotonic": 5791.465533386,
+      "host": "fl10",
+      "phase": "publish",
+      "ok": true,
+      "result": {
+        "event": "receive_verified",
+        "monotonic": 5599.238308547,
+        "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    {
+      "wall": 1794125270.240239,
+      "monotonic": 5984.347768044,
+      "host": "fl07",
+      "phase": "submit",
+      "ok": true,
+      "result": {
+        "event": "update_sent",
+        "monotonic": 5943.933432822,
+        "node": 7
+      }
+    },
+    {
+      "wall": 1794125273.5610778,
+      "monotonic": 5987.668606965,
+      "host": "fl01",
+      "phase": "submit",
+      "ok": true,
+      "result": {
+        "event": "update_sent",
+        "monotonic": 5956.246483693,
+        "node": 1
+      }
+    },
+    {
+      "wall": 1794125377.37178,
+      "monotonic": 6091.479309157,
+      "host": "fl00",
+      "phase": "submit",
+      "ok": false,
+      "error": "RuntimeError('{\\'id\\': 6, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'轮次等待 update 超时，未达到最小配额: 期望 9\\')\"}')"
+    },
+    {
+      "wall": 1794125377.372254,
+      "monotonic": 6091.479781202,
+      "phase": "run",
+      "ok": false,
+      "error": "RuntimeError('submit failed: fl00')"
+    },
+    {
+      "wall": 1794125377.3724034,
+      "monotonic": 6091.479930486,
+      "phase": "restore",
+      "ok": false,
+      "error": "全角色 close 未确认；先独立回收再恢复"
+    },
+    {
+      "wall": 1794125378.9140773,
+      "monotonic": 6093.021604902,
+      "phase": "independent_cleanup",
+      "host": "fl00",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl00.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.1990557,
+      "monotonic": 6093.306583816,
+      "phase": "independent_cleanup",
+      "host": "fl01",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl01.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.1993928,
+      "monotonic": 6093.306919921,
+      "phase": "independent_cleanup",
+      "host": "fl02",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl02.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.429418,
+      "monotonic": 6093.536946139,
+      "phase": "independent_cleanup",
+      "host": "fl04",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl04.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.4297483,
+      "monotonic": 6093.537275492,
+      "phase": "independent_cleanup",
+      "host": "fl05",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl05.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.4298954,
+      "monotonic": 6093.53742228,
+      "phase": "independent_cleanup",
+      "host": "fl06",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl06.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.5990558,
+      "monotonic": 6093.706583808,
+      "phase": "independent_cleanup",
+      "host": "fl07",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl07.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.5993907,
+      "monotonic": 6093.706917577,
+      "phase": "independent_cleanup",
+      "host": "fl08",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl08.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.9688764,
+      "monotonic": 6094.076404134,
+      "phase": "independent_cleanup",
+      "host": "fl09",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl09.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125379.9692235,
+      "monotonic": 6094.076750543,
+      "phase": "independent_cleanup",
+      "host": "fl10",
+      "result": {
+        "ok": true,
+        "unit": "comm-smoke-nine-grant10-model-20261108-1-fl10.service",
+        "active": "inactive",
+        "errors": []
+      }
+    },
+    {
+      "wall": 1794125386.8136642,
+      "monotonic": 6100.921191717,
+      "phase": "independent_restore",
+      "result": {
+        "ok": false,
+        "rf_response_ok": true,
+        "audited": false,
+        "attempted": true,
+        "response": {
+          "calibration": false,
+          "session_id": "switch_103a0b4acb744f3e86c66b73993cd68f",
+          "status": "finalized",
+          "target_channel": 149,
+          "applied_patch": {
+            "channel": 149,
+            "bandwidth_mhz": 40,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "radio_txpower_dbm": 18,
+            "uftp_rate_kbps": 15000
+          },
+          "failed_phase": null,
+          "unresponsive_nodes": [],
+          "error_message": null,
+          "effective_config": {
+            "channel": 149,
+            "bandwidth_mhz": 40,
+            "radio_txpower_dbm": 18,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "uftp_rate_kbps": 15000,
+            "fec_k": 8,
+            "fec_n": 14,
+            "channel_width": "HT40+",
+            "guard_interval": "long"
+          },
+          "local_committed_config": null
+        }
+      },
+      "rf_response_ok": true,
+      "audited": false
+    },
+    {
+      "wall": 1794125386.8140125,
+      "monotonic": 6100.921539534,
+      "phase": "result",
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    }
+  ],
+  "timeline": {
+    "publish_start_inferred_wall": 1794124974.7539816,
+    "publish_start_note": "phase dispatch not logged; preceding start_receive barrier upper timestamp is estimate",
+    "submit_start_inferred_wall": 1794125077.3580048,
+    "submit_start_note": "phase dispatch not logged; final receive barrier timestamp is estimate",
+    "receive": [
+      {
+        "host": "fl05",
+        "wall": 1794125076.0507216,
+        "seconds_from_publish_estimate": 101.29674005508423
+      },
+      {
+        "host": "fl02",
+        "wall": 1794125076.0550437,
+        "seconds_from_publish_estimate": 101.30106210708618
+      },
+      {
+        "host": "fl06",
+        "wall": 1794125076.0601063,
+        "seconds_from_publish_estimate": 101.30612468719482
+      },
+      {
+        "host": "fl08",
+        "wall": 1794125076.064008,
+        "seconds_from_publish_estimate": 101.31002640724182
+      },
+      {
+        "host": "fl01",
+        "wall": 1794125076.066817,
+        "seconds_from_publish_estimate": 101.3128354549408
+      },
+      {
+        "host": "fl07",
+        "wall": 1794125076.0717058,
+        "seconds_from_publish_estimate": 101.31772422790527
+      },
+      {
+        "host": "fl04",
+        "wall": 1794125076.1383913,
+        "seconds_from_publish_estimate": 101.3844096660614
+      },
+      {
+        "host": "fl09",
+        "wall": 1794125077.110222,
+        "seconds_from_publish_estimate": 102.35624051094055
+      },
+      {
+        "host": "fl10",
+        "wall": 1794125077.3580048,
+        "seconds_from_publish_estimate": 102.60402321815491
+      }
+    ],
+    "submit": [
+      {
+        "wall": 1794125270.240239,
+        "monotonic": 5984.347768044,
+        "host": "fl07",
+        "phase": "submit",
+        "ok": true,
+        "result": {
+          "event": "update_sent",
+          "monotonic": 5943.933432822,
+          "node": 7
+        },
+        "seconds_from_submit_estimate": 192.8822340965271
+      },
+      {
+        "wall": 1794125273.5610778,
+        "monotonic": 5987.668606965,
+        "host": "fl01",
+        "phase": "submit",
+        "ok": true,
+        "result": {
+          "event": "update_sent",
+          "monotonic": 5956.246483693,
+          "node": 1
+        },
+        "seconds_from_submit_estimate": 196.20307302474976
+      },
+      {
+        "wall": 1794125377.37178,
+        "monotonic": 6091.479309157,
+        "host": "fl00",
+        "phase": "submit",
+        "ok": false,
+        "error": "RuntimeError('{\\'id\\': 6, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'轮次等待 update 超时，未达到最小配额: 期望 9\\')\"}')",
+        "seconds_from_submit_estimate": 300.01377511024475
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "host": "fl00",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl00\", \"tun\": \"fl-s\", \"ifindex\": 12, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-s\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-s\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"30460\": \"439791\", \"30514\": \"439862\"}, \"daemon_pid\": 30460, \"radio_attempted\": true, \"original\": {\"channel\": 149, \"bandwidth_mhz\": 40, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"radio_txpower_dbm\": 18, \"uftp_rate_kbps\": 15000}, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5678.671911358, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"registry_gate\", \"monotonic\": 5678.850190462, \"status\": {\"server_state\": \"IDLE\", \"management_web\": {\"status\": \"ready\", \"host\": \"192.168.0.190\", \"port\": 8080, \"error\": null}, \"link_required\": true, \"recent_job\": null, \"active_job\": null, \"radio\": {\"channel\": 149, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 15000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"tun\": {\"name\": \"fl-s\", \"ip\": \"10.80.0.1\", \"cidr\": \"10.80.0.1/24\", \"txqueuelen\": 5000, \"is_active\": true}, \"air_interface\": \"wlxfc221c100119\", \"link_process\": {\"running\": true, \"pid\": 30514}, \"nodes\": {\"1\": {\"node_id\": 1, \"tun_ip\": \"10.80.0.11\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143657, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.189653599, \"last_heartbeat_timestamp_ms\": 1794124964082, \"last_heartbeat_ago_seconds\": 0.66, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"2\": {\"node_id\": 2, \"tun_ip\": \"10.80.0.12\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 142913, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5677.446549964, \"last_heartbeat_timestamp_ms\": 1794124963339, \"last_heartbeat_ago_seconds\": 1.4, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"3\": {\"node_id\": 3, \"tun_ip\": \"10.80.0.13\", \"reported_state\": null, \"readiness\": \"OFFLINE\", \"elapsed_ms\": 0, \"current_channel\": null, \"txpower_dbm\": null, \"uplink_mcs\": null, \"last_heartbeat_time\": null, \"last_heartbeat_timestamp_ms\": null, \"last_heartbeat_ago_seconds\": null, \"error_code\": null, \"can_select\": false, \"selection_blockers\": [{\"code\": \"NODE_OFFLINE\", \"message\": \"\\u8282\\u70b9\\u672a\\u4e0a\\u7ebf\\u6216\\u5fc3\\u8df3\\u5df2\\u8d85\\u65f6\"}]}, \"4\": {\"node_id\": 4, \"tun_ip\": \"10.80.0.14\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 142916, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5677.485983669, \"last_heartbeat_timestamp_ms\": 1794124963378, \"last_heartbeat_ago_seconds\": 1.36, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"5\": {\"node_id\": 5, \"tun_ip\": \"10.80.0.15\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 144276, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.794022622, \"last_heartbeat_timestamp_ms\": 1794124964686, \"last_heartbeat_ago_seconds\": 0.05, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"6\": {\"node_id\": 6, \"tun_ip\": \"10.80.0.16\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143347, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5677.889811789, \"last_heartbeat_timestamp_ms\": 1794124963782, \"last_heartbeat_ago_seconds\": 0.96, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"7\": {\"node_id\": 7, \"tun_ip\": \"10.80.0.17\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143211, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5677.746809321, \"last_heartbeat_timestamp_ms\": 1794124963639, \"last_heartbeat_ago_seconds\": 1.1, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"8\": {\"node_id\": 8, \"tun_ip\": \"10.80.0.18\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 144088, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.634121472, \"last_heartbeat_timestamp_ms\": 1794124964526, \"last_heartbeat_ago_seconds\": 0.21, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"9\": {\"node_id\": 9, \"tun_ip\": \"10.80.0.19\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143967, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.552821741, \"last_heartbeat_timestamp_ms\": 1794124964445, \"last_heartbeat_ago_seconds\": 0.3, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"10\": {\"node_id\": 10, \"tun_ip\": \"10.80.0.20\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143665, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.15067021, \"last_heartbeat_timestamp_ms\": 1794124964043, \"last_heartbeat_ago_seconds\": 0.7, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}}}, \"online\": [1, 2, 4, 5, 6, 7, 8, 9, 10]}\n{\"event\": \"prepared\", \"monotonic\": 5678.857864839, \"daemon_pid\": 30460, \"native_pid\": 30514, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-s\", \"ifindex\": 12, \"radio\": {\"iw\": \"Interface wlxfc221c100119\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:19\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 3, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"path\": \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"registry_gate\", \"monotonic\": 5680.077994704, \"status\": {\"server_state\": \"IDLE\", \"management_web\": {\"status\": \"ready\", \"host\": \"192.168.0.190\", \"port\": 8080, \"error\": null}, \"link_required\": true, \"recent_job\": null, \"active_job\": null, \"radio\": {\"channel\": 149, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 15000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"tun\": {\"name\": \"fl-s\", \"ip\": \"10.80.0.1\", \"cidr\": \"10.80.0.1/24\", \"txqueuelen\": 5000, \"is_active\": true}, \"air_interface\": \"wlxfc221c100119\", \"link_process\": {\"running\": true, \"pid\": 30514}, \"nodes\": {\"1\": {\"node_id\": 1, \"tun_ip\": \"10.80.0.11\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143657, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.189653599, \"last_heartbeat_timestamp_ms\": 1794124964082, \"last_heartbeat_ago_seconds\": 1.89, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"2\": {\"node_id\": 2, \"tun_ip\": \"10.80.0.12\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 144973, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5679.494271214, \"last_heartbeat_timestamp_ms\": 1794124965386, \"last_heartbeat_ago_seconds\": 0.58, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"3\": {\"node_id\": 3, \"tun_ip\": \"10.80.0.13\", \"reported_state\": null, \"readiness\": \"OFFLINE\", \"elapsed_ms\": 0, \"current_channel\": null, \"txpower_dbm\": null, \"uplink_mcs\": null, \"last_heartbeat_time\": null, \"last_heartbeat_timestamp_ms\": null, \"last_heartbeat_ago_seconds\": null, \"error_code\": null, \"can_select\": false, \"selection_blockers\": [{\"code\": \"NODE_OFFLINE\", \"message\": \"\\u8282\\u70b9\\u672a\\u4e0a\\u7ebf\\u6216\\u5fc3\\u8df3\\u5df2\\u8d85\\u65f6\"}]}, \"4\": {\"node_id\": 4, \"tun_ip\": \"10.80.0.14\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 142916, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5677.485983669, \"last_heartbeat_timestamp_ms\": 1794124963378, \"last_heartbeat_ago_seconds\": 2.59, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"5\": {\"node_id\": 5, \"tun_ip\": \"10.80.0.15\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 144276, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.794022622, \"last_heartbeat_timestamp_ms\": 1794124964686, \"last_heartbeat_ago_seconds\": 1.28, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"6\": {\"node_id\": 6, \"tun_ip\": \"10.80.0.16\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 145412, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5679.95522131, \"last_heartbeat_timestamp_ms\": 1794124965847, \"last_heartbeat_ago_seconds\": 0.12, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"7\": {\"node_id\": 7, \"tun_ip\": \"10.80.0.17\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 145273, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5679.794832627, \"last_heartbeat_timestamp_ms\": 1794124965687, \"last_heartbeat_ago_seconds\": 0.28, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"8\": {\"node_id\": 8, \"tun_ip\": \"10.80.0.18\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 144088, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.634121472, \"last_heartbeat_timestamp_ms\": 1794124964526, \"last_heartbeat_ago_seconds\": 1.44, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"9\": {\"node_id\": 9, \"tun_ip\": \"10.80.0.19\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143967, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.552821741, \"last_heartbeat_timestamp_ms\": 1794124964445, \"last_heartbeat_ago_seconds\": 1.52, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"10\": {\"node_id\": 10, \"tun_ip\": \"10.80.0.20\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 143665, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5678.15067021, \"last_heartbeat_timestamp_ms\": 1794124964043, \"last_heartbeat_ago_seconds\": 1.93, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}}}, \"online\": [1, 2, 4, 5, 6, 7, 8, 9, 10]}\n{\"event\": \"radio_attempted\", \"monotonic\": 5680.078989162, \"original\": {\"channel\": 149, \"bandwidth_mhz\": 40, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"radio_txpower_dbm\": 18, \"uftp_rate_kbps\": 15000}}\n{\"event\": \"reconfigure_request\", \"monotonic\": 5680.089236598, \"daemon_pid\": 30460, \"request\": {\"confirmed\": true, \"patch\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"radio_txpower_dbm\": 18, \"uftp_rate_kbps\": 12000}, \"target_nodes\": [1, 2, 4, 5, 6, 7, 8, 9, 10]}}\n{\"event\": \"reconfigure_response\", \"monotonic\": 5688.370771181, \"response\": {\"calibration\": false, \"session_id\": \"switch_e16499b34da14bbd8515a59166066d84\", \"status\": \"finalized\", \"target_channel\": 157, \"applied_patch\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"radio_txpower_dbm\": 18, \"uftp_rate_kbps\": 12000}, \"failed_phase\": null, \"unresponsive_nodes\": [], \"error_message\": null, \"effective_config\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 12000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"local_committed_config\": null}, \"daemon_pid_after\": 30460}\n{\"event\": \"radio_acquired\", \"monotonic\": 5688.371190104, \"response\": {\"calibration\": false, \"session_id\": \"switch_e16499b34da14bbd8515a59166066d84\", \"status\": \"finalized\", \"target_channel\": 157, \"applied_patch\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"radio_txpower_dbm\": 18, \"uftp_rate_kbps\": 12000}, \"failed_phase\": null, \"unresponsive_nodes\": [], \"error_message\": null, \"effective_config\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 12000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"local_committed_config\": null}, \"proof\": \"\\u666e\\u901a\\u91cd\\u914d\\u4e8b\\u52a1\\uff0c\\u4e0d\\u6301\\u6709\\u5b88\\u62a4\\u8fdb\\u7a0b\\u4f5c\\u4e1a\\u51c6\\u5165\\u79df\\u7ea6\"}\n{\"event\": \"registry_gate\", \"monotonic\": 5688.381657355, \"status\": {\"server_state\": \"IDLE\", \"management_web\": {\"status\": \"ready\", \"host\": \"192.168.0.190\", \"port\": 8080, \"error\": null}, \"link_required\": true, \"recent_job\": null, \"active_job\": null, \"radio\": {\"channel\": 157, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 12000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"tun\": {\"name\": \"fl-s\", \"ip\": \"10.80.0.1\", \"cidr\": \"10.80.0.1/24\", \"txqueuelen\": 5000, \"is_active\": true}, \"air_interface\": \"wlxfc221c100119\", \"link_process\": {\"running\": true, \"pid\": 30514}, \"nodes\": {\"1\": {\"node_id\": 1, \"tun_ip\": \"10.80.0.11\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 145723, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5680.256668954, \"last_heartbeat_timestamp_ms\": 1794124966149, \"last_heartbeat_ago_seconds\": 8.12, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"2\": {\"node_id\": 2, \"tun_ip\": \"10.80.0.12\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 147020, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5681.562821776, \"last_heartbeat_timestamp_ms\": 1794124967455, \"last_heartbeat_ago_seconds\": 6.82, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"3\": {\"node_id\": 3, \"tun_ip\": \"10.80.0.13\", \"reported_state\": null, \"readiness\": \"OFFLINE\", \"elapsed_ms\": 0, \"current_channel\": null, \"txpower_dbm\": null, \"uplink_mcs\": null, \"last_heartbeat_time\": null, \"last_heartbeat_timestamp_ms\": null, \"last_heartbeat_ago_seconds\": null, \"error_code\": null, \"can_select\": false, \"selection_blockers\": [{\"code\": \"NODE_OFFLINE\", \"message\": \"\\u8282\\u70b9\\u672a\\u4e0a\\u7ebf\\u6216\\u5fc3\\u8df3\\u5df2\\u8d85\\u65f6\"}]}, \"4\": {\"node_id\": 4, \"tun_ip\": \"10.80.0.14\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 2001, \"current_channel\": 157, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5688.298166879, \"last_heartbeat_timestamp_ms\": 1794124974190, \"last_heartbeat_ago_seconds\": 0.08, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"5\": {\"node_id\": 5, \"tun_ip\": \"10.80.0.15\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 146327, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5681.164648813, \"last_heartbeat_timestamp_ms\": 1794124967057, \"last_heartbeat_ago_seconds\": 7.22, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"6\": {\"node_id\": 6, \"tun_ip\": \"10.80.0.16\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 147482, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5682.028041647, \"last_heartbeat_timestamp_ms\": 1794124967920, \"last_heartbeat_ago_seconds\": 6.35, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"7\": {\"node_id\": 7, \"tun_ip\": \"10.80.0.17\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 2001, \"current_channel\": 157, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5688.371742855, \"last_heartbeat_timestamp_ms\": 1794124974264, \"last_heartbeat_ago_seconds\": 0.01, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"8\": {\"node_id\": 8, \"tun_ip\": \"10.80.0.18\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 146160, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5681.146982878, \"last_heartbeat_timestamp_ms\": 1794124967039, \"last_heartbeat_ago_seconds\": 7.23, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"9\": {\"node_id\": 9, \"tun_ip\": \"10.80.0.19\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 146029, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5681.203415813, \"last_heartbeat_timestamp_ms\": 1794124967095, \"last_heartbeat_ago_seconds\": 7.18, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"10\": {\"node_id\": 10, \"tun_ip\": \"10.80.0.20\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 2001, \"current_channel\": 157, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 5688.32947858, \"last_heartbeat_timestamp_ms\": 1794124974222, \"last_heartbeat_ago_seconds\": 0.05, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}}}, \"online\": [1, 2, 4, 5, 6, 7, 8, 9, 10]}\n{\"event\": \"radio_verified\", \"monotonic\": 5688.382173432, \"iw\": \"Interface wlxfc221c100119\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:19\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 3, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5688.636279738, \"actual_uftp_rate_kbps\": 12000}\n{\"event\": \"send_complete\", \"monotonic\": 5788.467285845, \"round_id\": \"923d6e06-36cf-4002-be7d-8e0c0b2954eb\", \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/payload.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6091.87087085, \"ok\": true, \"errors\": [], \"resident_pids\": [\"30460\", \"30514\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "30460": {
+          "expected": "439791",
+          "actual": "439791",
+          "ok": true
+        },
+        "30514": {
+          "expected": "439862",
+          "actual": "439862",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        3,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 0,
+        "stdout": "{\"server_state\": \"IDLE\", \"management_web\": {\"status\": \"ready\", \"host\": \"192.168.0.190\", \"port\": 8080, \"error\": null}, \"link_required\": true, \"recent_job\": null, \"active_job\": null, \"radio\": {\"channel\": 149, \"bandwidth_mhz\": 40, \"radio_txpower_dbm\": 18, \"downlink_mcs\": 3, \"uplink_mcs\": 4, \"uftp_rate_kbps\": 15000, \"fec_k\": 8, \"fec_n\": 14, \"channel_width\": \"HT40+\", \"guard_interval\": \"long\"}, \"tun\": {\"name\": \"fl-s\", \"ip\": \"10.80.0.1\", \"cidr\": \"10.80.0.1/24\", \"txqueuelen\": 5000, \"is_active\": true}, \"air_interface\": \"wlxfc221c100119\", \"link_process\": {\"running\": true, \"pid\": 30514}, \"nodes\": {\"1\": {\"node_id\": 1, \"tun_ip\": \"10.80.0.11\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 445936, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.922642854, \"last_heartbeat_timestamp_ms\": 1794125831815, \"last_heartbeat_ago_seconds\": 0.65, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"2\": {\"node_id\": 2, \"tun_ip\": \"10.80.0.12\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 445953, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.844866398, \"last_heartbeat_timestamp_ms\": 1794125831737, \"last_heartbeat_ago_seconds\": 0.73, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"3\": {\"node_id\": 3, \"tun_ip\": \"10.80.0.13\", \"reported_state\": null, \"readiness\": \"OFFLINE\", \"elapsed_ms\": 0, \"current_channel\": null, \"txpower_dbm\": null, \"uplink_mcs\": null, \"last_heartbeat_time\": null, \"last_heartbeat_timestamp_ms\": null, \"last_heartbeat_ago_seconds\": null, \"error_code\": null, \"can_select\": false, \"selection_blockers\": [{\"code\": \"NODE_OFFLINE\", \"message\": \"\\u8282\\u70b9\\u672a\\u4e0a\\u7ebf\\u6216\\u5fc3\\u8df3\\u5df2\\u8d85\\u65f6\"}]}, \"4\": {\"node_id\": 4, \"tun_ip\": \"10.80.0.14\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 444985, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6544.939947679, \"last_heartbeat_timestamp_ms\": 1794125830832, \"last_heartbeat_ago_seconds\": 1.63, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"5\": {\"node_id\": 5, \"tun_ip\": \"10.80.0.15\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 445744, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.642653429, \"last_heartbeat_timestamp_ms\": 1794125831535, \"last_heartbeat_ago_seconds\": 0.93, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"6\": {\"node_id\": 6, \"tun_ip\": \"10.80.0.16\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 446024, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.945910144, \"last_heartbeat_timestamp_ms\": 1794125831838, \"last_heartbeat_ago_seconds\": 0.63, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"7\": {\"node_id\": 7, \"tun_ip\": \"10.80.0.17\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 446232, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6546.163217541, \"last_heartbeat_timestamp_ms\": 1794125832055, \"last_heartbeat_ago_seconds\": 0.41, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"8\": {\"node_id\": 8, \"tun_ip\": \"10.80.0.18\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 445214, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.139880042, \"last_heartbeat_timestamp_ms\": 1794125831032, \"last_heartbeat_ago_seconds\": 1.43, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"9\": {\"node_id\": 9, \"tun_ip\": \"10.80.0.19\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 445665, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6545.542284964, \"last_heartbeat_timestamp_ms\": 1794125831434, \"last_heartbeat_ago_seconds\": 1.03, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}, \"10\": {\"node_id\": 10, \"tun_ip\": \"10.80.0.20\", \"reported_state\": \"IDLE\", \"readiness\": \"READY\", \"elapsed_ms\": 446133, \"current_channel\": 149, \"txpower_dbm\": 18, \"uplink_mcs\": 4, \"last_heartbeat_time\": 6546.063273312, \"last_heartbeat_timestamp_ms\": 1794125831955, \"last_heartbeat_ago_seconds\": 0.51, \"error_code\": null, \"can_select\": true, \"selection_blockers\": []}}}",
+        "stderr": ""
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": [],
+      "server_files": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/server_role.json",
+          "size_bytes": 240
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/runtime.lock",
+          "size_bytes": 0
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/current-round.json",
+          "size_bytes": 87
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/uftp-d7b0d41e-4f84-45a0-93c9-5353bf5e71cd.status",
+          "size_bytes": 2354
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/uftp-e6342bae-f7bb-435d-a28e-886c0dd2ed4d.log",
+          "size_bytes": 19602
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.manifest.json",
+          "size_bytes": 237
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/round-state.json",
+          "size_bytes": 266
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/7/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/7/update.manifest.json",
+          "size_bytes": 206
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/1/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/1/update.manifest.json",
+          "size_bytes": 206
+        }
+      ]
+    },
+    {
+      "host": "fl01",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl01\", \"tun\": \"fl-c1\", \"ifindex\": 18, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c1\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c1\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"6987\": \"436741\", \"7003\": \"436807\"}, \"daemon_pid\": 6987, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5647.632449364, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5647.794002788, \"daemon_pid\": 6987, \"native_pid\": 7003, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c1\", \"ifindex\": 18, \"radio\": {\"iw\": \"Interface wlxfc221c500bfe\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:50:0b:fe\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5657.171927079, \"iw\": \"Interface wlxfc221c500bfe\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:50:0b:fe\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5657.2305082, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5758.754819357, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"update_sent\", \"monotonic\": 5956.246483693, \"node\": 1}\n{\"event\": \"cleanup\", \"monotonic\": 6060.255125919, \"ok\": true, \"errors\": [], \"resident_pids\": [\"6987\", \"7003\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "6987": {
+          "expected": "436741",
+          "actual": "436741",
+          "ok": true
+        },
+        "7003": {
+          "expected": "436807",
+          "actual": "436807",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c500bfe\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl02",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl02\", \"tun\": \"fl-c2\", \"ifindex\": 19, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c2\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c2\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"7355\": \"426973\", \"7371\": \"427040\"}, \"daemon_pid\": 7355, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5550.58588693, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5550.74820144, \"daemon_pid\": 7355, \"native_pid\": 7371, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c2\", \"ifindex\": 19, \"radio\": {\"iw\": \"Interface wlxbcec23372588\\n\\tifindex 15\\n\\twdev 0x300000001\\n\\taddr bc:ec:23:37:25:88\\n\\ttype monitor\\n\\twiphy 3\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5559.556716019, \"iw\": \"Interface wlxbcec23372588\\n\\tifindex 15\\n\\twdev 0x300000001\\n\\taddr bc:ec:23:37:25:88\\n\\ttype monitor\\n\\twiphy 3\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5559.897667036, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5661.326267577, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 5963.8734679, \"ok\": true, \"errors\": [], \"resident_pids\": [\"7355\", \"7371\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "7355": {
+          "expected": "426973",
+          "actual": "426973",
+          "ok": true
+        },
+        "7371": {
+          "expected": "427040",
+          "actual": "427040",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxbcec23372588\n\tifindex 15\n\twdev 0x300000001\n\taddr bc:ec:23:37:25:88\n\ttype monitor\n\twiphy 3\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl04",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl04\", \"tun\": \"fl-c4\", \"ifindex\": 20, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c4\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c4\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"6871\": \"432901\", \"6887\": \"432968\"}, \"daemon_pid\": 6871, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5609.476918255, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5609.641411097, \"daemon_pid\": 6871, \"native_pid\": 6887, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c4\", \"ifindex\": 20, \"radio\": {\"iw\": \"Interface wlxfc221c300cbc\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0c:bc\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5618.749413138, \"iw\": \"Interface wlxfc221c300cbc\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0c:bc\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5618.902142345, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5720.38521086, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6022.834516778, \"ok\": true, \"errors\": [], \"resident_pids\": [\"6871\", \"6887\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "6871": {
+          "expected": "432901",
+          "actual": "432901",
+          "ok": true
+        },
+        "6887": {
+          "expected": "432968",
+          "actual": "432968",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c300cbc\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bc\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl05",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl05\", \"tun\": \"fl-c5\", \"ifindex\": 13, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c5\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c5\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"6156\": \"439964\", \"6172\": \"440033\"}, \"daemon_pid\": 6156, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5680.21734704, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5680.387499833, \"daemon_pid\": 6156, \"native_pid\": 6172, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c5\", \"ifindex\": 13, \"radio\": {\"iw\": \"Interface wlxfc221c100157\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:57\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5689.378325131, \"iw\": \"Interface wlxfc221c100157\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:57\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5689.435362773, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5790.941214853, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6092.763839884, \"ok\": true, \"errors\": [], \"resident_pids\": [\"6156\", \"6172\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "6156": {
+          "expected": "439964",
+          "actual": "439964",
+          "ok": true
+        },
+        "6172": {
+          "expected": "440033",
+          "actual": "440033",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl06",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl06\", \"tun\": \"fl-c6\", \"ifindex\": 18, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c6\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c6\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"12434\": \"436100\", \"12450\": \"436165\"}, \"daemon_pid\": 12434, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5641.598592071, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5641.773493827, \"daemon_pid\": 12434, \"native_pid\": 12450, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c6\", \"ifindex\": 18, \"radio\": {\"iw\": \"Interface wlxfc221c300cbb\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0c:bb\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5650.492819443, \"iw\": \"Interface wlxfc221c300cbb\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0c:bb\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5650.840534887, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5752.162824773, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6053.997882146, \"ok\": true, \"errors\": [], \"resident_pids\": [\"12434\", \"12450\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "12434": {
+          "expected": "436100",
+          "actual": "436100",
+          "ok": true
+        },
+        "12450": {
+          "expected": "436165",
+          "actual": "436165",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c300cbb\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl07",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl07\", \"tun\": \"fl-c7\", \"ifindex\": 18, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c7\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c7\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"12582\": \"435859\", \"12598\": \"435926\"}, \"daemon_pid\": 12582, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5639.43251017, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5639.595667718, \"daemon_pid\": 12582, \"native_pid\": 12598, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c7\", \"ifindex\": 18, \"radio\": {\"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5648.080791208, \"iw\": \"Interface wlxfc221c300e99\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5648.448352504, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5749.76607589, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"update_sent\", \"monotonic\": 5943.933432822, \"node\": 7}\n{\"event\": \"cleanup\", \"monotonic\": 6051.26755496, \"ok\": true, \"errors\": [], \"resident_pids\": [\"12582\", \"12598\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "12582": {
+          "expected": "435859",
+          "actual": "435859",
+          "ok": true
+        },
+        "12598": {
+          "expected": "435926",
+          "actual": "435926",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c300e99\n\tifindex 14\n\twdev 0x200000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl08",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl08\", \"tun\": \"fl-c8\", \"ifindex\": 15, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c8\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c8\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"11781\": \"435563\", \"11798\": \"435630\"}, \"daemon_pid\": 11781, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5636.257222259, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5636.420826711, \"daemon_pid\": 11781, \"native_pid\": 11798, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c8\", \"ifindex\": 15, \"radio\": {\"iw\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5645.0592999, \"iw\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5645.425875464, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5746.836284071, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6048.620571564, \"ok\": true, \"errors\": [], \"resident_pids\": [\"11781\", \"11798\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "11781": {
+          "expected": "435563",
+          "actual": "435563",
+          "ok": true
+        },
+        "11798": {
+          "expected": "435630",
+          "actual": "435630",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl09",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl09\", \"tun\": \"fl-c9\", \"ifindex\": 18, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c9\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c9\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"13434\": \"433138\", \"13451\": \"433205\"}, \"daemon_pid\": 13434, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5612.24034794, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5612.40944251, \"daemon_pid\": 13434, \"native_pid\": 13451, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c9\", \"ifindex\": 18, \"radio\": {\"iw\": \"Interface wlx88e62852aae4\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr 88:e6:28:52:aa:e4\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5621.236900002, \"iw\": \"Interface wlx88e62852aae4\\n\\tifindex 14\\n\\twdev 0x200000001\\n\\taddr 88:e6:28:52:aa:e4\\n\\ttype monitor\\n\\twiphy 2\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5621.297528661, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5723.844995288, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 6025.232304212, \"ok\": true, \"errors\": [], \"resident_pids\": [\"13434\", \"13451\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "13434": {
+          "expected": "433138",
+          "actual": "433138",
+          "ok": true
+        },
+        "13451": {
+          "expected": "433205",
+          "actual": "433205",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlx88e62852aae4\n\tifindex 14\n\twdev 0x200000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    },
+    {
+      "host": "fl10",
+      "errors": [],
+      "cleanup-state.json": "{\"host\": \"fl10\", \"tun\": \"fl-c10\", \"ifindex\": 15, \"routes\": {\"239.80.41.1/32\": [{\"dst\": \"239.80.41.1\", \"dev\": \"fl-c10\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}], \"239.80.42.1/32\": [{\"dst\": \"239.80.42.1\", \"dev\": \"fl-c10\", \"protocol\": \"bgp\", \"scope\": \"link\", \"flags\": []}]}, \"resident\": {\"9722\": \"420642\", \"9738\": \"420709\"}, \"daemon_pid\": 9722, \"radio_attempted\": false, \"original\": null, \"original_channel\": 149}",
+      "facts.jsonl": "{\"event\": \"runtime_dependencies\", \"monotonic\": 5487.728511398, \"tools\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}}\n{\"event\": \"prepared\", \"monotonic\": 5487.89411635, \"daemon_pid\": 9722, \"native_pid\": 9738, \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"tun\": \"fl-c10\", \"ifindex\": 15, \"radio\": {\"iw\": \"Interface wlxfca386b38672\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr fc:a3:86:b3:86:72\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}, \"wrapper_sha\": \"d68d2819baf2cc611e324ae7d7bd707b92f2ca243c7810249abbe2d941d00fa6\", \"installed\": \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl\", \"source\": \"/srv/wfb-ng-fl/releases/heartbeat-98dda459fb9a-20261108T073921Z/source/wfb_ng/fl\", \"payload\": {\"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}, \"timing\": {\"io_timeout\": 300, \"orchestration_timeout\": 690, \"node_timeout\": 705, \"recovery_budget\": 60, \"cleanup_timeout\": 10, \"unit_stop_timeout\": 8, \"close_restore_reserve\": 40}, \"runtime_dependencies\": {\"uftp\": {\"path\": \"/usr/bin/uftp\", \"resolved_path\": \"/usr/bin/uftp\", \"sha256\": \"71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}, \"uftpd\": {\"path\": \"/usr/bin/uftpd\", \"resolved_path\": \"/usr/bin/uftpd\", \"sha256\": \"0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9\", \"version\": \"5.0.3\", \"version_source\": \"binary_banner\"}}, \"scope\": \"\\u7b49\\u91cf\\u901a\\u4fe1\\uff1b\\u65e0\\u6a21\\u578b\\u8bed\\u4e49\\u9a8c\\u8bc1\\u3001\\u6b63\\u5f0fFL\\u751f\\u547d\\u5468\\u671f\\u6216\\u5c04\\u9891\\u6240\\u6709\\u6743\\u627f\\u8bfa\"}\n{\"event\": \"radio_verified\", \"monotonic\": 5496.322363213, \"iw\": \"Interface wlxfca386b38672\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr fc:a3:86:b3:86:72\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 157 (5785 MHz), width: 40 MHz, center1: 5795 MHz\\n\\ttxpower -18.00 dBm\\n\", \"get_radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1]}\n{\"event\": \"receive_started\", \"monotonic\": 5496.676850375, \"actual_uftp_rate_kbps\": null}\n{\"event\": \"receive_verified\", \"monotonic\": 5599.238308547, \"path\": \"/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin\", \"size_bytes\": 44770302, \"sha256\": \"4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96\"}\n{\"event\": \"cleanup\", \"monotonic\": 5899.779260205, \"ok\": true, \"errors\": [], \"resident_pids\": [\"9722\", \"9738\"], \"role_close_returned\": true, \"owned_routes\": [\"239.80.41.1/32\", \"239.80.42.1/32\"]}\n",
+      "nvpmodel": {
+        "returncode": 0,
+        "stdout": "NV Power Mode: 15W\n0\n",
+        "stderr": ""
+      },
+      "files": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/online": "1",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/online": "1",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/online": "1",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/online": "1",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/online": "1",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/online": "1",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "power_ok": true,
+      "resident": {
+        "9722": {
+          "expected": "420642",
+          "actual": "420642",
+          "ok": true
+        },
+        "9738": {
+          "expected": "420709",
+          "actual": "420709",
+          "ok": true
+        }
+      },
+      "iw": {
+        "returncode": 0,
+        "stdout": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      },
+      "get_radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "status": {
+        "returncode": 7,
+        "stdout": "",
+        "stderr": "curl: (7) Failed to connect to 127.0.0.1 port 9090 after 0 ms: Connection refused\n"
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "-- No entries --\n",
+        "stderr": ""
+      },
+      "usb_reset_lines": []
+    }
+  ],
+  "server_committed": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/7/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/1/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "remaining_partial": [],
+  "bytescompleted": 89540604,
+  "remainingpartial_bytes": 0,
+  "server_files": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/server_role.json",
+      "size_bytes": 240
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/runtime.lock",
+      "size_bytes": 0
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/current-round.json",
+      "size_bytes": 87
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/uftp-d7b0d41e-4f84-45a0-93c9-5353bf5e71cd.status",
+      "size_bytes": 2354
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/uftp-e6342bae-f7bb-435d-a28e-886c0dd2ed4d.log",
+      "size_bytes": 19602
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.manifest.json",
+      "size_bytes": 237
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/round-state.json",
+      "size_bytes": 266
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/7/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/7/update.manifest.json",
+      "size_bytes": 206
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/1/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/updates/1/update.manifest.json",
+      "size_bytes": 206
+    }
+  ],
+  "get_readiness": {
+    "1": {
+      "node_id": 1,
+      "tun_ip": "10.80.0.11",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 445936,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.922642854,
+      "last_heartbeat_timestamp_ms": 1794125831815,
+      "last_heartbeat_ago_seconds": 0.65,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "2": {
+      "node_id": 2,
+      "tun_ip": "10.80.0.12",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 445953,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.844866398,
+      "last_heartbeat_timestamp_ms": 1794125831737,
+      "last_heartbeat_ago_seconds": 0.73,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "4": {
+      "node_id": 4,
+      "tun_ip": "10.80.0.14",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 444985,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6544.939947679,
+      "last_heartbeat_timestamp_ms": 1794125830832,
+      "last_heartbeat_ago_seconds": 1.63,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "5": {
+      "node_id": 5,
+      "tun_ip": "10.80.0.15",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 445744,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.642653429,
+      "last_heartbeat_timestamp_ms": 1794125831535,
+      "last_heartbeat_ago_seconds": 0.93,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "6": {
+      "node_id": 6,
+      "tun_ip": "10.80.0.16",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 446024,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.945910144,
+      "last_heartbeat_timestamp_ms": 1794125831838,
+      "last_heartbeat_ago_seconds": 0.63,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "7": {
+      "node_id": 7,
+      "tun_ip": "10.80.0.17",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 446232,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6546.163217541,
+      "last_heartbeat_timestamp_ms": 1794125832055,
+      "last_heartbeat_ago_seconds": 0.41,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "8": {
+      "node_id": 8,
+      "tun_ip": "10.80.0.18",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 445214,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.139880042,
+      "last_heartbeat_timestamp_ms": 1794125831032,
+      "last_heartbeat_ago_seconds": 1.43,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "9": {
+      "node_id": 9,
+      "tun_ip": "10.80.0.19",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 445665,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6545.542284964,
+      "last_heartbeat_timestamp_ms": 1794125831434,
+      "last_heartbeat_ago_seconds": 1.03,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    },
+    "10": {
+      "node_id": 10,
+      "tun_ip": "10.80.0.20",
+      "reported_state": "IDLE",
+      "readiness": "READY",
+      "elapsed_ms": 446133,
+      "current_channel": 149,
+      "txpower_dbm": 18,
+      "uplink_mcs": 4,
+      "last_heartbeat_time": 6546.063273312,
+      "last_heartbeat_timestamp_ms": 1794125831955,
+      "last_heartbeat_ago_seconds": 0.51,
+      "error_code": null,
+      "can_select": true,
+      "selection_blockers": []
+    }
+  },
+  "all_nine_ready_idle": true,
+  "kernel_conclusion": "All ten journal queries returned -- No entries --; no USB reset found, but kernel window has no available records, so absence cannot be established."
+}

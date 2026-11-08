@@ -15,6 +15,8 @@ Status: ready-for-agent
 
 ## Comments
 
+- 已完成本轮排查、统一98dda45 grant10/guard10及十台UFTP5.0.3同摘要；全九端1MiB冒烟通过。随后一次模型等量预实验九端下行SHA通过、上行300秒仅1/7提交而失败；末尾十台radio/15W/resident审计及九端READY通过。详见`../evidence/grant-budget-local/README.md`。当前待处理是大文件并发上行吞吐，不再按旧的入网失败描述。
+
 - 换卡后补测：已按六卡实际MAC重绑接口并重启六台。短暂出现全九READY，但冒烟prepare实读fl01信道153且连续失确认，故在切频与文件发送前停止。十台临时unit回收均通过，未启动模型预实验。实际映射及结果见`../evidence/card-swap-full-nine-20261108T070828Z/RESULT.md`。
 - 工具纠正：旧runner的ServerRole实际用默认15Mbps，不能沿用历史12/6Mbps速率标记；已显式传参、核验实际transport速率，30项本地测试通过。
 
