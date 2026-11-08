@@ -1,0 +1,6 @@
+{
+  "host": "fl10",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl10\", \"unit\": \"MainPID=12827\\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfca386b38672 --fec-n 14 ; ignore_errors=no ; start_time=[Sun 2026-11-08 18:07:13 CST] ; stop_time=[n/a] ; pid=12827 ; code=(null) ; status=0/0 }\\nActiveState=active\\n\", \"iface\": \"wlxfca386b38672\", \"native_pid\": \"12842\", \"native_sha\": \"ad3340e51eecc6e5691a6edb84f26f3a262b518c3555497df62ea6f7865e1e56\", \"control_sha\": \"ab2917d10f73a3e3bb428c5e8867cb59f91ebd70ddff9ed4c8f3c44796565e83\", \"radio\": \"Interface wlxfca386b38672\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr fc:a3:86:b3:86:72\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"nvpmodel\": \"NV Power Mode: 15W\\n0\\n\"}\n",
+  "stderr": ""
+}
