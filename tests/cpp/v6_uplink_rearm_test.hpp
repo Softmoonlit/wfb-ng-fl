@@ -90,10 +90,31 @@ static bool rearm_receive_data_frame(int fd, int timeout_ms, uint64_t *nonce, ui
     if (n <= static_cast<ssize_t>(sizeof(wrxfwd_t) + sizeof(wblock_hdr_t))) return false;
     const auto *block = reinterpret_cast<const wblock_hdr_t *>(packet + sizeof(wrxfwd_t));
     if (block->packet_type != WFB_PACKET_DATA || be16toh(block->magic) != WFB_DATA_MAGIC) return false;
-    const auto *fragment = reinterpret_cast<const wpacket_hdr_t *>(packet + sizeof(wrxfwd_t) + sizeof(*block));
     *nonce = be64toh(block->data_nonce);
-    *flags = fragment->flags;
+    // Parity carries encoded bytes, not an independently readable wpacket_hdr_t.
+    if (flags != nullptr) {
+        const auto *fragment = reinterpret_cast<const wpacket_hdr_t *>(packet + sizeof(wrxfwd_t) + sizeof(*block));
+        *flags = fragment->flags;
+    }
     return true;
+}
+
+static void test_native_overdue_fec_wakeup() {
+    AirReadyState ready = {};
+    const uint64_t now = 2000, log_due = 3000, fec_due = 1999;
+    // 进入循环时已经到期且尚未声明：立即唤醒一次，不能等日志。
+    assert(client_next_wakeup_ms(now, log_due, fec_due, false, false, ready) <= now);
+    ready.declaration_in_flight = true;
+    ready.last_declare_at_ms = now;
+    // 声明后只等重试；旧 deadline 不得造成零超时循环。
+    assert(client_next_wakeup_ms(now, log_due + 500, fec_due, false, false, ready) == now + 1000);
+    assert(client_next_wakeup_ms(now + 1, log_due + 500, fec_due, false, false, ready) > now + 1);
+    assert(client_next_wakeup_ms(now + 1000, log_due + 500, fec_due, false, false, ready) == now + 1000);
+    ready.declaration_in_flight = false;
+    assert(client_next_wakeup_ms(now, log_due, now + 2, false, false, ready) == now + 2);
+    assert(client_next_wakeup_ms(now, log_due, 0, false, false, ready) == log_due);
+    assert(client_next_wakeup_ms(now, log_due, fec_due, false, true, ready) <= now);
+    std::cerr << "overdue-on-entry FEC wakeup and retry bounds: PASS" << std::endl;
 }
 
 // Empty TUN queue still owes the receiver a partial block seal after grant expiry.
@@ -155,13 +176,15 @@ static void test_native_empty_queue_partial_fec_reauthorization() {
         assert(ready && ready_elapsed_ms < 150);
         const uint64_t seal_grant_sent_ms = get_time_ms();
         rearm_grant(command, input_port, round * 2 + 2, 100, 100);
-        uint64_t seal[2] = {}; uint8_t seal_flags[2] = {};
-        assert(rearm_receive_data_frame(air, 80, &seal[0], &seal_flags[0]));
-        assert(rearm_receive_data_frame(air, 80, &seal[1], &seal_flags[1]));
+        uint64_t seal[2] = {}; uint8_t filler_flags = 0;
+        assert(rearm_receive_data_frame(air, 80, &seal[0], &filler_flags));
+        assert(rearm_receive_data_frame(air, 80, &seal[1], nullptr));
         assert(get_time_ms() - seal_grant_sent_ms < 100);
         assert((seal[0] >> 8) == block && (seal[0] & 0xff) == 1);
-        assert((seal[1] >> 8) == block && (seal[1] & 0xff) == 2);
-        assert(seal_flags[0] == WFB_PACKET_FEC_ONLY);
+        // The helper checks DATA frame kind/magic; index 2 is parity for k=2,n=3.
+        // Its encoded body has no payload-header flags to assert.
+        assert((seal[1] >> 8) == block && (seal[1] & 0xff) == config.plaintext_fec_k);
+        assert(filler_flags == WFB_PACKET_FEC_ONLY);
         // Drain through grant expiry: EMPTY without FEC must stay silent.
         pollfd empty = {air, POLLIN, 0};
         assert(poll(&empty, 1, 120) == 0);

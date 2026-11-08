@@ -23,3 +23,15 @@ RED 版本日志间隔为 20ms。另行运行原有全部回归通过，见 `emp
 实现完成后，单独重新检查生产差异、flush 返回值、READY 状态和授权检查路径；发现应按实际封块成功清除声明，已改成检查 flush_data_block_if_due 的返回值，随后重跑完整目标并构建 native。当前工具没有独立 reviewer / 子代理调用能力，此处是同一代理的单独复核轮次，不能视作第二人的独立审查。
 
 本次验证覆盖发送端旧 block seal 和 nonce 顺序，未新增接收端 ordered delivery 端到端测试；未做远端或真实无线链路验证。
+
+## 独立审查后补充：进入循环时已经过期
+
+审查指出 P1：如果首次计算唤醒时间时 FEC deadline 已经过期、授权已失效且 declaration_in_flight=false，上一版仍可能等 1000ms 日志定时器。将原唤醒计算提取为生产路径直接调用的私有函数 client_next_wakeup_ms，固定时钟输入验证该状态。旧条件下测试先 RED，见 `empty-fec-overdue-red.log`；修正为未宣告时立即唤醒一次，已宣告时只等待原 READY 重试周期，不让过期 deadline 导致零超时循环。
+
+确定性覆盖包括：过期未宣告、宣告后的下一次计算、重试前与重试到期、未来 FEC deadline、无 FEC 的 EMPTY，以及已有授权时的过期封块。没有扩大未到期旧块的封块契约。
+
+P2：parity 的主体是 FEC 编码字节，不能解读为独立 wpacket_hdr_t，也不能断言其 payload flags。测试 helper 对 parity 仅检查 DATA 帧类型、数据 magic 和 block nonce；k=2,n=3 时 index=k 明确为 parity。filler 仍验证 FEC_ONLY 标志。
+
+最终 `make test_v6_radio_update` 全部通过，见 `empty-fec-overdue-green.log`：两轮真实 run_client READY 均为 2ms，无越权 DATA，旧块 seal 成功，zero_timeout_polls=0，CPU=2143 微秒，EMPTY 无 FEC 静默。`make build_v6` 成功，见 `empty-fec-overdue-native-build.log`；`git diff --check` 通过。
+
+审查 #3 单独留档：既有 AirTransmitter::apply_radio_config 在 src/v6_uplink.cpp 中直接调用 flush_data_block（约第 258 行），客户端 radio command 路径会调用该方法。这是早于本 diff 的独立授权问题，本次仅记录，后续单独处理。未改 radio config 路径，未部署；此次提交使用中文，不重写之前的提交历史。
