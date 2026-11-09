@@ -1,0 +1,26 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 0,
+    "stdout": "{\"start_returncode\": 0, \"start_stdout\": \"\", \"start_stderr\": \"\", \"service\": \"MainPID=14753\\nActiveState=active\\nSubState=running\\n\"}\n",
+    "stderr": "",
+    "result": {
+      "start_returncode": 0,
+      "start_stdout": "",
+      "start_stderr": "",
+      "service": "MainPID=14753\nActiveState=active\nSubState=running\n"
+    }
+  },
+  {
+    "host": "fl10",
+    "returncode": 0,
+    "stdout": "{\"start_returncode\": 0, \"start_stdout\": \"\", \"start_stderr\": \"\", \"service\": \"MainPID=17786\\nActiveState=active\\nSubState=running\\n\"}\n",
+    "stderr": "",
+    "result": {
+      "start_returncode": 0,
+      "start_stdout": "",
+      "start_stderr": "",
+      "service": "MainPID=17786\nActiveState=active\nSubState=running\n"
+    }
+  }
+]

@@ -1,0 +1,66 @@
+{
+  "run_id": "rs20261109T055853Z-g30-d5-smoke",
+  "idle_server_state": "IDLE",
+  "active_job": null,
+  "server_uploaded_files": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/6/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/3/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/7/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/2/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/8/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/5/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/9/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/1/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke/role/rounds/6a3c581d-351b-4edd-a03c-e4aa566b5b3a/updates/10/update.bin",
+      "size_bytes": 1048576,
+      "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+      "complete_model": false
+    }
+  ],
+  "all_nine_uploads_size_sha_verified": true,
+  "usb_reset_hosts": [],
+  "exact_uftp_kernel_file": "rs20261109T055853Z-g30-d5-smoke-exact-uftp-kernel-files.json",
+  "model_execute_count": 0,
+  "comparison": "B2 model not executed: immediate independent restoration audit failed on fl02 actual channel157; no B2 model timing exists. B1 48.5879s failure and A2 50.3435s all9 DL success remain historical single-run data."
+}

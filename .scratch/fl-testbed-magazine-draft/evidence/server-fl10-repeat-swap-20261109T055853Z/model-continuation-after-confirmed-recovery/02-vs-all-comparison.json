@@ -1,0 +1,85 @@
+{
+  "os_groups": {
+    "Ubuntu 22.04.5 LTS / 5.15.148-tegra": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ]
+  },
+  "driver_module_file_sha_groups": {
+    "1a845230125dab762649f80da85ee53bfd494ebaf1a8eb68d43372477a604a13": [
+      "fl00"
+    ],
+    "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491": [
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ]
+  },
+  "libcrypto_so3_sha_groups": {
+    "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05"
+    ],
+    "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f": [
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ]
+  },
+  "client_explicit_radio_common": {
+    "channel": "149",
+    "bandwidth-mhz": "40",
+    "radio-txpower-dbm": "18",
+    "uplink-mcs": "4",
+    "fec-n": "14"
+  },
+  "client_radio_identity_differences": "node ID, interface and MAC differ as expected",
+  "limits": "Module SHA identifies on-disk module, not an independent hash of loaded kernel memory. OS release/kernel release and selected unit/config fields only; no claim of all package versions identical. UFTP executable/version and frozen-manifest source/native checks passed; dependency libraries are not all identical. libcrypto grouping does not isolate fl02 and does not establish cause.",
+  "nv_tegra_release_groups": {
+    "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ]
+  },
+  "driver_sysfs_srcversion_groups": {
+    "08BBAE7FE71F25B7F0ED54C": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ]
+  }
+}

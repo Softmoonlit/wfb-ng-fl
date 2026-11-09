@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "phase": "B2 repeat NIC/antenna swap",
+  "total_execute_count": 2,
+  "small": {
+    "execute_count": 1,
+    "raw_transfer_verified": true,
+    "raw_cleanup_ok": true,
+    "raw_restore_ok": true,
+    "immediate_independent_restore_ok": false,
+    "stop_reason": "fl02 momentary actual iw channel157; original STOP preserved",
+    "subsequent_full_recovery": true
+  },
+  "model": {
+    "execute_count": 1,
+    "run_id": "rsmc20261109T060537Z-g30-d5-model",
+    "DLduration": 54.181630837998455,
+    "ULduration": 416.28128980399924,
+    "raw_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "independent_restore_ok": true,
+    "independent_ready_ok": true,
+    "all_nine_server_upload_files_independently_size_sha_verified": true
+  },
+  "final_independent_recovery": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "exact_cleanup_ok": true,
+    "server_schedule": "10/10",
+    "independent_restoration": true,
+    "measurement_error": null,
+    "raw_flags": [
+      {
+        "mode": "model",
+        "execute_count": 1,
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      }
+    ],
+    "total_execute_count": 2,
+    "wall": 1794204879.9704607
+  },
+  "model_continuation": "model-continuation-after-confirmed-recovery",
+  "fl02_observation": {
+    "model_DL_seconds": 53.38254485099969,
+    "model_UL_seconds": 252.67595997900025,
+    "complete_model_download_and_upload": true,
+    "selected_radio_fields_match_other_clients": true,
+    "os_kernel_l4t_driver_sysfs_srcversion_match": true,
+    "client_driver_file_sha_match": true,
+    "libcrypto_dependency_split_does_not_isolate_fl02": true
+  },
+  "comparison": "B2 DL54.1816 all9 verified, UL416.2813 all9 verified. Does not reproduce B1 failed DL48.5879; A2 DL50.3435 all9 and UL600 only03. Single-run evidence does not establish NIC causality.",
+  "remote_work_finished": true
+}

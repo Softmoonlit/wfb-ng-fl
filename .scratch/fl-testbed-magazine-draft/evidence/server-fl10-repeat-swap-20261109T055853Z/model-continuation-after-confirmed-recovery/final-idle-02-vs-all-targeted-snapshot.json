@@ -1,0 +1,1741 @@
+{
+  "initial_idle_status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfca386b38672",
+    "link_process": {
+      "running": true,
+      "pid": 24749
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 96815,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9661.70650287,
+        "last_heartbeat_timestamp_ms": 1794204971745,
+        "last_heartbeat_ago_seconds": 1.98,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99553,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.791871761,
+        "last_heartbeat_timestamp_ms": 1794204972830,
+        "last_heartbeat_ago_seconds": 0.9,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97057,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9661.867222014,
+        "last_heartbeat_timestamp_ms": 1794204971906,
+        "last_heartbeat_ago_seconds": 1.82,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99890,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.032221129,
+        "last_heartbeat_timestamp_ms": 1794204973071,
+        "last_heartbeat_ago_seconds": 0.66,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97188,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.650495243,
+        "last_heartbeat_timestamp_ms": 1794204972689,
+        "last_heartbeat_ago_seconds": 1.04,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97051,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9661.807065207,
+        "last_heartbeat_timestamp_ms": 1794204971846,
+        "last_heartbeat_ago_seconds": 1.88,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97859,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.991987157,
+        "last_heartbeat_timestamp_ms": 1794204973031,
+        "last_heartbeat_ago_seconds": 0.7,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 101194,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.471569249,
+        "last_heartbeat_timestamp_ms": 1794204972510,
+        "last_heartbeat_ago_seconds": 1.22,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97615,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.011303159,
+        "last_heartbeat_timestamp_ms": 1794204973050,
+        "last_heartbeat_ago_seconds": 0.68,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  },
+  "final_idle_status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 14,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfca386b38672",
+    "link_process": {
+      "running": true,
+      "pid": 24749
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 98881,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.772331018,
+        "last_heartbeat_timestamp_ms": 1794204973811,
+        "last_heartbeat_ago_seconds": 1.01,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99553,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.791871761,
+        "last_heartbeat_timestamp_ms": 1794204972830,
+        "last_heartbeat_ago_seconds": 1.99,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99123,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.934972749,
+        "last_heartbeat_timestamp_ms": 1794204973974,
+        "last_heartbeat_ago_seconds": 0.84,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99890,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.032221129,
+        "last_heartbeat_timestamp_ms": 1794204973071,
+        "last_heartbeat_ago_seconds": 1.75,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99256,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9664.71842368,
+        "last_heartbeat_timestamp_ms": 1794204974757,
+        "last_heartbeat_ago_seconds": 0.06,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 99117,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.874898375,
+        "last_heartbeat_timestamp_ms": 1794204973913,
+        "last_heartbeat_ago_seconds": 0.9,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97859,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9662.991987157,
+        "last_heartbeat_timestamp_ms": 1794204973031,
+        "last_heartbeat_ago_seconds": 1.79,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 103263,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9664.539286832,
+        "last_heartbeat_timestamp_ms": 1794204974578,
+        "last_heartbeat_ago_seconds": 0.24,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 97615,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 9663.011303159,
+        "last_heartbeat_timestamp_ms": 1794204973050,
+        "last_heartbeat_ago_seconds": 1.77,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  },
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "wall": 1794204973.8539453,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "1a845230125dab762649f80da85ee53bfd494ebaf1a8eb68d43372477a604a13",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-server-daemon.service",
+        "service": {
+          "MainPID": "24630",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-server-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf /etc/systemd/system/wfb-fl-server-daemon.service.d/zzzz-release-149.conf /etc/systemd/system/wfb-fl-server-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-server-daemon.service",
+            "sha256": "1163486bdbae229b912d3c49b6e6696498c446219019c73e98f9c320b55aeb10"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf",
+            "sha256": "8dc34a56e1f7d649b4fe6fc147983fe9e85ecc24c199dbd9d6a22c9c54d94733"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-server-daemon.service.d/zzzz-release-149.conf",
+            "sha256": "d19d3ea412ea8d8d1c0e105f316366e8f5700235c1541059327c941fa78c0c85"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-server-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "8408723f49def3fc7ee985178560df95e6a950c1d0ad82fa5743dfd5ca786a76"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "txpower": "18",
+          "downlink-mcs": "3",
+          "uplink-mcs": "4",
+          "uftp-rate-kbps": "15000",
+          "interface": "wlxfca386b38672"
+        },
+        "config_path": "/etc/wfb-ng-fl/server.json",
+        "config_radio_whitelist": {
+          "bandwidth_mhz": 40,
+          "channel": 149,
+          "downlink_mcs": 3,
+          "known_clients": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "radio_txpower_dbm": 14,
+          "uftp_rate_kbps": 15000,
+          "uplink_mcs": 4,
+          "grant_duration_ms": 10,
+          "guard_interval_ms": 10,
+          "fec_n": 14
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfca386b38672",
+            "mac": "fc:a3:86:b3:86:72",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3/1-2.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "881a",
+                  "speed": "480",
+                  "busnum": "1",
+                  "devnum": "12",
+                  "devpath": "2.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "5489",
+                  "speed": "480",
+                  "busnum": "1",
+                  "devnum": "2",
+                  "devpath": "2"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb1",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0002",
+                  "speed": "480",
+                  "busnum": "1",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "wall": 1794204974.5174332,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "855",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzz-release-149.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf",
+            "sha256": "5b193e4373685af2a84214050714dd90b49581a1958f475109200943d781a401"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzz-release-149.conf",
+            "sha256": "6aa874e2ab7099164a9942444a855efd00eb108f1dc41df84590a0f5f921506c"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "a5dccec34414d291825ad1c2dee7059ca23b75a318d02e3150d61894053292b2"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c500bfe",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 1
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c500bfe",
+            "mac": "fc:22:1c:50:0b:fe",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "wall": 1794204974.608127,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "853",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzz-release-149.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/08-mnist.conf",
+            "sha256": "5b193e4373685af2a84214050714dd90b49581a1958f475109200943d781a401"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzz-release-149.conf",
+            "sha256": "3e6af59a5015fac7a3e0e68ec04096969ed9b511dc0996bbdd363241433c6ff3"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "81afb7fc12cd99f683aaccb505417f5d6733c606e8cc3eae17f65bef3b847464"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c300f04",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 2
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c300f04",
+            "mac": "fc:22:1c:30:0f:04",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "wall": 1794204974.2270913,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "855",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "8236a6783e4f2c9122cd0de6812043bfd0bcbf13d1a7b2cad014a8e0654c93c1"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlx5cffffaf6d8c",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 3
+        },
+        "interfaces": [
+          {
+            "interface": "wlx5cffffaf6d8c",
+            "mac": "5c:ff:ff:af:6d:8c",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.1/2-1.1:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "wall": 1794204974.6045582,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "6014",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf",
+            "sha256": "01569566b218f680bc16a6ff693b33a85c29288a954ce86564999c7f111fa012"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "105d5bce363fde6371507849b37badc1916f03885168d7e63a8e18346c355f88"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c100157",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 5
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c100157",
+            "mac": "fc:22:1c:10:01:57",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "wall": 1794204974.816624,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "867",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf",
+            "sha256": "01569566b218f680bc16a6ff693b33a85c29288a954ce86564999c7f111fa012"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "88e87d725a2161de8277b9ce2a0679e8e597a6cfb53da0ed61154f7bd90c771b"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c300cbb",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 6
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c300cbb",
+            "mac": "fc:22:1c:30:0c:bb",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "wall": 1794204974.6548557,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "866",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/phase1-baseline.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/phase1-baseline.conf",
+            "sha256": "15af37c260f31f1046d16baacd4bac20bf11a0755afd27b8121f5a838dbb1a93"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "196ced00cdda9652d5ccd9548442932523a8b12c9fd0a2979c616c62ecdbab42"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c300e99",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 7
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c300e99",
+            "mac": "fc:22:1c:30:0e:99",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "wall": 1794204974.7623277,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "857",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf",
+            "sha256": "01569566b218f680bc16a6ff693b33a85c29288a954ce86564999c7f111fa012"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "5327944166e12b9556a454c0c6b0ce0d0128f720f45d950d8a7ef1d4cfd7b1d1"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c500a88",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 8
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c500a88",
+            "mac": "fc:22:1c:50:0a:88",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "wall": 1794204974.829215,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "860",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/phase1-baseline.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/phase1-baseline.conf",
+            "sha256": "15af37c260f31f1046d16baacd4bac20bf11a0755afd27b8121f5a838dbb1a93"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "0b21789236f516439a2df2ee2bc5cdaa35479865ed7550e410fc684b85577d99"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlx88e62852aae4",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 9
+        },
+        "interfaces": [
+          {
+            "interface": "wlx88e62852aae4",
+            "mac": "88:e6:28:52:aa:e4",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "3",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "wall": 1794204974.8360257,
+        "os_release": {
+          "PRETTY_NAME": "Ubuntu 22.04.5 LTS",
+          "NAME": "Ubuntu",
+          "VERSION_ID": "22.04",
+          "VERSION": "22.04.5 LTS (Jammy Jellyfish)",
+          "ID": "ubuntu"
+        },
+        "kernel_release": "5.15.148-tegra",
+        "kernel_version": "#1 SMP PREEMPT Tue Jan 7 17:14:38 PST 2025",
+        "nv_tegra_release": "# R36 (release), REVISION: 4.3, GCID: 38968081, BOARD: generic, EABI: aarch64, DATE: Wed Jan  8 01:49:37 UTC 2025\n# KERNEL_VARIANT: oot\nTARGET_USERSPACE_LIB_DIR=nvidia\nTARGET_USERSPACE_LIB_DIR_PATH=usr/lib/aarch64-linux-gnu/nvidia",
+        "driver_modules": {
+          "88XXau_wfb": {
+            "filename": {
+              "returncode": 0,
+              "stdout": "/lib/modules/5.15.148-tegra/updates/dkms/88XXau_wfb.ko",
+              "stderr": ""
+            },
+            "version": {
+              "returncode": 0,
+              "stdout": "v5.2.20.2_28373.20190919",
+              "stderr": ""
+            },
+            "srcversion": {
+              "returncode": 0,
+              "stdout": "08BBAE7FE71F25B7F0ED54C",
+              "stderr": ""
+            },
+            "vermagic": {
+              "returncode": 0,
+              "stdout": "5.15.148-tegra SMP preempt mod_unload modversions aarch64",
+              "stderr": ""
+            },
+            "file_sha256": "9a3a2a1303d7585cdb5245a92e8fd2280902de2e209f22319c7b2e42152ef491",
+            "sysfs_version": "v5.2.20.2_28373.20190919",
+            "sysfs_srcversion": "08BBAE7FE71F25B7F0ED54C"
+          }
+        },
+        "resident_unit": "wfb-fl-client-daemon.service",
+        "service": {
+          "MainPID": "17786",
+          "ActiveState": "active",
+          "SubState": "running",
+          "FragmentPath": "/lib/systemd/system/wfb-fl-client-daemon.service",
+          "DropInPaths": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf /etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf"
+        },
+        "unit_file_digests": [
+          {
+            "path": "/lib/systemd/system/wfb-fl-client-daemon.service",
+            "sha256": "927e8eaa2742f990c93353a490b75db0aaf872de847624951954e05872dffcea"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf",
+            "sha256": "01569566b218f680bc16a6ff693b33a85c29288a954ce86564999c7f111fa012"
+          },
+          {
+            "path": "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf",
+            "sha256": "285050c40439b0e2c3fa4e28f9171181e6f742c4022cfe5bf384aba3b338301e"
+          }
+        ],
+        "explicit_unit_radio_flags": {
+          "channel": "149",
+          "bandwidth-mhz": "40",
+          "radio-txpower-dbm": "18",
+          "uplink-mcs": "4",
+          "interface": "wlxfc221c100119",
+          "fec-n": "14"
+        },
+        "config_path": "/etc/wfb-ng-fl/node.json",
+        "config_radio_whitelist": {
+          "node_id": 10
+        },
+        "interfaces": [
+          {
+            "interface": "wlxfc221c100119",
+            "mac": "fc:22:1c:10:01:19",
+            "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+            "module": "/sys/module/88XXau_wfb",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "usb": [
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "8812",
+                  "speed": "5000",
+                  "busnum": "2",
+                  "devnum": "4",
+                  "devpath": "1.3"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+                "attributes": {
+                  "idVendor": "0bda",
+                  "idProduct": "0489",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "2",
+                  "devpath": "1"
+                }
+              },
+              {
+                "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+                "attributes": {
+                  "idVendor": "1d6b",
+                  "idProduct": "0003",
+                  "speed": "10000",
+                  "busnum": "2",
+                  "devnum": "1",
+                  "devpath": "0"
+                }
+              }
+            ],
+            "iw": [
+              "type monitor",
+              "channel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz",
+              "txpower -18.00 dBm"
+            ]
+          }
+        ],
+        "privacy": "OS/module/sysfs identity and explicit radio whitelist only; no environment or arbitrary config values"
+      },
+      "stderr": ""
+    }
+  ],
+  "ok": true,
+  "wall": 1794204974.820345
+}
