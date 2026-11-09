@@ -1,0 +1,424 @@
+{
+  "candidate": {
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "fec_n": 14,
+    "mode": "model",
+    "stage": "execute",
+    "readiness_fail_nodes": [],
+    "DLduration": 332.78339414000015,
+    "ULduration": 600.0192269290001,
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/continuation-30-d5/fec14-g30-d5-model",
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "execute_count": 1,
+    "started_wall": 1794197171.9098618,
+    "latest_registry_states": {
+      "1": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "2": {
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      }
+    },
+    "runner_last_phase": "independent_cleanup",
+    "runner_last_monotonic": 2808.415596317,
+    "currentphase": "submit",
+    "completed_hosts": {
+      "publish": [
+        "fl00",
+        "fl10",
+        "fl06",
+        "fl01",
+        "fl08",
+        "fl09",
+        "fl03",
+        "fl02",
+        "fl07",
+        "fl05"
+      ],
+      "submit": [
+        "fl03",
+        "fl09",
+        "fl01",
+        "fl10",
+        "fl06",
+        "fl07",
+        "fl08",
+        "fl05"
+      ]
+    },
+    "hunt_events": [
+      {
+        "wall": 1794197228.3302855,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197348.7134788,
+        "node": "8",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197388.8482077,
+        "node": "8",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197544.3659961,
+        "node": "7",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197554.4025817,
+        "node": "7",
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197559.4218132,
+        "node": "7",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197569.4557211,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197574.478274,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197584.5185661,
+        "node": "10",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197614.6450229,
+        "node": "6",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197629.713185,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197639.7563517,
+        "node": "8",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197659.848395,
+        "node": "5",
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197664.8718746,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197684.9686947,
+        "node": "5",
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197700.0385203,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197715.1104367,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197715.1104403,
+        "node": "10",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197725.1610801,
+        "node": "8",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197740.239398,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197760.3381732,
+        "node": "5",
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197916.2726226,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794197951.493954,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794198122.6513813,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794198132.7267172,
+        "node": "2",
+        "readiness": "OFFLINE",
+        "reported_state": "HUNTING",
+        "channel": 157
+      }
+    ],
+    "client_upload_progress": {
+      "wall": 1794198109.011713,
+      "monotonic": 2798.972738275,
+      "phase": "upload_progress",
+      "host": "fl00",
+      "ok": true,
+      "result": {
+        "nodes": [
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 1,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 2,
+            "bytes": 27131904,
+            "partial_bytes": 27131904,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 3,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 5,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 6,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 7,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 8,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 9,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "21b2c501-aa9d-4446-afc4-5e1367068748",
+            "node": 10,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          }
+        ],
+        "observation": "filesystem_snapshot",
+        "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+      }
+    },
+    "runner_returncode": 1,
+    "runner_restore_ok": false,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/continuation-30-d5/fec14-g30-d5-model/k20261109T034216Z-g30-d5-model/progress.jsonl",
+    "elapsed": 964.5672254410001,
+    "failures": [
+      {
+        "wall": 1794198113.9033308,
+        "monotonic": 2803.864357803,
+        "host": "fl00",
+        "phase": "submit",
+        "ok": false,
+        "error": "RuntimeError('{\\'id\\': 6, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'轮次等待 update 超时，未达到最小配额: 期望 9\\')\"}')"
+      },
+      {
+        "wall": 1794198113.9036436,
+        "monotonic": 2803.864668816,
+        "phase": "run",
+        "ok": false,
+        "error": "RuntimeError('submit failed: fl00')"
+      },
+      {
+        "wall": 1794198113.9037566,
+        "monotonic": 2803.864781682,
+        "phase": "restore",
+        "ok": false,
+        "error": "全角色 close 未确认；先独立回收再恢复"
+      }
+    ],
+    "original_runner_final_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "server_verified_files": {},
+    "phase_completion_seconds": {
+      "publish": {
+        "fl00": 187.3776915609999,
+        "fl10": 188.30630425599998,
+        "fl06": 188.379117532,
+        "fl01": 189.3370543120002,
+        "fl08": 189.8648020789999,
+        "fl09": 190.2130131790002,
+        "fl03": 192.27582665700015,
+        "fl02": 195.40995299500014,
+        "fl07": 332.72239063400025,
+        "fl05": 332.78339414000015
+      },
+      "submit": {
+        "fl03": 126.1567744670001,
+        "fl09": 263.20020991,
+        "fl01": 267.545430312,
+        "fl10": 309.646777337,
+        "fl06": 348.5380627119998,
+        "fl07": 362.6126771859999,
+        "fl08": 414.6803170510002,
+        "fl05": 484.755188136
+      }
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794198134.411617,
+    "monotonic": 2824.372642243,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  }
+}

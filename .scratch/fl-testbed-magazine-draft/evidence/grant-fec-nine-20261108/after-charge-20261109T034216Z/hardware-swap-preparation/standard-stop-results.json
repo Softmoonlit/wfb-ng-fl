@@ -1,0 +1,61 @@
+{
+  "ready_for_user_physical_swap": true,
+  "stops": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "unit": "wfb-fl-server-daemon.service",
+        "ok": true,
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "remaining_native": [],
+        "wall": 1794198318.005905
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "unit": "wfb-fl-client-daemon.service",
+        "ok": true,
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "remaining_native": [],
+        "wall": 1794198318.4767618
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "unit": "wfb-fl-client-daemon.service",
+        "ok": true,
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "remaining_native": [],
+        "wall": 1794198318.5322897
+      },
+      "stderr": ""
+    }
+  ],
+  "host_shutdown": false,
+  "ssh_host_left_running": true,
+  "other_clients_unchanged": true,
+  "interface_bindings_changed": false,
+  "new_trials_started": false,
+  "physical_confirmation_received": false,
+  "interpretation": "new multi-device hardware baseline after swaps, not single-variable05 AB",
+  "wall": 1794198318.5604699
+}

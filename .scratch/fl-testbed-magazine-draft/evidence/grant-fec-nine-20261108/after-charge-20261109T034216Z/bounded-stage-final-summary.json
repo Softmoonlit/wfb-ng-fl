@@ -1,0 +1,91 @@
+{
+  "status": "bounded_stage_complete_hardware_swap_ready",
+  "results": [
+    {
+      "grant": 20,
+      "guard": 5,
+      "mode": "smoke",
+      "DL_seconds": 12.19349046900004,
+      "UL_seconds": 15.504051894999975,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "execute_count": 1,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/fec14-g20-d5-smoke"
+    },
+    {
+      "grant": 20,
+      "guard": 5,
+      "mode": "model",
+      "DL_seconds": 65.91107003799999,
+      "UL_seconds": 600.0285704019999,
+      "raw_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "independent_restore_ok": true,
+      "execute_count": 1,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/fec14-g20-d5-model"
+    },
+    {
+      "grant": 30,
+      "guard": 5,
+      "mode": "smoke",
+      "DL_seconds": 8.935886470000014,
+      "UL_seconds": 11.637437803000012,
+      "raw_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_restore_ok": true,
+      "execute_count": 1,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/continuation-30-d5/fec14-g30-d5-smoke"
+    },
+    {
+      "grant": 30,
+      "guard": 5,
+      "mode": "model",
+      "DL_seconds": 332.78339414000015,
+      "UL_seconds": 600.0192269290001,
+      "raw_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "independent_restore_ok": true,
+      "execute_count": 1,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/continuation-30-d5/fec14-g30-d5-model"
+    }
+  ],
+  "model30_tail": {
+    "last_unfinished_node": 2,
+    "fl05_submit_complete_seconds": 484.755188136,
+    "fl05_is_last_failed_node": false
+  },
+  "original20_model_postidle_hash_evidence": "post-idle-independent20-model-files.json",
+  "original20_independently_hashed_complete_updates": 8,
+  "original20_missing_update_node": 5,
+  "server_schedule_before_stop": "10/10",
+  "full_ten_baseline_audit_before_stop": true,
+  "nine_ready_idle_before_stop": true,
+  "current_intentionally_stopped": [
+    "fl00",
+    "fl10",
+    "fl05"
+  ],
+  "native_absent_all_three": true,
+  "other_clients_unchanged": true,
+  "pending_user_physical_confirmation": true,
+  "hardware_identity_evidence": "hardware-swap-preparation/before-nic-identities.json",
+  "stop_evidence": "hardware-swap-preparation/standard-stop-results.json",
+  "no_FEC12_no40_60_no_validations": true,
+  "source": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "wall": 1794198347.793267
+}

@@ -1,0 +1,900 @@
+{
+  "kind": "supplemental-readonly-power-audit-during-first-smoke",
+  "basis": "board-power/audit-jtop.py existing paths + cpuinfo/scaling maximum fields",
+  "rows": [
+    {
+      "host": "fl00",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "boot_id": "6ad51f15-51bb-42b4-ae09-54d808b6c3c4",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.0638177
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "boot_id": "96b7967d-6755-442f-a93d-dea2b6842ae4",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196017.2996457
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "boot_id": "1556c12d-753b-433f-95dd-387b94369b27",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.9769292
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "boot_id": "bbf344ce-88d1-4737-a76a-f32b98d8c951",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.571894
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "boot_id": "8b6cdd20-f4f9-475d-a636-ba4a4d133356",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.878508
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "boot_id": "10214fad-d1da-4523-9070-97ea716340fd",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.4475796
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "boot_id": "d8aa9920-2327-4f73-83d9-48642d87bdf1",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.4578798
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "boot_id": "6a11eeba-aba4-402d-9ccb-bf2df8ef9aaa",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.4052339
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "boot_id": "b8540dab-ff28-446f-896b-cf98e77080be",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.407322
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "ok": false,
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "boot_id": "3cad4cb3-7fc9-47bb-8a42-0a419ea6a424",
+        "actual": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "3199000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1728000",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "expected": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "mismatches": {
+          "/sys/kernel/debug/bpmp/debug/clk/emc/max_rate": {
+            "actual": "3199000000",
+            "expected": "2133000000"
+          },
+          "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu1/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu2/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu3/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          },
+          "/sys/devices/system/cpu/cpu5/cpufreq/cpuinfo_max_freq": {
+            "actual": "1728000",
+            "expected": "1497600"
+          }
+        },
+        "power_service": {
+          "returncode": 0,
+          "stdout": "Result=success\nExecMainStatus=0\n",
+          "stderr": ""
+        },
+        "jtop": {
+          "returncode": 3,
+          "stdout": "inactive\n",
+          "stderr": ""
+        },
+        "wall": 1794196016.351288
+      },
+      "stderr": ""
+    }
+  ],
+  "all_ok": false,
+  "running_driver_not_modified": true,
+  "wall": 1794196017.2868617,
+  "interpretation_note": "cpuinfo_max_freq and debug EMC max_rate are recorded capability ceilings; effective scaling_max_freq and nvpmodel EMC cap match policy. Initial strict comparator mismatch does not by itself establish power-policy failure. Boundary STOP requests parent assessment; no power settings modified."
+}

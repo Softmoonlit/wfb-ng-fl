@@ -1,0 +1,274 @@
+{
+  "candidate": {
+    "grant_duration_ms": 20,
+    "guard_interval_ms": 5,
+    "fec_n": 14,
+    "mode": "smoke",
+    "stage": "execute",
+    "readiness_fail_nodes": [],
+    "DLduration": 12.19349046900004,
+    "ULduration": 15.504051894999975,
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/fec14-g20-d5-smoke",
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "execute_count": 1,
+    "started_wall": 1794195739.3122268,
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      }
+    },
+    "runner_last_phase": "independent_cleanup",
+    "runner_last_monotonic": 488.362941185,
+    "currentphase": "verify",
+    "completed_hosts": {
+      "publish": [
+        "fl08",
+        "fl06",
+        "fl02",
+        "fl07",
+        "fl01",
+        "fl09",
+        "fl05",
+        "fl10",
+        "fl03",
+        "fl00"
+      ],
+      "submit": [
+        "fl03",
+        "fl02",
+        "fl01",
+        "fl07",
+        "fl10",
+        "fl08",
+        "fl09",
+        "fl06",
+        "fl05",
+        "fl00"
+      ]
+    },
+    "client_upload_progress": {
+      "wall": 1794195791.707641,
+      "monotonic": 481.668666478,
+      "phase": "upload_progress",
+      "host": "fl00",
+      "ok": true,
+      "result": {
+        "nodes": [
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 1,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 2,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 3,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 5,
+            "bytes": 851968,
+            "partial_bytes": 851968,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 6,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 7,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 8,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 9,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "444373df-4128-4899-96a2-c78477e7dcfa",
+            "node": 10,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          }
+        ],
+        "observation": "filesystem_snapshot",
+        "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+      }
+    },
+    "runner_returncode": 0,
+    "runner_restore_ok": true,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/fec14-g20-d5-smoke/c20261109T034216Z-g20-d5-smoke/progress.jsonl",
+    "elapsed": 50.153077234999955,
+    "failures": [],
+    "original_runner_final_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "server_verified_files": {
+      "1": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/1/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "2": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/2/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "3": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/3/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "5": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/5/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "6": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/6/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "7": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/7/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "8": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/8/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "9": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/9/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "10": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke/role/rounds/444373df-4128-4899-96a2-c78477e7dcfa/updates/10/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      }
+    },
+    "phase_completion_seconds": {
+      "publish": {
+        "fl08": 11.258256543000016,
+        "fl06": 11.258555717000036,
+        "fl02": 11.260466347000033,
+        "fl07": 11.263356197000007,
+        "fl01": 11.267204882000044,
+        "fl09": 11.268290663000016,
+        "fl05": 11.27682741000001,
+        "fl10": 11.278760505000037,
+        "fl03": 11.339072174000023,
+        "fl00": 12.19349046900004
+      },
+      "submit": {
+        "fl03": 1.9176320509999982,
+        "fl02": 2.9969820430000027,
+        "fl01": 4.424893964999967,
+        "fl07": 5.850963473999968,
+        "fl10": 7.003037447999986,
+        "fl08": 8.350908570000001,
+        "fl09": 12.106877442999973,
+        "fl06": 14.401219252999965,
+        "fl05": 15.492586778999964,
+        "fl00": 15.504051894999975
+      }
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794195798.5898879,
+    "monotonic": 488.550912599,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  }
+}

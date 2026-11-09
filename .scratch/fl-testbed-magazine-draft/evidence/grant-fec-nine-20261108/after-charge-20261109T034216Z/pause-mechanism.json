@@ -1,0 +1,8 @@
+{
+  "markers": [
+    "PAUSE",
+    "STOP"
+  ],
+  "effect": "当前runner完整收尾并独立审计后检查标记；候选配置前和execute前也检查；prepare>=60s且SSH失败向精确runner发SIGINT",
+  "installed_before_start": true
+}

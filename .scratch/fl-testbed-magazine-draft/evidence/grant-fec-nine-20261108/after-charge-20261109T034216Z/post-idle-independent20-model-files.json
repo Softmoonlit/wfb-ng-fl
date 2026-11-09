@@ -1,0 +1,91 @@
+{
+  "returncode": 0,
+  "result": {
+    "runroot": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+    "records": [
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 1,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/1/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 2,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/2/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 3,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/3/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 5,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/5/update.bin",
+        "exists": false,
+        "ok": false
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 6,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/6/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 7,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/7/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 8,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/8/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 9,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/9/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      },
+      {
+        "round": "845470f6-b42e-4fc9-83bc-24ba23ee96bf",
+        "node": 10,
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/updates/10/update.bin",
+        "exists": true,
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "ok": true
+      }
+    ],
+    "observed_committed_count": 8,
+    "note": "Post-run read-only committed-file audit; missing files cannot be reconstructed or inferred as independently hashed. Raw timeout flags remain unchanged.",
+    "wall": 1794198259.6153243
+  },
+  "stderr": ""
+}

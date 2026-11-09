@@ -1,0 +1,197 @@
+{
+  "original_supplemental_preserved": true,
+  "corrected_policy_all_ok": true,
+  "full_actual_recovery_ok": true,
+  "checks": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "limits": {
+        "/sys/devices/system/cpu/online": "0-5",
+        "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+        "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+        "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+        "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+        "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+      },
+      "service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "profile": "/etc/nvpmodel/nvpmodel_p3767_0003_super.conf"
+    }
+  ]
+}
