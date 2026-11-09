@@ -1,0 +1,139 @@
+{
+  "ok": false,
+  "elapsed": 0.6014495339995847,
+  "checks": [
+    {
+      "host": "fl00",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl01",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl02",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl03",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl05",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl06",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl07",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl08",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl09",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    },
+    {
+      "host": "fl10",
+      "ok": false,
+      "errors": [
+        "management/probe failed"
+      ]
+    }
+  ],
+  "fl04": "excluded; not contacted per current authorization",
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/cifar10_model.py'\n"
+    },
+    {
+      "host": "fl01",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl02",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl03",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl05",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl06",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl07",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl08",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl09",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    },
+    {
+      "host": "fl10",
+      "returncode": 1,
+      "result": "",
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 36, in <module>\n  File \"<string>\", line 36, in <dictcomp>\n  File \"/usr/lib/python3.10/pathlib.py\", line 1126, in read_bytes\n    with self.open(mode='rb') as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z/source/observation.py'\n"
+    }
+  ]
+}

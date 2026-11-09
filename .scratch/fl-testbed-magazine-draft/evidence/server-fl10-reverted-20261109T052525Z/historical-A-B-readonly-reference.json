@@ -1,0 +1,147 @@
+[
+  {
+    "phase": "A-original",
+    "matrix": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-20261108/after-charge-20261109T034216Z/continuation-30-d5/matrix.json",
+    "DLduration": 332.78339414000015,
+    "ULduration": 600.0192269290001,
+    "raw_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "verified_downlink": [
+      {
+        "host": "fl10",
+        "event": "receive_verified",
+        "monotonic": 2277.220180654,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl06",
+        "event": "receive_verified",
+        "monotonic": 2127.529375835,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl01",
+        "event": "receive_verified",
+        "monotonic": 2224.369056638,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl08",
+        "event": "receive_verified",
+        "monotonic": 2153.822525662,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl09",
+        "event": "receive_verified",
+        "monotonic": 2330.919900122,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl03",
+        "event": "receive_verified",
+        "monotonic": 2083.097124965,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl02",
+        "event": "receive_verified",
+        "monotonic": 2325.231721035,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl07",
+        "event": "receive_verified",
+        "monotonic": 2286.671376003,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      {
+        "host": "fl05",
+        "event": "receive_verified",
+        "monotonic": 2443.427959285,
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    ],
+    "failures": [
+      {
+        "wall": 1794198113.9033308,
+        "monotonic": 2803.864357803,
+        "host": "fl00",
+        "phase": "submit",
+        "ok": false,
+        "error": "RuntimeError('{\\'id\\': 6, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'\u8f6e\u6b21\u7b49\u5f85 update \u8d85\u65f6\uff0c\u672a\u8fbe\u5230\u6700\u5c0f\u914d\u989d: \u671f\u671b 9\\')\"}')"
+      },
+      {
+        "wall": 1794198113.9036436,
+        "monotonic": 2803.864668816,
+        "phase": "run",
+        "ok": false,
+        "error": "RuntimeError('submit failed: fl00')"
+      },
+      {
+        "wall": 1794198113.9037566,
+        "monotonic": 2803.864781682,
+        "phase": "restore",
+        "ok": false,
+        "error": "\u5168\u89d2\u8272 close \u672a\u786e\u8ba4\uff1b\u5148\u72ec\u7acb\u56de\u6536\u518d\u6062\u590d"
+      }
+    ]
+  },
+  {
+    "phase": "B-swapped",
+    "matrix": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/model-continuation-after-settled-recovery/matrix.json",
+    "DLduration": 48.58789837700078,
+    "ULduration": null,
+    "raw_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "verified_downlink": [],
+    "failures": [
+      {
+        "wall": 1794200097.5110908,
+        "monotonic": 4787.472117627,
+        "host": "fl00",
+        "phase": "publish",
+        "ok": false,
+        "error": "RuntimeError('{\\'id\\': 5, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'UFTP \u9000\u51fa\u7801\u4e3a 9\\')\"}')"
+      },
+      {
+        "wall": 1794200097.5114064,
+        "monotonic": 4787.472431401,
+        "phase": "run",
+        "ok": false,
+        "error": "RuntimeError('publish failed: fl00')"
+      },
+      {
+        "wall": 1794200097.5114973,
+        "monotonic": 4787.472522382,
+        "phase": "restore",
+        "ok": false,
+        "error": "\u5168\u89d2\u8272 close \u672a\u786e\u8ba4\uff1b\u5148\u72ec\u7acb\u56de\u6536\u518d\u6062\u590d"
+      }
+    ]
+  }
+]

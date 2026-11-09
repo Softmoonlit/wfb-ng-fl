@@ -1,0 +1,25 @@
+{
+  "full_ten_actual_baseline_ok": false,
+  "exact_nine_ready_idle": false,
+  "exact_cleanup_ok": true,
+  "server_schedule": "10/10",
+  "independent_restoration": true,
+  "measurement_error": "AssertionError('independent restoration incomplete: stop without another execute')",
+  "raw_flags": [
+    {
+      "mode": "smoke",
+      "execute_count": 1,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    {
+      "mode": "model",
+      "execute_count": 1,
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    }
+  ],
+  "wall": 1794203115.1480062
+}

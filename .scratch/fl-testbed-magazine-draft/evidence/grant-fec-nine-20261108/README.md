@@ -94,3 +94,11 @@ fl09复核ping2发0收、SSH `No route to host`、ARP INCOMPLETE，当时无法�
 30/5、FEC8/14、实际UFTP 12000 Kbps的小文件一次通过（下行9.004秒、上传9.986秒）。小文件后独立审计曾读到01仍在157，原false保留，后续全十板149实际审计与九端准入通过，未重跑小文件。模型一次在下行48.588秒时UFTP退出9，未调度上传；九端已注册并返回FILEINFO_ACK，随后sender记录Sending thread timed out、全九端Lost connection，receiver均Transfer timed out。没有完整模型接收／SHA通过事实，仅保留重启记录；本次未见内核USB重置匹配行，不能把退出9直接判为网卡损坏。
 
 模型原始transfer=false、cleanup=true、restore=false以及恢复HTTP409保留。随后标准恢复完成：server10/10、全十板149/HT40/Long GI/索引18/MCS3/4/FEC8/14/实际15W与版本通过，九端READY/IDLE，无活动作业，所有临时unit与本地runner退出。未重试、未执行其他组。现有证据将问题指向待查的整组下行路径，不能归因于单一02／05客户端。详情见[新硬件结果](../server-fl10-swap-20261109T044926Z/result.json)。
+
+## 回换A2结果与再次互换准备
+
+用户确认00／10网卡及天线换回，新批次`server-fl10-reverted-20261109T052525Z/`实读00=`fc:22:1c:10:01:19`、10=`fc:a3:86:b3:86:72`，仅两端恢复显式绑定并标准启动，其余端不动。首次新审计工具把冻结源码模块目录写错，十端均FileNotFoundError；这次零execute，原脚本／失败／STOP保留。独立`audit-corrected-continuation/`修正本地审计目录后重新准入，没有改板上源码、native或冻结runner。
+
+A2仍为30/5、FEC8/14、UFTP实际12000 Kbps：小文件一次通过（5.131秒下行、9.657秒上传）；模型九端下行50.343秒且大小／SHA全部正确，但上传600.045秒仅fl03完整提交，服务端已独立核验该完整文件，其余八端未完整提交。模型原始false／true／false保留。临时unit已回收、server恢复10/10，独立恢复仍未齐：fl10一次标准恢复后仍157／OFFLINE，其他九板实际基线通过。不能把下行恢复描述成整个通信闭环通过，也不能把源码审计错误与前一批真实UFTP失败混为一谈。
+
+用户要求再交换00／10作为B2重复对照；当前两端已经标准停止，inactive/dead、MainPID=0、native无残留，宿主及管理网络继续运行。等待物理互换：00的`.119`移到10、10的`.8672`移到00，天线随卡、原USB口不变；其余端不动。没有修改新绑定或启动B2，也没有继续其他参数组。证据见[回换A2记录](../server-fl10-reverted-20261109T052525Z/README.md)。

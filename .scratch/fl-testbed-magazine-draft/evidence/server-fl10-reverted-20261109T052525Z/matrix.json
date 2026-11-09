@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "profile": "server-fl10-reverted-30-5-fec14",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    30
+  ],
+  "guard_interval_ms": 5,
+  "status": "stopped",
+  "max_executions": 2,
+  "candidates": [
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-reverted-20261109T052525Z/fec14-g30-d5-smoke",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-reverted-20261109T052525Z/fec14-g30-d5-model",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    }
+  ],
+  "power_context": "User confirmed original00/10 NICs and antennas restored;02/05 unchanged. A-B-A phase",
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "pause_requested": true,
+  "updated_wall": 1794202197.2287369,
+  "updated_monotonic": 6887.189764078,
+  "error": "AssertionError([{'host': 'fl00', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl01', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl02', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl03', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl05', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl06', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl07', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl08', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl09', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl10', 'ok': False, 'errors': ['management/probe failed']}])"
+}

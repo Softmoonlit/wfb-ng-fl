@@ -1,0 +1,82 @@
+{
+  "full_ten_restoration_complete": false,
+  "fl10_before_stop_actual_channel": 157,
+  "fl10_before_stop_registry": {
+    "node_id": 10,
+    "tun_ip": "10.80.0.20",
+    "reported_state": null,
+    "readiness": "OFFLINE",
+    "elapsed_ms": 0,
+    "current_channel": null,
+    "txpower_dbm": null,
+    "uplink_mcs": null,
+    "last_heartbeat_time": null,
+    "last_heartbeat_timestamp_ms": null,
+    "last_heartbeat_ago_seconds": null,
+    "error_code": null,
+    "can_select": false,
+    "selection_blockers": [
+      {
+        "code": "NODE_OFFLINE",
+        "message": "\u8282\u70b9\u672a\u4e0a\u7ebf\u6216\u5fc3\u8df3\u5df2\u8d85\u65f6"
+      }
+    ]
+  },
+  "latest_authorization": "Parent explicitly authorized standard00/10 stop with incomplete restoration; no further recovery",
+  "ready_for_user_physical_swap": true,
+  "stops": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl00\", \"unit\": \"wfb-fl-server-daemon.service\", \"utc\": \"2026-11-09T05:49:32.888286+00:00\", \"stop_returncode\": 0, \"stop_stdout\": \"\", \"stop_stderr\": \"\", \"service\": \"MainPID=0\\nActiveState=inactive\\nSubState=dead\\n\", \"service_returncode\": 0, \"remaining_native\": [], \"ok\": true}\n",
+      "stderr": "",
+      "result": {
+        "host": "fl00",
+        "unit": "wfb-fl-server-daemon.service",
+        "utc": "2026-11-09T05:49:32.888286+00:00",
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "service_returncode": 0,
+        "remaining_native": [],
+        "ok": true
+      }
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl10\", \"unit\": \"wfb-fl-client-daemon.service\", \"utc\": \"2026-11-09T05:49:34.007080+00:00\", \"stop_returncode\": 0, \"stop_stdout\": \"\", \"stop_stderr\": \"\", \"service\": \"MainPID=0\\nActiveState=inactive\\nSubState=dead\\n\", \"service_returncode\": 0, \"remaining_native\": [], \"ok\": true}\n",
+      "stderr": "",
+      "result": {
+        "host": "fl10",
+        "unit": "wfb-fl-client-daemon.service",
+        "utc": "2026-11-09T05:49:34.007080+00:00",
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "service_returncode": 0,
+        "remaining_native": [],
+        "ok": true
+      }
+    }
+  ],
+  "physical_swap_completed": false,
+  "current_identities": {
+    "fl00": "fc:22:1c:10:01:19",
+    "fl10": "fc:a3:86:b3:86:72",
+    "fl05": "fc:22:1c:10:01:57"
+  },
+  "expected_after_swap": {
+    "fl00": "fc:a3:86:b3:86:72",
+    "fl10": "fc:22:1c:10:01:19",
+    "fl05": "fc:22:1c:10:01:57"
+  },
+  "other_clients_including_05_unchanged": true,
+  "management_wifi_changed": false,
+  "interface_bindings_changed": false,
+  "power_parameters_changed": false,
+  "new_trial_started": false,
+  "wall": 1794203374.0429046
+}

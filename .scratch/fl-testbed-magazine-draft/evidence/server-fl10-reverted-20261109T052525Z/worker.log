@@ -1,0 +1,19 @@
+{"monotonic": 6870.40551167, "status": "running", "grant": null, "stage": "server_readiness_15s"}
+{"monotonic": 6870.507804463, "status": "running", "grant": null, "stage": "audit_initial-ten-board-baseline"}
+{"monotonic": 6871.952507217, "status": "stopped", "grant": null, "stage": "stopped"}
+AssertionError([{'host': 'fl00', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl01', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl02', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl03', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl05', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl06', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl07', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl08', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl09', 'ok': False, 'errors': ['management/probe failed']}, {'host': 'fl10', 'ok': False, 'errors': ['management/probe failed']}])
+{"monotonic": 6871.954947026, "status": "stopped", "grant": null, "stage": "configure_10"}
+{"monotonic": 6872.058295473, "status": "stopped", "grant": null, "stage": "server_readiness_15s"}
+{"monotonic": 6872.164345148, "status": "stopped", "grant": null, "stage": "audit_actual-baseline"}
+{"monotonic": 6873.162738406, "status": "stopped", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 6874.176637989, "status": "stopped", "grant": null, "stage": "server_readiness_15s"}
+{"monotonic": 6874.179237516, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6874.682425921, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6875.288342388, "status": "stopped", "grant": null, "stage": "audit_after-standard-restart-baseline"}
+{"monotonic": 6875.89249494, "status": "stopped", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 6875.896413335, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6877.903896395, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6879.910399736, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6881.917116269, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6883.925085781, "status": "stopped", "grant": null, "stage": null}
+{"monotonic": 6887.191248488, "status": "stopped", "grant": null, "stage": "finished"}

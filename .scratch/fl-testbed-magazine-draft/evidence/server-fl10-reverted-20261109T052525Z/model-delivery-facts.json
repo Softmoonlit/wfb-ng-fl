@@ -1,0 +1,191 @@
+{
+  "downlink_verified_count": 9,
+  "downlink_files": [
+    {
+      "host": "fl09",
+      "event": "receive_verified",
+      "monotonic": 7388.967390934,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl05",
+      "event": "receive_verified",
+      "monotonic": 7359.025449957,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl07",
+      "event": "receive_verified",
+      "monotonic": 7202.453335841,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl06",
+      "event": "receive_verified",
+      "monotonic": 7187.699330476,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl10",
+      "event": "receive_verified",
+      "monotonic": 7338.173888604,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl01",
+      "event": "receive_verified",
+      "monotonic": 7286.121429349,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl08",
+      "event": "receive_verified",
+      "monotonic": 7216.593990296,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl02",
+      "event": "receive_verified",
+      "monotonic": 7384.079325081,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "host": "fl03",
+      "event": "receive_verified",
+      "monotonic": 7147.184088716,
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "server_complete_uploaded_files": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/updates/3/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "complete_model": true
+    }
+  ],
+  "server_complete_uploaded_node_ids": [
+    3
+  ],
+  "nodes_without_complete_server_upload": [
+    1,
+    2,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "local_client_update_files_are_not_delivery_proof": true,
+  "raw_model_flags": {
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "DLduration": 50.34347465100018,
+  "ULduration": 600.0450571199999,
+  "last_upload_progress": {
+    "wall": 1794203032.7326791,
+    "monotonic": 7722.693704899,
+    "phase": "upload_progress",
+    "host": "fl00",
+    "ok": true,
+    "result": {
+      "nodes": [
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 1,
+          "bytes": 16121856,
+          "partial_bytes": 16121856,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 2,
+          "bytes": 18808832,
+          "partial_bytes": 18808832,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 3,
+          "bytes": 44770302,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 5,
+          "bytes": 1441792,
+          "partial_bytes": 1441792,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 6,
+          "bytes": 8323072,
+          "partial_bytes": 8323072,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 7,
+          "bytes": 10747904,
+          "partial_bytes": 10747904,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 8,
+          "bytes": 3538944,
+          "partial_bytes": 3538944,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 9,
+          "bytes": 5898240,
+          "partial_bytes": 5898240,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "09f8ff31-9a1d-4b1d-849e-d23d97be96b4",
+          "node": 10,
+          "bytes": 3801088,
+          "partial_bytes": 3801088,
+          "committed": false,
+          "observed": true
+        }
+      ],
+      "observation": "filesystem_snapshot",
+      "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+    }
+  }
+}
