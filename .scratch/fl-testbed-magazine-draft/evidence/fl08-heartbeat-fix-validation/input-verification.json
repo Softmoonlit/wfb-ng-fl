@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "execution_ready": true,
+  "release_identity_pending": false,
+  "model_bytes": 44770302,
+  "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958",
+  "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+  "topology": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "excluded": [
+    "fl04"
+  ],
+  "timing": {
+    "io_timeout": 600,
+    "orchestration_timeout": 1290,
+    "node_timeout": 1305,
+    "recovery_budget": 60,
+    "cleanup_timeout": 10,
+    "unit_stop_timeout": 8,
+    "close_restore_reserve": 40
+  },
+  "wall": 1794250030.024803
+}

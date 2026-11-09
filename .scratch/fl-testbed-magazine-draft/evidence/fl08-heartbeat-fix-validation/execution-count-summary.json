@@ -1,0 +1,49 @@
+{
+  "batch_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation",
+  "execution_count_policy": "Only continuation model payload executions count; pre-model tool failures are recorded separately and are not model retries.",
+  "original_fresh_root": {
+    "wrapper_attempts": 2,
+    "pre_model_tool_failures": 2,
+    "model_payload_executions": 0,
+    "stop_marker": true,
+    "reason_1": "storage.py archived-success evidence path was not reachable from nested fresh root",
+    "reason_2": "canonical check-all-ready.py was missing from TOOL root",
+    "classification": "tool-only preparation failures; not wireless admission or parameter failures",
+    "raw_preserved": true
+  },
+  "continuation_root": {
+    "path": "continuation-cccac233291c-0model-gate",
+    "wrapper_attempts": 1,
+    "model_payload_executions": 2,
+    "model_retry_count": 0,
+    "trial1": {
+      "execute_count": 1,
+      "outcome": "passed",
+      "run_id": "fec12-apr-20261109T185342Z-t1-g30-d5-model",
+      "downlink_seconds": 41.82566966700051,
+      "uplink_seconds": 265.4140438959994,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "trial2": {
+      "execute_count": 1,
+      "outcome": "passed",
+      "run_id": "fec12-apr-20261109T185342Z-t2-g30-d5-model",
+      "downlink_seconds": 46.94585797199943,
+      "uplink_seconds": 255.10296096599996,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    }
+  },
+  "aggregate": {
+    "fresh_model_rounds": 2,
+    "total_model_payload_executions": 2,
+    "total_model_retries": 0,
+    "consecutive_two_passed": true,
+    "first_substantive_model_failure": false,
+    "all_executor_processes_exited": true,
+    "packagekit_final": "active/static"
+  }
+}

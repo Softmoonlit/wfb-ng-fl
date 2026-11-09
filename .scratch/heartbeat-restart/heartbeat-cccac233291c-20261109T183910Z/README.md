@@ -14,4 +14,4 @@
 
 原代码回归复现、修复契约、101项本地回归与同配置CMD_SET_RADIO授权检查见[fl08诊断记录](../../fl-testbed-magazine-draft/evidence/fl08-admission-diagnosis/README.md)。核心行为为事务内统一禁止心跳发送，CONFIRMED完成后先发送确认ACK，再立即发送带身份的真实心跳；只有匹配心跳ACK更新活性锚。230ms和十秒门限不变。
 
-发布成功不代表两次模型闭环验收通过。后续验收独立保存在[修复后验收根](../../fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/)。首个执行器因漏带`check-all-ready.py`在模型前停止，零模型执行；当时十板实际审计通过、九端均READY/IDLE149，不将该工具错误归为无线或参数失败。原STOP与原始记录保留，补齐依赖后的连续两轮另立continuation批次，最终结果以其收尾记录为准。
+发布后的独立验收已完成，完整证据保存在[修复后验收根](../../fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/)。初始执行器的模型前工具错误（包括漏带`check-all-ready.py`）保留为零模型记录；当时十板实际审计和九端READY/IDLE149均通过，不归为无线或参数失败。补齐依赖后的continuation另立批次，恰好两次模型执行、零模型重试：第一轮下行41.82567秒／上行265.41404秒，第二轮下行46.94586秒／上行255.10296秒。两轮九端尺寸／SHA、精确清理、实际无线及15W恢复审计、九端READY全部通过，最终恢复149、HT40、Long GI、索引18、FEC8/12、30/5；全部执行器退出，PackageKit恢复原服务状态。本结果不证明40/5或230ms／十秒门限最优。

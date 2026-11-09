@@ -1,0 +1,81 @@
+{
+  "ok": true,
+  "offline_only": true,
+  "py_compile": true,
+  "embedded_code_compile": true,
+  "verify_inputs": {
+    "ok": true,
+    "execution_ready": true,
+    "release_identity_pending": false,
+    "model_bytes": 44770302,
+    "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958",
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+    "topology": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ],
+    "excluded": [
+      "fl04"
+    ],
+    "timing": {
+      "io_timeout": 600,
+      "orchestration_timeout": 1290,
+      "node_timeout": 1305,
+      "recovery_budget": 60,
+      "cleanup_timeout": 10,
+      "unit_stop_timeout": 8,
+      "close_restore_reserve": 40
+    },
+    "wall": 1794250383.3676353
+  },
+  "storage_index": {
+    "batchroot": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z",
+    "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/worker.py",
+    "source_exists": true,
+    "reclaim_bases": [
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-client-restart-resume-20261109T1833Z",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-storage-evidence-continuation-20261109T1840Z",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-fl02-restart-resume-20261109T1915Z",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-apt-generated-cache-reclamation-20261109T1930Z",
+      "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-final-two-with-cache-hold"
+    ]
+  },
+  "bundle_manifest": {
+    "schema_version": 1,
+    "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958",
+    "bundle_source": "canonical communication runner.py, node_agent.py, recover.py; node_agent includes pre-rejection registry snapshot",
+    "canonical_source_hashes": {
+      "runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+      "node_agent.py": "f24616f60dcdd5453161afe298f376fc7a93dc1cf319ef4034e6b1937b47d7b8",
+      "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147"
+    },
+    "files": {
+      "runner.py": "9f72fdef974efbbe1d2bbffbd4b9b9ddc5b95d3354515f928366c99c2c6a89e8",
+      "node_agent.py": "819057f464378fa05fca9824bcdd45a341dd01306b923a76e93e12661dc0c0ff",
+      "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147"
+    },
+    "identity_source": "release-identity.json",
+    "release_identity": {
+      "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+      "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+    },
+    "status": "release-published-awaiting-admission"
+  },
+  "execution_authorized_after_parent_release": true
+}

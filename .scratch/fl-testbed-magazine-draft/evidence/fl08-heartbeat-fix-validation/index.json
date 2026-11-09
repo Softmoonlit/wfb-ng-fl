@@ -1,0 +1,32 @@
+{
+  "batch_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation",
+  "status": "complete",
+  "continuation_root": "continuation-cccac233291c-0model-gate",
+  "raw_stop_root": ".",
+  "raw_stop_policy": "preserved; tool-only failure, zero model executions",
+  "raw_stop_reason": "missing canonical check-all-ready.py in original fresh root",
+  "raw_stop_not_a_wire_failure": true,
+  "release_audit_root": "/home/fl/projects/wfb-ng-fl/.scratch/heartbeat-restart/heartbeat-cccac233291c-20261109T183910Z",
+  "release": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958"
+  },
+  "result": {
+    "consecutive_two_passed": true,
+    "model_payload_executions": 2,
+    "model_retry_count": 0,
+    "trial1": "continuation-cccac233291c-0model-gate/trial1",
+    "trial2": "continuation-cccac233291c-0model-gate/trial2",
+    "final_closeout": "continuation-cccac233291c-0model-gate/final-closeout.json",
+    "wrapper_final": "continuation-cccac233291c-0model-gate/wrapper-final.json",
+    "worker_exit": "continuation-cccac233291c-0model-gate/worker-exit.json"
+  },
+  "cleanup_and_restore": {
+    "all_executors_exited": true,
+    "packagekit": "active/static",
+    "final_actual_audit": true,
+    "final_nine_ready": true
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "batch": "fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate",
+  "status": "complete",
+  "parent_tool_failure": {
+    "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation",
+    "reason": "missing canonical check-all-ready.py",
+    "model_executions": 0,
+    "raw_stop_preserved": true
+  },
+  "release": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958"
+  },
+  "topology": {
+    "server": "fl00",
+    "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "excluded": ["fl04"]
+  },
+  "configuration": {
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "fec": "8/12",
+    "test_channel": 157,
+    "restore_channel": 149,
+    "bandwidth_mhz": 40,
+    "gi": "LGI",
+    "driver_index": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 12000,
+    "model_bytes": 44770302,
+    "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "runs": [
+    {
+      "trial": 1,
+      "run_id": "fec12-apr-20261109T185342Z-t1-g30-d5-model",
+      "outcome": "passed",
+      "downlink_seconds": 41.82566966700051,
+      "uplink_seconds": 265.4140438959994,
+      "independent_nine_size_sha": "trial1/independent-server-nine-size-sha.json"
+    },
+    {
+      "trial": 2,
+      "run_id": "fec12-apr-20261109T185342Z-t2-g30-d5-model",
+      "outcome": "passed",
+      "downlink_seconds": 46.94585797199943,
+      "uplink_seconds": 255.10296096599996,
+      "independent_nine_size_sha": "trial2/independent-server-nine-size-sha.json"
+    }
+  ],
+  "closeout": {
+    "consecutive_two_passed": true,
+    "final_audit": "final-audit.json",
+    "final_ready": "final-ready/gate-result.json",
+    "packagekit": "active/static",
+    "all_executors_exited": true,
+    "stop_marker": false
+  }
+}

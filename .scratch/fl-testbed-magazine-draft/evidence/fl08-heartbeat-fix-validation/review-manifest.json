@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "status": "local-prepared-awaiting-parent-release",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation",
+  "files": {
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/wrapper.py": "e7636d3ec221920a4703080d4f39d4aaeec06b46715827fdef55651926f5635e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/worker.py": "b85f8c1aaf76bb4bf27cefa87d35fb4eda2f97a5cb89b700df3cf1f4d1ddea0c",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/helpers.py": "e0f9ee2230fbbe1ad7f853b410fc6fe209b698a0be0be19d9f6f3a2c5d38b5ca",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/driver-base.py": "7ef5fd0adef2a27a2f34390d5381e1c488f903aae4a82ca0c86d97ec1b99217e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/storage.py": "7ffcf59546854e0148df49561037d006d6499f14d23eb14e554caa54b088d12d",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/runner.py": "9f72fdef974efbbe1d2bbffbd4b9b9ddc5b95d3354515f928366c99c2c6a89e8",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/node_agent.py": "819057f464378fa05fca9824bcdd45a341dd01306b923a76e93e12661dc0c0ff",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/verify-local.py": "c19c4078afc7d855e1dcceeae0f61f4a92c6ab2cfd4405b467d657a23db34326",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/bundle-manifest.json": "bcd70ce2e945fcc733be467b8f7a2b62a23368e6e2ce0acec43dd5a9cdfdb513",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/release-identity.json": "ed919d3f458dd87d74b3ba0f810ad755ba9b79a99324c877155bc33ca2c8ecaf",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/model-manifest.json": "d617615c5a9ef3009378f41fe96c3e9fa2b67335e2e0db82c520bd2d616f070d",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/hardware-from-actual.json": "a4016319623bb1b27e47ecb69b9de2ca4b64872b8b3d73ec6d3f69e05c6ae12f"
+  },
+  "constraints": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "bundle_sha": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958",
+    "model_bytes": 44770302,
+    "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "topology": {
+    "server": "fl00",
+    "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "excluded": ["fl04"]
+  },
+  "execution_policy": {
+    "model_executions": 2,
+    "stop_after_first_failure": true,
+    "direction_seconds": 600,
+    "test_channel": 157,
+    "restore_channel": 149,
+    "bandwidth_mhz": 40,
+    "gi": "LGI",
+    "driver_index": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 12000,
+    "fec": "8/12",
+    "grant_guard_ms": "30/5",
+    "minimum_available_bytes": 536870912
+  }
+}

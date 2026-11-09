@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "batch": "fl08-heartbeat-fix-validation",
+  "status": "release-published-full-admission-pending",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation",
+  "source": {
+    "canonical_directory": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication",
+    "canonical_files": ["runner.py", "node_agent.py", "recover.py"],
+    "registry_gate_policy": "snapshot status before every rejection; predicate unchanged",
+    "bundle_sha256": "728896c99b36cb873962dda74d61de729c223e82e5e06b58ac5b63f87441d958"
+  },
+  "participants": ["fl00", "fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+  "excluded": ["fl04"],
+  "model": {
+    "bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "manifest": "model-manifest.json"
+  },
+  "radio_and_transport": {
+    "fec_k": 8,
+    "fec_n": 12,
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "bandwidth_mhz": 40,
+    "gi": "LGI",
+    "driver_index": 18,
+    "test_channel": 157,
+    "restore_channel": 149,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 12000,
+    "direction_seconds": 600,
+    "orchestration_seconds": 1290
+  },
+  "execution": {
+    "exact_model_runs": 2,
+    "stop_after_first_substantive_failure": true,
+    "full_size_sha_for_each_direction": true,
+    "cleanup_actual_audit_all_10": true,
+    "final_ready_9": true,
+    "storage_minimum_bytes": 536870912,
+    "packagekit": "wrapper transaction-idle/read-only-detail policy; finally restore active/static"
+  },
+  "identity": "release-identity.json",
+  "execution_gate": "CCC release audit passed; wrapper full admission and model GO are now authorized by parent"
+}

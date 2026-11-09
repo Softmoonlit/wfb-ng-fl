@@ -1,0 +1,7 @@
+{
+  "reason": "RuntimeError('标准恢复前置条件不满足：除 iw 信道外存在实质错误')",
+  "wall": 1794250060.673297,
+  "pid": 12601,
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/worker.py\", line 263, in main\n    service_recovery(d, audit, since)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/worker.py\", line 107, in service_recovery\n    raise RuntimeError('标准恢复前置条件不满足：除 iw 信道外存在实质错误')\nRuntimeError: 标准恢复前置条件不满足：除 iw 信道外存在实质错误\n",
+  "model_executed": false
+}

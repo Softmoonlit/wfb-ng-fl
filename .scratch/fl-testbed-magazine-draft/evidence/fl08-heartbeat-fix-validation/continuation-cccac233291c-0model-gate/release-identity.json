@@ -1,0 +1,16 @@
+{
+  "status": "parent-release-published",
+  "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "release_id": "heartbeat-cccac233291c-20261109T183910Z",
+  "release_state": "/home/fl/projects/wfb-ng-fl/.scratch/heartbeat-restart/heartbeat-cccac233291c-20261109T183910Z/state.json",
+  "audit": {
+    "targets": ["fl00", "fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "completed_phases": ["preflight", "stage", "prepare", "stop", "install", "start", "audit"],
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "fec_n": 12,
+    "native_reused": true
+  }
+}
