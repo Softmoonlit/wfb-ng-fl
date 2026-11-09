@@ -1,0 +1,224 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 0,
+    "stdout": "{\"host\": \"fl00\", \"utc\": \"2026-11-09T05:19:43.961747+00:00\", \"unit\": \"wfb-fl-server-daemon.service\", \"service\": \"MainPID=12048\\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfca386b38672 ; ignore_errors=no ; start_time=[Mon 2026-11-09 13:00:47 CST] ; stop_time=[n/a] ; pid=12048 ; code=(null) ; status=0/0 }\\nActiveState=active\\nSubState=running\\n\", \"service_returncode\": 0, \"service_stderr\": \"\", \"interfaces\": [{\"interface\": \"wlxfca386b38672\", \"mac\": \"fc:a3:86:b3:86:72\", \"device_path\": \"/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1/1-2.1:1.0\", \"driver\": \"/sys/bus/usb/drivers/rtl88xxau_wfb\", \"usb\": [{\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1\", \"attributes\": {\"idVendor\": \"0bda\", \"idProduct\": \"881a\", \"speed\": \"480\", \"busnum\": \"1\", \"devnum\": \"7\", \"devpath\": \"2.1\"}}, {\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb1/1-2\", \"attributes\": {\"idVendor\": \"0bda\", \"idProduct\": \"5489\", \"speed\": \"480\", \"busnum\": \"1\", \"devnum\": \"2\", \"devpath\": \"2\"}}, {\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb1\", \"attributes\": {\"idVendor\": \"1d6b\", \"idProduct\": \"0002\", \"speed\": \"480\", \"busnum\": \"1\", \"devnum\": \"1\", \"devpath\": \"0\"}}]}], \"native\": [{\"pid\": 12061, \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"server\", \"--tun-name\", \"fl-s\", \"--tun-addr\", \"10.80.0.1/24\", \"--node-id\", \"255\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"14\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"3\", \"--air-interface\", \"wlxfca386b38672\", \"--known-clients\", \"1,2,3,4,5,6,7,8,9,10\", \"--grant-duration-ms\", \"10\", \"--guard-interval-ms\", \"10\", \"--client-target\", \"1:10.80.0.11:127.0.0.1:1\", \"--client-target\", \"2:10.80.0.12:127.0.0.1:1\", \"--client-target\", \"3:10.80.0.13:127.0.0.1:1\", \"--client-target\", \"4:10.80.0.14:127.0.0.1:1\", \"--client-target\", \"5:10.80.0.15:127.0.0.1:1\", \"--client-target\", \"6:10.80.0.16:127.0.0.1:1\", \"--client-target\", \"7:10.80.0.17:127.0.0.1:1\", \"--client-target\", \"8:10.80.0.18:127.0.0.1:1\", \"--client-target\", \"9:10.80.0.19:127.0.0.1:1\", \"--client-target\", \"10:10.80.0.20:127.0.0.1:1\", \"--downlink-pause-threshold-bytes\", \"131072\", \"--downlink-resume-threshold-bytes\", \"65536\", \"--downlink-queue-packets-limit\", \"64\", \"\"]}]}\n",
+    "stderr": "",
+    "result": {
+      "host": "fl00",
+      "utc": "2026-11-09T05:19:43.961747+00:00",
+      "unit": "wfb-fl-server-daemon.service",
+      "service": "MainPID=12048\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfca386b38672 ; ignore_errors=no ; start_time=[Mon 2026-11-09 13:00:47 CST] ; stop_time=[n/a] ; pid=12048 ; code=(null) ; status=0/0 }\nActiveState=active\nSubState=running\n",
+      "service_returncode": 0,
+      "service_stderr": "",
+      "interfaces": [
+        {
+          "interface": "wlxfca386b38672",
+          "mac": "fc:a3:86:b3:86:72",
+          "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1/1-2.1:1.0",
+          "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+          "usb": [
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "881a",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "7",
+                "devpath": "2.1"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "5489",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "2",
+                "devpath": "2"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1",
+              "attributes": {
+                "idVendor": "1d6b",
+                "idProduct": "0002",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "1",
+                "devpath": "0"
+              }
+            }
+          ]
+        }
+      ],
+      "native": [
+        {
+          "pid": 12061,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "server",
+            "--tun-name",
+            "fl-s",
+            "--tun-addr",
+            "10.80.0.1/24",
+            "--node-id",
+            "255",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "3",
+            "--air-interface",
+            "wlxfca386b38672",
+            "--known-clients",
+            "1,2,3,4,5,6,7,8,9,10",
+            "--grant-duration-ms",
+            "10",
+            "--guard-interval-ms",
+            "10",
+            "--client-target",
+            "1:10.80.0.11:127.0.0.1:1",
+            "--client-target",
+            "2:10.80.0.12:127.0.0.1:1",
+            "--client-target",
+            "3:10.80.0.13:127.0.0.1:1",
+            "--client-target",
+            "4:10.80.0.14:127.0.0.1:1",
+            "--client-target",
+            "5:10.80.0.15:127.0.0.1:1",
+            "--client-target",
+            "6:10.80.0.16:127.0.0.1:1",
+            "--client-target",
+            "7:10.80.0.17:127.0.0.1:1",
+            "--client-target",
+            "8:10.80.0.18:127.0.0.1:1",
+            "--client-target",
+            "9:10.80.0.19:127.0.0.1:1",
+            "--client-target",
+            "10:10.80.0.20:127.0.0.1:1",
+            "--downlink-pause-threshold-bytes",
+            "131072",
+            "--downlink-resume-threshold-bytes",
+            "65536",
+            "--downlink-queue-packets-limit",
+            "64",
+            ""
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "host": "fl10",
+    "returncode": 0,
+    "stdout": "{\"host\": \"fl10\", \"utc\": \"2026-11-09T05:19:45.015255+00:00\", \"unit\": \"wfb-fl-client-daemon.service\", \"service\": \"MainPID=12609\\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100119 --fec-n 14 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:50:11 CST] ; stop_time=[n/a] ; pid=12609 ; code=(null) ; status=0/0 }\\nActiveState=active\\nSubState=running\\n\", \"service_returncode\": 0, \"service_stderr\": \"\", \"interfaces\": [{\"interface\": \"wlxfc221c100119\", \"mac\": \"fc:22:1c:10:01:19\", \"device_path\": \"/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0\", \"driver\": \"/sys/bus/usb/drivers/rtl88xxau_wfb\", \"usb\": [{\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3\", \"attributes\": {\"idVendor\": \"0bda\", \"idProduct\": \"8812\", \"speed\": \"5000\", \"busnum\": \"2\", \"devnum\": \"3\", \"devpath\": \"1.3\"}}, {\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb2/2-1\", \"attributes\": {\"idVendor\": \"0bda\", \"idProduct\": \"0489\", \"speed\": \"10000\", \"busnum\": \"2\", \"devnum\": \"2\", \"devpath\": \"1\"}}, {\"path\": \"/sys/devices/platform/bus@0/3610000.usb/usb2\", \"attributes\": {\"idVendor\": \"1d6b\", \"idProduct\": \"0003\", \"speed\": \"10000\", \"busnum\": \"2\", \"devnum\": \"1\", \"devpath\": \"0\"}}]}], \"native\": [{\"pid\": 12628, \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c10\", \"--tun-addr\", \"10.80.0.20/24\", \"--node-id\", \"10\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"14\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c100119\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\", \"\"]}]}\n",
+    "stderr": "",
+    "result": {
+      "host": "fl10",
+      "utc": "2026-11-09T05:19:45.015255+00:00",
+      "unit": "wfb-fl-client-daemon.service",
+      "service": "MainPID=12609\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100119 --fec-n 14 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:50:11 CST] ; stop_time=[n/a] ; pid=12609 ; code=(null) ; status=0/0 }\nActiveState=active\nSubState=running\n",
+      "service_returncode": 0,
+      "service_stderr": "",
+      "interfaces": [
+        {
+          "interface": "wlxfc221c100119",
+          "mac": "fc:22:1c:10:01:19",
+          "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+          "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+          "usb": [
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "8812",
+                "speed": "5000",
+                "busnum": "2",
+                "devnum": "3",
+                "devpath": "1.3"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "0489",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "2",
+                "devpath": "1"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+              "attributes": {
+                "idVendor": "1d6b",
+                "idProduct": "0003",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "1",
+                "devpath": "0"
+              }
+            }
+          ]
+        }
+      ],
+      "native": [
+        {
+          "pid": 12628,
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c10",
+            "--tun-addr",
+            "10.80.0.20/24",
+            "--node-id",
+            "10",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "14",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c100119",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64",
+            ""
+          ]
+        }
+      ]
+    }
+  }
+]

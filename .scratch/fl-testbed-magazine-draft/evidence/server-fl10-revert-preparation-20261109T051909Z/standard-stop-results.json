@@ -1,0 +1,52 @@
+{
+  "ready_for_user_physical_swap": true,
+  "stops": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl00\", \"unit\": \"wfb-fl-server-daemon.service\", \"utc\": \"2026-11-09T05:20:14.575995+00:00\", \"stop_returncode\": 0, \"stop_stdout\": \"\", \"stop_stderr\": \"\", \"service\": \"MainPID=0\\nActiveState=inactive\\nSubState=dead\\n\", \"service_returncode\": 0, \"remaining_native\": [], \"ok\": true}\n",
+      "stderr": "",
+      "result": {
+        "host": "fl00",
+        "unit": "wfb-fl-server-daemon.service",
+        "utc": "2026-11-09T05:20:14.575995+00:00",
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "service_returncode": 0,
+        "remaining_native": [],
+        "ok": true
+      }
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl10\", \"unit\": \"wfb-fl-client-daemon.service\", \"utc\": \"2026-11-09T05:20:15.371919+00:00\", \"stop_returncode\": 0, \"stop_stdout\": \"\", \"stop_stderr\": \"\", \"service\": \"MainPID=0\\nActiveState=inactive\\nSubState=dead\\n\", \"service_returncode\": 0, \"remaining_native\": [], \"ok\": true}\n",
+      "stderr": "",
+      "result": {
+        "host": "fl10",
+        "unit": "wfb-fl-client-daemon.service",
+        "utc": "2026-11-09T05:20:15.371919+00:00",
+        "stop_returncode": 0,
+        "stop_stdout": "",
+        "stop_stderr": "",
+        "service": "MainPID=0\nActiveState=inactive\nSubState=dead\n",
+        "service_returncode": 0,
+        "remaining_native": [],
+        "ok": true
+      }
+    }
+  ],
+  "host_shutdown": false,
+  "management_wifi_changed": false,
+  "interface_bindings_changed": false,
+  "power_or_radio_parameters_changed": false,
+  "new_trials_started": false,
+  "other_clients_including_05_unchanged": true,
+  "physical_swap_completed": false,
+  "expected_after_swap": {
+    "fl00": "fc:22:1c:10:01:19",
+    "fl10": "fc:a3:86:b3:86:72"
+  }
+}
