@@ -1,0 +1,23 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 255,
+    "stderr": "Host key verification failed.\n",
+    "lines": 0,
+    "excerpt": ""
+  },
+  {
+    "host": "fl08",
+    "returncode": 0,
+    "stderr": "",
+    "lines": 7,
+    "excerpt": "[ 2992.016080] fl08 python3[860]: 2026-11-10 01:44:42,992 [INFO] [client-daemon] 节点 8 LEASE_ARM session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 lease_seconds=15.000\n[ 2994.395230] fl08 python3[860]: 2026-11-10 01:44:45,371 [INFO] [client-daemon] 节点 8 COMMIT session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 channel=157\n[ 2997.659173] fl08 python3[860]: 2026-11-10 01:44:48,635 [INFO] [client-daemon] 节点 8 CONFIRMED session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 channel=157\n[ 2999.893147] fl08 python3[860]: 2026-11-10 01:44:50,868 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 2 次 ACK\n[ 3007.180897] fl08 python3[860]: 2026-11-10 01:44:58,157 [INFO] [client-daemon] 节点 8 LEASE_ARM session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 lease_seconds=15.000\n[ 3009.535238] fl08 python3[860]: 2026-11-10 01:45:00,511 [INFO] [client-daemon] 节点 8 COMMIT session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 channel=149\n[ 3010.130855] fl08 python3[860]: 2026-11-10 01:45:01,107 [INFO] [client-daemon] 节点 8 CONFIRMED session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 channel=149\n"
+  },
+  {
+    "host": "fl02",
+    "returncode": 0,
+    "stderr": "",
+    "lines": 7,
+    "excerpt": "[ 2872.294745] fl02 python3[860]: 2026-11-10 01:44:42,902 [INFO] [client-daemon] 节点 2 LEASE_ARM session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 lease_seconds=15.000\n[ 2874.636063] fl02 python3[860]: 2026-11-10 01:44:45,244 [INFO] [client-daemon] 节点 2 COMMIT session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 channel=157\n[ 2876.937582] fl02 python3[860]: 2026-11-10 01:44:47,545 [INFO] [client-daemon] 节点 2 CONFIRMED session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 channel=157\n[ 2887.461348] fl02 python3[860]: 2026-11-10 01:44:58,069 [INFO] [client-daemon] 节点 2 LEASE_ARM session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 lease_seconds=15.000\n[ 2889.805306] fl02 python3[860]: 2026-11-10 01:45:00,413 [INFO] [client-daemon] 节点 2 COMMIT session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 channel=149\n[ 2890.411185] fl02 python3[860]: 2026-11-10 01:45:01,019 [INFO] [client-daemon] 节点 2 CONFIRMED session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 channel=149\n[ 2894.875185] fl02 python3[860]: 2026-11-10 01:45:05,483 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 2 次 ACK\n"
+  }
+]

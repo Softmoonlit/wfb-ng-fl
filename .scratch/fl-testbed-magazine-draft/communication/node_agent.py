@@ -345,15 +345,16 @@ class Node:
     def registry_gate(self):
         require(self.node == 0, 'registry IPC is server localhost only')
         status = get_json('127.0.0.1', '/api/v1/status')
-        require(status.get('active_job') is None and status['server_state'] == 'IDLE', 'server job/state gate')
         online = sorted(int(key) for key, value in status['nodes'].items()
                         if value.get('readiness') != 'OFFLINE')
+        # 拒绝前先保存状态，保留具体节点当时的就绪、心跳状态和错误码。
+        self.fact('registry_gate', status=status, online=online)
+        require(status.get('active_job') is None and status['server_state'] == 'IDLE', 'server job/state gate')
         require(online == NODES, 'online target set mismatch')
         for node in NODES:
             record = status['nodes'][str(node)]
             require(record['readiness'] == 'READY' and record['reported_state'] == 'IDLE'
                     and record.get('error_code') is None, 'target registry gate failed: ' + str(node))
-        self.fact('registry_gate', status=status, online=online)
         return status
 
     def daemon_identity(self):

@@ -834,6 +834,20 @@ class MockTests(unittest.TestCase):
         node.submit()
         self.assertEqual(set(node.verify()['files']), {str(n) for n in runner.NODES})
 
+    def test_registry_gate_preserves_rejected_node_snapshot(self):
+        node = self.node()
+        node.fact = Mock()
+        status = dict(active_job=None, server_state='IDLE', nodes={str(n): dict(
+            readiness='READY', reported_state='IDLE', error_code=None, current_channel=157)
+            for n in runner.NODES})
+        status['nodes']['8']['readiness'] = 'CONNECTING'
+        status['nodes']['8']['reported_state'] = 'CONNECTING'
+        with patch('node_agent.get_json', return_value=status):
+            with self.assertRaisesRegex(RuntimeError, 'target registry gate failed: 8'):
+                node.registry_gate()
+        # 拒绝仍须发生，同时保留拒绝瞬间的原始状态，不能用稍后的READY快照替代。
+        node.fact.assert_called_once_with('registry_gate', status=status, online=runner.NODES)
+
     def test_fixed_complete_topology_and_registry(self):
         expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
         self.assertEqual(runner.NODES, expected)

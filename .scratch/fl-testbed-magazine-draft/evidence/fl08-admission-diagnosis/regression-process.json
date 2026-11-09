@@ -1,0 +1,26 @@
+{
+  "pid": 9911,
+  "args": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "180s",
+    "python3",
+    "-m",
+    "pytest",
+    "-q",
+    "wfb_ng/tests/test_fl_heartbeat_liveness.py",
+    "wfb_ng/tests/test_fl_heartbeat_ack_identity.py",
+    "wfb_ng/tests/test_fl_heartbeat_restart.py",
+    "wfb_ng/tests/test_fl_control_plane.py",
+    "wfb_ng/tests/test_fl_control_review.py",
+    "wfb_ng/tests/test_fl_radio_switch.py",
+    "wfb_ng/tests/test_fl_radio_transactions.py",
+    "wfb_ng/tests/test_fl_client_radio_application.py",
+    "wfb_ng/tests/test_fl_radio_runtime_application.py",
+    "wfb_ng/tests/test_fl_client_jobradio.py",
+    "wfb_ng/tests/test_fl_job_radio_policy.py"
+  ],
+  "started": 1794247570.2864535,
+  "hard_limit_seconds": 180
+}

@@ -1,0 +1,88 @@
+{
+  "server_state": "IDLE",
+  "active_job": null,
+  "radio": {
+    "channel": 149,
+    "bandwidth_mhz": 40,
+    "radio_txpower_dbm": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 15000,
+    "fec_k": 8,
+    "fec_n": 12,
+    "channel_width": "HT40+",
+    "guard_interval": "long"
+  },
+  "nodes": {
+    "1": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247656365
+    },
+    "2": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247655101
+    },
+    "3": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247656856
+    },
+    "4": {
+      "readiness": "OFFLINE",
+      "reported_state": null,
+      "error_code": null,
+      "current_channel": null,
+      "last_heartbeat_timestamp_ms": null
+    },
+    "5": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247655312
+    },
+    "6": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247655242
+    },
+    "7": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247655451
+    },
+    "8": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247656927
+    },
+    "9": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247655276
+    },
+    "10": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "error_code": null,
+      "current_channel": 149,
+      "last_heartbeat_timestamp_ms": 1794247656891
+    }
+  }
+}

@@ -1,0 +1,4 @@
+[ 2967.102162] fl00 python3[979]: 2026-11-10 01:44:41,745 [INFO] [client-daemon] 射频重配 PREPARE session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 157, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 12000}
+[ 2972.926880] fl00 python3[979]: 2026-11-10 01:44:47,570 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_69d1a0b37f2647a9a9f8ee7df19fd5f6 channel=157
+[ 2980.361154] fl00 python3[979]: 2026-11-10 01:44:55,004 [INFO] [client-daemon] 射频重配 PREPARE session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 149, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 15000}
+[ 2986.402849] fl00 python3[979]: 2026-11-10 01:45:01,046 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_ed23c1c68acc4eaeb4fa3d38cecd6484 channel=149

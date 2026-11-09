@@ -118,20 +118,24 @@ static void test_native_overdue_fec_wakeup() {
 }
 
 // Empty TUN queue still owes the receiver a partial block seal after grant expiry.
-static void test_native_empty_queue_partial_fec_reauthorization() {
-    uint16_t air_port, input_port, unused;
+static void test_native_empty_queue_partial_fec_reauthorization(bool same_radio_command = false) {
+    uint16_t air_port, input_port, control_port, unused;
     int air = rearm_udp(&air_port), reservation = rearm_udp(&input_port);
+    int control_reservation = rearm_udp(&control_port);
     int command = rearm_udp(&unused), output[2], tun[2];
     assert(pipe(output) == 0);
     assert(socketpair(AF_UNIX, SOCK_DGRAM, 0, tun) == 0);
     Config config; config.node_id = 9; config.link_id = 1;
     config.uplink_stream = 1; config.downlink_stream = 2;
-    config.air_listen_port = input_port; config.radio_control_port = 0;
+    config.air_listen_port = input_port; config.radio_control_port = control_port;
+    config.raw_air_radio.bandwidth = 40;
+    config.raw_air_radio.mcs_index = 4;
+    config.raw_air_radio.short_gi = false;
     config.air_target_host = "127.0.0.1"; config.air_target_port = air_port;
     config.plaintext_fec_k = 2; config.plaintext_fec_n = 3;
     // FEC wakeup must not depend on the one-second log timer.
     config.log_interval = 1000;
-    close(reservation);
+    close(reservation); close(control_reservation);
     pid_t child = fork(); assert(child >= 0);
     if (child == 0) {
         prctl(PR_SET_PDEATHSIG, SIGKILL); close(tun[0]); close(output[0]);
@@ -174,6 +178,26 @@ static void test_native_empty_queue_partial_fec_reauthorization() {
         }
         assert(!unauthorized_data);
         assert(ready && ready_elapsed_ms < 150);
+        if (same_radio_command) {
+            // 宿主只切信道时仍会下发同一40MHz/MCS4/Long GI；成功回执不能掩盖越权封块。
+            cmd_req_t request = {};
+            request.req_id = htobe32(73 + round); request.cmd_id = CMD_SET_RADIO;
+            request.u.cmd_set_radio.bandwidth = 40;
+            request.u.cmd_set_radio.mcs_index = 4;
+            request.u.cmd_set_radio.vht_nss = 1;
+            rearm_send(command, control_port, &request,
+                       offsetof(cmd_req_t, u) + sizeof(request.u.cmd_set_radio));
+            pollfd response_ready = {command, POLLIN, 0};
+            assert(poll(&response_ready, 1, 500) == 1);
+            uint32_t response[2] = {};
+            assert(recv(command, response, sizeof(response), 0) == sizeof(response));
+            assert(response[0] == request.req_id && response[1] == 0);
+            const uint64_t until = get_time_ms() + 50;
+            while (get_time_ms() < until) {
+                uint64_t unexpected_nonce = 0; uint8_t unexpected_flags = 0;
+                assert(!rearm_receive_data_frame(air, 5, &unexpected_nonce, &unexpected_flags));
+            }
+        }
         const uint64_t seal_grant_sent_ms = get_time_ms();
         rearm_grant(command, input_port, round * 2 + 2, 100, 100);
         uint64_t seal[2] = {}; uint8_t filler_flags = 0;

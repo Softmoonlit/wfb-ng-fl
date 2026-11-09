@@ -239,6 +239,7 @@ int main()
     test_udp_control_and_data_mcs();
     test_native_overdue_fec_wakeup();
     test_native_empty_queue_partial_fec_reauthorization();
+    test_native_empty_queue_partial_fec_reauthorization(true);
     test_native_rearm();
     test_native_ready_retry_loss();
     test_native_unauthorized_fec_deadline();

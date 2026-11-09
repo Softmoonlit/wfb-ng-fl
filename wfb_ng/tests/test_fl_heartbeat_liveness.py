@@ -40,6 +40,7 @@ def heartbeat_peer(loopback_network, monkeypatch):
     errors = []
     finished = threading.Event()
     received = []
+    wire_types = []
     reports = queue.Queue()
 
     def reply():
@@ -50,6 +51,7 @@ def heartbeat_peer(loopback_network, monkeypatch):
                 except socket.timeout:
                     continue
                 message = json.loads(raw)
+                wire_types.append(message.get("type"))
                 if message.get("type") != "NODE_HEARTBEAT":
                     reports.put(message)
                     continue
@@ -71,7 +73,7 @@ def heartbeat_peer(loopback_network, monkeypatch):
                 elif mode == "boot":
                     payload["boot_id"] = "previous-boot"
                 elif mode == "channel":
-                    payload["channel"] = 157
+                    payload["channel"] = 157 if heartbeat.current_channel == 149 else 149
                 elif mode == "source":
                     sender = impostor
                 sender.sendto(json.dumps(payload).encode(), address)
@@ -92,7 +94,8 @@ def heartbeat_peer(loopback_network, monkeypatch):
 
     try:
         yield SimpleNamespace(client=client, clock=clock, exchange=exchange,
-                              actions=actions, received=received, reports=reports)
+                              actions=actions, received=received, reports=reports,
+                              wire_types=wire_types)
     finally:
         finished.set()
         peer.join(timeout=2)
@@ -217,6 +220,88 @@ def test_prepare_suppresses_hunting_without_renewing_liveness(heartbeat_peer):
     assert not p.client.radio_switch_pending
     assert p.exchange(111) is None
     assert p.client.state == ClientNodeState.HUNTING
+
+
+@pytest.mark.parametrize('mode', ['valid', 'old-ts', 'channel', 'source', 'boot'])
+def test_confirmed_radio_dispatches_identity_checked_heartbeat(heartbeat_peer, mode):
+    """先确认收尾，再真实探测；CONFIRMED本身不能续期旧活性锚。"""
+    p = heartbeat_peer
+    p.exchange(100, 'valid', operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+    applied = threading.Event()
+    p.client.on_radio_applied = lambda config: applied.set()
+    proposal = dict(session_id='switch-heartbeat', target_nodes=[4], patch={'channel': 157})
+    p.clock.now = 108
+    p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_PREPARE'))
+    assert p.reports.get(timeout=1)['type'] == 'PREPARE_ACK'
+    p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_COMMIT', delay_ms=0))
+    assert applied.wait(1), '模拟驱动必须完成实际应用'
+    config = p.client._current_radio_config().to_dict()
+    final = dict(session_id=proposal['session_id'], target_nodes=[4], channel=157,
+                 config=config, calibration=False)
+    p.client.handle_broadcast(dict(final, type='NEW_CHANNEL_PING'))
+    assert p.reports.get(timeout=1)['type'] == 'COMMIT_SUCCESS'
+    p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_FINALIZED'))
+    assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_FINALIZED_ACK'
+    assert p.client.radio_switch_pending
+    assert p.client._idle_liveness_anchor == 100
+    p.clock.now = 111
+    before = len(p.received)
+    p.actions.put((mode, None))
+    try:
+        p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
+    finally:
+        if len(p.received) == before:
+            p.actions.get_nowait()
+    assert len(p.received) == before + 1, 'CONFIRMED收尾未立即恢复真实心跳'
+    assert p.received[-1].current_channel == 157
+    assert p.client._idle_liveness_anchor == (111 if mode == 'valid' else 100)
+    assert not p.client.radio_switch_pending
+    assert not p.client.lease_watchdog.is_armed
+    confirmed_at = p.wire_types.index('RADIO_SWITCH_CONFIRMED_ACK')
+    assert p.wire_types[confirmed_at + 1] == 'NODE_HEARTBEAT'
+    # 重复确认只重复回执，不能再次发送探测或凭空续期。
+    p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
+    assert len(p.received) == before + 1
+    assert p.exchange(113) is None
+    if mode != 'valid':
+        assert p.client.state == ClientNodeState.HUNTING
+        return
+    assert p.client.state == ClientNodeState.IDLE
+    assert p.exchange(120.75) is None
+    assert p.client.state == ClientNodeState.HUNTING
+
+
+@pytest.mark.parametrize('applied_ok', [False, True])
+def test_radio_transaction_blocks_periodic_and_state_change_heartbeats(heartbeat_peer, applied_ok):
+    """发送入口持锁复核，覆盖监督等待后COMMIT或物理失败的竞争窗口。"""
+    p = heartbeat_peer
+    p.exchange(100, 'valid', operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+    applied = threading.Event()
+
+    def apply(config):
+        applied.set()
+        if not applied_ok:
+            raise RuntimeError('模拟物理应用失败')
+
+    p.client.on_radio_applied = apply
+    proposal = dict(session_id='switch-guard', target_nodes=[4], patch={'channel': 157})
+    p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_PREPARE'))
+    assert p.reports.get(timeout=1)['type'] == 'PREPARE_ACK'
+    p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_COMMIT', delay_ms=0))
+    assert applied.wait(1)
+    for operation in (p.client.send_heartbeat_once,
+                      lambda: p.client.notify_state_change(ClientNodeState.RUNNING)):
+        before = len(p.received)
+        p.actions.put(('valid', None))
+        try:
+            operation()
+        finally:
+            if len(p.received) == before:
+                p.actions.get_nowait()
+        assert len(p.received) == before, '事务内发送入口越过射频隔离门禁'
+    assert p.client._switch_applied is applied_ok
+    assert p.client.radio_switch_pending
+    assert p.client._idle_liveness_anchor == 100
 
 
 def test_state_changes_without_any_ack_do_not_extend_initial_window(heartbeat_peer):

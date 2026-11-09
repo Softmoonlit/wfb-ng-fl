@@ -1,0 +1,69 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_applied_radio_transaction_keeps_identity_checked_heartbeats[valid] ____
+
+heartbeat_peer = namespace(client=<wfb_ng.fl.control.ControlPlaneClient object at 0xffff906a1750>, clock=namespace(now=109), exchange=<...ot_id='88c58d91a6984c9591a5d394e6d0c808', session='loopback-session')], reports=<queue.Queue object at 0xffff906d4be0>)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xffff906a3b50>
+mode = 'valid'
+
+    @pytest.mark.parametrize('mode', ['valid', 'old-ts', 'channel', 'source', 'boot'])
+    def test_applied_radio_transaction_keeps_identity_checked_heartbeats(heartbeat_peer, monkeypatch, mode):
+        """新信道已应用后仍监督活性，不能把整个事务变成心跳静默期。"""
+        p = heartbeat_peer
+        p.exchange(100, 'valid', operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+        applied = threading.Event()
+        p.client.on_radio_applied = lambda config: applied.set()
+        proposal = dict(session_id='switch-heartbeat', target_nodes=[4], patch={'channel': 157})
+        p.clock.now = 108
+        p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_PREPARE'))
+        assert p.reports.get(timeout=1)['type'] == 'PREPARE_ACK'
+        p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_COMMIT', delay_ms=0))
+        assert applied.wait(1), '模拟驱动必须完成实际应用'
+        # 公共消息入口拿同一把状态锁，确保COMMIT线程已结束应用。
+        config = p.client._current_radio_config().to_dict()
+        final = dict(session_id=proposal['session_id'], target_nodes=[4], channel=157,
+                     config=config, calibration=False)
+        p.client.handle_broadcast(dict(final, type='NEW_CHANNEL_PING'))
+        assert p.reports.get(timeout=1)['type'] == 'COMMIT_SUCCESS'
+        assert p.client.radio_switch_pending
+        sent = threading.Event()
+        original = p.client._send_heartbeat
+    
+        def observe(*args, **kwargs):
+            result = original(*args, **kwargs)
+            sent.set()
+            p.client._stop_event.set()
+            return result
+    
+        monkeypatch.setattr(p.client, '_send_heartbeat', observe)
+        p.client.idle_interval_seconds = 0.01
+        p.clock.now = 109
+        p.actions.put((mode, None))
+        supervisor = threading.Thread(target=p.client._supervisory_loop, daemon=True)
+        supervisor.start()
+        try:
+            delivered = sent.wait(0.5)
+        finally:
+            p.client._stop_event.set()
+            supervisor.join(timeout=1)
+            assert not supervisor.is_alive()
+            if not sent.is_set():
+                p.actions.get_nowait()
+>       assert delivered, '新信道已应用但事务未结束时，监督循环停止了所有心跳'
+E       AssertionError: 新信道已应用但事务未结束时，监督循环停止了所有心跳
+E       assert False
+
+wfb_ng/tests/test_fl_heartbeat_liveness.py:265: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  /usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+    from distutils.version import LooseVersion
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  /usr/lib/python3/dist-packages/pyroute2/__init__.py:68: DeprecationWarning: SelectableGroups dict interface is deprecated. Use select.
+    for entry_point in metadata.entry_points().get('pr2modules', []):
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_liveness.py::test_applied_radio_transaction_keeps_identity_checked_heartbeats[valid]
+1 failed, 2 warnings in 0.84s

@@ -2905,6 +2905,9 @@ class ControlPlaneClient:
 
     def _send_heartbeat(self, state: str, elapsed_ms: int) -> Optional[HeartbeatAck]:
         """Internal helper to send a heartbeat and optionally wait for ACK."""
+        # COMMIT至收尾期间由事务拥有射频；所有发送入口都遵守这道门禁。
+        if self._pre_switch_config is not None:
+            return None
         sock = self._get_uplink_sock()
         self._drain_sock(sock)
 
@@ -3449,6 +3452,8 @@ class ControlPlaneClient:
             new_config = self._current_radio_config()
             self._send_final_barrier_ack(
                 "RADIO_SWITCH_CONFIRMED_ACK", session_id, confirmed_job_id)
+            # 先结束确认屏障，再用当前信道的真实ACK恢复活性，不能凭CONFIRMED续期。
+            self._send_heartbeat(self.state.value, elapsed_ms=0)
             self._wake_event.set()
             logger.info("节点 %d CONFIRMED session=%s channel=%d", self.node_id, session_id, self.current_channel)
         if self.on_radio_finalized is not None:

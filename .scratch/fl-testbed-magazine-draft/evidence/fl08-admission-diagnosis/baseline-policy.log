@@ -1,0 +1,909 @@
+.F.FFFFFFFFFFFFFFFFFF                                                    [100%]
+=================================== FAILURES ===================================
+_ test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds __
+
+policy_host = <function policy_host.<locals>.make at 0xfffec994b370>
+
+    def test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds(policy_host):
+        calls = []
+    
+        def policy(config, context):
+            calls.append(context.round_index)
+            assert context.phase == 'radio_policy'
+            assert context.job_id == host.payload['job_id']
+            assert context.target_nodes == (1, 2)
+            if context.round_index == 0:
+                assert host.evaluation_exited.is_set()
+                assert host.daemon.active_job is None
+                assert not host.announced.is_set()
+                assert host.daemon.server_state == ServerState.PREPARING
+            else:
+                assert host.runtime.wait_calls == 1
+                assert len(host.runtime.models) == 1
+                assert host.daemon.server_state == ServerState.RUNNING
+    
+        host = policy_host(policy)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec99658a0>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E       assert not [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E        +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec99658a0>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+_ test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec994b2e0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9792740>
+
+    def test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk(
+            policy_host, monkeypatch):
+        from wfb_ng.fl.radio import validate_radio_patch
+        calls = []
+        reports = []
+    
+        def policy(config, context):
+            reports.append(context.configure_radio({'radio_txpower_dbm': 13 + context.round_index}))
+    
+        host = policy_host(policy)
+        add_online_node(host, 3)
+        startup = host.daemon.config
+        startup_path = Path(host.daemon.config.work_dir) / 'startup.json'
+        startup_path.parent.mkdir(parents=True, exist_ok=True)
+        startup_path.write_text('unchanged deployment')
+        host.daemon.config = replace(startup, startup_config_path=str(startup_path))
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            assert job_id == host.payload['job_id']
+            assert stop_event.is_set() is False
+            before = host.daemon.control_plane.active_radio_config
+            calls.append((list(target_nodes), host.daemon.server_state))
+            assert list(target_nodes) == [1, 2, 3]
+            add_online_node(host, 4)
+            assert list(target_nodes) == [1, 2, 3], '已受理事务不加入后到节点'
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id=f'fixture-{len(calls)}',
+                target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        # 第二次事务的在线union应包含首次事务后上线的4号节点。
+        def controlled_transaction(patch, target_nodes, **kwargs):
+            if calls:
+                assert list(target_nodes) == [1, 2, 3, 4]
+                before = host.daemon.control_plane.active_radio_config
+                updated = validate_radio_patch(patch, before)
+                calls.append((list(target_nodes), host.daemon.server_state))
+                host.daemon.control_plane.active_radio_config = updated
+                return RadioSwitchResult(success=True, session_id='fixture-2',
+                    target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                    effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                    confirmed_nodes=list(target_nodes), job_id=kwargs['job_id'])
+            return transaction(patch, target_nodes, **kwargs)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', controlled_transaction)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9791c60>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E       assert not [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E        +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9791c60>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-0] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec994ba30>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9793550>
+phase = 0, unknown = False
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+>           assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+E           assert ([FLRuntimeError("目标客户端不可用: ['1', '2']")] and 'preflight_ta...des_not_ready' == 'radio_transaction_failed'
+E            +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec97f65f0>.errors
+E             - radio_transaction_failed
+E             + preflight_target_nodes_not_ready)
+
+wfb_ng/tests/test_fl_job_radio_policy.py:202: AssertionError
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-1] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b3d00>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec985c8b0>
+phase = 1, unknown = False
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+            assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+            recent = host.daemon.get_status_report()['recent_job']
+>       assert caught == ['radio_transaction_failed']
+E       AssertionError: assert [] == ['radio_transaction_failed']
+E         Right contains one more item: 'radio_transaction_failed'
+E         Full diff:
+E         - ['radio_transaction_failed']
+E         + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:204: AssertionError
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-0] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b11b0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9849180>
+phase = 0, unknown = True
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+>           assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+E           assert ([FLRuntimeError("目标客户端不可用: ['1', '2']")] and 'preflight_ta...des_not_ready' == 'radio_transaction_failed'
+E            +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9848cd0>.errors
+E             - radio_transaction_failed
+E             + preflight_target_nodes_not_ready)
+
+wfb_ng/tests/test_fl_job_radio_policy.py:202: AssertionError
+_ test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-1] _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b1480>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec986f310>
+phase = 1, unknown = True
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    @pytest.mark.parametrize('unknown', [False, True])
+    def test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts(
+            policy_host, monkeypatch, phase, unknown):
+        from wfb_ng.fl.radio import validate_radio_patch
+        caught = []
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    caught.append(exc.error_code)
+    
+        host = policy_host(policy)
+    
+        def failed_transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            target = validate_radio_patch(patch, before)
+            if unknown:
+                host.daemon.control_plane.active_radio_config = target
+                host.daemon.control_plane.radio_error = True
+            return RadioSwitchResult(success=False, session_id='fixture-failed',
+                target_channel=target.channel, applied_patch=dict(patch),
+                status='radio_error' if unknown else 'rolled_back',
+                effective_config=None if unknown else before, before_config=before,
+                error_message='fixture confirm missing', failed_phase='CONFIRMED' if unknown else 'COMMIT',
+                unresponsive_nodes=[2], target_nodes=list(target_nodes), confirmed_nodes=[1], job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', failed_transaction)
+        host.launch()
+        assert host.start_done.wait(3)
+        if phase == 1:
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                recent = host.daemon.get_status_report()['recent_job']
+                if recent and recent['recovery_state'] != 'recovering':
+                    break
+                threading.Event().wait(0.005)
+        else:
+            assert host.errors and host.errors[0].error_code == 'radio_transaction_failed'
+            recent = host.daemon.get_status_report()['recent_job']
+>       assert caught == ['radio_transaction_failed']
+E       AssertionError: assert [] == ['radio_transaction_failed']
+E         Right contains one more item: 'radio_transaction_failed'
+E         Full diff:
+E         - ['radio_transaction_failed']
+E         + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:204: AssertionError
+__ test_preflight_patch_rejections_are_handleable_without_control_transaction __
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b3f40>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec984bbe0>
+
+    def test_preflight_patch_rejections_are_handleable_without_control_transaction(policy_host, monkeypatch):
+        rejected = []
+    
+        def policy(config, context):
+            for patch in ({'channel': 149}, {'target_nodes': [1]}, {'radio_txpower_dbm': True},
+                          {'bandwidth_mhz': 20}, {'uftp_rate_kbps': -1}):
+                try:
+                    context.configure_radio(patch)
+                except FLRuntimeError as exc:
+                    rejected.append(exc.error_code)
+    
+        host = policy_host(policy, rounds=1)
+    
+        def no_transaction(*args, **kwargs):
+            raise AssertionError('参数拒绝不能发起跨节点事务')
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', no_transaction)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec984a290>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E       assert not [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E        +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec984a290>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+_ test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit[0] __
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b15a0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec984ada0>
+phase = 0
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit(
+            policy_host, monkeypatch, phase):
+        entered = threading.Event()
+        cancelled = threading.Event()
+        release = threading.Event()
+        exited = threading.Event()
+        stop_done = threading.Event()
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                context.configure_radio({'radio_txpower_dbm': 13})
+    
+        host = policy_host(policy)
+    
+        def blocked_transaction(patch, target_nodes, *, job_id, stop_event):
+            entered.set()
+            assert stop_event.wait(2), '宿主必须将同一停止事件传入事务'
+            cancelled.set()
+            release.wait()
+            before = host.daemon.control_plane.active_radio_config
+            exited.set()
+            return RadioSwitchResult(success=False, session_id='fixture-cancelled',
+                target_channel=before.channel, applied_patch=dict(patch), status='rolled_back',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), failed_phase='PREPARE',
+                error_message='fixture cancelled and rolled back', job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocked_transaction)
+        host.launch()
+>       assert entered.wait(2)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xfffec985f100>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xfffec985f100>> = <threading.Event object at 0xfffec985f100>.wait
+
+wfb_ng/tests/test_fl_job_radio_policy.py:279: AssertionError
+_ test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit[1] __
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b3c70>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec984ae60>
+phase = 1
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit(
+            policy_host, monkeypatch, phase):
+        entered = threading.Event()
+        cancelled = threading.Event()
+        release = threading.Event()
+        exited = threading.Event()
+        stop_done = threading.Event()
+    
+        def policy(config, context):
+            if context.round_index == phase:
+                context.configure_radio({'radio_txpower_dbm': 13})
+    
+        host = policy_host(policy)
+    
+        def blocked_transaction(patch, target_nodes, *, job_id, stop_event):
+            entered.set()
+            assert stop_event.wait(2), '宿主必须将同一停止事件传入事务'
+            cancelled.set()
+            release.wait()
+            before = host.daemon.control_plane.active_radio_config
+            exited.set()
+            return RadioSwitchResult(success=False, session_id='fixture-cancelled',
+                target_channel=before.channel, applied_patch=dict(patch), status='rolled_back',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), failed_phase='PREPARE',
+                error_message='fixture cancelled and rolled back', job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocked_transaction)
+        host.launch()
+>       assert entered.wait(2)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xfffec9836320>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xfffec9836320>> = <threading.Event object at 0xfffec9836320>.wait
+
+wfb_ng/tests/test_fl_job_radio_policy.py:279: AssertionError
+____ test_report_barrier_precedes_policy_and_next_publish_waits_transaction ____
+
+policy_host = <function policy_host.<locals>.make at 0xfffec994b1c0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec986caf0>
+
+    def test_report_barrier_precedes_policy_and_next_publish_waits_transaction(policy_host, monkeypatch):
+        from wfb_ng.fl.radio import validate_radio_patch
+        entered = threading.Event()
+        release = threading.Event()
+    
+        def policy(config, context):
+            if context.round_index:
+                context.configure_radio({'radio_txpower_dbm': 13})
+    
+        host = policy_host(policy, auto_round_ready=False)
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            entered.set()
+            release.wait()
+            before = host.daemon.control_plane.active_radio_config
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id='fixture-report-boundary',
+                target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.launch()
+>       assert host.runtime.collected.wait(2)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xfffec986f7f0>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xfffec986f7f0>> = <threading.Event object at 0xfffec986f7f0>.wait
+E        +      where <threading.Event object at 0xfffec986f7f0> = <wfb_ng.tests.test_fl_training_host.ControlledRuntime object at 0xfffec986f880>.collected
+E        +        where <wfb_ng.tests.test_fl_training_host.ControlledRuntime object at 0xfffec986f880> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec986ccd0>.runtime
+
+wfb_ng/tests/test_fl_job_radio_policy.py:335: AssertionError
+__ test_next_downlink_uses_confirmed_rate_without_recreating_role_or_runtime ___
+
+policy_host = <function policy_host.<locals>.make at 0xfffec994b910>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9791060>
+
+    def test_next_downlink_uses_confirmed_rate_without_recreating_role_or_runtime(policy_host, monkeypatch):
+        from types import SimpleNamespace
+        from wfb_ng.fl.radio import validate_radio_patch
+        rates = []
+        role_creations = []
+        role_closed = threading.Event()
+    
+        def policy(config, context):
+            context.configure_radio({'uftp_rate_kbps': 12000 if context.round_index == 0 else 18000})
+    
+        host = policy_host(policy)
+    
+        class Role:
+            def __init__(self, **kwargs):
+                role_creations.append(kwargs)
+                self.transport = SimpleNamespace(uftp_rate_kbps=kwargs['uftp_rate_kbps'])
+                self.runtime = host.runtime
+    
+            def start(self):
+                pass
+    
+            def close(self):
+                role_closed.set()
+    
+            def poll_failure(self):
+                return None
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id=f'rate-{updated.uftp_rate_kbps}',
+                target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        publish = host.runtime.publish_model
+    
+        def observe_publish(path):
+            rates.append(host.daemon.server_role.transport.uftp_rate_kbps)
+            publish(path)
+    
+        monkeypatch.setattr('wfb_ng.fl.role.ServerRole', Role)
+        monkeypatch.setattr(host.runtime, 'publish_model', observe_publish)
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.daemon.runtime_factory = None
+        host.daemon.config = replace(host.daemon.config, enable_link_process=True)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:398: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9790250>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E       assert not [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E        +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9790250>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+__________ test_saved_context_cannot_reconfigure_after_policy_window ___________
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b30a0>
+
+    def test_saved_context_cannot_reconfigure_after_policy_window(policy_host):
+        captured = []
+    
+        def policy(config, context):
+            captured.append(context)
+    
+        host = policy_host(policy, auto_round_ready=False)
+        host.launch()
+>       assert host.runtime.collected.wait(2)
+E       assert False
+E        +  where False = <bound method Event.wait of <threading.Event object at 0xfffec98378e0>>(2)
+E        +    where <bound method Event.wait of <threading.Event object at 0xfffec98378e0>> = <threading.Event object at 0xfffec98378e0>.wait
+E        +      where <threading.Event object at 0xfffec98378e0> = <wfb_ng.tests.test_fl_training_host.ControlledRuntime object at 0xfffec9836ce0>.collected
+E        +        where <wfb_ng.tests.test_fl_training_host.ControlledRuntime object at 0xfffec9836ce0> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9835780>.runtime
+
+wfb_ng/tests/test_fl_job_radio_policy.py:414: AssertionError
+________ test_initial_policy_prep_budget_cancels_and_does_not_announce _________
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b3370>
+
+    def test_initial_policy_prep_budget_cancels_and_does_not_announce(policy_host):
+        entered = threading.Event()
+        exited = threading.Event()
+    
+        def policy(config, context):
+            entered.set()
+            context.stop_event.wait()
+            exited.set()
+            context.check_stop()
+    
+        host = policy_host(policy)
+        host.daemon.config = replace(host.daemon.config, preparation_timeout_seconds=1.0)
+        host.launch()
+        assert host.start_done.wait(3)
+>       assert entered.is_set() and exited.is_set()
+E       assert (False)
+E        +  where False = <bound method Event.is_set of <threading.Event object at 0xfffec98499c0>>()
+E        +    where <bound method Event.is_set of <threading.Event object at 0xfffec98499c0>> = <threading.Event object at 0xfffec98499c0>.is_set
+
+wfb_ng/tests/test_fl_job_radio_policy.py:436: AssertionError
+_ test_public_start_uses_actual_control_job_wire_and_keeps_initial_unwatched_safe _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b3e20>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec97f5930>
+
+    def test_public_start_uses_actual_control_job_wire_and_keeps_initial_unwatched_safe(
+            policy_host, monkeypatch):
+        from functools import partial
+        rounds = []
+        sessions = []
+    
+        def policy(config, context):
+            rounds.append(context.round_index)
+            context.configure_radio({'radio_txpower_dbm': 13 + context.round_index})
+    
+        host = policy_host(policy)
+        receive = host.receive_downlink
+        control = host.daemon.control_plane
+        # 仅缩短公开事务参数；控制面状态机、job绑定和逐阶段报告处理保持真实。
+        monkeypatch.setattr(control, 'reconfigure_radio', partial(
+            control.reconfigure_radio, prepare_timeout_seconds=0.05, commit_delay_seconds=0,
+            commit_timeout_seconds=0.1, lease_timeout_seconds=0.3, ping_interval_seconds=0.005))
+    
+        def wire(message):
+            receive(message)
+            reply_type = {
+                'CONFIG_RADIO_PREPARE': 'PREPARE_ACK',
+                'NEW_CHANNEL_PING': 'COMMIT_SUCCESS',
+                'RADIO_SWITCH_FINALIZED': 'RADIO_SWITCH_FINALIZED_ACK',
+                'RADIO_SWITCH_CONFIRMED': 'RADIO_SWITCH_CONFIRMED_ACK',
+                'CONFIG_RADIO_ABORT': 'RADIO_SWITCH_ROLLBACK_ACK',
+            }.get(message['type'])
+            if reply_type is None:
+                return
+            assert message['job_id'] == host.payload['job_id']
+            if message['type'] == 'CONFIG_RADIO_PREPARE':
+                sessions.append(message['session_id'])
+            for node in message['target_nodes']:
+                reply = dict(type=reply_type, node_id=node, job_id=message['job_id'],
+                             session_id=message['session_id'], ok=True,
+                             channel=message['config']['channel'],
+                             current_channel=message['config']['channel'],
+                             config=message['config'], calibration=message['calibration'])
+                control.handle_datagram(json.dumps(reply).encode(),
+                                        (f'127.0.0.{10 + node}', host.control_address[1]))
+    
+        monkeypatch.setattr(control, 'broadcast_downlink', wire)
+        host.launch()
+>       recent = host.assert_succeeded()
+
+wfb_ng/tests/test_fl_job_radio_policy.py:485: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec97f5750>
+
+    def assert_succeeded(self):
+        assert self.start_done.wait(2), 'start_job must finish within its preparation budget'
+>       assert not self.errors, f'start_job failed: {self.errors}'
+E       AssertionError: start_job failed: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E       assert not [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E        +  where [FLRuntimeError("目标客户端不可用: ['1', '2']")] = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec97f5750>.errors
+
+wfb_ng/tests/test_fl_training_host.py:302: AssertionError
+____ test_initial_confirmed_change_is_retained_when_role_preparation_fails _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b0ee0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9869660>
+
+    def test_initial_confirmed_change_is_retained_when_role_preparation_fails(policy_host, monkeypatch):
+        from wfb_ng.fl.radio import validate_radio_patch
+    
+        def policy(config, context):
+            context.configure_radio({'radio_txpower_dbm': 13})
+    
+        host = policy_host(policy, rounds=1)
+        host.daemon.runtime_factory = lambda job, payload: None
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            before = host.daemon.control_plane.active_radio_config
+            updated = validate_radio_patch(patch, before)
+            host.daemon.control_plane.active_radio_config = updated
+            return RadioSwitchResult(success=True, session_id='before-role-failure',
+                target_channel=updated.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=updated, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.launch()
+        assert host.start_done.wait(2)
+>       assert host.errors[0].error_code == 'runtime_unavailable'
+E       AssertionError: assert 'preflight_ta...des_not_ready' == 'runtime_unavailable'
+E         - runtime_unavailable
+E         + preflight_target_nodes_not_ready
+
+wfb_ng/tests/test_fl_job_radio_policy.py:515: AssertionError
+_______ test_unexpected_control_error_is_unknown_and_cannot_be_swallowed _______
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b1000>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec97f4700>
+
+    def test_unexpected_control_error_is_unknown_and_cannot_be_swallowed(policy_host, monkeypatch):
+        caught = []
+    
+        def policy(config, context):
+            try:
+                context.configure_radio({'radio_txpower_dbm': 13})
+            except FLRuntimeError as exc:
+                caught.append(exc.error_code)
+    
+        host = policy_host(policy, rounds=1)
+    
+        def transaction(*args, **kwargs):
+            raise OSError('fixture lost control outcome')
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.launch()
+        assert host.start_done.wait(2)
+>       assert caught == ['radio_transaction_failed']
+E       AssertionError: assert [] == ['radio_transaction_failed']
+E         Right contains one more item: 'radio_transaction_failed'
+E         Full diff:
+E         - ['radio_transaction_failed']
+E         + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:540: AssertionError
+_ test_initial_target_snapshot_keeps_fixed_nodes_even_when_they_become_offline _
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97b25f0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec986b5e0>
+
+    def test_initial_target_snapshot_keeps_fixed_nodes_even_when_they_become_offline(
+            policy_host, monkeypatch):
+        seen = []
+    
+        def policy(config, context):
+            # 通过既有注册表超时判定变为OFFLINE；不修改目标集合或伪造未来心跳。
+            host.daemon.control_plane.registry.offline_threshold_seconds = -1
+            try:
+                context.configure_radio({'radio_txpower_dbm': 13})
+            except FLRuntimeError:
+                pass
+    
+        host = policy_host(policy, rounds=1)
+    
+        def transaction(patch, target_nodes, *, job_id, stop_event):
+            seen.append(list(target_nodes))
+            before = host.daemon.control_plane.active_radio_config
+            return RadioSwitchResult(success=False, session_id='offline-fixed',
+                target_channel=before.channel, applied_patch=dict(patch), status='rolled_back',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=[], unresponsive_nodes=list(target_nodes), failed_phase='PREPARE',
+                error_message='fixed participants offline', job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', transaction)
+        host.launch()
+        assert host.start_done.wait(2)
+>       assert seen == [[1, 2]]
+E       assert [] == [[1, 2]]
+E         Right contains one more item: [1, 2]
+E         Full diff:
+E         - [[1, 2]]
+E         + []
+
+wfb_ng/tests/test_fl_job_radio_policy.py:577: AssertionError
+_____ test_policy_spawned_thread_cannot_escape_synchronous_radio_window[0] _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97ebbe0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec986a650>
+phase = 0
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_policy_spawned_thread_cannot_escape_synchronous_radio_window(
+            policy_host, monkeypatch, phase):
+        attempted = threading.Event()
+        transaction_entered = threading.Event()
+        release_transaction = threading.Event()
+        children = []
+        rejected = []
+        saved_contexts = []
+    
+        def policy(config, context):
+            if context.round_index != phase:
+                return
+            saved_contexts.append(context)
+    
+            def spawned_configure():
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    rejected.append(exc.error_code)
+                    attempted.set()
+    
+            child = threading.Thread(target=spawned_configure, name='fixture-escaped-radio')
+            children.append(child)
+            child.start()
+            # 在策略返回前确认子线程已进入事务，或已在公开上下文入口遭拒。
+            assert attempted.wait(2)
+    
+        host = policy_host(policy)
+        host.hold_final_reports = True
+    
+        def blocking_transaction(patch, target_nodes, *, job_id, stop_event):
+            transaction_entered.set()
+            attempted.set()
+            release_transaction.wait()
+            before = host.daemon.control_plane.active_radio_config
+            return RadioSwitchResult(success=True, session_id='must-not-escape',
+                target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocking_transaction)
+        try:
+            host.launch()
+>           assert host.final_evaluated.wait(2), f'公开start未推进到末轮: {host.errors}'
+E           AssertionError: 公开start未推进到末轮: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E           assert False
+E            +  where False = <bound method Event.wait of <threading.Event object at 0xfffec98498a0>>(2)
+E            +    where <bound method Event.wait of <threading.Event object at 0xfffec98498a0>> = <threading.Event object at 0xfffec98498a0>.wait
+E            +      where <threading.Event object at 0xfffec98498a0> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec9967f70>.final_evaluated
+
+wfb_ng/tests/test_fl_job_radio_policy.py:626: AssertionError
+_____ test_policy_spawned_thread_cannot_escape_synchronous_radio_window[1] _____
+
+policy_host = <function policy_host.<locals>.make at 0xfffec97eacb0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0xfffec9791900>
+phase = 1
+
+    @pytest.mark.parametrize('phase', [0, 1])
+    def test_policy_spawned_thread_cannot_escape_synchronous_radio_window(
+            policy_host, monkeypatch, phase):
+        attempted = threading.Event()
+        transaction_entered = threading.Event()
+        release_transaction = threading.Event()
+        children = []
+        rejected = []
+        saved_contexts = []
+    
+        def policy(config, context):
+            if context.round_index != phase:
+                return
+            saved_contexts.append(context)
+    
+            def spawned_configure():
+                try:
+                    context.configure_radio({'radio_txpower_dbm': 13})
+                except FLRuntimeError as exc:
+                    rejected.append(exc.error_code)
+                    attempted.set()
+    
+            child = threading.Thread(target=spawned_configure, name='fixture-escaped-radio')
+            children.append(child)
+            child.start()
+            # 在策略返回前确认子线程已进入事务，或已在公开上下文入口遭拒。
+            assert attempted.wait(2)
+    
+        host = policy_host(policy)
+        host.hold_final_reports = True
+    
+        def blocking_transaction(patch, target_nodes, *, job_id, stop_event):
+            transaction_entered.set()
+            attempted.set()
+            release_transaction.wait()
+            before = host.daemon.control_plane.active_radio_config
+            return RadioSwitchResult(success=True, session_id='must-not-escape',
+                target_channel=before.channel, applied_patch=dict(patch), status='finalized',
+                effective_config=before, before_config=before, target_nodes=list(target_nodes),
+                confirmed_nodes=list(target_nodes), job_id=job_id)
+    
+        monkeypatch.setattr(host.daemon.control_plane, 'reconfigure_radio', blocking_transaction)
+        try:
+            host.launch()
+>           assert host.final_evaluated.wait(2), f'公开start未推进到末轮: {host.errors}'
+E           AssertionError: 公开start未推进到末轮: [FLRuntimeError("目标客户端不可用: ['1', '2']")]
+E           assert False
+E            +  where False = <bound method Event.wait of <threading.Event object at 0xfffec985e440>>(2)
+E            +    where <bound method Event.wait of <threading.Event object at 0xfffec985e440>> = <threading.Event object at 0xfffec985e440>.wait
+E            +      where <threading.Event object at 0xfffec985e440> = <wfb_ng.tests.test_fl_training_host.TrainingHost object at 0xfffec985ff40>.final_evaluated
+
+wfb_ng/tests/test_fl_job_radio_policy.py:626: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  /usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+    from distutils.version import LooseVersion
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  /usr/lib/python3/dist-packages/pyroute2/__init__.py:68: DeprecationWarning: SelectableGroups dict interface is deprecated. Use select.
+    for entry_point in metadata.entry_points().get('pr2modules', []):
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_runs_after_initial_evaluation_and_only_between_completed_rounds
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_job_callback_freezes_union_and_records_confirmed_config_without_idle_or_disk
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[False-1]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_transaction_failure_is_fatal_even_if_policy_catches_and_keeps_radio_facts[True-1]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_preflight_patch_rejections_are_handleable_without_control_transaction
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit[0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_stop_cancels_job_bound_transaction_and_waits_for_actual_policy_exit[1]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_report_barrier_precedes_policy_and_next_publish_waits_transaction
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_next_downlink_uses_confirmed_rate_without_recreating_role_or_runtime
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_saved_context_cannot_reconfigure_after_policy_window
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_initial_policy_prep_budget_cancels_and_does_not_announce
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_public_start_uses_actual_control_job_wire_and_keeps_initial_unwatched_safe
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_initial_confirmed_change_is_retained_when_role_preparation_fails
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_unexpected_control_error_is_unknown_and_cannot_be_swallowed
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_initial_target_snapshot_keeps_fixed_nodes_even_when_they_become_offline
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_spawned_thread_cannot_escape_synchronous_radio_window[0]
+FAILED wfb_ng/tests/test_fl_job_radio_policy.py::test_policy_spawned_thread_cannot_escape_synchronous_radio_window[1]
+19 failed, 2 passed, 2 warnings in 29.21s

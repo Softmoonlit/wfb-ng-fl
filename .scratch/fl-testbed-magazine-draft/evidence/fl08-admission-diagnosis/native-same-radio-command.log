@@ -1,0 +1,93 @@
+v6_radio_frame kind=data generation=0 bandwidth=40 mcs_index=3 short_gi=1
+v6_radio_frame kind=control generation=0 bandwidth=40 mcs_index=0 short_gi=1
+v6_radio_frame kind=data generation=1 bandwidth=20 mcs_index=5 short_gi=0
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+5460962	PKT	0:0:0:0:0:0:0:0:0:0:0
+5460962	RX_BATCH	0:0:0:0:0
+5460962	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+5460962	READY_FILTER	0:0:0:0:0
+5460962	REASSEMBLY	0:40
+5460962	TOKEN_AUTH	0:0:0:0
+5460962	GRANT_SEQ	0:0
+5460962	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5460962
+v6_radio_frame kind=control generation=1 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5461043
+v6_radio_frame kind=control generation=2 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5461204
+grant_accept node_id=9 sequence=10 duration_ms=3000 expires_at_ms=5464365
+v6_radio_frame kind=data generation=2 bandwidth=20 mcs_index=4 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=5461365
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5461445
+grant_accept node_id=9 sequence=11 duration_ms=3000 expires_at_ms=5464525
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=5461525
+grant_accept node_id=9 sequence=0 duration_ms=3000 expires_at_ms=5464526
+v6_radio_frame kind=control generation=3 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5461526
+grant_accept node_id=9 sequence=1 duration_ms=3000 expires_at_ms=5464606
+v6_radio_frame kind=data generation=3 bandwidth=20 mcs_index=5 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=5461606
+native run_client UDP rearm, READY, authorization and sequence: PASS
+LISTEN_UDP_CONTROL 57180
+5461608	PKT	0:0:0:0:0:0:0:0:0:0:0
+5461608	RX_BATCH	0:0:0:0:0
+5461608	GRANT_FILTER	0:0:0:0:0:0:0:0:0
+5461608	READY_FILTER	0:0:0:0:0
+5461608	REASSEMBLY	0:40
+5461608	TOKEN_AUTH	0:0:0:0
+5461608	GRANT_SEQ	0:0
+5461608	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+v6_radio_frame kind=control generation=0 bandwidth=20 mcs_index=0 short_gi=0
+first_declare node_id=9 state=undeclared->declared_waiting_for_grant at_ms=5462809
+redeclare node_id=9 state=declared_waiting_for_grant->declared_waiting_for_grant at_ms=5463810
+native run_client UDP rearm, READY, authorization and sequence: PASS
+redeclare node_id=9 state=declared_waiting_for_grant->declared_waiting_for_grant at_ms=5464811
+grant_accept node_id=9 sequence=1 duration_ms=3000 expires_at_ms=5467811
+v6_radio_frame kind=data generation=0 bandwidth=20 mcs_index=0 short_gi=0
+state_transition node_id=9 state=declared_waiting_for_grant->grant_seen_waiting_for_next at_ms=5464811
+5466608	PKT	1:28:0:0:0:0:0:0:0:0:0
+5466608	RX_BATCH	0:0:0:0:0
+5466608	GRANT_FILTER	1:1:0:0:0:0:0:0:0
+5466608	READY_FILTER	0:0:0:0:0
+5466608	REASSEMBLY	0:40
+5466608	TOKEN_AUTH	1:0:2:3
+5466608	GRANT_SEQ	1:1
+5466608	CLIENT_LOOP	pending_unauthorized_fec_due=0 zero_timeout_polls=0
+redeclare node_id=9 state=grant_seen_waiting_for_next->grant_seen_waiting_for_next at_ms=5468115
+grant_accept node_id=9 sequence=2 duration_ms=3000 expires_at_ms=5471115
+native run_client READY/GRANT loss recovery_ms=2002, idle and authorized pending: PASS
+native run_client unauthorized pending FEC deadline/order: PASS
+v6 radio command validation and control/data radiotap sync: PASS
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+overdue-on-entry FEC wakeup and retry bounds: PASS
+v6 radio control loopback port=51861
+EMPTY partial FEC round=1 ready_elapsed_ms=2 unauthorized_data=0 old_block_sealed=1
+EMPTY partial FEC round=2 ready_elapsed_ms=2 unauthorized_data=0 old_block_sealed=1
+EMPTY partial FEC: zero_timeout_polls=0 cpu_us=1910 log_samples=2
+v6 radio control loopback port=42609
+v6_radio_command req_id=73 cmd_id=2 rc=0 payload_size=0
+EMPTY partial FEC round=1 ready_elapsed_ms=2 unauthorized_data=0 old_block_sealed=1
+v6_radio_command req_id=74 cmd_id=2 rc=0 payload_size=0
+EMPTY partial FEC round=2 ready_elapsed_ms=2 unauthorized_data=0 old_block_sealed=1
+EMPTY partial FEC: zero_timeout_polls=0 cpu_us=2321 log_samples=2
+v6 radio control loopback port=44088
+v6_radio_update generation=1 bandwidth=20 data_mcs_index=3 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_update generation=2 bandwidth=20 data_mcs_index=4 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=116 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=22 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6_radio_update generation=3 bandwidth=20 data_mcs_index=5 control_mcs_index=0 short_gi=0 radiotap_flags=0x00 sync=data+control fec=1/1
+v6_radio_command req_id=72 cmd_id=2 rc=0 payload_size=0
+v6_radio_command req_id=71 cmd_id=5 rc=0 payload_size=0
+v6 radio control loopback port=57180
+READY loss retry 1: received=1 elapsed_ms=1002
+READY loss retry 2: received=1 elapsed_ms=1000
+v6 radio control loopback port=54827

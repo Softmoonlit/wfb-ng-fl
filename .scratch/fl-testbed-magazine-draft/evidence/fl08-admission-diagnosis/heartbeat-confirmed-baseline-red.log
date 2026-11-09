@@ -1,0 +1,57 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_confirmed_radio_dispatches_identity_checked_heartbeat[valid] _______
+
+heartbeat_peer = namespace(client=<wfb_ng.fl.control.ControlPlaneClient object at 0xffffad9a5d20>, clock=namespace(now=111), exchange=<...TBEAT', 'NODE_HEARTBEAT', 'PREPARE_ACK', 'COMMIT_SUCCESS', 'RADIO_SWITCH_FINALIZED_ACK', 'RADIO_SWITCH_CONFIRMED_ACK'])
+mode = 'valid'
+
+    @pytest.mark.parametrize('mode', ['valid', 'old-ts', 'channel', 'source', 'boot'])
+    def test_confirmed_radio_dispatches_identity_checked_heartbeat(heartbeat_peer, mode):
+        """先确认收尾，再真实探测；CONFIRMED本身不能续期旧活性锚。"""
+        p = heartbeat_peer
+        p.exchange(100, 'valid', operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+        applied = threading.Event()
+        p.client.on_radio_applied = lambda config: applied.set()
+        proposal = dict(session_id='switch-heartbeat', target_nodes=[4], patch={'channel': 157})
+        p.clock.now = 108
+        p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_PREPARE'))
+        assert p.reports.get(timeout=1)['type'] == 'PREPARE_ACK'
+        p.client.handle_broadcast(dict(proposal, type='CONFIG_RADIO_COMMIT', delay_ms=0))
+        assert applied.wait(1), '模拟驱动必须完成实际应用'
+        config = p.client._current_radio_config().to_dict()
+        final = dict(session_id=proposal['session_id'], target_nodes=[4], channel=157,
+                     config=config, calibration=False)
+        p.client.handle_broadcast(dict(final, type='NEW_CHANNEL_PING'))
+        assert p.reports.get(timeout=1)['type'] == 'COMMIT_SUCCESS'
+        p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_FINALIZED'))
+        assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_FINALIZED_ACK'
+        assert p.client.radio_switch_pending
+        assert p.client._idle_liveness_anchor == 100
+        p.clock.now = 111
+        before = len(p.received)
+        p.actions.put((mode, None))
+        try:
+            p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
+        finally:
+            if len(p.received) == before:
+                p.actions.get_nowait()
+>       assert len(p.received) == before + 1, 'CONFIRMED收尾未立即恢复真实心跳'
+E       AssertionError: CONFIRMED收尾未立即恢复真实心跳
+E       assert 1 == (1 + 1)
+E        +  where 1 = len([NodeHeartbeat(node_id=4, state='IDLE', elapsed_ms=0, current_channel=149, txpower_dbm=18, uplink_mcs=6, error_code=No...cs=3, uftp_rate_kbps=15000, calibration=False, boot_id='f2d5692f35a542c19c47a7045da88936', session='loopback-session')])
+E        +    where [NodeHeartbeat(node_id=4, state='IDLE', elapsed_ms=0, current_channel=149, txpower_dbm=18, uplink_mcs=6, error_code=No...cs=3, uftp_rate_kbps=15000, calibration=False, boot_id='f2d5692f35a542c19c47a7045da88936', session='loopback-session')] = namespace(client=<wfb_ng.fl.control.ControlPlaneClient object at 0xffffad9a5d20>, clock=namespace(now=111), exchange=<...a4760>, wire_types=['NODE_HEARTBEAT', 'NODE_HEARTBEAT', 'PREPARE_ACK', 'COMMIT_SUCCESS', 'RADIO_SWITCH_FINALIZED_ACK']).received
+
+wfb_ng/tests/test_fl_heartbeat_liveness.py:255: AssertionError
+=============================== warnings summary ===============================
+../../../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  /usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+    from distutils.version import LooseVersion
+
+../../../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  /usr/lib/python3/dist-packages/pyroute2/__init__.py:68: DeprecationWarning: SelectableGroups dict interface is deprecated. Use select.
+    for entry_point in metadata.entry_points().get('pr2modules', []):
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_heartbeat_liveness.py::test_confirmed_radio_dispatches_identity_checked_heartbeat[valid]
+1 failed, 2 warnings in 0.34s
