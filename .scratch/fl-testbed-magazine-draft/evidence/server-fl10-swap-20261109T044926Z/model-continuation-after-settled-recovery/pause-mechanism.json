@@ -1,0 +1,12 @@
+{
+  "markers": [
+    "PAUSE",
+    "STOP",
+    "../PAUSE",
+    "../STOP"
+  ],
+  "before_launch": true,
+  "max_executes": 1,
+  "small_not_repeated": true,
+  "prepare_watchdog_seconds": 60
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 0,
+    "result": {
+      "host": "fl00",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "service": "MainPID=11266\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfca386b38672 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:50:10 CST] ; stop_time=[n/a] ; pid=11266 ; code=(null) ; status=0/0 }\nActiveState=active\n"
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl10",
+    "returncode": 0,
+    "result": {
+      "host": "fl10",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "service": "MainPID=12609\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100119 --fec-n 14 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:50:11 CST] ; stop_time=[n/a] ; pid=12609 ; code=(null) ; status=0/0 }\nActiveState=active\n"
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl05",
+    "returncode": 0,
+    "result": {
+      "host": "fl05",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "service": "MainPID=6014\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100157 --fec-n 14 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:50:11 CST] ; stop_time=[n/a] ; pid=6014 ; code=(null) ; status=0/0 }\nActiveState=active\n"
+    },
+    "stderr": ""
+  }
+]

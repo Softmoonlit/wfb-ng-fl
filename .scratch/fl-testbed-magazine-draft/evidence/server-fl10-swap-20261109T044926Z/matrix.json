@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "profile": "server-fl10-hardware-swap-30-5-fec14",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    30
+  ],
+  "guard_interval_ms": 5,
+  "status": "stopped",
+  "max_executions": 2,
+  "candidates": [
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "stopped",
+      "readiness_fail_nodes": [],
+      "DLduration": 9.00354419299947,
+      "ULduration": 9.985886928000582,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/fec14-g30-d5-smoke",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794199851.8042436,
+      "latest_registry_states": {
+        "1": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "2": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "3": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "5": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "6": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "7": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "8": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "9": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "10": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        }
+      },
+      "runner_last_phase": "cleanup",
+      "runner_last_monotonic": 4584.857446246,
+      "currentphase": "verify",
+      "completed_hosts": {
+        "publish": [
+          "fl02",
+          "fl01",
+          "fl10",
+          "fl05",
+          "fl08",
+          "fl09",
+          "fl07",
+          "fl03",
+          "fl06",
+          "fl00"
+        ],
+        "submit": [
+          "fl10",
+          "fl01",
+          "fl02",
+          "fl07",
+          "fl06",
+          "fl05",
+          "fl03",
+          "fl08",
+          "fl09",
+          "fl00"
+        ]
+      },
+      "client_upload_progress": {
+        "wall": 1794199889.657329,
+        "monotonic": 4579.618354772,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 1,
+              "bytes": 1048576,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 2,
+              "bytes": 1048576,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 3,
+              "bytes": 393216,
+              "partial_bytes": 393216,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 5,
+              "bytes": 131072,
+              "partial_bytes": 131072,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 6,
+              "bytes": 393216,
+              "partial_bytes": 393216,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 7,
+              "bytes": 983040,
+              "partial_bytes": 983040,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 8,
+              "bytes": 0,
+              "partial_bytes": 0,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 9,
+              "bytes": 131072,
+              "partial_bytes": 131072,
+              "committed": false,
+              "observed": true
+            },
+            {
+              "round": "ca6d40f8-87de-4de4-984d-2842937faf85",
+              "node": 10,
+              "bytes": 1048576,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/fec14-g30-d5-smoke/sw20261109T044926Z-g30-d5-smoke/progress.jsonl",
+      "elapsed": 40.13375039499988,
+      "failures": [],
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "server_verified_files": {
+        "1": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/1/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "2": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/2/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "3": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/3/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "5": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/5/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "6": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/6/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "7": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/7/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "8": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/8/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "9": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/9/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        },
+        "10": {
+          "path": "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke/role/rounds/ca6d40f8-87de-4de4-984d-2842937faf85/updates/10/update.bin",
+          "size_bytes": 1048576,
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+        }
+      },
+      "phase_completion_seconds": {
+        "publish": {
+          "fl02": 8.133008142999643,
+          "fl01": 8.133607343999756,
+          "fl10": 8.135674819000087,
+          "fl05": 8.13721074499972,
+          "fl08": 8.138647048999701,
+          "fl09": 8.141588491999755,
+          "fl07": 8.146230414999991,
+          "fl03": 8.21054442500008,
+          "fl06": 8.953051274000245,
+          "fl00": 9.00354419299947
+        },
+        "submit": {
+          "fl10": 4.215864413000418,
+          "fl01": 4.611171696999918,
+          "fl02": 4.764679034999972,
+          "fl07": 5.38246360300036,
+          "fl06": 7.04150839400063,
+          "fl05": 7.741177783000239,
+          "fl03": 8.09160101100042,
+          "fl08": 8.966038995999952,
+          "fl09": 9.973270905999925,
+          "fl00": 9.985886928000582
+        }
+      },
+      "bundle_unchanged": true,
+      "independent_restore_ok": false,
+      "audit_failures": [
+        {
+          "host": "fl00",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl01",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl02",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl03",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl05",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl06",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl07",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl08",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl09",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl10",
+          "ok": true,
+          "errors": []
+        }
+      ],
+      "error": "RuntimeError('independent baseline restoration failed')"
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "readiness_fail_nodes": [],
+      "DLduration": null,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/fec14-g30-d5-model",
+      "bundleSHA": null,
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 0
+    }
+  ],
+  "power_context": "User confirmed only00<->10 NIC and antenna swap;02/05 unchanged. New hardware baseline, not single-variable05 AB",
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "pause_requested": false,
+  "updated_wall": 1794200002.0967593,
+  "updated_monotonic": 4692.057785755,
+  "initial_full_recovery_ok": true,
+  "error": "RuntimeError('independent baseline restoration failed')",
+  "independent_settled_recovery_evidence": "small-restoration-settled-result.json",
+  "original_small_independent_false_preserved": true
+}

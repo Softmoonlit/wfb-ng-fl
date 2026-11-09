@@ -1,0 +1,32 @@
+{"monotonic": 4539.289868495, "status": "running", "grant": null, "stage": "starting_continuation_30_5"}
+{"monotonic": 4539.291616115, "status": "running", "grant": null, "stage": "server_readiness_15s"}
+{"monotonic": 4539.398788589, "status": "running", "grant": null, "stage": "audit_initial-ten-board-baseline"}
+{"monotonic": 4540.868433265, "status": "running", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 4541.766906934, "status": "running", "grant": 30, "stage": "starting_candidate"}
+{"monotonic": 4541.76973004, "status": "running", "grant": 30, "stage": "configure_30"}
+{"monotonic": 4542.438488591, "status": "running", "grant": 30, "stage": "server_readiness_15s"}
+{"monotonic": 4542.441139912, "status": "running", "grant": 30, "stage": "server_readiness_15s"}
+{"monotonic": 4542.944305492, "status": "running", "grant": 30, "stage": "server_readiness_15s"}
+{"monotonic": 4543.552969605, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4543.558405725, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4545.566869961, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4547.574987863, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4549.582752329, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4551.590777377, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4555.019392357, "status": "running", "grant": 30, "stage": "audit_before"}
+{"monotonic": 4556.008222282, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4556.016450972, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4561.031058135, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4566.047633848, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4571.059176711, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4576.075166147, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4581.093332793, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4586.114908153, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4591.132967185, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4596.149813392, "status": "running", "grant": 30, "stage": "audit_after"}
+{"monotonic": 4597.312080601, "status": "stopped", "grant": 30, "stage": "stopped"}
+RuntimeError('independent baseline restoration failed')
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/orchestration-swap-30-d5.py", line 367, in <module>
+    if not after['ok']:CURRENT['audit_failures']=after['checks'];raise RuntimeError('independent baseline restoration failed')
+RuntimeError: independent baseline restoration failed

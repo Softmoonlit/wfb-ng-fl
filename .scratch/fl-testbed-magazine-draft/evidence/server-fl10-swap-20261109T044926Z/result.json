@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "status": "measurements_stopped_final_recovery_complete",
+  "hardware": {
+    "fl00": {
+      "mac": "fc:a3:86:b3:86:72",
+      "interface": "wlxfca386b38672",
+      "usb_speed_mbps": 480
+    },
+    "fl10": {
+      "mac": "fc:22:1c:10:01:19",
+      "interface": "wlxfc221c100119",
+      "usb_speed_mbps": 5000
+    },
+    "fl05": {
+      "mac": "fc:22:1c:10:01:57",
+      "interface": "wlxfc221c100157",
+      "usb_speed_mbps": 5000,
+      "configuration_unchanged": true
+    }
+  },
+  "smoke": {
+    "execute_count": 1,
+    "DL_seconds": 9.00354419299947,
+    "UL_seconds": 9.985886928000582,
+    "original_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "initial_independent_audit": false,
+    "later_settled_full_audit": true
+  },
+  "model": {
+    "execute_count": 1,
+    "publish_failure_at_seconds": 48.58789837700078,
+    "error": "UFTP exit9 / sending thread timed out",
+    "lost_connection_nodes": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "receiver_timeouts_all_nine": true,
+    "uploads_dispatched": false,
+    "independently_verified_complete_receiver_files": 0,
+    "retained_receiver_files": "only per-group restart records; no inbox model files",
+    "original_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "initial_independent_audit": false,
+    "independent_after_standard_recovery": true,
+    "initial_independent_rf_restore_error": "HTTP409 Conflict"
+  },
+  "final_state": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "server_schedule": "10/10",
+    "raw_model_restore_ok": false,
+    "raw_model_cleanup_ok": true,
+    "raw_model_transfer_verified": false,
+    "independent_after_standard_server_recovery": true,
+    "wall": 1794200484.113808
+  },
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "bundle_unchanged": true,
+  "USB_reset_matching_lines_observed": false,
+  "model_retries": 0,
+  "extra_candidates_executed": 0,
+  "no_card_fault_conclusion": true,
+  "local_processes": {
+    "11324": "absent",
+    "11723": "absent",
+    "11780": "absent"
+  },
+  "wall": 1794200620.0981913
+}

@@ -1,0 +1,11 @@
+{
+  "markers": [
+    "PAUSE",
+    "STOP"
+  ],
+  "boundary": "真实runner结束并独立恢复审计后暂停，execute/configure前也检查",
+  "prepare": "单端prepare>=60s且普通fl SSH4s失败，核对精确runner cmdline后SIGINT清理",
+  "max_executions": 2,
+  "only_schedule": "30/5FEC14",
+  "source_unchanged": true
+}

@@ -1,0 +1,231 @@
+[
+  {
+    "host": "fl00",
+    "returncode": 0,
+    "result": {
+      "host": "fl00",
+      "cards": [
+        {
+          "interface": "wlxfca386b38672",
+          "mac": "fc:a3:86:b3:86:72",
+          "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+          "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1/1-2.1:1.0",
+          "usb": [
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.1",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "881a",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "5",
+                "devpath": "2.1",
+                "serial": "123456"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "5489",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "2",
+                "devpath": "2"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb1",
+              "attributes": {
+                "idVendor": "1d6b",
+                "idProduct": "0002",
+                "speed": "480",
+                "busnum": "1",
+                "devnum": "1",
+                "devpath": "0",
+                "serial": "3610000.usb"
+              }
+            }
+          ]
+        }
+      ],
+      "native": [],
+      "service": "MainPID=0\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfc221c100119 ; ignore_errors=no ; start_time=[Mon 2026-11-09 12:22:19 CST] ; stop_time=[Mon 2026-11-09 12:25:17 CST] ; pid=10854 ; code=exited ; status=0 }\nActiveState=inactive\n",
+      "dropins": {
+        "/etc/systemd/system/wfb-fl-server-daemon.service.d/zzzz-release-149.conf": "[Service]\nExecStart=\nExecStart=\"/usr/bin/python3\" \"-B\" \"/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z/release-node.py\" \"daemon\" \"5443ca22658202805317a9a974c261cde7c751b9\" \"fl00\" \"/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z\" \"--\" \"--config\" \"/etc/wfb-ng-fl/server.json\" \"--channel\" \"149\" \"--bandwidth-mhz\" \"40\" \"--txpower\" \"14\" \"--downlink-mcs\" \"3\" \"--uplink-mcs\" \"4\" \"--uftp-rate-kbps\" \"15000\"\nEnvironment=PYTHONDONTWRITEBYTECODE=1\nKillMode=control-group\n",
+        "/etc/systemd/system/wfb-fl-server-daemon.service.d/zzzzz-heartbeat-release.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfc221c100119\nWorkingDirectory=/\nUnsetEnvironment=PYTHONPATH PYTHONHOME\nKillMode=control-group\n",
+        "/etc/systemd/system/wfb-fl-server-daemon.service.d/08-mnist.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-server-daemon --config /etc/wfb-ng-fl/server.json\nEnvironment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1\n"
+      },
+      "config": {
+        "bandwidth_mhz": 40,
+        "channel": 149,
+        "downlink_mcs": 3,
+        "ipc_host": "127.0.0.1",
+        "ipc_port": 9090,
+        "known_clients": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "model_library_dir": "/var/lib/wfb-ng-fl/models",
+        "radio_txpower_dbm": 14,
+        "tun_cidr": "10.80.0.1/24",
+        "tun_ip": "10.80.0.1",
+        "tun_name": "fl-s",
+        "tun_txqueuelen": 5000,
+        "uftp_rate_kbps": 15000,
+        "uplink_mcs": 4,
+        "web_host": "192.168.0.190",
+        "web_port": 8080,
+        "work_dir": "/srv/wfb-ng-fl/server",
+        "mnist_data_dir": "/srv/wfb-ng-fl/mnist",
+        "client_entry": "wfb_ng.fl.mnist_cnn_32_64:client_entry",
+        "aggregate_entry": "wfb_ng.fl.mnist_cnn_32_64:aggregate_entry",
+        "evaluate_entry": "wfb_ng.fl.mnist_cnn_32_64:evaluate_entry",
+        "algorithm_config": {
+          "data_seed": 2026
+        },
+        "preparation_timeout_seconds": 300.0,
+        "round_timeout_seconds": 1800.0,
+        "io_timeout_seconds": 120.0,
+        "grant_duration_ms": 10,
+        "guard_interval_ms": 10,
+        "fec_n": 14
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl10",
+    "returncode": 0,
+    "result": {
+      "host": "fl10",
+      "cards": [
+        {
+          "interface": "wlxfc221c100119",
+          "mac": "fc:22:1c:10:01:19",
+          "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+          "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+          "usb": [
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "8812",
+                "speed": "5000",
+                "busnum": "2",
+                "devnum": "3",
+                "devpath": "1.3",
+                "serial": "123456"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "0489",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "2",
+                "devpath": "1"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+              "attributes": {
+                "idVendor": "1d6b",
+                "idProduct": "0003",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "1",
+                "devpath": "0",
+                "serial": "3610000.usb"
+              }
+            }
+          ]
+        }
+      ],
+      "native": [],
+      "service": "MainPID=0\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfca386b38672 --fec-n 14 ; ignore_errors=no ; start_time=[Sun 2026-11-08 22:27:33 CST] ; stop_time=[Mon 2026-11-09 12:25:18 CST] ; pid=906 ; code=exited ; status=0 }\nActiveState=inactive\n",
+      "dropins": {
+        "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfca386b38672 --fec-n 14\nWorkingDirectory=/\nUnsetEnvironment=PYTHONPATH PYTHONHOME\nKillMode=control-group\n",
+        "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4\nEnvironment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1\n"
+      },
+      "config": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20/24"
+      }
+    },
+    "stderr": ""
+  },
+  {
+    "host": "fl05",
+    "returncode": 0,
+    "result": {
+      "host": "fl05",
+      "cards": [
+        {
+          "interface": "wlxfc221c100157",
+          "mac": "fc:22:1c:10:01:57",
+          "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+          "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+          "usb": [
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "8812",
+                "speed": "5000",
+                "busnum": "2",
+                "devnum": "3",
+                "devpath": "1.3",
+                "serial": "123456"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+              "attributes": {
+                "idVendor": "0bda",
+                "idProduct": "0489",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "2",
+                "devpath": "1"
+              }
+            },
+            {
+              "path": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+              "attributes": {
+                "idVendor": "1d6b",
+                "idProduct": "0003",
+                "speed": "10000",
+                "busnum": "2",
+                "devnum": "1",
+                "devpath": "0",
+                "serial": "3610000.usb"
+              }
+            }
+          ]
+        }
+      ],
+      "native": [],
+      "service": "MainPID=0\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100157 --fec-n 14 ; ignore_errors=no ; start_time=[Sun 2026-11-08 22:27:33 CST] ; stop_time=[Mon 2026-11-09 12:25:18 CST] ; pid=851 ; code=exited ; status=0 }\nActiveState=inactive\n",
+      "dropins": {
+        "/etc/systemd/system/wfb-fl-client-daemon.service.d/zzzzz-heartbeat-release.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/python3 -I -B -m wfb_ng.fl.client_daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 18 --uplink-mcs 4 --interface wlxfc221c100157 --fec-n 14\nWorkingDirectory=/\nUnsetEnvironment=PYTHONPATH PYTHONHOME\nKillMode=control-group\n",
+        "/etc/systemd/system/wfb-fl-client-daemon.service.d/10-deployment.conf": "[Service]\nExecStart=\nExecStart=/usr/bin/wfb-fl-client-daemon --config /etc/wfb-ng-fl/node.json --work-dir /srv/wfb-ng-fl/client --channel 149 --bandwidth-mhz 40 --radio-txpower-dbm 14 --uplink-mcs 4\nEnvironment=OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1\n"
+      },
+      "config": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15/24"
+      }
+    },
+    "stderr": ""
+  }
+]

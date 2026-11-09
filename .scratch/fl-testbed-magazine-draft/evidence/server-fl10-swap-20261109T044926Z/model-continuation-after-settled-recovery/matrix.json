@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "profile": "server-fl10-hardware-swap-30-5-fec14",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    30
+  ],
+  "guard_interval_ms": 5,
+  "status": "stopped",
+  "max_executions": 1,
+  "candidates": [
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "stopped",
+      "readiness_fail_nodes": [],
+      "DLduration": 48.58789837700078,
+      "ULduration": null,
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/model-continuation-after-settled-recovery/fec14-g30-d5-model",
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+      "nativeSHA": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "execute_count": 1,
+      "started_wall": 1794200036.8864985,
+      "latest_registry_states": {
+        "1": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "2": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "3": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "5": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "6": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "7": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "8": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "9": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "10": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        }
+      },
+      "runner_last_phase": "restore",
+      "runner_last_monotonic": 4787.472522382,
+      "currentphase": "publish",
+      "completed_hosts": {
+        "publish": [],
+        "submit": []
+      },
+      "hunt_events": [
+        {
+          "wall": 1794200049.6505556,
+          "node": "1",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        }
+      ],
+      "runner_returncode": 1,
+      "runner_restore_ok": false,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/model-continuation-after-settled-recovery/fec14-g30-d5-model/swr20261109T044926Z-g30-d5-model/progress.jsonl",
+      "elapsed": 65.19772901299984,
+      "failures": [
+        {
+          "wall": 1794200097.5110908,
+          "monotonic": 4787.472117627,
+          "host": "fl00",
+          "phase": "publish",
+          "ok": false,
+          "error": "RuntimeError('{\\'id\\': 5, \\'ok\\': False, \\'error\\': \"FLRuntimeError(\\'UFTP 退出码为 9\\')\"}')"
+        },
+        {
+          "wall": 1794200097.5114064,
+          "monotonic": 4787.472431401,
+          "phase": "run",
+          "ok": false,
+          "error": "RuntimeError('publish failed: fl00')"
+        },
+        {
+          "wall": 1794200097.5114973,
+          "monotonic": 4787.472522382,
+          "phase": "restore",
+          "ok": false,
+          "error": "全角色 close 未确认；先独立回收再恢复"
+        }
+      ],
+      "original_runner_final_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "server_verified_files": {},
+      "phase_completion_seconds": {
+        "publish": {},
+        "submit": {}
+      },
+      "bundle_unchanged": true,
+      "independent_restore_ok": false,
+      "audit_failures": [
+        {
+          "host": "fl00",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl01",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl02",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl03",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl05",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl06",
+          "ok": true,
+          "errors": []
+        },
+        {
+          "host": "fl07",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl08",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl09",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        },
+        {
+          "host": "fl10",
+          "ok": false,
+          "errors": [
+            "iw baseline mismatch"
+          ]
+        }
+      ],
+      "error": "RuntimeError('independent final restoration not complete')"
+    }
+  ],
+  "power_context": "User confirmed only00<->10 NIC and antenna swap;02/05 unchanged. New hardware baseline, not single-variable05 AB",
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "pause_requested": false,
+  "updated_wall": 1794200484.114107,
+  "updated_monotonic": 5174.07513386,
+  "error": "RuntimeError('independent final restoration not complete')",
+  "final_closeout": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "server_schedule": "10/10",
+    "raw_model_restore_ok": false,
+    "raw_model_cleanup_ok": true,
+    "raw_model_transfer_verified": false,
+    "independent_after_standard_server_recovery": true,
+    "wall": 1794200484.113808
+  }
+}

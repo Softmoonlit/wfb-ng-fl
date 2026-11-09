@@ -86,3 +86,11 @@ fl09复核ping2发0收、SSH `No route to host`、ARP INCOMPLETE，当时无法�
 用户随后提出更换fl05网卡，并追加fl00与fl10网卡互换。30/5收尾、独立恢复至server10/10及完整九端READY/IDLE后，已记录三端实际网卡、USB口与参数，并标准停止fl00/05/10的WFB服务；三端均inactive/dead、MainPID=0、native无残留，宿主及SSH未关闭。用户看到fl05本次成功后询问是否改换fl02；当前建议先保留02/05原卡，只执行已明确提出的00↔10互换，避免追随最后超时节点换卡。05暂保持停服，互换完成后使用原卡和原绑定恢复服务。
 
 互换后按新的硬件批次重新全九端准入和同参数通信验证，不把改善单独归因于fl02或fl05网卡。40／60ms模型与FEC12暂缓。实际停服记录见该批`hardware-swap-preparation/`，后续范围见[硬件更换计划](../fl05-card-ab-20261109/README.md)。
+
+## fl00／fl10互换后的新硬件批次
+
+用户确认互换完成，fl02／fl05原卡保留。`server-fl10-swap-20261109T044926Z/`核验新MAC、驱动和实际USB拓扑，00已使用原10卡、10已使用原00卡，仅两端接口绑定更新；05沿原绑定恢复。新硬件准入的版本、实际15W、GET_FEC、GET_RADIO、iw及完整九端READY/IDLE通过。
+
+30/5、FEC8/14、实际UFTP 12000 Kbps的小文件一次通过（下行9.004秒、上传9.986秒）。小文件后独立审计曾读到01仍在157，原false保留，后续全十板149实际审计与九端准入通过，未重跑小文件。模型一次在下行48.588秒时UFTP退出9，未调度上传；九端已注册并返回FILEINFO_ACK，随后sender记录Sending thread timed out、全九端Lost connection，receiver均Transfer timed out。没有完整模型接收／SHA通过事实，仅保留重启记录；本次未见内核USB重置匹配行，不能把退出9直接判为网卡损坏。
+
+模型原始transfer=false、cleanup=true、restore=false以及恢复HTTP409保留。随后标准恢复完成：server10/10、全十板149/HT40/Long GI/索引18/MCS3/4/FEC8/14/实际15W与版本通过，九端READY/IDLE，无活动作业，所有临时unit与本地runner退出。未重试、未执行其他组。现有证据将问题指向待查的整组下行路径，不能归因于单一02／05客户端。详情见[新硬件结果](../server-fl10-swap-20261109T044926Z/result.json)。

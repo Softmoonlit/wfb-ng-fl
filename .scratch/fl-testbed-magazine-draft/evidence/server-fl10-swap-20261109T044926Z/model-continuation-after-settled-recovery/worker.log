@@ -1,0 +1,26 @@
+{"monotonic": 4726.846730822, "status": "running", "grant": null, "stage": "starting_single_model_continuation"}
+{"monotonic": 4726.848667587, "status": "running", "grant": 30, "stage": "configure_30"}
+{"monotonic": 4726.946761773, "status": "running", "grant": 30, "stage": "server_readiness_15s"}
+{"monotonic": 4727.054603626, "status": "running", "grant": 30, "stage": "readiness_gate"}
+{"monotonic": 4728.521636972, "status": "running", "grant": 30, "stage": "audit_before"}
+{"monotonic": 4729.573088204, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4729.581679851, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4734.597649603, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4739.613851479, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4744.627987074, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4749.644576741, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4754.6622322, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4759.673283721, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4764.687076428, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4769.703285962, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4774.719858475, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4779.730923465, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4784.747337604, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4789.763690602, "status": "running", "grant": 30, "stage": "execute"}
+{"monotonic": 4794.776439106, "status": "running", "grant": 30, "stage": "audit_after"}
+{"monotonic": 4795.47078198, "status": "stopped", "grant": 30, "stage": "stopped"}
+RuntimeError('independent final restoration not complete')
+Traceback (most recent call last):
+  File "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-swap-20261109T044926Z/model-continuation-after-settled-recovery/orchestration-single-model.py", line 356, in <module>
+    if not after['ok']:CURRENT['audit_failures']=after['checks'];raise RuntimeError('independent final restoration not complete')
+RuntimeError: independent final restoration not complete
