@@ -1,0 +1,89 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ TestTwoPhaseRadioSwitchNetworkLoop.test_confirmed_ack_cannot_overtake_gated_current_channel_heartbeat _
+
+self = <wfb_ng.tests.test_fl_radio_switch.TestTwoPhaseRadioSwitchNetworkLoop testMethod=test_confirmed_ack_cannot_overtake_gated_current_channel_heartbeat>
+
+    def test_confirmed_ack_cannot_overtake_gated_current_channel_heartbeat(self):
+        """真实 UDP 门控下，事务不得早于目标节点的就绪事实返回。"""
+        # 使用公开 listener/hunt 入口，不启动监督线程，稳定保持 node2 的 HUNTING/CONNECTING 快照。
+        self.client1.start_broadcast_listener()
+        self.client2.start_broadcast_listener()
+        self.assertTrue(self.client1.hunt_once([157]))
+        self.assertTrue(self.client2.hunt_once([157]))
+        self.client2.notify_state_change(ClientNodeState.HUNTING)
+        before = self.server.registry.get_node(2)
+        self.assertIsNotNone(before)
+        self.assertEqual(before.readiness, NodeReadiness.CONNECTING)
+        self.assertEqual(before.reported_state, ClientNodeState.HUNTING.value)
+        self.assertEqual(before.current_channel, 157)
+    
+        heartbeat_blocked = threading.Event()
+        release_heartbeat = threading.Event()
+        transaction_returned = threading.Event()
+        final_ack_seen = threading.Event()
+        gated_heartbeat = []
+        result_holder = []
+        original_sendto = _LoopbackOnlyDatagramSocket.sendto
+    
+        def gated_sendto(sock, data, address):
+            try:
+                message = json.loads(data)
+            except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
+                message = {}
+            if (message.get("type") == "RADIO_SWITCH_CONFIRMED_ACK"
+                    and message.get("node_id") == 2):
+                final_ack_seen.set()
+            if (message.get("type") == "NODE_HEARTBEAT"
+                    and message.get("node_id") == 2
+                    and message.get("state") == ClientNodeState.IDLE.value
+                    and message.get("current_channel") == 149
+                    and not release_heartbeat.is_set()):
+                gated_heartbeat.append((message, sock.getsockname(), address))
+                heartbeat_blocked.set()
+                if not release_heartbeat.wait(2.0):
+                    raise AssertionError("heartbeat gate was not released")
+            return original_sendto(sock, data, address)
+    
+        def switch():
+            try:
+                result_holder.append(self.server.reconfigure_radio(
+                    patch={"channel": 149},
+                    target_nodes=[1, 2],
+                    prepare_timeout_seconds=1.0,
+                    commit_delay_seconds=0.05,
+                    commit_timeout_seconds=0.8,
+                    lease_timeout_seconds=1.0,
+                    ping_interval_seconds=0.02,
+                ))
+            finally:
+                transaction_returned.set()
+    
+        worker = threading.Thread(target=switch)
+        with patch.object(_LoopbackOnlyDatagramSocket, "sendto", gated_sendto):
+            worker.start()
+            try:
+                self.assertTrue(heartbeat_blocked.wait(2.0))
+                current = self.server.registry.get_node(2)
+                self.assertIsNotNone(current)
+>               self.assertFalse(
+                    transaction_returned.wait(0.2),
+                    "事务在 node2 仍 HUNTING/CONNECTING 时提前返回; "
+                    f"confirmed_ack_observed={final_ack_seen.is_set()}",
+                )
+E               AssertionError: True is not false : 事务在 node2 仍 HUNTING/CONNECTING 时提前返回; confirmed_ack_observed=True
+
+wfb_ng/tests/test_fl_radio_switch.py:383: AssertionError
+=============================== warnings summary ===============================
+../../usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4
+  /usr/lib/python3/dist-packages/pr2modules/config/__init__.py:4: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives
+    from distutils.version import LooseVersion
+
+../../usr/lib/python3/dist-packages/pyroute2/__init__.py:68
+  /usr/lib/python3/dist-packages/pyroute2/__init__.py:68: DeprecationWarning: SelectableGroups dict interface is deprecated. Use select.
+    for entry_point in metadata.entry_points().get('pr2modules', []):
+
+-- Docs: https://docs.pytest.org/en/stable/warnings.html
+=========================== short test summary info ============================
+FAILED wfb_ng/tests/test_fl_radio_switch.py::TestTwoPhaseRadioSwitchNetworkLoop::test_confirmed_ack_cannot_overtake_gated_current_channel_heartbeat
+1 failed, 30 deselected, 2 warnings in 0.98s

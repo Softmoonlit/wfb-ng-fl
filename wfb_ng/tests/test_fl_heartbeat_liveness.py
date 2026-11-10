@@ -222,9 +222,9 @@ def test_prepare_suppresses_hunting_without_renewing_liveness(heartbeat_peer):
     assert p.client.state == ClientNodeState.HUNTING
 
 
-@pytest.mark.parametrize('mode', ['valid', 'old-ts', 'channel', 'source', 'boot'])
+@pytest.mark.parametrize('mode', ['valid', 'drop', 'old-ts', 'channel', 'source', 'boot'])
 def test_confirmed_radio_dispatches_identity_checked_heartbeat(heartbeat_peer, mode):
-    """先确认收尾，再真实探测；CONFIRMED本身不能续期旧活性锚。"""
+    """最终确认必须先取得当前信道有效心跳；错身份时保留事务供重复确认重试。"""
     p = heartbeat_peer
     p.exchange(100, 'valid', operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
     applied = threading.Event()
@@ -244,31 +244,45 @@ def test_confirmed_radio_dispatches_identity_checked_heartbeat(heartbeat_peer, m
     assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_FINALIZED_ACK'
     assert p.client.radio_switch_pending
     assert p.client._idle_liveness_anchor == 100
+
     p.clock.now = 111
     before = len(p.received)
     p.actions.put((mode, None))
-    try:
-        p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
-    finally:
-        if len(p.received) == before:
-            p.actions.get_nowait()
+    p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
     assert len(p.received) == before + 1, 'CONFIRMED收尾未立即恢复真实心跳'
     assert p.received[-1].current_channel == 157
     assert p.client._idle_liveness_anchor == (111 if mode == 'valid' else 100)
-    assert not p.client.radio_switch_pending
-    assert not p.client.lease_watchdog.is_armed
-    confirmed_at = p.wire_types.index('RADIO_SWITCH_CONFIRMED_ACK')
-    assert p.wire_types[confirmed_at + 1] == 'NODE_HEARTBEAT'
-    # 重复确认只重复回执，不能再次发送探测或凭空续期。
+
+    if mode == 'valid':
+        assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_CONFIRMED_ACK'
+        assert not p.client.radio_switch_pending
+        assert not p.client.lease_watchdog.is_armed
+    else:
+        # 错身份/错信道/旧请求不能清 pending，也不能发最终确认。
+        with pytest.raises(queue.Empty):
+            p.reports.get(timeout=0.05)
+        assert p.client.radio_switch_pending
+        assert p.client.lease_watchdog.is_armed
+
+        # 同一 CONFIRMED 期限内的重复通知重新发送真实心跳，不能复用失败事实。
+        before_retry = len(p.received)
+        p.actions.put(('valid', None))
+        p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
+        assert len(p.received) == before_retry + 1
+        assert p.received[-1].current_channel == 157
+        assert p.client._idle_liveness_anchor == (111.25 if mode == 'drop' else 111)
+        assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_CONFIRMED_ACK'
+        assert not p.client.radio_switch_pending
+        assert not p.client.lease_watchdog.is_armed
+
+    # 重复确认只重发最终收据，不再次探测，也不再次调用 finalized 回调。
+    before_duplicate = len(p.received)
     p.client.handle_broadcast(dict(final, type='RADIO_SWITCH_CONFIRMED'))
-    assert len(p.received) == before + 1
-    assert p.exchange(113) is None
-    if mode != 'valid':
-        assert p.client.state == ClientNodeState.HUNTING
-        return
+    assert len(p.received) == before_duplicate
+    assert p.reports.get(timeout=1)['type'] == 'RADIO_SWITCH_CONFIRMED_ACK'
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(120.75) is None
-    assert p.client.state == ClientNodeState.HUNTING
+    assert p.exchange(113) is None
+    assert p.client.state == ClientNodeState.IDLE
 
 
 @pytest.mark.parametrize('applied_ok', [False, True])

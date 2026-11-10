@@ -2903,10 +2903,13 @@ class ControlPlaneClient:
         except Exception as exc:
             logger.warning("解析或应用对齐指令失败: %s", exc)
 
-    def _send_heartbeat(self, state: str, elapsed_ms: int) -> Optional[HeartbeatAck]:
+    def _send_heartbeat(
+        self, state: str, elapsed_ms: int, *,
+        allow_radio_switch_confirmation: bool = False,
+    ) -> Optional[HeartbeatAck]:
         """Internal helper to send a heartbeat and optionally wait for ACK."""
-        # COMMIT至收尾期间由事务拥有射频；所有发送入口都遵守这道门禁。
-        if self._pre_switch_config is not None:
+        # COMMIT至收尾期间由事务拥有射频；仅最终确认专用路径可发送一次真实心跳。
+        if self._pre_switch_config is not None and not allow_radio_switch_confirmation:
             return None
         sock = self._get_uplink_sock()
         self._drain_sock(sock)
@@ -3421,39 +3424,51 @@ class ControlPlaneClient:
                 return
             if (not self._matches_pending_switch(msg)
                 or self._finalized_proposal_session != session_id
-                or not self.lease_watchdog.disarm_if_alive()):
+                or not self.lease_watchdog.is_armed):
                 return
-            self.locked_channel = self.current_channel
-            self.cached_channel = self.current_channel
+            previous_state = self._pending_switch_state or ClientNodeState.IDLE
+            previous_locked_channel = self._pending_switch_locked_channel
             confirmed_job_id = self._pending_switch_job_id
             confirmed_target_nodes = self._pending_switch_target_nodes
             task_owned = (
                 confirmed_job_id is not None
                 and self._bound_job_id == confirmed_job_id
             )
-            previous_state = self._pending_switch_state or ClientNodeState.IDLE
-            previous_locked_channel = self._pending_switch_locked_channel
-            self._confirmed_switch_session = session_id
-            self._confirmed_switch_channel = self.current_channel
-            self._confirmed_switch_job_id = confirmed_job_id
-            self._confirmed_switch_target_nodes = confirmed_target_nodes
-            self._clear_pending_switch()
             if task_owned:
-                self.state = previous_state
-                self.locked_channel = (
+                next_state = previous_state
+                next_locked_channel = (
                     previous_locked_channel
                     if previous_locked_channel is not None
                     else (self.current_channel if previous_state == ClientNodeState.IDLE else None)
                 )
             else:
-                self.state = ClientNodeState.IDLE
-                self.locked_channel = self.current_channel
+                next_state = ClientNodeState.IDLE
+                next_locked_channel = self.current_channel
+            self.state = next_state
+            self.locked_channel = next_locked_channel
             self._state_enter_time = time.monotonic()
             new_config = self._current_radio_config()
+            # CONFIRMED 只有在当前信道的真实心跳获得有效回执后才成立。
+            # 保留 pending/旧配置直到这里成功，使同一确认期限内的重复 CONFIRMED 可重试，
+            # 同时让 watchdog 仍能在持续失败时回滚。
+            heartbeat_ack = self._send_heartbeat(
+                self.state.value, elapsed_ms=0,
+                allow_radio_switch_confirmation=True,
+            )
+            if heartbeat_ack is None or not self.lease_watchdog.disarm_if_alive():
+                logger.warning(
+                    "节点 %d CONFIRMED session=%s 未取得当前信道有效心跳，拒绝最终确认",
+                    self.node_id, session_id,
+                )
+                return
+            self._confirmed_switch_session = session_id
+            self._confirmed_switch_channel = self.current_channel
+            self._confirmed_switch_job_id = confirmed_job_id
+            self._confirmed_switch_target_nodes = confirmed_target_nodes
+            self.cached_channel = self.current_channel
+            self._clear_pending_switch()
             self._send_final_barrier_ack(
                 "RADIO_SWITCH_CONFIRMED_ACK", session_id, confirmed_job_id)
-            # 先结束确认屏障，再用当前信道的真实ACK恢复活性，不能凭CONFIRMED续期。
-            self._send_heartbeat(self.state.value, elapsed_ms=0)
             self._wake_event.set()
             logger.info("节点 %d CONFIRMED session=%s channel=%d", self.node_id, session_id, self.current_channel)
         if self.on_radio_finalized is not None:

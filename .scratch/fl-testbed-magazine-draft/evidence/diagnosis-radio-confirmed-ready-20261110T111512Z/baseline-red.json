@@ -1,0 +1,46 @@
+{
+  "timestamp_utc": "2026-11-10T11:38:49.380761+00:00",
+  "source": "HEAD 2b26d3a，control.py为已发布cccac23实现",
+  "tests": "当前最终回归文件",
+  "results": [
+    {
+      "attempt": 1,
+      "returncode": 1,
+      "command": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "wfb_ng/tests/test_fl_radio_switch.py",
+        "-k",
+        "gated_current_channel_heartbeat"
+      ]
+    },
+    {
+      "attempt": 2,
+      "returncode": 1,
+      "command": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "wfb_ng/tests/test_fl_radio_switch.py",
+        "-k",
+        "gated_current_channel_heartbeat"
+      ]
+    },
+    {
+      "attempt": 3,
+      "returncode": 1,
+      "command": [
+        "python3",
+        "-m",
+        "pytest",
+        "-q",
+        "wfb_ng/tests/test_fl_radio_switch.py",
+        "-k",
+        "gated_current_channel_heartbeat"
+      ]
+    }
+  ]
+}

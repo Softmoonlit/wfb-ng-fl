@@ -343,7 +343,7 @@ class TestRadioTransaction(unittest.TestCase):
     def test_job_bound_confirmed_and_rollback_preserve_task_state_and_channel_owner(self):
         client = ControlPlaneClient(1, "10.80.0.11", initial_channel=157)
         # 本组只验证事务和所有权；真实心跳往返由动态loopback专项覆盖。
-        client._send_heartbeat = Mock(return_value=None)
+        client._send_heartbeat = Mock(return_value=object())
         sent = []
         commit_seen = threading.Event()
         client._send_unicast_datagram = lambda data: (
@@ -526,7 +526,7 @@ class TestRadioTransaction(unittest.TestCase):
     def setUp(self):
         self.client = ControlPlaneClient(1, "10.80.0.11", initial_channel=149, txpower_dbm=12)
         # 事务收据测试隔离确认后的心跳，禁止触碰实机TUN和生产UDP端口。
-        self.client._send_heartbeat = Mock(return_value=None)
+        self.client._send_heartbeat = Mock(return_value=object())
         self.sent = []
         self.online = threading.Event()
         self.finalized = Mock()

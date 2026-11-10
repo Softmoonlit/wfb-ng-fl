@@ -296,6 +296,116 @@ class TestTwoPhaseRadioSwitchNetworkLoop(unittest.TestCase):
             time.sleep(0.05)
         self.fail("客户端未能成功上线至 READY 状态")
 
+    def test_confirmed_transaction_returns_after_ready_barrier(self):
+        """事务返回时，全部目标必须已由真实心跳确认 READY/IDLE。"""
+        self._bring_clients_online()
+
+        result = self.server.reconfigure_radio(
+            patch={"channel": 149},
+            target_nodes=[1, 2],
+            prepare_timeout_seconds=1.0,
+            commit_delay_seconds=0.05,
+            commit_timeout_seconds=0.8,
+            lease_timeout_seconds=1.0,
+            ping_interval_seconds=0.02,
+        )
+
+        self.assertTrue(result.success, result.error_message)
+        for node_id in (1, 2):
+            record = self.server.registry.get_node(node_id)
+            self.assertIsNotNone(record)
+            self.assertEqual(record.readiness, NodeReadiness.READY)
+            self.assertEqual(record.reported_state, ClientNodeState.IDLE.value)
+            self.assertEqual(record.current_channel, 149)
+
+    def test_confirmed_ack_cannot_overtake_gated_current_channel_heartbeat(self):
+        """真实 UDP 门控下，事务不得早于目标节点的就绪事实返回。"""
+        # 使用公开 listener/hunt 入口，不启动监督线程，稳定保持 node2 的 HUNTING/CONNECTING 快照。
+        self.client1.start_broadcast_listener()
+        self.client2.start_broadcast_listener()
+        self.assertTrue(self.client1.hunt_once([157]))
+        self.assertTrue(self.client2.hunt_once([157]))
+        self.client2.notify_state_change(ClientNodeState.HUNTING)
+        before = self.server.registry.get_node(2)
+        self.assertIsNotNone(before)
+        self.assertEqual(before.readiness, NodeReadiness.CONNECTING)
+        self.assertEqual(before.reported_state, ClientNodeState.HUNTING.value)
+        self.assertEqual(before.current_channel, 157)
+
+        heartbeat_blocked = threading.Event()
+        release_heartbeat = threading.Event()
+        transaction_returned = threading.Event()
+        final_ack_seen = threading.Event()
+        gated_heartbeat = []
+        result_holder = []
+        original_sendto = _LoopbackOnlyDatagramSocket.sendto
+
+        def gated_sendto(sock, data, address):
+            try:
+                message = json.loads(data)
+            except (TypeError, UnicodeDecodeError, json.JSONDecodeError):
+                message = {}
+            if (message.get("type") == "RADIO_SWITCH_CONFIRMED_ACK"
+                    and message.get("node_id") == 2):
+                final_ack_seen.set()
+            if (message.get("type") == "NODE_HEARTBEAT"
+                    and message.get("node_id") == 2
+                    and message.get("state") == ClientNodeState.IDLE.value
+                    and message.get("current_channel") == 149
+                    and not release_heartbeat.is_set()):
+                gated_heartbeat.append((message, sock.getsockname(), address))
+                heartbeat_blocked.set()
+                if not release_heartbeat.wait(2.0):
+                    raise AssertionError("heartbeat gate was not released")
+            return original_sendto(sock, data, address)
+
+        def switch():
+            try:
+                result_holder.append(self.server.reconfigure_radio(
+                    patch={"channel": 149},
+                    target_nodes=[1, 2],
+                    prepare_timeout_seconds=1.0,
+                    commit_delay_seconds=0.05,
+                    commit_timeout_seconds=0.8,
+                    lease_timeout_seconds=1.0,
+                    ping_interval_seconds=0.02,
+                ))
+            finally:
+                transaction_returned.set()
+
+        worker = threading.Thread(target=switch)
+        with patch.object(_LoopbackOnlyDatagramSocket, "sendto", gated_sendto):
+            worker.start()
+            try:
+                self.assertTrue(heartbeat_blocked.wait(2.0))
+                current = self.server.registry.get_node(2)
+                self.assertIsNotNone(current)
+                self.assertFalse(
+                    transaction_returned.wait(0.2),
+                    "事务在 node2 仍 HUNTING/CONNECTING 时提前返回; "
+                    f"confirmed_ack_observed={final_ack_seen.is_set()}",
+                )
+                self.assertEqual(current.readiness, NodeReadiness.CONNECTING)
+                self.assertEqual(current.reported_state, ClientNodeState.HUNTING.value)
+                self.assertEqual(current.current_channel, 157)
+            finally:
+                release_heartbeat.set()
+                worker.join(2.0)
+        self.assertFalse(worker.is_alive(), "射频事务线程未在门控释放后结束")
+        self.assertEqual(len(result_holder), 1)
+        self.assertTrue(result_holder[0].success, result_holder[0].error_message)
+        self.assertEqual(len(gated_heartbeat), 1)
+        heartbeat, source, destination = gated_heartbeat[0]
+        self.assertEqual(heartbeat["boot_id"], self.client2.boot_id)
+        self.assertEqual(heartbeat["current_channel"], 149)
+        self.assertEqual(destination, ("127.0.0.1", self.server_port))
+        record = self.server.registry.get_node(2)
+        self.assertIsNotNone(record)
+        self.assertEqual(record.addr[1], source[1])
+        self.assertEqual(record.readiness, NodeReadiness.READY)
+        self.assertEqual(record.reported_state, ClientNodeState.IDLE.value)
+        self.assertEqual(record.current_channel, 149)
+
     def test_normal_atomic_two_phase_switch_to_channel_149(self):
         """
         Full two-phase reconfiguration from Channel 157 to Channel 149:
