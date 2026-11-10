@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "batch_id": "post-fl02-reboot-20261110T142107Z",
+  "scope": {
+    "server": "fl00",
+    "clients": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "excluded": [
+      4,
+      10
+    ],
+    "release_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "reviewed_bundle_sha": "1ff80d4683137c191328ef524b910143a2dae462b9c6854e615412da61d46496",
+    "radio": "149/HT40/LGI/index18",
+    "fec": "RS(8,12)",
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "uftp_rate_kbps": 12000
+  },
+  "storage": {
+    "evidence": "storage-reclamation.json",
+    "required_bytes": 671181818,
+    "fl08_before": 603426816,
+    "fl08_after": 692490240,
+    "fl09_before": 581210112,
+    "fl09_after": 715026432,
+    "b2_original_preserved": true,
+    "failed_attempts_deleted": false,
+    "evidence_or_install_deleted": false
+  },
+  "admission": {
+    "evidence": "admission-post-reclamation.json",
+    "hardware_probe_rc": 0,
+    "check_all_ready_rc": 0,
+    "errors": []
+  },
+  "smoke": {
+    "run_id": "post-fl02-20261110T142107Z-smoke",
+    "root": "smoke",
+    "progress": "smoke/runs/post-fl02-20261110T142107Z-smoke/progress.jsonl",
+    "payload_size_bytes": 1048576,
+    "payload_sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "verify_hosts": 8,
+    "final_recovery_audit_rc": 0,
+    "independent_audit_ok": true,
+    "automatic_retry": false,
+    "publish_seconds": 8.891205799998716,
+    "submit_seconds": 12.406343770999229
+  },
+  "model": {
+    "run_id": "post-fl02-20261110T142107Z-model",
+    "root": "model",
+    "progress": "model/runs/post-fl02-20261110T142107Z-model/progress.jsonl",
+    "payload_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "manifest": "model-manifest-input.json",
+    "payload_size_bytes": 44770302,
+    "payload_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "verify_hosts": 8,
+    "final_recovery_audit_rc": 0,
+    "independent_audit_ok": true,
+    "automatic_retry": false,
+    "direction_timeout_seconds": 600,
+    "publish_seconds": 78.1922718679998,
+    "submit_seconds": 289.9750930750015
+  },
+  "final_registry": {
+    "server_state": "IDLE",
+    "active_job": null,
+    "clients_ready_idle": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "channel": 149,
+    "independent_audit_errors": []
+  },
+  "preserved_non_transport_attempt": {
+    "path": "smoke/cli-argument-error",
+    "status": "runner_argparse_only",
+    "runner_returncode": 2,
+    "transport_started": false,
+    "note": "第一次 wrapper 调用误传解释器路径；其 raw/executor/log 已归档，未作为 smoke 传输 retry。"
+  },
+  "file_transfer": "已通过WFB执行1MiB及44770302字节模型双向传输；未向外部消息应用发送文件",
+  "acceptance_boundary": "八端重启后单次完整模型通过，不等于根因已消除、两轮连续验收或最优调度"
+}

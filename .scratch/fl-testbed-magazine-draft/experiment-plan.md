@@ -29,6 +29,8 @@
 
 换频最终确认先于真实心跳的旧事实已由 `66f1535...` 替换，详见[问题17](issues/17-radio-final-confirmation-ready-barrier.md)；此前 fl00 旧卡接收路径问题保留于[问题18](issues/18-server-rx-path-after-restart.md)，本批仅在新物理身份完成后续验证。当前批次状态入口为 `evidence/eight-client-hardware-20261110T202200Z/progress-status.json`。
 
+fl02经用户授权整机重启后，另立[重启后八端续验](evidence/post-fl02-reboot-20261110T142107Z/README.md)，1MiB闭环通过；模型78.192秒下行、289.975秒上行，八端尺寸/SHA、cleanup及独立恢复均通过。当前八端为一次模型完整成功，旧失败独立保留，尚不构成连续两轮最终验收或根因已消除。
+
 ### 2.1.1 历史九客户端批次：保留fl03，排除fl04
 
 当前00／10再次互换后的硬件批次已完成两种FEC各七档、共十四组的筛选。十三组完成九端模型收发并最终独立恢复；FEC8/14的20/10在PREPARE阶段未取得fl05确认，未发送模型主体，不形成吞吐样本。FEC8/14的10/10原恢复审计为false、随后独立恢复通过，两项分别保留。换卡前样本仍作为历史，不混入当前硬件排名。

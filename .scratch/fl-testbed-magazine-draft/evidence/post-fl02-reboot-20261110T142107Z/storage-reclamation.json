@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "batch_id": "post-fl02-reboot-20261110T142107Z",
+  "operation": "exact_success_duplicate_reclamation",
+  "canonical": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "reserve_gate": {
+    "minimum_bytes": 536870912,
+    "model_copy_count": 3,
+    "required_bytes": 671181818,
+    "admission_before": {
+      "fl08": 603426816,
+      "fl09": 581210112
+    },
+    "shortfall_before": {
+      "fl08": 67755002,
+      "fl09": 89971706
+    }
+  },
+  "selection_policy": "Only complete successful model runs with independent size/SHA evidence; excluded fl08 fec12-g30-d5 because its three duplicates were reclaimed in the previous batch; preserve one B2 original per host; retain all failed attempts, logs, manifests, evidence and install files.",
+  "source_success_evidence": [
+    {
+      "host": "fl08",
+      "run_id": "fec12-20261109T071504Z-g20-d5-model",
+      "progress": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d5-model/fec12-20261109T071504Z-g20-d5-model/progress.jsonl",
+      "exact_files": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g20-d5-model-after-exact-uftp-kernel-files.json",
+      "record": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d5-model/run-summary.json"
+    },
+    {
+      "host": "fl09",
+      "run_id": "fec12-20261109T071504Z-g60-d10-model",
+      "progress": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g60-d10-model/fec12-20261109T071504Z-g60-d10-model/progress.jsonl",
+      "exact_files": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g60-d10-model-after-exact-uftp-kernel-files.json",
+      "record": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g60-d10-model/run-summary.json"
+    }
+  ],
+  "hosts": {
+    "fl08": {
+      "status": "complete",
+      "space_before": {"available_bytes": 602943488, "available_inodes": 1607426, "block_bytes": 4096},
+      "space_after": {"available_bytes": 692490240, "available_inodes": 1607428, "block_bytes": 4096},
+      "released_allocated_bytes": 89546752,
+      "b2_original": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "stat_before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44777472, "inode": 545946, "device": 2049, "nlink": 1, "mode": "0o600"},
+        "stat_after": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44777472, "inode": 545946, "device": 2049, "nlink": 1, "mode": "0o600"}
+      },
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546503, "device": 2049, "nlink": 1, "mode": "0o600"},
+          "after": {"exists": false}
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/update.bin",
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546505, "device": 2049, "nlink": 1, "mode": "0o600"},
+          "after": {"exists": false}
+        }
+      ]
+    },
+    "fl09": {
+      "status": "complete",
+      "space_before": {"available_bytes": 580706304, "available_inodes": 1607281, "block_bytes": 4096},
+      "space_after": {"available_bytes": 715026432, "available_inodes": 1607284, "block_bytes": 4096},
+      "released_allocated_bytes": 134320128,
+      "b2_original": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "stat_before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546126, "device": 2049, "nlink": 1, "mode": "0o600"},
+        "stat_after": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546126, "device": 2049, "nlink": 1, "mode": "0o600"}
+      },
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/inbox/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546654, "device": 2049, "nlink": 1, "mode": "0o644"},
+          "after": {"exists": false}
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546656, "device": 2049, "nlink": 1, "mode": "0o600"},
+          "after": {"exists": false}
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/update.bin",
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "before": {"exists": true, "regular": true, "size_bytes": 44770302, "allocated_bytes": 44773376, "inode": 546658, "device": 2049, "nlink": 1, "mode": "0o600"},
+          "after": {"exists": false}
+        }
+      ]
+    }
+  },
+  "post_cleanup_gate": {
+    "fl08_available_bytes": 692490240,
+    "fl09_available_bytes": 715026432,
+    "fl08_meets_required": true,
+    "fl09_meets_required": true,
+    "failed_attempts_deleted": false,
+    "b2_original_deleted": false,
+    "evidence_or_install_deleted": false
+  }
+}

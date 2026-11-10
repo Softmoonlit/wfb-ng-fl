@@ -1,0 +1,1225 @@
+{
+  "admission_type": "post_reclamation_full_nine_board",
+  "wall": 1794321504.8443565,
+  "run_ids": [
+    "post-fl02-20261110T142107Z-smoke",
+    "post-fl02-20261110T142107Z-model"
+  ],
+  "remote_absent": {
+    "post-fl02-20261110T142107Z-smoke": [
+      {
+        "host": "fl00",
+        "command": [
+          "test",
+          "!",
+          "-e",
+          "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl01",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl01",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl02",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl02",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl03",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl03",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl05",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl05",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl06",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl06",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl07",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl07",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl08",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl08",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl09",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl09",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-smoke"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ],
+    "post-fl02-20261110T142107Z-model": [
+      {
+        "host": "fl00",
+        "command": [
+          "test",
+          "!",
+          "-e",
+          "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl01",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl01",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl02",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl02",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl03",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl03",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl05",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl05",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl06",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl06",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl07",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl07",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl08",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl08",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "host": "fl09",
+        "command": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl09",
+          "test '!' -e /srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "12395",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "server",
+            "--tun-name",
+            "fl-s",
+            "--tun-addr",
+            "10.80.0.1/24",
+            "--node-id",
+            "255",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "3",
+            "--air-interface",
+            "wlxfc221c100119",
+            "--known-clients",
+            "1,2,3,4,5,6,7,8,9,10",
+            "--grant-duration-ms",
+            "30",
+            "--guard-interval-ms",
+            "5",
+            "--client-target",
+            "1:10.80.0.11:127.0.0.1:1",
+            "--client-target",
+            "2:10.80.0.12:127.0.0.1:1",
+            "--client-target",
+            "3:10.80.0.13:127.0.0.1:1",
+            "--client-target",
+            "4:10.80.0.14:127.0.0.1:1",
+            "--client-target",
+            "5:10.80.0.15:127.0.0.1:1",
+            "--client-target",
+            "6:10.80.0.16:127.0.0.1:1",
+            "--client-target",
+            "7:10.80.0.17:127.0.0.1:1",
+            "--client-target",
+            "8:10.80.0.18:127.0.0.1:1",
+            "--client-target",
+            "9:10.80.0.19:127.0.0.1:1",
+            "--client-target",
+            "10:10.80.0.20:127.0.0.1:1",
+            "--downlink-pause-threshold-bytes",
+            "131072",
+            "--downlink-resume-threshold-bytes",
+            "65536",
+            "--downlink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c100119",
+          "mac": "fc:22:1c:10:01:19",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.1:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              3,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c100119",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c100119\n\tifindex 21\n\twdev 0x800000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 8\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 52465086464,
+        "available_inodes": 6679850
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-server-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=12375\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "12548",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c1",
+            "--tun-addr",
+            "10.80.0.11/24",
+            "--node-id",
+            "1",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c500bfe",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c500bfe",
+          "mac": "fc:22:1c:50:0b:fe",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c500bfe",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 868614144,
+        "available_inodes": 1534406
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=12531\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "1515",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c2",
+            "--tun-addr",
+            "10.80.0.12/24",
+            "--node-id",
+            "2",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c300f04",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c300f04",
+          "mac": "fc:22:1c:30:0f:04",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c300f04",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c300f04\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 733814784,
+        "available_inodes": 1534486
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=851\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "11821",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c3",
+            "--tun-addr",
+            "10.80.0.13/24",
+            "--node-id",
+            "3",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlx5cffffaf6d8c",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlx5cffffaf6d8c",
+          "mac": "5c:ff:ff:af:6d:8c",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.1:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlx5cffffaf6d8c",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 2604670976,
+        "available_inodes": 1591066
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=11805\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "13483",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c5",
+            "--tun-addr",
+            "10.80.0.15/24",
+            "--node-id",
+            "5",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c100157",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c100157",
+          "mac": "fc:22:1c:10:01:57",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c100157",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 1007439872,
+        "available_inodes": 1571401
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=13466\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "13328",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c6",
+            "--tun-addr",
+            "10.80.0.16/24",
+            "--node-id",
+            "6",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c300cbb",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c300cbb",
+          "mac": "fc:22:1c:30:0c:bb",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c300cbb",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 958480384,
+        "available_inodes": 1607062
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=13311\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "13158",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c7",
+            "--tun-addr",
+            "10.80.0.17/24",
+            "--node-id",
+            "7",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c300e99",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c300e99",
+          "mac": "fc:22:1c:30:0e:99",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c300e99",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 921600000,
+        "available_inodes": 1607275
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=13141\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "13109",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c8",
+            "--tun-addr",
+            "10.80.0.18/24",
+            "--node-id",
+            "8",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlxfc221c500a88",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlxfc221c500a88",
+          "mac": "fc:22:1c:50:0a:88",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlxfc221c500a88",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 692244480,
+        "available_inodes": 1607428
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=13091\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "probe_error": null,
+      "native_count": 1,
+      "native": [
+        {
+          "pid": "13065",
+          "argv": [
+            "/usr/bin/wfb_v6_uplink",
+            "--role",
+            "client",
+            "--tun-name",
+            "fl-c9",
+            "--tun-addr",
+            "10.80.0.19/24",
+            "--node-id",
+            "9",
+            "--link-id",
+            "7669206",
+            "--uplink-stream",
+            "1",
+            "--downlink-stream",
+            "2",
+            "--fec-k",
+            "8",
+            "--fec-n",
+            "12",
+            "--radio-bandwidth",
+            "40",
+            "--radio-control-port",
+            "9200",
+            "--radio-mcs-index",
+            "4",
+            "--air-interface",
+            "wlx88e62852aae4",
+            "--uplink-pause-threshold-bytes",
+            "131072",
+            "--uplink-resume-threshold-bytes",
+            "65536",
+            "--uplink-queue-packets-limit",
+            "64"
+          ],
+          "interface": "wlx88e62852aae4",
+          "mac": "88:e6:28:52:aa:e4",
+          "driver": "rtl88xxau_wfb",
+          "usb_path": "2-1.3:1.0",
+          "usb_speed": "5000",
+          "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+          "queries": {
+            "radio": [
+              1129270605,
+              0,
+              0,
+              0,
+              0,
+              40,
+              4,
+              0,
+              1
+            ],
+            "fec": [
+              1129270605,
+              0,
+              8,
+              12
+            ]
+          },
+          "iw": {
+            "argv": [
+              "iw",
+              "dev",
+              "wlx88e62852aae4",
+              "info"
+            ],
+            "returncode": 0,
+            "stdout": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+            "stderr": ""
+          }
+        }
+      ],
+      "storage": {
+        "available_bytes": 714678272,
+        "available_inodes": 1607284
+      },
+      "service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-client-daemon.service",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=13049\nActiveState=active\nSubState=running\n",
+        "stderr": ""
+      },
+      "stderr": ""
+    }
+  ],
+  "errors": [],
+  "reserve": {
+    "min_storage": 536870912,
+    "model_size": 44770302,
+    "model_copies": 3,
+    "required": 671181818
+  },
+  "source_script": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/post-fl02-reboot-20261110T142107Z/batchhardwareprobe.py"
+}

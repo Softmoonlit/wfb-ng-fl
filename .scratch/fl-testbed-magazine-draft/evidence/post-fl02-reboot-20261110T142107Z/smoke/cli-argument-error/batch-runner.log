@@ -1,0 +1,11 @@
+usage: runner.py [-h] (--payload PAYLOAD | --smoke)
+                 [--model-manifest MODEL_MANIFEST] [--execute]
+                 [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+                 [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+                 [--release-root RELEASE_ROOT]
+                 [--release-commit RELEASE_COMMIT] [--fec-n {12,14}]
+                 [--grant-duration-ms GRANT_DURATION_MS]
+                 [--guard-interval-ms GUARD_INTERVAL_MS]
+                 [--downlink-mcs {3,4}] [--uplink-mcs {4,6}]
+                 [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID] [--output OUTPUT]
+runner.py: error: unrecognized arguments: /usr/bin/python3 /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py
