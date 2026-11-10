@@ -1,0 +1,14 @@
+{
+  "started": 1794311563.073049,
+  "attempts": 1,
+  "device": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.4/1-2.4:1.0",
+  "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+  "before_kernel": "device wlxfca386b38672 left promiscuous mode\ndevice wlxfca386b38672 entered promiscuous mode\n",
+  "stopped": true,
+  "unbind_ok": true,
+  "bind_ok": true,
+  "interface_returned": true,
+  "started_service": true,
+  "after_kernel": "device wlxfca386b38672 left promiscuous mode\nusb 1-2.4: reset high-speed USB device number 13 using tegra-xusb\nrtl88xxau_wfb 1-2.4:1.0 wlxfca386b38672: renamed from wlan0\n",
+  "finished": 1794311565.3411443
+}

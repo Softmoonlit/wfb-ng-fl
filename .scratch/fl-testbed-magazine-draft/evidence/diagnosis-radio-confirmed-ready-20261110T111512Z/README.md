@@ -22,4 +22,15 @@
 
 ## 实机验证
 
-待统一冻结发布后追加：十板源码及运行native摘要、实际射频/FEC/15 W审计，九端小文件闭环与一次模型等量闭环。每个新任务使用唯一run_id；每方向600秒，不自动重试。
+已统一发布`66f15358d309d646d7dca887624a66c46099a54a`至全部十个目标。发布冻结目录为`.scratch/heartbeat-restart/heartbeat-1cd6264d5d6b-20261108T124420Z/heartbeat-66f15358d309-20261110T114225Z/`；单一native工件保持`44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2`，没有重新编译或改变无线参数。
+
+十板独立只读清单确认40个安装源码文件匹配冻结manifest、运行native摘要相同、实际15 W策略限制正确。见`final-source-native-power-inventory.json`。原发布运行审计未通过实际149信道条件：客户端在寻频，服务端未形成九端入网。没有进入文件执行、157换频或模型发送，模型执行数为零。
+
+服务端接收路径出现额外阻断：
+
+1. 首次12秒原始AF_PACKET监控采样中，fl00为零帧；同期fl01捕获144帧，其中98帧为数据帧。采样末两端信道不同，该比较不能据此直接计算链路丢包率，见`post-release-passive.json`。
+2. 标准停止fl00后，对明确MAC`fc:a3:86:b3:86:72`、USB接口`1-2.4:1.0`执行一次驱动解绑/重绑。接口正常重新出现；内核的USB reset为这次主动操作产生，未记录为自发故障。短暂收到部分IDLE请求，但未完成持续入网。见`server-rx-rebind.json`。
+3. 对九客户端执行一次标准重启，未恢复九READY。随后停止完整目标集，仅重新加载绑定fl00专用网卡的`88XXau_wfb`模块；磁盘与原加载源码版本同为`08BBAE7FE71F25B7F0ED54C`，模块SHA为`1a845230125dab762649f80da85ee53bfd494ebaf1a8eb68d43372477a604a13`。按服务端先、客户端后启动，仍未入网。见`server-module-reload.json`与`module-reload-readiness.json`。
+4. 模块重载后的另一12秒原始监控采样仍为零帧，见`post-module-raw-capture.json`。这是接收交付路径异常证据，不证明永久网卡损坏，也不能把采样窗口外缺失报文直接算作物理丢包。
+
+远程受控恢复未完成，停止继续重启和测试。十个参与目标的WFB服务均已标准停止，native PID全部退出，见`controlled-stop.json`；管理网保持可达，fl04未操作。现场需要重插fl00当前专用WFB网卡，保持当前USB口与天线，再从完整十板准入重新验证。软件回归成功不替代这一实机验收。后续阻断另列[问题18](../../issues/18-server-rx-path-after-restart.md)。

@@ -1,0 +1,26 @@
+# fl00服务重启后专用网卡接收路径未恢复
+
+Status: ready-for-human
+
+## 范围与现象
+
+拓扑固定fl00与九客户端`[1,2,3,5,6,7,8,9,10]`，fl04排除。问题17修复`66f1535`已安装至十板，源码、运行native摘要及实际15 W策略限制核验一致。未进入文件发送，不能把本记录作为30/5、FEC或模型吞吐结果。
+
+fl00的WFB接口为`wlxfca386b38672`，MAC`fc:a3:86:b3:86:72`，当前USB接口`1-2.4:1.0`，专用驱动`rtl88xxau_wfb`。发布后九端无法入网；两次12秒原始监控采样均为零帧，中间有短暂IDLE请求到达但没有持续READY。该现象不能证明永久硬件损坏。
+
+## 已完成的受控恢复
+
+- 一次停止服务、确认native退出后的接口解绑/重绑；接口恢复、无枚举失败，但未恢复九端持续入网。
+- 一次九端标准服务重启，未恢复。
+- 一次专用驱动完整模块卸载/加载；原加载与磁盘驱动源码版本匹配、只绑定专用WFB接口；随后按服务端先、客户端后启动，仍未恢复。
+- 未调整230 ms/10秒门限、30/5、RS(8,12)、功率索引、MCS或拓扑，没有重复文件试验。
+
+## 现场动作及续接条件
+
+重插fl00当前专用WFB USB网卡，保持当前插口、网卡和天线。管理网卡不属于本次动作。十板WFB服务已停止、native全部退出；fl04未操作。
+
+重插后重新读回MAC、USB路径/驱动与实际射频，按标准路径启动完整目标集，验证源码、native、FEC、Long GI、15 W、实际149信道、九READY及存储。全部通过后才使用新唯一run_id进行157换频、小文件闭环，再进行一次模型闭环。每方向600秒、不自动重试；物理连接若改变必须如实建立新批次，不能写成严格同连接对比。
+
+## 证据
+
+`../evidence/diagnosis-radio-confirmed-ready-20261110T111512Z/README.md`，以及同目录的`post-release-passive.json`、`server-rx-rebind.json`、`server-module-reload.json`、`post-module-raw-capture.json`、`final-source-native-power-inventory.json`和`controlled-stop.json`。

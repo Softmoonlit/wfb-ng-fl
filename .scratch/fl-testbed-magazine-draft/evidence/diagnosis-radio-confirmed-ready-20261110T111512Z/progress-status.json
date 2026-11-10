@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "task_id": "radio-confirmed-ready-20261110T111512Z",
+  "status": "blocked-physical-fl00-rx",
+  "updated_utc": "2026-11-10T12:04:47.931227+00:00",
+  "owner": "parent",
+  "scope": "ControlPlaneClient dynamic loopback and radio transaction completion ordering",
+  "evidence_root": ".scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z",
+  "baseline": {
+    "source_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "field_symptom": "radio transaction finalized then verify_radio gate sees fl02 HUNTING/CONNECTING with heartbeat_ago 0.01"
+  },
+  "ranked_hypotheses": [
+    {
+      "rank": 1,
+      "hypothesis": "CONFIRMED_ACK precedes real IDLE heartbeat processing",
+      "prediction": "Move final ACK after valid heartbeat; transaction return then observes READY/IDLE"
+    },
+    {
+      "rank": 2,
+      "hypothesis": "real post-confirm heartbeat fails or is rejected",
+      "prediction": "No final ACK and transaction fails within existing confirmation deadline"
+    },
+    {
+      "rank": 3,
+      "hypothesis": "finalized is only radio barrier, not node-ready barrier",
+      "prediction": "Protocol ordering must make final ACK represent ready barrier without changing registry gate"
+    },
+    {
+      "rank": 4,
+      "hypothesis": "old HUNTING heartbeat overwrites new IDLE",
+      "prediction": "same-socket sequence timeline would show a post-IDLE HUNTING packet"
+    },
+    {
+      "rank": 5,
+      "hypothesis": "status read is stale/incorrect",
+      "prediction": "direct registry and public status disagree after ordered heartbeat"
+    }
+  ],
+  "red_test": {
+    "status": "red",
+    "command": "python3 -m pytest -q wfb_ng/tests/test_fl_radio_switch.py -k gated_current_channel_heartbeat -vv",
+    "result": "1 failed, 30 deselected; old implementation emitted RADIO_SWITCH_CONFIRMED_ACK before gated node2 IDLE/current_channel=149 heartbeat was released"
+  },
+  "code_change": "真实当前状态心跳有效ACK后才提交最终确认；失败保留原pending/lease",
+  "regression": {
+    "passed": 125,
+    "seconds": 27.34,
+    "independent_baseline_red_runs": 3,
+    "review": "无阻塞项"
+  },
+  "field_validation": "准入未通过，未换频，未发送文件，模型执行零次",
+  "commit": "66f15358d309d646d7dca887624a66c46099a54a",
+  "code_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+  "published_targets": [
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10",
+    "fl00"
+  ],
+  "source_native_power_verified": true,
+  "controlled_stop_ok": true,
+  "updated_wall": 1794312152.554855
+}
