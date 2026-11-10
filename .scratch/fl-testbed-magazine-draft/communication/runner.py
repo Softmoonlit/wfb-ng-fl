@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""九客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。"""
+"""八客户端通信：模型制品或显式 1MiB 合成冒烟；默认仅生成本地计划。
+
+本批传输前后的 MAC/USB raw inventory 由 batchhardwareprobe.py 独立执行。"""
 import argparse
 import concurrent.futures as futures
 import hashlib
@@ -14,11 +16,11 @@ import subprocess
 import threading
 import time
 
-NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+NODES = [1, 2, 3, 5, 6, 7, 8, 9]
 HOSTS = ['fl00'] + [f'fl{node:02d}' for node in NODES]
 DIRECTORY = Path(__file__).resolve().parent
-RELEASE_COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
-RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
+RELEASE_COMMIT = '66f15358d309d646d7dca887624a66c46099a54a'
+RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z'
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
 DIRECTION_TIMEOUT = 600
 ORCHESTRATION_TIMEOUT = 2 * DIRECTION_TIMEOUT + 90
@@ -67,7 +69,7 @@ def model_manifest_info(path, payload):
 
 
 def audit_final(sessions, record, deadline):
-    """十端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
+    """九端审计必须全部按时通过；射频 HTTP 成功不能替代最终状态证据。"""
     if set(sessions) != set(HOSTS):
         return False
     pending = {h: sessions[h].call('audit_final') for h in HOSTS}
@@ -89,7 +91,7 @@ def audit_final(sessions, record, deadline):
 
 def bundle_sha():
     digest = hashlib.sha256()
-    for name in ['runner.py', 'node_agent.py', 'recover.py']:
+    for name in ['runner.py', 'node_agent.py', 'recover.py', 'check-all-ready.py']:
         digest.update(name.encode() + b'\0' + (DIRECTORY / name).read_bytes())
     return digest.hexdigest()
 
@@ -181,7 +183,7 @@ def scan_upload_progress(run_root):
         if updates.is_symlink():
             continue
         observed = {path.name: path for path in directories(updates)}
-        for node in (1, 2, 3, 5, 6, 7, 8, 9, 10):
+        for node in (1, 2, 3, 5, 6, 7, 8, 9):
             partial, committed_bytes = [], None
             node_dir = observed.get(str(node))
             if node_dir is not None:
@@ -246,7 +248,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
     if radio_patch is None:
         radio_patch = dict(PATCH_DEFAULT)
     if set(sessions) != set(HOSTS):
-        raise RuntimeError("固定十节点会话不齐")
+        raise RuntimeError("固定八客户端会话不齐")
     def phase(action, hosts=HOSTS, **params):
         dispatch_start = time.monotonic()
         record(dict(phase=action, event='dispatch_start', dispatch_start=dispatch_start, hosts=list(hosts)))
@@ -263,7 +265,7 @@ def orchestrate(sessions, record, deadline, run_id, payload, radio_patch=None, e
                 for other in pending:
                     other.cancel()
                 raise RuntimeError(action + ' failed: ' + host) from exc
-    # 全十目标准备成功后，才允许重配事务及角色启动。
+    # 全九目标准备成功后，才允许重配事务及角色启动。
     # 客户端不获知本机源路径，更不会经管理网获取文件内容。
     dispatch_start = time.monotonic()
     record(dict(phase='prepare', event='dispatch_start', dispatch_start=dispatch_start, hosts=HOSTS))
@@ -307,8 +309,8 @@ def main():
     parser.add_argument('--native-sha', required=True, help='本批次显式声明的 native 制品 SHA-256')
     parser.add_argument('--release-root', default=RELEASE_ROOT)
     parser.add_argument('--release-commit', default=RELEASE_COMMIT)
-    parser.add_argument('--fec-n', type=int, choices=(12, 14), default=14)
-    parser.add_argument('--grant-duration-ms', type=int, default=15)
+    parser.add_argument('--fec-n', type=int, choices=(12, 14), default=12)
+    parser.add_argument('--grant-duration-ms', type=int, default=30)
     parser.add_argument('--guard-interval-ms', type=int, default=5)
     parser.add_argument('--downlink-mcs', type=int, choices=(3, 4), default=3)
     parser.add_argument('--uplink-mcs', type=int, choices=(4, 6), default=4)
@@ -467,7 +469,7 @@ def main():
                     rf_response_ok = restored.get('rf_response_ok', result.returncode == 0 and restored['ok'])
                     record(dict(phase='independent_restore', result=restored,
                                 rf_response_ok=rf_response_ok, audited=False))
-                    # 原代理已退出，独立恢复不具备十端最终审计，保守保持失败。
+                    # 原代理已退出，独立恢复不具备九端最终审计，保守保持失败。
                     restore_ok = False
                 except Exception as exc:
                     record(dict(phase='independent_restore', ok=False, error=repr(exc)))

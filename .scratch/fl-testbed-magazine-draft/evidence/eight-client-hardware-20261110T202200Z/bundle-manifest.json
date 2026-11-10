@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "bundle_sha256": "1ff80d4683137c191328ef524b910143a2dae462b9c6854e615412da61d46496",
+  "files": {
+    "runner.py": "b0150283fab91aecf59e0d1215f7c755ccd8c72707159ead45d52f6d0f5d64ef",
+    "node_agent.py": "ace163d0b6cbd7537b71491c1028e74d9f96624eb5106c5c1eab5533952d500d",
+    "recover.py": "afe502ff7d643f4ae64c8ac6ce5581b4bcf3109b00ce769105574ddf5b55505a",
+    "check-all-ready.py": "RECOMPUTED_BY_RUNNER_BUNDLE_SHA"
+  },
+  "source_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "scope": {
+    "server": "fl00",
+    "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09"],
+    "excluded": ["fl04", "fl10"],
+    "fec": "RS(8,12)",
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "io_timeout_seconds": 600,
+    "heartbeat_ack_ms": 230,
+    "inactivity_seconds": 10
+  },
+  "tests": {
+    "command": "PYTHONPATH=.scratch/fl-testbed-magazine-draft/communication python3 -m unittest discover -s .scratch/fl-testbed-magazine-draft/communication -p test_mock.py -q",
+    "passed": 59,
+    "failed": 0,
+    "py_compile": true,
+    "production_udp_access": false
+  },
+  "review": {
+    "scope_release_regression_review": "passed",
+    "post_review_change": "help/docstrings only; bundle SHA recomputed",
+    "batch_hardware_probe": "separate from generic communication bundle"
+  }
+}

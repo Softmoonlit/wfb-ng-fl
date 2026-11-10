@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "status": "model_failed_preserved_final_audit_complete",
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "updated_at_utc": "2026-11-10T13:38:00Z",
+  "topology": {
+    "server": "fl00",
+    "clients": [
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09"
+    ],
+    "excluded": [
+      "fl04",
+      "fl10"
+    ],
+    "client_count": 8,
+    "board_count": 9
+  },
+  "physical_identity": {
+    "fl00_interface": "wlxfc221c100119",
+    "fl00_mac": "fc:22:1c:10:01:19",
+    "fl00_driver": "rtl88xxau_wfb",
+    "fl00_usb_path": "2-1.1:1.0",
+    "fl00_usb_speed": "5000",
+    "hardware_change_detected_pre_post": false,
+    "raw_inventory_model_pre": "model-raw-inventory-pre.json",
+    "raw_inventory_model_post": "model-raw-inventory-post.json",
+    "raw_inventory_smoke": null,
+    "raw_inventory_smoke_note": "Smoke raw was overwritten by subsequent model executor and is not claimed"
+  },
+  "release": {
+    "commit": "66f15358d309d646d7dca887624a66c46099a54a",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "actualargs_sha256_after_rebind": "9c9a832dd15c54032d0bc30a1ee44db451fbe59b55ad787965be02102cb742a0"
+  },
+  "readiness_final": {
+    "server_service": "active",
+    "client_services": "active",
+    "server_state": "IDLE",
+    "active_job": null,
+    "clients_ready_idle": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "radio": "149/HT40/LGI/index18",
+    "fec": "RS(8,12)",
+    "routes_after_cleanup": "clean"
+  },
+  "storage": {
+    "fl08_exact_reclamation": "fl08-storage-reclamation.json",
+    "fl08_available_post_model": 606191616,
+    "hard_minimum_bytes": 536870912,
+    "model_run_failed_preserved": true,
+    "partial_cleanup_or_failed_evidence_deleted": false
+  },
+  "runs": {
+    "failed_prepare_only": "eight-20261110T131800Z-smoke",
+    "smoke_success": "eight-20261110T132200Z-smoke",
+    "smoke_result": "smoke-result.json",
+    "model_failed": "eight-20261110T132500Z-model",
+    "model_progress": "runs/eight-20261110T132500Z-model/progress.jsonl",
+    "model_result": "model-result.json"
+  },
+  "gates": {
+    "tool_scope_review": "passed",
+    "standard_admission": "passed",
+    "raw_inventory_pre_post": "passed; no hardware identity change",
+    "final_recovery_audit_initial": "captured transient fl02 HUNTING/OFFLINE; independent_audit_ok=false",
+    "final_recovery_audit_recheck": "passed; independent_audit_ok=true; source/native/15W/EMC/radio/FEC/READY/job/routes",
+    "fl02_bounded_diagnosis": "captured; no kernel USB/power/thermal event; heartbeat/seek tail retained",
+    "smoke": "passed",
+    "model": "failed at one 600s submit deadline; retained",
+    "final_claim": "not final double-loop acceptance or scheduler optimum"
+  },
+  "fl02_user_authorized_reboot": {
+    "completed": true,
+    "new_boot_id": "2d5d89c7-d14b-4ab0-8842-a7026a2ef6bf",
+    "post_reboot_audit": "fl02-post-reboot-audit.json",
+    "ready_clients": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "model_retried": false
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "host": "fl00",
+  "path": "/etc/systemd/system/wfb-fl-server-daemon.service.d/zzzzz-heartbeat-release.conf",
+  "old_interface": "wlxfca386b38672",
+  "new_interface": "wlxfc221c100119",
+  "old_sha256": "8408723f49def3fc7ee985178560df95e6a950c1d0ad82fa5743dfd5ca786a76",
+  "new_sha256": "7136c67051c5d97108398fdbdabf9cdfac26db38b2760b0d13dae01a3f024387",
+  "effective_args": ["/usr/bin/python3", "-I", "-B", "-m", "wfb_ng.fl.server_daemon", "--config", "/etc/wfb-ng-fl/server.json", "--channel", "149", "--bandwidth-mhz", "40", "--txpower", "18", "--downlink-mcs", "3", "--uplink-mcs", "4", "--uftp-rate-kbps", "15000", "--interface", "wlxfc221c100119"],
+  "daemon_reload": true,
+  "service_started": false,
+  "management_network_modified": false
+}

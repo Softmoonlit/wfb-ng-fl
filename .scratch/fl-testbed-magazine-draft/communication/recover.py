@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""独立回收本轮临时 unit 和专有路由；仅在全端结束后按需恢复射频。"""
+"""独立回收本轮临时 unit 和专有路由；仅在全端结束后按需恢复射频。
+
+本通用回收器不硬编码具体实验网卡身份；批次硬件变化由外层 raw inventory gate 处理。"""
 import json
 import os
 from pathlib import Path
@@ -10,7 +12,7 @@ import sys
 import urllib.request
 
 
-NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+NODES = [1, 2, 3, 5, 6, 7, 8, 9]
 
 
 def run(argv, check=True, timeout=10):
@@ -41,13 +43,13 @@ def main():
         if current != pid or tick != state['resident'][pid]:
             raise ValueError('服务端身份已改变，拒绝沿用旧批次恢复')
         request = urllib.request.Request('http://127.0.0.1:9090/api/v1/radio/reconfigure',
-            data=json.dumps(dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9, 10], patch=state['original'])).encode(),
+            data=json.dumps(dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9], patch=state['original'])).encode(),
             headers={'Content-Type': 'application/json'}, method='POST')
         with urllib.request.urlopen(request, timeout=30) as response:
             result = json.load(response)
         ok = result.get('status') == 'finalized' and result.get('calibration') is False
         ok = ok and all(result['effective_config'][k] == v for k, v in state['original'].items())
-        # 独立恢复缺少原代理十端审计，RF 响应成功不能宣称最终恢复通过。
+        # 独立恢复缺少原代理九端审计，RF 响应成功不能宣称最终恢复通过。
         output = dict(ok=False, rf_response_ok=ok, audited=False, attempted=True, response=result)
         (root / 'independent-restore.json').write_text(json.dumps(output))
         return output

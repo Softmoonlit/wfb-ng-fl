@@ -1,0 +1,14 @@
+{
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+  "file": "actualargs.json",
+  "old_sha256": "3ff77aa91cf458ce85c743dad37c0435719f638d4a1ed92dfc599c44751e280f",
+  "old_interface": "wlxfca386b38672",
+  "new_interface": "wlxfc221c100119",
+  "reason": "new physical fl00 adapter; current effective ExecStart must match prepare release identity",
+  "payload_sent_before_fix": 0,
+  "old_failure_run_id": "eight-20261110T131800Z-smoke",
+  "old_failure": "prepare fl00 release actualargs mismatch",
+  "old_content": ["/usr/bin/python3", "-I", "-B", "-m", "wfb_ng.fl.server_daemon", "--config", "/etc/wfb-ng-fl/server.json", "--channel", "149", "--bandwidth-mhz", "40", "--txpower", "18", "--downlink-mcs", "3", "--uplink-mcs", "4", "--uftp-rate-kbps", "15000", "--interface", "wlxfca386b38672"],
+  "new_content": ["/usr/bin/python3", "-I", "-B", "-m", "wfb_ng.fl.server_daemon", "--config", "/etc/wfb-ng-fl/server.json", "--channel", "149", "--bandwidth-mhz", "40", "--txpower", "18", "--downlink-mcs", "3", "--uplink-mcs", "4", "--uftp-rate-kbps", "15000", "--interface", "wlxfc221c100119"]
+}

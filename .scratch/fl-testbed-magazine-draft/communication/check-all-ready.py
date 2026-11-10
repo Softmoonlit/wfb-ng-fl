@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""只读检查完整九客户端是否真正可开始通信，失败返回非零。"""
+"""只读检查完整八客户端是否真正可开始通信，失败返回非零。"""
 import concurrent.futures
 import json
 import subprocess
 import sys
 import urllib.request
 
-NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+NODES = [1, 2, 3, 5, 6, 7, 8, 9]
 with urllib.request.urlopen('http://127.0.0.1:9090/api/v1/status', timeout=4) as response:
     status = json.load(response)
 

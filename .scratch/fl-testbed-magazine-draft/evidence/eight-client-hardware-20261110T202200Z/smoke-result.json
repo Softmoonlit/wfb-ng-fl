@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "run_id": "eight-20261110T132200Z-smoke",
+  "status": "success",
+  "mode": "smoke",
+  "payload": {"size_bytes": 1048576, "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"},
+  "radio": {"baseline": "149/HT40/LGI/index18", "candidate": "157/HT40/LGI/index18", "fec": "RS(8,12)", "grant_duration_ms": 30, "guard_interval_ms": 5, "uftp_rate_kbps": 12000},
+  "result": {"transfer_verified": true, "cleanup_ok": true, "restore_ok": true, "automatic_retry": false},
+  "clients": [1,2,3,5,6,7,8,9],
+  "verify_files": "runs/eight-20261110T132200Z-smoke/progress.jsonl phase=verify",
+  "raw_inventory_pre": null,
+  "raw_inventory_post": null,
+  "raw_inventory_note": "Smoke raw inventory was overwritten by the subsequent model executor before it was copied; no independent smoke raw inventory is claimed.",
+  "executor_result": "executor-result.json",
+  "failed_prior_attempt": "runs/eight-20261110T131800Z-smoke/progress.jsonl; prepare-only release actualargs mismatch; payload=0",
+  "model_gate": {"fl08_available_after_smoke": 742969344, "hard_minimum_bytes": 536870912, "model_size_bytes": 44770302, "three_copy_reserve_threshold": 671181818, "pass": true}
+}

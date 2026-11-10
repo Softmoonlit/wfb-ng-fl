@@ -1,0 +1,35 @@
+{
+  "old_boot_id": "8c60fa57-ef3e-47a7-a433-f91fb4d8917b",
+  "attempts": [
+    {
+      "wall": 1794319511.8564563,
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.192 port 22: Connection timed out\n"
+    },
+    {
+      "wall": 1794319517.8733575,
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.192 port 22: Connection timed out\n"
+    },
+    {
+      "wall": 1794319523.891363,
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.192 port 22: Connection timed out\n"
+    },
+    {
+      "wall": 1794319529.9083817,
+      "returncode": 255,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.192 port 22: Connection timed out\n"
+    },
+    {
+      "wall": 1794319535.0435739,
+      "returncode": 0,
+      "stdout": "2d5d89c7-d14b-4ab0-8842-a7026a2ef6bf\n",
+      "stderr": ""
+    }
+  ]
+}

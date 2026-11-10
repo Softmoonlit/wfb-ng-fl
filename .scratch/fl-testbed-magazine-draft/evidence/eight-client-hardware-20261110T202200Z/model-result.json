@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "run_id": "eight-20261110T132500Z-model",
+  "status": "failed_preserved",
+  "mode": "model",
+  "payload": {"size_bytes": 44770302, "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"},
+  "radio": {"baseline": "149/HT40/LGI/index18", "candidate": "157/HT40/LGI/index18", "restored": "149/HT40/LGI/index18", "fec": "RS(8,12)", "grant_duration_ms": 30, "guard_interval_ms": 5, "uftp_rate_kbps": 12000},
+  "result": {
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false,
+    "rf_response_ok": true,
+    "final_audit_after_independent_restore": false,
+    "automatic_retry": false,
+    "failure": "FLRuntimeError: 轮次等待 update 超时，未达到最小配额: 期望 8",
+    "failed_node": "fl02",
+    "failed_node_observed_bytes": 15466496,
+    "failed_node_observed_sha": null,
+    "completed_clients": [1,3,5,6,7,8,9],
+    "client_update_sent_only": [1,3,5,6,7,8,9],
+    "server_independent_sha_verified_clients": [],
+    "server_phase_verify_reached": false,
+    "server_update_audit": "fl02-model-server-update-audit.json",
+    "missing_client": 2
+  },
+  "timing": {
+    "publish_seconds": 69.24881576700136,
+    "submit_hard_deadline_seconds": 600,
+    "submit_last_completed_seconds": 236.2398546889999
+  },
+  "evidence": {
+    "progress": "runs/eight-20261110T132500Z-model/progress.jsonl",
+    "runner_log": "runs/eight-20261110T132500Z-model/runner.log",
+    "raw_inventory_pre": "model-raw-inventory-pre.json",
+    "raw_inventory_post": "model-raw-inventory-post.json",
+    "executor_result": "executor-result.json",
+    "partial_upload_samples": "progress.jsonl phase=upload_progress",
+    "server_update_audit": "fl02-model-server-update-audit.json",
+    "model_manifest": ".scratch/fl-testbed-magazine-draft/evidence/model-sized-four-20261106T173222Z/model-manifest.json"
+  },
+  "boundary": "本批一小文件 smoke 成功；本次模型闭环失败并保留，不能声称最终双闭环验收、调度最优或物理更换最终成功。"
+}

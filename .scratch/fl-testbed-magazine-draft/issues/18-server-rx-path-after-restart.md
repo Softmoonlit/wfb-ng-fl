@@ -1,6 +1,6 @@
 # fl00服务重启后专用网卡接收路径未恢复
 
-Status: ready-for-human
+Status: resolved
 
 ## 范围与现象
 
@@ -23,4 +23,7 @@ fl00的WFB接口为`wlxfca386b38672`，MAC`fc:a3:86:b3:86:72`，当前USB接口`
 
 ## 证据
 
-`../evidence/diagnosis-radio-confirmed-ready-20261110T111512Z/README.md`，以及同目录的`post-release-passive.json`、`server-rx-rebind.json`、`server-module-reload.json`、`post-module-raw-capture.json`、`final-source-native-power-inventory.json`和`controlled-stop.json`。
+
+## Comments
+
+- 2026-11-10：用户已改为更换 fl00 专用卡并建立 server+八客户端新批次；新卡完成标准准入和 1MiB smoke 下行/上行闭环，说明旧卡接收路径阻断的受控 action 已完成。该结果不证明原卡故障根因，也不把 USB/温度现象解释为硬件根因。旧卡问题的现场阻断已解除，模型长尾另立问题19，不改变本问题的历史证据。

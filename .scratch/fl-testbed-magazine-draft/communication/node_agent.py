@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""冻结安装角色的 JSONL 代理；不拥有常驻 native、daemon 或 TUN。"""
+"""冻结安装角色的 JSONL 代理；不拥有常驻 native、daemon 或 TUN。
+
+本通用代理不硬编码具体实验网卡身份；批次硬件身份由外层 raw inventory gate 核验。"""
 import contextlib
 import fcntl
 import hashlib
@@ -17,14 +19,14 @@ import sys
 import time
 import urllib.request
 
-COMMIT = '88099f04ffaee56c576bb35a9e50baec5f1113d7'
-RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-88099f04ffae-20261108T100120Z'
+COMMIT = '66f15358d309d646d7dca887624a66c46099a54a'
+RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z'
 # fl00 实际 PATH 中的 UFTP 5.0.3；运行依赖独立于 release 源码 manifest。
 UFTP_SHA256 = {
     'uftp': '71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3',
     'uftpd': '0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9',
 }
-NODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+NODES = [1, 2, 3, 5, 6, 7, 8, 9]
 GROUPS = ['239.80.41.1/32', '239.80.42.1/32']
 PATCH = dict(channel=157, bandwidth_mhz=40, downlink_mcs=3, uplink_mcs=4,
              radio_txpower_dbm=18, uftp_rate_kbps=12000)
@@ -497,7 +499,7 @@ class Node:
                 require(current == tick, 'resident identity changed: ' + pid)
             actual['nvpmodel'] = run(['nvpmodel', '-q'])
             require(actual['nvpmodel'].strip() == 'NV Power Mode: 15W\n0', 'nvpmodel mismatch')
-            # 路径来自既有十端 board-power 审计及 audit-jtop.py，仅只读。
+            # 路径来自既有板级审计及 audit-jtop.py，仅只读。
             expected = {'/sys/devices/system/cpu/online': '0-5',
                         '/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq': '612000000',
                         '/sys/kernel/nvpmodel_clk_cap/emc': '2133000000',

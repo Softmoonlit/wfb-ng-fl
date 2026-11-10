@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "host": "fl08",
+  "run_id": "fec12-20261109T071504Z-g30-d5-model",
+  "status": "deleted_exact_duplicate",
+  "canonical": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "source_success_evidence": {
+    "progress": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g30-d5-model/fec12-20261109T071504Z-g30-d5-model/progress.jsonl",
+    "exact_files": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g30-d5-model-after-exact-uftp-kernel-files.json",
+    "independent_cleanup": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g30-d5-model/exact-cache-reclamation/cleanup-manifest.json"
+  },
+  "before": [
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin", "size_bytes": 44770302, "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96", "inode": 546529, "device": 2049, "nlink": 1, "regular": true, "matches": true},
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin", "size_bytes": 44770302, "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96", "inode": 546531, "device": 2049, "nlink": 1, "regular": true, "matches": true},
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/update.bin", "size_bytes": 44770302, "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96", "inode": 546533, "device": 2049, "nlink": 1, "regular": true, "matches": true}
+  ],
+  "available_before": 612433920,
+  "deleted_paths": [
+    "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+    "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+    "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/update.bin"
+  ],
+  "after": [
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin", "exists": false},
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin", "exists": false},
+    {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/update.bin", "exists": false}
+  ],
+  "free_after": 746758144,
+  "released_bytes": 134324224,
+  "failed_partials_deleted": false,
+  "b2_original_deleted": false,
+  "evidence_or_install_deleted": false,
+  "remote_raw_source": "command output captured in this manifest; original successful progress/partial evidence paths retained"
+}

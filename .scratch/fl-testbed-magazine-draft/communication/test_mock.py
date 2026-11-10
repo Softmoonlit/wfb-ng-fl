@@ -18,8 +18,8 @@ import node_agent
 
 
 NATIVE_FIXTURE_SHA = hashlib.sha256(b'local native fixture').hexdigest()
-EXPECTED_NATIVE = dict(native_sha=NATIVE_FIXTURE_SHA, fec_k=8, fec_n=14,
-                       grant_duration_ms=15, guard_interval_ms=5)
+EXPECTED_NATIVE = dict(native_sha=NATIVE_FIXTURE_SHA, fec_k=8, fec_n=12,
+                       grant_duration_ms=30, guard_interval_ms=5)
 
 
 class MockTests(unittest.TestCase):
@@ -50,9 +50,9 @@ class MockTests(unittest.TestCase):
             paths[name] = str(path)
         return paths, {name: node_agent.sha(path) for name, path in paths.items()}
 
-    def test_complete_fixed_nine_client_scope_and_600_second_budgets(self):
-        self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in [1, 2, 3, 5, 6, 7, 8, 9, 10]])
-        self.assertEqual(runner.NODES, [1, 2, 3, 5, 6, 7, 8, 9, 10])
+    def test_complete_fixed_eight_client_scope_and_600_second_budgets(self):
+        self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in [1, 2, 3, 5, 6, 7, 8, 9]])
+        self.assertEqual(runner.NODES, [1, 2, 3, 5, 6, 7, 8, 9])
         self.assertEqual(node_agent.NODES, runner.NODES)
         self.assertEqual(self.node('fl03').node, 3)
         timing = runner.TIMING
@@ -79,7 +79,7 @@ class MockTests(unittest.TestCase):
         starts = [record for record in records if record.get('event') == 'dispatch_start']
         self.assertEqual([record['phase'] for record in starts], [
             'prepare', 'acquire_radio', 'verify_radio', 'start_receive', 'publish', 'submit', 'verify'])
-        self.assertEqual(len(calls), 5 * 10 + 2)
+        self.assertEqual(len(calls), 5 * 9 + 2)
 
     def test_upload_scanner_real_files_missing_cleanup_and_isolation(self):
         root = Path(self.temporary.name) / 'run'
@@ -423,14 +423,17 @@ class MockTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, 'expected native'):
                     node.prepare('rejectsha', {}, runner.TIMING, expected_native=metadata)
 
-    def test_fixed_nine_scope_rejects_missing_nine_extra_four_and_hunt_with_fresh_facts(self):
-        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+    def test_fixed_eight_scope_rejects_missing_eight_extra_four_extra_ten_and_hunt_with_fresh_facts(self):
+        expected = [1, 2, 3, 5, 6, 7, 8, 9]
         self.assertEqual(recover.NODES, expected)
         self.assertNotIn('fl04', runner.HOSTS)
-        with self.assertRaisesRegex(RuntimeError, 'unexpected host'):
-            self.node('fl04')
-        for hosts in ([host for host in runner.HOSTS if host != 'fl09'], runner.HOSTS + ['fl04']):
-            with self.assertRaisesRegex(RuntimeError, '固定十节点会话不齐'):
+        self.assertNotIn('fl10', runner.HOSTS)
+        for extra in ('fl04', 'fl10'):
+            with self.assertRaisesRegex(RuntimeError, 'unexpected host'):
+                self.node(extra)
+        for hosts in ([host for host in runner.HOSTS if host != 'fl09'],
+                      runner.HOSTS + ['fl04'], runner.HOSTS + ['fl10']):
+            with self.assertRaisesRegex(RuntimeError, '固定八客户端会话不齐'):
                 runner.orchestrate(dict.fromkeys(hosts), lambda value: None,
                                    time.monotonic() + 1, 'fixed-scope', self.payload)
         node = self.node()
@@ -463,20 +466,22 @@ class MockTests(unittest.TestCase):
         (root / 'role/rounds/1/updates/4/update.bin').write_bytes(b'excluded')
         self.assertEqual([row['node'] for row in runner.scan_upload_progress(root)['nodes']], expected)
 
-    def test_check_all_ready_fixed_scope_requires_all_ready_and_rejects_extra_four(self):
+    def test_check_all_ready_fixed_scope_requires_all_ready_and_rejects_extra_four_and_ten(self):
         source = runner.DIRECTORY / 'check-all-ready.py'
-        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+        expected = [1, 2, 3, 5, 6, 7, 8, 9]
         for assignment in ast.parse(source.read_text()).body:
             if isinstance(assignment, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'NODES' for t in assignment.targets):
                 self.assertEqual(ast.literal_eval(assignment.value), expected)
         good = dict(active_job=None, server_state='IDLE', nodes={str(n): dict(
             readiness='READY', reported_state='IDLE') for n in expected})
-        for change, exit_code in [('ready', 0), ('missing9', 1), ('extra4', 1), ('hunt9', 1)]:
+        for change, exit_code in [('ready', 0), ('missing9', 1), ('extra4', 1), ('extra10', 1), ('hunt9', 1)]:
             status = json.loads(json.dumps(good))
             if change == 'missing9':
                 status['nodes'].pop('9')
             elif change == 'extra4':
                 status['nodes']['4'] = dict(readiness='READY', reported_state='IDLE')
+            elif change == 'extra10':
+                status['nodes']['10'] = dict(readiness='READY', reported_state='IDLE')
             elif change == 'hunt9':
                 status['nodes']['9']['reported_state'] = 'HUNT'
             reply = io.BytesIO(json.dumps(status).encode())
@@ -540,7 +545,7 @@ class MockTests(unittest.TestCase):
         self.assertEqual(tools['uftpd']['sha256'], digests['uftpd'])
 
     def test_prepare_rejects_uftp_hash_before_frozen_release_checks(self):
-        node = self.node('fl10')
+        node = self.node('fl09')
         paths, digests = self.uftp_fixture()
         Path(paths['uftpd']).write_bytes(b'UFTP version 4.10.2\x00wrong executable')
         root = Path(self.temporary.name)
@@ -625,7 +630,7 @@ class MockTests(unittest.TestCase):
                 'node_agent.urllib.request.urlopen', return_value=reply) as http:
             result = node.radio_transaction('reconfigure', node_agent.PATCH)
         body = json.loads(http.call_args.args[0].data)
-        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9, 10], patch=node_agent.PATCH))
+        self.assertEqual(body, dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9], patch=node_agent.PATCH))
         self.assertIs(result['calibration'], False)
 
     def test_start_receive_passes_configured_rate_to_server_role(self):
@@ -773,7 +778,7 @@ class MockTests(unittest.TestCase):
             spawn.assert_not_called()
 
     def test_missing_target_rejected_before_prepare(self):
-        with self.assertRaisesRegex(RuntimeError, '十节点会话不齐'):
+        with self.assertRaisesRegex(RuntimeError, '固定八客户端会话不齐'):
             runner.orchestrate({h: None for h in runner.HOSTS if h != 'fl09'},
                                lambda v: None, time.monotonic() + 1, 'mock', self.payload)
 
@@ -829,7 +834,7 @@ class MockTests(unittest.TestCase):
         node.runtime.wait_for_updates.return_value = {1: 'a', 2: 'b', 4: 'c'}
         with self.assertRaisesRegex(RuntimeError, 'missing updates'):
             node.submit()
-        node.runtime.wait_for_updates.assert_called_once_with(min_updates=9, timeout=600)
+        node.runtime.wait_for_updates.assert_called_once_with(min_updates=8, timeout=600)
         node.runtime.wait_for_updates.return_value = {n: self.payload_path for n in runner.NODES}
         node.submit()
         self.assertEqual(set(node.verify()['files']), {str(n) for n in runner.NODES})
@@ -849,7 +854,7 @@ class MockTests(unittest.TestCase):
         node.fact.assert_called_once_with('registry_gate', status=status, online=runner.NODES)
 
     def test_fixed_complete_topology_and_registry(self):
-        expected = [1, 2, 3, 5, 6, 7, 8, 9, 10]
+        expected = [1, 2, 3, 5, 6, 7, 8, 9]
         self.assertEqual(runner.NODES, expected)
         self.assertEqual(node_agent.NODES, expected)
         self.assertEqual(runner.HOSTS, ['fl00'] + [f'fl{n:02d}' for n in expected])
@@ -860,10 +865,10 @@ class MockTests(unittest.TestCase):
             readiness='READY', reported_state='IDLE', error_code=None) for n in expected})
         with patch('node_agent.get_json', return_value=status):
             node.registry_gate()
-            status['nodes'].pop('10')
+            status['nodes'].pop('9')
             with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
                 node.registry_gate()
-            status['nodes']['11'] = dict(readiness='READY')
+            status['nodes']['10'] = dict(readiness='READY')
             with self.assertRaisesRegex(RuntimeError, 'online target set mismatch'):
                 node.registry_gate()
 
@@ -968,7 +973,7 @@ class MockTests(unittest.TestCase):
                 events.append((self.host, action))
                 future = futures.Future()
                 if action == 'publish':
-                    if self.host == 'fl10':
+                    if self.host == 'fl09':
                         future.set_exception(RuntimeError('publish failed'))
                     else:
                         future.set_running_or_notify_cancel()
@@ -980,9 +985,9 @@ class MockTests(unittest.TestCase):
                 events.append((self.host, 'dispose'))
         reply = Mock(returncode=0, stdout=json.dumps(dict(ok=cleanup_result)), stderr='')
         def independent(argv, **kwargs):
-            self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
+            self.assertEqual(sum(action == 'dispose' for _, action in events), len(runner.HOSTS))
             if '--restore' in argv:
-                self.assertEqual(sum(action == 'independent_stop' for _, action in events), 10)
+                self.assertEqual(sum(action == 'independent_stop' for _, action in events), len(runner.HOSTS))
                 events.append(('fl00', 'independent_restore'))
             else:
                 events.append(('owned-unit', 'independent_stop'))
@@ -996,15 +1001,15 @@ class MockTests(unittest.TestCase):
                 'sys.stdout', new_callable=io.StringIO):
             self.assertEqual(runner.main(), 1)
         self.assertLess(time.monotonic() - started, 2)
-        self.assertEqual(len(blocked), 9)
+        self.assertEqual(len(blocked), len(runner.HOSTS) - 1)
         self.assertTrue(all(not future.done() for future in blocked))
         self.assertFalse(any(action in ('submit', 'verify', 'close', 'release_radio') for _, action in events))
-        self.assertEqual(sum(action == 'dispose' for _, action in events), 10)
-        self.assertEqual(run.call_count, 11 if cleanup_result is True else 10)
+        self.assertEqual(sum(action == 'dispose' for _, action in events), len(runner.HOSTS))
+        self.assertEqual(run.call_count, len(runner.HOSTS) + 1 if cleanup_result is True else len(runner.HOSTS))
         if cleanup_result is not True:
             self.assertFalse(any(action == 'independent_restore' for _, action in events))
         records = [json.loads(line) for line in (Path(self.temporary.name) / run_id / 'progress.jsonl').read_text().splitlines()]
-        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), 10)
+        self.assertEqual(sum(r['phase'] == 'independent_cleanup' for r in records), len(runner.HOSTS))
         self.assertFalse(records[-1]['transfer_verified'])
         self.assertFalse(records[-1]['restore_ok'])
 

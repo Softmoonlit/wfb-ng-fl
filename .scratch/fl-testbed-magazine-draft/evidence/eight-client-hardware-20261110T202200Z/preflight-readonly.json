@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "captured_at": "2026-11-10T20:31:00+08:00",
+  "method": "read-only local fl00 and SSH inventory for participating eight clients",
+  "topology": {
+    "server": "fl00",
+    "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09"],
+    "excluded_not_queried": ["fl04", "fl10"]
+  },
+  "storage": {
+    "hard_minimum_bytes": 536870912,
+    "preferred_bytes": 1073741824,
+    "available_bytes": {
+      "fl00": 52937445376,
+      "fl01": 1012637696,
+      "fl02": 865468416,
+      "fl03": 2750554112,
+      "fl05": 1153265664,
+      "fl06": 1104482304,
+      "fl07": 1067225088,
+      "fl08": 613810176,
+      "fl09": 725417984
+    },
+    "hard_gate": "pass",
+    "below_preferred_1GiB": ["fl02", "fl08", "fl09"],
+    "partial_or_model_cleanup_requested": false,
+    "storage_maintenance_scope_changed": false
+  },
+  "power": {
+    "nvpmodel": "NV Power Mode: 15W\\n0",
+    "cpu_online": "0-5",
+    "gpu_max_freq": "612000000",
+    "emc_cap": "2133000000",
+    "cpu_max_freq_all_six": "1497600",
+    "emc_rate_locked": "not readable without elevated debugfs permission; no write attempted",
+    "all_readable_limits_match_expected": true
+  },
+  "services_and_residue": {
+    "wfb_services": "inactive on all nine participating boards",
+    "native_processes": "none observed on fl00; no WFB native observed by participating client inventory",
+    "old_comm_units": "none listed on all nine participating boards",
+    "dedicated_multicast_routes": "none on all nine participating boards",
+    "packagekit": "active/static on all queried boards; no apt/dpkg process observed",
+    "management_network_modified": false
+  },
+  "probe_note": "Initial SSH attempt to local fl00 was rejected by local host-key verification; fl00 was then checked locally. This is a probe-path correction, not a WFB runtime failure."
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "batch_id": "eight-client-hardware-20261110T202200Z",
+  "release_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+  "manifest_files_count": 40,
+  "manifest_native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "native_paths": {
+    "release_source": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z/source/wfb_v6_uplink",
+    "installed": "/usr/bin/wfb_v6_uplink"
+  },
+  "native_sha256_by_path": {
+    "release_source": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "installed": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+  },
+  "source_manifest_installed_root": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl",
+  "expected_native_parameters": {
+    "fec_k": 8,
+    "fec_n": 12,
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5
+  },
+  "actualargs": {
+    "path": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z/actualargs.json",
+    "sha256": "9c9a832dd15c54032d0bc30a1ee44db451fbe59b55ad787965be02102cb742a0",
+    "fl00_interface": "wlxfc221c100119"
+  },
+  "verification": "read-only release manifest/native inventory plus current proc/loaded source prepare audit; actualargs atomically rebound to new fl00 interface"
+}
