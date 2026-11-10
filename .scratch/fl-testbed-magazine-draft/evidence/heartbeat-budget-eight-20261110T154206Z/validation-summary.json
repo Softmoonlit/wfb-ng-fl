@@ -1,0 +1,30 @@
+{
+  "batch_id": "heartbeat-budget-eight-20261110T154206Z",
+  "thresholds_unchanged": {
+    "ack_budget_ms": 230,
+    "offline_seconds": 10
+  },
+  "idle_summary": "power02-recovery-20261110T161403Z/idle-20261110T1615Z/idle-summary.json",
+  "idle_counts": {
+    "request_count": 464,
+    "paired_confirmed_count": 463,
+    "timely_count": 462,
+    "late_count": 1,
+    "unmatched_count": 0,
+    "right_censored_count": 1
+  },
+  "ratio": 0.9978401727861771,
+  "model_payload_sent": false,
+  "model_evidence": "model-20261110T1606Z/model-preflight-failure.json",
+  "confirmed_power_events": [
+    "fl03上一模型清理时断电，用户已重启",
+    "fl02本轮准备中断电，用户已重启；恢复后另采120秒空闲"
+  ],
+  "final_blockers": [
+    "fl08: SSH No route to host，registry OFFLINE",
+    "fl09: SSH No route to host、ping无响应、邻居INCOMPLETE，registry OFFLINE"
+  ],
+  "final_power_cause_unconfirmed": true,
+  "application_acceptance_observed": false,
+  "conclusion": "空闲旁路候选462/463在230ms内；尚无模型负载测量，不能选定新阈值，保留230ms与10秒。"
+}

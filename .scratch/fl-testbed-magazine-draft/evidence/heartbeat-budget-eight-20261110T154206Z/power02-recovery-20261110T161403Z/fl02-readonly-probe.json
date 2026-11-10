@@ -1,0 +1,188 @@
+{
+  "probe_type": "fl02_post_power_recovery_readonly",
+  "captured_at_wall_ns": 1794327291844096947,
+  "captured_at_mono_ns": 91205929984,
+  "host": "fl02",
+  "boot_id": "8ec76341-ea5e-455e-a007-a2c182a60469",
+  "uptime": "91.20 454.59",
+  "power_query": {
+    "argv": [
+      "nvpmodel",
+      "-q"
+    ],
+    "returncode": 0,
+    "stdout": "NV Power Mode: 15W\n0\n",
+    "stderr": ""
+  },
+  "power_service": {
+    "argv": [
+      "systemctl",
+      "show",
+      "nvpmodel.service",
+      "-p",
+      "Result",
+      "-p",
+      "ExecMainStatus",
+      "-p",
+      "ActiveState"
+    ],
+    "returncode": 0,
+    "stdout": "Result=success\nExecMainStatus=0\nActiveState=inactive\n",
+    "stderr": ""
+  },
+  "service": {
+    "argv": [
+      "systemctl",
+      "show",
+      "wfb-fl-client-daemon.service",
+      "-p",
+      "ActiveState",
+      "-p",
+      "SubState",
+      "-p",
+      "MainPID"
+    ],
+    "returncode": 0,
+    "stdout": "MainPID=862\nActiveState=active\nSubState=running\n",
+    "stderr": ""
+  },
+  "daemon_pid": 862,
+  "daemon_argv": [
+    "/usr/bin/python3",
+    "-I",
+    "-B",
+    "-m",
+    "wfb_ng.fl.client_daemon",
+    "--config",
+    "/etc/wfb-ng-fl/node.json",
+    "--work-dir",
+    "/srv/wfb-ng-fl/client",
+    "--channel",
+    "149",
+    "--bandwidth-mhz",
+    "40",
+    "--radio-txpower-dbm",
+    "18",
+    "--uplink-mcs",
+    "4",
+    "--interface",
+    "wlxfc221c300f04",
+    "--fec-n",
+    "12"
+  ],
+  "native": [
+    {
+      "pid": "1489",
+      "argv": [
+        "/usr/bin/wfb_v6_uplink",
+        "--role",
+        "client",
+        "--tun-name",
+        "fl-c2",
+        "--tun-addr",
+        "10.80.0.12/24",
+        "--node-id",
+        "2",
+        "--link-id",
+        "7669206",
+        "--uplink-stream",
+        "1",
+        "--downlink-stream",
+        "2",
+        "--fec-k",
+        "8",
+        "--fec-n",
+        "12",
+        "--radio-bandwidth",
+        "40",
+        "--radio-control-port",
+        "9200",
+        "--radio-mcs-index",
+        "4",
+        "--air-interface",
+        "wlxfc221c300f04",
+        "--uplink-pause-threshold-bytes",
+        "131072",
+        "--uplink-resume-threshold-bytes",
+        "65536",
+        "--uplink-queue-packets-limit",
+        "64"
+      ],
+      "proc_exe": "/usr/bin/wfb_v6_uplink",
+      "proc_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "interface": "wlxfc221c300f04",
+      "mac": "fc:22:1c:30:0f:04",
+      "driver": "rtl88xxau_wfb",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000",
+      "radio_query": {
+        "address": [
+          "127.0.0.1",
+          9200
+        ],
+        "request_hex": "434f4d4d04",
+        "raw_hex": "434f4d4d0000000000000028040001",
+        "decoded": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ]
+      },
+      "fec_query": {
+        "address": [
+          "127.0.0.1",
+          9200
+        ],
+        "request_hex": "434f4d4d03",
+        "raw_hex": "434f4d4d00000000080c",
+        "decoded": [
+          1129270605,
+          0,
+          8,
+          12
+        ]
+      },
+      "iw": {
+        "argv": [
+          "iw",
+          "dev",
+          "wlxfc221c300f04",
+          "info"
+        ],
+        "returncode": 0,
+        "stdout": "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "release": {
+    "root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+    "commit": "66f15358d309d646d7dca887624a66c46099a54a",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "source_native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "installed_native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "identity": {
+      "commit": "66f15358d309d646d7dca887624a66c46099a54a",
+      "schema_version": 1
+    }
+  },
+  "kernel_recent": {
+    "argv": [
+      "journalctl",
+      "-k",
+      "--since=-10 minutes",
+      "--no-pager",
+      "-o",
+      "short-iso"
+    ],
+    "returncode": 0,
+    "stdout": "-- No entries --\n",
+    "stderr": ""
+  }
+}

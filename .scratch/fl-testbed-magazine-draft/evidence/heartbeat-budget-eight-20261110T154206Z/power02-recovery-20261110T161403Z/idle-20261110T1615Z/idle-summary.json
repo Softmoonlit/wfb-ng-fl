@@ -1,0 +1,438 @@
+{
+  "schema_version": 3,
+  "phase": "idle_after_fl02_power_recovery",
+  "task_id": "heartbeat-budget-eight-20261110T154206Z",
+  "run_id": "idle-20261110T1615Z",
+  "power02_environment_interruption_confirmed": true,
+  "fl02_recovery_probe": "fl02-readonly-probe.json",
+  "fl02_boot_id": "8ec76341-ea5e-455e-a007-a2c182a60469",
+  "fl02_power": "NV Power Mode: 15W / mode 0",
+  "client_only": true,
+  "server_capture": "forbidden_not_run",
+  "tool_sha256": "30b03bda86536fe12e2f502ca26b7bc822defb8f3cd4ca8fd4a7758af54e3dd7",
+  "deadline_ms": 230,
+  "deadline_comparison": "strictly less than 230ms",
+  "offline_threshold_seconds": 10,
+  "anchor_observed": false,
+  "application_acceptance_observed": false,
+  "old_power_interrupted_idle_excluded": true,
+  "old_idle_run": "../heartbeat-budget-eight-20261110T154206Z/idle-20261110T1602Z",
+  "rows": [
+    {
+      "host": "fl01",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000136356,
+      "request_count": 58,
+      "paired_confirmed_count": 57,
+      "timely_count": 57,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 1,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 45.244918,
+        "p50": 49.509796,
+        "p95": 78.660536,
+        "max": 84.975594
+      },
+      "identity_session_channel_summary": {
+        "1/e3c24ee98a844ab5aa2163250250accf/ff03b2d151aaba931fc31a72980569523b7069fa450b95934966da6633599a37/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 57,
+          "timely_count": 57,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 1,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "1/e3c24ee98a844ab5aa2163250250accf/ff03b2d151aaba931fc31a72980569523b7069fa450b95934966da6633599a37/149": 2106.497739
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "1/e3c24ee98a844ab5aa2163250250accf/ff03b2d151aaba931fc31a72980569523b7069fa450b95934966da6633599a37/149": 2106.215487
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 521,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl02",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000309189,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 45.243753,
+        "p50": 50.452963499999996,
+        "p95": 54.889819,
+        "max": 55.527576
+      },
+      "identity_session_channel_summary": {
+        "2/81bfa36379d14c68b794d030b65249fb/3cebafcfd3eda75b540594d7233981077471d346cc1c4459df9d1fecfabb418c/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "2/81bfa36379d14c68b794d030b65249fb/3cebafcfd3eda75b540594d7233981077471d346cc1c4459df9d1fecfabb418c/149": 2076.821408
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "2/81bfa36379d14c68b794d030b65249fb/3cebafcfd3eda75b540594d7233981077471d346cc1c4459df9d1fecfabb418c/149": 2077.544284
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 521,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl03",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000153323,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 57,
+      "late_count": 1,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 0.9827586206896551,
+      "candidate_ratio_window_requests": 0.9827586206896551,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 44.59531,
+        "p50": 49.88583199999999,
+        "p95": 55.27703,
+        "max": 1068.70105
+      },
+      "identity_session_channel_summary": {
+        "3/bf3fe6b898704b79ab8818e5c8af4c6c/27e43bb6538c26e739152456e6ad35c6fcecd607a5e54f3d9ca3778e4cdb86ba/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 57,
+          "late_count": 1,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 0.9827586206896551,
+          "candidate_ratio_window_requests": 0.9827586206896551
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "3/bf3fe6b898704b79ab8818e5c8af4c6c/27e43bb6538c26e739152456e6ad35c6fcecd607a5e54f3d9ca3778e4cdb86ba/149": 3089.956974
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "3/bf3fe6b898704b79ab8818e5c8af4c6c/27e43bb6538c26e739152456e6ad35c6fcecd607a5e54f3d9ca3778e4cdb86ba/149": 4303.495975
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 521,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl05",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000121369,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 45.179263,
+        "p50": 50.4506665,
+        "p95": 55.649965,
+        "max": 81.875416
+      },
+      "identity_session_channel_summary": {
+        "5/be52449bb6d24801a931c33dd82c34f6/03671375a18dd5dec631f3e3a0473e489db65ae7c9938a7c5cd2da0cda6eaef8/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "5/be52449bb6d24801a931c33dd82c34f6/03671375a18dd5dec631f3e3a0473e489db65ae7c9938a7c5cd2da0cda6eaef8/149": 2103.034256
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "5/be52449bb6d24801a931c33dd82c34f6/03671375a18dd5dec631f3e3a0473e489db65ae7c9938a7c5cd2da0cda6eaef8/149": 2103.031471
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 521,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl06",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000152426,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 44.4617,
+        "p50": 50.1166315,
+        "p95": 54.710252,
+        "max": 81.520797
+      },
+      "identity_session_channel_summary": {
+        "6/11f27b40a03f456d8e4e8ef51fccd1fa/746e66129480b53c55e6751719a5e8a41964e1e04878b82b3ed63b439a979f25/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "6/11f27b40a03f456d8e4e8ef51fccd1fa/746e66129480b53c55e6751719a5e8a41964e1e04878b82b3ed63b439a979f25/149": 2102.595799
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "6/11f27b40a03f456d8e4e8ef51fccd1fa/746e66129480b53c55e6751719a5e8a41964e1e04878b82b3ed63b439a979f25/149": 2103.186874
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 522,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl07",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000205166,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 42.464078,
+        "p50": 49.663069,
+        "p95": 53.994612,
+        "max": 81.882598
+      },
+      "identity_session_channel_summary": {
+        "7/960cd4c45a6b479eab41cd98c18d1a29/13df9fe03600442c6fa87b18d3246931373f2464858465691eb464366f17c906/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "7/960cd4c45a6b479eab41cd98c18d1a29/13df9fe03600442c6fa87b18d3246931373f2464858465691eb464366f17c906/149": 2102.917408
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "7/960cd4c45a6b479eab41cd98c18d1a29/13df9fe03600442c6fa87b18d3246931373f2464858465691eb464366f17c906/149": 2102.950037
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 522,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl08",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000130934,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 44.678072,
+        "p50": 49.948342499999995,
+        "p95": 53.75129,
+        "max": 81.906986
+      },
+      "identity_session_channel_summary": {
+        "8/758a97eee6cf450b8cfa3060613bb11a/050c9276057b7228259113f7e22ce71e3a1ed07356e12e14f1953fa13f7f462e/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "8/758a97eee6cf450b8cfa3060613bb11a/050c9276057b7228259113f7e22ce71e3a1ed07356e12e14f1953fa13f7f462e/149": 2103.759313
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "8/758a97eee6cf450b8cfa3060613bb11a/050c9276057b7228259113f7e22ce71e3a1ed07356e12e14f1953fa13f7f462e/149": 2104.27026
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 522,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    },
+    {
+      "host": "fl09",
+      "schema_version": 3,
+      "elapsed_mono_seconds": 120.000087638,
+      "request_count": 58,
+      "paired_confirmed_count": 58,
+      "timely_count": 58,
+      "late_count": 0,
+      "unmatched_count": 0,
+      "right_censored_count": 0,
+      "challenge_count": 0,
+      "unmatched_ack_count": 0,
+      "candidate_ratio_paired_confirmed": 1.0,
+      "candidate_ratio_window_requests": 1.0,
+      "candidate_ratio_paired_denominator": "paired_confirmed_count",
+      "candidate_ratio_window_denominator": "request_count-right_censored_count",
+      "rtt_ms": {
+        "min": 45.259876,
+        "p50": 50.0473175,
+        "p95": 79.577779,
+        "max": 81.602911
+      },
+      "identity_session_channel_summary": {
+        "9/b4359ce15b994f0a8c72ff9556f3f87d/dcaa134c684ecd71f6b39b8b45b36e8a4d048f6482f7916196d050ebceccb35d/149": {
+          "request_count": 58,
+          "paired_confirmed_count": 58,
+          "timely_count": 58,
+          "late_count": 0,
+          "unmatched_count": 0,
+          "right_censored_count": 0,
+          "challenge_count": 0,
+          "candidate_ratio_paired_confirmed": 1.0,
+          "candidate_ratio_window_requests": 1.0
+        }
+      },
+      "max_wire_ack_receive_gap_ms_by_identity": {
+        "9/b4359ce15b994f0a8c72ff9556f3f87d/dcaa134c684ecd71f6b39b8b45b36e8a4d048f6482f7916196d050ebceccb35d/149": 2103.487559
+      },
+      "max_timely_candidate_send_gap_ms_by_identity": {
+        "9/b4359ce15b994f0a8c72ff9556f3f87d/dcaa134c684ecd71f6b39b8b45b36e8a4d048f6482f7916196d050ebceccb35d/149": 2103.434443
+      },
+      "liveness_gap_status": "timely_candidate_send_gap_only; non_app_anchor",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 522,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "unmatched_is_not_physical_loss": true
+    }
+  ]
+}

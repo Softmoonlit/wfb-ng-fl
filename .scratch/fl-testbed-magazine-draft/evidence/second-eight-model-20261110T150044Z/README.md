@@ -38,3 +38,7 @@ runner 内的 role cleanup 九端均返回 `ok=true`，149 restore 返回 `ok=tr
 ## 父侧最终只读复核
 
 直接复核原始progress的server verify：固定八份更新均为44,770,302字节，SHA均匹配模型。随后只读管理检查仍为fl03 SSH `No route to host`、两次ping均未响应、邻居项FAILED，registry为OFFLINE，其余七客户端READY/IDLE/149。见`fl03-final-management-recheck.json`。尚无现场供电确认，不能自行归因为断电。未自动重试或继续发送。需要现场检查fl03的供电与管理连接，恢复后重新完整准入；本轮结束时不能宣称连续两次完整验收通过。
+
+## 后续现场事实分类（不改原验收结论）
+
+用户随后确认：fl03 当时确因断电而关机，之后已充电并启动。该事实将旧批次的 `fl03 No route` 分类为**供电/环境中断**，不归因为无线、USB、温度或永久硬件故障。原始 `cleanup_ok=false`、独立 audit 失败、registry OFFLINE 和 runner 失败字段保持原值，不能改写为成功，也不能与新恢复后的九板审计拼接为连续验收。恢复后新 root `heartbeat-budget-eight-20261110T154206Z` 的九板独立审计通过证据另行保存。

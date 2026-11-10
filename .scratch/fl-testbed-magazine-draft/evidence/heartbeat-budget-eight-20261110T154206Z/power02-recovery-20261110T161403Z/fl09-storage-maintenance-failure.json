@@ -1,0 +1,12 @@
+{
+  "status": "blocked_before_cleanup",
+  "host": "fl09",
+  "operation": "exact_success_duplicate_reclamation",
+  "failure_class": "management_environment_interruption",
+  "evidence": "ssh No route to host (192.168.0.199), returncode 255 before remote maintenance script started",
+  "unlink_performed": false,
+  "old_reclamation_paths_reused": false,
+  "model_started": false,
+  "retry": false,
+  "next_gate": "restore fl09 management environment, rerun full read-only storage/preflight gate; do not lower reserve"
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "task_id": "heartbeat-budget-eight-20261110T154206Z",
+  "phase": "model_preflight",
+  "run_id": "heartbeat-budget-eight-model-20261110T1606Z",
+  "status": "blocked_before_model_send",
+  "model_communication_started": false,
+  "model_payload_sent": false,
+  "radio_mutation_started": false,
+  "threshold_or_retry_changed": false,
+  "preflight_source": "model-20261110T1606Z/run-id-preflight.json",
+  "failure_class": "management_environment_interruption",
+  "blocking_host": "fl02",
+  "blocking_evidence": "ssh No route to host (192.168.0.192), returncode 255",
+  "other_hosts_preflight_returncode": {
+    "fl00": 0,
+    "fl01": 0,
+    "fl03": 0,
+    "fl05": 0,
+    "fl06": 0,
+    "fl07": 0,
+    "fl08": 0,
+    "fl09": 0
+  },
+  "runner_stderr": "run ID already exists or management check failed",
+  "capture": {
+    "client_only": true,
+    "duration_limit_seconds": 1500,
+    "tool_sha256": "bee3fc5038dfd0a31ecf9c3d09e5f7b7f8a5a690f12ec98f1417cdbb80d06be3",
+    "fl02_rc": 4,
+    "fl02_stderr": "ssh: connect to host 192.168.0.192 port 22: Connection timed out",
+    "other_client_capture_stopped_after_preflight_block": true,
+    "residual_capture_checked_on_reachable_hosts": true
+  },
+  "retry": false,
+  "interpretation": "Do not classify as a new wireless failure and do not retry automatically. After the management environment is restored, continue only under a fresh unique run and preflight; the user's confirmed power recovery authorizes continuation without a second parent authorization.",
+}

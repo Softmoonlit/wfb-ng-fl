@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "checks": [
+    "strict_229_candidate",
+    "exact_230_non_candidate",
+    "confirmed_false_excluded",
+    "duplicate_separate",
+    "reverse_endpoint_required",
+    "full_identity",
+    "session_gap_partition",
+    "client_direction_and_rtt",
+    "ratio_denominator_explicit"
+  ],
+  "analysis_summary": {
+    "heartbeat_request_count": 3,
+    "deadline_candidate_count": 2,
+    "deadline_non_candidate_count": 1,
+    "confirmed_ack_candidate_count": 3,
+    "invalid_ack_count": 3,
+    "deadline_candidate_ratio": 0.6666666666666666,
+    "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+    "max_confirmed_ack_receive_gap_ms_by_identity": {
+      "1/boot-a/s1/149": 1001.0,
+      "1/boot-a/s2/149": null
+    },
+    "max_confirmed_ack_receive_gap_ms_by_node": {
+      "1": 1001.0
+    },
+    "rtt_semantics": "client_send_to_client_ack_receive",
+    "application_acceptance_observed": false
+  }
+}

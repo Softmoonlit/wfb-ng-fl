@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "phase": "idle",
+  "task_id": "heartbeat-budget-eight-20261110T154206Z",
+  "capture_run_id": "idle-20261110T1602Z",
+  "capture_tool_sha256": "a21de58851b17a82bc8780f12b30b5b8e45ebf2c7a7ffc78f433bd76fd9f9521",
+  "source_capture_tool_sha256": "941c9e185090c67ef7a641877f798159dcdae18d4433c940d6773096ca765b81",
+  "schema_doc_sha256": "1cb4b0f78a264d9f8e82b347c1685ad8a79b66a44180db24b756b812351d5e8c",
+  "hosts": [
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09"
+  ],
+  "client_only": true,
+  "server_capture": "forbidden_not_run",
+  "window_seconds": 120,
+  "heartbeat_period_seconds": 2,
+  "expected_samples_per_client": "about 60",
+  "deadline_ms": 230,
+  "deadline_comparison": "strictly less than 230ms",
+  "offline_threshold_seconds": 10,
+  "anchor_observed": false,
+  "application_acceptance_observed": false,
+  "accepted_count_field_present": false,
+  "nonzero_socket_drops_means_incomplete": true,
+  "unmatched_window_boundary_is_not_loss": true,
+  "superseded_failed_attempt": ".scratch/fl-testbed-magazine-draft/evidence/idle-20261110T1554Z (launcher path error; rc=2; not a measurement)",
+  "rows": [
+    {
+      "host": "fl01",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000124872,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 57,
+      "deadline_non_candidate_count": 1,
+      "deadline_candidate_ratio": 0.9827586206896551,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "1/e3c24ee98a844ab5aa2163250250accf/ff03b2d151aaba931fc31a72980569523b7069fa450b95934966da6633599a37/149": 3157.080499
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "1": 3157.080499
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 520,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl02",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000142822,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 57,
+      "deadline_candidate_count": 56,
+      "deadline_non_candidate_count": 1,
+      "deadline_candidate_ratio": 0.9824561403508771,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "2/d276a58439ec4f58804a700964a7a212/69fe92b5cdcbd04a52f0383cc2c5e9c03718a25a6d271ee19c81cc7ce9a595cf/149": 3087.586561
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "2": 3087.586561
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 520,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl03",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.00008917,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 58,
+      "deadline_non_candidate_count": 0,
+      "deadline_candidate_ratio": 1.0,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "3/bf3fe6b898704b79ab8818e5c8af4c6c/27e43bb6538c26e739152456e6ad35c6fcecd607a5e54f3d9ca3778e4cdb86ba/149": 2102.772412
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "3": 2102.772412
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 521,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl05",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000149776,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 58,
+      "deadline_non_candidate_count": 0,
+      "deadline_candidate_ratio": 1.0,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "5/be52449bb6d24801a931c33dd82c34f6/03671375a18dd5dec631f3e3a0473e489db65ae7c9938a7c5cd2da0cda6eaef8/149": 2106.571476
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "5": 2106.571476
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 520,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl06",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000084145,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 57,
+      "deadline_non_candidate_count": 1,
+      "deadline_candidate_ratio": 0.9827586206896551,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "6/11f27b40a03f456d8e4e8ef51fccd1fa/746e66129480b53c55e6751719a5e8a41964e1e04878b82b3ed63b439a979f25/149": 3091.750427
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "6": 3091.750427
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 519,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl07",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000114028,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 58,
+      "deadline_non_candidate_count": 0,
+      "deadline_candidate_ratio": 1.0,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "7/960cd4c45a6b479eab41cd98c18d1a29/13df9fe03600442c6fa87b18d3246931373f2464858465691eb464366f17c906/149": 2105.468029
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "7": 2105.468029
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 519,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl08",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000091866,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 57,
+      "deadline_candidate_count": 57,
+      "deadline_non_candidate_count": 0,
+      "deadline_candidate_ratio": 1.0,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "8/758a97eee6cf450b8cfa3060613bb11a/050c9276057b7228259113f7e22ce71e3a1ed07356e12e14f1953fa13f7f462e/149": 2137.960096
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "8": 2137.960096
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 520,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    },
+    {
+      "host": "fl09",
+      "capture_errors": [],
+      "elapsed_mono_seconds": 120.000139771,
+      "heartbeat_request_count": 58,
+      "confirmed_ack_candidate_count": 58,
+      "deadline_candidate_count": 58,
+      "deadline_non_candidate_count": 0,
+      "deadline_candidate_ratio": 1.0,
+      "deadline_candidate_ratio_denominator": "confirmed_ack_candidate_count",
+      "invalid_ack_count": 0,
+      "duplicate_packet_count": 0,
+      "rtt_ms": {
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "max": null
+      },
+      "max_confirmed_ack_receive_gap_ms_by_identity": {
+        "9/b4359ce15b994f0a8c72ff9556f3f87d/dcaa134c684ecd71f6b39b8b45b36e8a4d048f6482f7916196d050ebceccb35d/149": 2109.528588
+      },
+      "max_confirmed_ack_receive_gap_ms_by_node": {
+        "9": 2109.528588
+      },
+      "rtt_semantics": "client_send_to_client_ack_receive",
+      "application_acceptance_observed": false,
+      "packet_statistics_delta": {
+        "packets": 520,
+        "drops": 0
+      },
+      "capture_completeness": "complete_no_socket_drops",
+      "daemon_hunt_count": null,
+      "daemon_hunt_evidence": "unavailable_in_window; bounded journal has no entries",
+      "daemon_journal_bytes": 16,
+      "unmatched_ack_is_not_loss": true
+    }
+  ]
+}

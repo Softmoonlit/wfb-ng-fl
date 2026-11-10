@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "checks": [
+    "request_paired_timely_late_unmatched",
+    "right_censor_excluded_from_window_denominator",
+    "challenge_separate",
+    "strict_230_late",
+    "paired_ratio_denominator",
+    "window_ratio_denominator",
+    "unmatched_not_physical_loss",
+    "timely_send_gap_identity"
+  ],
+  "summary": {
+    "request_count": 4,
+    "paired_confirmed_count": 2,
+    "timely_count": 1,
+    "late_count": 1,
+    "unmatched_count": 1,
+    "right_censored_count": 1,
+    "challenge_count": 1,
+    "candidate_ratio_paired_confirmed": 0.5,
+    "candidate_ratio_window_requests": 0.3333333333333333,
+    "candidate_ratio_paired_denominator": "paired_confirmed_count",
+    "candidate_ratio_window_denominator": "request_count-right_censored_count"
+  }
+}
