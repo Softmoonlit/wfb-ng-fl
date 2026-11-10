@@ -29,7 +29,9 @@
 
 换频最终确认先于真实心跳的旧事实已由 `66f1535...` 替换，详见[问题17](issues/17-radio-final-confirmation-ready-barrier.md)；此前 fl00 旧卡接收路径问题保留于[问题18](issues/18-server-rx-path-after-restart.md)，本批仅在新物理身份完成后续验证。当前批次状态入口为 `evidence/eight-client-hardware-20261110T202200Z/progress-status.json`。
 
-fl02经用户授权整机重启后，另立[重启后八端续验](evidence/post-fl02-reboot-20261110T142107Z/README.md)，1MiB闭环通过；模型78.192秒下行、289.975秒上行，八端尺寸/SHA、cleanup及独立恢复均通过。当前八端为一次模型完整成功，旧失败独立保留，尚不构成连续两轮最终验收或根因已消除。
+fl02经用户授权整机重启后，另立[重启后八端续验](evidence/post-fl02-reboot-20261110T142107Z/README.md)，1MiB闭环通过；模型78.192秒下行、289.975秒上行，八端尺寸/SHA、cleanup及独立恢复均通过。该批是当前八端唯一一次模型完整成功，旧失败独立保留，尚不构成连续两轮最终验收或根因已消除。
+
+随后在完整准入和精确存储回收后，另立[第二次八端模型批次](evidence/second-eight-model-20261110T150044Z/README.md)。本轮不重复smoke，只执行一次44,770,302字节模型：编排机monotonic计算下行58.769秒、上行261.305秒，server八份size/SHA全部通过；runner内角色cleanup、149恢复和九端audit_final返回通过。但独立cleanup时fl03 SSH超时，随后fl03管理面`No route to host`，post inventory和独立审计无法确认fl03回收，registry为fl03 OFFLINE，executor/runner返回1，`cleanup_ok=false`。因此本轮是WFB双向传输和server八份校验通过、完整闭环验收被fl03管理失联阻断的失败批次，不能与上一轮拼成连续两次完整通过。该边界不把失联归因于USB、供电、温度、网卡永久损坏或重启永久修复；没有retry、改参或重启。
 
 ### 2.1.1 历史九客户端批次：保留fl03，排除fl04
 

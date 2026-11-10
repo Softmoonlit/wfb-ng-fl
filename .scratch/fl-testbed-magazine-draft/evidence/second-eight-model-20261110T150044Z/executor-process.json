@@ -1,0 +1,21 @@
+{
+  "pid": 16979,
+  "command": [
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py",
+    "--native-sha",
+    "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "--payload",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "--model-manifest",
+    ".scratch/fl-testbed-magazine-draft/evidence/second-eight-model-20261110T150044Z/model-manifest-input.json",
+    "--execute",
+    "--reviewed-sha",
+    "1ff80d4683137c191328ef524b910143a2dae462b9c6854e615412da61d46496",
+    "--run-id",
+    "second-eight-model-20261110T150044Z-model",
+    "--output",
+    ".scratch/fl-testbed-magazine-draft/evidence/second-eight-model-20261110T150044Z/model/runs"
+  ],
+  "run_id": "second-eight-model-20261110T150044Z-model",
+  "started_wall": 1794323707.7925532
+}

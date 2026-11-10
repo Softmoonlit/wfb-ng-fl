@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "batch_id": "second-eight-model-20261110T150044Z",
+  "scope": {
+    "server": "fl00",
+    "clients": [1, 2, 3, 5, 6, 7, 8, 9],
+    "excluded": [4, 10],
+    "release_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "bundle_sha": "1ff80d4683137c191328ef524b910143a2dae462b9c6854e615412da61d46496",
+    "radio": "149 baseline / 157 model, HT40, Long GI, index18",
+    "fec": "RS(8,12)",
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "uftp_rate_kbps": 12000
+  },
+  "admission": {
+    "final_recovery_audit_rc": 0,
+    "check_all_ready_rc": 0,
+    "storage_required_bytes": 671181818,
+    "storage_after": {
+      "fl02": 680824832,
+      "fl08": 685203456,
+      "fl09": 707059712
+    },
+    "no_new_smoke": true
+  },
+  "model": {
+    "run_id": "second-eight-model-20261110T150044Z-model",
+    "payload_size_bytes": 44770302,
+    "payload_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "direction_timeout_seconds": 600,
+    "publish_seconds_orchestrator_monotonic": 58.768997595001565,
+    "submit_seconds_orchestrator_monotonic": 261.30517540599976,
+    "server_verify_hosts": 8,
+    "server_verify_size_sha_all_match": true,
+    "role_cleanup_all_hosts_ok": true,
+    "runner_restore_ok": true,
+    "runner_audit_final_all_hosts_ok": true,
+    "transfer_verified": true,
+    "cleanup_ok": false,
+    "complete_closed_loop": false,
+    "runner_returncode": 1,
+    "executor_returncode": 1,
+    "executor_post_errors": ["fl03: management/raw probe failed"],
+    "independent_audit_rc": 2,
+    "independent_audit_errors": ["fl03: raw probe failed", "server registry final gate"],
+    "fl03_boundary": "独立cleanup SSH timeout；随后No route to host；registry OFFLINE，未补回收、未重启、未retry"
+  },
+  "continuity": {
+    "first_complete_model": {
+      "batch_id": "post-fl02-reboot-20261110T142107Z",
+      "publish_seconds": 78.192,
+      "submit_seconds": 289.975,
+      "complete_closed_loop": true
+    },
+    "second_complete_model": false,
+    "two_consecutive_complete_closures": false,
+    "reason": "本轮model传输和八份server SHA通过，但fl03独立cleanup/post audit阻断"
+  },
+  "file_transfer": "已通过WFB完成模型实际双向传输和server八份独立SHA校验；未通过外部消息应用传文件",
+  "automatic_retry": false,
+  "parameter_change": false,
+  "reboot": false,
+  "failed_attempts_deleted": false,
+  "hardware_or_permanent_fix_claim": false
+}

@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "batch_id": "second-eight-model-20261110T150044Z",
+  "operation": "exact_success_duplicate_reclamation",
+  "canonical": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "reserve_gate": {
+    "minimum_bytes": 536870912,
+    "model_copy_count": 3,
+    "required_bytes": 671181818,
+    "before": {
+      "fl02": 591278080,
+      "fl08": 550883328,
+      "fl09": 572739584
+    },
+    "after": {
+      "fl02": 680824832,
+      "fl08": 685203456,
+      "fl09": 707059712
+    },
+    "all_participating_hosts_meet_required": true
+  },
+  "selection_policy": "只清理有完整成功证据、逐文件size和SHA完全匹配的旧模型副本；每端保留B2原件、重启后第一轮成功模型及至少一份成功模型；失败尝试、partial、日志、manifest、evidence、安装文件和通信目录均不删除。",
+  "failed_wrapper_attempts": [
+    {
+      "attempt": 1,
+      "status": "no_unlink",
+      "record": "storage-reclamation-attempt-1.txt",
+      "reason": "远端参数占位符--被当作目标路径，前置校验失败"
+    },
+    {
+      "attempt": 2,
+      "status": "no_unlink",
+      "record": "storage-reclamation-attempt-2.txt",
+      "reason": "fl02预核定g30-d10目标当前已不存在，前置校验失败；fl08/fl09未执行"
+    }
+  ],
+  "successful_unlink_evidence": "storage-reclamation-final.raw",
+  "hosts": {
+    "fl02": {
+      "source_success_evidence": "历史完整成功fec12-apr-20261109T185342Z-t2-g30-d5-model；保留该run的rounds/model.bin",
+      "free_before": 591278080,
+      "free_after": 680824832,
+      "deleted": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/inbox/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1098810,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1098814,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        }
+      ],
+      "protected_verified": [
+        "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+        "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin"
+      ]
+    },
+    "fl08": {
+      "source_success_evidence": "历史完整成功fec12-20261109T071504Z-g40-d10-model",
+      "free_before": 550883328,
+      "free_after": 685203456,
+      "deleted": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/inbox/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546445,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546447,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/update.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546449,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        }
+      ],
+      "protected_verified": [
+        "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+        "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin"
+      ]
+    },
+    "fl09": {
+      "source_success_evidence": "历史完整成功fec12-20261109T071504Z-g30-d10-model",
+      "free_before": 572739584,
+      "free_after": 707059712,
+      "deleted": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/inbox/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546598,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546600,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/update.bin",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 546602,
+          "device": 2049,
+          "sha256_before": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+          "after_exists": false
+        }
+      ],
+      "protected_verified": [
+        "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+        "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/model.bin"
+      ]
+    }
+  },
+  "failed_attempts_deleted": false,
+  "b2_original_deleted": false,
+  "first_success_model_deleted": false,
+  "evidence_or_install_deleted": false,
+  "stop_condition": "达到512MiB加三份模型副本门槛后立即停止，不追求1GB"
+}
