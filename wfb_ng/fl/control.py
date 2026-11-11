@@ -50,6 +50,7 @@ CANDIDATE_CHANNELS: Tuple[int, ...] = (149, 153, 165)
 # Timing Parameters
 HUNTING_ATTEMPT_TIMEOUT_SECONDS: float = 0.23
 HUNTING_RETRIES_PER_CHANNEL: int = 2
+HEARTBEAT_ACK_TIMEOUT_SECONDS: float = 1.0
 IDLE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
 ACTIVE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
 NODE_OFFLINE_THRESHOLD_SECONDS: float = 10.0
@@ -2479,7 +2480,8 @@ class ControlPlaneClient:
     """客户端双向 UDP 控制面，负责心跳与三级寻频。
 
     寻频顺序为缓存信道、157、其余候选信道，每信道默认尝试两次，
-    单次回执等待预算为 230ms。有效回执锁定信道并立即上报待命心跳。
+    单次探测等待预算为 230ms。待命期间心跳单次回执等待预算为 1.0s。
+    有效回执锁定信道并立即上报待命心跳。
     空闲和活动心跳默认每两秒发送；状态变化立即上报。
     待命期间仅在最近有效确认对应的发送时间已过去十秒后恢复寻频。
     """
@@ -2498,6 +2500,7 @@ class ControlPlaneClient:
         server_port: int = CLIENT_UPLINK_DEFAULT_PORT,
         broadcast_port: int = SERVER_CONTROL_BROADCAST_PORT,
         attempt_timeout_seconds: float = HUNTING_ATTEMPT_TIMEOUT_SECONDS,
+        heartbeat_timeout_seconds: Optional[float] = None,
         max_attempts_per_channel: int = HUNTING_RETRIES_PER_CHANNEL,
         idle_interval_seconds: float = IDLE_HEARTBEAT_INTERVAL_SECONDS,
         active_interval_seconds: float = ACTIVE_HEARTBEAT_INTERVAL_SECONDS,
@@ -2550,6 +2553,12 @@ class ControlPlaneClient:
         self._server_endpoint: Optional[Tuple[str, int]] = None
         self.broadcast_port = broadcast_port
         self.attempt_timeout_seconds = attempt_timeout_seconds
+        if heartbeat_timeout_seconds is not None:
+            self.heartbeat_timeout_seconds = heartbeat_timeout_seconds
+        elif attempt_timeout_seconds != HUNTING_ATTEMPT_TIMEOUT_SECONDS:
+            self.heartbeat_timeout_seconds = attempt_timeout_seconds
+        else:
+            self.heartbeat_timeout_seconds = HEARTBEAT_ACK_TIMEOUT_SECONDS
         self.max_attempts_per_channel = max_attempts_per_channel
         self.idle_interval_seconds = idle_interval_seconds
         self.active_interval_seconds = active_interval_seconds
@@ -2681,7 +2690,7 @@ class ControlPlaneClient:
         with self._lock:
             if self._uplink_sock is None:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sock.settimeout(self.attempt_timeout_seconds)
+                sock.settimeout(max(self.attempt_timeout_seconds, self.heartbeat_timeout_seconds))
                 self._uplink_sock = sock
             return self._uplink_sock
 
@@ -2932,7 +2941,7 @@ class ControlPlaneClient:
         sent_mono = time.monotonic()
         if state == ClientNodeState.IDLE.value and self._idle_liveness_anchor is None:
             self._idle_liveness_anchor = sent_mono
-        deadline = sent_mono + self.attempt_timeout_seconds
+        deadline = sent_mono + self.heartbeat_timeout_seconds
         try:
             sock.sendto(hb.to_bytes(), self._get_server_endpoint())
         except Exception as exc:
@@ -2957,9 +2966,9 @@ class ControlPlaneClient:
     def send_heartbeat_once(self, timeout: Optional[float] = None) -> Optional[HeartbeatAck]:
         """Send a single heartbeat in the current state and process the response."""
         with self._lock:
-            old_timeout = self.attempt_timeout_seconds
+            old_timeout = self.heartbeat_timeout_seconds
             if timeout is not None:
-                self.attempt_timeout_seconds = timeout
+                self.heartbeat_timeout_seconds = timeout
 
             try:
                 ack = self._send_heartbeat(
@@ -2980,7 +2989,7 @@ class ControlPlaneClient:
                         self._state_enter_time = now
                 return ack
             finally:
-                self.attempt_timeout_seconds = old_timeout
+                self.heartbeat_timeout_seconds = old_timeout
 
     def notify_state_change(self, new_state: ClientNodeState) -> None:
         """

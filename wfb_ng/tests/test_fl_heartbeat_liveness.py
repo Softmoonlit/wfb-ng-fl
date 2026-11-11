@@ -35,6 +35,7 @@ def heartbeat_peer(loopback_network, monkeypatch):
         initial_channel=149, server_host="127.0.0.1",
         server_port=server.getsockname()[1], broadcast_port=server.getsockname()[1],
         max_attempts_per_channel=1,
+        heartbeat_timeout_seconds=0.23,
     )
     actions = queue.Queue()
     errors = []
@@ -328,3 +329,101 @@ def test_state_changes_without_any_ack_do_not_extend_initial_window(heartbeat_pe
     assert p.client.state == ClientNodeState.IDLE
     assert p.exchange(109.75) is None
     assert p.client.state == ClientNodeState.HUNTING
+
+
+def test_heartbeat_timeout_defaults_and_constants():
+    """验证待命心跳回执预算常量为1.0秒，寻频探测为0.23秒。"""
+    assert control.HEARTBEAT_ACK_TIMEOUT_SECONDS == 1.0
+    assert control.HUNTING_ATTEMPT_TIMEOUT_SECONDS == 0.23
+
+    client = ControlPlaneClient(
+        node_id=1, tun_ip="127.0.0.1",
+        network_adapter=MockNetworkAdapter(["wlan-test"]), air_interface="wlan-test",
+        initial_channel=149, server_host="127.0.0.1",
+        server_port=9001, broadcast_port=9000,
+    )
+    assert client.attempt_timeout_seconds == 0.23
+    assert client.heartbeat_timeout_seconds == 1.0
+    client.stop()
+
+
+def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_network):
+    """待命心跳在230ms之后但在1.0秒之内收到的有效回执被成功采纳，刷新活性锚。"""
+    from wfb_ng.fl.control import HeartbeatAck
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind(("127.0.0.1", 0))
+    server_port = server.getsockname()[1]
+
+    client = ControlPlaneClient(
+        node_id=2, tun_ip="127.0.0.1",
+        network_adapter=MockNetworkAdapter(["wlan-test"]), air_interface="wlan-test",
+        initial_channel=149, server_host="127.0.0.1",
+        server_port=server_port, broadcast_port=server_port,
+        max_attempts_per_channel=1,
+    )
+    assert client.heartbeat_timeout_seconds == 1.0
+    # 模拟进入已就绪 IDLE 待命状态及合法会话
+    client.state = ClientNodeState.IDLE
+    client._heartbeat_session = "test-session-idle"
+    client.locked_channel = 149
+
+    def delayed_server():
+        try:
+            raw, address = receive_heartbeat(server)
+            hb = NodeHeartbeat.from_bytes(raw)
+            # 模拟高负载排队延时 0.45 秒 (450ms > 230ms 但 < 1.0s)
+            time.sleep(0.45)
+            ack = HeartbeatAck(
+                ack=True,
+                heartbeat_timestamp_ms=hb.timestamp_ms,
+                channel=hb.current_channel,
+                boot_id=hb.boot_id,
+                session=hb.session,
+                confirmed=True,
+            )
+            server.sendto(ack.to_bytes(), address)
+        except Exception:
+            pass
+
+    t = threading.Thread(target=delayed_server, daemon=True)
+    t.start()
+    try:
+        t0 = time.monotonic()
+        ack = client.send_heartbeat_once()
+        elapsed = time.monotonic() - t0
+        assert ack is not None, "450ms延时的有效回执应在1.0s预算内被采纳"
+        assert elapsed >= 0.40
+        assert client.missed_acks == 0
+        assert client.state == ClientNodeState.IDLE
+    finally:
+        client.stop()
+        server.close()
+        t.join(timeout=1.0)
+
+
+def test_idle_heartbeat_times_out_when_ack_exceeds_one_second(loopback_network):
+    """待命心跳等待超过1.0秒仍未收到回执时判定超时并增加missed_acks。"""
+    server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server.bind(("127.0.0.1", 0))
+    server_port = server.getsockname()[1]
+
+    client = ControlPlaneClient(
+        node_id=2, tun_ip="127.0.0.1",
+        network_adapter=MockNetworkAdapter(["wlan-test"]), air_interface="wlan-test",
+        initial_channel=149, server_host="127.0.0.1",
+        server_port=server_port, broadcast_port=server_port,
+        max_attempts_per_channel=1,
+    )
+    client.state = ClientNodeState.IDLE
+    client._heartbeat_session = "test-session-idle"
+    client.locked_channel = 149
+
+    t0 = time.monotonic()
+    ack = client.send_heartbeat_once()
+    elapsed = time.monotonic() - t0
+
+    assert ack is None
+    assert 0.95 <= elapsed <= 1.4
+    assert client.missed_acks == 1
+    client.stop()
+    server.close()
