@@ -108,30 +108,30 @@ def heartbeat_peer(loopback_network, monkeypatch):
         assert actions.empty(), "预定公开心跳未发出"
 
 
-def test_idle_packet_loss_waits_for_ten_second_liveness_window(heartbeat_peer):
-    """一两次丢包不触发寻频，持续失联仅在探测结束达到十秒时触发。"""
+def test_idle_packet_loss_waits_for_fifteen_second_liveness_window(heartbeat_peer):
+    """一两次丢包不触发寻频，持续失联仅在探测结束达到十五秒时触发。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    for missed, at in enumerate((102, 104, 106, 108, 109.7), start=1):
+    for missed, at in enumerate((102, 104, 106, 108, 110, 112, 114, 114.7), start=1):
         assert p.exchange(at) is None
         assert p.client.state == ClientNodeState.IDLE
         assert p.client.missed_acks == missed
-    assert p.exchange(109.75) is None
-    assert p.client.missed_acks == 6
+    assert p.exchange(114.75) is None
+    assert p.client.missed_acks == 9
     assert p.client.state == ClientNodeState.HUNTING
 
 
 def test_valid_ack_renews_from_request_send_time(heartbeat_peer):
-    """有效回执恢复确认，但迟到的接收时刻不额外延长十秒窗口。"""
+    """有效回执恢复确认，但迟到的接收时刻不额外延长十五秒窗口。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
     p.exchange(102)
     p.exchange(104)
     assert p.exchange(106, "valid", arrival=106.2) is not None
     assert p.client.missed_acks == 0
-    assert p.exchange(115.7) is None
+    assert p.exchange(120.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(115.75) is None
+    assert p.exchange(120.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -144,7 +144,7 @@ def test_invalid_ack_cannot_renew_liveness(heartbeat_peer, mode):
     assert p.client.state == ClientNodeState.IDLE
     assert p.exchange(108) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(109.75) is None
+    assert p.exchange(114.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -152,14 +152,14 @@ def test_unacknowledged_idle_entry_has_finite_nonrenewable_window(heartbeat_peer
     """首次待命有有限起点，活动后返回待命不能续期既有确认。"""
     p = heartbeat_peer
     p.exchange(100, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(109.7) is None
+    assert p.exchange(114.7) is None
     assert p.client.state == ClientNodeState.IDLE
     p.client.notify_state_change(ClientNodeState.IDLE)
-    assert p.exchange(109.75) is None
+    assert p.exchange(114.75) is None
     assert p.client.state == ClientNodeState.HUNTING
     p.exchange(120, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
     p.exchange(130, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(130.5) is None
+    assert p.exchange(135.5) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -169,16 +169,16 @@ def test_hunt_ack_seeds_liveness_and_recovers_ack_updates(heartbeat_peer):
     p.actions.put(("valid", None))
     assert p.exchange(100, operation=lambda: p.client.hunt_once(ladder=[149]))
     assert p.client.locked_channel == 149
-    assert p.exchange(109.7) is None
+    assert p.exchange(114.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(109.75) is None
+    assert p.exchange(114.75) is None
     assert p.client.state == ClientNodeState.HUNTING
     p.actions.put(("valid", None))
     assert p.exchange(120, "valid", operation=lambda: p.client.hunt_once(ladder=[149]))
     assert p.exchange(126, "valid", arrival=126.2) is not None
-    assert p.exchange(135.7) is None
+    assert p.exchange(140.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(135.75) is None
+    assert p.exchange(140.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -186,7 +186,7 @@ def test_long_custom_probe_checks_liveness_even_after_valid_ack(heartbeat_peer):
     """自定义长等待收到有效回执后，仍按发送锚检查探测结束时的失活。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(102, "valid", arrival=112,
+    assert p.exchange(102, "valid", arrival=118,
                       operation=lambda: p.client.send_heartbeat_once(timeout=20)) is not None
     assert p.client.missed_acks == 0
     assert p.client.state == ClientNodeState.HUNTING
@@ -210,16 +210,16 @@ def test_prepare_suppresses_hunting_without_renewing_liveness(heartbeat_peer):
     p.client.bind_job_context("job")
     proposal = {"session_id": "prepare", "job_id": "job", "target_nodes": [4],
                 "channel": 149, "patch": {"radio_txpower_dbm": 13}}
-    p.clock.now = 109
+    p.clock.now = 114
     p.client.handle_broadcast(dict(proposal, type="CONFIG_RADIO_PREPARE"))
     assert p.reports.get(timeout=1)["type"] == "PREPARE_ACK"
     assert p.client.radio_switch_pending
-    assert p.exchange(110) is None
+    assert p.exchange(115) is None
     assert p.client.state == ClientNodeState.IDLE
     p.client.handle_broadcast(dict(proposal, type="CONFIG_RADIO_ABORT"))
     assert p.reports.get(timeout=1)["type"] == "RADIO_SWITCH_ROLLBACK_ACK"
     assert not p.client.radio_switch_pending
-    assert p.exchange(111) is None
+    assert p.exchange(116) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -325,16 +325,17 @@ def test_state_changes_without_any_ack_do_not_extend_initial_window(heartbeat_pe
     p.exchange(100, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
     p.exchange(104, operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
     p.exchange(108, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(109.7) is None
+    assert p.exchange(114.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(109.75) is None
+    assert p.exchange(114.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
 def test_heartbeat_timeout_defaults_and_constants():
-    """验证待命心跳回执预算常量为1.0秒，寻频探测为0.23秒。"""
-    assert control.HEARTBEAT_ACK_TIMEOUT_SECONDS == 1.0
+    """验证待命心跳回执预算常量为1.8秒，寻频探测为0.23秒，失活门限为15.0秒。"""
+    assert control.HEARTBEAT_ACK_TIMEOUT_SECONDS == 1.8
     assert control.HUNTING_ATTEMPT_TIMEOUT_SECONDS == 0.23
+    assert control.NODE_OFFLINE_THRESHOLD_SECONDS == 15.0
 
     client = ControlPlaneClient(
         node_id=1, tun_ip="127.0.0.1",
@@ -343,12 +344,12 @@ def test_heartbeat_timeout_defaults_and_constants():
         server_port=9001, broadcast_port=9000,
     )
     assert client.attempt_timeout_seconds == 0.23
-    assert client.heartbeat_timeout_seconds == 1.0
+    assert client.heartbeat_timeout_seconds == 1.8
     client.stop()
 
 
-def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_network):
-    """待命心跳在230ms之后但在1.0秒之内收到的有效回执被成功采纳，刷新活性锚。"""
+def test_idle_heartbeat_accepts_ack_between_230ms_and_one_point_eight_seconds(loopback_network):
+    """待命心跳在230ms之后但在1.8秒之内收到的有效回执被成功采纳，刷新活性锚。"""
     from wfb_ng.fl.control import HeartbeatAck
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server.bind(("127.0.0.1", 0))
@@ -361,7 +362,7 @@ def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_networ
         server_port=server_port, broadcast_port=server_port,
         max_attempts_per_channel=1,
     )
-    assert client.heartbeat_timeout_seconds == 1.0
+    assert client.heartbeat_timeout_seconds == 1.8
     # 模拟进入已就绪 IDLE 待命状态及合法会话
     client.state = ClientNodeState.IDLE
     client._heartbeat_session = "test-session-idle"
@@ -371,8 +372,8 @@ def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_networ
         try:
             raw, address = receive_heartbeat(server)
             hb = NodeHeartbeat.from_bytes(raw)
-            # 模拟高负载排队延时 0.45 秒 (450ms > 230ms 但 < 1.0s)
-            time.sleep(0.45)
+            # 模拟高负载排队延时 0.6 秒 (600ms > 230ms 但 < 1.8s)
+            time.sleep(0.6)
             ack = HeartbeatAck(
                 ack=True,
                 heartbeat_timestamp_ms=hb.timestamp_ms,
@@ -391,8 +392,8 @@ def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_networ
         t0 = time.monotonic()
         ack = client.send_heartbeat_once()
         elapsed = time.monotonic() - t0
-        assert ack is not None, "450ms延时的有效回执应在1.0s预算内被采纳"
-        assert elapsed >= 0.40
+        assert ack is not None, "600ms延时的有效回执应在1.8s预算内被采纳"
+        assert elapsed >= 0.55
         assert client.missed_acks == 0
         assert client.state == ClientNodeState.IDLE
     finally:
@@ -401,8 +402,8 @@ def test_idle_heartbeat_accepts_ack_between_230ms_and_one_second(loopback_networ
         t.join(timeout=1.0)
 
 
-def test_idle_heartbeat_times_out_when_ack_exceeds_one_second(loopback_network):
-    """待命心跳等待超过1.0秒仍未收到回执时判定超时并增加missed_acks。"""
+def test_idle_heartbeat_times_out_when_ack_exceeds_timeout(loopback_network):
+    """待命心跳等待超过设定预算仍未收到回执时判定超时并增加missed_acks。"""
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server.bind(("127.0.0.1", 0))
     server_port = server.getsockname()[1]
@@ -419,11 +420,12 @@ def test_idle_heartbeat_times_out_when_ack_exceeds_one_second(loopback_network):
     client.locked_channel = 149
 
     t0 = time.monotonic()
-    ack = client.send_heartbeat_once()
+    # 显式传入0.25秒超时以加速测试执行
+    ack = client.send_heartbeat_once(timeout=0.25)
     elapsed = time.monotonic() - t0
 
     assert ack is None
-    assert 0.95 <= elapsed <= 1.4
+    assert 0.20 <= elapsed <= 0.6
     assert client.missed_acks == 1
     client.stop()
     server.close()

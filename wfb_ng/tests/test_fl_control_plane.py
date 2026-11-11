@@ -410,9 +410,9 @@ class TestNodeHorizonRegistryAndAntiDesyncGate(unittest.TestCase):
         )
         self.assertTrue(self.registry.is_node_ready(1))
 
-        # 将心跳时间推至十秒离线阈值之前。
+        # 将心跳时间推至十五秒离线阈值之前。
         node = self.registry.get_node(1)
-        node.last_heartbeat_time -= 11.0
+        node.last_heartbeat_time -= 16.0
 
         self.assertFalse(self.registry.is_node_ready(1))
         self.assertEqual(self.registry.get_node(1).readiness, NodeReadiness.OFFLINE)

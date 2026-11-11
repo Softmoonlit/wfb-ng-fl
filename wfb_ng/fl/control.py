@@ -50,10 +50,10 @@ CANDIDATE_CHANNELS: Tuple[int, ...] = (149, 153, 165)
 # Timing Parameters
 HUNTING_ATTEMPT_TIMEOUT_SECONDS: float = 0.23
 HUNTING_RETRIES_PER_CHANNEL: int = 2
-HEARTBEAT_ACK_TIMEOUT_SECONDS: float = 1.0
+HEARTBEAT_ACK_TIMEOUT_SECONDS: float = 1.8
 IDLE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
 ACTIVE_HEARTBEAT_INTERVAL_SECONDS: float = 2.0
-NODE_OFFLINE_THRESHOLD_SECONDS: float = 10.0
+NODE_OFFLINE_THRESHOLD_SECONDS: float = 15.0
 
 # Two-Phase Radio Switch Parameters (ADR-0012, ADR-0014, Ticket 04)
 PREPARE_TIMEOUT_DEFAULT_SECONDS: float = 5.0
@@ -2480,10 +2480,10 @@ class ControlPlaneClient:
     """客户端双向 UDP 控制面，负责心跳与三级寻频。
 
     寻频顺序为缓存信道、157、其余候选信道，每信道默认尝试两次，
-    单次探测等待预算为 230ms。待命期间心跳单次回执等待预算为 1.0s。
+    单次探测等待预算为 230ms。待命期间心跳单次回执等待预算为 1.8s。
     有效回执锁定信道并立即上报待命心跳。
     空闲和活动心跳默认每两秒发送；状态变化立即上报。
-    待命期间仅在最近有效确认对应的发送时间已过去十秒后恢复寻频。
+    待命期间仅在最近有效确认对应的发送时间已过去十五秒后恢复寻频。
     """
 
     def __init__(
@@ -2980,11 +2980,11 @@ class ControlPlaneClient:
                         and self._pre_switch_config is None):
                     if ack is None:
                         self.missed_acks += 1
-                    # 仅在本次探测结束时检查，与服务端使用同一个十秒阈值。
+                    # 仅在本次探测结束时检查，与服务端使用同一个十五秒阈值。
                     now = time.monotonic()
                     if (self._idle_liveness_anchor is not None
                             and now - self._idle_liveness_anchor >= NODE_OFFLINE_THRESHOLD_SECONDS):
-                        logger.warning("十秒内未确认有效心跳，退回寻频自愈，累计缺失 %d 次 ACK", self.missed_acks)
+                        logger.warning("十五秒内未确认有效心跳，退回寻频自愈，累计缺失 %d 次 ACK", self.missed_acks)
                         self.state = ClientNodeState.HUNTING
                         self._state_enter_time = now
                 return ack

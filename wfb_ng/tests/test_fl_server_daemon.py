@@ -635,7 +635,7 @@ class TestServerDaemonRestIPCAndPreflight(unittest.TestCase):
 
     def test_timed_out_node_is_rejected(self):
         self._simulate_client_handshake(1)
-        self.daemon.control_plane.registry.get_node(1).last_heartbeat_time -= 12.0
+        self.daemon.control_plane.registry.get_node(1).last_heartbeat_time -= 16.0
         with self.assertRaises(FLRuntimeError) as caught:
             self.daemon.start_job(self._job_payload(job_id="job-offline"))
         self.assertEqual(caught.exception.error_code, "preflight_target_nodes_not_ready")
