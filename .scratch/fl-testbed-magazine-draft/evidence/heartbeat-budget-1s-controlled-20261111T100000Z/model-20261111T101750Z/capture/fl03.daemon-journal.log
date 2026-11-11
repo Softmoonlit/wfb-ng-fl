@@ -1,0 +1,7 @@
+[ 5388.629687] fl03 python3[3781]: 2026-11-11 18:18:10,570 [INFO] [client-daemon] 节点 3 LEASE_ARM session=switch_9bfb3c351d61430da7c81fb0c5bfaf76 lease_seconds=15.000
+[ 5390.969647] fl03 python3[3781]: 2026-11-11 18:18:12,911 [INFO] [client-daemon] 节点 3 COMMIT session=switch_9bfb3c351d61430da7c81fb0c5bfaf76 channel=157
+[ 5392.482307] fl03 python3[3781]: 2026-11-11 18:18:14,423 [WARNING] [client-daemon] 节点 3 CONFIRMED session=switch_9bfb3c351d61430da7c81fb0c5bfaf76 未取得当前信道有效心跳，拒绝最终确认
+[ 5392.687418] fl03 python3[3781]: 2026-11-11 18:18:14,629 [INFO] [client-daemon] 节点 3 CONFIRMED session=switch_9bfb3c351d61430da7c81fb0c5bfaf76 channel=157
+[ 5416.047856] fl03 python3[3781]: 2026-11-11 18:18:37,988 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 4 次 ACK
+[ 5438.916963] fl03 python3[3781]: 2026-11-11 18:19:00,858 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 4 次 ACK
+[ 5853.949704] fl03 python3[3781]: 2026-11-11 18:25:55,891 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 4 次 ACK

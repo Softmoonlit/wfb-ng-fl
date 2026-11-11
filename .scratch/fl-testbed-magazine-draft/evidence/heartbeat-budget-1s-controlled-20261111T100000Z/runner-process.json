@@ -1,0 +1,25 @@
+{
+  "pid": 53747,
+  "command": [
+    "/usr/bin/python3",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py",
+    "--native-sha",
+    "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "--payload",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "--model-manifest",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-budget-1s-controlled-20261111T100000Z/model-manifest-input.json",
+    "--execute",
+    "--reviewed-sha",
+    "1ff80d4683137c191328ef524b910143a2dae462b9c6854e615412da61d46496",
+    "--run-id",
+    "hb-budget-1s-20261111T101750Z-model",
+    "--release-commit",
+    "ae6e8b49b7576d6a1990c7f93bee87e5ff7121f8",
+    "--release-root",
+    "/srv/wfb-ng-fl/releases/heartbeat-ae6e8b49b757-20261111T093949Z",
+    "--output",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-budget-1s-controlled-20261111T100000Z/model-20261111T101750Z/runs"
+  ],
+  "started_wall": 1794392285.9139142
+}

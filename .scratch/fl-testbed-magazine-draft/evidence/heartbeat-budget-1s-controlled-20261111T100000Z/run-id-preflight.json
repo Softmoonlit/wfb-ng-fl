@@ -1,0 +1,130 @@
+{
+  "run_id": "hb-budget-1s-20261111T101750Z-model",
+  "remote": [
+    {
+      "host": "fl00",
+      "command": [
+        "test",
+        "!",
+        "-e",
+        "/srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl01",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl02",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl03",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl05",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl06",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl07",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl08",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl09",
+        "test '!' -e /srv/wfb-ng-fl/comm-hb-budget-1s-20261111T101750Z-model"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "wall": 1794392285.476558
+}

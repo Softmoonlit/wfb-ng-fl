@@ -10,7 +10,7 @@ import subprocess
 import sys
 import tarfile
 
-TARGETS = {'fl00', 'fl01', 'fl02', 'fl03', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09', 'fl10'}
+TARGETS = {'fl00', 'fl01', 'fl02', 'fl03', 'fl05', 'fl06', 'fl07', 'fl08', 'fl09'}
 BASE = pathlib.Path(__file__).resolve().parent
 PHASES = ['preflight', 'stage', 'prepare', 'stop', 'install', 'start', 'audit']
 
@@ -43,7 +43,7 @@ if len(sys.argv) >= 2 and sys.argv[1] == 'init':
     if not targets or len(set(targets)) != len(targets) or targets[0] != 'fl00':
         raise SystemExit('targets 必须去重且必须包含首位 fl00')
     if set(targets) != TARGETS:
-        raise SystemExit('本轮 targets 必须精确为固定10板 fl00 fl01 fl02 fl03 fl05 fl06 fl07 fl08 fl09 fl10（fl04不参与）')
+        raise SystemExit('本轮 targets 必须精确为固定9板 fl00 fl01 fl02 fl03 fl05 fl06 fl07 fl08 fl09（fl04/fl10不参与）')
     checked(['git', 'diff', '--exit-code', '--', 'src'])
     checked(['git', 'diff', '--cached', '--exit-code', '--', 'src'])
     assert len(options.native_before_sha) == 64 and all(c in '0123456789abcdef' for c in options.native_before_sha)
