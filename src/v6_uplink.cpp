@@ -43,8 +43,8 @@ using namespace std;
 namespace {
 
 const uint32_t kIdleSleepMs = 10;
-// 有 pending 且无有效授权时，未确认 READY 固定每秒重试；这是链路层声明重试，不是 UFTP 超时。
-const uint64_t kReadyRedeclareTimeoutMs = 1000;
+// 有 pending 且无有效授权时，未确认 READY 重试周期设为 400ms（覆盖最大 10 节点满载轮转周期 350ms 并保留裕量）。
+const uint64_t kReadyRedeclareTimeoutMs = 400;
 const uint64_t kFecFlushIdleMs = 2;
 
 struct AirReadyState {

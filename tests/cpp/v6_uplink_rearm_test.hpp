@@ -107,9 +107,9 @@ static void test_native_overdue_fec_wakeup() {
     ready.declaration_in_flight = true;
     ready.last_declare_at_ms = now;
     // 声明后只等重试；旧 deadline 不得造成零超时循环。
-    assert(client_next_wakeup_ms(now, log_due + 500, fec_due, false, false, ready) == now + 1000);
+    assert(client_next_wakeup_ms(now, log_due + 500, fec_due, false, false, ready) == now + 400);
     assert(client_next_wakeup_ms(now + 1, log_due + 500, fec_due, false, false, ready) > now + 1);
-    assert(client_next_wakeup_ms(now + 1000, log_due + 500, fec_due, false, false, ready) == now + 1000);
+    assert(client_next_wakeup_ms(now + 400, log_due + 500, fec_due, false, false, ready) == now + 400);
     ready.declaration_in_flight = false;
     assert(client_next_wakeup_ms(now, log_due, now + 2, false, false, ready) == now + 2);
     assert(client_next_wakeup_ms(now, log_due, 0, false, false, ready) == log_due);
@@ -379,10 +379,10 @@ static void test_native_ready_retry_loss() {
         std::cerr << "READY loss retry " << loss + 1 << ": received=" << received
                   << " elapsed_ms=" << elapsed_ms << std::endl;
         assert(received);
-        assert(elapsed_ms >= 800 && elapsed_ms <= 1800);
+        assert(elapsed_ms >= 300 && elapsed_ms <= 800);
     }
     const uint64_t recovery_ms = get_time_ms() - first_ready_ms;
-    assert(recovery_ms <= 2400);
+    assert(recovery_ms <= 1200);
     rearm_grant(command, input_port, 1);
     assert(rearm_receive(air, 500, WFB_PACKET_DATA));
     // 仍有有效的三秒授权时，新 pending 数据应直接发送，不重新声明 READY。

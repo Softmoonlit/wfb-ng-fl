@@ -22,7 +22,8 @@ using namespace std;
 
 namespace {
 
-const uint32_t kSilentGrantRemovalThreshold = 2;
+// 连续静默剔除门限设为 6 次，容忍 TCP 最小重传超时 (200ms) 及突发物理丢包，避免轻易踢出队列。
+const uint32_t kSilentGrantRemovalThreshold = 6;
 
 string format_node_list(const vector<uint8_t> &nodes)
 {
