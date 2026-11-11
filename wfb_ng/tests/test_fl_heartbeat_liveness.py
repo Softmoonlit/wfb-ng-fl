@@ -108,30 +108,30 @@ def heartbeat_peer(loopback_network, monkeypatch):
         assert actions.empty(), "预定公开心跳未发出"
 
 
-def test_idle_packet_loss_waits_for_fifteen_second_liveness_window(heartbeat_peer):
-    """一两次丢包不触发寻频，持续失联仅在探测结束达到十五秒时触发。"""
+def test_idle_packet_loss_waits_for_sixty_second_liveness_window(heartbeat_peer):
+    """一两次丢包不触发寻频，持续失联仅在探测结束达到六十秒时触发。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    for missed, at in enumerate((102, 104, 106, 108, 110, 112, 114, 114.7), start=1):
+    for missed, at in enumerate((102, 104, 110, 120, 140, 150, 158, 159.7), start=1):
         assert p.exchange(at) is None
         assert p.client.state == ClientNodeState.IDLE
         assert p.client.missed_acks == missed
-    assert p.exchange(114.75) is None
+    assert p.exchange(159.75) is None
     assert p.client.missed_acks == 9
     assert p.client.state == ClientNodeState.HUNTING
 
 
 def test_valid_ack_renews_from_request_send_time(heartbeat_peer):
-    """有效回执恢复确认，但迟到的接收时刻不额外延长十五秒窗口。"""
+    """有效回执恢复确认，但迟到的接收时刻不额外延长六十秒窗口。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
     p.exchange(102)
     p.exchange(104)
     assert p.exchange(106, "valid", arrival=106.2) is not None
     assert p.client.missed_acks == 0
-    assert p.exchange(120.7) is None
+    assert p.exchange(165.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(120.75) is None
+    assert p.exchange(165.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -144,7 +144,7 @@ def test_invalid_ack_cannot_renew_liveness(heartbeat_peer, mode):
     assert p.client.state == ClientNodeState.IDLE
     assert p.exchange(108) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(114.75) is None
+    assert p.exchange(159.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -152,14 +152,14 @@ def test_unacknowledged_idle_entry_has_finite_nonrenewable_window(heartbeat_peer
     """首次待命有有限起点，活动后返回待命不能续期既有确认。"""
     p = heartbeat_peer
     p.exchange(100, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(114.7) is None
+    assert p.exchange(159.7) is None
     assert p.client.state == ClientNodeState.IDLE
     p.client.notify_state_change(ClientNodeState.IDLE)
-    assert p.exchange(114.75) is None
+    assert p.exchange(159.75) is None
     assert p.client.state == ClientNodeState.HUNTING
-    p.exchange(120, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
-    p.exchange(130, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(135.5) is None
+    p.exchange(170, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
+    p.exchange(180, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
+    assert p.exchange(230.5) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -169,16 +169,16 @@ def test_hunt_ack_seeds_liveness_and_recovers_ack_updates(heartbeat_peer):
     p.actions.put(("valid", None))
     assert p.exchange(100, operation=lambda: p.client.hunt_once(ladder=[149]))
     assert p.client.locked_channel == 149
-    assert p.exchange(114.7) is None
+    assert p.exchange(159.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(114.75) is None
+    assert p.exchange(159.75) is None
     assert p.client.state == ClientNodeState.HUNTING
     p.actions.put(("valid", None))
-    assert p.exchange(120, "valid", operation=lambda: p.client.hunt_once(ladder=[149]))
-    assert p.exchange(126, "valid", arrival=126.2) is not None
-    assert p.exchange(140.7) is None
+    assert p.exchange(170, "valid", operation=lambda: p.client.hunt_once(ladder=[149]))
+    assert p.exchange(176, "valid", arrival=176.2) is not None
+    assert p.exchange(235.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(140.75) is None
+    assert p.exchange(235.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -186,8 +186,8 @@ def test_long_custom_probe_checks_liveness_even_after_valid_ack(heartbeat_peer):
     """自定义长等待收到有效回执后，仍按发送锚检查探测结束时的失活。"""
     p = heartbeat_peer
     p.exchange(100, "valid", operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(102, "valid", arrival=118,
-                      operation=lambda: p.client.send_heartbeat_once(timeout=20)) is not None
+    assert p.exchange(102, "valid", arrival=165,
+                      operation=lambda: p.client.send_heartbeat_once(timeout=80)) is not None
     assert p.client.missed_acks == 0
     assert p.client.state == ClientNodeState.HUNTING
     assert p.client.attempt_timeout_seconds == 0.23
@@ -210,16 +210,16 @@ def test_prepare_suppresses_hunting_without_renewing_liveness(heartbeat_peer):
     p.client.bind_job_context("job")
     proposal = {"session_id": "prepare", "job_id": "job", "target_nodes": [4],
                 "channel": 149, "patch": {"radio_txpower_dbm": 13}}
-    p.clock.now = 114
+    p.clock.now = 159
     p.client.handle_broadcast(dict(proposal, type="CONFIG_RADIO_PREPARE"))
     assert p.reports.get(timeout=1)["type"] == "PREPARE_ACK"
     assert p.client.radio_switch_pending
-    assert p.exchange(115) is None
+    assert p.exchange(160) is None
     assert p.client.state == ClientNodeState.IDLE
     p.client.handle_broadcast(dict(proposal, type="CONFIG_RADIO_ABORT"))
     assert p.reports.get(timeout=1)["type"] == "RADIO_SWITCH_ROLLBACK_ACK"
     assert not p.client.radio_switch_pending
-    assert p.exchange(116) is None
+    assert p.exchange(161) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
@@ -325,17 +325,17 @@ def test_state_changes_without_any_ack_do_not_extend_initial_window(heartbeat_pe
     p.exchange(100, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
     p.exchange(104, operation=lambda: p.client.notify_state_change(ClientNodeState.RUNNING))
     p.exchange(108, operation=lambda: p.client.notify_state_change(ClientNodeState.IDLE))
-    assert p.exchange(114.7) is None
+    assert p.exchange(159.7) is None
     assert p.client.state == ClientNodeState.IDLE
-    assert p.exchange(114.75) is None
+    assert p.exchange(159.75) is None
     assert p.client.state == ClientNodeState.HUNTING
 
 
 def test_heartbeat_timeout_defaults_and_constants():
-    """验证待命心跳回执预算常量为1.8秒，寻频探测为0.23秒，失活门限为15.0秒。"""
+    """验证待命心跳回执预算常量为1.8秒，寻频探测为0.23秒，失活门限为60.0秒。"""
     assert control.HEARTBEAT_ACK_TIMEOUT_SECONDS == 1.8
     assert control.HUNTING_ATTEMPT_TIMEOUT_SECONDS == 0.23
-    assert control.NODE_OFFLINE_THRESHOLD_SECONDS == 15.0
+    assert control.NODE_OFFLINE_THRESHOLD_SECONDS == 60.0
 
     client = ControlPlaneClient(
         node_id=1, tun_ip="127.0.0.1",
