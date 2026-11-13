@@ -1,0 +1,31 @@
+{
+  "canonical_payload": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "source_success_run": "fec12-20261109T071504Z-g20-d5-model",
+  "source_progress": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d5-model/fec12-20261109T071504Z-g20-d5-model/progress.jsonl",
+  "source_progress_final": {
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  },
+  "excluded_runs": ["comm-rsmc20261109T060537Z-g30-d5-model"],
+  "policy": "仅对下列已有成功证据、size/SHA严格匹配、非符号链接、nlink=1的model.bin/update.bin做逐文件归档后精确unlink；不碰失败、partial、日志或目录。",
+  "candidates": {
+    "fl01": [
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/inbox/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/update.bin"
+    ],
+    "fl02": [
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/inbox/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/update.bin"
+    ],
+    "fl06": [
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/inbox/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+      "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin"
+    ]
+  }
+}

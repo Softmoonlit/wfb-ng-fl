@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "status": "STOP-admission-blocked",
+  "fresh_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-20261110T170213Z",
+  "owner": "fl00",
+  "execution": {
+    "smoke_executions": 0,
+    "model_executions": 0,
+    "remote_executor_count": 0,
+    "active_job_created": false,
+    "configuration_changed": false,
+    "heartbeat_budget_changed": false,
+    "old_matrix_retested": false
+  },
+  "topology": {
+    "server": "fl00",
+    "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "excluded": ["fl04"]
+  },
+  "release": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "release_root": "/srv/wfb-ng-fl/releases/heartbeat-cccac233291c-20261109T183910Z"
+  },
+  "admission": {
+    "attempts": [
+      {"name": "attempt1", "result": "probe_script_error", "detail": "local probe used PosixPath.statvfs; no remote experiment action"},
+      {"name": "attempt2", "result": "probe_script_error", "detail": "remote probe omitted os import; no remote experiment action"},
+      {"name": "attempt3", "result": "failed", "evidence": "full-admission-attempt3.json"}
+    ],
+    "full_admission": false,
+    "registry_online_nodes": [2, 3, 5, 6, 7, 8, 9, 10],
+    "registry_bad_nodes": [1],
+    "registry_active_job": null,
+    "registry_server_state": "IDLE",
+    "fl01": {
+      "ssh": "failed",
+      "management_error": "No route to host",
+      "bounded_ping": "100% packet loss",
+      "bounded_retry": "No route to host",
+      "status": "unreachable; not classified as power loss"
+    },
+    "fl06": {
+      "ssh": "passed",
+      "daemon": "active/running",
+      "boot_id": "b13fa1fa-28b1-4e92-b76e-94af782822cb",
+      "available_bytes": 1006608384,
+      "native_get_radio": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1],
+      "native_get_fec": [1129270605, 0, 8, 12],
+      "iw": "149/HT40/monitor/-18.00 dBm",
+      "old_comm_units": [],
+      "exact_test_routes": [],
+      "audit_ok": true
+    },
+    "fl10": {
+      "ssh": "passed",
+      "daemon": "active/running",
+      "boot_id": "125634e1-a952-4872-ac8d-859374a7560b",
+      "available_bytes": 559419392,
+      "native_get_radio": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1],
+      "native_get_fec": [1129270605, 0, 8, 12],
+      "iw": "149/HT40/monitor/-18.00 dBm",
+      "old_comm_units": [],
+      "exact_test_routes": [],
+      "audit_ok": true
+    },
+    "other_storage_blocker": {
+      "host": "fl05",
+      "available_bytes": 376127488,
+      "hard_minimum_bytes": 536870912,
+      "status": "below hard gate",
+      "authorized_cleanup": false,
+      "reason": "existing authorized exact duplicate inventory covers fl01/fl02/fl06 only; no fl05 authorized size/SHA/archive-success duplicate"
+    },
+    "other_reachable_storage": {
+      "fl00": 53031952384,
+      "fl02": 895336448,
+      "fl03": 2779774976,
+      "fl06": 1006608384,
+      "fl07": 1097314304,
+      "fl08": 602136576,
+      "fl09": 757161984,
+      "fl10": 559419392
+    },
+    "old_units_and_routes": "no active comm-smoke unit and no exact 239.80.41.1/32 or 239.80.42.1/32 route on every reachable board",
+    "persisted_server_config_observation": {
+      "radio_txpower_dbm": 14,
+      "uftp_rate_kbps": 15000,
+      "actual_readback": "iw -18.00 dBm; GET_RADIO/GET_FEC and registry effective state were checked separately",
+      "interpretation": "recorded discrepancy only; no config edit performed"
+    },
+    "packagekit": {
+      "method": "current DBus GetTransactionList and transaction properties only",
+      "historical_logs_used_for_upgrade_judgment": false,
+      "reachable_hosts_have_current_transaction_object": true,
+      "raw_evidence": "packagekit-current-readonly.json",
+      "observed_raw_properties": "Role=u 8; Status=u 8; CallerActive=true; AllowCancel=true; percentages varied; no transaction mutation",
+      "service_mutated": false
+    }
+  },
+  "recovery": {
+    "needed": false,
+    "reason": "no smoke/model/configure/temporary unit/radio transaction started",
+    "current_target_preserved": "audit observed 149/HT40/LGI/index18/FEC8/12 on all reachable participating boards",
+    "packagekit_preserved": true
+  },
+  "evidence": {
+    "plan": "plan.json",
+    "attempt1": "full-admission-attempt1.json",
+    "attempt2": "full-admission-attempt2.json",
+    "attempt3": "full-admission-attempt3.json",
+    "packagekit_current": "packagekit-current-readonly.json",
+    "bounded_fl01_retry": "preflight-console-attempt3.log",
+    "existing_storage_authorization": "../storage-authorized-inventory.json"
+  },
+  "wall": 1794302263
+}

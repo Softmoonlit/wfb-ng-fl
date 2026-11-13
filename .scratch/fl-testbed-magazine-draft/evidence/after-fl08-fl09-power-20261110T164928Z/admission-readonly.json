@@ -1,0 +1,392 @@
+{
+  "kind": "read_only_admission_markers",
+  "hosts": [
+    {
+      "host": "fl00",
+      "rc": 0,
+      "result": {
+        "host": "fl00",
+        "role": "server",
+        "boot_id": "18dcb4f5-c3b9-4aa5-85c0-3c04f4e47e26",
+        "uptime": "29126.25 156991.33",
+        "wall_ns": 1794330013658908114,
+        "monotonic_ns": 29126257037089,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-server-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=12375\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 51254988800,
+          "available_inodes": 6679010
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "rc": 0,
+      "result": {
+        "host": "fl01",
+        "role": "client",
+        "boot_id": "91ed512c-a3a1-4d13-9d59-7ecc950442f4",
+        "uptime": "27127.88 159879.77",
+        "wall_ns": 1794330014602254088,
+        "monotonic_ns": 27127887187916,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=12531\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 585191424,
+          "available_inodes": 1534343
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "rc": 0,
+      "result": {
+        "host": "fl02",
+        "role": "client",
+        "boot_id": "8ec76341-ea5e-455e-a007-a2c182a60469",
+        "uptime": "2815.19 16297.93",
+        "wall_ns": 1794330015836051180,
+        "monotonic_ns": 2815197896475,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=862\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 601853952,
+          "available_inodes": 1534426
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "rc": 0,
+      "result": {
+        "host": "fl03",
+        "role": "client",
+        "boot_id": "14b5ea53-ac5e-4030-8f65-5d2a7d8c3e55",
+        "uptime": "5329.27 31241.42",
+        "wall_ns": 1794330016793371810,
+        "monotonic_ns": 5329276286125,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=854\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 2335731712,
+          "available_inodes": 1591031
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "rc": 0,
+      "result": {
+        "host": "fl05",
+        "role": "client",
+        "boot_id": "49404ecc-6729-4e2e-9cd8-49e115130c55",
+        "uptime": "29163.73 171997.19",
+        "wall_ns": 1794330017545833552,
+        "monotonic_ns": 29163738134998,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=13466\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 723443712,
+          "available_inodes": 1571342
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "rc": 0,
+      "result": {
+        "host": "fl06",
+        "role": "client",
+        "boot_id": "b13fa1fa-28b1-4e92-b76e-94af782822cb",
+        "uptime": "29218.78 172073.41",
+        "wall_ns": 1794330018310172906,
+        "monotonic_ns": 29218787742038,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=13311\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 673964032,
+          "available_inodes": 1606999
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "rc": 0,
+      "result": {
+        "host": "fl07",
+        "role": "client",
+        "boot_id": "8d257d8c-9bfb-4ed4-8171-08111c5b5470",
+        "uptime": "29295.51 172729.31",
+        "wall_ns": 1794330019023519140,
+        "monotonic_ns": 29295512922220,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=13141\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 639762432,
+          "available_inodes": 1607208
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "rc": 0,
+      "result": {
+        "host": "fl08",
+        "role": "client",
+        "boot_id": "73510648-529d-41ac-bf0f-eec42de0168a",
+        "uptime": "815.93 4460.35",
+        "wall_ns": 1794330019497389621,
+        "monotonic_ns": 815932884771,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=866\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 683384832,
+          "available_inodes": 1607372
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "rc": 0,
+      "result": {
+        "host": "fl09",
+        "role": "client",
+        "boot_id": "f4dc7ed0-48a4-464e-b03b-470d9644682f",
+        "uptime": "770.61 4087.49",
+        "wall_ns": 1794330019917193367,
+        "monotonic_ns": 770613388697,
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=865\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "storage": {
+          "available_bytes": 704249856,
+          "available_inodes": 1607230
+        },
+        "power_query": {
+          "argv": [
+            "nvpmodel",
+            "-q"
+          ],
+          "returncode": 0,
+          "stdout": "NV Power Mode: 15W\n0\n",
+          "stderr": ""
+        },
+        "kernel_release": "5.15.148-tegra"
+      },
+      "stderr": ""
+    }
+  ]
+}

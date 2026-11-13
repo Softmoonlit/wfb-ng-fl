@@ -1,0 +1,108 @@
+{
+  "summary_version": 1,
+  "evidence_root": "after-fl08-fl09-power-20261110T164928Z",
+  "commit": "9447a81",
+  "topology": {
+    "server": "fl00",
+    "clients": [1, 2, 3, 5, 6, 7, 8, 9],
+    "excluded": [4, 10],
+    "release_commit": "66f15358d309d646d7dca887624a66c46099a54a",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "radio": "149/HT40/Long GI/index18/DL3/UL4/RS(8,12)/30/5",
+    "power": "15W/mode0"
+  },
+  "admission": {
+    "final_recovery_audit_post_storage": true,
+    "check_all_ready_post_all_storage": true,
+    "fl02_boot_id": "8ec76341-ea5e-455e-a007-a2c182a60469",
+    "fl08_boot_id": "73510648-529d-41ac-bf0f-eec42de0168a",
+    "fl09_boot_id": "f4dc7ed0-48a4-464e-b03b-470d9644682f",
+    "storage_required_bytes": 671181818,
+    "storage_after_cleanup_bytes": {
+      "fl01": 674279424,
+      "fl02": 690814976,
+      "fl03": 2335731712,
+      "fl05": 723443712,
+      "fl06": 673964032,
+      "fl07": 683982848,
+      "fl08": 683384832,
+      "fl09": 704249856
+    },
+    "cleanup_evidence": [
+      "fl09-storage-maintenance-attempt3.json",
+      "fl01-storage-maintenance.json",
+      "fl02-storage-maintenance-attempt2.json",
+      "fl07-storage-maintenance-attempt2.json"
+    ]
+  },
+  "model": {
+    "run_id": "after-fl08-fl09-power-20261110T171130Z-model",
+    "payload_size_bytes": 44770302,
+    "payload_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "runner_returncode": 0,
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "post_inventory_errors": [],
+    "independent_audit_post_model": true,
+    "phase_timing_seconds": {
+      "capture_start_to_model_start": 4.159657,
+      "model_total_wall": 322.079890,
+      "downlink_server_send_complete": 41.630212,
+      "downlink_last_client_receive_verified_from_publish_dispatch": 45.672251,
+      "uplink_submit_to_server_updates_received": 258.290853,
+      "model_end_to_capture_stop_request": 0.053931
+    },
+    "server_verified_client_nodes": [1, 2, 3, 5, 6, 7, 8, 9],
+    "server_verified_sha256_all_match": true,
+    "application_acceptance_observed": false
+  },
+  "capture": {
+    "collector": "schema3 passive AF_PACKET/TUN collector started before model_start",
+    "capture_ready_marker": true,
+    "capture_local_window_seconds": 326.389617,
+    "raw_json_bytes_by_client": {
+      "fl01": 0,
+      "fl02": 0,
+      "fl03": 0,
+      "fl05": 0,
+      "fl06": 0,
+      "fl07": 0,
+      "fl08": 0,
+      "fl09": 0
+    },
+    "capture_timeout_rc_by_client": {
+      "fl01": 255,
+      "fl02": 255,
+      "fl03": 255,
+      "fl05": 255,
+      "fl06": 255,
+      "fl07": 255,
+      "fl08": 255,
+      "fl09": 255
+    },
+    "stop_method": "SIGTERM to each local timeout PID after model completion",
+    "capture_result": "blocked_before_schema3_output: SSH returned 255 while terminating foreground timeout chain; raw JSON was not emitted",
+    "request_count": null,
+    "paired_confirmed_count": null,
+    "timely_count": null,
+    "late_count": null,
+    "unmatched_count": null,
+    "right_censored_count": null,
+    "challenge_count": null,
+    "state_counts": null,
+    "socket_drops": null,
+    "daemon_hunt_count": null,
+    "journal_result": "unknown; bounded journal command rejected nanosecond --since timestamp, stderr preserved",
+    "measurement_conclusion": "No heartbeat RTT/deadline sample is claimed from this model window. Do not infer 230ms/10s behavior from the successful model transfer."
+  },
+  "closeout": {
+    "post_model_check_all_ready": true,
+    "post_model_independent_audit": true,
+    "post_model_residual_check": "post-model-residual-check.txt",
+    "active_model_runner": false,
+    "active_capture_runner": false,
+    "raw_and_partial_evidence_preserved": true,
+    "next_decision": "This is a successful model transport baseline but not a usable schema3 heartbeat-load sample; do not tune thresholds or rerun model automatically."
+  }
+}

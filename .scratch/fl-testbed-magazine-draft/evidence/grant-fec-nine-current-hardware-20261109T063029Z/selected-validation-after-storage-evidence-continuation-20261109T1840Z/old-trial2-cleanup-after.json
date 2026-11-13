@@ -1,0 +1,168 @@
+{
+  "run_id": "fec12-20261109T092236Z-trial2-g30-d5-model",
+  "residual_hosts": [],
+  "cleanup_rows": [],
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl00.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl01.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl02.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl03.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl05.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl06.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl07.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl08.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl09.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "unit": "comm-smoke-fec12-20261109T092236Z-trial2-g30-d5-model-fl10.service",
+        "active": "inactive",
+        "routes": {
+          "239.80.41.1/32": [],
+          "239.80.42.1/32": []
+        },
+        "root_exists": true,
+        "cleanup_state": true
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794221403.2721627
+}

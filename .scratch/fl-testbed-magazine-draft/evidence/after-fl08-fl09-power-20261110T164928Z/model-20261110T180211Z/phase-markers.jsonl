@@ -1,0 +1,6 @@
+{"phase": "capture_start", "detail": "remote_root=/var/tmp/wfb-heartbeat-capture-repair-20261110T180211Z duration=1500", "wall_ns": 1794333825839578263, "monotonic_ns": 32938437713574}
+{"phase": "capture_ready", "detail": "all_start_pid_cmdline_verified=1", "wall_ns": 1794333843184111904, "monotonic_ns": 32955782244047}
+{"phase": "model_start", "detail": "run_id=after-fl08-fl09-power-20261110T180211Z-model payload_bytes=44770302", "wall_ns": 1794333843238754287, "monotonic_ns": 32955836886655}
+{"phase": "model_end", "detail": "rc=0", "wall_ns": 1794334164892473969, "monotonic_ns": 33277490606432}
+{"phase": "capture_stop_requested", "detail": "model_rc=0", "wall_ns": 1794334164947903167, "monotonic_ns": 33277546036301}
+{"phase": "capture_stopped", "detail": "model_rc=0", "wall_ns": 1794334190292564586, "monotonic_ns": 33302890697785}

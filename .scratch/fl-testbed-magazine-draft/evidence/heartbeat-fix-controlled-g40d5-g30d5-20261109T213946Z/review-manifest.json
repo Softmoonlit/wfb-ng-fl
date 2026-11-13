@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "status": "reviewed-stop-maintenance-partial-actual-update",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+  "constraints": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "fec": "8/12",
+    "heartbeat_ack_wait_ms": 230,
+    "heartbeat_silence_timeout_s": 10,
+    "measurement_channel": 157,
+    "restore_channel": 149,
+    "grant_guard_order": [
+      "40/5 gate",
+      "40/5 model",
+      "30/5 model"
+    ],
+    "model_execution_limit": 2,
+    "minimum_available_bytes": 536870912,
+    "cache_reserve_target_bytes": 704643072,
+    "topology": [
+      "fl00",
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ],
+    "excluded": [
+      "fl04"
+    ]
+  },
+  "files": {
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/plan.json": "3c49b8096fdd544389003535d3e730ce1d625ef56db0435b480efdc6877d22e6",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/README.md": "dc6183cca37387ce30f209f159acd3f30af0a9ef8326fece7e531288c66b6ea8",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/cache-maintenance-result.json": "ed2e734049951f38f94d421a1968ccfaf33a5c2452c00a073c45e22da2160dff",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/cache-maintenance-fl02-classification.json": "07a2cffce76e6ef608efe81633736d67a13ebef0b6c083903bafe7e1a95b35a3",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/cache-maintenance-fl02-packagekit-journal.txt": "9eec6b1e46b3028bb7b23f04a0abec028377c72b09686af74ced20599ab758eb",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/cache-archive-fl01-manifest.json": "e84d1364c803797cbcf7d1a9d8bd162f846a561b9e12d835c39892e558946d26",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl06-reclaim-manifest.json": "0c7bfd9ef44feaa7edb8f6b7fd1c54186e6ce2979f29b6e8a87d62625db442d0",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/budget-research.json": "7d9c7ff6d258035194f25259277d78dd0bbd62833c3022f11d978cb88cf8ecb3",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/node_agent.py": "f24616f60dcdd5453161afe298f376fc7a93dc1cf319ef4034e6b1937b47d7b8",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/check-all-ready.py": "3cba1e22ad90a9d677a9d9de02018117577877abf5380fbbe4ed009abadaf5d2",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate/worker.py": "b85f8c1aaf76bb4bf27cefa87d35fb4eda2f97a5cb89b700df3cf1f4d1ddea0c",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate/helpers.py": "e0f9ee2230fbbe1ad7f853b410fc6fe209b698a0be0be19d9f6f3a2c5d38b5ca",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate/storage.py": "0565a99c58ccabf953340794766caa9da03dfecd7a5f736e9cfd5d70f6f13a88",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate/driver-base.py": "7ef5fd0adef2a27a2f34390d5381e1c488f903aae4a82ca0c86d97ec1b99217e"
+  },
+  "canonical_bundle_sha256": "301194954d172c1ded82765738f6651df82324b0a63494357f447e28b453eb55",
+  "offline_import_verify": {
+    "previous_worker_helpers_storage_driver_base": "passed",
+    "canonical_runner_node_agent_recover": "passed",
+    "canonical_local_unittest": "59/59 passed"
+  },
+  "execution": {
+    "started": false,
+    "model_executions": 0,
+    "remote_executor_count": 0
+  },
+  "continuation": {
+    "status": "STOP",
+    "fl02_actual_packagekit_update": true,
+    "transaction_id": "/382_aaaadbca",
+    "full_admission_started": false
+  },
+  "wall": 1794263322.3101385
+}

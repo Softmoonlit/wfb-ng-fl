@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "说明": "本地编译语法对象、嵌入代码语法、计划及SHA核验通过，未执行编排",
+  "compiled": [
+    "driver-base.py",
+    "helpers.py",
+    "release-online-node.py",
+    "release-online.py",
+    "storage.py",
+    "verify-local.py",
+    "worker.py"
+  ],
+  "profile_completed": [],
+  "bundle_sha256": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "model_bytes": 44770302,
+  "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "review_manifest_sha256": "972db768c9fb3f79ef722eff91807073aff04f2cfc936a59dbc791307274b9be",
+  "reviewed_files": 21,
+  "prior_screening_guard_checks": {
+    "accepted": 2,
+    "rejected": 7
+  },
+  "remote_actions_this_turn": 0,
+  "worker_started": false,
+  "wall": 1794214332.827043
+}

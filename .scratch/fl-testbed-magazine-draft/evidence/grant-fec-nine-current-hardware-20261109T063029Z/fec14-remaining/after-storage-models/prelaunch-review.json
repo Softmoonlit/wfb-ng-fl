@@ -1,0 +1,35 @@
+{
+  "py_compile": "passed",
+  "candidates": [
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/fec14-g40-d10-model",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/fec14-g60-d10-model",
+      "execute_count": 0
+    }
+  ],
+  "bundle_sha": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "model_size": 44770302,
+  "model_sha": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "max_execute": 2
+}

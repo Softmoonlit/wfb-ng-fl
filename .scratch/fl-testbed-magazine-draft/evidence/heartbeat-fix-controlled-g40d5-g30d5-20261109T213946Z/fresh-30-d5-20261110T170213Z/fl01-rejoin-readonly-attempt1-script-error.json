@@ -1,0 +1,277 @@
+{
+  "status": "still-unreachable",
+  "known_host": "fl01",
+  "known_ip": "192.168.0.191",
+  "max_retries": 2,
+  "attempts": [
+    {
+      "attempt": 1,
+      "wall": 1794303082.6573477,
+      "known_host": "fl01",
+      "known_ip": "192.168.0.191",
+      "ping": {
+        "argv": [
+          "ping",
+          "-c",
+          "1",
+          "-W",
+          "1",
+          "192.168.0.191"
+        ],
+        "returncode": 0,
+        "stdout": "PING 192.168.0.191 (192.168.0.191) 56(84) bytes of data.\n64 bytes from 192.168.0.191: icmp_seq=1 ttl=64 time=3.85 ms\n\n--- 192.168.0.191 ping statistics ---\n1 packets transmitted, 1 received, 0% packet loss, time 0ms\nrtt min/avg/max/mdev = 3.851/3.851/3.851/0.000 ms\n",
+        "stderr": ""
+      },
+      "ssh": {
+        "argv": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl01",
+          "sudo -n python3 -c 'import json, pathlib, socket, subprocess, time\\n\\ndef run(argv):\\n    try:\\n        p = subprocess.run(argv, capture_output=True, text=True, timeout=5)\\n        return dict(returncode=p.returncode, stdout=p.stdout, stderr=p.stderr)\\n    except Exception as exc:\\n        return dict(error=repr(exc))\\n\\ndef read(path):\\n    try:\\n        return pathlib.Path(path).read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\')\\n    except Exception as exc:\\n        return \\'ERROR:\\' + repr(exc)\\n\\nrole = \\'client\\'\\nunit = \\'wfb-fl-client-daemon.service\\'\\nservice = run([\\'systemctl\\', \\'show\\', unit, \\'-p\\', \\'MainPID\\', \\'-p\\', \\'ActiveState\\', \\'-p\\', \\'SubState\\'])\\nargs = []\\nfor p in pathlib.Path(\\'/proc\\').glob(\\'[0-9]*/cmdline\\'):\\n    try:\\n        a = p.read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\').split(\\'\\\\\\\\0\\')\\n        if a and a[0] == \\'/usr/bin/wfb_v6_uplink\\':\\n            args.append(dict(pid=p.parent.name, argv=a, exe_sha256=__import__(\\'hashlib\\').sha256((p.parent / \\'exe\\').read_bytes()).hexdigest()))\\n    except (OSError, UnicodeError):\\n        pass\\ninterfaces = run([\\'bash\\', \\'-lc\\', \\'for p in /sys/class/net/*; do [ \"$(basename \"$(readlink -f \"$p/device/driver\")\")\" = rtl88xxau_wfb ] && iw dev \"$(basename \"$p\")\" info; done\\'])\\nget_radio = None\\nget_fec = None\\nif len(args) == 1:\\n    import socket as so, struct\\n    try:\\n        port = int(args[0][\\'argv\\'][args[0][\\'argv\\'].index(\\'--radio-control-port\\') + 1])\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 4), (\\'127.0.0.1\\', port))\\n            get_radio = list(struct.unpack(\\'!II7B\\', sock.recvfrom(4096)[0]))\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 3), (\\'127.0.0.1\\', port))\\n            get_fec = list(struct.unpack(\\'!II2B\\', sock.recvfrom(4096)[0]))\\n    except Exception as exc:\\n        get_radio = \\'ERROR:\\' + repr(exc)\\n        get_fec = \\'ERROR:\\' + repr(exc)\\nspace = pathlib.Path(\\'/srv/wfb-ng-fl\\')\\nst = __import__(\\'os\\').statvfs(str(space))\\npower = run([\\'nvpmodel\\', \\'-q\\'])\\nlimits = {}\\nfor path in [\\'/sys/devices/system/cpu/online\\', \\'/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq\\', \\'/sys/kernel/nvpmodel_clk_cap/emc\\', \\'/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked\\'] + [\\'/sys/devices/system/cpu/cpu\\' + str(i) + \\'/cpufreq/scaling_max_freq\\' for i in range(6)]:\\n    limits[path] = read(path)\\nprint(json.dumps(dict(hostname=socket.gethostname(), model=read(\\'/proc/device-tree/model\\'), board_id=read(\\'/proc/device-tree/serial-number\\'), machine_id=read(\\'/etc/machine-id\\'), boot_id=read(\\'/proc/sys/kernel/random/boot_id\\'), service=service, native=args, iw=interfaces, get_radio=get_radio, get_fec=get_fec, power=power, limits=limits, storage=dict(available_bytes=st.f_bavail * st.f_frsize, available_inodes=st.f_favail), monotonic=time.monotonic()), ensure_ascii=False))\\n'"
+        ],
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "bash: -c: line 1: syntax error near unexpected token `)'\nbash: -c: line 1: `sudo -n python3 -c 'import json, pathlib, socket, subprocess, time\\n\\ndef run(argv):\\n    try:\\n        p = subprocess.run(argv, capture_output=True, text=True, timeout=5)\\n        return dict(returncode=p.returncode, stdout=p.stdout, stderr=p.stderr)\\n    except Exception as exc:\\n        return dict(error=repr(exc))\\n\\ndef read(path):\\n    try:\\n        return pathlib.Path(path).read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\')\\n    except Exception as exc:\\n        return \\'ERROR:\\' + repr(exc)\\n\\nrole = \\'client\\'\\nunit = \\'wfb-fl-client-daemon.service\\'\\nservice = run([\\'systemctl\\', \\'show\\', unit, \\'-p\\', \\'MainPID\\', \\'-p\\', \\'ActiveState\\', \\'-p\\', \\'SubState\\'])\\nargs = []\\nfor p in pathlib.Path(\\'/proc\\').glob(\\'[0-9]*/cmdline\\'):\\n    try:\\n        a = p.read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\').split(\\'\\\\\\\\0\\')\\n        if a and a[0] == \\'/usr/bin/wfb_v6_uplink\\':\\n            args.append(dict(pid=p.parent.name, argv=a, exe_sha256=__import__(\\'hashlib\\').sha256((p.parent / \\'exe\\').read_bytes()).hexdigest()))\\n    except (OSError, UnicodeError):\\n        pass\\ninterfaces = run([\\'bash\\', \\'-lc\\', \\'for p in /sys/class/net/*; do [ \"$(basename \"$(readlink -f \"$p/device/driver\")\")\" = rtl88xxau_wfb ] && iw dev \"$(basename \"$p\")\" info; done\\'])\\nget_radio = None\\nget_fec = None\\nif len(args) == 1:\\n    import socket as so, struct\\n    try:\\n        port = int(args[0][\\'argv\\'][args[0][\\'argv\\'].index(\\'--radio-control-port\\') + 1])\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 4), (\\'127.0.0.1\\', port))\\n            get_radio = list(struct.unpack(\\'!II7B\\', sock.recvfrom(4096)[0]))\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 3), (\\'127.0.0.1\\', port))\\n            get_fec = list(struct.unpack(\\'!II2B\\', sock.recvfrom(4096)[0]))\\n    except Exception as exc:\\n        get_radio = \\'ERROR:\\' + repr(exc)\\n        get_fec = \\'ERROR:\\' + repr(exc)\\nspace = pathlib.Path(\\'/srv/wfb-ng-fl\\')\\nst = __import__(\\'os\\').statvfs(str(space))\\npower = run([\\'nvpmodel\\', \\'-q\\'])\\nlimits = {}\\nfor path in [\\'/sys/devices/system/cpu/online\\', \\'/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq\\', \\'/sys/kernel/nvpmodel_clk_cap/emc\\', \\'/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked\\'] + [\\'/sys/devices/system/cpu/cpu\\' + str(i) + \\'/cpufreq/scaling_max_freq\\' for i in range(6)]:\\n    limits[path] = read(path)\\nprint(json.dumps(dict(hostname=socket.gethostname(), model=read(\\'/proc/device-tree/model\\'), board_id=read(\\'/proc/device-tree/serial-number\\'), machine_id=read(\\'/etc/machine-id\\'), boot_id=read(\\'/proc/sys/kernel/random/boot_id\\'), service=service, native=args, iw=interfaces, get_radio=get_radio, get_fec=get_fec, power=power, limits=limits, storage=dict(available_bytes=st.f_bavail * st.f_frsize, available_inodes=st.f_favail), monotonic=time.monotonic()), ensure_ascii=False))\\n''\n"
+      }
+    },
+    {
+      "attempt": 2,
+      "wall": 1794303098.0903373,
+      "known_host": "fl01",
+      "known_ip": "192.168.0.191",
+      "ping": {
+        "argv": [
+          "ping",
+          "-c",
+          "1",
+          "-W",
+          "1",
+          "192.168.0.191"
+        ],
+        "returncode": 0,
+        "stdout": "PING 192.168.0.191 (192.168.0.191) 56(84) bytes of data.\n64 bytes from 192.168.0.191: icmp_seq=1 ttl=64 time=47.7 ms\n\n--- 192.168.0.191 ping statistics ---\n1 packets transmitted, 1 received, 0% packet loss, time 0ms\nrtt min/avg/max/mdev = 47.685/47.685/47.685/0.000 ms\n",
+        "stderr": ""
+      },
+      "ssh": {
+        "argv": [
+          "ssh",
+          "-T",
+          "-oBatchMode=yes",
+          "-oConnectTimeout=5",
+          "fl01",
+          "sudo -n python3 -c 'import json, pathlib, socket, subprocess, time\\n\\ndef run(argv):\\n    try:\\n        p = subprocess.run(argv, capture_output=True, text=True, timeout=5)\\n        return dict(returncode=p.returncode, stdout=p.stdout, stderr=p.stderr)\\n    except Exception as exc:\\n        return dict(error=repr(exc))\\n\\ndef read(path):\\n    try:\\n        return pathlib.Path(path).read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\')\\n    except Exception as exc:\\n        return \\'ERROR:\\' + repr(exc)\\n\\nrole = \\'client\\'\\nunit = \\'wfb-fl-client-daemon.service\\'\\nservice = run([\\'systemctl\\', \\'show\\', unit, \\'-p\\', \\'MainPID\\', \\'-p\\', \\'ActiveState\\', \\'-p\\', \\'SubState\\'])\\nargs = []\\nfor p in pathlib.Path(\\'/proc\\').glob(\\'[0-9]*/cmdline\\'):\\n    try:\\n        a = p.read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\').split(\\'\\\\\\\\0\\')\\n        if a and a[0] == \\'/usr/bin/wfb_v6_uplink\\':\\n            args.append(dict(pid=p.parent.name, argv=a, exe_sha256=__import__(\\'hashlib\\').sha256((p.parent / \\'exe\\').read_bytes()).hexdigest()))\\n    except (OSError, UnicodeError):\\n        pass\\ninterfaces = run([\\'bash\\', \\'-lc\\', \\'for p in /sys/class/net/*; do [ \"$(basename \"$(readlink -f \"$p/device/driver\")\")\" = rtl88xxau_wfb ] && iw dev \"$(basename \"$p\")\" info; done\\'])\\nget_radio = None\\nget_fec = None\\nif len(args) == 1:\\n    import socket as so, struct\\n    try:\\n        port = int(args[0][\\'argv\\'][args[0][\\'argv\\'].index(\\'--radio-control-port\\') + 1])\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 4), (\\'127.0.0.1\\', port))\\n            get_radio = list(struct.unpack(\\'!II7B\\', sock.recvfrom(4096)[0]))\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 3), (\\'127.0.0.1\\', port))\\n            get_fec = list(struct.unpack(\\'!II2B\\', sock.recvfrom(4096)[0]))\\n    except Exception as exc:\\n        get_radio = \\'ERROR:\\' + repr(exc)\\n        get_fec = \\'ERROR:\\' + repr(exc)\\nspace = pathlib.Path(\\'/srv/wfb-ng-fl\\')\\nst = __import__(\\'os\\').statvfs(str(space))\\npower = run([\\'nvpmodel\\', \\'-q\\'])\\nlimits = {}\\nfor path in [\\'/sys/devices/system/cpu/online\\', \\'/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq\\', \\'/sys/kernel/nvpmodel_clk_cap/emc\\', \\'/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked\\'] + [\\'/sys/devices/system/cpu/cpu\\' + str(i) + \\'/cpufreq/scaling_max_freq\\' for i in range(6)]:\\n    limits[path] = read(path)\\nprint(json.dumps(dict(hostname=socket.gethostname(), model=read(\\'/proc/device-tree/model\\'), board_id=read(\\'/proc/device-tree/serial-number\\'), machine_id=read(\\'/etc/machine-id\\'), boot_id=read(\\'/proc/sys/kernel/random/boot_id\\'), service=service, native=args, iw=interfaces, get_radio=get_radio, get_fec=get_fec, power=power, limits=limits, storage=dict(available_bytes=st.f_bavail * st.f_frsize, available_inodes=st.f_favail), monotonic=time.monotonic()), ensure_ascii=False))\\n'"
+        ],
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "bash: -c: line 1: syntax error near unexpected token `)'\nbash: -c: line 1: `sudo -n python3 -c 'import json, pathlib, socket, subprocess, time\\n\\ndef run(argv):\\n    try:\\n        p = subprocess.run(argv, capture_output=True, text=True, timeout=5)\\n        return dict(returncode=p.returncode, stdout=p.stdout, stderr=p.stderr)\\n    except Exception as exc:\\n        return dict(error=repr(exc))\\n\\ndef read(path):\\n    try:\\n        return pathlib.Path(path).read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\')\\n    except Exception as exc:\\n        return \\'ERROR:\\' + repr(exc)\\n\\nrole = \\'client\\'\\nunit = \\'wfb-fl-client-daemon.service\\'\\nservice = run([\\'systemctl\\', \\'show\\', unit, \\'-p\\', \\'MainPID\\', \\'-p\\', \\'ActiveState\\', \\'-p\\', \\'SubState\\'])\\nargs = []\\nfor p in pathlib.Path(\\'/proc\\').glob(\\'[0-9]*/cmdline\\'):\\n    try:\\n        a = p.read_bytes().rstrip(b\\'\\\\\\\\0\\').decode(errors=\\'replace\\').split(\\'\\\\\\\\0\\')\\n        if a and a[0] == \\'/usr/bin/wfb_v6_uplink\\':\\n            args.append(dict(pid=p.parent.name, argv=a, exe_sha256=__import__(\\'hashlib\\').sha256((p.parent / \\'exe\\').read_bytes()).hexdigest()))\\n    except (OSError, UnicodeError):\\n        pass\\ninterfaces = run([\\'bash\\', \\'-lc\\', \\'for p in /sys/class/net/*; do [ \"$(basename \"$(readlink -f \"$p/device/driver\")\")\" = rtl88xxau_wfb ] && iw dev \"$(basename \"$p\")\" info; done\\'])\\nget_radio = None\\nget_fec = None\\nif len(args) == 1:\\n    import socket as so, struct\\n    try:\\n        port = int(args[0][\\'argv\\'][args[0][\\'argv\\'].index(\\'--radio-control-port\\') + 1])\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 4), (\\'127.0.0.1\\', port))\\n            get_radio = list(struct.unpack(\\'!II7B\\', sock.recvfrom(4096)[0]))\\n        with so.socket(so.AF_INET, so.SOCK_DGRAM) as sock:\\n            sock.settimeout(2)\\n            sock.sendto(struct.pack(\\'!IB\\', 0x434f4d4d, 3), (\\'127.0.0.1\\', port))\\n            get_fec = list(struct.unpack(\\'!II2B\\', sock.recvfrom(4096)[0]))\\n    except Exception as exc:\\n        get_radio = \\'ERROR:\\' + repr(exc)\\n        get_fec = \\'ERROR:\\' + repr(exc)\\nspace = pathlib.Path(\\'/srv/wfb-ng-fl\\')\\nst = __import__(\\'os\\').statvfs(str(space))\\npower = run([\\'nvpmodel\\', \\'-q\\'])\\nlimits = {}\\nfor path in [\\'/sys/devices/system/cpu/online\\', \\'/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq\\', \\'/sys/kernel/nvpmodel_clk_cap/emc\\', \\'/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked\\'] + [\\'/sys/devices/system/cpu/cpu\\' + str(i) + \\'/cpufreq/scaling_max_freq\\' for i in range(6)]:\\n    limits[path] = read(path)\\nprint(json.dumps(dict(hostname=socket.gethostname(), model=read(\\'/proc/device-tree/model\\'), board_id=read(\\'/proc/device-tree/serial-number\\'), machine_id=read(\\'/etc/machine-id\\'), boot_id=read(\\'/proc/sys/kernel/random/boot_id\\'), service=service, native=args, iw=interfaces, get_radio=get_radio, get_fec=get_fec, power=power, limits=limits, storage=dict(available_bytes=st.f_bavail * st.f_frsize, available_inodes=st.f_favail), monotonic=time.monotonic()), ensure_ascii=False))\\n''\n"
+      }
+    }
+  ],
+  "registry": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 12,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfca386b38672",
+    "link_process": {
+      "running": true,
+      "pid": 1628
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 178550,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.106165641,
+        "last_heartbeat_timestamp_ms": 1794303096508,
+        "last_heartbeat_ago_seconds": 1.95,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2191098,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2210.61458226,
+        "last_heartbeat_timestamp_ms": 1794303098016,
+        "last_heartbeat_ago_seconds": 0.45,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2190701,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2210.192656407,
+        "last_heartbeat_timestamp_ms": 1794303097594,
+        "last_heartbeat_ago_seconds": 0.87,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2187638,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.141308455,
+        "last_heartbeat_timestamp_ms": 1794303096543,
+        "last_heartbeat_ago_seconds": 1.92,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2190326,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2210.755771536,
+        "last_heartbeat_timestamp_ms": 1794303098157,
+        "last_heartbeat_ago_seconds": 0.3,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2185968,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.175112727,
+        "last_heartbeat_timestamp_ms": 1794303096577,
+        "last_heartbeat_ago_seconds": 1.88,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2187780,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.492144984,
+        "last_heartbeat_timestamp_ms": 1794303096894,
+        "last_heartbeat_ago_seconds": 1.57,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2189617,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.316465536,
+        "last_heartbeat_timestamp_ms": 1794303096718,
+        "last_heartbeat_ago_seconds": 1.74,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 2188673,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 2209.736725076,
+        "last_heartbeat_timestamp_ms": 1794303097138,
+        "last_heartbeat_ago_seconds": 1.32,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      }
+    }
+  },
+  "wall": 1794303098.4631958,
+  "note": "Only the existing fl01 hostname and 192.168.0.191 were used; no unknown address discovery."
+}

@@ -1,0 +1,135 @@
+{
+  "status": "complete",
+  "host": "fl01",
+  "wall_ns": 1794330638219409438,
+  "required_bytes": 671181818,
+  "free_before": 584732672,
+  "free_after": 674279424,
+  "target": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "selected": [
+    "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+    "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin"
+  ],
+  "deleted_rows": [
+    {
+      "before": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+        "exists": true,
+        "regular": true,
+        "size_bytes": 44770302,
+        "inode": 584998,
+        "device": 2049,
+        "nlink": 1,
+        "mode": "0o100600",
+        "mtime_ns": 1794250884200054405,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "after": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+        "exists": false
+      },
+      "free_after": 629506048
+    },
+    {
+      "before": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin",
+        "exists": true,
+        "regular": true,
+        "size_bytes": 44770302,
+        "inode": 585000,
+        "device": 2049,
+        "nlink": 1,
+        "mode": "0o100600",
+        "mtime_ns": 1794250893565113296,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "after": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin",
+        "exists": false
+      },
+      "free_after": 674279424
+    }
+  ],
+  "protected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 583344,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430718440404,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 585435,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946770043144,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 585449,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771183000366,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "protected_after": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 583344,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430718440404,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 585435,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946770043144,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 585449,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771183000366,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "old_reclamation_paths_reused": false,
+  "failed_attempts_deleted": false,
+  "source_success_evidence": "fl08-heartbeat-fix-validation/continuation-cccac233291c-0model-gate/trial2/run-summary.json"
+}

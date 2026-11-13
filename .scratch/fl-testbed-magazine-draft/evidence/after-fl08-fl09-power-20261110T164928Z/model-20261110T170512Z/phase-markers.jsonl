@@ -1,0 +1,6 @@
+{"phase": "capture_start", "detail": "hosts=fl01 fl02 fl03 fl05 fl06 fl07 fl08 fl09 duration=1500", "wall_ns": 1794330437413083929, "monotonic_ns": 29550011216616}
+{"phase": "capture_ready", "detail": "local_capture_processes_alive=1", "wall_ns": 1794330441523621084, "monotonic_ns": 29554121754763}
+{"phase": "model_start", "detail": "run_id=after-fl08-fl09-power-20261110T170512Z-model payload_bytes=44770302 deadline_each_direction=600", "wall_ns": 1794330441583332781, "monotonic_ns": 29554181465276}
+{"phase": "model_end", "detail": "rc=1", "wall_ns": 1794330443763618711, "monotonic_ns": 29556361750726}
+{"phase": "capture_stop_requested", "detail": "model_rc=1", "wall_ns": 1794330443820275831, "monotonic_ns": 29556418409863}
+{"phase": "capture_stopped", "detail": "wall=2026-11-10T17:07:23.872026692Z", "wall_ns": 1794330443921793040, "monotonic_ns": 29556519924927}

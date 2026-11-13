@@ -1,0 +1,36 @@
+./tests/fl_runtime/stage3_runner.py:316:            packages = list(build_dir.glob('**/*.deb')) + list(build_dir.parent.glob('*.deb'))
+./tests/fl_runtime/stage3_runner.py:326:                remote = '/var/tmp/' + self.run_id + '.deb'
+./docs/deployment/MNIST参考初始模型.md:27:基础通信服务不强制安装 PyTorch；`mnist` 安装 extra 声明参考模型所需的 `torch`。执行工具的解释器必须已具备支持 `weights_only=True` 的 PyTorch。Jetson 对应 JetPack／CUDA 的兼容包和各端依赖组合由 [08 票](../../.scratch/real-fedavg-training/issues/08-jetson-environment-and-40mhz-trial.md)核实，不用普通 CPU wheel 替代客户端 GPU 环境。
+./Makefile:43:	$$(PATH="$(ENV)/bin:$(ENV)/local/bin:$(PATH)" which python3) -m pip install --upgrade pip setuptools $(STDEB)
+./.scratch/stage3-vm-managed-physical-radio-loop/issues/01-client-local-evidence-archive.md:39:- 双轴审查发现的资源清理、退出码、沙箱删除及构建缓存问题已修复并复验。本工单未执行实体射频验收或完整 Debian 打包；包资源验证使用真实 wheel/sdist 构建。
+./wfb_ng/mavlink.py:5572:MAVLINK_MSG_ID_WHEEL_DISTANCE = 9000
+./wfb_ng/mavlink.py:15476:class MAVLink_wheel_distance_message(MAVLink_message):
+./wfb_ng/mavlink.py:15478:    Cumulative distance traveled for each reported wheel.
+./wfb_ng/mavlink.py:15481:    id = MAVLINK_MSG_ID_WHEEL_DISTANCE
+./wfb_ng/mavlink.py:15482:    msgname = "WHEEL_DISTANCE"
+./wfb_ng/mavlink.py:15499:        MAVLink_message.__init__(self, MAVLink_wheel_distance_message.id, MAVLink_wheel_distance_message.msgname)
+./wfb_ng/mavlink.py:15500:        self._fieldnames = MAVLink_wheel_distance_message.fieldnames
+./wfb_ng/mavlink.py:15501:        self._instance_field = MAVLink_wheel_distance_message.instance_field
+./wfb_ng/mavlink.py:15502:        self._instance_offset = MAVLink_wheel_distance_message.instance_offset
+./wfb_ng/mavlink.py:15513:setattr(MAVLink_wheel_distance_message, "name", mavlink_msg_deprecated_name_property())
+./wfb_ng/mavlink.py:16353:    MAVLINK_MSG_ID_WHEEL_DISTANCE: MAVLink_wheel_distance_message,
+./wfb_ng/mavlink.py:24510:    def wheel_distance_encode(self, time_usec: int, count: int, distance: Sequence[float]) -> MAVLink_wheel_distance_message:
+./wfb_ng/mavlink.py:24512:        Cumulative distance traveled for each reported wheel.
+./wfb_ng/mavlink.py:24516:        distance                  : Distance reported by individual wheel encoders. Forward rotations increase values, reverse rotations decrease them. Not all wheels will necessarily have wheel encoders; the mapping of encoders to wheel positions must be agreed/understood by the endpoints. [m] (type:double)
+./wfb_ng/mavlink.py:24519:        return MAVLink_wheel_distance_message(time_usec, count, distance)
+./wfb_ng/mavlink.py:24521:    def wheel_distance_send(self, time_usec: int, count: int, distance: Sequence[float], force_mavlink1: bool = False) -> None:
+./wfb_ng/mavlink.py:24523:        Cumulative distance traveled for each reported wheel.
+./wfb_ng/mavlink.py:24527:        distance                  : Distance reported by individual wheel encoders. Forward rotations increase values, reverse rotations decrease them. Not all wheels will necessarily have wheel encoders; the mapping of encoders to wheel positions must be agreed/understood by the endpoints. [m] (type:double)
+./wfb_ng/mavlink.py:24530:        self.send(self.wheel_distance_encode(time_usec, count, distance), force_mavlink1=force_mavlink1)
+./wfb_ng/tests/test_build_identity_packaging.py:64:    def test_wheel_contains_direct_package_resource_and_refreshes_commit(self):
+./wfb_ng/tests/test_build_identity_packaging.py:66:            self.build('bdist_wheel', commit=commit)
+./wfb_ng/tests/test_build_identity_packaging.py:67:            wheel = next((self.source / 'dist').glob('*.whl'))
+./wfb_ng/tests/test_build_identity_packaging.py:68:            with zipfile.ZipFile(wheel) as package:
+./wfb_ng/tests/test_build_identity_packaging.py:71:            wheel.unlink()
+./wfb_ng/tests/test_build_identity_packaging.py:73:    def test_sdist_then_wheel_preserves_target_identity_without_git(self):
+./wfb_ng/tests/test_build_identity_packaging.py:76:        self.build('bdist_wheel', source=unpacked)
+./wfb_ng/tests/test_build_identity_packaging.py:77:        with zipfile.ZipFile(next((unpacked / 'dist').glob('*.whl'))) as package:
+./wfb_ng/tests/test_build_identity_packaging.py:85:                result = self.build('bdist_wheel', commit=commit, succeeds=False)
+./wfb_ng/tests/test_build_identity_packaging.py:95:                self.build('bdist_wheel', source=unpacked, commit=commit, succeeds=False)
+./wfb_ng/tests/test_build_identity_packaging.py:111:                self.build('bdist_wheel', source=unpacked, succeeds=False)
+./.scratch/stage4-web-console-file-simulation/issues/01-web-management-and-state-snapshot.md:27:- 直接安装临时目录与 `sdist → wheel` 的 HTML/CSS/JavaScript 均与源码一致。真实管理 IPv4 组合 HTTP 测试通过，基础页面使用现有 Node 执行实际 JavaScript 行为测试。

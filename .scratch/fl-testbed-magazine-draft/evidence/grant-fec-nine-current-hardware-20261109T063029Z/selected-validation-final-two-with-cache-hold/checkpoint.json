@@ -1,0 +1,20 @@
+{
+  "stage": "stopped-before-cache-maintenance",
+  "status": "stopped-management-boundary",
+  "pid": 439530,
+  "wall": 1794225327.469666,
+  "monotonic": 30017.430703719,
+  "deadline_seconds": 180,
+  "execute_count": 0,
+  "model_transfer_started": false,
+  "model_files_sent": false,
+  "cache_maintenance_started": false,
+  "reason": "fl07 management lost before full-ten actual/nine-READY gate",
+  "fl07": {
+    "registry": "OFFLINE",
+    "ssh_error": "No route to host"
+  },
+  "fl10_power_event_not_parameter_failure": true,
+  "background_owner_exited": true,
+  "child_worker_started": false
+}

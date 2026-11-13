@@ -1,0 +1,25 @@
+{
+  "owner_pid": 439530,
+  "owner": "cache-hold-wrapper",
+  "child_worker_started": false,
+  "child_pid": null,
+  "child_returncode": null,
+  "status": "stopped-management-boundary",
+  "execute_count": 0,
+  "cache_hold": false,
+  "cache_maintenance": false,
+  "packagekit_restore": {
+    "ok": true,
+    "attempted": false,
+    "reason": "hold was never acquired; final read-only verification active/static"
+  },
+  "packagekit_final_readonly": {
+    "active": "active",
+    "enabled": "static",
+    "main_pid": "6111",
+    "pkgcache_exists": true,
+    "srcpkgcache_exists": true
+  },
+  "background_owner_exited": true,
+  "wall": 1794225327.469666
+}

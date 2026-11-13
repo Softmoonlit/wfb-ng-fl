@@ -1,0 +1,99 @@
+{
+  "object_path": "/372_cbdeeced",
+  "wait_file": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-final-two-after-all-powered/packagekit-transaction-wait.json",
+  "wait_status": "ao-nonzero-after-180s",
+  "supplemental": {
+    "host": "fl02",
+    "returncode": 0,
+    "stdout": "{\"host\": \"fl02\", \"boot_id\": \"1a183917-61d1-4512-8967-4e790c118dcc\", \"object_path\": \"/372_cbdeeced\", \"transaction_list\": {\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\"}, \"properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}, \"AllowCancel\": {\"returncode\": 0, \"stdout\": \"b true\\n\", \"stderr\": \"\"}}, \"packagekit_version\": {\"returncode\": 0, \"stdout\": \"gir1.2-packagekitglib-1.0 1.2.5-2ubuntu2\\nlibpackagekit-glib2-18 1.2.5-2ubuntu2\\npackagekit 1.2.5-2ubuntu2\\npackagekit-tools 1.2.5-2ubuntu2\\n\", \"stderr\": \"\"}, \"packagekit_processes\": [{\"pid\": \"1950\", \"argv\": [\"/usr/libexec/packagekitd\"]}], \"service\": {\"returncode\": 0, \"stdout\": \"MainPID=1950\\nActiveState=active\\nSubState=running\\nUnitFileState=static\\n\", \"stderr\": \"\"}, \"locks\": {\"/var/lib/dpkg/lock-frontend\": {\"path\": \"/var/lib/dpkg/lock-frontend\", \"exists\": true, \"held\": false}, \"/var/lib/dpkg/lock\": {\"path\": \"/var/lib/dpkg/lock\", \"exists\": true, \"held\": false}, \"/var/lib/apt/lists/lock\": {\"path\": \"/var/lib/apt/lists/lock\", \"exists\": true, \"held\": false}, \"/var/cache/apt/archives/lock\": {\"path\": \"/var/cache/apt/archives/lock\", \"exists\": true, \"held\": false}}, \"wall\": 1794245036.3990955}\n",
+    "stderr": "",
+    "elapsed_seconds": 0.8780670166015625,
+    "remote": {
+      "host": "fl02",
+      "boot_id": "1a183917-61d1-4512-8967-4e790c118dcc",
+      "object_path": "/372_cbdeeced",
+      "transaction_list": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": ""
+      },
+      "properties": {
+        "Role": {
+          "returncode": 0,
+          "stdout": "u 8\n",
+          "stderr": ""
+        },
+        "Status": {
+          "returncode": 0,
+          "stdout": "u 8\n",
+          "stderr": ""
+        },
+        "Percentage": {
+          "returncode": 0,
+          "stdout": "u 0\n",
+          "stderr": ""
+        },
+        "AllowCancel": {
+          "returncode": 0,
+          "stdout": "b true\n",
+          "stderr": ""
+        }
+      },
+      "packagekit_version": {
+        "returncode": 0,
+        "stdout": "gir1.2-packagekitglib-1.0 1.2.5-2ubuntu2\nlibpackagekit-glib2-18 1.2.5-2ubuntu2\npackagekit 1.2.5-2ubuntu2\npackagekit-tools 1.2.5-2ubuntu2\n",
+        "stderr": ""
+      },
+      "packagekit_processes": [
+        {
+          "pid": "1950",
+          "argv": [
+            "/usr/libexec/packagekitd"
+          ]
+        }
+      ],
+      "service": {
+        "returncode": 0,
+        "stdout": "MainPID=1950\nActiveState=active\nSubState=running\nUnitFileState=static\n",
+        "stderr": ""
+      },
+      "locks": {
+        "/var/lib/dpkg/lock-frontend": {
+          "path": "/var/lib/dpkg/lock-frontend",
+          "exists": true,
+          "held": false
+        },
+        "/var/lib/dpkg/lock": {
+          "path": "/var/lib/dpkg/lock",
+          "exists": true,
+          "held": false
+        },
+        "/var/lib/apt/lists/lock": {
+          "path": "/var/lib/apt/lists/lock",
+          "exists": true,
+          "held": false
+        },
+        "/var/cache/apt/archives/lock": {
+          "path": "/var/cache/apt/archives/lock",
+          "exists": true,
+          "held": false
+        }
+      },
+      "wall": 1794245036.3990955
+    }
+  },
+  "local_enum_mapping": {
+    "source": "installed GI PackageKitGlib-1.0 typelib",
+    "packagekit_version": "1.2.5-2ubuntu2",
+    "role_api": "role_enum_to_string",
+    "status_api": "status_enum_to_string",
+    "role_8": "get-update-detail",
+    "status_8": "download",
+    "allowcancel_interface": "/usr/share/dbus-1/interfaces/org.freedesktop.PackageKit.Transaction.xml"
+  },
+  "read_only_only": true,
+  "stop_attempted": false,
+  "cancel_attempted": false,
+  "cache_unlink_attempted": false,
+  "wall": 1794245036.4821675
+}

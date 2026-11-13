@@ -1,0 +1,1081 @@
+{
+  "phase": "post",
+  "wall": 1794466020.8060849,
+  "runner_returncode": 0,
+  "rows": [
+    {
+      "host": "fl00",
+      "command": [
+        "sudo",
+        "-n",
+        "/usr/bin/python3",
+        "-I",
+        "-c",
+        "import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='server' if host=='fl00' else 'client'\nunit='wfb-fl-'+role+'-daemon.service'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'argv':argv,'returncode':p.returncode,'stdout':p.stdout,'stderr':p.stderr}\nservice=run(['systemctl','show',unit,'-p','ActiveState','-p','SubState','-p','MainPID'])\nitems=[]\nfor proc in pathlib.Path('/proc').glob('[0-9]*/cmdline'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='/usr/bin/wfb_v6_uplink': continue\n  iface=argv[argv.index('--air-interface')+1]; dev=pathlib.Path('/sys/class/net')/iface\n  usbdev=(dev/'device').resolve(); usb_path=usbdev.name\n  speed=next((p/'speed' for p in [usbdev,*usbdev.parents] if (p/'speed').exists()),None)\n  port=int(argv[argv.index('--radio-control-port')+1]); queries={}\n  for code,fmt,key in [(4,'!II7B','radio'),(3,'!II2B','fec')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('!IB',0x434f4d4d,code),('127.0.0.1',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'address').read_text().strip(),driver=(dev/'device/driver').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'exe').read_bytes()).hexdigest(),queries=queries,iw=run(['iw','dev',iface,'info'])))\n except Exception as exc: items.append({'probe_error':repr(exc)})\nst=os.statvfs('/srv/wfb-ng-fl')\nprint(json.dumps({'host':host,'role':role,'service':service,'native':items,'storage':{'available_bytes':st.f_bavail*st.f_frsize,'available_inodes':st.f_favail},'management':run(['ip','-j','addr','show','dev','enP8p1s0']) if host=='fl00' else None},ensure_ascii=False))\n"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl00\", \"role\": \"server\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-server-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=8375\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"8386\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"server\", \"--tun-name\", \"fl-s\", \"--tun-addr\", \"10.80.0.1/24\", \"--node-id\", \"255\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"3\", \"--air-interface\", \"wlxfc221c100119\", \"--known-clients\", \"1,2,3,4,5,6,7,8,9,10\", \"--grant-duration-ms\", \"30\", \"--guard-interval-ms\", \"5\", \"--client-target\", \"1:10.80.0.11:127.0.0.1:1\", \"--client-target\", \"2:10.80.0.12:127.0.0.1:1\", \"--client-target\", \"3:10.80.0.13:127.0.0.1:1\", \"--client-target\", \"4:10.80.0.14:127.0.0.1:1\", \"--client-target\", \"5:10.80.0.15:127.0.0.1:1\", \"--client-target\", \"6:10.80.0.16:127.0.0.1:1\", \"--client-target\", \"7:10.80.0.17:127.0.0.1:1\", \"--client-target\", \"8:10.80.0.18:127.0.0.1:1\", \"--client-target\", \"9:10.80.0.19:127.0.0.1:1\", \"--client-target\", \"10:10.80.0.20:127.0.0.1:1\", \"--downlink-pause-threshold-bytes\", \"131072\", \"--downlink-resume-threshold-bytes\", \"65536\", \"--downlink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c100119\", \"mac\": \"fc:22:1c:10:01:19\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.1:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 3, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c100119\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c100119\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:19\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 48205312000, \"available_inodes\": 6676254}, \"management\": {\"argv\": [\"ip\", \"-j\", \"addr\", \"show\", \"dev\", \"enP8p1s0\"], \"returncode\": 0, \"stdout\": \"[{\\\"ifindex\\\":4,\\\"ifname\\\":\\\"enP8p1s0\\\",\\\"flags\\\":[\\\"BROADCAST\\\",\\\"MULTICAST\\\",\\\"UP\\\",\\\"LOWER_UP\\\"],\\\"mtu\\\":1500,\\\"qdisc\\\":\\\"mq\\\",\\\"operstate\\\":\\\"UP\\\",\\\"group\\\":\\\"default\\\",\\\"txqlen\\\":1000,\\\"link_type\\\":\\\"ether\\\",\\\"address\\\":\\\"3c:6d:66:b5:0c:0b\\\",\\\"broadcast\\\":\\\"ff:ff:ff:ff:ff:ff\\\",\\\"addr_info\\\":[{\\\"family\\\":\\\"inet\\\",\\\"local\\\":\\\"192.168.0.190\\\",\\\"prefixlen\\\":24,\\\"broadcast\\\":\\\"192.168.0.255\\\",\\\"scope\\\":\\\"global\\\",\\\"dynamic\\\":true,\\\"noprefixroute\\\":true,\\\"label\\\":\\\"enP8p1s0\\\",\\\"valid_life_time\\\":81864,\\\"preferred_life_time\\\":81864},{\\\"family\\\":\\\"inet6\\\",\\\"local\\\":\\\"2001:3::b16b:e98b:5c57:4846\\\",\\\"prefixlen\\\":64,\\\"scope\\\":\\\"global\\\",\\\"temporary\\\":true,\\\"dynamic\\\":true,\\\"valid_life_time\\\":281,\\\"preferred_life_time\\\":281},{\\\"family\\\":\\\"inet6\\\",\\\"local\\\":\\\"2001:3::cbd5:bfa:c686:17e0\\\",\\\"prefixlen\\\":64,\\\"scope\\\":\\\"global\\\",\\\"dynamic\\\":true,\\\"mngtmpaddr\\\":true,\\\"noprefixroute\\\":true,\\\"valid_life_time\\\":281,\\\"preferred_life_time\\\":281},{\\\"family\\\":\\\"inet6\\\",\\\"local\\\":\\\"fe80::212d:5c5e:f4b2:9e7a\\\",\\\"prefixlen\\\":64,\\\"scope\\\":\\\"link\\\",\\\"noprefixroute\\\":true,\\\"valid_life_time\\\":4294967295,\\\"preferred_life_time\\\":4294967295}]}]\\n\", \"stderr\": \"\"}}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl00",
+        "role": "server",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-server-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=8375\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "8386",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "server",
+              "--tun-name",
+              "fl-s",
+              "--tun-addr",
+              "10.80.0.1/24",
+              "--node-id",
+              "255",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "3",
+              "--air-interface",
+              "wlxfc221c100119",
+              "--known-clients",
+              "1,2,3,4,5,6,7,8,9,10",
+              "--grant-duration-ms",
+              "30",
+              "--guard-interval-ms",
+              "5",
+              "--client-target",
+              "1:10.80.0.11:127.0.0.1:1",
+              "--client-target",
+              "2:10.80.0.12:127.0.0.1:1",
+              "--client-target",
+              "3:10.80.0.13:127.0.0.1:1",
+              "--client-target",
+              "4:10.80.0.14:127.0.0.1:1",
+              "--client-target",
+              "5:10.80.0.15:127.0.0.1:1",
+              "--client-target",
+              "6:10.80.0.16:127.0.0.1:1",
+              "--client-target",
+              "7:10.80.0.17:127.0.0.1:1",
+              "--client-target",
+              "8:10.80.0.18:127.0.0.1:1",
+              "--client-target",
+              "9:10.80.0.19:127.0.0.1:1",
+              "--client-target",
+              "10:10.80.0.20:127.0.0.1:1",
+              "--downlink-pause-threshold-bytes",
+              "131072",
+              "--downlink-resume-threshold-bytes",
+              "65536",
+              "--downlink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c100119",
+            "mac": "fc:22:1c:10:01:19",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.1:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                3,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c100119",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 48205312000,
+          "available_inodes": 6676254
+        },
+        "management": {
+          "argv": [
+            "ip",
+            "-j",
+            "addr",
+            "show",
+            "dev",
+            "enP8p1s0"
+          ],
+          "returncode": 0,
+          "stdout": "[{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3c:6d:66:b5:0c:0b\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.0.190\",\"prefixlen\":24,\"broadcast\":\"192.168.0.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"enP8p1s0\",\"valid_life_time\":81864,\"preferred_life_time\":81864},{\"family\":\"inet6\",\"local\":\"2001:3::b16b:e98b:5c57:4846\",\"prefixlen\":64,\"scope\":\"global\",\"temporary\":true,\"dynamic\":true,\"valid_life_time\":281,\"preferred_life_time\":281},{\"family\":\"inet6\",\"local\":\"2001:3::cbd5:bfa:c686:17e0\",\"prefixlen\":64,\"scope\":\"global\",\"dynamic\":true,\"mngtmpaddr\":true,\"noprefixroute\":true,\"valid_life_time\":281,\"preferred_life_time\":281},{\"family\":\"inet6\",\"local\":\"fe80::212d:5c5e:f4b2:9e7a\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]}]\n",
+          "stderr": ""
+        }
+      }
+    },
+    {
+      "host": "fl01",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl01",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl01\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=5237\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"5287\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c1\", \"--tun-addr\", \"10.80.0.11/24\", \"--node-id\", \"1\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c500bfe\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c500bfe\", \"mac\": \"fc:22:1c:50:0b:fe\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c500bfe\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c500bfe\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0b:fe\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 914984960, \"available_inodes\": 1532423}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl01",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=5237\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "5287",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c1",
+              "--tun-addr",
+              "10.80.0.11/24",
+              "--node-id",
+              "1",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500bfe",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c500bfe",
+            "mac": "fc:22:1c:50:0b:fe",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c500bfe",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 914984960,
+          "available_inodes": 1532423
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl02",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl02",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl02\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=4976\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"5027\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c2\", \"--tun-addr\", \"10.80.0.12/24\", \"--node-id\", \"2\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c300f04\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c300f04\", \"mac\": \"fc:22:1c:30:0f:04\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c300f04\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c300f04\\n\\tifindex 6\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:30:0f:04\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 807583744, \"available_inodes\": 1532538}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl02",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=4976\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "5027",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c2",
+              "--tun-addr",
+              "10.80.0.12/24",
+              "--node-id",
+              "2",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300f04",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c300f04",
+            "mac": "fc:22:1c:30:0f:04",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c300f04",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c300f04\n\tifindex 6\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 807583744,
+          "available_inodes": 1532538
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl03",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl03",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl03\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=5410\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"5429\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c3\", \"--tun-addr\", \"10.80.0.13/24\", \"--node-id\", \"3\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlx5cffffaf6d8c\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlx5cffffaf6d8c\", \"mac\": \"5c:ff:ff:af:6d:8c\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.1:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlx5cffffaf6d8c\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlx5cffffaf6d8c\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr 5c:ff:ff:af:6d:8c\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 1618128896, \"available_inodes\": 1589083}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl03",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=5410\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "5429",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c3",
+              "--tun-addr",
+              "10.80.0.13/24",
+              "--node-id",
+              "3",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx5cffffaf6d8c",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlx5cffffaf6d8c",
+            "mac": "5c:ff:ff:af:6d:8c",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.1:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlx5cffffaf6d8c",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 1618128896,
+          "available_inodes": 1589083
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl05",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl05",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl05\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=4739\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"4755\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c5\", \"--tun-addr\", \"10.80.0.15/24\", \"--node-id\", \"5\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c100157\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c100157\", \"mac\": \"fc:22:1c:10:01:57\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c100157\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c100157\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:10:01:57\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 539009024, \"available_inodes\": 1569428}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl05",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=4739\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "4755",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c5",
+              "--tun-addr",
+              "10.80.0.15/24",
+              "--node-id",
+              "5",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c100157",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c100157",
+            "mac": "fc:22:1c:10:01:57",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c100157",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 539009024,
+          "available_inodes": 1569428
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl06",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl06",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl06\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=7355\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"7371\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c6\", \"--tun-addr\", \"10.80.0.16/24\", \"--node-id\", \"6\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c300cbb\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c300cbb\", \"mac\": \"fc:22:1c:30:0c:bb\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c300cbb\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c300cbb\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:30:0c:bb\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 1029242880, \"available_inodes\": 1605224}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl06",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=7355\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "7371",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c6",
+              "--tun-addr",
+              "10.80.0.16/24",
+              "--node-id",
+              "6",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300cbb",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c300cbb",
+            "mac": "fc:22:1c:30:0c:bb",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c300cbb",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 1029242880,
+          "available_inodes": 1605224
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl07",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl07",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl07\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=7633\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"7648\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c7\", \"--tun-addr\", \"10.80.0.17/24\", \"--node-id\", \"7\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c300e99\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c300e99\", \"mac\": \"fc:22:1c:30:0e:99\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c300e99\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c300e99\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:30:0e:99\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 614756352, \"available_inodes\": 1605247}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl07",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=7633\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "7648",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c7",
+              "--tun-addr",
+              "10.80.0.17/24",
+              "--node-id",
+              "7",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300e99",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c300e99",
+            "mac": "fc:22:1c:30:0e:99",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c300e99",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 614756352,
+          "available_inodes": 1605247
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl08",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl08",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl08\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=6587\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"6607\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c8\", \"--tun-addr\", \"10.80.0.18/24\", \"--node-id\", \"8\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlxfc221c500a88\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlxfc221c500a88\", \"mac\": \"fc:22:1c:50:0a:88\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlxfc221c500a88\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlxfc221c500a88\\n\\tifindex 8\\n\\twdev 0x100000001\\n\\taddr fc:22:1c:50:0a:88\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 966864896, \"available_inodes\": 1605603}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl08",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=6587\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "6607",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c8",
+              "--tun-addr",
+              "10.80.0.18/24",
+              "--node-id",
+              "8",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500a88",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlxfc221c500a88",
+            "mac": "fc:22:1c:50:0a:88",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlxfc221c500a88",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 966864896,
+          "available_inodes": 1605603
+        },
+        "management": null
+      }
+    },
+    {
+      "host": "fl09",
+      "command": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl09",
+        "sudo -n /usr/bin/python3 -I -c 'import hashlib,json,pathlib,socket,struct,subprocess,os\nhost=socket.gethostname(); role='\"'\"'server'\"'\"' if host=='\"'\"'fl00'\"'\"' else '\"'\"'client'\"'\"'\nunit='\"'\"'wfb-fl-'\"'\"'+role+'\"'\"'-daemon.service'\"'\"'\ndef run(argv):\n p=subprocess.run(argv,capture_output=True,text=True,timeout=8)\n return {'\"'\"'argv'\"'\"':argv,'\"'\"'returncode'\"'\"':p.returncode,'\"'\"'stdout'\"'\"':p.stdout,'\"'\"'stderr'\"'\"':p.stderr}\nservice=run(['\"'\"'systemctl'\"'\"','\"'\"'show'\"'\"',unit,'\"'\"'-p'\"'\"','\"'\"'ActiveState'\"'\"','\"'\"'-p'\"'\"','\"'\"'SubState'\"'\"','\"'\"'-p'\"'\"','\"'\"'MainPID'\"'\"'])\nitems=[]\nfor proc in pathlib.Path('\"'\"'/proc'\"'\"').glob('\"'\"'[0-9]*/cmdline'\"'\"'):\n try:\n  argv=proc.read_bytes().decode().rstrip(chr(0)).split(chr(0))\n  if not argv or argv[0]!='\"'\"'/usr/bin/wfb_v6_uplink'\"'\"': continue\n  iface=argv[argv.index('\"'\"'--air-interface'\"'\"')+1]; dev=pathlib.Path('\"'\"'/sys/class/net'\"'\"')/iface\n  usbdev=(dev/'\"'\"'device'\"'\"').resolve(); usb_path=usbdev.name\n  speed=next((p/'\"'\"'speed'\"'\"' for p in [usbdev,*usbdev.parents] if (p/'\"'\"'speed'\"'\"').exists()),None)\n  port=int(argv[argv.index('\"'\"'--radio-control-port'\"'\"')+1]); queries={}\n  for code,fmt,key in [(4,'\"'\"'!II7B'\"'\"','\"'\"'radio'\"'\"'),(3,'\"'\"'!II2B'\"'\"','\"'\"'fec'\"'\"')]:\n   with socket.socket(socket.AF_INET,socket.SOCK_DGRAM) as s:\n    s.settimeout(2); s.sendto(struct.pack('\"'\"'!IB'\"'\"',0x434f4d4d,code),('\"'\"'127.0.0.1'\"'\"',port)); raw,peer=s.recvfrom(4096)\n    queries[key]=list(struct.unpack(fmt,raw))\n  items.append(dict(pid=proc.parent.name,argv=argv,interface=iface,mac=(dev/'\"'\"'address'\"'\"').read_text().strip(),driver=(dev/'\"'\"'device/driver'\"'\"').resolve().name,usb_path=usb_path,usb_speed=speed.read_text().strip() if speed else None,native_sha=hashlib.sha256((proc.parent/'\"'\"'exe'\"'\"').read_bytes()).hexdigest(),queries=queries,iw=run(['\"'\"'iw'\"'\"','\"'\"'dev'\"'\"',iface,'\"'\"'info'\"'\"'])))\n except Exception as exc: items.append({'\"'\"'probe_error'\"'\"':repr(exc)})\nst=os.statvfs('\"'\"'/srv/wfb-ng-fl'\"'\"')\nprint(json.dumps({'\"'\"'host'\"'\"':host,'\"'\"'role'\"'\"':role,'\"'\"'service'\"'\"':service,'\"'\"'native'\"'\"':items,'\"'\"'storage'\"'\"':{'\"'\"'available_bytes'\"'\"':st.f_bavail*st.f_frsize,'\"'\"'available_inodes'\"'\"':st.f_favail},'\"'\"'management'\"'\"':run(['\"'\"'ip'\"'\"','\"'\"'-j'\"'\"','\"'\"'addr'\"'\"','\"'\"'show'\"'\"','\"'\"'dev'\"'\"','\"'\"'enP8p1s0'\"'\"']) if host=='\"'\"'fl00'\"'\"' else None},ensure_ascii=False))\n'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl09\", \"role\": \"client\", \"service\": {\"argv\": [\"systemctl\", \"show\", \"wfb-fl-client-daemon.service\", \"-p\", \"ActiveState\", \"-p\", \"SubState\", \"-p\", \"MainPID\"], \"returncode\": 0, \"stdout\": \"MainPID=7780\\nActiveState=active\\nSubState=running\\n\", \"stderr\": \"\"}, \"native\": [{\"pid\": \"7795\", \"argv\": [\"/usr/bin/wfb_v6_uplink\", \"--role\", \"client\", \"--tun-name\", \"fl-c9\", \"--tun-addr\", \"10.80.0.19/24\", \"--node-id\", \"9\", \"--link-id\", \"7669206\", \"--uplink-stream\", \"1\", \"--downlink-stream\", \"2\", \"--fec-k\", \"8\", \"--fec-n\", \"12\", \"--radio-bandwidth\", \"40\", \"--radio-control-port\", \"9200\", \"--radio-mcs-index\", \"4\", \"--air-interface\", \"wlx88e62852aae4\", \"--uplink-pause-threshold-bytes\", \"131072\", \"--uplink-resume-threshold-bytes\", \"65536\", \"--uplink-queue-packets-limit\", \"64\"], \"interface\": \"wlx88e62852aae4\", \"mac\": \"88:e6:28:52:aa:e4\", \"driver\": \"rtl88xxau_wfb\", \"usb_path\": \"2-1.3:1.0\", \"usb_speed\": \"5000\", \"native_sha\": \"5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f\", \"queries\": {\"radio\": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1], \"fec\": [1129270605, 0, 8, 12]}, \"iw\": {\"argv\": [\"iw\", \"dev\", \"wlx88e62852aae4\", \"info\"], \"returncode\": 0, \"stdout\": \"Interface wlx88e62852aae4\\n\\tifindex 5\\n\\twdev 0x100000001\\n\\taddr 88:e6:28:52:aa:e4\\n\\ttype monitor\\n\\twiphy 1\\n\\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\\n\\ttxpower -18.00 dBm\\n\", \"stderr\": \"\"}}], \"storage\": {\"available_bytes\": 1442349056, \"available_inodes\": 1605441}, \"management\": null}\n",
+      "stderr": "",
+      "parsed": {
+        "host": "fl09",
+        "role": "client",
+        "service": {
+          "argv": [
+            "systemctl",
+            "show",
+            "wfb-fl-client-daemon.service",
+            "-p",
+            "ActiveState",
+            "-p",
+            "SubState",
+            "-p",
+            "MainPID"
+          ],
+          "returncode": 0,
+          "stdout": "MainPID=7780\nActiveState=active\nSubState=running\n",
+          "stderr": ""
+        },
+        "native": [
+          {
+            "pid": "7795",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c9",
+              "--tun-addr",
+              "10.80.0.19/24",
+              "--node-id",
+              "9",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "12",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx88e62852aae4",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "interface": "wlx88e62852aae4",
+            "mac": "88:e6:28:52:aa:e4",
+            "driver": "rtl88xxau_wfb",
+            "usb_path": "2-1.3:1.0",
+            "usb_speed": "5000",
+            "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                12
+              ]
+            },
+            "iw": {
+              "argv": [
+                "iw",
+                "dev",
+                "wlx88e62852aae4",
+                "info"
+              ],
+              "returncode": 0,
+              "stdout": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+              "stderr": ""
+            }
+          }
+        ],
+        "storage": {
+          "available_bytes": 1442349056,
+          "available_inodes": 1605441
+        },
+        "management": null
+      }
+    }
+  ],
+  "errors": []
+}

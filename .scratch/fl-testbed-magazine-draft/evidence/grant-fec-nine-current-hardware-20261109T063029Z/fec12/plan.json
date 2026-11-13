@@ -1,0 +1,128 @@
+{
+  "status": "pending_parent_GO",
+  "scope": "仅本地准备与语法/计划核验",
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "excluded": [
+    "fl04"
+  ],
+  "schedule": [
+    {
+      "grant_ms": 10,
+      "guard_ms": 10,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 20,
+      "guard_ms": 10,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 30,
+      "guard_ms": 10,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 40,
+      "guard_ms": 10,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 60,
+      "guard_ms": 10,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 20,
+      "guard_ms": 5,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    },
+    {
+      "grant_ms": 30,
+      "guard_ms": 5,
+      "modes": [
+        "smoke",
+        "model"
+      ],
+      "smoke_bytes": 1048576,
+      "model_requires_smoke_pass": true
+    }
+  ],
+  "max_executions": 14,
+  "model_bytes": 44770302,
+  "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "fec_k": 8,
+  "fec_n": 12,
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T124420Z",
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "profile": "/home/fl/projects/wfb-ng-fl/.scratch/heartbeat-restart/heartbeat-1cd6264d5d6b-20261108T124420Z",
+  "profile_completed": [],
+  "cold_phases": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ],
+  "minimum_model_available_bytes": 536870912,
+  "agent_cleanup_budget_target_bytes": 1073741824,
+  "direction_seconds": 600,
+  "overall_seconds": 1290,
+  "stage_budget_seconds": 9000,
+  "uftp_kbps": 12000,
+  "test_channel": 157,
+  "baseline_channel": 149,
+  "bandwidth_mhz": 40,
+  "gi": "LGI",
+  "index": 18,
+  "downlink_mcs": 3,
+  "uplink_mcs": 4,
+  "power": "15W",
+  "transient_and_final_evidence_separate": true,
+  "failed_transfer_can_continue_after_exact_cleanup_full10_restore_nine_READY": true,
+  "remote_actions_this_turn": 0,
+  "worker_started": false
+}

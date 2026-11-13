@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "status": "STOP-smoke-gate-failed-recovery-incomplete",
+  "fresh_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-20261110T170213Z",
+  "parent_material": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z",
+  "owner": "fl00",
+  "participants": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "excluded": [
+    "fl04"
+  ],
+  "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "fec": "8/12",
+  "heartbeat_ack_wait_ms": 230,
+  "heartbeat_silence_timeout_s": 10,
+  "baseline_channel": 149,
+  "measurement_channel": 157,
+  "bandwidth_mhz": 40,
+  "guard_interval": "LGI",
+  "driver_power_index": 18,
+  "downlink_mcs": 3,
+  "uplink_mcs": 4,
+  "uftp_rate_kbps": 12000,
+  "schedule": {
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5
+  },
+  "model": {
+    "bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "execution": {
+    "smoke_gate": {
+      "bytes": 1048576,
+      "count": 1
+    },
+    "model": {
+      "count": 1,
+      "direction_timeout_seconds": 600
+    },
+    "model_budget": 1,
+    "total_boundary_seconds": 1800,
+    "no_retry": true,
+    "first_substantive_failure_stop": true,
+    "no_node_drop": true,
+    "no_40_5_execution": true,
+    "no_matrix_retest": true
+  },
+  "admission": {
+    "mode": "read-only full ten-board admission",
+    "storage_hard_minimum_bytes": 536870912,
+    "storage_preferred_bytes": 1073741824,
+    "requires_nine_ready_idle": true,
+    "requires_active_job_null": true,
+    "fl04_contacted": false
+  },
+  "recovery": {
+    "target_channel": 149,
+    "target_bandwidth_mhz": 40,
+    "target_gi": "LGI",
+    "target_driver_power_index": 18,
+    "target_fec": "8/12",
+    "target_schedule": "30/5",
+    "packagekit_restore": "preserve observed current DBus/systemd state"
+  },
+  "execution_started_wall": 1794303801.9574766
+}

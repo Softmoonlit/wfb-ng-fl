@@ -1,0 +1,166 @@
+{
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 64601051136,
+        "free_bytes": 70941528064,
+        "total_bytes": 123887923200,
+        "inodes_available": 6688599,
+        "run_tmpfs": [
+          "/dev/nvme0n1p1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 6443008,
+        "free_bytes": 1456463872,
+        "total_bytes": 29692346368,
+        "inodes_available": 1536859,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 652017664,
+        "free_bytes": 2102038528,
+        "total_bytes": 29692346368,
+        "inodes_available": 1536935,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 5339086848,
+        "free_bytes": 6789107712,
+        "total_bytes": 29692346368,
+        "inodes_available": 1593601,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 3169767424,
+        "free_bytes": 4619788288,
+        "total_bytes": 29692346368,
+        "inodes_available": 1573910,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 2885296128,
+        "free_bytes": 4335316992,
+        "total_bytes": 29692346368,
+        "inodes_available": 1609508,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 4736548864,
+        "free_bytes": 6186569728,
+        "total_bytes": 29692346368,
+        "inodes_available": 1609987,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 2665889792,
+        "free_bytes": 4115910656,
+        "total_bytes": 29692346368,
+        "inodes_available": 1609925,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 2764763136,
+        "free_bytes": 4214784000,
+        "total_bytes": 29692346368,
+        "inodes_available": 1609801,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "path": "/srv/wfb-ng-fl",
+        "fragment_size": 4096,
+        "available_bytes": 3424038912,
+        "free_bytes": 4874059776,
+        "total_bytes": 29692346368,
+        "inodes_available": 1630894,
+        "run_tmpfs": [
+          "/dev/sda1 / ext4 rw,relatime 0 0"
+        ]
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794206105.8688912,
+  "no_deletions": true
+}

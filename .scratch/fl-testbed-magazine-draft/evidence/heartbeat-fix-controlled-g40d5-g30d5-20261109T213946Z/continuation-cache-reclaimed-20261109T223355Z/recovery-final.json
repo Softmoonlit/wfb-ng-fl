@@ -1,0 +1,654 @@
+{
+  "status": "recovery-incomplete",
+  "wall": 1794267356.7013133,
+  "final_management_status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 12,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfca386b38672",
+    "link_process": {
+      "running": true,
+      "pid": 22919
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 132807,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24040.117806035,
+        "last_heartbeat_timestamp_ms": 1794267354761,
+        "last_heartbeat_ago_seconds": 1.94,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 134279,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.940648169,
+        "last_heartbeat_timestamp_ms": 1794267356584,
+        "last_heartbeat_ago_seconds": 0.11,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 134700,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.521040091,
+        "last_heartbeat_timestamp_ms": 1794267356165,
+        "last_heartbeat_ago_seconds": 0.53,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 134673,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.976413092,
+        "last_heartbeat_timestamp_ms": 1794267356620,
+        "last_heartbeat_ago_seconds": 0.08,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 134874,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.870526368,
+        "last_heartbeat_timestamp_ms": 1794267356514,
+        "last_heartbeat_ago_seconds": 0.18,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 132597,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.311868265,
+        "last_heartbeat_timestamp_ms": 1794267355955,
+        "last_heartbeat_ago_seconds": 0.74,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 134708,
+        "current_channel": 149,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 24041.625954687,
+        "last_heartbeat_timestamp_ms": 1794267356270,
+        "last_heartbeat_ago_seconds": 0.43,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  "readback": {
+    "fl00": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        3,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=22909\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 52757188608,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl01": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=16579\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 961675264,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl02": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=20197\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 822939648,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl03": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=12586\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 2708205568,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl05": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfc221c100157\n\tifindex 6\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=12585\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 303239168,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl07": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=14703\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 802254848,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl08": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlxfc221c500a88\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=16657\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 395407360,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    },
+    "fl09": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        4,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ],
+      "iw": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "service": "MainPID=16594\nActiveState=active\nSubState=running\n",
+      "power_limits_ok": true,
+      "nvpmodel": "NV Power Mode: 15W\n0",
+      "nvpmodel_service": "Result=success\nExecMainStatus=0\n",
+      "jtop": "inactive",
+      "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static\n",
+      "transaction_list": "ao 0",
+      "available_bytes": 548794368,
+      "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "installed_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+      "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "native_source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+      "tools": {
+        "uftp": {
+          "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+          "version": "5.0.3"
+        },
+        "uftpd": {
+          "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+          "version": "5.0.3"
+        }
+      }
+    }
+  },
+  "unreachable": {
+    "fl06": {
+      "ping": "0/1",
+      "arp": "INCOMPLETE",
+      "ssh": "timeout",
+      "source": "recovery-reach-fl06.txt"
+    },
+    "fl10": {
+      "ping": "0/1",
+      "arp": "INCOMPLETE",
+      "ssh": "timeout",
+      "source": "recovery-reach-fl10.txt"
+    }
+  },
+  "manual_restore": {
+    "returncode": 1,
+    "stdout": "{\"ok\": false, \"error\": \"<HTTPError 409: 'Conflict'>\"}\n",
+    "stderr": "",
+    "command": [
+      "sudo",
+      "-n",
+      "python3",
+      "-I",
+      "-B",
+      "-c",
+      "#!/usr/bin/env python3\n\"\"\"独立回收本轮临时 unit 和专有路由；仅在全端结束后按需恢复射频。\"\"\"\nimport json\nimport os\nfrom pathlib import Path\nimport re\nimport socket\nimport subprocess\nimport sys\nimport urllib.request\n\n\nNODES = [1, 2, 3, 5, 6, 7, 8, 9, 10]\n\n\ndef run(argv, check=True, timeout=10):\n    return subprocess.run(argv, capture_output=True, text=True, check=check, timeout=timeout)\n\n\ndef main():\n    run_id = sys.argv[1]\n    if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', run_id):\n        raise ValueError('非法批次')\n    host = socket.gethostname()\n    if host not in ['fl00'] + [f'fl{node:02d}' for node in NODES] or os.geteuid() != 0:\n        raise ValueError('节点或权限不符')\n    root = Path('/srv/wfb-ng-fl') / ('comm-' + run_id)\n    state_path = root / 'cleanup-state.json'\n    restore = len(sys.argv) == 3 and sys.argv[2] == '--restore'\n    state = json.loads(state_path.read_text()) if state_path.exists() else None\n    if state is not None and state['host'] != host:\n        raise ValueError('回收记录节点不符')\n    if restore:\n        if host != 'fl00':\n            raise ValueError('射频只能由服务端恢复')\n        if state is None or not state['radio_attempted']:\n            return dict(ok=True, attempted=False)\n        pid = str(state['daemon_pid'])\n        current = run(['systemctl', 'show', 'wfb-fl-server-daemon.service', '-p', 'MainPID', '--value']).stdout.strip()\n        tick = Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()[19]\n        if current != pid or tick != state['resident'][pid]:\n            raise ValueError('服务端身份已改变，拒绝沿用旧批次恢复')\n        request = urllib.request.Request('http://127.0.0.1:9090/api/v1/radio/reconfigure',\n            data=json.dumps(dict(confirmed=True, target_nodes=[1, 2, 3, 5, 6, 7, 8, 9, 10], patch=state['original'])).encode(),\n            headers={'Content-Type': 'application/json'}, method='POST')\n        with urllib.request.urlopen(request, timeout=30) as response:\n            result = json.load(response)\n        ok = result.get('status') == 'finalized' and result.get('calibration') is False\n        ok = ok and all(result['effective_config'][k] == v for k, v in state['original'].items())\n        # 独立恢复缺少原代理十端审计，RF 响应成功不能宣称最终恢复通过。\n        output = dict(ok=False, rf_response_ok=ok, audited=False, attempted=True, response=result)\n        (root / 'independent-restore.json').write_text(json.dumps(output))\n        return output\n    unit = 'comm-smoke-' + run_id + '-' + host + '.service'\n    stopped = run(['systemctl', 'stop', unit], check=False, timeout=12)\n    active = run(['systemctl', 'is-active', unit], check=False).stdout.strip()\n    if active not in ['inactive', 'failed', 'unknown']:\n        raise ValueError('测试 unit 尚未结束：' + active + stopped.stderr)\n    errors = []\n    if state is not None:\n        for group, owned in state['routes'].items():\n            try:\n                if group not in ['239.80.41.1/32', '239.80.42.1/32']:\n                    raise ValueError('非本轮组播路由')\n                current = json.loads(run(['ip', '-j', 'route', 'show', 'exact', group]).stdout)\n                if not current:\n                    continue\n                links = json.loads(run(['ip', '-j', 'link', 'show', 'dev', state['tun']]).stdout)\n                if links[0]['ifindex'] != state['ifindex'] or current != owned:\n                    raise ValueError('路由或接口身份改变，保留现场')\n                run(['ip', 'route', 'del', group, 'dev', state['tun'], 'proto', '186'])\n            except Exception as exc:\n                errors.append(group + ': ' + repr(exc))\n        for pid, tick in state['resident'].items():\n            try:\n                if Path('/proc', pid, 'stat').read_text().rsplit(')', 1)[1].split()[19] != tick:\n                    raise ValueError('常驻进程身份变化')\n            except Exception as exc:\n                errors.append('resident ' + pid + ': ' + repr(exc))\n    output = dict(ok=not errors, unit=unit, active=active, errors=errors)\n    if root.is_dir():\n        (root / 'independent-cleanup.json').write_text(json.dumps(output))\n    return output\n\n\nif __name__ == '__main__':\n    try:\n        result = main()\n    except Exception as exc:\n        result = dict(ok=False, error=repr(exc))\n    print(json.dumps(result), flush=True)\n    raise SystemExit(0 if result['ok'] else 1)\n",
+      "fec12-g30-d5-model-20261110",
+      "--restore"
+    ]
+  },
+  "unit_cleanup": {
+    "reachable_exact_units": "all inactive",
+    "unreachable_units": "not verifiable for fl06/fl10; no assumption"
+  },
+  "radio_restore": {
+    "reachable_actual_channel": 149,
+    "server_actual_channel": 149,
+    "full_nine_verified": false
+  },
+  "packagekit": {
+    "reachable_readback": "active/static; GetTransactionList ao 0"
+  },
+  "phases": {
+    "40_5_smoke": {
+      "publish_seconds": 4.602804082001967,
+      "publish_completed_events": 10,
+      "submit_seconds": 8.914190511000925,
+      "submit_completed_events": 10,
+      "result": {
+        "wall": 1794265527.7483513,
+        "monotonic": 22213.104339002,
+        "phase": "result",
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "progress_path": ".scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/smoke-40-d5/fec12-g40-d5-smoke-20261110/progress.jsonl"
+    },
+    "40_5_model": {
+      "publish_seconds": 50.82383683200169,
+      "publish_completed_events": 10,
+      "submit_seconds": 348.66917446799926,
+      "submit_completed_events": 10,
+      "result": {
+        "wall": 1794265950.0546153,
+        "monotonic": 22635.41060309,
+        "phase": "result",
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "progress_path": ".scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/model-40-d5/fec12-g40-d5-model-20261110/progress.jsonl"
+    },
+    "30_5_model": {
+      "publish_seconds": 47.555605156998354,
+      "publish_completed_events": 10,
+      "submit_seconds": 233.78668385199853,
+      "submit_completed_events": 6,
+      "result": {
+        "wall": 1794266633.0451126,
+        "monotonic": 23318.401100239,
+        "phase": "result",
+        "transfer_verified": false,
+        "cleanup_ok": false,
+        "restore_ok": false
+      },
+      "progress_path": ".scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/model-30-d5/fec12-g30-d5-model-20261110/progress.jsonl"
+    }
+  },
+  "model_executions": 2,
+  "retries": 0
+}

@@ -1,0 +1,317 @@
+{
+  "generated_utc": "2026-11-09T10:02:55.939051+00:00",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "payload_size": 44770302,
+  "payload_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "scope": "同硬件、不同时刻的单次容量样本；不等于最终连续两次验收或统计显著最优",
+  "excluded_infrastructure_failures": "fec14-remaining首批两次UFTP8空间拒绝；原记录保留，不作为吞吐样本",
+  "duration_scope": "下行及上行阶段，包含相应协议与校验开销，不含整个编排的切频和收尾",
+  "upload_proof_scope": "运行中或待执行行尚无服务端独立文件快照时留空，不把缺少观测解释为零字节",
+  "candidates": [
+    {
+      "fec_n": 14,
+      "grant_ms": 30,
+      "guard_ms": 5,
+      "downlink_s": 54.181630837998455,
+      "uplink_s": 416.28128980399924,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "server-fl10-repeat-swap-20261109T055853Z/B2-final-summary.json"
+      ],
+      "transfer_phase_total_s": 470.4629206419977,
+      "aggregate_uplink_mbps": 7.743470155763489
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 40,
+      "guard_ms": 10,
+      "downlink_s": 59.39869039900077,
+      "uplink_s": 380.4290145670002,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/as20261109T065447Z-g40-d10-model-after-exact-uftp-kernel-files.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/as20261109T065447Z-g40-d10-model-final-idle-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 439.82770496600097,
+      "aggregate_uplink_mbps": 8.47322790999237
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 60,
+      "guard_ms": 10,
+      "downlink_s": 77.13533416800055,
+      "uplink_s": 373.28743071400095,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/as20261109T065447Z-g60-d10-model-final-idle-exact-uftp-kernel-files.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/after-storage-models/as20261109T065447Z-g60-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 450.4227648820015,
+      "aggregate_uplink_mbps": 8.635334272665872
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 10,
+      "guard_ms": 10,
+      "downlink_s": 52.26321654300045,
+      "uplink_s": 416.0578563190011,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g10-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 468.32107286200153,
+      "aggregate_uplink_mbps": 7.747628593097635
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 20,
+      "guard_ms": 10,
+      "downlink_s": 55.56569339999987,
+      "uplink_s": 375.8512647659991,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g20-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 431.41695816599895,
+      "aggregate_uplink_mbps": 8.576429152119236
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 30,
+      "guard_ms": 10,
+      "downlink_s": 47.04808752200006,
+      "uplink_s": 341.32898049600044,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g30-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 388.3770680180005,
+      "aggregate_uplink_mbps": 9.443856010456079
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 40,
+      "guard_ms": 10,
+      "downlink_s": 49.51819254000111,
+      "uplink_s": 384.6547306780012,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g40-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 434.1729232180023,
+      "aggregate_uplink_mbps": 8.380143247733502
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 60,
+      "guard_ms": 10,
+      "downlink_s": 49.5793885539988,
+      "uplink_s": 330.58328576799977,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g60-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 380.16267432199857,
+      "aggregate_uplink_mbps": 9.750830978981178
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 20,
+      "guard_ms": 5,
+      "downlink_s": 46.50265198099987,
+      "uplink_s": 372.56884838099904,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g20-d5-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 419.0715003619989,
+      "aggregate_uplink_mbps": 8.651989445729505
+    },
+    {
+      "fec_n": 12,
+      "grant_ms": 30,
+      "guard_ms": 5,
+      "downlink_s": 46.88306189499781,
+      "uplink_s": 298.46924647299966,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-20261109T071504Z-g30-d5-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 345.35230836799747,
+      "aggregate_uplink_mbps": 10.799979502382678
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 10,
+      "guard_ms": 10,
+      "downlink_s": 56.881617508999625,
+      "uplink_s": 550.6247372929975,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "传输完成，原恢复审计未过，独立恢复通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/fec14-20261109T082509Z-g10-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 607.5063548019971,
+      "aggregate_uplink_mbps": 5.854189842336736
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 20,
+      "guard_ms": 10,
+      "downlink_s": null,
+      "uplink_s": null,
+      "server_verified_uploads": 0,
+      "accepted_capacity_pass": false,
+      "status": "控制准入失败，未发模型，已恢复",
+      "raw_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/fec14-20261109T082509Z-g20-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": null,
+      "aggregate_uplink_mbps": null
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 30,
+      "guard_ms": 10,
+      "downlink_s": 58.54027204100203,
+      "uplink_s": 421.6960496719985,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/fec14-20261109T082509Z-g30-d10-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 480.2363217130005,
+      "aggregate_uplink_mbps": 7.644040646117641
+    },
+    {
+      "fec_n": 14,
+      "grant_ms": 20,
+      "guard_ms": 5,
+      "downlink_s": 57.090703210000356,
+      "uplink_s": 573.056607575003,
+      "server_verified_uploads": 9,
+      "accepted_capacity_pass": true,
+      "status": "一次容量通过",
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "sources": [
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/matrix.json",
+        "grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/fec14-20261109T082509Z-g20-d5-model-after-exact-uftp-kernel-files.json"
+      ],
+      "transfer_phase_total_s": 630.1473107850034,
+      "aggregate_uplink_mbps": 5.625031980070321
+    }
+  ]
+}

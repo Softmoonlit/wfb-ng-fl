@@ -1,0 +1,115 @@
+{
+  "status": "complete",
+  "host": "fl07",
+  "wall_ns": 1794330682959172971,
+  "required_bytes": 671181818,
+  "free_before": 639209472,
+  "free_after": 683982848,
+  "target": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "selected": [
+    "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin"
+  ],
+  "deleted_rows": [
+    {
+      "before": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+        "exists": true,
+        "regular": true,
+        "size_bytes": 44770302,
+        "inode": 546373,
+        "device": 2049,
+        "nlink": 1,
+        "mode": "0o100600",
+        "mtime_ns": 1794209177976772473,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "after": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+        "exists": false
+      },
+      "free_after": 683982848
+    }
+  ],
+  "protected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 545927,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430450997023,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 549149,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946707475037,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 549163,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771323366463,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "protected_after": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 545927,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430450997023,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 549149,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946707475037,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 549163,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771323366463,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "old_reclamation_paths_reused": false,
+  "failed_attempts_deleted": false,
+  "source_success_evidence": "grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d10-model/run-summary.json"
+}

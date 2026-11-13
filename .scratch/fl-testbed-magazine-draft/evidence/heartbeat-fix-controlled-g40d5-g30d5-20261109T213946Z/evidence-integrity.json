@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "status": "passed-with-two-documented-raw-exceptions",
+  "scope": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+  "json_files_before_integrity": 205,
+  "valid_json_files": 203,
+  "documented_raw_exceptions": [
+    {
+      "path": "cache-maintenance-fl02-packagekit-stopped.json",
+      "size_bytes": 71,
+      "kind": "plain_raw_systemctl_output_not_json",
+      "reason": "PackageKit stop命令的stdout直接重定向为systemctl show原始文本（MainPID/ActiveState/SubState/UnitFileState），不是JSON；后续状态以unit/journal/classification/result证据为准。",
+      "raw_untouched": true,
+      "sha256": "15ec8ed073c1c2e2c2cdcc4b2cabcd56400b94a91312e9f257d72104154134df",
+      "superseded_by": [
+        "cache-maintenance-fl02-packagekit-unit.txt",
+        "cache-maintenance-fl02-packagekit-journal.txt",
+        "cache-maintenance-fl02-classification.json",
+        "cache-maintenance-result.json"
+      ]
+    },
+    {
+      "path": "storage-delete-result-fl01.json",
+      "size_bytes": 0,
+      "kind": "empty_raw_failure_output",
+      "reason": "第一轮fl01逐文件unlink脚本在unlink前因远端变量覆盖异常退出，stdout没有JSON；后续未使用该文件作为删除事实。",
+      "raw_untouched": true,
+      "superseded_by": [
+        "cache-archive-fl01-manifest.json",
+        "cache-maintenance-result.json",
+        "cache-maintenance-fl01-guard.json"
+      ]
+    }
+  ],
+  "unexpected_json_failures": [],
+  "all_other_json_parse_ok": true,
+  "core_40_5_nine_sha": {
+    "path": "continuation-cache-reclaimed-20261109T223355Z/model-40-d5/independent-server-nine-size-sha.json",
+    "ok": true,
+    "count": 9,
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "unique_paths": 9
+  },
+  "final_recovery": {
+    "path": "continuation-cache-reclaimed-20261109T223355Z/recovery-final.json",
+    "status": "recovery-incomplete",
+    "server_final_channel": 149,
+    "full_nine_verified": false,
+    "unreachable": {
+      "fl06": {
+        "ping": "0/1",
+        "arp": "INCOMPLETE",
+        "ssh": "timeout",
+        "source": "recovery-reach-fl06.txt"
+      },
+      "fl10": {
+        "ping": "0/1",
+        "arp": "INCOMPLETE",
+        "ssh": "timeout",
+        "source": "recovery-reach-fl10.txt"
+      }
+    }
+  },
+  "remote_operations_after_integrity": false,
+  "model_executions_after_integrity": false,
+  "committed": false,
+  "wall": 1794267592.8247588
+}

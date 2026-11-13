@@ -1,0 +1,124 @@
+{
+  "status": "complete",
+  "attempt_reason": "after-space-recovery",
+  "prior_infrastructure_failures_preserved": true,
+  "execute_count": 2,
+  "small_resent": false,
+  "candidates": [
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "mode": "model",
+      "execute_count": 1,
+      "outcome": "passed",
+      "DLduration": 59.39869039900077,
+      "ULduration": 380.4290145670002,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_exact_cleanup_ok": true,
+      "immediate_independent_restore_ok": true,
+      "immediate_independent_ready_ok": true,
+      "independent_restore_ok": true,
+      "independent_ready_ok": true,
+      "bundle_unchanged": true,
+      "phase_completion_seconds": {
+        "publish": {
+          "fl00": 54.5153932129997,
+          "fl10": 55.26690583399977,
+          "fl01": 55.28430248699988,
+          "fl07": 55.3228695960006,
+          "fl09": 55.38394857500134,
+          "fl02": 55.3900802370008,
+          "fl06": 56.767665606001174,
+          "fl08": 56.99287787600042,
+          "fl03": 57.80601470900001,
+          "fl05": 59.39869039900077
+        },
+        "submit": {
+          "fl03": 240.52015162399948,
+          "fl05": 251.4123716209997,
+          "fl10": 253.84885025699987,
+          "fl09": 305.1297922599988,
+          "fl02": 319.28468221799994,
+          "fl06": 332.566924838,
+          "fl01": 336.23210835699865,
+          "fl07": 353.11454983600015,
+          "fl08": 379.82610340799874,
+          "fl00": 380.4290145670002
+        }
+      }
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "mode": "model",
+      "execute_count": 1,
+      "outcome": "passed",
+      "DLduration": 77.13533416800055,
+      "ULduration": 373.28743071400095,
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "independent_exact_cleanup_ok": true,
+      "immediate_independent_restore_ok": true,
+      "immediate_independent_ready_ok": true,
+      "independent_restore_ok": true,
+      "independent_ready_ok": true,
+      "bundle_unchanged": true,
+      "phase_completion_seconds": {
+        "publish": {
+          "fl00": 68.02359403400078,
+          "fl10": 68.73734094700012,
+          "fl06": 68.74123676700037,
+          "fl05": 68.76486224899963,
+          "fl07": 68.76559215700036,
+          "fl09": 68.81480391200057,
+          "fl08": 68.83344756100087,
+          "fl03": 71.32726652800011,
+          "fl01": 72.26513593799973,
+          "fl02": 77.13533416800055
+        },
+        "submit": {
+          "fl06": 283.24530468800003,
+          "fl05": 283.54866564199983,
+          "fl09": 285.6122157990012,
+          "fl01": 300.13498901000094,
+          "fl08": 310.66425431100106,
+          "fl03": 326.49436445300125,
+          "fl10": 342.1573594010006,
+          "fl02": 346.27543675800007,
+          "fl07": 372.63365802800035,
+          "fl00": 373.28743071400095
+        }
+      }
+    }
+  ],
+  "final_recovery": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "server_schedule": "10/10",
+    "runs": [
+      [
+        "as20261109T065447Z-g40-d10-model",
+        1794207290
+      ],
+      [
+        "as20261109T065447Z-g60-d10-model",
+        1794207766
+      ]
+    ],
+    "execute_count": 2,
+    "measurement_error": null,
+    "wall": 1794208269.4168258
+  },
+  "all_model_uploads_independent_size_sha_ok": true,
+  "final_kernel_reset_matches": [],
+  "worker_exited": true,
+  "fec12_executed": false,
+  "wall": 1794208305.3745568
+}

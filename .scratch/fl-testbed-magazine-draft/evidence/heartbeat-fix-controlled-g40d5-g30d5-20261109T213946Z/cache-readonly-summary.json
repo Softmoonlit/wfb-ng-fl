@@ -1,0 +1,135 @@
+{
+  "status": "STOP-no-cache-mutation",
+  "wall": 1794261711.1613595,
+  "thresholds": {
+    "hard_minimum_bytes": 536870912,
+    "target_with_reserve_bytes": 704643072,
+    "target_label": ">=672MiB"
+  },
+  "nodes": {
+    "fl01": {
+      "cache_files": [
+        {
+          "path": "/var/cache/apt/pkgcache.bin",
+          "exists": true,
+          "size_bytes": 70968211,
+          "mtime_ns": 1794245041266140211,
+          "mode": "0o100644",
+          "sha256": "3f74a7ec3f976fdf6b92d0044cf7a5d72f748ffcebf2571ffcdb27150c679e9f"
+        },
+        {
+          "path": "/var/cache/apt/srcpkgcache.bin",
+          "exists": true,
+          "size_bytes": 70759897,
+          "mtime_ns": 1794245041154155397,
+          "mode": "0o100644",
+          "sha256": "4e8336305446eecc713406c7b83299538ce4e5ee7097eef7ea9ef076adade8a9"
+        }
+      ],
+      "available_bytes": 410320896,
+      "packagekit_service": "MainPID=1951\nActiveState=active\nSubState=running\nUnitFileState=static",
+      "pkcon_returncode": 0,
+      "lock_holders": {
+        "/var/lib/dpkg/lock": 1,
+        "/var/lib/dpkg/lock-frontend": 1,
+        "/var/lib/apt/lists/lock": 1,
+        "/var/cache/apt/archives/lock": 1
+      },
+      "apt_cache_du": "4096\t/var/cache/apt/archives/partial\n8650752\t/var/cache/apt/archives\n150396928\t/var/cache/apt"
+    },
+    "fl02": {
+      "cache_files": [
+        {
+          "path": "/var/cache/apt/pkgcache.bin",
+          "exists": false
+        },
+        {
+          "path": "/var/cache/apt/srcpkgcache.bin",
+          "exists": false
+        }
+      ],
+      "available_bytes": 413683712,
+      "packagekit_service": "MainPID=14590\nActiveState=active\nSubState=running\nUnitFileState=static",
+      "pkcon_returncode": 0,
+      "lock_holders": {
+        "/var/lib/dpkg/lock": 1,
+        "/var/lib/dpkg/lock-frontend": 1,
+        "/var/lib/apt/lists/lock": 1,
+        "/var/cache/apt/archives/lock": 1
+      },
+      "apt_cache_du": "4096\t/var/cache/apt/archives/partial\n8650752\t/var/cache/apt/archives\n8654848\t/var/cache/apt"
+    },
+    "fl06": {
+      "cache_files": [
+        {
+          "path": "/var/cache/apt/pkgcache.bin",
+          "exists": true,
+          "size_bytes": 71316893,
+          "mtime_ns": 1794245628393439216,
+          "mode": "0o100644",
+          "sha256": "c527eb96a13e7b11ed9a47e90d751828318a007964ba0bb49612fd2b126ae834"
+        },
+        {
+          "path": "/var/cache/apt/srcpkgcache.bin",
+          "exists": true,
+          "size_bytes": 71108357,
+          "mtime_ns": 1794245628277436505,
+          "mode": "0o100644",
+          "sha256": "7734b7dac3cbff08afa5cbab7d6a75edb488f9f125e0e51a4677a82aee270991"
+        }
+      ],
+      "available_bytes": 453177344,
+      "packagekit_service": "MainPID=1943\nActiveState=active\nSubState=running\nUnitFileState=static",
+      "pkcon_returncode": 0,
+      "lock_holders": {
+        "/var/lib/dpkg/lock": 1,
+        "/var/lib/dpkg/lock-frontend": 1,
+        "/var/lib/apt/lists/lock": 1,
+        "/var/cache/apt/archives/lock": 1
+      },
+      "apt_cache_du": "4096\t/var/cache/apt/archives/partial\n1537892352\t/var/cache/apt/archives\n1680334848\t/var/cache/apt"
+    }
+  },
+  "lock_policy": "fuser return 1 for all four APT/dpkg locks on each node; no holder observed; PackageKit active/static; pkcon get-transactions read-only rc0",
+  "non_evidence_regenerable_candidates": {
+    "/srv/wfb-ng-fl/install-cache": {
+      "hosts": [
+        "fl01",
+        "fl02"
+      ],
+      "size_bytes": 832237568,
+      "observed_contents": [
+        "torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+        "numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+        "other wheels/deb",
+        "install-artifact-manifest.json"
+      ],
+      "action": "report-only; unknown deletion prohibited"
+    }
+  },
+  "top_directories_report_only": {
+    "fl01": {
+      "install-cache": 832237568,
+      "evidence": 224006144,
+      "client": 355450880,
+      "releases": 100950016,
+      "calibration": 84107264,
+      "mnist": 54968320
+    },
+    "fl02": {
+      "install-cache": 832237568,
+      "client": 377278464,
+      "releases": 100950016,
+      "calibration": 69386240,
+      "mnist": 54968320
+    },
+    "fl06": {
+      "client": 168538112,
+      "releases": 100892672,
+      "calibration": "not_present_in_du_snapshot",
+      "mnist": 54972416
+    }
+  },
+  "no_deletion": true
+}

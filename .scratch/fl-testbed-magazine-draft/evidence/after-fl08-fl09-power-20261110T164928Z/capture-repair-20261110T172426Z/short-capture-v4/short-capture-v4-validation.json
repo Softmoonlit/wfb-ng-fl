@@ -1,0 +1,339 @@
+{
+  "hosts": [
+    {
+      "host": "fl01",
+      "raw_bytes": 24264,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 22,
+      "elapsed": 5.000118114,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 19429,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl01/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl01",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 19429,
+        "argv": [],
+        "host": "fl01",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl02",
+      "raw_bytes": 22524,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 20,
+      "elapsed": 5.000084644,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 6684,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl02/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl02",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 6684,
+        "argv": [],
+        "host": "fl02",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl03",
+      "raw_bytes": 23282,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 21,
+      "elapsed": 5.00013874,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 7332,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl03/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl03",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 7332,
+        "argv": [],
+        "host": "fl03",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl05",
+      "raw_bytes": 23316,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 21,
+      "elapsed": 5.000116833,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 20184,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl05/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl05",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 20184,
+        "argv": [],
+        "host": "fl05",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl06",
+      "raw_bytes": 20769,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 18,
+      "elapsed": 5.000150161,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 19664,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl06/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl06",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 19664,
+        "argv": [],
+        "host": "fl06",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl07",
+      "raw_bytes": 25157,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 22,
+      "elapsed": 5.000110562,
+      "requests": 3,
+      "paired": 3,
+      "timely": 3,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 19535,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl07/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl07",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 19535,
+        "argv": [],
+        "host": "fl07",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl08",
+      "raw_bytes": 23275,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 21,
+      "elapsed": 5.000100346,
+      "requests": 2,
+      "paired": 2,
+      "timely": 2,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 8567,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl08/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl08",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 8567,
+        "argv": [],
+        "host": "fl08",
+        "term_requested": true
+      }
+    },
+    {
+      "host": "fl09",
+      "raw_bytes": 26802,
+      "schema": 3,
+      "errors": [],
+      "stop": false,
+      "drops": 0,
+      "packets": 24,
+      "elapsed": 5.000211806,
+      "requests": 3,
+      "paired": 3,
+      "timely": 3,
+      "late": 0,
+      "unmatched": 0,
+      "right_censored": 0,
+      "challenge": 0,
+      "running-probe": {
+        "status": "alive_verified",
+        "pid": 7988,
+        "argv": [
+          "/usr/bin/python3",
+          "-I",
+          "/var/tmp/wfb-heartbeat-capture-repair-20261110T172426Z-v4/fl09/capture-heartbeats-batch.py",
+          "--duration",
+          "5",
+          "--clients",
+          "all",
+          "--ports",
+          "9001"
+        ],
+        "host": "fl09",
+        "term_requested": false
+      },
+      "post-probe": {
+        "status": "not_alive",
+        "pid": 7988,
+        "argv": [],
+        "host": "fl09",
+        "term_requested": true
+      }
+    }
+  ],
+  "all_schema3": true,
+  "all_nonempty": true,
+  "all_errors_empty": true,
+  "all_stop_false": true,
+  "all_drops_zero": true,
+  "all_running_verified": false,
+  "all_post_not_alive": false
+}

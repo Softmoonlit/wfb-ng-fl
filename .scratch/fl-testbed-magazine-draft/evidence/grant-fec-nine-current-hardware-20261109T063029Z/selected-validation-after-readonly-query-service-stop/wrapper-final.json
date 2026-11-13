@@ -1,0 +1,31 @@
+{
+  "wrapper_pid": 8075,
+  "child_pid": 8126,
+  "child_returncode": 0,
+  "hold_failure": null,
+  "worker_exit": {
+    "pid": 8126,
+    "status": "stopped",
+    "exited_wall": 1794245803.4721606,
+    "stop_exists": true
+  },
+  "final_closeout": {},
+  "packagekit_restore": {
+    "host": "fl02",
+    "returncode": 0,
+    "stdout": "{\"action\": \"stop\", \"action_returncode\": 0, \"action_stderr\": \"\", \"active\": \"inactive\", \"enabled\": \"static\", \"main_pid\": \"0\", \"active_ok\": true, \"enabled_ok\": false}\n",
+    "stderr": "",
+    "result": {
+      "action": "stop",
+      "action_returncode": 0,
+      "action_stderr": "",
+      "active": "inactive",
+      "enabled": "static",
+      "main_pid": "0",
+      "active_ok": true,
+      "enabled_ok": false
+    },
+    "ok": false
+  },
+  "wall": 1794245806.157327
+}

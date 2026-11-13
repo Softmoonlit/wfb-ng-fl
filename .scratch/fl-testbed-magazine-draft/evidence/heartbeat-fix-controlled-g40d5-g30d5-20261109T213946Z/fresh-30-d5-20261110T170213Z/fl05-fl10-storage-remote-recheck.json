@@ -1,0 +1,1286 @@
+{
+  "status": "read-only-recheck",
+  "wall": 1794303502.0812209,
+  "hosts": [
+    "fl05",
+    "fl10"
+  ],
+  "target_bytes": 1073741824,
+  "payload": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "protected": {
+    "fl05": {
+      "b2": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        }
+      ],
+      "b2_protected": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+        "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+      },
+      "current_40_5": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/inbox/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/update.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        }
+      ],
+      "current_40_5_protected": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+        "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+        "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+      }
+    },
+    "fl10": {
+      "b2": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+          "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+        }
+      ],
+      "b2_protected": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/rsmc20261109T060537Z-g30-d5-model-final-idle-exact-uftp-kernel-files.json",
+        "source_sha256": "20f710f3cd5f930e83fd4d7166e5aa584df450a0bd89848511dde5a99df1f4a0"
+      },
+      "current_40_5": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/inbox/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/update.bin",
+          "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+          "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+        }
+      ],
+      "current_40_5_protected": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+        "source": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/fec12-g40-d5-model-20261110-after-exact-uftp-kernel-files.json",
+        "source_sha256": "0b802e8aee6482dde91e4b71d8b5ebc1dc5c6b853b8c58cf3115bd8147c142e7"
+      }
+    }
+  },
+  "facts": {
+    "fl05": {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "available_bytes": 368717824,
+        "available_inodes": 1571813,
+        "files": [
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/inbox/8913a858-0826-4a8f-853f-28acd17d8acc/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546448,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/rounds/8913a858-0826-4a8f-853f-28acd17d8acc/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546450,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/rounds/8913a858-0826-4a8f-853f-28acd17d8acc/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546452,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/inbox/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546462,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/rounds/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546464,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/rounds/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546466,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/inbox/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547861,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/rounds/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547864,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/rounds/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547866,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/inbox/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547903,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547906,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547908,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/inbox/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548030,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548032,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548034,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/inbox/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547945,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547948,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547950,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548058,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548060,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548062,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/inbox/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547974,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547976,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 547978,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/inbox/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548002,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548004,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548006,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/inbox/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548807,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548809,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548811,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/inbox/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549169,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/rounds/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549171,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/rounds/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549173,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/inbox/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549183,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549185,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549187,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/inbox/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549211,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549213,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 549215,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/inbox/fae38ee5-99c2-41ce-a253-c3c446e80301/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548476,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/rounds/fae38ee5-99c2-41ce-a253-c3c446e80301/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548478,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/rounds/fae38ee5-99c2-41ce-a253-c3c446e80301/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548480,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/inbox/e5348b89-650d-4035-840c-3da4bd6c160a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548448,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/rounds/e5348b89-650d-4035-840c-3da4bd6c160a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548450,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/rounds/e5348b89-650d-4035-840c-3da4bd6c160a/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 548452,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546390,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546392,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 546394,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    "fl10": {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "available_bytes": 549888000,
+        "available_inodes": 1628796,
+        "files": [
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/inbox/8913a858-0826-4a8f-853f-28acd17d8acc/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526459,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/rounds/8913a858-0826-4a8f-853f-28acd17d8acc/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526461,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g40-d10-model/role/rounds/8913a858-0826-4a8f-853f-28acd17d8acc/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526463,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/inbox/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526473,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/rounds/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526475,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-as20261109T065447Z-g60-d10-model/role/rounds/b28cfcf2-7a46-4f0b-a6cd-5a843900faf7/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526477,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/inbox/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526818,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/rounds/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526820,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g10-d10-model/role/rounds/3dcf98eb-17e7-4ede-a7f9-009db8d1779d/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526822,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/inbox/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526846,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526848,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d10-model/role/rounds/cee8e9d4-af9e-465e-8df7-9881158f8423/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526850,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/inbox/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526958,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526960,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526962,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/inbox/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526874,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526876,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d10-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526878,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526986,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526988,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526990,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/inbox/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526902,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526904,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g40-d10-model/role/rounds/f80703de-e660-496e-b684-812e75dbe672/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526906,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/inbox/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526930,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526932,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g60-d10-model/role/rounds/b635d4b7-9f8d-48e1-90cd-759baaaad35a/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526934,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/inbox/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527735,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527737,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527739,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/inbox/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528097,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/rounds/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528099,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t1-g30-d5-model/role/rounds/135a2d3f-31e4-4f36-bc1f-2d63c971a9a1/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528101,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/inbox/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528111,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528113,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T185342Z-t2-g30-d5-model/role/rounds/28602245-36ff-47c5-b587-932a31c49623/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528115,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/inbox/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528139,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528141,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec12-g40-d5-model-20261110/role/rounds/9934eb94-fe3e-48ac-a0ad-4b62acfa2e87/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 528143,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/inbox/fae38ee5-99c2-41ce-a253-c3c446e80301/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527404,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/rounds/fae38ee5-99c2-41ce-a253-c3c446e80301/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527406,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d5-model/role/rounds/fae38ee5-99c2-41ce-a253-c3c446e80301/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527408,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/inbox/e5348b89-650d-4035-840c-3da4bd6c160a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527376,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/rounds/e5348b89-650d-4035-840c-3da4bd6c160a/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527378,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g30-d10-model/role/rounds/e5348b89-650d-4035-840c-3da4bd6c160a/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 527380,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526401,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100644"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526403,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          },
+          {
+            "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+            "exists": true,
+            "regular": true,
+            "symlink": false,
+            "size_bytes": 44770302,
+            "inode": 526405,
+            "device": 2049,
+            "nlink": 1,
+            "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+            "mode": "0o100600"
+          }
+        ]
+      },
+      "stderr": ""
+    }
+  },
+  "note": "No unlink; exact lstat/SHA only on manifest paths and protected B2/current-40/5 paths."
+}

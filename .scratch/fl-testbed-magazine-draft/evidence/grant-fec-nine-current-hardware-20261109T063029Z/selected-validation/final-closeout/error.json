@@ -1,0 +1,5 @@
+{
+  "error": "RuntimeError(\"触及停止边界，保留现场事实交父处理: RuntimeError('collection management failure: fl01')\")",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/worker.py\", line 196, in main\n    if blocked:raise RuntimeError('触及停止边界，保留现场事实交父处理: '+error)\nRuntimeError: 触及停止边界，保留现场事实交父处理: RuntimeError('collection management failure: fl01')\n",
+  "wall": 1794218047.6854637
+}

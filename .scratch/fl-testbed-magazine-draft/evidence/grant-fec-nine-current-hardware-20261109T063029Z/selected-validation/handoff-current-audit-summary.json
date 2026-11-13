@@ -1,0 +1,124 @@
+{
+  "audit_ok": true,
+  "audit_elapsed": 1.3272464209985628,
+  "audit_checks": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "gate_passed": true,
+  "gate_fail_nodes": [],
+  "gate_radio": {
+    "channel": 149,
+    "bandwidth_mhz": 40,
+    "radio_txpower_dbm": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 15000,
+    "fec_k": 8,
+    "fec_n": 12,
+    "channel_width": "HT40+",
+    "guard_interval": "long"
+  },
+  "gate_server_state": "IDLE",
+  "gate_active_job": null,
+  "gate_nodes": {
+    "1": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "2": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "3": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "4": {
+      "readiness": "OFFLINE",
+      "reported_state": null,
+      "current_channel": null
+    },
+    "5": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "6": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "7": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "8": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "9": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    },
+    "10": {
+      "readiness": "READY",
+      "reported_state": "IDLE",
+      "current_channel": 149
+    }
+  }
+}

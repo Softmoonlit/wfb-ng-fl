@@ -1,0 +1,640 @@
+{
+  "status": "blocked_insufficient_eligible_capacity_on_fl01",
+  "purpose": "Space reclamation only; preserve all infrastructure failure evidence",
+  "deletions": [],
+  "deleted_count": 0,
+  "no_remote_changes": true,
+  "canonical_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+  "canonical_size": 44770302,
+  "canonical_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "minimum_available_bytes": 1610612736,
+  "hosts": [
+    {
+      "host": "fl01",
+      "available_bytes": 5505024,
+      "size_matching_count": 35,
+      "excluded_ufpt_tmp_count": 2,
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "runid": "rsmc20261109T060537Z-g30-d5-model",
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "inode": 583344,
+        "device": 2049,
+        "nlink": 1
+      },
+      "possible_deletion_count": 32,
+      "possible_release_upper_bound": 1432752128,
+      "available_after_upper_bound": 1438257152,
+      "minimum_available_required": 1610612736,
+      "shortfall_even_if_all_sha_match": 172355584,
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583236,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583238,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583240,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581715,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581717,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581719,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583264,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583266,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583268,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583174,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583176,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583178,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/inbox/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583188,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583190,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/update.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583192,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/inbox/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583202,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583204,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/update.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583206,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/inbox/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580962,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580964,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/update.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580966,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/inbox/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580976,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580978,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/update.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 580980,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/inbox/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581464,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581466,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/update.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 581468,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "runid": "rsmc20261109T060537Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583342,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+          "runid": "rsmc20261109T060537Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583346,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/inbox/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44777472,
+          "inode": 583314,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583316,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/update.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 583318,
+          "device": 2049,
+          "nlink": 1
+        }
+      ],
+      "sha_check": "Upper bound only. Not eligible until complete SHA verification and log archival; no files selected for deletion."
+    },
+    {
+      "host": "fl02",
+      "available_bytes": 651206656,
+      "size_matching_count": 34,
+      "excluded_ufpt_tmp_count": 1,
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "runid": "rsmc20261109T060537Z-g30-d5-model",
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "inode": 1097139,
+        "device": 2049,
+        "nlink": 1
+      },
+      "possible_deletion_count": 32,
+      "possible_release_upper_bound": 1432760320,
+      "available_after_upper_bound": 2083966976,
+      "minimum_available_required": 1610612736,
+      "shortfall_even_if_all_sha_match": 0,
+      "files": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097030,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097032,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+          "runid": "c20261109T034216Z-g20-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097034,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095511,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095513,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+          "runid": "eleven-A-g18d2-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095515,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44785664,
+          "inode": 1097059,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097061,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+          "runid": "k20261109T034216Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097063,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096970,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096972,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+          "runid": "model-fec14-g10-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096974,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/inbox/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096984,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096986,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/update.bin",
+          "runid": "model-fec14-g20-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096988,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/inbox/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1096998,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097000,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/update.bin",
+          "runid": "model-fec14-g30-d10",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097002,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/inbox/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094725,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094728,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/update.bin",
+          "runid": "model-sized-ht40-149-12-2",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094730,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/inbox/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094746,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094749,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/update.bin",
+          "runid": "model-sized-ht40-149-12-3",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1094751,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/inbox/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095259,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/model.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095261,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1/role/rounds/923d6e06-36cf-4002-be7d-8e0c0b2954eb/update.bin",
+          "runid": "nine-grant10-model-20261108-1",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1095263,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+          "runid": "rsmc20261109T060537Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097137,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+          "runid": "rsmc20261109T060537Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097141,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/inbox/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097109,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097111,
+          "device": 2049,
+          "nlink": 1
+        },
+        {
+          "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/update.bin",
+          "runid": "rv20261109T052525Z-g30-d5-model",
+          "size_bytes": 44770302,
+          "allocated_bytes": 44773376,
+          "inode": 1097113,
+          "device": 2049,
+          "nlink": 1
+        }
+      ],
+      "sha_check": "Upper bound only. Not eligible until complete SHA verification and log archival; no files selected for deletion."
+    }
+  ],
+  "hash_inventory_note": "Bulk read-only SHA batches on fl01 exceeded 24s under concurrent reads; partial results preserved. No management-loss or deletion conclusion inferred from these workload timeouts. SHA inventory discontinued because size/allocated-byte upper bound already proves capacity insufficient.",
+  "existing_verified_candidates": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/cache-cleanup-candidates.json",
+  "full10_final_baseline": true,
+  "nine_ready_final": true,
+  "wall": 1794206938.9069664
+}

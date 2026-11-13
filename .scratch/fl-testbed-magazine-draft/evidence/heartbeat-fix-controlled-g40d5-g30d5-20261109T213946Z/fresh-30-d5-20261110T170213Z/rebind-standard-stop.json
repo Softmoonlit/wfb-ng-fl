@@ -1,0 +1,134 @@
+{
+  "clients": [
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl01",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl01\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl02",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl02\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl03",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl03\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl05",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl05\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl06",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl06\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl07",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl07\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl08",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl08\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl09",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl09\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ssh",
+        "-T",
+        "-oBatchMode=yes",
+        "-oConnectTimeout=5",
+        "fl10",
+        "sudo -n python3 -c 'import subprocess,json,socket\np=subprocess.run(['\"'\"'systemctl'\"'\"','\"'\"'stop'\"'\"','\"'\"'wfb-fl-client-daemon.service'\"'\"'],capture_output=True,text=True,timeout=20)\nprint(json.dumps(dict(host=socket.gethostname(),returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)))\nraise SystemExit(p.returncode)'"
+      ],
+      "returncode": 0,
+      "stdout": "{\"host\": \"fl10\", \"returncode\": 0, \"stdout\": \"\", \"stderr\": \"\"}\n",
+      "stderr": ""
+    }
+  ],
+  "server": {
+    "argv": [
+      "sudo",
+      "-n",
+      "systemctl",
+      "stop",
+      "wfb-fl-server-daemon.service"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "wall": 1794305807.6569293
+}

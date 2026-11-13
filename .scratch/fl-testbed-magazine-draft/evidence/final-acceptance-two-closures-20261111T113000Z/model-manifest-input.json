@@ -1,0 +1,25 @@
+{
+  "dtype_statistics": {
+    "float32": {
+      "bytes": 44734248,
+      "elements": 11183562
+    },
+    "int64": {
+      "bytes": 160,
+      "elements": 20
+    }
+  },
+  "initialization": {
+    "seed": 7,
+    "source": "torchvision-resnet18-basicblock-cifar10-kaiming-normal-fan-out-relu-bn-standard-kaiming-uniform-a-sqrt5-v1"
+  },
+  "model_format": "cifar10-resnet18-fp32-v1",
+  "parameter_count": 11173962,
+  "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "size_bytes": 44770302,
+  "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+  "torch_version": "2.5.0a0+872d972e41.nv24.08",
+  "torchvision_version": "0.20.0a0+afc54f7",
+  "model_source_commit": "f15de6517acbc3ebbf8d1e1defe78900c81fd2ca",
+  "public_load_verified": true
+}

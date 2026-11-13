@@ -1,0 +1,125 @@
+{
+  "status": "stopped_infrastructure_storage_no_more_tests",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining",
+  "execute_count": 4,
+  "results": [
+    {
+      "grant": 40,
+      "guard": 10,
+      "mode": "smoke",
+      "execute_count": 1,
+      "classification": "passed",
+      "DLduration": 8.639830727999652,
+      "ULduration": 27.365239820999705,
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "exact_cleanup": true,
+      "independent_baseline": true,
+      "independent_nine_ready": true,
+      "storage_abort": [],
+      "complete_upload_count": 9
+    },
+    {
+      "grant": 40,
+      "guard": 10,
+      "mode": "model",
+      "execute_count": 1,
+      "classification": "infrastructure_disk_space_abort_not_performance_sample",
+      "DLduration": 4.209276506000606,
+      "ULduration": null,
+      "raw_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "exact_cleanup": true,
+      "independent_baseline": true,
+      "independent_nine_ready": true,
+      "storage_abort": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model/role/rounds/dc50201c-e18c-4da6-af4b-92c561373750/uftp-0e7776e8-9b3a-4ba2-9cf9-10e707886da1.log",
+          "text": "2026/11/09 14:33:24.818189: [25451E6C/00:0]: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/11/09 14:33:24.818373: [25451E6C/00:0]: Transfer rate: 12000 Kbps (1500 KB/s)\n2026/11/09 14:33:24.818399: [25451E6C/00:0]: Wait between packets: 880208 ns\n2026/11/09 14:33:24.818420: [25451E6C/00:0]: Using private multicast address 239.80.42.1  Group ID: 25451E6C\n2026/11/09 14:33:24.818439: [25451E6C/00:0]: Initializing group\n2026/11/09 14:33:24.818500: [25451E6C/00:0]: Sending ANNOUNCE 1.1\n2026/11/09 14:33:24.822241: [25451E6C/00:0]: Received REGISTER from client 0x00000003\n2026/11/09 14:33:24.833291: [25451E6C/00:0]: Received REGISTER from client 0x00000001\n2026/11/09 14:33:24.883877: [25451E6C/00:0]: Received REGISTER from client 0x00000002\n2026/11/09 14:33:24.933342: [25451E6C/00:0]: Received REGISTER from client 0x00000009\n2026/11/09 14:33:24.985658: [25451E6C/00:0]: Received REGISTER from client 0x00000005\n2026/11/09 14:33:25.340823: [25451E6C/00:0]: Received REGISTER from client 0x00000008\n2026/11/09 14:33:25.390304: [25451E6C/00:0]: Received REGISTER from client 0x0000000A\n2026/11/09 14:33:25.440615: [25451E6C/00:0]: Received REGISTER from client 0x00000007\n2026/11/09 14:33:26.319411: [25451E6C/00:0]: Sending REG_CONF 2.1\n2026/11/09 14:33:26.320562: [25451E6C/00:0]: Sending ANNOUNCE 2.1\n2026/11/09 14:33:26.692056: [25451E6C/00:0]: Received REGISTER from client 0x00000006\n2026/11/09 14:33:26.692194: [25451E6C/00:0]: Late registers:\n2026/11/09 14:33:26.692238: [25451E6C/00:0]: Sending REG_CONF 3.1\n2026/11/09 14:33:28.567250: [25451E6C/00:0]: ----- model.bin -----\n2026/11/09 14:33:28.567477: [25451E6C/00:0001]: File ID: 0001  Name: model.bin\n2026/11/09 14:33:28.567523: [25451E6C/00:0001]:   sending as: dc50201c-e18c-4da6-af4b-92c561373750/model.bin\n2026/11/09 14:33:28.567556: [25451E6C/00:0001]: Bytes: 44770302  Blocks: 34439  Sections: 4\n2026/11/09 14:33:28.567609: [25451E6C/00:0001]: Sending FILEINFO 1.1\n2026/11/09 14:33:28.572695: [25451E6C/00:0001]: Transfer aborted by 0x00000001: Not enough disk space\n2026/11/09 14:33:28.572748: [25451E6C/00:0001]: Aborting all clients\n2026/11/09 14:33:28.572805: [25451E6C/00:0001]: Aborting all clients\n2026/11/09 14:33:28.572853: [25451E6C/00:0001]: Announce timed out\n"
+        }
+      ],
+      "complete_upload_count": 0
+    },
+    {
+      "grant": 60,
+      "guard": 10,
+      "mode": "smoke",
+      "execute_count": 1,
+      "classification": "passed",
+      "DLduration": 14.18932425499952,
+      "ULduration": 17.863304418000553,
+      "raw_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "exact_cleanup": true,
+      "independent_baseline": true,
+      "independent_nine_ready": true,
+      "storage_abort": [],
+      "complete_upload_count": 9
+    },
+    {
+      "grant": 60,
+      "guard": 10,
+      "mode": "model",
+      "execute_count": 1,
+      "classification": "infrastructure_disk_space_abort_not_performance_sample",
+      "DLduration": 1.926718370999879,
+      "ULduration": null,
+      "raw_flags": {
+        "transfer_verified": false,
+        "cleanup_ok": true,
+        "restore_ok": false
+      },
+      "exact_cleanup": true,
+      "independent_baseline": true,
+      "independent_nine_ready": true,
+      "storage_abort": [
+        {
+          "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model/role/rounds/3e079bcb-657e-4191-85e8-25d8308a28da/uftp-6345bc96-c3ea-450e-a3c3-ca5c38e28d34.log",
+          "text": "2026/11/09 14:35:22.179085: [3903B913/00:0]: UFTP version 5.0.3  Copyright (C) 2001-2023  Dennis A. Bush\n2026/11/09 14:35:22.179270: [3903B913/00:0]: Transfer rate: 12000 Kbps (1500 KB/s)\n2026/11/09 14:35:22.179296: [3903B913/00:0]: Wait between packets: 880208 ns\n2026/11/09 14:35:22.179317: [3903B913/00:0]: Using private multicast address 239.80.42.1  Group ID: 3903B913\n2026/11/09 14:35:22.179335: [3903B913/00:0]: Initializing group\n2026/11/09 14:35:22.179395: [3903B913/00:0]: Sending ANNOUNCE 1.1\n2026/11/09 14:35:22.184786: [3903B913/00:0]: Received REGISTER from client 0x00000002\n2026/11/09 14:35:22.237269: [3903B913/00:0]: Received REGISTER from client 0x00000003\n2026/11/09 14:35:22.303207: [3903B913/00:0]: Received REGISTER from client 0x00000006\n2026/11/09 14:35:22.373072: [3903B913/00:0]: Received REGISTER from client 0x00000001\n2026/11/09 14:35:22.452047: [3903B913/00:0]: Received REGISTER from client 0x0000000A\n2026/11/09 14:35:22.512832: [3903B913/00:0]: Received REGISTER from client 0x00000008\n2026/11/09 14:35:22.582538: [3903B913/00:0]: Received REGISTER from client 0x00000007\n2026/11/09 14:35:22.654659: [3903B913/00:0]: Received REGISTER from client 0x00000005\n2026/11/09 14:35:22.723386: [3903B913/00:0]: Received REGISTER from client 0x00000009\n2026/11/09 14:35:22.723498: [3903B913/00:0]: Late registers:\n2026/11/09 14:35:22.723542: [3903B913/00:0]: Sending REG_CONF 2.1\n2026/11/09 14:35:23.267543: [3903B913/00:0]: ----- model.bin -----\n2026/11/09 14:35:23.267770: [3903B913/00:0001]: File ID: 0001  Name: model.bin\n2026/11/09 14:35:23.267815: [3903B913/00:0001]:   sending as: 3e079bcb-657e-4191-85e8-25d8308a28da/model.bin\n2026/11/09 14:35:23.267847: [3903B913/00:0001]: Bytes: 44770302  Blocks: 34439  Sections: 4\n2026/11/09 14:35:23.267900: [3903B913/00:0001]: Sending FILEINFO 1.1\n2026/11/09 14:35:23.285652: [3903B913/00:0001]: Received FILEINFO_ACK from client 0x00000005\n2026/11/09 14:35:23.356350: [3903B913/00:0001]: Received FILEINFO_ACK from client 0x00000009\n2026/11/09 14:35:23.427308: [3903B913/00:0001]: Received FILEINFO_ACK from client 0x00000002\n2026/11/09 14:35:23.494348: [3903B913/00:0001]: Received FILEINFO_ACK from client 0x00000003\n2026/11/09 14:35:23.563985: [3903B913/00:0001]: Received FILEINFO_ACK from client 0x00000006\n2026/11/09 14:35:23.634391: [3903B913/00:0001]: Transfer aborted by 0x00000001: Not enough disk space\n2026/11/09 14:35:23.634528: [3903B913/00:0001]: Aborting all clients\n2026/11/09 14:35:23.634639: [3903B913/00:0001]: Aborting all clients\n2026/11/09 14:35:23.634695: [3903B913/00:0001]: Announce timed out\n"
+        }
+      ],
+      "complete_upload_count": 0
+    }
+  ],
+  "final_recovery": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "server_schedule": "10/10",
+    "runs": [
+      [
+        "gf20261109T063029Z-g40-d10-smoke",
+        1794205917
+      ],
+      [
+        "gf20261109T063029Z-g40-d10-model",
+        1794205989
+      ],
+      [
+        "gf20261109T063029Z-g60-d10-smoke",
+        1794206030
+      ],
+      [
+        "gf20261109T063029Z-g60-d10-model",
+        1794206112
+      ]
+    ],
+    "execute_count": 4,
+    "measurement_error": null,
+    "wall": 1794206161.2878916
+  },
+  "disk_evidence": "disk-capacity-stop-full10-readonly.json",
+  "cleanup_candidates": "cache-cleanup-candidates.json",
+  "no_deletions": true,
+  "worker_exited": true,
+  "scope": "FEC14 only; no FEC12 executed",
+  "wall": 1794206751.5922613
+}

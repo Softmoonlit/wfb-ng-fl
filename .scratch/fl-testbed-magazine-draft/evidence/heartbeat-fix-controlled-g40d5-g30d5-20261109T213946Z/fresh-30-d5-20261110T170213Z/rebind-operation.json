@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "sudo",
+    "-n",
+    "bash",
+    "-c",
+    "set -eu; echo -n 1-2.3:1.0 > /sys/bus/usb/drivers/rtl88xxau_wfb/unbind; sleep 2; echo -n 1-2.3:1.0 > /sys/bus/usb/drivers/rtl88xxau_wfb/bind; udevadm settle"
+  ],
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "bash: 第 1 行： echo: 写入错误：没有那个设备\n"
+}

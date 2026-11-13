@@ -1,0 +1,17 @@
+{
+  "wrapper_pid": 8138,
+  "child_pid": null,
+  "child_returncode": null,
+  "hold_failure": {
+    "reason": "wrapper failure",
+    "error": "RuntimeError(\"cache is not exact regular non-symlink non-mount file: {'path': '/var/cache/apt/pkgcache.bin', 'exists': False}\")",
+    "wall": 1794245947.8541503
+  },
+  "worker_exit": {},
+  "final_closeout": {},
+  "packagekit_restore": {
+    "ok": true,
+    "attempted": false
+  },
+  "wall": 1794245947.8548055
+}

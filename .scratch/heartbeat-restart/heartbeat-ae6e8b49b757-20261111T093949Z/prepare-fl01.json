@@ -1,0 +1,6 @@
+{
+  "host": "fl01",
+  "exit": 0,
+  "stdout": "{\"host\": \"fl01\", \"phase\": \"prepare\", \"archive_sha\": \"efe6d22a0616b3559559d231f1a22d7e68c8a7c7ccd5d02ad4e59a37b39c1cd8\", \"root\": \"/srv/wfb-ng-fl/releases/heartbeat-ae6e8b49b757-20261111T093949Z\", \"runtime_files\": [\"__init__.py\", \"algorithm.py\", \"artifacts.py\", \"cifar10_model.py\", \"client_daemon.py\", \"console.py\", \"console_http.py\", \"control.py\", \"coordinator.py\", \"errors.py\", \"evidence.py\", \"fp64_audit.py\", \"issue41_fixtures.py\", \"link_radio.py\", \"mnist.py\", \"mnist_cnn_32_64.py\", \"mnist_cnn_model.py\", \"mnist_data.py\", \"mnist_deployment.py\", \"model_artifact.py\", \"model_library.py\", \"observation.py\", \"radio.py\", \"reference_model.py\", \"role.py\", \"runtime.py\", \"server_daemon.py\", \"service.py\", \"static/console.css\", \"static/console.js\", \"static/evaluation-curves.js\", \"static/index.html\", \"static/models.css\", \"static/models.html\", \"static/models.js\", \"static/radio.css\", \"static/radio.html\", \"static/radio.js\", \"transport.py\"], \"dependencies\": {\"daemon_import_without_torch\": true, \"model_dependencies\": {\"torch\": true, \"torchvision\": false}}, \"iface\": \"wlxfc221c500bfe\"}\n",
+  "stderr": ""
+}

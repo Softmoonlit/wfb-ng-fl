@@ -1,0 +1,107 @@
+{
+  "status": "stopped_at_cold_audit",
+  "reason": "冷阶段 audit 的 fl03/fl06 首次 channel149/HT40 断言失败；worker 按阶段屏障退出，未启动文件矩阵",
+  "execute_count": 0,
+  "profile": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/heartbeat-1cd6264d5d6b-20261109T080119Z",
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start"
+  ],
+  "cold_audit_first_ok": false,
+  "first_failure_hosts": [
+    "fl03",
+    "fl06"
+  ],
+  "first_failure_line": 385,
+  "first_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/cold-switch-audit.log",
+  "independent_readonly_final": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "checks": [
+      {
+        "host": "fl00",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl01",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl02",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl03",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl05",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl06",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl07",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl08",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl09",
+        "ok": true,
+        "errors": []
+      },
+      {
+        "host": "fl10",
+        "ok": true,
+        "errors": []
+      }
+    ],
+    "fec_n": 14,
+    "server_schedule": "10/10",
+    "baseline_channel": 149,
+    "readonly": true,
+    "wall": 1794212326.7180471
+  },
+  "final_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/cold-audit-failure-readonly/result.json",
+  "final_active_old_units": {
+    "fl00": [],
+    "fl01": [],
+    "fl02": [],
+    "fl03": [],
+    "fl05": [],
+    "fl06": [],
+    "fl07": [],
+    "fl08": [],
+    "fl09": [],
+    "fl10": []
+  },
+  "worker_pid": 187953,
+  "worker_exited": true,
+  "remote_operations_finished": true,
+  "no_further_remote_operations": true,
+  "review_manifest_unchanged": true,
+  "reviewed_inputs_changed_only_expected_profile_state": [
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/heartbeat-1cd6264d5d6b-20261109T080119Z/state.json"
+  ],
+  "original_failure_preserved": true,
+  "recovery_or_registry_mutation_after_stop": false,
+  "parent_review_required_before_cold_stage_continuation": true,
+  "wall": 1794212384.9947977
+}

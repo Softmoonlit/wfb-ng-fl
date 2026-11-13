@@ -1,0 +1,19 @@
+{
+  "status": "blocked",
+  "reason": "selected_precondition_mismatch",
+  "free_before": 569905152,
+  "selected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/inbox/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+      "exists": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/model.bin",
+      "exists": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/dd983fd1-53bd-4e48-aec7-bc6e837eb60e/update.bin",
+      "exists": false
+    }
+  ]
+}

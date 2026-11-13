@@ -1,0 +1,95 @@
+{
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "文件系统             1B的块        已用        可用 已用% 挂载点\n/dev/nvme0n1p1 123887923200 53046804480 64500641792   46% /\n",
+        "df_inodes": "文件系统        Inodes   已用I   可用I 已用I% 挂载点\n/dev/nvme0n1p1 7725056 1036574 6688482    14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 27162865664 1079459840  97% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315453 1536867   18% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 27143856128 1098469376  97% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315389 1536931   18% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 22833561600 5408763904  81% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 258732 1593588   14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25073762304 3168563200  89% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 278424 1573896   16% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25358319616 2884005888  90% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242826 1609494   14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 23507017728 4735307776  84% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242347 1609973   14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25577635840 2664689664  91% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242409 1609911   14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25478713344 2763612160  91% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242533 1609787   14% /\n"
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 24819486720 3422838784  88% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 221440 1630880   12% /\n"
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794207197.3272548
+}

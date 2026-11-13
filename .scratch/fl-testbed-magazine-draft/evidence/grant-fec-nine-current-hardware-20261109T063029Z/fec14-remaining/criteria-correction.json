@@ -1,0 +1,11 @@
+{
+  "prior_execute_count": 0,
+  "prior_preserved": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/zero-execute-criteria-error",
+  "reason": "MCS index 3/4 is separate from driver power index18 shown by iw txpower -18.00; corrected local audit only",
+  "prior_unnecessary_standard_restarts": "See zero-execute-criteria-error/final-closeout/single-standard-recovery.json; no payload executed",
+  "deadline_unchanged": true,
+  "error_origin": "Agent-added assertion in driver-base.py: a[a.index('--radio-mcs-index')+1] == '18'; original reused driver had no such assertion. This native option is MCS3/4, separate from driver power index18.",
+  "power_evidence": "Only iw dev selected-interface info txpower -18.00 dBm is used for driver index18; GET_RADIO retained existing protocol BW/MCS/GI checks, no added power field interpretation.",
+  "parent_guidance": "Shared new assertion failing on all hosts requires tool review first; do not restart all boards as if independent hardware failures.",
+  "unnecessary_recovery_preserved": true
+}

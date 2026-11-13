@@ -1,0 +1,785 @@
+{
+  "status": "complete",
+  "purpose": "Reclaim exact duplicate complete model payload caches; preserve failed samples and all logs/metadata",
+  "prior_no_delete_record": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-closure/cleanup-manifest.json",
+  "threshold_change": {
+    "previous_bytes": 1610612736,
+    "current_bytes": 1073741824,
+    "reason": "执行编排根据单次模型约201MB及两次模型预算，将自定空间预留由1.5GiB调整为1GiB；这是代理的执行选择，用户授权的是继续测试。",
+    "single_model_budget_bytes": 201419770,
+    "future_fec12_pre_model_statvfs_minimum": 536870912
+  },
+  "canonical": {
+    "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "size": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "hosts": {
+    "fl01": {
+      "status": "complete",
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 583344,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "deleted_count": 24,
+      "available_bytes": 1079476224,
+      "retained_b2_final": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 583344,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      }
+    },
+    "fl02": {
+      "status": "complete",
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "deleted_count": 10,
+      "available_bytes": 1098498048,
+      "retained_b2_final": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      }
+    }
+  },
+  "files": [
+    {
+      "host": "fl01",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583236,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 49852416
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097030,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/inbox/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 695595008
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097032,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 740364288
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583238,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 94617600
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097034,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 785129472
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "c20261109T034216Z-g20-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583240,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model/role/rounds/845470f6-b42e-4fc9-83bc-24ba23ee96bf/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 139382784
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1095511,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 829894656
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 581715,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/inbox/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 184152064
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1095513,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 874659840
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 581717,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 228913152
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1095515,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 919429120
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "eleven-A-g18d2-model-20261108-1",
+      "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 581719,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1/role/rounds/056d0234-e080-44f2-9cc4-852cff8b0fdc/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 273682432
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097059,
+      "device": 2049,
+      "allocated_bytes": 44785664,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 964206592
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583264,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/inbox/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 318443520
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097061,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 1008967680
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583266,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 363208704
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1097063,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 1053732864
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "k20261109T034216Z-g30-d5-model",
+      "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583268,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model/role/rounds/21b2c501-aa9d-4446-afc4-5e1367068748/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 407990272
+      }
+    },
+    {
+      "host": "fl02",
+      "runid": "model-fec14-g10-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1096970,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-model-fec14-g10-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 1098498048
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g10-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583174,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g10-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/inbox/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 452755456
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g10-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583176,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g10-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 497512448
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g10-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583178,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g10-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 542281728
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g20-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/inbox/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583188,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g20-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/inbox/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 587046912
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g20-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583190,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g20-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 631812096
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g20-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583192,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g20-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g20-d10/role/rounds/391d429f-ed7d-4d7c-904f-ac506f01c861/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 676577280
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g30-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/inbox/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583202,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g30-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/inbox/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 721338368
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g30-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583204,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g30-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 766103552
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-fec14-g30-d10",
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 583206,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g30-d10-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g30-d10/role/rounds/d927359d-0b66-4231-a0f5-865628b93c0c/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 810872832
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-2",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/inbox/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580962,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-2-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/inbox/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 855638016
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-2",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580964,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-2-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 900407296
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-2",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580966,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-2-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2/role/rounds/3126cc46-7d9c-4a04-9c74-4580b1bff4fb/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 945172480
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-3",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/inbox/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580976,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-3-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/inbox/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 989933568
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-3",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580978,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-3-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 1034702848
+      }
+    },
+    {
+      "host": "fl01",
+      "runid": "model-sized-ht40-149-12-3",
+      "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 580980,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_log_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-3-metadata-logs.json",
+      "canonical_local": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3/role/rounds/a2120893-87ec-45e6-a8c4-93c19bab0061/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 1079480320
+      }
+    }
+  ],
+  "deleted_count": 34,
+  "tests_started": 0,
+  "full10_baseline_ok": true,
+  "nine_ready_idle": true
+}

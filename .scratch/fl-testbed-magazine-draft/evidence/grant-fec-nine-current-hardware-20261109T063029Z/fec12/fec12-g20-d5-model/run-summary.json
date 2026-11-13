@@ -1,0 +1,314 @@
+{
+  "candidate": {
+    "grant_duration_ms": 20,
+    "guard_interval_ms": 5,
+    "fec_n": 12,
+    "mode": "model",
+    "stage": "execute",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d5-model",
+    "execute_count": 1,
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      }
+    },
+    "runner_last_phase": "cleanup",
+    "runner_last_monotonic": 16281.885814075,
+    "currentphase": "verify",
+    "completed_hosts": {
+      "publish": [
+        "fl00",
+        "fl08",
+        "fl05",
+        "fl01",
+        "fl06",
+        "fl02",
+        "fl10",
+        "fl07",
+        "fl09",
+        "fl03"
+      ],
+      "submit": [
+        "fl03",
+        "fl10",
+        "fl01",
+        "fl02",
+        "fl06",
+        "fl07",
+        "fl09",
+        "fl05",
+        "fl08",
+        "fl00"
+      ]
+    },
+    "client_upload_progress": {
+      "wall": 1794211588.4026003,
+      "monotonic": 16278.363625399,
+      "phase": "upload_progress",
+      "host": "fl00",
+      "ok": true,
+      "result": {
+        "nodes": [
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 1,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 2,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 3,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 5,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 6,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 7,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 8,
+            "bytes": 43909120,
+            "partial_bytes": 43909120,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 9,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "0f6c288a-42fe-4588-a5f0-014b58009b1f",
+            "node": 10,
+            "bytes": 44770302,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          }
+        ],
+        "observation": "filesystem_snapshot",
+        "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+      }
+    },
+    "hunt_events": [
+      {
+        "wall": 1794211268.1612995,
+        "node": "1",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794211298.3600008,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794211313.4521537,
+        "node": "9",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794211318.4883041,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794211439.363109,
+        "node": "5",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794211520.0352259,
+        "node": "2",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      }
+    ],
+    "runner_returncode": 0,
+    "runner_restore_ok": true,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g20-d5-model/fec12-20261109T071504Z-g20-d5-model/progress.jsonl",
+    "elapsed": 438.19143678,
+    "DLduration": 46.50265198099987,
+    "ULduration": 372.56884838099904,
+    "failures": [],
+    "original_runner_final_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "server_verified_files": {
+      "1": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/1/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "2": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/2/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "3": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/3/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "5": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/5/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "6": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/6/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "7": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/7/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "8": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/8/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "9": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/9/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "10": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g20-d5-model/role/rounds/0f6c288a-42fe-4588-a5f0-014b58009b1f/updates/10/update.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      }
+    },
+    "phase_completion_seconds": {
+      "publish": {
+        "fl00": 42.33337991699955,
+        "fl08": 43.97176009599934,
+        "fl05": 43.97768788099893,
+        "fl01": 43.99941611899885,
+        "fl06": 44.00325882099969,
+        "fl02": 44.00727835999896,
+        "fl10": 44.97729820399945,
+        "fl07": 45.402733220998925,
+        "fl09": 45.80343927600006,
+        "fl03": 46.50265198099987
+      },
+      "submit": {
+        "fl03": 212.63974549799968,
+        "fl10": 227.63872424500005,
+        "fl01": 271.23098534899873,
+        "fl02": 307.0961506570002,
+        "fl06": 309.4972703029998,
+        "fl07": 313.85967490999974,
+        "fl09": 315.5265963209986,
+        "fl05": 355.2192582579992,
+        "fl08": 371.85725450599966,
+        "fl00": 372.56884838099904
+      }
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794211599.08845,
+    "monotonic": 16289.049474803,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  }
+}

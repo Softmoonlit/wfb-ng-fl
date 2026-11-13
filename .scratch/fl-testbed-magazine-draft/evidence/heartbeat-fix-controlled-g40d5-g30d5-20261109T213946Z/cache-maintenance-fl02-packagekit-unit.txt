@@ -1,0 +1,44 @@
+Restart=no
+RestartUSec=100ms
+MainPID=16183
+Id=packagekit.service
+Names=packagekit.service
+Triggers=
+TriggeredBy=
+ActiveState=active
+SubState=running
+UnitFileState=static
+● packagekit.service - PackageKit Daemon
+     Loaded: loaded (/lib/systemd/system/packagekit.service; static)
+     Active: active (running) since Tue 2026-11-10 06:23:43 CST; 53s ago
+   Main PID: 16183 (packagekitd)
+      Tasks: 3 (limit: 8809)
+     Memory: 32.0M
+        CPU: 6.040s
+     CGroup: /system.slice/packagekit.service
+             └─16183 /usr/libexec/packagekitd
+
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libnss-sss arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libpam-sss arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libsss-certmap0 arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libsss-nss-idmap0 arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libsss-idmap0 arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libipa-hbac0 arm64 2.6.3-1ubuntu3.9 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 libreoffice-pdfimport all 1:7.3.7-0ubuntu0.22.04.13 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 p11-kit arm64 0.24.0-6ubuntu0.1 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/main arm64 qemu-efi-aarch64 all 2022.02-3ubuntu0.22.04.7 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+11月 10 06:24:09 fl02 packagekitd[16183]: http://ports.ubuntu.com/ubuntu-ports jammy-updates/universe arm64 qemu-efi all 2022.02-3ubuntu0.22.04.7 is not (yet) available (Unable to connect to 10.59.37.140:7890:)
+# /lib/systemd/system/packagekit.service
+[Unit]
+Description=PackageKit Daemon
+# PK doesn't know how to do anything on ostree-managed systems;
+# currently the design is to have dedicated daemons like
+# eos-updater and rpm-ostree, and gnome-software talks to those.
+ConditionPathExists=!/run/ostree-booted
+Wants=network-online.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.PackageKit
+User=root
+ExecStart=/usr/libexec/packagekitd

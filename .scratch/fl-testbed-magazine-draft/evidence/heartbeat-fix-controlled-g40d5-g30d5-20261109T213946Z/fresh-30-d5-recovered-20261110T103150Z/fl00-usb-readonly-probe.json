@@ -1,0 +1,318 @@
+{
+  "local_started_wall": 1794306841.595825,
+  "local_finished_wall": 1794306841.745085,
+  "ssh_argv": [
+    "sudo",
+    "-n",
+    "python3",
+    "-c",
+    "import json,pathlib,subprocess,socket,time,re\nTARGET_MAC='fc:a3:86:b3:86:72'\nTARGET_USB='1-2.3:1.0'\nOLD_REBIND_WALL=1794305865\n\ndef read(path):\n    p=pathlib.Path(path)\n    try:\n        return p.read_text().strip()\n    except Exception as exc:\n        return 'ERROR:'+repr(exc)\n\ndef run(argv, timeout=8):\n    try:\n        p=subprocess.run(argv,capture_output=True,text=True,timeout=timeout)\n        return dict(argv=argv,returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)\n    except Exception as exc:\n        return dict(argv=argv,error=repr(exc))\n\nnet=[]\nfor p in sorted(pathlib.Path('/sys/class/net').glob('*')):\n    if not p.is_dir():\n        continue\n    dev=(p/'device')\n    resolved=str(dev.resolve()) if dev.exists() else None\n    driver=str((dev/'driver').resolve()) if (dev/'driver').exists() else None\n    net.append(dict(name=p.name,address=read(p/'address'),operstate=read(p/'operstate'),ifindex=read(p/'ifindex'),device=resolved,driver=driver,carrier=read(p/'carrier')))\n\ntarget=[x for x in net if x['address'].lower()==TARGET_MAC]\nusb_devices=[]\nfor p in sorted(pathlib.Path('/sys/bus/usb/devices').glob('*')):\n    if not p.is_dir() or not (p/'idVendor').exists():\n        continue\n    usb_devices.append(dict(name=p.name,realpath=str(p.resolve()),idVendor=read(p/'idVendor'),idProduct=read(p/'idProduct'),manufacturer=read(p/'manufacturer'),product=read(p/'product'),serial=read(p/'serial'),speed=read(p/'speed'),busnum=read(p/'busnum'),devnum=read(p/'devnum'),authorized=read(p/'authorized'),configuration=read(p/'bConfigurationValue')))\n\ntarget_usb=[x for x in usb_devices if x['name']==TARGET_USB]\nkernel=run(['journalctl','-k','--since','@'+str(OLD_REBIND_WALL),'--no-pager','-o','short-unix'],timeout=12)\nlines=kernel.get('stdout','').splitlines()\nusb_events=[line for line in lines if re.search(r'(?i)(usb|error -71|unable to enumer|descriptor|disconnect|reset high|device firmware changed)',line)]\nnew_71=[line for line in lines if re.search(r\"(?i)(error -71|unable to enumer|descriptor read|can't read configurations)\",line)]\nnew_disconnect=[line for line in lines if re.search(r'(?i)(USB disconnect|usb .*disconnect|reset (?:high|full|super|low)-speed USB)',line)]\nservices={u:run(['systemctl','show',u,'-p','Id','-p','ActiveState','-p','SubState','-p','MainPID','-p','ExecMainStartTimestamp']) for u in ['wfb-fl-server-daemon.service']}\nps=run(['ps','-eo','pid=,stat=,args=','--forest'])\nnet_addr=run(['ip','-j','addr','show'])\nnet_link=run(['ip','-j','link','show','dev','enP8p1s0'])\nnet_mgmt_addr=run(['ip','-j','addr','show','dev','enP8p1s0'])\nprint(json.dumps(dict(host=socket.gethostname(),wall=time.time(),old_rebind_wall=OLD_REBIND_WALL,target_mac=TARGET_MAC,target_usb=TARGET_USB,target_netdev=target,all_netdev=net,target_usb_sysfs=target_usb,usb_devices=usb_devices,kernel_since_old_rebind=kernel,kernel_usb_event_lines=usb_events,new_error_71_lines=new_71,new_disconnect_or_reset_lines=new_disconnect,services=services,management_enP8p1s0=dict(link=net_link,addr=net_mgmt_addr),all_addr=net_addr,processes=ps),ensure_ascii=False))\n"
+  ],
+  "returncode": 0,
+  "stderr": "",
+  "remote": {
+    "host": "fl00",
+    "wall": 1794306841.7300081,
+    "old_rebind_wall": 1794305865,
+    "target_mac": "fc:a3:86:b3:86:72",
+    "target_usb": "1-2.3:1.0",
+    "target_netdev": [
+      {
+        "name": "wlxfca386b38672",
+        "address": "fc:a3:86:b3:86:72",
+        "operstate": "down",
+        "ifindex": "13",
+        "device": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.4/1-2.4:1.0",
+        "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+        "carrier": "ERROR:OSError(22, 'Invalid argument')"
+      }
+    ],
+    "all_netdev": [
+      {
+        "name": "can0",
+        "address": "",
+        "operstate": "down",
+        "ifindex": "3",
+        "device": "/sys/devices/platform/bus@0/c310000.mttcan",
+        "driver": "/sys/bus/platform/drivers/mttcan",
+        "carrier": "ERROR:OSError(22, 'Invalid argument')"
+      },
+      {
+        "name": "enP8p1s0",
+        "address": "3c:6d:66:b5:0c:0b",
+        "operstate": "up",
+        "ifindex": "4",
+        "device": "/sys/devices/platform/bus@0/140a0000.pcie/pci0008:00/0008:00:00.0/0008:01:00.0",
+        "driver": "/sys/bus/pci/drivers/r8168",
+        "carrier": "1"
+      },
+      {
+        "name": "l4tbr0",
+        "address": "3e:c7:e7:79:f3:87",
+        "operstate": "down",
+        "ifindex": "6",
+        "device": null,
+        "driver": null,
+        "carrier": "ERROR:OSError(22, 'Invalid argument')"
+      },
+      {
+        "name": "lo",
+        "address": "00:00:00:00:00:00",
+        "operstate": "unknown",
+        "ifindex": "1",
+        "device": null,
+        "driver": null,
+        "carrier": "1"
+      },
+      {
+        "name": "usb0",
+        "address": "16:fd:dc:6d:67:91",
+        "operstate": "down",
+        "ifindex": "7",
+        "device": "/sys/devices/platform/bus@0/3550000.usb/gadget",
+        "driver": null,
+        "carrier": "0"
+      },
+      {
+        "name": "usb1",
+        "address": "16:fd:dc:6d:67:93",
+        "operstate": "down",
+        "ifindex": "8",
+        "device": "/sys/devices/platform/bus@0/3550000.usb/gadget",
+        "driver": null,
+        "carrier": "0"
+      },
+      {
+        "name": "wlP1p1s0",
+        "address": "dc:4a:9e:e2:3c:48",
+        "operstate": "down",
+        "ifindex": "2",
+        "device": "/sys/devices/platform/bus@0/14100000.pcie/pci0001:00/0001:00:00.0/0001:01:00.0",
+        "driver": "/sys/bus/pci/drivers/rtl88x2ce",
+        "carrier": "0"
+      },
+      {
+        "name": "wlxfca386b38672",
+        "address": "fc:a3:86:b3:86:72",
+        "operstate": "down",
+        "ifindex": "13",
+        "device": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.4/1-2.4:1.0",
+        "driver": "/sys/bus/usb/drivers/rtl88xxau_wfb",
+        "carrier": "ERROR:OSError(22, 'Invalid argument')"
+      }
+    ],
+    "target_usb_sysfs": [],
+    "usb_devices": [
+      {
+        "name": "1-2",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2",
+        "idVendor": "0bda",
+        "idProduct": "5489",
+        "manufacturer": "Generic",
+        "product": "4-Port USB 2.0 Hub",
+        "serial": "ERROR:FileNotFoundError(2, 'No such file or directory')",
+        "speed": "480",
+        "busnum": "1",
+        "devnum": "2",
+        "authorized": "1",
+        "configuration": "1"
+      },
+      {
+        "name": "1-2.4",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.4",
+        "idVendor": "0bda",
+        "idProduct": "881a",
+        "manufacturer": "Realtek",
+        "product": "802.11n NIC",
+        "serial": "123456",
+        "speed": "480",
+        "busnum": "1",
+        "devnum": "13",
+        "authorized": "1",
+        "configuration": "1"
+      },
+      {
+        "name": "1-3",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-3",
+        "idVendor": "0bda",
+        "idProduct": "c822",
+        "manufacturer": "Realtek",
+        "product": "Bluetooth Radio",
+        "serial": "00e04c000001",
+        "speed": "12",
+        "busnum": "1",
+        "devnum": "3",
+        "authorized": "1",
+        "configuration": "1"
+      },
+      {
+        "name": "2-1",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1",
+        "idVendor": "0bda",
+        "idProduct": "0489",
+        "manufacturer": "Generic",
+        "product": "4-Port USB 3.0 Hub",
+        "serial": "ERROR:FileNotFoundError(2, 'No such file or directory')",
+        "speed": "10000",
+        "busnum": "2",
+        "devnum": "2",
+        "authorized": "1",
+        "configuration": "1"
+      },
+      {
+        "name": "usb1",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb1",
+        "idVendor": "1d6b",
+        "idProduct": "0002",
+        "manufacturer": "Linux 5.15.148-tegra xhci-hcd",
+        "product": "xHCI Host Controller",
+        "serial": "3610000.usb",
+        "speed": "480",
+        "busnum": "1",
+        "devnum": "1",
+        "authorized": "1",
+        "configuration": "1"
+      },
+      {
+        "name": "usb2",
+        "realpath": "/sys/devices/platform/bus@0/3610000.usb/usb2",
+        "idVendor": "1d6b",
+        "idProduct": "0003",
+        "manufacturer": "Linux 5.15.148-tegra xhci-hcd",
+        "product": "xHCI Host Controller",
+        "serial": "3610000.usb",
+        "speed": "10000",
+        "busnum": "2",
+        "devnum": "1",
+        "authorized": "1",
+        "configuration": "1"
+      }
+    ],
+    "kernel_since_old_rebind": {
+      "argv": [
+        "journalctl",
+        "-k",
+        "--since",
+        "@1794305865",
+        "--no-pager",
+        "-o",
+        "short-unix"
+      ],
+      "returncode": 0,
+      "stdout": "1794305865.277974 fl00 kernel: usb 1-2.3: reset high-speed USB device number 5 using tegra-xusb\n1794305865.377967 fl00 kernel: usb 1-2.3: device firmware changed\n1794305865.381925 fl00 kernel: usb 1-2.3: USB disconnect, device number 5\n1794305865.462009 fl00 kernel: usb 1-2.3: new high-speed USB device number 6 using tegra-xusb\n1794305865.542235 fl00 kernel: usb 1-2.3: Device not responding to setup address.\n1794305865.750272 fl00 kernel: usb 1-2.3: Device not responding to setup address.\n1794305865.958135 fl00 kernel: usb 1-2.3: device not accepting address 6, error -71\n1794305866.041938 fl00 kernel: usb 1-2.3: new high-speed USB device number 7 using tegra-xusb\n1794305866.142137 fl00 kernel: usb 1-2.3: device descriptor read/all, error -71\n1794305866.142360 fl00 kernel: usb 1-2-port3: attempt power cycle\n1794305867.949946 fl00 kernel: usb 1-2.3: new high-speed USB device number 8 using tegra-xusb\n1794305867.973928 fl00 kernel: usb 1-2.3: unable to read config index 0 descriptor/start: -71\n1794305867.974074 fl00 kernel: usb 1-2.3: can't read configurations, error -71\n1794305868.053928 fl00 kernel: usb 1-2.3: new high-speed USB device number 9 using tegra-xusb\n1794305868.054160 fl00 kernel: usb 1-2.3: Device not responding to setup address.\n1794305868.262085 fl00 kernel: usb 1-2.3: Device not responding to setup address.\n1794305868.470160 fl00 kernel: usb 1-2.3: device not accepting address 9, error -71\n1794305868.470516 fl00 kernel: usb 1-2-port3: unable to enumerate USB device\n1794306573.026284 fl00 kernel: usb 1-2.4: new high-speed USB device number 10 using tegra-xusb\n1794306574.406026 fl00 kernel: rtl88xxau_wfb 1-2.4:1.0 wlxfca386b38672: renamed from wlan0\n1794306575.574755 fl00 kernel: usb 1-2.4: USB disconnect, device number 10\n1794306575.866161 fl00 kernel: usb 1-2.4: new high-speed USB device number 11 using tegra-xusb\n1794306575.945947 fl00 kernel: usb 1-2.4: Device not responding to setup address.\n1794306576.153913 fl00 kernel: usb 1-2.4: Device not responding to setup address.\n1794306576.361920 fl00 kernel: usb 1-2.4: device not accepting address 11, error -71\n1794306592.238136 fl00 kernel: usb 1-2.4: new high-speed USB device number 13 using tegra-xusb\n1794306593.610112 fl00 kernel: rtl88xxau_wfb 1-2.4:1.0 wlxfca386b38672: renamed from wlan0\n",
+      "stderr": ""
+    },
+    "kernel_usb_event_lines": [
+      "1794305865.277974 fl00 kernel: usb 1-2.3: reset high-speed USB device number 5 using tegra-xusb",
+      "1794305865.377967 fl00 kernel: usb 1-2.3: device firmware changed",
+      "1794305865.381925 fl00 kernel: usb 1-2.3: USB disconnect, device number 5",
+      "1794305865.462009 fl00 kernel: usb 1-2.3: new high-speed USB device number 6 using tegra-xusb",
+      "1794305865.542235 fl00 kernel: usb 1-2.3: Device not responding to setup address.",
+      "1794305865.750272 fl00 kernel: usb 1-2.3: Device not responding to setup address.",
+      "1794305865.958135 fl00 kernel: usb 1-2.3: device not accepting address 6, error -71",
+      "1794305866.041938 fl00 kernel: usb 1-2.3: new high-speed USB device number 7 using tegra-xusb",
+      "1794305866.142137 fl00 kernel: usb 1-2.3: device descriptor read/all, error -71",
+      "1794305866.142360 fl00 kernel: usb 1-2-port3: attempt power cycle",
+      "1794305867.949946 fl00 kernel: usb 1-2.3: new high-speed USB device number 8 using tegra-xusb",
+      "1794305867.973928 fl00 kernel: usb 1-2.3: unable to read config index 0 descriptor/start: -71",
+      "1794305867.974074 fl00 kernel: usb 1-2.3: can't read configurations, error -71",
+      "1794305868.053928 fl00 kernel: usb 1-2.3: new high-speed USB device number 9 using tegra-xusb",
+      "1794305868.054160 fl00 kernel: usb 1-2.3: Device not responding to setup address.",
+      "1794305868.262085 fl00 kernel: usb 1-2.3: Device not responding to setup address.",
+      "1794305868.470160 fl00 kernel: usb 1-2.3: device not accepting address 9, error -71",
+      "1794305868.470516 fl00 kernel: usb 1-2-port3: unable to enumerate USB device",
+      "1794306573.026284 fl00 kernel: usb 1-2.4: new high-speed USB device number 10 using tegra-xusb",
+      "1794306575.574755 fl00 kernel: usb 1-2.4: USB disconnect, device number 10",
+      "1794306575.866161 fl00 kernel: usb 1-2.4: new high-speed USB device number 11 using tegra-xusb",
+      "1794306575.945947 fl00 kernel: usb 1-2.4: Device not responding to setup address.",
+      "1794306576.153913 fl00 kernel: usb 1-2.4: Device not responding to setup address.",
+      "1794306576.361920 fl00 kernel: usb 1-2.4: device not accepting address 11, error -71",
+      "1794306592.238136 fl00 kernel: usb 1-2.4: new high-speed USB device number 13 using tegra-xusb"
+    ],
+    "new_error_71_lines": [
+      "1794305865.958135 fl00 kernel: usb 1-2.3: device not accepting address 6, error -71",
+      "1794305866.142137 fl00 kernel: usb 1-2.3: device descriptor read/all, error -71",
+      "1794305867.974074 fl00 kernel: usb 1-2.3: can't read configurations, error -71",
+      "1794305868.470160 fl00 kernel: usb 1-2.3: device not accepting address 9, error -71",
+      "1794305868.470516 fl00 kernel: usb 1-2-port3: unable to enumerate USB device",
+      "1794306576.361920 fl00 kernel: usb 1-2.4: device not accepting address 11, error -71"
+    ],
+    "new_disconnect_or_reset_lines": [
+      "1794305865.277974 fl00 kernel: usb 1-2.3: reset high-speed USB device number 5 using tegra-xusb",
+      "1794305865.381925 fl00 kernel: usb 1-2.3: USB disconnect, device number 5",
+      "1794306575.574755 fl00 kernel: usb 1-2.4: USB disconnect, device number 10"
+    ],
+    "services": {
+      "wfb-fl-server-daemon.service": {
+        "argv": [
+          "systemctl",
+          "show",
+          "wfb-fl-server-daemon.service",
+          "-p",
+          "Id",
+          "-p",
+          "ActiveState",
+          "-p",
+          "SubState",
+          "-p",
+          "MainPID",
+          "-p",
+          "ExecMainStartTimestamp"
+        ],
+        "returncode": 0,
+        "stdout": "MainPID=0\nExecMainStartTimestamp=Tue 2026-11-10 17:56:08 CST\nId=wfb-fl-server-daemon.service\nActiveState=inactive\nSubState=dead\n",
+        "stderr": ""
+      }
+    },
+    "management_enP8p1s0": {
+      "link": {
+        "argv": [
+          "ip",
+          "-j",
+          "link",
+          "show",
+          "dev",
+          "enP8p1s0"
+        ],
+        "returncode": 0,
+        "stdout": "[{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"linkmode\":\"DEFAULT\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3c:6d:66:b5:0c:0b\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\"}]\n",
+        "stderr": ""
+      },
+      "addr": {
+        "argv": [
+          "ip",
+          "-j",
+          "addr",
+          "show",
+          "dev",
+          "enP8p1s0"
+        ],
+        "returncode": 0,
+        "stdout": "[{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3c:6d:66:b5:0c:0b\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.0.190\",\"prefixlen\":24,\"broadcast\":\"192.168.0.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"enP8p1s0\",\"valid_life_time\":80468,\"preferred_life_time\":80468},{\"family\":\"inet6\",\"local\":\"2001:3::aca:6f7c:2bb4:f11a\",\"prefixlen\":64,\"scope\":\"global\",\"temporary\":true,\"dynamic\":true,\"valid_life_time\":285,\"preferred_life_time\":285},{\"family\":\"inet6\",\"local\":\"2001:3::cbd5:bfa:c686:17e0\",\"prefixlen\":64,\"scope\":\"global\",\"dynamic\":true,\"mngtmpaddr\":true,\"noprefixroute\":true,\"valid_life_time\":285,\"preferred_life_time\":285},{\"family\":\"inet6\",\"local\":\"fe80::212d:5c5e:f4b2:9e7a\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]}]\n",
+        "stderr": ""
+      }
+    },
+    "all_addr": {
+      "argv": [
+        "ip",
+        "-j",
+        "addr",
+        "show"
+      ],
+      "returncode": 0,
+      "stdout": "[{\"ifindex\":1,\"ifname\":\"lo\",\"flags\":[\"LOOPBACK\",\"UP\",\"LOWER_UP\"],\"mtu\":65536,\"qdisc\":\"noqueue\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"loopback\",\"address\":\"00:00:00:00:00:00\",\"broadcast\":\"00:00:00:00:00:00\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"127.0.0.1\",\"prefixlen\":8,\"scope\":\"host\",\"label\":\"lo\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":2,\"ifname\":\"wlP1p1s0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"dc:4a:9e:e2:3c:48\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":3,\"ifname\":\"can0\",\"flags\":[\"NOARP\",\"ECHO\"],\"mtu\":16,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":10,\"link_type\":\"can\",\"addr_info\":[]},{\"ifindex\":4,\"ifname\":\"enP8p1s0\",\"flags\":[\"BROADCAST\",\"MULTICAST\",\"UP\",\"LOWER_UP\"],\"mtu\":1500,\"qdisc\":\"mq\",\"operstate\":\"UP\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3c:6d:66:b5:0c:0b\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"192.168.0.190\",\"prefixlen\":24,\"broadcast\":\"192.168.0.255\",\"scope\":\"global\",\"dynamic\":true,\"noprefixroute\":true,\"label\":\"enP8p1s0\",\"valid_life_time\":80468,\"preferred_life_time\":80468},{\"family\":\"inet6\",\"local\":\"2001:3::aca:6f7c:2bb4:f11a\",\"prefixlen\":64,\"scope\":\"global\",\"temporary\":true,\"dynamic\":true,\"valid_life_time\":285,\"preferred_life_time\":285},{\"family\":\"inet6\",\"local\":\"2001:3::cbd5:bfa:c686:17e0\",\"prefixlen\":64,\"scope\":\"global\",\"dynamic\":true,\"mngtmpaddr\":true,\"noprefixroute\":true,\"valid_life_time\":285,\"preferred_life_time\":285},{\"family\":\"inet6\",\"local\":\"fe80::212d:5c5e:f4b2:9e7a\",\"prefixlen\":64,\"scope\":\"link\",\"noprefixroute\":true,\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]},{\"ifindex\":6,\"ifname\":\"l4tbr0\",\"flags\":[\"BROADCAST\",\"MULTICAST\"],\"mtu\":1500,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"3e:c7:e7:79:f3:87\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":7,\"ifname\":\"usb0\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"16:fd:dc:6d:67:91\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":8,\"ifname\":\"usb1\",\"flags\":[\"NO-CARRIER\",\"BROADCAST\",\"MULTICAST\",\"UP\"],\"mtu\":1500,\"qdisc\":\"pfifo_fast\",\"master\":\"l4tbr0\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"16:fd:dc:6d:67:93\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]},{\"ifindex\":13,\"ifname\":\"wlxfca386b38672\",\"flags\":[\"BROADCAST\",\"MULTICAST\"],\"mtu\":4052,\"qdisc\":\"noop\",\"operstate\":\"DOWN\",\"group\":\"default\",\"txqlen\":1000,\"link_type\":\"ether\",\"address\":\"fc:a3:86:b3:86:72\",\"broadcast\":\"ff:ff:ff:ff:ff:ff\",\"addr_info\":[]}]\n",
+      "stderr": ""
+    },
+    "processes": {
+      "argv": [
+        "ps",
+        "-eo",
+        "pid=,stat=,args=",
+        "--forest"
+      ],
+      "returncode": 0,
+      "stdout": "      2 S    [kthreadd]\n      3 I<    \\_ [rcu_gp]\n      4 I<    \\_ [rcu_par_gp]\n      5 I<    \\_ [slub_flushwq]\n      6 I<    \\_ [netns]\n      8 I<    \\_ [kworker/0:0H-events_highpri]\n     10 I<    \\_ [mm_percpu_wq]\n     11 S     \\_ [rcu_tasks_kthre]\n     12 S     \\_ [rcu_tasks_rude_]\n     13 S     \\_ [rcu_tasks_trace]\n     14 S     \\_ [ksoftirqd/0]\n     15 I     \\_ [rcu_preempt]\n     16 S     \\_ [migration/0]\n     17 S     \\_ [cpuhp/0]\n     18 S     \\_ [cpuhp/1]\n     19 S     \\_ [migration/1]\n     20 S     \\_ [ksoftirqd/1]\n     22 I<    \\_ [kworker/1:0H-events_highpri]\n     23 S     \\_ [cpuhp/2]\n     24 S     \\_ [migration/2]\n     25 S     \\_ [ksoftirqd/2]\n     27 I<    \\_ [kworker/2:0H-events_highpri]\n     28 S     \\_ [cpuhp/3]\n     29 S     \\_ [migration/3]\n     30 S     \\_ [ksoftirqd/3]\n     32 I<    \\_ [kworker/3:0H-events_highpri]\n     33 S     \\_ [cpuhp/4]\n     34 S     \\_ [migration/4]\n     35 S     \\_ [ksoftirqd/4]\n     37 I<    \\_ [kworker/4:0H-events_highpri]\n     38 S     \\_ [cpuhp/5]\n     39 S     \\_ [migration/5]\n     40 S     \\_ [ksoftirqd/5]\n     42 I<    \\_ [kworker/5:0H-events_highpri]\n     43 S     \\_ [kdevtmpfs]\n     44 I<    \\_ [inet_frag_wq]\n     46 I     \\_ [kworker/2:1-mm_percpu_wq]\n     48 I     \\_ [kworker/3:1-mm_percpu_wq]\n     49 I     \\_ [kworker/5:1-events]\n     51 S     \\_ [kauditd]\n     52 S     \\_ [oom_reaper]\n     53 I<    \\_ [writeback]\n     54 S     \\_ [kcompactd0]\n     55 SN    \\_ [ksmd]\n     56 SN    \\_ [khugepaged]\n     67 I<    \\_ [cryptd]\n     86 I<    \\_ [kintegrityd]\n     87 I<    \\_ [kblockd]\n     88 I<    \\_ [blkcg_punt_bio]\n     89 I<    \\_ [tpm_dev_wq]\n     90 I<    \\_ [ata_sff]\n     91 I<    \\_ [edac-poller]\n     92 I<    \\_ [devfreq_wq]\n     93 S     \\_ [watchdogd]\n     96 I<    \\_ [kworker/0:1H-kblockd]\n     97 I<    \\_ [rpciod]\n     98 I<    \\_ [kworker/u13:0-hci0]\n     99 I<    \\_ [xprtiod]\n    127 S     \\_ [kswapd0]\n    128 I<    \\_ [nfsiod]\n    132 I<    \\_ [vfio-irqfd-clea]\n    133 I<    \\_ [dm_bufio_cache]\n    135 S<    \\_ [krfcommd]\n    136 S     \\_ [pr/tty0]\n    137 S     \\_ [pr/ttyTCU0]\n    140 S     \\_ [irq/114-3160000]\n    142 S     \\_ [irq/115-3180000]\n    143 I     \\_ [kworker/4:3-events]\n    144 S     \\_ [irq/116-31b0000]\n    145 S     \\_ [irq/167-c240000]\n    146 S     \\_ [irq/168-c250000]\n    147 S     \\_ [irq/125-3610000]\n    148 S     \\_ [irq/122-3610000]\n    152 I<    \\_ [sdhci]\n    153 S     \\_ [irq/120-mmc0]\n    154 S     \\_ [irq/230-3400000]\n    170 I<    \\_ [kworker/3:1H-kblockd]\n    172 I     \\_ [kworker/1:2-events]\n    175 S     \\_ [irq/191-tegra-p]\n    176 I<    \\_ [nvme-wq]\n    177 I<    \\_ [nvme-reset-wq]\n    178 I<    \\_ [nvme-delete-wq]\n    187 S     \\_ [irq/191-aerdrv]\n    188 S     \\_ [irq/193-tegra-p]\n    192 S     \\_ [irq/193-aerdrv]\n    193 S     \\_ [irq/195-tegra-p]\n    197 S     \\_ [jbd2/nvme0n1p1-]\n    198 I<    \\_ [ext4-rsv-conver]\n    207 I<    \\_ [mld]\n    208 I<    \\_ [kworker/1:1H-kblockd]\n    209 I<    \\_ [ipv6_addrconf]\n    210 I     \\_ [kworker/0:2-mm_percpu_wq]\n    248 I<    \\_ [kworker/2:1H-kblockd]\n    267 SN    \\_ [nvmap-bz]\n    268 S     \\_ [irq/188-host1x_]\n    272 S     \\_ [irq/197-gk20a_s]\n    273 S     \\_ [irq/198-gk20a_s]\n    274 S     \\_ [irq/199-gk20a_s]\n    275 S     \\_ [irq/200-gk20a_n]\n    286 I<    \\_ [optee_bus_scan]\n    288 I<    \\_ [kworker/5:1H-kblockd]\n    303 I<    \\_ [kworker/4:1H-kblockd]\n    333 S     \\_ [irq/219-bc00000]\n    334 S     \\_ [capture-control]\n    335 S     \\_ [capture]\n    340 S     \\_ [irq/189-tegra-p]\n    341 S     \\_ [irq/214-tegra_d]\n    347 S     \\_ [irq/215-tegra_d]\n    348 I<    \\_ [dce-async-ipc-w]\n    357 I<    \\_ [cfg80211]\n    358 S     \\_ [nv_queue]\n    359 S     \\_ [nv_queue]\n    360 S     \\_ [irq/239-nvvrs-p]\n    361 S     \\_ [irq/118-3210000]\n    363 S     \\_ [spi0]\n    368 S     \\_ [irq/119-3230000]\n    369 S     \\_ [spi1]\n    388 S     \\_ [irq/189-aerdrv]\n    469 I<    \\_ [kworker/u13:2-hci0]\n    471 I<    \\_ [btfwwork]\n    472 I<    \\_ [bttimerwork]\n    655 S     \\_ [sugov:0]\n    659 S     \\_ [sugov:4]\n    816 S     \\_ [file-storage]\n    871 S     \\_ [RTW_CMD_THREAD]\n    898 S     \\_ [pr/ramoops-1]\n    953 S     \\_ [sw-quiesce]\n    956 S     \\_ [nvgpu_channel_p]\n    957 S     \\_ [nvgpu_pg_init_g]\n    958 S     \\_ [nvgpu_clk_arb_p]\n   1481 S     \\_ [nvidia-modeset/]\n   1482 S     \\_ [nvidia-modeset/]\n   1484 S     \\_ [nvidia]\n   1485 S     \\_ [nv_queue]\n   5738 I     \\_ [kworker/u12:5-events_freezable_power_]\n   5819 I     \\_ [kworker/u12:10-events_freezable_power_]\n   6388 I     \\_ [kworker/u12:4-events_freezable_power_]\n   6960 I     \\_ [kworker/4:1-events]\n   6966 I     \\_ [kworker/1:3-events]\n   7235 I     \\_ [kworker/u12:3-events_freezable_power_]\n   7268 I     \\_ [kworker/u12:1-events_freezable_power_]\n   7409 I     \\_ [kworker/u12:6-devfreq_wq]\n   7426 I     \\_ [kworker/5:0-mm_percpu_wq]\n   7498 I     \\_ [kworker/0:0-mm_percpu_wq]\n   7580 I     \\_ [kworker/2:0-cgroup_destroy]\n   7581 I     \\_ [kworker/u12:0-events_freezable_power_]\n   7635 I     \\_ [kworker/3:0]\n   7659 I     \\_ [kworker/u12:7-events_unbound]\n   7660 I     \\_ [kworker/0:1-cgroup_destroy]\n   7699 I     \\_ [kworker/0:3-mm_percpu_wq]\n   7723 I     \\_ [kworker/2:2-mm_percpu_wq]\n   7741 I     \\_ [kworker/u12:2-events_freezable_power_]\n   7840 I     \\_ [kworker/5:2]\n   7920 I     \\_ [kworker/u12:8-events_freezable_power_]\n      1 Ss   /sbin/init 2\n    242 S<s  /lib/systemd/systemd-journald\n    279 Ss   /bin/bash /etc/systemd/nv-tee-supplicant.sh\n    283 S     \\_ /usr/sbin/tee-supplicant\n    290 Ss   /lib/systemd/systemd-udevd\n    291 S     \\_ /lib/systemd/systemd-udevd\n    292 S     \\_ /lib/systemd/systemd-udevd\n    293 S     \\_ /lib/systemd/systemd-udevd\n    294 S     \\_ /lib/systemd/systemd-udevd\n    295 S     \\_ /lib/systemd/systemd-udevd\n    296 S     \\_ /lib/systemd/systemd-udevd\n    297 S     \\_ /lib/systemd/systemd-udevd\n    298 S     \\_ /lib/systemd/systemd-udevd\n    299 S     \\_ /lib/systemd/systemd-udevd\n    300 S     \\_ /lib/systemd/systemd-udevd\n    301 S     \\_ /lib/systemd/systemd-udevd\n    305 S     \\_ /lib/systemd/systemd-udevd\n    306 S     \\_ /lib/systemd/systemd-udevd\n    307 S     \\_ /lib/systemd/systemd-udevd\n    308 S     \\_ /lib/systemd/systemd-udevd\n    309 S     \\_ /lib/systemd/systemd-udevd\n    310 S     \\_ /lib/systemd/systemd-udevd\n    311 S     \\_ /lib/systemd/systemd-udevd\n    312 S     \\_ /lib/systemd/systemd-udevd\n    313 S     \\_ /lib/systemd/systemd-udevd\n    314 S     \\_ /lib/systemd/systemd-udevd\n    315 S     \\_ /lib/systemd/systemd-udevd\n    317 S     \\_ /lib/systemd/systemd-udevd\n    318 S     \\_ /lib/systemd/systemd-udevd\n    319 S     \\_ /lib/systemd/systemd-udevd\n    320 S     \\_ /lib/systemd/systemd-udevd\n    321 S     \\_ /lib/systemd/systemd-udevd\n    322 S     \\_ /lib/systemd/systemd-udevd\n    578 Ss   /usr/sbin/haveged --Foreground --verbose=1\n    579 Ss   /sbin/rpcbind -f -w\n    580 Ss   /lib/systemd/systemd-resolved\n    581 Ssl  /lib/systemd/systemd-timesyncd\n    593 Ss   avahi-daemon: running [fl00.local]\n    658 S     \\_ avahi-daemon: chroot helper\n    594 Ss   /usr/lib/bluetooth/bluetoothd -d --noplugin=audio,a2dp,avrcp\n    595 Ss   @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n    596 Ssl  /usr/sbin/NetworkManager --no-daemon\n    604 Ss   /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers\n    609 Ss   python3 /opt/nvidia/pva-allow-2/bin/nvidiaPvaAllowd.py\n    615 Ssl  /usr/libexec/polkitd --no-debug\n    617 Ssl  /usr/libexec/power-profiles-daemon\n    618 Ss   /usr/sbin/lpd -s\n    620 Ssl  /usr/sbin/rsyslogd -n -iNONE\n    625 Ss   seatd -g video\n    632 Ssl  /usr/lib/snapd/snapd\n    636 Ssl  /usr/libexec/accounts-daemon\n    638 Ssl  /usr/libexec/switcheroo-control\n    642 Ss   /lib/systemd/systemd-logind\n    643 Ssl  /usr/libexec/udisks2/udisksd\n    645 Ss   /sbin/wpa_supplicant -u -s -O /run/wpa_supplicant\n    703 Ssl  /usr/sbin/ModemManager\n    729 Ss   /usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/wfb-ng-fl/management-dhcp.conf --pid-file=\n    761 Ss   /usr/sbin/nvfancontrol &\n    959 Ss   /usr/sbin/nvargus-daemon\n    962 Ssl  /usr/sbin/nvs-service\n    971 Ss   /bin/sh /snap/cups/1274/scripts/run-cups-browsed\n   2446 Sl    \\_ cups-browsed -c /var/snap/cups/common/etc/cups/cups-browsed.conf\n    977 Ss   /bin/sh /snap/cups/1274/scripts/run-cupsd\n   2394 Sl    \\_ cupsd -f -s /var/snap/cups/common/etc/cups/cups-files.conf -c /var/snap/cups/common/etc/cups/cupsd.conf\n   2444 S         \\_ /snap/cups/1274/lib/cups/notifier/dbus dbus://\n   1018 Ss   /usr/sbin/cron -f -P\n   1037 Ss   sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups\n   3759 Ss    \\_ sshd: fl [priv]\n   3789 S         \\_ sshd: fl@pts/0\n   3790 Ss            \\_ -bash\n   4255 Rl+               \\_ pi\n   7729 Ssl                   \\_ pi\n   7922 Ss                        \\_ python3 .scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z/fl00-usb-readonly-probe.py\n   7923 S                             \\_ sudo -n python3 -c import json,pathlib,subprocess,socket,time,re TARGET_MAC='fc:a3:86:b3:86:72' TARGET_USB='1-2.3:1.0' OLD_REBIND_WALL=1794305865  def read(path):     p=pathlib.Path(path)     try:         return p.read_text().strip()     except Exception as exc:         return 'ERROR:'+repr(exc)  def run(argv, timeout=8):     try:         p=subprocess.run(argv,capture_output=True,text=True,timeout=timeout)         return dict(argv=argv,returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)     except Exception as exc:         return dict(argv=argv,error=repr(exc))  net=[] for p in sorted(pathlib.Path('/sys/class/net').glob('*')):     if not p.is_dir():         continue     dev=(p/'device')     resolved=str(dev.resolve()) if dev.exists() else None     driver=str((dev/'driver').resolve()) if (dev/'driver').exists() else None     net.append(dict(name=p.name,address=read(p/'address'),operstate=read(p/'operstate'),ifindex=read(p/'ifindex'),device=resolved,driver=driver,carrier=read(p/'carrier')))  target=[x for x in net if x['address'].lower()==TARGET_MAC] usb_devices=[] for p in sorted(pathlib.Path('/sys/bus/usb/devices').glob('*')):     if not p.is_dir() or not (p/'idVendor').exists():         continue     usb_devices.append(dict(name=p.name,realpath=str(p.resolve()),idVendor=read(p/'idVendor'),idProduct=read(p/'idProduct'),manufacturer=read(p/'manufacturer'),product=read(p/'product'),serial=read(p/'serial'),speed=read(p/'speed'),busnum=read(p/'busnum'),devnum=read(p/'devnum'),authorized=read(p/'authorized'),configuration=read(p/'bConfigurationValue')))  target_usb=[x for x in usb_devices if x['name']==TARGET_USB] kernel=run(['journalctl','-k','--since','@'+str(OLD_REBIND_WALL),'--no-pager','-o','short-unix'],timeout=12) lines=kernel.get('stdout','').splitlines() usb_events=[line for line in lines if re.search(r'(?i)(usb|error -71|unable to enumer|descriptor|disconnect|reset high|device firmware changed)',line)] new_71=[line for line in lines if re.search(r\"(?i)(error -71|unable to enumer|descriptor read|can't read configurations)\",line)] new_disconnect=[line for line in lines if re.search(r'(?i)(USB disconnect|usb .*disconnect|reset (?:high|full|super|low)-speed USB)',line)] services={u:run(['systemctl','show',u,'-p','Id','-p','ActiveState','-p','SubState','-p','MainPID','-p','ExecMainStartTimestamp']) for u in ['wfb-fl-server-daemon.service']} ps=run(['ps','-eo','pid=,stat=,args=','--forest']) net_addr=run(['ip','-j','addr','show']) net_link=run(['ip','-j','link','show','dev','enP8p1s0']) net_mgmt_addr=run(['ip','-j','addr','show','dev','enP8p1s0']) print(json.dumps(dict(host=socket.gethostname(),wall=time.time(),old_rebind_wall=OLD_REBIND_WALL,target_mac=TARGET_MAC,target_usb=TARGET_USB,target_netdev=target,all_netdev=net,target_usb_sysfs=target_usb,usb_devices=usb_devices,kernel_since_old_rebind=kernel,kernel_usb_event_lines=usb_events,new_error_71_lines=new_71,new_disconnect_or_reset_lines=new_disconnect,services=services,management_enP8p1s0=dict(link=net_link,addr=net_mgmt_addr),all_addr=net_addr,processes=ps),ensure_ascii=False)) \n   7924 S                                 \\_ python3 -c import json,pathlib,subprocess,socket,time,re TARGET_MAC='fc:a3:86:b3:86:72' TARGET_USB='1-2.3:1.0' OLD_REBIND_WALL=1794305865  def read(path):     p=pathlib.Path(path)     try:         return p.read_text().strip()     except Exception as exc:         return 'ERROR:'+repr(exc)  def run(argv, timeout=8):     try:         p=subprocess.run(argv,capture_output=True,text=True,timeout=timeout)         return dict(argv=argv,returncode=p.returncode,stdout=p.stdout,stderr=p.stderr)     except Exception as exc:         return dict(argv=argv,error=repr(exc))  net=[] for p in sorted(pathlib.Path('/sys/class/net').glob('*')):     if not p.is_dir():         continue     dev=(p/'device')     resolved=str(dev.resolve()) if dev.exists() else None     driver=str((dev/'driver').resolve()) if (dev/'driver').exists() else None     net.append(dict(name=p.name,address=read(p/'address'),operstate=read(p/'operstate'),ifindex=read(p/'ifindex'),device=resolved,driver=driver,carrier=read(p/'carrier')))  target=[x for x in net if x['address'].lower()==TARGET_MAC] usb_devices=[] for p in sorted(pathlib.Path('/sys/bus/usb/devices').glob('*')):     if not p.is_dir() or not (p/'idVendor').exists():         continue     usb_devices.append(dict(name=p.name,realpath=str(p.resolve()),idVendor=read(p/'idVendor'),idProduct=read(p/'idProduct'),manufacturer=read(p/'manufacturer'),product=read(p/'product'),serial=read(p/'serial'),speed=read(p/'speed'),busnum=read(p/'busnum'),devnum=read(p/'devnum'),authorized=read(p/'authorized'),configuration=read(p/'bConfigurationValue')))  target_usb=[x for x in usb_devices if x['name']==TARGET_USB] kernel=run(['journalctl','-k','--since','@'+str(OLD_REBIND_WALL),'--no-pager','-o','short-unix'],timeout=12) lines=kernel.get('stdout','').splitlines() usb_events=[line for line in lines if re.search(r'(?i)(usb|error -71|unable to enumer|descriptor|disconnect|reset high|device firmware changed)',line)] new_71=[line for line in lines if re.search(r\"(?i)(error -71|unable to enumer|descriptor read|can't read configurations)\",line)] new_disconnect=[line for line in lines if re.search(r'(?i)(USB disconnect|usb .*disconnect|reset (?:high|full|super|low)-speed USB)',line)] services={u:run(['systemctl','show',u,'-p','Id','-p','ActiveState','-p','SubState','-p','MainPID','-p','ExecMainStartTimestamp']) for u in ['wfb-fl-server-daemon.service']} ps=run(['ps','-eo','pid=,stat=,args=','--forest']) net_addr=run(['ip','-j','addr','show']) net_link=run(['ip','-j','link','show','dev','enP8p1s0']) net_mgmt_addr=run(['ip','-j','addr','show','dev','enP8p1s0']) print(json.dumps(dict(host=socket.gethostname(),wall=time.time(),old_rebind_wall=OLD_REBIND_WALL,target_mac=TARGET_MAC,target_usb=TARGET_USB,target_netdev=target,all_netdev=net,target_usb_sysfs=target_usb,usb_devices=usb_devices,kernel_since_old_rebind=kernel,kernel_usb_event_lines=usb_events,new_error_71_lines=new_71,new_disconnect_or_reset_lines=new_disconnect,services=services,management_enP8p1s0=dict(link=net_link,addr=net_mgmt_addr),all_addr=net_addr,processes=ps),ensure_ascii=False)) \n   7927 R                                     \\_ ps -eo pid=,stat=,args= --forest\n   1049 Ss   /usr/sbin/kerneloops --test\n   1068 Ssl  /usr/sbin/gdm3\n   1115 Sl    \\_ gdm-session-worker [pam/gdm-autologin]\n   1477 Ssl+      \\_ /usr/libexec/gdm-x-session --run-script env GNOME_SHELL_SESSION_MODE=ubuntu /usr/bin/gnome-session --session=ubuntu\n   1479 Sl+           \\_ /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1000/gdm/Xauthority -nolisten tcp -background none -noreset -keeptty -novtswitch -verbose 3\n   1522 Sl+           \\_ /usr/libexec/gnome-session-binary --session=ubuntu\n   1071 Ss   /usr/sbin/kerneloops\n   1094 Ss+  /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyGS0 vt220\n   1098 Ss+  /sbin/agetty -o -p -- \\u --keep-baud 115200,57600,38400,9600 ttyTCU0 vt220\n   1185 Ss   /usr/sbin/nvphsd\n   1189 S     \\_ /usr/sbin/nvphsd\n   1229 Ss   /lib/systemd/systemd --user\n   1234 S     \\_ (sd-pam)\n   1447 S<sl  \\_ /usr/bin/pipewire\n   1448 Ssl   \\_ /usr/bin/pipewire-media-session\n   1449 S<sl  \\_ /usr/bin/pulseaudio --daemonize=no --log-target=journal\n   1519 Ss    \\_ /usr/bin/dbus-daemon --session --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only\n   1615 Ssl   \\_ /usr/libexec/at-spi-bus-launcher\n   1621 S     |   \\_ /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/run/user/1000/at-spi/bus_0\n   1631 Ssl   \\_ /usr/libexec/gnome-session-ctl --monitor\n   1646 Ssl   \\_ /usr/libexec/gvfsd\n   1884 Sl    |   \\_ /usr/libexec/gvfsd-trash --spawner :1.19 /org/gtk/gvfs/exec_spaw/0\n   1664 Sl    \\_ /usr/libexec/gvfsd-fuse /run/user/1000/gvfs -f\n   1671 Ssl   \\_ /usr/libexec/gnome-session-binary --systemd-service --session=ubuntu\n   2025 Sl    |   \\_ /usr/libexec/evolution-data-server/evolution-alarm-notify\n   2028 Sl    |   \\_ /usr/bin/gnome-software --gapplication-service\n   2034 Sl    |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2160 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2161 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2162 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2164 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2165 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2166 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2167 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2168 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2172 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2175 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2176 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2177 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2179 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2181 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2182 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2184 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2185 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2186 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2187 S     |   |   \\_ python3 /usr/share/nvpmodel_indicator/nvpmodel_indicator.py\n   2038 Sl    |   \\_ /usr/libexec/gsd-disk-utility-notify\n   3736 Sl    |   \\_ update-notifier\n   1713 Ssl   \\_ /usr/bin/gnome-shell\n   1767 Ssl   \\_ /usr/libexec/xdg-permission-store\n   1769 Sl    \\_ /usr/libexec/gnome-shell-calendar-server\n   1784 Ssl   \\_ /usr/libexec/evolution-source-registry\n   1803 Sl    \\_ /usr/libexec/goa-daemon\n   1811 Ssl   \\_ /usr/libexec/evolution-calendar-factory\n   1818 Ssl   \\_ /usr/libexec/dconf-service\n   1827 Sl    \\_ /usr/libexec/goa-identity-service\n   1830 Ssl   \\_ /usr/libexec/gvfs-udisks2-volume-monitor\n   1846 Ssl   \\_ /usr/libexec/evolution-addressbook-factory\n   1849 Ssl   \\_ /usr/libexec/gvfs-goa-volume-monitor\n   1858 Ssl   \\_ /usr/libexec/gvfs-gphoto2-volume-monitor\n   1864 Ssl   \\_ /usr/libexec/gvfs-afc-volume-monitor\n   1869 Ssl   \\_ /usr/libexec/gvfs-mtp-volume-monitor\n   1898 Ssl   \\_ /usr/libexec/xdg-desktop-portal\n   1902 Ssl   \\_ /usr/libexec/xdg-document-portal\n   1909 Ss    |   \\_ fusermount3 -o rw,nosuid,nodev,fsname=portal,auto_unmount,subtype=portal -- /run/user/1000/doc\n   1905 Sl    \\_ /usr/bin/gjs /usr/share/gnome-shell/org.gnome.Shell.Notifications\n   1911 Sl    \\_ /usr/libexec/at-spi2-registryd --use-gnome-session\n   1915 Ssl   \\_ /usr/libexec/xdg-desktop-portal-gnome\n   1928 Ss    \\_ sh -c /usr/bin/ibus-daemon --panel disable $([ \"$XDG_SESSION_TYPE\" = \"x11\" ] && echo \"--xim\")\n   1937 Sl    |   \\_ /usr/bin/ibus-daemon --panel disable --xim\n   1979 Sl    |       \\_ /usr/libexec/ibus-memconf\n   1988 Sl    |       \\_ /usr/libexec/ibus-extension-gtk3\n   2205 Sl    |       \\_ /usr/libexec/ibus-engine-libpinyin --ibus\n   1929 Ssl   \\_ /usr/libexec/gsd-a11y-settings\n   1930 Ssl   \\_ /usr/libexec/gsd-color\n   1931 Ssl   \\_ /usr/libexec/gsd-datetime\n   1932 Ssl   \\_ /usr/libexec/gsd-housekeeping\n   1933 Ssl   \\_ /usr/libexec/gsd-keyboard\n   1934 Ssl   \\_ /usr/libexec/gsd-media-keys\n   1935 Ssl   \\_ /usr/libexec/gsd-power\n   1938 Ssl   \\_ /usr/libexec/gsd-print-notifications\n   1939 Ssl   \\_ /usr/libexec/gsd-rfkill\n   1942 Ssl   \\_ /usr/libexec/gsd-screensaver-proxy\n   1943 Ssl   \\_ /usr/libexec/gsd-sharing\n   1944 Ssl   \\_ /usr/libexec/gsd-smartcard\n   1946 Ssl   \\_ /usr/libexec/gsd-sound\n   1948 Ssl   \\_ /usr/libexec/gsd-wacom\n   1950 Ssl   \\_ /usr/libexec/gsd-xsettings\n   1986 Sl    \\_ /usr/libexec/gsd-printer\n   1999 Sl    \\_ /usr/libexec/ibus-x11 --kill-daemon\n   2024 Sl    \\_ /usr/libexec/ibus-portal\n   2118 Sl    \\_ /usr/bin/gjs /usr/share/gnome-shell/org.gnome.ScreenSaver\n   2206 SNsl  \\_ /usr/libexec/tracker-miner-fs-3\n   2216 Ssl   \\_ /usr/libexec/xdg-desktop-portal-gtk\n   3735 Ssl   \\_ /usr/libexec/gvfsd-metadata\n   4476 SNl   \\_ /usr/bin/python3 /usr/bin/update-manager --no-update --no-focus-on-map\n   1469 SNsl /usr/libexec/rtkit-daemon\n   1472 Sl   /usr/bin/gnome-keyring-daemon --daemonize --login\n   1800 Ssl  /usr/libexec/upowerd\n   2096 Ssl  /usr/libexec/colord\n   2113 Ssl  /usr/libexec/fwupd/fwupd\n   5799 Ssl  /usr/libexec/packagekitd\n",
+      "stderr": ""
+    }
+  }
+}

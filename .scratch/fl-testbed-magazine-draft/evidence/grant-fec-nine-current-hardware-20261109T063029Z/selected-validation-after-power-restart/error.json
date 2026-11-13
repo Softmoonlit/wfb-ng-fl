@@ -1,0 +1,5 @@
+{
+  "error": "RuntimeError(\"重启后只读实际审计失败，停止且不恢复: {'fl00': ['iw baseline mismatch'], 'fl01': ['management/probe failed'], 'fl02': ['management/probe failed'], 'fl03': ['management/probe failed'], 'fl05': ['iw baseline mismatch'], 'fl06': ['management/probe failed'], 'fl07': ['management/probe failed'], 'fl08': ['management/probe failed'], 'fl09': ['management/probe failed'], 'fl10': ['management/probe failed']}\")",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/worker.py\", line 245, in main\n    raise RuntimeError('重启后只读实际审计失败，停止且不恢复: ' + repr(failures))\nRuntimeError: 重启后只读实际审计失败，停止且不恢复: {'fl00': ['iw baseline mismatch'], 'fl01': ['management/probe failed'], 'fl02': ['management/probe failed'], 'fl03': ['management/probe failed'], 'fl05': ['iw baseline mismatch'], 'fl06': ['management/probe failed'], 'fl07': ['management/probe failed'], 'fl08': ['management/probe failed'], 'fl09': ['management/probe failed'], 'fl10': ['management/probe failed']}\n",
+  "wall": 1794219779.7247152
+}

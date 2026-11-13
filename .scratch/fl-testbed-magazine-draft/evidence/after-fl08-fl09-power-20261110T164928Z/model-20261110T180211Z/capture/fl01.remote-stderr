@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/var/tmp/wfb-heartbeat-capture-repair-20261110T180211Z/fl01/capture-heartbeats-batch.py", line 389, in <module>
+    raise SystemExit(main())
+  File "/var/tmp/wfb-heartbeat-capture-repair-20261110T180211Z/fl01/capture-heartbeats-batch.py", line 354, in main
+    analysis = annotate(events, args.clients, local_node, end_mono) if not errors else {
+  File "/var/tmp/wfb-heartbeat-capture-repair-20261110T180211Z/fl01/capture-heartbeats-batch.py", line 231, in annotate
+    local_gap = max((gap for group, gap in identity_wire_gap.items()
+TypeError: '>' not supported between instances of 'NoneType' and 'float'

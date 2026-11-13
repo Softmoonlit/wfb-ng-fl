@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "syntax_files": [
+    "driver-base.py",
+    "helpers.py",
+    "storage.py",
+    "verify-local.py",
+    "verify-offline-policy.py",
+    "worker.py"
+  ],
+  "embedded_code_syntax": "通过",
+  "profile_completed": [],
+  "profile_bytes_and_native": "摘要一致",
+  "hardware_source_audit_ok": true,
+  "hardware_hosts": 10,
+  "schedule_count": 4,
+  "smoke_count_maximum": 4,
+  "model_count_maximum": 4,
+  "max_executions": 8,
+  "raw_runner_flags_separate_from_independent_restore": true,
+  "minimum_model_available_bytes": 536870912,
+  "frozen_bundle_sha": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+  "new_comments_and_module_docstrings": "中文",
+  "worker_imported_or_started": false,
+  "profile_init_executed": true,
+  "profile_release_phases_executed": false,
+  "remote_or_live_HTTP_actions": 0,
+  "limitations": "本地静态核验未声称远端预飞、运行 smoke、模型传输或恢复已通过"
+}

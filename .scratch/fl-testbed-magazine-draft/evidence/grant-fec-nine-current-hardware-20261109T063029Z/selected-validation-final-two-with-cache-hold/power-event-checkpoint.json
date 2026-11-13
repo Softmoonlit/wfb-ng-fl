@@ -1,0 +1,27 @@
+{
+  "stage": "fl10-power-interruption-before-execute",
+  "status": "confirmed-infrastructure-power-event",
+  "root": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-final-two-with-cache-hold",
+  "model_transfer_started": false,
+  "model_files_sent": false,
+  "execute_count": 0,
+  "prior_trial_reuse": false,
+  "power_event": {
+    "host": "fl10",
+    "event": "unexpected-power-off-and-user-reboot",
+    "confirmed_by_user": true,
+    "parameter_failure": false,
+    "boot_id": "37d66fe9-0101-4033-866e-2e2ca8f09e18",
+    "startup_identity_gate_passed": true,
+    "full_ten_actual_and_nine_ready_gate_passed": false,
+    "startup_check_deadline_seconds": 180
+  },
+  "stop_reason": {
+    "host": "fl07",
+    "registry": "OFFLINE",
+    "ssh_error": "No route to host",
+    "automatic_retry": false
+  },
+  "wall": 1794225327.469666,
+  "wall_iso": "2026-11-09T11:55:27Z"
+}

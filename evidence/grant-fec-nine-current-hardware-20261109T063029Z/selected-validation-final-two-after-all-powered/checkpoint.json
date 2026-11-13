@@ -1,0 +1,16 @@
+{
+  "batch": "selected-validation-final-two-after-all-powered",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-final-two-after-all-powered",
+  "status": "authorized-exact-cancel-final-checkpoint",
+  "stage": "before-single-standard-cancel",
+  "latest_readonly_evidence_preserved": "packagekit-process-lineage.json",
+  "target_object": "/372_cbdeeced",
+  "preconditions": {"same_ao1_object_required": true, "role": "get-update-detail", "status": "download", "allow_cancel": true, "no_apt_dpkg_unattended_process": true, "four_posix_locks_unheld": true},
+  "controller": {"target_assignment": "code = 'TARGET=' + repr('/372_cbdeeced') + '\\n' + raw_body", "compile_before_remote": true, "cancel_calls_allowed": 1, "cancel_calls_so_far": 0},
+  "post_cancel": {"max_wait_seconds": 60, "poll_interval_seconds": 10, "accept_only": "ao0 plus no apt/dpkg/unattended process and four locks unheld"},
+  "model_transfer_started": false,
+  "execute_count": 0,
+  "continuation_created": false,
+  "old_batch_untouched": true,
+  "next": "compile exact controller, re-confirm, call one target Cancel, wait ao0"
+}

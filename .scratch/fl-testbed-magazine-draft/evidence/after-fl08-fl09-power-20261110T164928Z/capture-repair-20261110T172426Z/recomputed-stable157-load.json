@@ -1,0 +1,148 @@
+{
+  "model_run_id": "after-fl08-fl09-power-20261110T180211Z-model",
+  "computed_from": [
+    "fl02.raw.json",
+    "fl08.raw.json",
+    "phase-markers.jsonl"
+  ],
+  "model_load_recompute": [
+    {
+      "host": "fl02",
+      "model_wall_bounds_ns": {
+        "start": 1794333843238754287,
+        "end": 1794334164892473969
+      },
+      "phase_filter": "paired samples whose request and ACK wall_ns fall inside model_start..model_end, request body.state=IDLE, channel=157",
+      "phase_wall_alignment_note": "remote host wall and local orchestrator wall are used only as broad alignment metadata; no cross-host monotonic subtraction",
+      "stable157_idle_paired_count": 116,
+      "stable157_idle_timely_count": 93,
+      "stable157_idle_late_count": 23,
+      "stable157_idle_rtt_ms": {
+        "p50": 151.992769,
+        "p95": 1054.628416,
+        "p99": 2150.393436,
+        "max": 2320.887955
+      },
+      "stable157_idle_over_deadline_counts": {
+        "230": 23,
+        "350": 9,
+        "500": 9,
+        "1000": 7
+      },
+      "stable157_idle_candidate_ratio_paired": 0.8017241379310345,
+      "stable157_idle_max_timely_send_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 157, 1)": 11158.14346
+        },
+        "max_within_epoch_ms": 11158.14346
+      },
+      "stable157_idle_max_wire_ack_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 157, 1)": 6720.326551
+        },
+        "max_within_epoch_ms": 6720.326551
+      },
+      "channel149_all_window_paired_count": 8,
+      "channel149_all_window_max_timely_send_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 149, 0)": null,
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 149, 2)": 2233.655416
+        },
+        "max_within_epoch_ms": 2233.655416
+      },
+      "channel149_all_window_max_wire_ack_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 149, 0)": 3157.66781,
+          "((2, '81bfa36379d14c68b794d030b65249fb', 'be45439aab63dfb9280d96d6c008ec9fd1603e8c008707a465a6dc66894d411c'), 149, 2)": 2171.289033
+        },
+        "max_within_epoch_ms": 3157.66781
+      },
+      "channel149_gap_use": "descriptive only; excludes channel-switch gaps from within-epoch maxima and is not evidence for 10s liveness",
+      "actual_accepted_anchor_gap_ms": null,
+      "daemon_hunt": null,
+      "application_acceptance_observed": false
+    },
+    {
+      "host": "fl08",
+      "model_wall_bounds_ns": {
+        "start": 1794333843238754287,
+        "end": 1794334164892473969
+      },
+      "phase_filter": "paired samples whose request and ACK wall_ns fall inside model_start..model_end, request body.state=IDLE, channel=157",
+      "phase_wall_alignment_note": "remote host wall and local orchestrator wall are used only as broad alignment metadata; no cross-host monotonic subtraction",
+      "stable157_idle_paired_count": 116,
+      "stable157_idle_timely_count": 93,
+      "stable157_idle_late_count": 23,
+      "stable157_idle_rtt_ms": {
+        "p50": 164.773635,
+        "p95": 1064.773158,
+        "p99": 2295.619698,
+        "max": 4523.595101
+      },
+      "stable157_idle_over_deadline_counts": {
+        "230": 23,
+        "350": 10,
+        "500": 9,
+        "1000": 7
+      },
+      "stable157_idle_candidate_ratio_paired": 0.8017241379310345,
+      "stable157_idle_max_timely_send_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 157, 1)": 11061.18274
+        },
+        "max_within_epoch_ms": 11061.18274
+      },
+      "stable157_idle_max_wire_ack_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 157, 1)": 8909.817364
+        },
+        "max_within_epoch_ms": 8909.817364
+      },
+      "channel149_all_window_paired_count": 16,
+      "channel149_all_window_max_timely_send_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 149, 0)": 2102.15874,
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 149, 2)": 2104.133783
+        },
+        "max_within_epoch_ms": 2104.133783
+      },
+      "channel149_all_window_max_wire_ack_gap_ms_within_epoch": {
+        "by_epoch": {
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 149, 0)": 2076.292379,
+          "((8, '4270b8e688744959aec406d5a4842446', 'e412d9a5b437921aa91067daad7c34112eed142656ba6b6ebdc274f48599264f'), 149, 2)": 2104.297367
+        },
+        "max_within_epoch_ms": 2104.297367
+      },
+      "channel149_gap_use": "descriptive only; excludes channel-switch gaps from within-epoch maxima and is not evidence for 10s liveness",
+      "actual_accepted_anchor_gap_ms": null,
+      "daemon_hunt": null,
+      "application_acceptance_observed": false
+    }
+  ],
+  "unavailable_nodes": {
+    "fl01": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    },
+    "fl03": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    },
+    "fl05": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    },
+    "fl06": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    },
+    "fl07": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    },
+    "fl09": {
+      "reason": "remote collector annotate TypeError at line 231: max(None, float); raw stdout empty",
+      "metrics": null
+    }
+  }
+}

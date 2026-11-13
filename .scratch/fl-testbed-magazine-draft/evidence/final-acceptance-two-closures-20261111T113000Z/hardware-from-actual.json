@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "batch_id": "second-eight-model-20261110T150044Z",
+  "captured_at": "2026-11-10T15:00:44Z",
+  "method": "read-only local and SSH inventory",
+  "remote_write": false,
+  "service_start": false,
+  "nodes": {
+    "fl00": {
+      "role": "server",
+      "interface": "wlxfc221c100119",
+      "mac": "fc:22:1c:10:01:19",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.1:1.0",
+      "usb_sysfs_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.1/2-1.1:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "managed",
+      "iw_channel_at_capture": null,
+      "management_interface": "enP8p1s0",
+      "management_address": "192.168.0.190/24"
+    },
+    "fl01": {
+      "role": "client",
+      "interface": "wlxfc221c500bfe",
+      "mac": "fc:22:1c:50:0b:fe",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 157
+    },
+    "fl02": {
+      "role": "client",
+      "interface": "wlxfc221c300f04",
+      "mac": "fc:22:1c:30:0f:04",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 149
+    },
+    "fl03": {
+      "role": "client",
+      "interface": "wlx5cffffaf6d8c",
+      "mac": "5c:ff:ff:af:6d:8c",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.1:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 149
+    },
+    "fl05": {
+      "role": "client",
+      "interface": "wlxfc221c100157",
+      "mac": "fc:22:1c:10:01:57",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 149
+    },
+    "fl06": {
+      "role": "client",
+      "interface": "wlxfc221c300cbb",
+      "mac": "fc:22:1c:30:0c:bb",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 153
+    },
+    "fl07": {
+      "role": "client",
+      "interface": "wlxfc221c300e99",
+      "mac": "fc:22:1c:30:0e:99",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 157
+    },
+    "fl08": {
+      "role": "client",
+      "interface": "wlxfc221c500a88",
+      "mac": "fc:22:1c:50:0a:88",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 157
+    },
+    "fl09": {
+      "role": "client",
+      "interface": "wlx88e62852aae4",
+      "mac": "88:e6:28:52:aa:e4",
+      "usb_id": "0bda:8812",
+      "model": "Realtek RTL8812AU 802.11a/b/g/n/ac 2T2R DB WLAN Adapter",
+      "driver": "rtl88xxau_wfb",
+      "driver_version": "5.15.148-tegra",
+      "usb_path": "2-1.3:1.0",
+      "usb_speed": "5000M",
+      "iw_type_at_capture": "monitor",
+      "iw_channel_at_capture": 157
+    }
+  },
+  "excluded": {
+    "fl04": "excluded by authorized topology; not queried",
+    "fl10": "excluded by authorized topology; WFB remains stopped"
+  },
+  "observations": [
+    "All participating wireless devices report USB ID 0bda:8812 and rtl88xxau_wfb.",
+    "All participating USB wireless devices enumerate at 5000M.",
+    "Captured client radio channels differ while WFB services are stopped; this is pre-admission state only.",
+    "No wl* interface was selected by identity; each selected interface is the rtl88xxau_wfb-backed dedicated adapter."
+  ]
+}

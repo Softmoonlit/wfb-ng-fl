@@ -1,0 +1,7 @@
+{
+  "reason": "FileNotFoundError(2, 'No such file or directory')",
+  "wall": 1794245803.470336,
+  "pid": 8126,
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-readonly-query-service-stop/worker.py\", line 227, in main\n    verify_inputs(d)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-readonly-query-service-stop/worker.py\", line 62, in verify_inputs\n    review = json.loads(manifest_path.read_text())\n  File \"/usr/lib/python3.10/pathlib.py\", line 1134, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors) as f:\n  File \"/usr/lib/python3.10/pathlib.py\", line 1119, in open\n    return self._accessor.open(self, mode, buffering, encoding, errors,\nFileNotFoundError: [Errno 2] No such file or directory: '/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-readonly-query-service-stop/review-manifest.json'\n",
+  "model_executed": false
+}

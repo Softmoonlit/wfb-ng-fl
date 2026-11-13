@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "profile": "current-hardware-fec14-remaining",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261108T115743Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    40,
+    60
+  ],
+  "guard_interval_ms": 10,
+  "status": "stopped",
+  "max_executions": 4,
+  "candidates": [
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g40-d10-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 40,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g40-d10-model",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g60-d10-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 60,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g60-d10-model",
+      "execute_count": 0
+    }
+  ],
+  "power_context": "User confirmed B2 repeat swap 00/10 NICs and antennas;02/05 unchanged",
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "pause_requested": true,
+  "updated_wall": 1794205896.146408,
+  "updated_monotonic": 10586.107434551,
+  "error": "RuntimeError('full ten baseline/nine READY restoration incomplete')"
+}

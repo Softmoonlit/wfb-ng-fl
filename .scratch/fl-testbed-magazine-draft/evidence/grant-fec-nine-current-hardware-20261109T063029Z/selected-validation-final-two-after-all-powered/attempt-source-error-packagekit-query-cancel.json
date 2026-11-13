@@ -1,0 +1,11 @@
+{
+  "host": "fl02",
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "  File \"<string>\", line 2\\n    '/372_cbdeeced'=TARGET\\n    ^^^^^^^^^^^^^^^\\nSyntaxError: cannot assign to literal here. Maybe you meant '==' instead of '='?\\n",
+  "elapsed_seconds": 1.2217,
+  "status": "attempt-source-error",
+  "cancel_call_reached": false,
+  "model_retry": false,
+  "note": "preserved original template-construction error; no remote PackageKit action was reached"
+}

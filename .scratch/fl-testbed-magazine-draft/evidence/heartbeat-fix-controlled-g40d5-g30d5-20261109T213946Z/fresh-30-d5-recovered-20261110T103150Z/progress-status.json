@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "STOP-substantive-admission-gate-failure-recovered",
+  "stage": "final-closeout-complete-all-executors-exited",
+  "wall_utc": "2026-11-10T11:10:00Z",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z",
+  "owner": "fl00",
+  "usb": {"status": "REENUMERATED", "batch": "new-usb-connection", "netdev": "wlxfca386b38672", "mac": "fc:a3:86:b3:86:72", "driver": "rtl88xxau_wfb", "current_usb_port": "1-2.4", "historical_usb_port": "1-2.3", "usb_speed": "480", "successful_enumeration_wall": 1794306592.238136, "post_success_error_71": 0, "post_success_disconnect": 0, "usb_fault_during_smoke": false},
+  "server": {"service": "active/running", "server_state": "IDLE", "active_job": null, "radio": "149/HT40/LGI/index18/DL3/UL4/FEC8/12", "native_pid": 8116},
+  "ready_nodes": [1, 2, 3, 5, 6, 7, 8, 9, 10],
+  "excluded_nodes": [4],
+  "executions": {"tool_iderror": 1, "real_smoke": 1, "real_smoke_failure": "verify_radio registry gate failed: target2", "real_smoke_payload_bytes": 0, "model": 0, "retry": 0, "old_matrix_retest": false},
+  "failure": {"target2_state": "HUNTING", "target2_readiness": "CONNECTING", "target2_channel": 157, "target2_error_code": null, "target2_boot_id": "8c60fa57-ef3e-47a7-a433-f91fb4d8917b", "target2_daemon_pid": 7827, "target2_native_pid": 7844, "session": "switch_e4d70c46929b4848bfad4fcd3f62ccc7", "publish": false, "submit": false, "dl": "not-started", "ul": "not-started"},
+  "recovery": {"restore_session": "switch_40ffeeab57c64579b09f35cdc6ec930c", "rf_response_ok": true, "final_full_admission": true, "final_nine_ready_idle": true, "cleanup_ok": true, "executor_exit": true, "no_rebind": true},
+  "admission": {"space_hard_minimum_bytes": 536870912, "minimum_final_observed_bytes": 629719040, "all_identity_power_radio_fec_checks": true},
+  "evidence_integrity": "evidence-integrity.json",
+  "next": "stop this batch; separately authorize diagnosis of target2 reconnect/hunt at 149-to-157 boundary"
+}

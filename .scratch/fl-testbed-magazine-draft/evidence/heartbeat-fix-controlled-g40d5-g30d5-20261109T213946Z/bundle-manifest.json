@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "status": "frozen-no-execution",
+  "bundle_sha256": "301194954d172c1ded82765738f6651df82324b0a63494357f447e28b453eb55",
+  "files": {
+    "runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "node_agent.py": "f24616f60dcdd5453161afe298f376fc7a93dc1cf319ef4034e6b1937b47d7b8",
+    "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147"
+  },
+  "canonical_check_all_ready": {
+    "path": ".scratch/fl-testbed-magazine-draft/communication/check-all-ready.py",
+    "sha256": "3cba1e22ad90a9d677a9d9de02018117577877abf5380fbbe4ed009abadaf5d2"
+  },
+  "source": "canonical communication scripts; no copy modified"
+}

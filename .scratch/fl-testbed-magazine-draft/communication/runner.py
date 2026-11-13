@@ -22,7 +22,7 @@ DIRECTORY = Path(__file__).resolve().parent
 RELEASE_COMMIT = '66f15358d309d646d7dca887624a66c46099a54a'
 RELEASE_ROOT = '/srv/wfb-ng-fl/releases/heartbeat-66f15358d309-20261110T114225Z'
 # 所有跨层期限在此定义；节点只消费 prepare 下发的值。
-DIRECTION_TIMEOUT = 600
+DIRECTION_TIMEOUT = 1800
 ORCHESTRATION_TIMEOUT = 2 * DIRECTION_TIMEOUT + 90
 TIMING = dict(io_timeout=DIRECTION_TIMEOUT, orchestration_timeout=ORCHESTRATION_TIMEOUT,
               node_timeout=ORCHESTRATION_TIMEOUT + 15,
@@ -313,7 +313,7 @@ def main():
     parser.add_argument('--grant-duration-ms', type=int, default=30)
     parser.add_argument('--guard-interval-ms', type=int, default=5)
     parser.add_argument('--downlink-mcs', type=int, choices=(3, 4), default=3)
-    parser.add_argument('--uplink-mcs', type=int, choices=(4, 6), default=4)
+    parser.add_argument('--uplink-mcs', type=int, choices=(4, 5, 6), default=4)
     parser.add_argument('--uftp-rate-kbps', type=int, default=12000,
                         choices=range(1, 26001), metavar='KBIT/S',
                         help='下行注入速率；HT20使用受控标定候选')

@@ -1,0 +1,44 @@
+{
+  "full_ten_actual_baseline_ok": true,
+  "exact_nine_ready_idle": true,
+  "fec_k": 8,
+  "fec_n": 14,
+  "server_schedule": "10/10",
+  "runs": [
+    [
+      "fec14-20261109T082509Z-g10-d10-smoke",
+      1794212711
+    ],
+    [
+      "fec14-20261109T082509Z-g10-d10-model",
+      1794212761
+    ],
+    [
+      "fec14-20261109T082509Z-g20-d10-smoke",
+      1794213407
+    ],
+    [
+      "fec14-20261109T082509Z-g20-d10-model",
+      1794213489
+    ],
+    [
+      "fec14-20261109T082509Z-g30-d10-smoke",
+      1794213504
+    ],
+    [
+      "fec14-20261109T082509Z-g30-d10-model",
+      1794213565
+    ],
+    [
+      "fec14-20261109T082509Z-g20-d5-smoke",
+      1794214069
+    ],
+    [
+      "fec14-20261109T082509Z-g20-d5-model",
+      1794214146
+    ]
+  ],
+  "execute_count": 8,
+  "measurement_error": null,
+  "wall": 1794214813.881118
+}

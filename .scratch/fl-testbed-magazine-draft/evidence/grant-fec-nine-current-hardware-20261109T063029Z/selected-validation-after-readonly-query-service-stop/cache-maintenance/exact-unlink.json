@@ -1,0 +1,42 @@
+{
+  "host": "fl02",
+  "returncode": 0,
+  "stdout": "{\"rows\": [{\"path\": \"/var/cache/apt/pkgcache.bin\", \"predelete\": {\"path\": \"/var/cache/apt/pkgcache.bin\", \"type\": \"regular\", \"is_symlink\": false, \"size_bytes\": 70968211, \"blocks\": 138624, \"inode\": 1188965, \"device\": 2049, \"mtime_ns\": 1794245306837060721, \"mode\": \"0o644\", \"nlink\": 1}, \"exact_unlink\": true}, {\"path\": \"/var/cache/apt/srcpkgcache.bin\", \"predelete\": {\"path\": \"/var/cache/apt/srcpkgcache.bin\", \"type\": \"regular\", \"is_symlink\": false, \"size_bytes\": 70759897, \"blocks\": 138216, \"inode\": 1176910, \"device\": 2049, \"mtime_ns\": 1794245306725057313, \"mode\": \"0o644\", \"nlink\": 1}, \"exact_unlink\": true}]}\n",
+  "stderr": "",
+  "result": {
+    "rows": [
+      {
+        "path": "/var/cache/apt/pkgcache.bin",
+        "predelete": {
+          "path": "/var/cache/apt/pkgcache.bin",
+          "type": "regular",
+          "is_symlink": false,
+          "size_bytes": 70968211,
+          "blocks": 138624,
+          "inode": 1188965,
+          "device": 2049,
+          "mtime_ns": 1794245306837060721,
+          "mode": "0o644",
+          "nlink": 1
+        },
+        "exact_unlink": true
+      },
+      {
+        "path": "/var/cache/apt/srcpkgcache.bin",
+        "predelete": {
+          "path": "/var/cache/apt/srcpkgcache.bin",
+          "type": "regular",
+          "is_symlink": false,
+          "size_bytes": 70759897,
+          "blocks": 138216,
+          "inode": 1176910,
+          "device": 2049,
+          "mtime_ns": 1794245306725057313,
+          "mode": "0o644",
+          "nlink": 1
+        },
+        "exact_unlink": true
+      }
+    ]
+  }
+}

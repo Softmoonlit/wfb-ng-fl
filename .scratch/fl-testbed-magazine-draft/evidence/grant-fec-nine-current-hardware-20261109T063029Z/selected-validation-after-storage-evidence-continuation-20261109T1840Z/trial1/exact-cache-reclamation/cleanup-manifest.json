@@ -1,0 +1,121 @@
+{
+  "status": "complete",
+  "canonical": {
+    "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "size": 44770302
+  },
+  "minimum_bytes": 536870912,
+  "agent_execution_budget_target_bytes": 1073741824,
+  "files": [
+    {
+      "host": "fl02",
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/inbox/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1098086,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_full_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/fec12-20261109T092236Z-trial1-g30-d5-model-after-exact-uftp-kernel-files.json",
+      "evidence_sha256": "3af8c2b75769ed3ca252fff826ee99ef8bfdb74c8964cb1d80ba280dc457508e",
+      "successful_round": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial1/fec12-20261109T092236Z-trial1-g30-d5-model/progress.jsonl",
+        "sha256": "a06ea6d1a705630677db6a3478cc48362c5be963b1832a1b19a8e67e1b14ebbe"
+      },
+      "metadata_archive": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-storage-evidence-continuation-20261109T1840Z/trial1/exact-cache-reclamation/fl02-fec12-20261109T092236Z-trial1-g30-d5-model-metadata-logs.json",
+        "sha256": "77c9afdf432a0a6631f0cd3b92d5cd4aa4de0bc627dde83abfaf451ff02e45a3"
+      },
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/inbox/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 562003968
+      }
+    },
+    {
+      "host": "fl02",
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1098112,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_full_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/fec12-20261109T092236Z-trial1-g30-d5-model-after-exact-uftp-kernel-files.json",
+      "evidence_sha256": "3af8c2b75769ed3ca252fff826ee99ef8bfdb74c8964cb1d80ba280dc457508e",
+      "successful_round": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial1/fec12-20261109T092236Z-trial1-g30-d5-model/progress.jsonl",
+        "sha256": "a06ea6d1a705630677db6a3478cc48362c5be963b1832a1b19a8e67e1b14ebbe"
+      },
+      "metadata_archive": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-storage-evidence-continuation-20261109T1840Z/trial1/exact-cache-reclamation/fl02-fec12-20261109T092236Z-trial1-g30-d5-model-metadata-logs.json",
+        "sha256": "77c9afdf432a0a6631f0cd3b92d5cd4aa4de0bc627dde83abfaf451ff02e45a3"
+      },
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/model.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 606769152
+      }
+    },
+    {
+      "host": "fl02",
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/update.bin",
+      "size_bytes": 44770302,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+      "inode": 1098438,
+      "device": 2049,
+      "allocated_bytes": 44773376,
+      "nlink": 1,
+      "local_full_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/fec12-20261109T092236Z-trial1-g30-d5-model-after-exact-uftp-kernel-files.json",
+      "evidence_sha256": "3af8c2b75769ed3ca252fff826ee99ef8bfdb74c8964cb1d80ba280dc457508e",
+      "successful_round": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial1/fec12-20261109T092236Z-trial1-g30-d5-model/progress.jsonl",
+        "sha256": "a06ea6d1a705630677db6a3478cc48362c5be963b1832a1b19a8e67e1b14ebbe"
+      },
+      "metadata_archive": {
+        "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-storage-evidence-continuation-20261109T1840Z/trial1/exact-cache-reclamation/fl02-fec12-20261109T092236Z-trial1-g30-d5-model-metadata-logs.json",
+        "sha256": "77c9afdf432a0a6631f0cd3b92d5cd4aa4de0bc627dde83abfaf451ff02e45a3"
+      },
+      "status": "deleted_exact_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/update.bin",
+        "deleted": true,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "size_bytes": 44770302,
+        "available_bytes": 651534336
+      }
+    }
+  ],
+  "hosts": {
+    "fl02": {
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "deleted_count": 3,
+      "available_bytes": 651517952,
+      "retained_b2_final": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "target_reached": false
+    }
+  }
+}

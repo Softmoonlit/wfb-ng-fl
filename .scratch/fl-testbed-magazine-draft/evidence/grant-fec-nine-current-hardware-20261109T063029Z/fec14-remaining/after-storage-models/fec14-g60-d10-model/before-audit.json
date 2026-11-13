@@ -1,0 +1,3395 @@
+{
+  "ok": true,
+  "elapsed": 0.7726529099982145,
+  "checks": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "fl04": "excluded; not contacted per current authorization",
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffa7fd0000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa6620000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa6210000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa6060000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa7f97000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff925c8000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff92410000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff92000000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff91e50000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9258f000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl00",
+        "boot_id": "6ad51f15-51bb-42b4-ae09-54d808b6c3c4",
+        "uptime": "12458.08 65507.69",
+        "service": "MainPID=58435\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:a3:86:b3:86:72",
+            "usb_speed": "480",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3/1-2.3:1.0",
+            "pid": "58554",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "server",
+              "--tun-name",
+              "fl-s",
+              "--tun-addr",
+              "10.80.0.1/24",
+              "--node-id",
+              "255",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "3",
+              "--air-interface",
+              "wlxfca386b38672",
+              "--known-clients",
+              "1,2,3,4,5,6,7,8,9,10",
+              "--grant-duration-ms",
+              "60",
+              "--guard-interval-ms",
+              "10",
+              "--client-target",
+              "1:10.80.0.11:127.0.0.1:1",
+              "--client-target",
+              "2:10.80.0.12:127.0.0.1:1",
+              "--client-target",
+              "3:10.80.0.13:127.0.0.1:1",
+              "--client-target",
+              "4:10.80.0.14:127.0.0.1:1",
+              "--client-target",
+              "5:10.80.0.15:127.0.0.1:1",
+              "--client-target",
+              "6:10.80.0.16:127.0.0.1:1",
+              "--client-target",
+              "7:10.80.0.17:127.0.0.1:1",
+              "--client-target",
+              "8:10.80.0.18:127.0.0.1:1",
+              "--client-target",
+              "9:10.80.0.19:127.0.0.1:1",
+              "--client-target",
+              "10:10.80.0.20:127.0.0.1:1",
+              "--downlink-pause-threshold-bytes",
+              "131072",
+              "--downlink-resume-threshold-bytes",
+              "65536",
+              "--downlink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                3,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfca386b38672\n\tifindex 27\n\twdev 0x900000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 9\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12458.084798479
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffbe5cd000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffbcc20000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffbc810000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffbc660000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbe594000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffbbe2c000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffbbc80000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffbb870000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffbb6c0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbbdf3000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl01",
+        "boot_id": "96b7967d-6755-442f-a93d-dea2b6842ae4",
+        "uptime": "12622.44 73313.39",
+        "service": "MainPID=14820\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:50:0b:fe",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "14835",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c1",
+              "--tun-addr",
+              "10.80.0.11/24",
+              "--node-id",
+              "1",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500bfe",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12622.446096989
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffa0b50000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9f1b0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff9eda0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9ebf0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa0b17000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff8a58a000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff8a3e0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff89fd0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff89e20000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff8a551000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl02",
+        "boot_id": "1556c12d-753b-433f-95dd-387b94369b27",
+        "uptime": "12717.03 73958.26",
+        "service": "MainPID=15052\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:30:0f:04",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "15067",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c2",
+              "--tun-addr",
+              "10.80.0.12/24",
+              "--node-id",
+              "2",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300f04",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12717.033623749
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffbc8bc000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffbaf10000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffbab00000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffba950000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbc883000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff883b9000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff88210000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff87e00000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff87c50000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff88380000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl03",
+        "boot_id": "bbf344ce-88d1-4737-a76a-f32b98d8c951",
+        "uptime": "12478.01 72533.24",
+        "service": "MainPID=14769\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "5c:ff:ff:af:6d:8c",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.1/2-1.1:1.0",
+            "pid": "14784",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c3",
+              "--tun-addr",
+              "10.80.0.13/24",
+              "--node-id",
+              "3",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx5cffffaf6d8c",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12478.014998801
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff9ea2a000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9d080000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff9cc70000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff9cac0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9e9f1000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffa45e8000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa4440000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa4030000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa3e80000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa45af000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "6df6c9ca3eb2a0ecded968b7aafb9e97d0942ffeebdcf916a35d3be2bf6a5810",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl05",
+        "boot_id": "8b6cdd20-f4f9-475d-a636-ba4a4d133356",
+        "uptime": "12698.07 74332.80",
+        "service": "MainPID=13547\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:10:01:57",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "13562",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c5",
+              "--tun-addr",
+              "10.80.0.15/24",
+              "--node-id",
+              "5",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c100157",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12698.080914799
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffae92b000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffacf80000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffacb90000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffac9e0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffae8f2000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffb192d000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb1790000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffb13a0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb11f0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb18f4000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl06",
+        "boot_id": "10214fad-d1da-4523-9070-97ea716340fd",
+        "uptime": "12526.45 72928.40",
+        "service": "MainPID=17996\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:30:0c:bb",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "18011",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c6",
+              "--tun-addr",
+              "10.80.0.16/24",
+              "--node-id",
+              "6",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300cbb",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12526.456576421
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffbc255000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffba8b0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffba4c0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffba310000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffbc21c000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffa56c1000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffa5520000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffa5130000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffa4f80000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffa5688000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl07",
+        "boot_id": "d8aa9920-2327-4f73-83d9-48642d87bdf1",
+        "uptime": "12541.20 73063.12",
+        "service": "MainPID=17376\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:30:0e:99",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "17392",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c7",
+              "--tun-addr",
+              "10.80.0.17/24",
+              "--node-id",
+              "7",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c300e99",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12541.205530528
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff84176000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff827d0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff823e0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff82230000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff8413d000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffaf8d3000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffaf730000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffaf340000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffaf190000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffaf89a000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl08",
+        "boot_id": "6a11eeba-aba4-402d-9ccb-bf2df8ef9aaa",
+        "uptime": "12551.29 73171.96",
+        "service": "MainPID=16622\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:50:0a:88",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "16637",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c8",
+              "--tun-addr",
+              "10.80.0.18/24",
+              "--node-id",
+              "8",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c500a88",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12551.291549807
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff9be10000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff9a470000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff9a080000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff99ed0000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9bdd7000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffba245000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffba0a0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffb9cb0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb9b00000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffba20c000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl09",
+        "boot_id": "b8540dab-ff28-446f-896b-cf98e77080be",
+        "uptime": "12727.99 74015.97",
+        "service": "MainPID=19010\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "88:e6:28:52:aa:e4",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "19025",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c9",
+              "--tun-addr",
+              "10.80.0.19/24",
+              "--node-id",
+              "9",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlx88e62852aae4",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12727.991581977
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "source_file_checks": {
+          "observation.py": {
+            "expected": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "installed": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd",
+            "source": "1625126ee1a28a44b9c84f0bd514a7404ab5d829ddf1f6e550059d3663246bcd"
+          },
+          "transport.py": {
+            "expected": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "installed": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7",
+            "source": "ec04df9c5d30f9afd01fbb3aa4a904a9a9a22dc0423956bb2d8c3ef87ae214a7"
+          },
+          "radio.py": {
+            "expected": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "installed": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210",
+            "source": "d853305dbeb899118beedf04788ca19ddeddeecce97f62c3095307f5c177d210"
+          },
+          "console.py": {
+            "expected": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "installed": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7",
+            "source": "aea06f16d39cc7c433eed605fb740ddb1a77b9664daf23d40b1b59a8657c8ae7"
+          },
+          "mnist_cnn_32_64.py": {
+            "expected": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "installed": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9",
+            "source": "4fefa9d60d6347d582a4073b9a613bf9145ef6e60dee372857b7d70db06b4cd9"
+          },
+          "coordinator.py": {
+            "expected": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "installed": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c",
+            "source": "43472904a1295fa616192b136fcfc4857c518764816ac432d1adea90e5ec9f3c"
+          },
+          "client_daemon.py": {
+            "expected": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "installed": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3",
+            "source": "6adb090abcb9a839338d7bf98c276676e6892f1d874a536f3883b3121387f1a3"
+          },
+          "mnist_cnn_model.py": {
+            "expected": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "installed": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce",
+            "source": "1757e7dbeb93f9008fd5779d26d3b7badebf12162d7414aa0422eb73f02e27ce"
+          },
+          "issue41_fixtures.py": {
+            "expected": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "installed": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146",
+            "source": "d444b9890f3bdad30df25f5957234e0f17d472ccca46674484fa6fc473180146"
+          },
+          "fp64_audit.py": {
+            "expected": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "installed": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55",
+            "source": "78d867ec4db0c0987bff1e3608bbe951962924a39e6745aee488cdc967d2bd55"
+          },
+          "server_daemon.py": {
+            "expected": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "installed": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b",
+            "source": "1185c067adb0aab345dfac7216f5c65f45ee8bb949c09262d4b25af3438a4d7b"
+          },
+          "artifacts.py": {
+            "expected": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "installed": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3",
+            "source": "64786c344d94d7e44c051bbfd2968ead9e319a7db7f9c5474f1eaae4cbe1edd3"
+          },
+          "model_artifact.py": {
+            "expected": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "installed": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d",
+            "source": "45d3208e2a7ae680ac280cf792e4d98b56c99612f14b23bac61ce4174c70d93d"
+          },
+          "algorithm.py": {
+            "expected": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "installed": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec",
+            "source": "3d5edcb71728d6816ba9cfd2ffd32daadd7063e7876942e919558cd9dfb107ec"
+          },
+          "role.py": {
+            "expected": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "installed": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75",
+            "source": "1038f004d9d1985f01c9cd0dfdc5c15bfdb68cf0cb1d111415f89890f18b3f75"
+          },
+          "mnist_deployment.py": {
+            "expected": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "installed": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa",
+            "source": "eac532eb981781129696008dcf5f259d693aff222447dac8f74468683ad321aa"
+          },
+          "link_radio.py": {
+            "expected": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "installed": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c",
+            "source": "5fc43189fafd99d166b6341d38422ef29159bd62181a171d7ea966f0ce4fbe5c"
+          },
+          "errors.py": {
+            "expected": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "installed": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0",
+            "source": "bf812dcbf4ecbf5e42bd33fce360494e4cc683137175a206b5cd8ae78d2908e0"
+          },
+          "control.py": {
+            "expected": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "installed": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b",
+            "source": "6012d8eea0d1f9e6ccdda975e802e55ef8f8006d99216fd2fb64f6cc00b44b7b"
+          },
+          "mnist.py": {
+            "expected": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "installed": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6",
+            "source": "e02f2053a0a297d183ab590274a8c97960c3f36968a5dcd3f1369edf3447b2b6"
+          },
+          "console_http.py": {
+            "expected": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "installed": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212",
+            "source": "13da65487cfd9aec2ca05c2f41684dd496126b9d9552baa368d7efc14eacd212"
+          },
+          "mnist_data.py": {
+            "expected": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "installed": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c",
+            "source": "6eb32313ab19c6c8e7e95a2527fb22ff582c184dc6addf024a70b85a9aba217c"
+          },
+          "model_library.py": {
+            "expected": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "installed": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2",
+            "source": "b67057a87d2fc2507401dae443504e3a37ff91107d15231352d498112e4c47f2"
+          },
+          "runtime.py": {
+            "expected": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "installed": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425",
+            "source": "71e72eb3e277a94166bd536d637462f37ecf2181e395a28eb27c8e7d08425425"
+          },
+          "service.py": {
+            "expected": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "installed": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c",
+            "source": "b4110ea6d277c879adcc6c326d38b1c464e6db26aced442121e9925863bdc49c"
+          },
+          "reference_model.py": {
+            "expected": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "installed": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f",
+            "source": "60b14bc03f7f5342355dbf1def5e65258b484233a1fb4be7ac5893dcfa00e81f"
+          },
+          "evidence.py": {
+            "expected": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "installed": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be",
+            "source": "6fe947522a254b6ee0df94775350686b6b031265ac41adbd7783fcc6e6fce5be"
+          },
+          "build_identity.json": {
+            "expected": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "installed": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591",
+            "source": "959451cfd093a1be86517e2a6b5212ac6ca80d5f8ef1971cf9ee5dbc04293591"
+          },
+          "__init__.py": {
+            "expected": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "installed": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645",
+            "source": "1eb1e778ff96d20f6eefc55d32c66ca744e1a686aaa004acb6a40583c0ee9645"
+          },
+          "cifar10_model.py": {
+            "expected": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "installed": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee",
+            "source": "c098c0b0add394f0817ffd46bdfb4e49d6e1b02c5b61e6e9923b5305835a2fee"
+          },
+          "static/radio.js": {
+            "expected": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "installed": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a",
+            "source": "7b38ea840518143b3c5b087a57ef0f81f2357d05bdfe86364e747d7181a8961a"
+          },
+          "static/radio.html": {
+            "expected": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "installed": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c",
+            "source": "6fe699eb58fd6ce62b532d18e67abf466dbbd5b6c99963c47bdc1361b990b13c"
+          },
+          "static/models.js": {
+            "expected": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "installed": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56",
+            "source": "bc8dcd8f1ad268ac28724927457693fe1b52e48d1916f64a910f68bf89222e56"
+          },
+          "static/console.js": {
+            "expected": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "installed": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51",
+            "source": "fa1cd1ad9ac7e09b127f04dc6fc54db8a04c63ea6d91c5c31f11ec19765fbe51"
+          },
+          "static/evaluation-curves.js": {
+            "expected": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "installed": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747",
+            "source": "b72e77c4965128506c439d468dcdbc643a24c16c1afd950eef448a49cd156747"
+          },
+          "static/models.css": {
+            "expected": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "installed": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35",
+            "source": "df8c4c8b647c22714d90270dd16222932ad45a48132c32e1081b3542ca6fdd35"
+          },
+          "static/index.html": {
+            "expected": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "installed": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf",
+            "source": "19b643ba0d938cfa628aca5a389ac63added85b34ae4857ab7babd0cf421dcdf"
+          },
+          "static/radio.css": {
+            "expected": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "installed": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d",
+            "source": "2b6e055c65bfe6dd628168b916648ac750c123c501bec4feb75465b91d5e389d"
+          },
+          "static/console.css": {
+            "expected": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "installed": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2",
+            "source": "1644319285cae2472d6c52564d5faeffcdba975664898c6aea142602b69281d2"
+          },
+          "static/models.html": {
+            "expected": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "installed": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56",
+            "source": "85bcc38006272a5ae81dfd431072ce6164302f1f38366d4ef4bc6323b06a2e56"
+          }
+        },
+        "uftp_tools": {
+          "uftp": {
+            "path": "/usr/bin/uftp",
+            "sha256": "71d9c15497b3bd4286a2c60c9d37871a50b7032793eae8d4bf7b3b8977e015e3",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffff9b057000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffff996b0000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffff992c0000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffff99110000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff9b01e000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          },
+          "uftpd": {
+            "path": "/usr/bin/uftpd",
+            "sha256": "0d7a31c6cbf783ad5ecced0bdce6705c30530a258fdf605d555c748827aa85b9",
+            "version": "5.0.3",
+            "ldd": "\tlinux-vdso.so.1 (0x0000ffffb29b2000)\n\tlibm.so.6 => /lib/aarch64-linux-gnu/libm.so.6 (0x0000ffffb2810000)\n\tlibcrypto.so.3 => /lib/aarch64-linux-gnu/libcrypto.so.3 (0x0000ffffb2420000)\n\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x0000ffffb2270000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb2979000)\n",
+            "libraries": {
+              "/lib/aarch64-linux-gnu/libm.so.6": "0c4efaa523282ba813974bccd7dedc8aae372a284284f3a679dae92735ee9201",
+              "/lib/aarch64-linux-gnu/libcrypto.so.3": "e7f5e30d7eeec2259c07493083c3ae6d0c0d361e2ae9127b19fe49c0a1a32f6f",
+              "/lib/aarch64-linux-gnu/libc.so.6": "265b8b6165b7826077d75a88677dbd37a82bd4f3be9e1fd8a79a6f2e2c38ff4f",
+              "/lib/ld-linux-aarch64.so.1": "d93175bf8f55407b2c7cd83f47f0cdaf0a2ddfd43cac7e3f59ac1b008708769e"
+            }
+          }
+        },
+        "power_service": "Result=success\nExecMainStatus=0\n",
+        "jtop_state": "inactive",
+        "power_limit_ok": true,
+        "power_limits": {
+          "/sys/devices/system/cpu/online": "0-5",
+          "/sys/devices/platform/17000000.gpu/devfreq_dev/max_freq": "612000000",
+          "/sys/kernel/nvpmodel_clk_cap/emc": "2133000000",
+          "/sys/kernel/debug/bpmp/debug/clk/emc/mrq_rate_locked": "0",
+          "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq": "1497600",
+          "/sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq": "1497600"
+        },
+        "pending_shutdown": null,
+        "old_units": "",
+        "active_old_units": [],
+        "host": "fl10",
+        "boot_id": "3cad4cb3-7fc9-47bb-8a42-0a419ea6a424",
+        "uptime": "12676.34 73552.60",
+        "service": "MainPID=19619\nActiveState=active\n",
+        "native": [
+          {
+            "mac": "fc:22:1c:10:01:19",
+            "usb_speed": "5000",
+            "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb2/2-1/2-1.3/2-1.3:1.0",
+            "pid": "19635",
+            "argv": [
+              "/usr/bin/wfb_v6_uplink",
+              "--role",
+              "client",
+              "--tun-name",
+              "fl-c10",
+              "--tun-addr",
+              "10.80.0.20/24",
+              "--node-id",
+              "10",
+              "--link-id",
+              "7669206",
+              "--uplink-stream",
+              "1",
+              "--downlink-stream",
+              "2",
+              "--fec-k",
+              "8",
+              "--fec-n",
+              "14",
+              "--radio-bandwidth",
+              "40",
+              "--radio-control-port",
+              "9200",
+              "--radio-mcs-index",
+              "4",
+              "--air-interface",
+              "wlxfc221c100119",
+              "--uplink-pause-threshold-bytes",
+              "131072",
+              "--uplink-resume-threshold-bytes",
+              "65536",
+              "--uplink-queue-packets-limit",
+              "64"
+            ],
+            "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+            "queries": {
+              "radio": [
+                1129270605,
+                0,
+                0,
+                0,
+                0,
+                40,
+                4,
+                0,
+                1
+              ],
+              "fec": [
+                1129270605,
+                0,
+                8,
+                14
+              ]
+            },
+            "iw": "Interface wlxfc221c100119\n\tifindex 22\n\twdev 0x600000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 6\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+          }
+        ],
+        "power": "NV Power Mode: 15W\n0\n",
+        "manifest_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+        "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "installed_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "owned_unit_state": null,
+        "kernel_log": "",
+        "kernel_error": "",
+        "monotonic": 12676.348275443
+      },
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "阶段": "apt-cache-maintenance-prepared",
+  "父1915": "stopped/execute0/STOP保留",
+  "授权范围": ["/var/cache/apt/pkgcache.bin", "/var/cache/apt/srcpkgcache.bin"],
+  "不允许": ["apt update/install/upgrade", "apt-cache gencaches", "删除archives.deb", "删除/var/lib/apt/lists", "删除dpkg数据库", "删除/srv或日志/journal", "disable/mask/kill packagekit"],
+  "boot_expected": "8831475d-7f89-458a-bfe5-e59bf8843eb4",
+  "model_execute": 0,
+  "remote_mutation_started": false,
+  "created_wall": "2026-11-09T19:24:40+08:00"
+}

@@ -1,0 +1,20 @@
+{
+  "start_wall": 1794205829.488872,
+  "deadline_wall": 1794209129.488873,
+  "stage_limit_seconds": 3300,
+  "expected_macs": {
+    "fl00": "fc:a3:86:b3:86:72",
+    "fl01": "fc:22:1c:50:0b:fe",
+    "fl02": "fc:22:1c:30:0f:04",
+    "fl03": "5c:ff:ff:af:6d:8c",
+    "fl05": "fc:22:1c:10:01:57",
+    "fl06": "fc:22:1c:30:0c:bb",
+    "fl07": "fc:22:1c:30:0e:99",
+    "fl08": "fc:22:1c:50:0a:88",
+    "fl09": "88:e6:28:52:aa:e4",
+    "fl10": "fc:22:1c:10:01:19"
+  },
+  "prior_snapshot": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/server-fl10-repeat-swap-20261109T055853Z/model-continuation-after-confirmed-recovery/final-idle-02-vs-all-targeted-snapshot.json",
+  "scope": "FEC14 40/10 and 60/10 only; smoke then model once, max4 executes",
+  "libcrypto": "existing two groups retained; no upgrades"
+}

@@ -1,0 +1,54 @@
+{
+  "status": "blocked-actual-packagekit-update",
+  "host": "fl02",
+  "sample_count": 2,
+  "interval_seconds": 10.59775972366333,
+  "evidence": {
+    "ppid_tree": "/usr/lib/apt/methods/https -> /usr/libexec/packagekitd -> PID1",
+    "argv": [
+      "/usr/lib/apt/methods/https"
+    ],
+    "dpkg_or_install_process": false,
+    "systemd_jobs_empty": true,
+    "four_locks_held": false,
+    "dpkg_audit_empty": true,
+    "packagekit_active_transaction_object": false,
+    "pkcon_running_marker": false,
+    "historical_roles": "finished update-packages only"
+  },
+  "action_authorized": "stop PackageKit, archive and unlink only install-cache wheel/deb, finally restore active/static",
+  "wall": 1794262992.4257162,
+  "actual_transaction_evidence": {
+    "transactions": [
+      {
+        "id": "/381_ddebddae",
+        "role": "get-updates",
+        "status": "finished",
+        "succeeded": true
+      },
+      {
+        "id": "/382_aaaadbca",
+        "role": "update-packages",
+        "status": "scheduled/active-download-evidence",
+        "succeeded": null
+      }
+    ],
+    "journal_path": "cache-maintenance-fl02-packagekit-journal.txt",
+    "download_failure_lines": 559,
+    "package_examples": [
+      "bsdutils",
+      "nvidia-l4t-graphics-demos",
+      "docker-ce",
+      "containerd.io",
+      "dpkg",
+      "apt",
+      "systemd",
+      "python3.10"
+    ],
+    "ppid_tree": "/usr/lib/apt/methods/https -> /usr/libexec/packagekitd -> PID1",
+    "dpkg_process": false,
+    "locks_held": false,
+    "dpkg_audit_empty": true
+  },
+  "action": "stop maintenance; no fl02 install-cache archive/unlink; do not kill apt/packagekit; final service active/static"
+}

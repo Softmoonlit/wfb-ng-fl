@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "说明": "续跑脚本、已完成冷阶段、父授权事实、模型输入和审阅 SHA 本地核验；未执行现场编排",
+  "checks": {
+    "manifest_files_sha": true,
+    "go_manifest_sha": true,
+    "go_facts": true,
+    "profile_complete": true,
+    "cold_outputs": true,
+    "interrupted_state": true,
+    "scheduler_evidence": true,
+    "resume_branch": true,
+    "no_cold_in_resume": true,
+    "model_payload": true,
+    "manifest_count": true,
+    "all": true
+  },
+  "manifest_sha256": "eeeff5fdefc97a169aa8fe2eb2028815376f56d81abff45569904db3d07c085d",
+  "worker_sha256": "4dc918b835b370bc5f7db8ff360ae8aca7b5a6a7e31f8e3ef600b2f79cb88557",
+  "profile_completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ],
+  "model_bytes": 44770302,
+  "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+  "remote_actions_this_check": 0
+}

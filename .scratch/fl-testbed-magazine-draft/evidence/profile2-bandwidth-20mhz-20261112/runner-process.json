@@ -1,0 +1,33 @@
+{
+  "pid": 14977,
+  "command": [
+    "/usr/bin/python3",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py",
+    "--native-sha",
+    "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+    "--payload",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "--model-manifest",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/profile2-bandwidth-20mhz-20261112/model-manifest-input.json",
+    "--execute",
+    "--reviewed-sha",
+    "fbed98b4a7314d72d79be706146e6fbc2cf80a1d51caf3950b92b6072fc6f35c",
+    "--run-id",
+    "profile2-model-r1-20261112T115429Z",
+    "--bandwidth-mhz",
+    "20",
+    "--downlink-mcs",
+    "3",
+    "--uplink-mcs",
+    "4",
+    "--uftp-rate-kbps",
+    "6000",
+    "--release-commit",
+    "e81c4f69eaa25d70d97d5bea35e7e332e967d305",
+    "--release-root",
+    "/srv/wfb-ng-fl/releases/heartbeat-e81c4f69eaa2-20261112T061928Z",
+    "--output",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/profile2-bandwidth-20mhz-20261112/round-1-20261112T115429Z/runs"
+  ],
+  "started_wall": 1794484476.3210773
+}

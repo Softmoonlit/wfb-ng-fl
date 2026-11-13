@@ -1,0 +1,37 @@
+{
+  "status": "stopped",
+  "canonical": {
+    "path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "size": 44770302
+  },
+  "minimum_bytes": 536870912,
+  "agent_execution_budget_target_bytes": 1073741824,
+  "files": [],
+  "hosts": {
+    "fl02": {
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "deleted_count": 0,
+      "available_bytes": 517763072,
+      "retained_b2_final": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "target_reached": false
+    }
+  },
+  "error": "RuntimeError('fl02 cannot reach 512MiB within authorized duplicates')"
+}

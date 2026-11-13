@@ -1,0 +1,66 @@
+{
+  "host": "fl01",
+  "returncode": 0,
+  "result": {
+    "host": "fl01",
+    "files": [
+      {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/inbox/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      },
+      {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      },
+      {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/update.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      },
+      {
+        "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/inbox/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44777472,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      },
+      {
+        "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/model.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      },
+      {
+        "path": "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model/role/rounds/09f8ff31-9a1d-4b1d-849e-d23d97be96b4/update.bin",
+        "exists": true,
+        "is_symlink": false,
+        "size_bytes": 44770302,
+        "allocated_bytes": 44773376,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "nlink": 1
+      }
+    ],
+    "active_comm_units": "",
+    "read_only": true
+  },
+  "stderr": ""
+}

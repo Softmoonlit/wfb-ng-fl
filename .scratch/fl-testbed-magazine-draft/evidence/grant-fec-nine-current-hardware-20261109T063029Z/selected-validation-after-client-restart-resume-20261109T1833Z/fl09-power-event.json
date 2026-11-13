@@ -1,0 +1,12 @@
+{
+  "event": "fl09_power_interruption_user_confirmed",
+  "classification": "供电事件，不是 FEC/调度性能失败",
+  "reported_by_user": true,
+  "reported_wall": "2026-11-09T18:36:12+08:00",
+  "batch_model_executed_before_event": false,
+  "batch_run_ids_before_event": [],
+  "old_roots_preserved": true,
+  "startup_wait_seconds": 180,
+  "model_dispatch": "尚未发送",
+  "next_gate": "以本次启动为准核验 fl09 boot/native/source/15W/iface/MAC/USB/driver/GET_FEC/GET_RADIO/iw/READY，再做全十准入"
+}

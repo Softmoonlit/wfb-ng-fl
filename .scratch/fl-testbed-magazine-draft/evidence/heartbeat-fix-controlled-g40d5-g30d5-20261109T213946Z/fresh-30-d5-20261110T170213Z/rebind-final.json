@@ -1,0 +1,47 @@
+{
+  "status": "STOP-rebind-hard-block-usb-enumeration",
+  "scope": "single rtl88xxau_wfb USB interface only",
+  "preflight": {
+    "active_job": null,
+    "temp_units": [],
+    "routes": [],
+    "driver": "rtl88xxau_wfb",
+    "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3/1-2.3:1.0",
+    "usb_device_id": "1-2.3:1.0",
+    "mac": "fc:a3:86:b3:86:72",
+    "usb_speed": "480",
+    "management": "192.168.0.190 on enP8p1s0; target USB interface is separate"
+  },
+  "standard_stop": {
+    "clients_returncode": 0,
+    "server_returncode": 0,
+    "native_exit_verified": true
+  },
+  "rebind": {
+    "operation": "write only rtl88xxau_wfb unbind/bind for 1-2.3:1.0",
+    "returncode": 1,
+    "stderr": "No such device",
+    "module_global_unload": false,
+    "usb_autosuspend_changed": false,
+    "power_changed": false,
+    "management_interface_touched": false
+  },
+  "kernel_root_cause_evidence": [
+    "usb 1-2.3: reset high-speed USB device number 5",
+    "usb 1-2.3: device firmware changed",
+    "usb 1-2.3: USB disconnect, device number 5",
+    "device not responding to setup address",
+    "device descriptor read/all, error -71",
+    "unable to read config index 0 descriptor/start: -71",
+    "can't read configurations, error -71",
+    "unable to enumerate USB device"
+  ],
+  "post_state": {
+    "target_netdev": "absent",
+    "server_service": "inactive/dead",
+    "client_services": "inactive/dead",
+    "management_enp8p1s0": "UP with 192.168.0.190",
+    "next_action": "physical/USB recovery required; no further software restart/rebind in this task"
+  },
+  "wall": 1794305865
+}

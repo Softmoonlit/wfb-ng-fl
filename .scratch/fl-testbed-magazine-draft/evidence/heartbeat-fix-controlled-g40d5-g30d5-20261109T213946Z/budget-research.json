@@ -1,0 +1,30 @@
+{
+  "status": "record-only-no-change",
+  "attempt_timeout_seconds": {
+    "production_daemon_json_cli_entry": false,
+    "construction": "daemon constructor only",
+    "coverage": [
+      "periodic",
+      "notify_state_change",
+      "CONFIRMED immediate heartbeat",
+      "hunt"
+    ],
+    "shared_state_lock_wait": true
+  },
+  "current_policy": {
+    "value_ms": 230,
+    "change": false
+  },
+  "future_evaluation": {
+    "when": "after scheduler stability",
+    "method": "bounded ACK wait evaluation",
+    "no_old_matrix_retest": [
+      "10/10",
+      "18/2"
+    ],
+    "no_historical_capture_ticket_revival": true,
+    "requires": "formal seam, regression, release"
+  },
+  "source": "用户提供的只读研究结论",
+  "wall": 1794261521.6847544
+}

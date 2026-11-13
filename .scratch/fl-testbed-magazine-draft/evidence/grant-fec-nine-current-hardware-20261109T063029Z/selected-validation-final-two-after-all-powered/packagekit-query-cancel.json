@@ -1,0 +1,102 @@
+{
+  "host": "fl02",
+  "returncode": 2,
+  "stdout": "{\"status\": \"confirmation-failed-no-cancel\", \"before\": {\"label\": \"before-confirm\", \"wall\": 1794245282.2843003, \"boot_id\": \"1a183917-61d1-4512-8967-4e790c118dcc\", \"transaction\": {\"call\": {\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\"}, \"raw_stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"raw_stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null}, \"properties\": {\"Role\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"value\": \"8\"}, \"Status\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"value\": \"8\"}, \"Percentage\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}, \"value\": \"0\"}, \"AllowCancel\": {\"call\": {\"returncode\": 0, \"stdout\": \"b true\\n\", \"stderr\": \"\"}, \"value\": \"true\"}}, \"apt_processes\": [{\"pid\": \"3876\", \"argv\": [\"apt-get\", \"check\", \"-qq\"]}], \"locks\": {\"/var/lib/dpkg/lock-frontend\": {\"path\": \"/var/lib/dpkg/lock-frontend\", \"exists\": true, \"held\": true}, \"/var/lib/dpkg/lock\": {\"path\": \"/var/lib/dpkg/lock\", \"exists\": true, \"held\": true}, \"/var/lib/apt/lists/lock\": {\"path\": \"/var/lib/apt/lists/lock\", \"exists\": true, \"held\": false}, \"/var/cache/apt/archives/lock\": {\"path\": \"/var/cache/apt/archives/lock\", \"exists\": true, \"held\": false}}, \"service\": {\"returncode\": 0, \"stdout\": \"MainPID=1950\\nActiveState=active\\n\", \"stderr\": \"\"}}, \"confirm\": false}\n",
+  "stderr": "",
+  "elapsed_seconds": 1.3538446426391602,
+  "remote": {
+    "status": "confirmation-failed-no-cancel",
+    "before": {
+      "label": "before-confirm",
+      "wall": 1794245282.2843003,
+      "boot_id": "1a183917-61d1-4512-8967-4e790c118dcc",
+      "transaction": {
+        "call": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/372_cbdeeced\"\n",
+          "stderr": ""
+        },
+        "raw_stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "raw_stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null
+      },
+      "properties": {
+        "Role": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "value": "8"
+        },
+        "Status": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "value": "8"
+        },
+        "Percentage": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          },
+          "value": "0"
+        },
+        "AllowCancel": {
+          "call": {
+            "returncode": 0,
+            "stdout": "b true\n",
+            "stderr": ""
+          },
+          "value": "true"
+        }
+      },
+      "apt_processes": [
+        {
+          "pid": "3876",
+          "argv": [
+            "apt-get",
+            "check",
+            "-qq"
+          ]
+        }
+      ],
+      "locks": {
+        "/var/lib/dpkg/lock-frontend": {
+          "path": "/var/lib/dpkg/lock-frontend",
+          "exists": true,
+          "held": true
+        },
+        "/var/lib/dpkg/lock": {
+          "path": "/var/lib/dpkg/lock",
+          "exists": true,
+          "held": true
+        },
+        "/var/lib/apt/lists/lock": {
+          "path": "/var/lib/apt/lists/lock",
+          "exists": true,
+          "held": false
+        },
+        "/var/cache/apt/archives/lock": {
+          "path": "/var/cache/apt/archives/lock",
+          "exists": true,
+          "held": false
+        }
+      },
+      "service": {
+        "returncode": 0,
+        "stdout": "MainPID=1950\nActiveState=active\n",
+        "stderr": ""
+      }
+    },
+    "confirm": false
+  }
+}

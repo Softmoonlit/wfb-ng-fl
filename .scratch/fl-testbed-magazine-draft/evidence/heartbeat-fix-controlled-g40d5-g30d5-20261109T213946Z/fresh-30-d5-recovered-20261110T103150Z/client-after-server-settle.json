@@ -1,0 +1,553 @@
+{
+  "observations": [
+    {
+      "wall": 1794307802.776113,
+      "online": [],
+      "bad": {
+        "1": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "2": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "3": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "5": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "6": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "7": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "8": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "9": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        },
+        "10": {
+          "readiness": "OFFLINE",
+          "reported_state": null,
+          "current_channel": null
+        }
+      },
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307807.780267,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307812.7895634,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307817.7979932,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307822.80687,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307827.8154562,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307832.8246381,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307837.8344133,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307842.843462,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307847.8527353,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307852.862297,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307857.8711839,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307862.8800523,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307867.8892283,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307872.8988035,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307877.9083722,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307882.9164708,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    },
+    {
+      "wall": 1794307887.9251595,
+      "online": [
+        "1",
+        "10",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "bad": {},
+      "radio": {
+        "channel": 149,
+        "bandwidth_mhz": 40,
+        "radio_txpower_dbm": 18,
+        "downlink_mcs": 3,
+        "uplink_mcs": 4,
+        "uftp_rate_kbps": 15000,
+        "fec_k": 8,
+        "fec_n": 12,
+        "channel_width": "HT40+",
+        "guard_interval": "long"
+      }
+    }
+  ],
+  "final": {
+    "wall": 1794307887.9251595,
+    "online": [
+      "1",
+      "10",
+      "2",
+      "3",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "bad": {},
+    "radio": {
+      "channel": 149,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 15000,
+      "fec_k": 8,
+      "fec_n": 12,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    }
+  }
+}

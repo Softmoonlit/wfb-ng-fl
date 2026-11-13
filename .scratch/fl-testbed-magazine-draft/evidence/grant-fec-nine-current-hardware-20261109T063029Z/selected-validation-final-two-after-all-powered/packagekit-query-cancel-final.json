@@ -1,0 +1,112 @@
+{
+  "host": "fl02",
+  "returncode": 0,
+  "stdout": "{\"status\": \"cancel-rejected-or-post-cancel-block\", \"target\": \"/372_cbdeeced\", \"confirm\": true, \"before\": {\"label\": \"before-confirm\", \"wall\": 1794245572.539191, \"boot_id\": \"1a183917-61d1-4512-8967-4e790c118dcc\", \"transaction\": {\"call\": {\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\"}, \"raw_stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"raw_stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null}, \"properties\": {\"Role\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"value\": \"8\"}, \"Status\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"value\": \"8\"}, \"Percentage\": {\"call\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}, \"value\": \"0\"}, \"AllowCancel\": {\"call\": {\"returncode\": 0, \"stdout\": \"b true\\n\", \"stderr\": \"\"}, \"value\": \"true\"}}, \"apt_related\": [], \"locks\": {\"/var/lib/dpkg/lock-frontend\": {\"path\": \"/var/lib/dpkg/lock-frontend\", \"exists\": true, \"held\": false}, \"/var/lib/dpkg/lock\": {\"path\": \"/var/lib/dpkg/lock\", \"exists\": true, \"held\": false}, \"/var/lib/apt/lists/lock\": {\"path\": \"/var/lib/apt/lists/lock\", \"exists\": true, \"held\": false}, \"/var/cache/apt/archives/lock\": {\"path\": \"/var/cache/apt/archives/lock\", \"exists\": true, \"held\": false}}, \"service\": {\"returncode\": 0, \"stdout\": \"MainPID=1950\\nActiveState=active\\n\", \"stderr\": \"\"}}, \"cancel\": {\"returncode\": 1, \"stdout\": \"\", \"stderr\": \"Call failed: sender does not match (:1.194 vs :1.61)\\n\"}, \"cancel_accepted\": false, \"after_samples\": [], \"ao0\": false, \"post_clear\": false}\n",
+  "stderr": "",
+  "elapsed_seconds": 1.1341419219970703,
+  "remote": {
+    "status": "cancel-rejected-or-post-cancel-block",
+    "target": "/372_cbdeeced",
+    "confirm": true,
+    "before": {
+      "label": "before-confirm",
+      "wall": 1794245572.539191,
+      "boot_id": "1a183917-61d1-4512-8967-4e790c118dcc",
+      "transaction": {
+        "call": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/372_cbdeeced\"\n",
+          "stderr": ""
+        },
+        "raw_stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "raw_stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null
+      },
+      "properties": {
+        "Role": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "value": "8"
+        },
+        "Status": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "value": "8"
+        },
+        "Percentage": {
+          "call": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          },
+          "value": "0"
+        },
+        "AllowCancel": {
+          "call": {
+            "returncode": 0,
+            "stdout": "b true\n",
+            "stderr": ""
+          },
+          "value": "true"
+        }
+      },
+      "apt_related": [],
+      "locks": {
+        "/var/lib/dpkg/lock-frontend": {
+          "path": "/var/lib/dpkg/lock-frontend",
+          "exists": true,
+          "held": false
+        },
+        "/var/lib/dpkg/lock": {
+          "path": "/var/lib/dpkg/lock",
+          "exists": true,
+          "held": false
+        },
+        "/var/lib/apt/lists/lock": {
+          "path": "/var/lib/apt/lists/lock",
+          "exists": true,
+          "held": false
+        },
+        "/var/cache/apt/archives/lock": {
+          "path": "/var/cache/apt/archives/lock",
+          "exists": true,
+          "held": false
+        }
+      },
+      "service": {
+        "returncode": 0,
+        "stdout": "MainPID=1950\nActiveState=active\n",
+        "stderr": ""
+      }
+    },
+    "cancel": {
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Call failed: sender does not match (:1.194 vs :1.61)\n"
+    },
+    "cancel_accepted": false,
+    "after_samples": [],
+    "ao0": false,
+    "post_clear": false
+  },
+  "compile": {
+    "compile_ok": true,
+    "compile_filename": "remote",
+    "target_assignment": "TARGET='/372_cbdeeced'",
+    "raw_body_sha256": "b836657dd6ba2b889d95408e7ae5730300b9ffa2eed491cf0bc00c6b31f6f897",
+    "generated_code_sha256": "f8c9e01ea2c444fcb7ff63c2f89c45816ddf7398cec8916a91c81107e93f1373",
+    "remote_execution": false,
+    "wall": 1794245571.6103163
+  }
+}

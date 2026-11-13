@@ -1,0 +1,263 @@
+{
+  "status": "read-only-common-offline-diagnostic",
+  "wall": 1794305465.8631985,
+  "server": {
+    "host": "fl00",
+    "native": [
+      {
+        "pid": 6971,
+        "args": [
+          "/usr/bin/wfb_v6_uplink",
+          "--role",
+          "server",
+          "--tun-name",
+          "fl-s",
+          "--tun-addr",
+          "10.80.0.1/24",
+          "--node-id",
+          "255",
+          "--link-id",
+          "7669206",
+          "--uplink-stream",
+          "1",
+          "--downlink-stream",
+          "2",
+          "--fec-k",
+          "8",
+          "--fec-n",
+          "12",
+          "--radio-bandwidth",
+          "40",
+          "--radio-control-port",
+          "9200",
+          "--radio-mcs-index",
+          "3",
+          "--air-interface",
+          "wlxfca386b38672",
+          "--known-clients",
+          "1,2,3,4,5,6,7,8,9,10",
+          "--grant-duration-ms",
+          "30",
+          "--guard-interval-ms",
+          "5",
+          "--client-target",
+          "1:10.80.0.11:127.0.0.1:1",
+          "--client-target",
+          "2:10.80.0.12:127.0.0.1:1",
+          "--client-target",
+          "3:10.80.0.13:127.0.0.1:1",
+          "--client-target",
+          "4:10.80.0.14:127.0.0.1:1",
+          "--client-target",
+          "5:10.80.0.15:127.0.0.1:1",
+          "--client-target",
+          "6:10.80.0.16:127.0.0.1:1",
+          "--client-target",
+          "7:10.80.0.17:127.0.0.1:1",
+          "--client-target",
+          "8:10.80.0.18:127.0.0.1:1",
+          "--client-target",
+          "9:10.80.0.19:127.0.0.1:1",
+          "--client-target",
+          "10:10.80.0.20:127.0.0.1:1",
+          "--downlink-pause-threshold-bytes",
+          "131072",
+          "--downlink-resume-threshold-bytes",
+          "65536",
+          "--downlink-queue-packets-limit",
+          "64"
+        ],
+        "exe_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2"
+      }
+    ],
+    "control": {
+      "radio": [
+        1129270605,
+        0,
+        0,
+        0,
+        0,
+        40,
+        3,
+        0,
+        1
+      ],
+      "fec": [
+        1129270605,
+        0,
+        8,
+        12
+      ]
+    },
+    "native_source_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "installed_native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "server_service": {
+      "returncode": 0,
+      "stdout": "MainPID=6958\nExecMainStartTimestamp=Tue 2026-11-10 17:56:08 CST\nActiveState=active\nSubState=running\n",
+      "stderr": ""
+    },
+    "iw": {
+      "returncode": 0,
+      "stdout": "Interface wlxfca386b38672\n\tifindex 10\n\twdev 0x200000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "stderr": ""
+    },
+    "ip_addr": {
+      "returncode": 0,
+      "stdout": "[{\"ifindex\":11,\"ifname\":\"fl-s\",\"flags\":[\"POINTOPOINT\",\"MULTICAST\",\"NOARP\",\"UP\",\"LOWER_UP\"],\"mtu\":3982,\"qdisc\":\"pfifo_fast\",\"operstate\":\"UNKNOWN\",\"group\":\"default\",\"txqlen\":5000,\"link_type\":\"none\",\"addr_info\":[{\"family\":\"inet\",\"local\":\"10.80.0.1\",\"prefixlen\":24,\"scope\":\"global\",\"label\":\"fl-s\",\"valid_life_time\":4294967295,\"preferred_life_time\":4294967295}]}]\n",
+      "stderr": ""
+    },
+    "routes": {
+      "returncode": 0,
+      "stdout": "[{\"dst\":\"10.80.0.0/24\",\"protocol\":\"kernel\",\"scope\":\"link\",\"prefsrc\":\"10.80.0.1\",\"flags\":[]},{\"dst\":\"169.254.0.0/16\",\"scope\":\"link\",\"metric\":1000,\"flags\":[]}]\n",
+      "stderr": ""
+    },
+    "sockets": {
+      "tcp": {
+        "returncode": 0,
+        "stdout": "Netid State  Recv-Q Send-Q               Local Address:Port  Peer Address:PortProcess                                                  \nudp   UNCONN 0      0                       127.0.0.53:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=580,fd=13))               \nudp   UNCONN 0      0                          0.0.0.0:67         0.0.0.0:*    users:((\"dnsmasq\",pid=729,fd=3))                        \nudp   UNCONN 0      0                          0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=579,fd=5),(\"systemd\",pid=1,fd=57))\nudp   UNCONN 0      0                        10.80.0.1:53685      0.0.0.0:*    users:((\"python3\",pid=6958,fd=5))                       \nudp   UNCONN 0      0                        10.80.0.1:9001       0.0.0.0:*    users:((\"python3\",pid=6958,fd=4))                       \nudp   UNCONN 0      0                        127.0.0.1:9200       0.0.0.0:*    users:((\"wfb_v6_uplink\",pid=6971,fd=4))                 \nudp   UNCONN 0      0                          0.0.0.0:37929      0.0.0.0:*    users:((\"avahi-daemon\",pid=593,fd=14))                  \nudp   UNCONN 0      0                          0.0.0.0:5353       0.0.0.0:*    users:((\"avahi-daemon\",pid=593,fd=12))                  \nudp   UNCONN 0      0                                *:111              *:*    users:((\"rpcbind\",pid=579,fd=7),(\"systemd\",pid=1,fd=59))\nudp   UNCONN 0      0                                *:49570            *:*    users:((\"avahi-daemon\",pid=593,fd=15))                  \nudp   UNCONN 0      0      [fe80::212d:5c5e:f4b2:9e7a]:546              *:*    users:((\"NetworkManager\",pid=596,fd=33))                \nudp   UNCONN 0      0                                *:5353             *:*    users:((\"avahi-daemon\",pid=593,fd=13))                  \ntcp   LISTEN 0      5                    192.168.0.190:8080       0.0.0.0:*    users:((\"python3\",pid=6958,fd=7))                       \ntcp   LISTEN 0      4096                       0.0.0.0:631        0.0.0.0:*    users:((\"cupsd\",pid=2394,fd=8))                         \ntcp   LISTEN 0      4096                       0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=579,fd=4),(\"systemd\",pid=1,fd=56))\ntcp   LISTEN 0      128                        0.0.0.0:22         0.0.0.0:*    users:((\"sshd\",pid=1037,fd=3))                          \ntcp   LISTEN 0      5                        127.0.0.1:9090       0.0.0.0:*    users:((\"python3\",pid=6958,fd=6))                       \ntcp   LISTEN 0      4096                 127.0.0.53%lo:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=580,fd=14))               \ntcp   LISTEN 0      4096                          [::]:631           [::]:*    users:((\"cupsd\",pid=2394,fd=9))                         \ntcp   LISTEN 0      4096                          [::]:111           [::]:*    users:((\"rpcbind\",pid=579,fd=6),(\"systemd\",pid=1,fd=58))\ntcp   LISTEN 0      128                           [::]:22            [::]:*    users:((\"sshd\",pid=1037,fd=4))                          \n",
+        "stderr": ""
+      },
+      "udp": {
+        "returncode": 0,
+        "stdout": "State  Recv-Q Send-Q               Local Address:Port  Peer Address:PortProcess                                                  \nUNCONN 0      0                       127.0.0.53:53         0.0.0.0:*    users:((\"systemd-resolve\",pid=580,fd=13))               \nUNCONN 0      0                          0.0.0.0:67         0.0.0.0:*    users:((\"dnsmasq\",pid=729,fd=3))                        \nUNCONN 0      0                          0.0.0.0:111        0.0.0.0:*    users:((\"rpcbind\",pid=579,fd=5),(\"systemd\",pid=1,fd=57))\nUNCONN 0      0                        10.80.0.1:53685      0.0.0.0:*    users:((\"python3\",pid=6958,fd=5))                       \nUNCONN 0      0                        10.80.0.1:9001       0.0.0.0:*    users:((\"python3\",pid=6958,fd=4))                       \nUNCONN 0      0                        127.0.0.1:9200       0.0.0.0:*    users:((\"wfb_v6_uplink\",pid=6971,fd=4))                 \nUNCONN 0      0                          0.0.0.0:37929      0.0.0.0:*    users:((\"avahi-daemon\",pid=593,fd=14))                  \nUNCONN 0      0                          0.0.0.0:5353       0.0.0.0:*    users:((\"avahi-daemon\",pid=593,fd=12))                  \nUNCONN 0      0                                *:111              *:*    users:((\"rpcbind\",pid=579,fd=7),(\"systemd\",pid=1,fd=59))\nUNCONN 0      0                                *:49570            *:*    users:((\"avahi-daemon\",pid=593,fd=15))                  \nUNCONN 0      0      [fe80::212d:5c5e:f4b2:9e7a]:546              *:*    users:((\"NetworkManager\",pid=596,fd=33))                \nUNCONN 0      0                                *:5353             *:*    users:((\"avahi-daemon\",pid=593,fd=13))                  \n",
+        "stderr": ""
+      }
+    },
+    "interface_stats": {
+      "returncode": 0,
+      "stdout": "10: wlxfca386b38672: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 4052 qdisc mq state UP mode DEFAULT group default qlen 1000\n    link/ieee802.11/radiotap fc:a3:86:b3:86:72 brd ff:ff:ff:ff:ff:ff\n    RX:  bytes packets errors dropped  missed   mcast           \n             0    1219      0       6       0       0 \n    TX:  bytes packets errors dropped carrier collsns           \n        173900    1143      0   25355       0       0 \n",
+      "stderr": ""
+    },
+    "daemon_traceback": true,
+    "logs": {
+      "daemon": {
+        "returncode": 0,
+        "stdout": "2026-11-10T08:19:34+0800 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,496 [INFO] [client-daemon] 网卡 wlxfca386b38672 配置就绪 (信道=149, 功率索引=18)\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,497 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 12 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --air-interface wlxfca386b38672 --known-clients 1,2,3,4,5,6,7,8,9,10 --grant-duration-ms 30 --guard-interval-ms 5 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,564 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,565 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,569 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090\n2026-11-10T08:19:38+0800 fl00 python3[985]: 2026-11-10 08:19:38,575 [WARNING] [client-daemon] Management Web unavailable\n2026-11-10T08:19:38+0800 fl00 python3[985]: Traceback (most recent call last):\n2026-11-10T08:19:38+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-10T08:19:38+0800 fl00 python3[985]:     self.validate(self.host)\n2026-11-10T08:19:38+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 797, in <lambda>\n2026-11-10T08:19:38+0800 fl00 python3[985]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-10T08:19:38+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 374, in validate_management_address\n2026-11-10T08:19:38+0800 fl00 python3[985]:     raise ManagementAddressError('WEB_ADDRESS_NOT_ASSIGNED', '管理地址尚未分配到本机接口')\n2026-11-10T08:19:38+0800 fl00 python3[985]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址尚未分配到本机接口\n2026-11-10T08:19:39+0800 fl00 python3[985]: 2026-11-10 08:19:39,579 [WARNING] [client-daemon] Management Web unavailable\n2026-11-10T08:19:39+0800 fl00 python3[985]: Traceback (most recent call last):\n2026-11-10T08:19:39+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-10T08:19:39+0800 fl00 python3[985]:     self.validate(self.host)\n2026-11-10T08:19:39+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 797, in <lambda>\n2026-11-10T08:19:39+0800 fl00 python3[985]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-10T08:19:39+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 374, in validate_management_address\n2026-11-10T08:19:39+0800 fl00 python3[985]:     raise ManagementAddressError('WEB_ADDRESS_NOT_ASSIGNED', '管理地址尚未分配到本机接口')\n2026-11-10T08:19:39+0800 fl00 python3[985]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址尚未分配到本机接口\n2026-11-10T08:19:40+0800 fl00 python3[985]: 2026-11-10 08:19:40,581 [WARNING] [client-daemon] Management Web unavailable\n2026-11-10T08:19:40+0800 fl00 python3[985]: Traceback (most recent call last):\n2026-11-10T08:19:40+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-10T08:19:40+0800 fl00 python3[985]:     self.validate(self.host)\n2026-11-10T08:19:40+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 797, in <lambda>\n2026-11-10T08:19:40+0800 fl00 python3[985]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-10T08:19:40+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 374, in validate_management_address\n2026-11-10T08:19:40+0800 fl00 python3[985]:     raise ManagementAddressError('WEB_ADDRESS_NOT_ASSIGNED', '管理地址尚未分配到本机接口')\n2026-11-10T08:19:40+0800 fl00 python3[985]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址尚未分配到本机接口\n2026-11-10T08:19:41+0800 fl00 python3[985]: 2026-11-10 08:19:41,583 [WARNING] [client-daemon] Management Web unavailable\n2026-11-10T08:19:41+0800 fl00 python3[985]: Traceback (most recent call last):\n2026-11-10T08:19:41+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-10T08:19:41+0800 fl00 python3[985]:     self.validate(self.host)\n2026-11-10T08:19:41+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 797, in <lambda>\n2026-11-10T08:19:41+0800 fl00 python3[985]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-10T08:19:41+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 374, in validate_management_address\n2026-11-10T08:19:41+0800 fl00 python3[985]:     raise ManagementAddressError('WEB_ADDRESS_NOT_ASSIGNED', '管理地址尚未分配到本机接口')\n2026-11-10T08:19:41+0800 fl00 python3[985]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址尚未分配到本机接口\n2026-11-10T08:19:42+0800 fl00 python3[985]: 2026-11-10 08:19:42,586 [WARNING] [client-daemon] Management Web unavailable\n2026-11-10T08:19:42+0800 fl00 python3[985]: Traceback (most recent call last):\n2026-11-10T08:19:42+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 414, in _run\n2026-11-10T08:19:42+0800 fl00 python3[985]:     self.validate(self.host)\n2026-11-10T08:19:42+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py\", line 797, in <lambda>\n2026-11-10T08:19:42+0800 fl00 python3[985]:     lambda host: validate_management_address(host, self.config.tun_name, self.current_interface),\n2026-11-10T08:19:42+0800 fl00 python3[985]:   File \"/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/console_http.py\", line 374, in validate_management_address\n2026-11-10T08:19:42+0800 fl00 python3[985]:     raise ManagementAddressError('WEB_ADDRESS_NOT_ASSIGNED', '管理地址尚未分配到本机接口')\n2026-11-10T08:19:42+0800 fl00 python3[985]: wfb_ng.fl.console_http.ManagementAddressError: 管理地址尚未分配到本机接口\n2026-11-10T17:43:24+0800 fl00 python3[985]: 2026-11-10 17:43:24,506 [INFO] [client-daemon] 射频重配 PREPARE session=switch_6d78a68cfdb9452f9ee7fbc6b1db988b targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 157, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 12000}\n2026-11-10T17:43:31+0800 fl00 python3[985]: 2026-11-10 17:43:31,915 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_6d78a68cfdb9452f9ee7fbc6b1db988b channel=157\n2026-11-10T17:56:07+0800 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...\n2026-11-10T17:56:07+0800 fl00 python3[985]: 2026-11-10 17:56:07,662 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...\n2026-11-10T17:56:08+0800 fl00 python3[985]: 2026-11-10 17:56:08,016 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止\n2026-11-10T17:56:08+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.\n2026-11-10T17:56:08+0800 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.\n2026-11-10T17:56:08+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 57.200s CPU time.\n2026-11-10T17:56:08+0800 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.\n2026-11-10T17:56:11+0800 fl00 python3[6958]: 2026-11-10 17:56:11,718 [INFO] [client-daemon] 网卡 wlxfca386b38672 配置就绪 (信道=149, 功率索引=18)\n2026-11-10T17:56:11+0800 fl00 python3[6958]: 2026-11-10 17:56:11,718 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 12 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --air-interface wlxfca386b38672 --known-clients 1,2,3,4,5,6,7,8,9,10 --grant-duration-ms 30 --guard-interval-ms 5 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64\n2026-11-10T17:56:11+0800 fl00 python3[6958]: 2026-11-10 17:56:11,780 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000\n2026-11-10T17:56:11+0800 fl00 python3[6958]: 2026-11-10 17:56:11,781 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)\n2026-11-10T17:56:11+0800 fl00 python3[6958]: 2026-11-10 17:56:11,785 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090\n",
+        "stderr": ""
+      },
+      "kernel": {
+        "returncode": 0,
+        "stdout": "2026-11-10T08:19:33+0800 fl00 kernel: Bluetooth: BNEP filters: protocol multicast\n2026-11-10T08:19:33+0800 fl00 kernel: Bluetooth: BNEP socket layer initialized\n2026-11-10T08:19:33+0800 fl00 kernel: loop19: detected capacity change from 0 to 32768\n2026-11-10T08:19:33+0800 fl00 kernel: NET: Registered PF_ALG protocol family\n2026-11-10T08:19:34+0800 fl00 nv_nvsciipc_init.sh[774]: found /dev/nvsciipc\n2026-11-10T08:19:34+0800 fl00 kernel: nvsciipc: set_db start\n2026-11-10T08:19:34+0800 fl00 kernel: nvsciipc: set_db done\n2026-11-10T08:19:34+0800 fl00 kernel: Mass Storage Function, version: 2009/09/11\n2026-11-10T08:19:34+0800 fl00 kernel: LUN: removable file: (no medium)\n2026-11-10T08:19:34+0800 fl00 kernel: using random self ethernet address\n2026-11-10T08:19:34+0800 fl00 kernel: using random host ethernet address\n2026-11-10T08:19:34+0800 fl00 kernel: bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.\n2026-11-10T08:19:34+0800 fl00 kernel: usb0: HOST MAC 16:fd:dc:6d:67:90\n2026-11-10T08:19:34+0800 fl00 kernel: usb0: MAC 16:fd:dc:6d:67:91\n2026-11-10T08:19:34+0800 fl00 kernel: usb1: HOST MAC 16:fd:dc:6d:67:92\n2026-11-10T08:19:34+0800 fl00 kernel: usb1: MAC 16:fd:dc:6d:67:93\n2026-11-10T08:19:34+0800 fl00 kernel: tegra-xudc 3550000.usb: EP 0 (type: ctrl, dir: out) enabled\n2026-11-10T08:19:34+0800 fl00 kernel: enP8p1s0: 0xffff800008bb5000, 3c:6d:66:b5:0c:0b, IRQ 244\n2026-11-10T08:19:34+0800 fl00 kernel: l4tbr0: port 1(usb0) entered blocking state\n2026-11-10T08:19:34+0800 fl00 kernel: l4tbr0: port 1(usb0) entered disabled state\n2026-11-10T08:19:34+0800 fl00 kernel: device usb0 entered promiscuous mode\n2026-11-10T08:19:34+0800 fl00 kernel: pstore: Using crash dump compression: deflate\n2026-11-10T08:19:34+0800 fl00 kernel: printk: console [ramoops-1]: printing thread started\n2026-11-10T08:19:34+0800 fl00 kernel: printk: console [ramoops-1] enabled\n2026-11-10T08:19:34+0800 fl00 kernel: pstore: Registered ramoops as persistent store backend\n2026-11-10T08:19:34+0800 fl00 kernel: ramoops: using 0x200000@0x2725f0000, ecc: 0\n2026-11-10T08:19:34+0800 fl00 kernel: nvgpu: 17000000.gpu                  gk20a_scale_init:541  [INFO]  enabled scaling for GPU\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram0\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram1\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram2\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram3\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram4\n2026-11-10T08:19:34+0800 fl00 kernel: zram: Added device: zram5\n2026-11-10T08:19:34+0800 fl00 kernel: l4tbr0: port 2(usb1) entered blocking state\n2026-11-10T08:19:34+0800 fl00 kernel: l4tbr0: port 2(usb1) entered disabled state\n2026-11-10T08:19:34+0800 fl00 kernel: device usb1 entered promiscuous mode\n2026-11-10T08:19:34+0800 fl00 kernel: zram0: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: loop19: detected capacity change from 0 to 32768\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram0.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:34+0800 fl00 kernel: zram1: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram1.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:34+0800 fl00 kernel: zram2: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram2.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:34+0800 fl00 kernel: zram3: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram3.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:34+0800 fl00 kernel: zram4: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram4.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:34+0800 fl00 kernel: zram5: detected capacity change from 0 to 1300464\n2026-11-10T08:19:34+0800 fl00 kernel: Adding 650228k swap on /dev/zram5.  Priority:5 extents:1 across:650228k SS\n2026-11-10T08:19:36+0800 fl00 kernel: nvidia-modeset: Loading NVIDIA UNIX Open Kernel Mode Setting Driver for aarch64  540.4.0  Release Build  (buildbrain@mobile-u64-6336-d8000)  Tue Jan  7 17:35:14 PST 2025\n2026-11-10T08:19:36+0800 fl00 kernel: [drm] [nvidia-drm] [GPU ID 0x00020000] Loading driver\n2026-11-10T08:19:37+0800 fl00 kernel: NVRM rpcRmApiControl_dce: NVRM_RPC_DCE: Failed RM ctrl call cmd:0x731341 result 0xffff:\n2026-11-10T08:19:37+0800 fl00 kernel: [drm] Initialized nvidia-drm 0.0.0 20160202 for 13800000.display on minor 1\n2026-11-10T08:19:37+0800 fl00 kernel: nv_platform 13800000.display: [drm] Cannot find any crtc or sizes\n2026-11-10T08:19:38+0800 fl00 kernel: r8168: enP8p1s0: link up\n2026-11-10T08:19:38+0800 fl00 kernel: IPv6: ADDRCONF(NETDEV_CHANGE): enP8p1s0: link becomes ready\n2026-11-10T08:19:38+0800 fl00 kernel: device wlxfca386b38672 entered promiscuous mode\n2026-11-10T08:19:39+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:39+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:39+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:39+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:39+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:41+0800 fl00 kernel: rfkill: input handler disabled\n2026-11-10T08:19:42+0800 fl00 kernel: loop20: detected capacity change from 0 to 8\n2026-11-10T08:19:44+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:44+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:44+0800 fl00 kernel: audit: type=1326 audit(1794269984.621:2): auid=4294967295 uid=0 gid=0 ses=4294967295 subj=kernel pid=2394 comm=\"cupsd\" exe=\"/snap/cups/1274/sbin/cupsd\" sig=0 arch=c00000b7 syscall=55 compat=0 ip=0xffffa5707a4c code=0x50000\n2026-11-10T08:19:44+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:45+0800 fl00 kernel: audit: type=1326 audit(1794269985.525:3): auid=4294967295 uid=0 gid=0 ses=4294967295 subj=kernel pid=2394 comm=\"cupsd\" exe=\"/snap/cups/1274/sbin/cupsd\" sig=0 arch=c00000b7 syscall=55 compat=0 ip=0xffffa5707a4c code=0x50000\n2026-11-10T08:19:50+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:50+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:50+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:50+0800 fl00 kernel: ACK 04 d4\n2026-11-10T08:19:51+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:33+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:34+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:34+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:34+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:34+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:49+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:49+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:49+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:49+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:55:50+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:00+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:00+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:01+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:01+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:01+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:16+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:16+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:16+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:16+0800 fl00 kernel: ACK 04 d4\n2026-11-10T16:56:17+0800 fl00 kernel: ACK 04 d4\n2026-11-10T17:00:27+0800 fl00 kernel: loop20: detected capacity change from 0 to 112080\n2026-11-10T17:45:53+0800 fl00 kernel: usb 1-2.3: USB disconnect, device number 4\n2026-11-10T17:45:53+0800 fl00 kernel: device wlxfca386b38672 left promiscuous mode\n2026-11-10T17:45:54+0800 fl00 kernel: usb 1-2.3: new high-speed USB device number 5 using tegra-xusb\n2026-11-10T17:45:56+0800 fl00 kernel: rtl88xxau_wfb 1-2.3:1.0 wlxfca386b38672: renamed from wlan0\n2026-11-10T17:56:11+0800 fl00 kernel: device wlxfca386b38672 entered promiscuous mode\n",
+        "stderr": ""
+      },
+      "all_errors": {
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    "key_files": {
+      "/etc/wfb-ng-fl/server.json": {
+        "size": 985,
+        "sha256": "96d325b2ceb7bca3a98a6f341cd92de953942bc577b711e6da640eb8a162b117",
+        "content": "{\n  \"bandwidth_mhz\": 40,\n  \"channel\": 149,\n  \"downlink_mcs\": 3,\n  \"ipc_host\": \"127.0.0.1\",\n  \"ipc_port\": 9090,\n  \"known_clients\": [\n    1,\n    2,\n    3,\n    4,\n    5,\n    6,\n    7,\n    8,\n    9,\n    10\n  ],\n  \"model_library_dir\": \"/var/lib/wfb-ng-fl/models\",\n  \"radio_txpower_dbm\": 14,\n  \"tun_cidr\": \"10.80.0.1/24\",\n  \"tun_ip\": \"10.80.0.1\",\n  \"tun_name\": \"fl-s\",\n  \"tun_txqueuelen\": 5000,\n  \"uftp_rate_kbps\": 15000,\n  \"uplink_mcs\": 4,\n  \"web_host\": \"192.168.0.190\",\n  \"web_port\": 8080,\n  \"work_dir\": \"/srv/wfb-ng-fl/server\",\n  \"mnist_data_dir\": \"/srv/wfb-ng-fl/mnist\",\n  \"client_entry\": \"wfb_ng.fl.mnist_cnn_32_64:client_entry\",\n  \"aggregate_entry\": \"wfb_ng.fl.mnist_cnn_32_64:aggregate_entry\",\n  \"evaluate_entry\": \"wfb_ng.fl.mnist_cnn_32_64:evaluate_entry\",\n  \"algorithm_config\": {\n    \"data_seed\": 2026\n  },\n  \"preparation_timeout_seconds\": 300.0,\n  \"round_timeout_seconds\": 1800.0,\n  \"io_timeout_seconds\": 120.0,\n  \"grant_duration_ms\": 30,\n  \"guard_interval_ms\": 5,\n  \"fec_n\": 12\n}\n"
+      },
+      "/lib/systemd/system/wfb-fl-server-daemon.service": {
+        "size": 350,
+        "sha256": "1163486bdbae229b912d3c49b6e6696498c446219019c73e98f9c320b55aeb10",
+        "content": "[Unit]\nDescription=WFB-ng FL server persistent daemon\nAfter=network.target\nWants=network.target\n\n[Service]\nType=simple\nExecStart=/usr/bin/wfb-fl-server-daemon --ipc-host 127.0.0.1 --ipc-port 9090\nKillMode=control-group\nTimeoutStopSec=15s\nRestart=always\nRestartSec=3s\nStandardOutput=journal\nStandardError=journal\n\n[Install]\nWantedBy=multi-user.target\n"
+      }
+    },
+    "config_observation": {
+      "bandwidth_mhz": 40,
+      "channel": 149,
+      "downlink_mcs": 3,
+      "ipc_host": "127.0.0.1",
+      "ipc_port": 9090,
+      "known_clients": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "model_library_dir": "/var/lib/wfb-ng-fl/models",
+      "radio_txpower_dbm": 14,
+      "tun_cidr": "10.80.0.1/24",
+      "tun_ip": "10.80.0.1",
+      "tun_name": "fl-s",
+      "tun_txqueuelen": 5000,
+      "uftp_rate_kbps": 15000,
+      "uplink_mcs": 4,
+      "web_host": "192.168.0.190",
+      "web_port": 8080,
+      "work_dir": "/srv/wfb-ng-fl/server",
+      "mnist_data_dir": "/srv/wfb-ng-fl/mnist",
+      "client_entry": "wfb_ng.fl.mnist_cnn_32_64:client_entry",
+      "aggregate_entry": "wfb_ng.fl.mnist_cnn_32_64:aggregate_entry",
+      "evaluate_entry": "wfb_ng.fl.mnist_cnn_32_64:evaluate_entry",
+      "algorithm_config": {
+        "data_seed": 2026
+      },
+      "preparation_timeout_seconds": 300.0,
+      "round_timeout_seconds": 1800.0,
+      "io_timeout_seconds": 120.0,
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 12
+    }
+  },
+  "clients": [
+    {
+      "host": "fl01",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl01: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl02",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl02: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl03",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl03: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl05",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl05: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl06",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl06: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl07",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl07: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl08",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl08: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl09",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl09: Temporary failure in name resolution\n"
+    },
+    {
+      "host": "fl10",
+      "returncode": 255,
+      "result": null,
+      "stderr": "ssh: Could not resolve hostname fl10: Temporary failure in name resolution\n"
+    }
+  ],
+  "historical_success_server_actualargs": [],
+  "comparison_note": "Current server native args/source/native hashes and client native args compared with prior successful 40/5 startup; no secrets collected."
+}

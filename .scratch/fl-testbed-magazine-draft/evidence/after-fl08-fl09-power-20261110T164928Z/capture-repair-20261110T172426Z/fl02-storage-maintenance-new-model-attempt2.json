@@ -1,0 +1,36 @@
+{
+  "status": "blocked",
+  "reason": "selected_precondition_mismatch",
+  "host": "fl02",
+  "free_before": 553074688,
+  "selected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g10-d10-model/role/rounds/372d5927-3d0b-4160-9eb8-73b77d5121dd/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1098039,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794212827416050027,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g10-d10-model/role/rounds/372d5927-3d0b-4160-9eb8-73b77d5121dd/update.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1098041,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794212834408579628,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+      "exists": false
+    }
+  ]
+}

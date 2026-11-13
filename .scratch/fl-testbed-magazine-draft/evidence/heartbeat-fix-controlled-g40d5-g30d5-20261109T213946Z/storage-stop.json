@@ -1,0 +1,46 @@
+{
+  "status": "stopped",
+  "reason": "空间硬门槛未满足，且fl01/fl02无可授权精确成功重复件；不触碰B2保护失败/不完整材料",
+  "minimum_available_bytes": 536870912,
+  "before": {
+    "fl00": 55447535616,
+    "fl01": 410955776,
+    "fl02": 414330880,
+    "fl03": 2991386624,
+    "fl05": 586625024,
+    "fl06": 453849088,
+    "fl07": 2251067392,
+    "fl08": 814219264,
+    "fl09": 966537216,
+    "fl10": 924614656
+  },
+  "authorized_probe": {
+    "fl01": {
+      "available_bytes": 410542080,
+      "candidate_rows": 36,
+      "eligible_exact_success_duplicates": 0
+    },
+    "fl02": {
+      "available_bytes": 413884416,
+      "candidate_rows": 36,
+      "eligible_exact_success_duplicates": 0
+    },
+    "fl06": {
+      "available_bytes": 453427200,
+      "candidate_rows": 36,
+      "eligible_exact_success_duplicates": 36
+    }
+  },
+  "no_remote_delete_performed": true,
+  "archives_created": [
+    "storage-archive-fl01.json",
+    "storage-archive-fl02.json",
+    "storage-archive-fl06.json"
+  ],
+  "protected_run": "comm-rsmc20261109T060537Z-g30-d5-model",
+  "wall": 1794261181.710521,
+  "cache_readonly": "cache-readonly-summary.json",
+  "cache_cleanup_attempted": false,
+  "packagekit_hold": false,
+  "non_evidence_candidate_report": "/srv/wfb-ng-fl/install-cache on fl01/fl02; report only, no deletion"
+}

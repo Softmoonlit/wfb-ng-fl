@@ -1,0 +1,82 @@
+{
+  "批次": "heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+  "状态": "STOP：缓存维护部分完成，fl02存在PackageKit update-packages事务，continuation未开始，零模型",
+  "目的": "在230ms单次心跳ACK等待和10s持续失活门限均保持不变的前提下，对同一九客户端、同一软件/native/FEC/硬件执行40/5与30/5受控通信比较；不把结果解释为统计最优。",
+  "授权与冻结": {
+    "线上commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "fec": "RS(8,12)",
+    "heartbeat_ack_wait_ms": 230,
+    "heartbeat_silence_timeout_s": 10,
+    "硬件": "当前固定九端，不换硬件、不改15W及既有频率/功率限制"
+  },
+  "拓扑": {
+    "server": "fl00",
+    "clients": [1, 2, 3, 5, 6, 7, 8, 9, 10],
+    "excluded": [4],
+    "platform_slots": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  },
+  "固定通信条件": {
+    "基线信道": 149,
+    "测量信道": 157,
+    "bandwidth_mhz": 40,
+    "gi": "LGI (GET_RADIO short_gi=0)",
+    "driver_power_index": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 12000,
+    "model_bytes": 44770302,
+    "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "阶段顺序": [
+    {
+      "阶段": "完整只读准入",
+      "范围": "SSH、loaded identity、native唯一性、iw、GET_FEC/GET_RADIO(GI)、九端READY/IDLE、旧unit精确核查、全十端CPU/GPU/EMC频率与解锁状态、nvpmodel服务成功、jtop inactive、每端可用空间>=512MiB",
+      "失败": "立即停止，不执行任何模型；节点不可达不轮询等待"
+    },
+    {
+      "阶段": "40/5 gate",
+      "调度": "grant_duration_ms=40, guard_interval_ms=5",
+      "载荷": "一次1MiB smoke",
+      "失败": "STOP并恢复完整集合，不自动重试、不删端"
+    },
+    {
+      "阶段": "40/5模型",
+      "调度": "40/5",
+      "载荷": "44770302字节模型一次，单方向600秒",
+      "模型执行计数": 1
+    },
+    {
+      "阶段": "30/5控制模型",
+      "调度": "grant_duration_ms=30, guard_interval_ms=5",
+      "载荷": "同版本同期模型一次，单方向600秒",
+      "限制": "不追加30/5第二模型、不追加40/5第二模型；模型执行总数最多2"
+    }
+  ],
+  "比较限制": {
+    "旧参考": "旧30/5两轮307.240秒和302.049秒仅历史参考，不并入本批统计",
+    "本批限制": "40/5先测、30/5后测，存在顺序效应和时间漂移；各一次，不宣称统计最优",
+    "心跳": "本批不改230ms等待与10s门限；调度结果完成后才另行设计有界心跳预算验证"
+  },
+  "执行边界": {
+    "总边界秒": 3000,
+    "方向超时秒": 600,
+    "无自动重试": true,
+    "首个实质失败即STOP": true,
+    "完整恢复集合": true,
+    "不删除端": true,
+    "远端owner": "fl00/本agent，父agent不SSH"
+  },
+  "存储规则": {
+    "硬门槛字节": 536870912,
+    "允许回收": "仅已有授权、完整成功、严格size/SHA匹配且先归档元数据/日志的重复成功件",
+    "禁止": ["失败件", "partial", "日志本体", "广泛删除", "安装升级"],
+    "PackageKit": "如维护期间变更，使用既有完整finally恢复并留证"
+  },
+  "证据要求": {
+    "fresh_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+    "旧冻结材料": "只读，不改写",
+    "bundle": "canonical communication runner/node_agent/recover/check-all-ready，导入与full dependency verify后冻结review hashes",
+    "HUNTING_validACK": "仅从本批窗口及明确PID的既有日志/状态字段收集；不主动抓包、不改变方案"
+  }
+}

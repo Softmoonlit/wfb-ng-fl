@@ -1,0 +1,453 @@
+{
+  "host": "fl02",
+  "max_seconds": 180,
+  "poll_interval_seconds": 15,
+  "samples": [
+    {
+      "wall": 1794244769.4713755,
+      "elapsed_seconds": 1.1944007280001188,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244769.4995856}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244769.4995856
+      }
+    },
+    {
+      "wall": 1794244785.6539364,
+      "elapsed_seconds": 17.37696198200001,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244785.661463}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244785.661463
+      }
+    },
+    {
+      "wall": 1794244801.286341,
+      "elapsed_seconds": 33.00936632900016,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244801.2928827}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244801.2928827
+      }
+    },
+    {
+      "wall": 1794244817.2390816,
+      "elapsed_seconds": 48.962107193000065,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244817.244417}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244817.244417
+      }
+    },
+    {
+      "wall": 1794244832.9276798,
+      "elapsed_seconds": 64.65070545900016,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244832.9322925}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244832.9322925
+      }
+    },
+    {
+      "wall": 1794244848.4234035,
+      "elapsed_seconds": 80.14642926400006,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244848.4250388}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244848.4250388
+      }
+    },
+    {
+      "wall": 1794244864.4076123,
+      "elapsed_seconds": 96.13063759900001,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244864.4090335}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244864.4090335
+      }
+    },
+    {
+      "wall": 1794244880.68009,
+      "elapsed_seconds": 112.4031154390002,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244880.6731594}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244880.6731594
+      }
+    },
+    {
+      "wall": 1794244897.011681,
+      "elapsed_seconds": 128.73470667200013,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244897.0103078}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244897.0103078
+      }
+    },
+    {
+      "wall": 1794244912.976141,
+      "elapsed_seconds": 144.69916685400017,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244912.9729886}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244912.9729886
+      }
+    },
+    {
+      "wall": 1794244928.4265428,
+      "elapsed_seconds": 160.1495685760001,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244928.4278681}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244928.4278681
+      }
+    },
+    {
+      "wall": 1794244944.294915,
+      "elapsed_seconds": 176.0179406860002,
+      "host": "fl02",
+      "returncode": 0,
+      "stdout": "{\"returncode\": 0, \"stdout\": \"ao 1 \\\"/372_cbdeeced\\\"\\n\", \"stderr\": \"\", \"valid\": true, \"count\": 1, \"paths\": [\"/372_cbdeeced\"], \"parse_error\": null, \"transaction_properties\": {\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Status\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"Percentage\": {\"returncode\": 0, \"stdout\": \"u 0\\n\", \"stderr\": \"\"}}, \"wall\": 1794244944.2944117}\n",
+      "stderr": "",
+      "probe": {
+        "returncode": 0,
+        "stdout": "ao 1 \"/372_cbdeeced\"\n",
+        "stderr": "",
+        "valid": true,
+        "count": 1,
+        "paths": [
+          "/372_cbdeeced"
+        ],
+        "parse_error": null,
+        "transaction_properties": {
+          "Role": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Status": {
+            "returncode": 0,
+            "stdout": "u 8\n",
+            "stderr": ""
+          },
+          "Percentage": {
+            "returncode": 0,
+            "stdout": "u 0\n",
+            "stderr": ""
+          }
+        },
+        "wall": 1794244944.2944117
+      }
+    }
+  ],
+  "accepted": false,
+  "status": "ao-nonzero-after-180s"
+}

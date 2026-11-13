@@ -1,0 +1,72 @@
+{
+  "审计": "fl02 磁盘容量只读定位",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-fl02-restart-resume-20261109T1915Z",
+  "wall_time": "2026-11-09T19:15:10+08:00",
+  "host": "fl02",
+  "boot_id": "8831475d-7f89-458a-bfe5-e59bf8843eb4",
+  "ssh_reachable": true,
+  "remote_command_deadline_seconds": 24,
+  "df": {
+    "filesystem": "/dev/sda1",
+    "mount": "/",
+    "size_bytes": 29692346368,
+    "used_bytes": 27729035264,
+    "available_bytes": 513290240,
+    "use_percent": "99%",
+    "inodes_free": 1535347,
+    "inodes_use_percent": "18%"
+  },
+  "mounts": [
+    {"target": "/", "source": "/dev/sda1", "fstype": "ext4", "options": "rw,relatime"}
+  ],
+  "apt_archives": {
+    "deb_count": 27,
+    "deb_total_bytes": 8589940,
+    "scope": "仅/var/cache/apt/archives一级下载.deb计数和字节；未读内容"
+  },
+  "var_cache_depth1": {
+    "total_bytes": 169295872,
+    "notable_children": [
+      {"path": "/var/cache/apt", "bytes": 150396928},
+      {"path": "/var/cache/swcatalog", "bytes": 8568832},
+      {"path": "/var/cache/debconf", "bytes": 4747264},
+      {"path": "/var/cache/fontconfig", "bytes": 999424},
+      {"path": "/var/cache/man", "bytes": 757760}
+    ],
+    "scope": "一级du元数据统计；未删除"
+  },
+  "tmp_metadata": {
+    "entries": [
+      {"path": "/var/tmp/wfb-ticket09", "kind": "dir", "size_bytes": 4096, "metadata_only": true}
+    ],
+    "tmp_entries": [],
+    "filters": ["comm-*", "heartbeat-*", ".wfb-*", ".server-fec-*", "wfb-*"],
+    "scope": "仅明确通信/构建临时物元数据；未递归读取用户内容"
+  },
+  "srv_wfb_top_level_du": {
+    "total_bytes": 4690108416,
+    "notable_entries": [
+      {"path": "/srv/wfb-ng-fl/install-cache", "bytes": 832237568, "protected": true},
+      {"path": "/srv/wfb-ng-fl/client", "bytes": 356216832, "protected": true},
+      {"path": "/srv/wfb-ng-fl/releases", "bytes": 92741632, "protected": true},
+      {"path": "/srv/wfb-ng-fl/comm-fec12-apr-20261109T105004Z-t1-g30-d5-model", "bytes": 134393856, "protected": true},
+      {"path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model", "bytes": 134397952, "protected": true},
+      {"path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model", "bytes": 134397952, "protected": true},
+      {"path": "/srv/wfb-ng-fl/mnist", "bytes": 54968320, "protected": true},
+      {"path": "/srv/wfb-ng-fl/mnist-downloads", "bytes": 11620352, "protected": true}
+    ],
+    "scope": "仅/srv/wfb-ng-fl depth=1 du；未读取文件内容、未删除"
+  },
+  "protected_paths": [
+    "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+    "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model",
+    "/srv/wfb-ng-fl/comm-fec12-apr-20261109T105004Z-t1-g30-d5-model",
+    "/srv/wfb-ng-fl/install-cache",
+    "/srv/wfb-ng-fl/client",
+    "/srv/wfb-ng-fl/releases",
+    "/srv/wfb-ng-fl/mnist",
+    "/srv/wfb-ng-fl/mnist-downloads"
+  ],
+  "actions": {"deleted": false, "modified": false, "service_restarted": false, "journal_read": false, "secret_read": false, "env_dump": false, "compile_or_upgrade": false},
+  "conclusion": "未发现可在当前授权范围内自行删除的明确安全缓存项；512MiB门槛仍未满足，应停留在证并交父判断"
+}

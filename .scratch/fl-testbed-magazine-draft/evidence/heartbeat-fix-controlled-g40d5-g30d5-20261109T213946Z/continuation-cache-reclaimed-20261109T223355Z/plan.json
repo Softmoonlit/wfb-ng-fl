@@ -1,0 +1,51 @@
+{
+  "批次": "heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z",
+  "状态": "STOP：执行完成但恢复不完整，40/5模型通过，30/5模型submit超时，模型已用满2次",
+  "父批次": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+  "授权": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "fec": "8/12",
+    "heartbeat_ack_wait_ms": 230,
+    "heartbeat_silence_timeout_s": 10,
+    "topology": ["fl00", "fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "excluded": ["fl04"]
+  },
+  "固定条件": {
+    "baseline_channel": 149,
+    "measurement_channel": 157,
+    "bandwidth_mhz": 40,
+    "gi": "LGI",
+    "driver_power_index": 18,
+    "downlink_mcs": 3,
+    "uplink_mcs": 4,
+    "uftp_rate_kbps": 12000,
+    "model_bytes": 44770302,
+    "model_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "顺序": [
+    {"phase": "40/5 smoke", "grant_duration_ms": 40, "guard_interval_ms": 5, "kind": "1MiB gate", "execute": 1},
+    {"phase": "40/5 model", "grant_duration_ms": 40, "guard_interval_ms": 5, "kind": "44770302-byte model", "model_execute": 1},
+    {"phase": "30/5 model", "grant_duration_ms": 30, "guard_interval_ms": 5, "kind": "44770302-byte same-version control model", "model_execute": 1}
+  ],
+  "限制": {
+    "model_execute_max": 2,
+    "direction_timeout_seconds": 600,
+    "total_boundary_seconds": 3000,
+    "no_retry": true,
+    "first_substantive_failure_stop": true,
+    "no_node_drop": true,
+    "old_30_5_reference_not_pooled": true,
+    "no_heartbeat_budget_change": true,
+    "no_old_matrix_retest": ["10/10", "18/2"]
+  },
+  "fresh_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z",
+  "maintenance": {
+    "fl01_cache_archive_manifest": "../cache-archive-fl01-manifest.json",
+    "fl02_cache_archive_manifest": "../cache-archive-fl02-manifest.json",
+    "fl06_reclaim_manifest": "../fl06-reclaim-manifest.json",
+    "fl02_packagekit_final_state": "active/static",
+    "fl02_transaction_history": "/382_aaaadbca finished=false historical; no current GetTransactionList object at final read"
+  },
+  "stop_marker": "STOP is intentional until full admission succeeds"
+}

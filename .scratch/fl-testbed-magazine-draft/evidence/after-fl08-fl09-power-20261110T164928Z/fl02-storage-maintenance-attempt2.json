@@ -1,0 +1,135 @@
+{
+  "status": "complete",
+  "host": "fl02",
+  "wall_ns": 1794330681380494609,
+  "required_bytes": 671181818,
+  "free_before": 601268224,
+  "free_after": 690814976,
+  "target": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "selected": [
+    "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+    "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin"
+  ],
+  "deleted_rows": [
+    {
+      "before": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+        "exists": true,
+        "regular": true,
+        "size_bytes": 44770302,
+        "inode": 1096972,
+        "device": 2049,
+        "nlink": 1,
+        "mode": "0o100600",
+        "mtime_ns": 1794143512371289023,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "after": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+        "exists": false
+      },
+      "free_after": 646041600
+    },
+    {
+      "before": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+        "exists": true,
+        "regular": true,
+        "size_bytes": 44770302,
+        "inode": 1096974,
+        "device": 2049,
+        "nlink": 1,
+        "mode": "0o100600",
+        "mtime_ns": 1794143517379198903,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+      },
+      "after": {
+        "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+        "exists": false
+      },
+      "free_after": 690814976
+    }
+  ],
+  "protected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1097139,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430469211710,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1099239,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946721164527,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1099251,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771263227286,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "protected_after": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1097139,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794204430469211710,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-post-fl02-20261110T142107Z-model/role/rounds/21b2b57d-6f48-48af-9eea-e2d74c89a83c/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1099239,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794321946721164527,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-second-eight-model-20261110T150044Z-model/role/rounds/26d375cd-7c5a-478c-ae4d-c4802b176958/model.bin",
+      "exists": true,
+      "regular": true,
+      "size_bytes": 44770302,
+      "inode": 1099251,
+      "device": 2049,
+      "nlink": 1,
+      "mode": "0o100600",
+      "mtime_ns": 1794323771263227286,
+      "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+    }
+  ],
+  "old_reclamation_paths_reused": false,
+  "failed_attempts_deleted": false,
+  "source_success_evidence": "grant-fec-nine-20261108/after-power-restored/model-fec14-g10-d10/run-summary.json"
+}

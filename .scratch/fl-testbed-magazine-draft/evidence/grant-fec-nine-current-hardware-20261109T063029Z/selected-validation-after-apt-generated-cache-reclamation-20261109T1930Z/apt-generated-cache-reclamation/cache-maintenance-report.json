@@ -1,0 +1,45 @@
+{
+  "审计": "fl02 APT生成缓存精确维护结果",
+  "parent_guard_report": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-apt-generated-cache-reclamation-20261109T1930Z/apt-generated-cache-reclamation/guard-report.json",
+  "host": "fl02",
+  "boot_id": "8831475d-7f89-458a-bfe5-e59bf8843eb4",
+  "ssh_reachable": true,
+  "initial_service": {"active": "active", "enabled": "static", "main_pid": "1944"},
+  "stop_service": {"returncode": 0, "method": "systemctl stop packagekit.service"},
+  "after_stop_service": {"active": "inactive", "main_pid": "0"},
+  "restore_service": {"returncode": 0, "method": "systemctl start packagekit.service", "final_active": "active", "final_enabled": "static", "final_main_pid": "6111"},
+  "initial_true_package_processes": [],
+  "initial_packagekit_process": {"pid": "1944", "comm": "packagekitd", "args": "/usr/libexec/packagekitd"},
+  "locks_initial": {"/var/lib/dpkg/lock-frontend": false, "/var/lib/dpkg/lock": false, "/var/lib/apt/lists/lock": false, "/var/cache/apt/archives/lock": false},
+  "transaction_query": {
+    "interface": "org.freedesktop.PackageKit.GetTransactionList",
+    "raw_stdout": "ao 1 \"/363_ccdebcac\"",
+    "listed_object_count": 1,
+    "intended_guard": "no active transaction",
+    "guard_result": "FAILED",
+    "note": "该标准接口返回了一个事务对象；原脚本错误地只匹配完整/org/freedesktop/PackageKit/transactions/前缀，未识别/363_ccdebcac。"
+  },
+  "files_before": [
+    {"path": "/var/cache/apt/pkgcache.bin", "type": "regular", "is_symlink": false, "is_mount": false, "size_bytes": 70968211, "st_blocks": 138624, "inode": 1188614, "device": 2049, "mtime_ns": 1794223060138434064, "mode": "0o644"},
+    {"path": "/var/cache/apt/srcpkgcache.bin", "type": "regular", "is_symlink": false, "is_mount": false, "size_bytes": 70759897, "st_blocks": 138216, "inode": 1188606, "device": 2049, "mtime_ns": 1794223060026399633, "mode": "0o644"}
+  ],
+  "second_lstat_unchanged": true,
+  "exact_unlinks": [
+    {"path": "/var/cache/apt/pkgcache.bin", "deleted": true},
+    {"path": "/var/cache/apt/srcpkgcache.bin", "deleted": true}
+  ],
+  "files_after": [
+    {"path": "/var/cache/apt/pkgcache.bin", "exists": false},
+    {"path": "/var/cache/apt/srcpkgcache.bin", "exists": false}
+  ],
+  "apt_archives_deb": {"before_count": 27, "before_bytes": 8589940, "after_count": 27, "after_bytes": 8589940, "unchanged": true},
+  "df_before": {"available_bytes": 513019904, "free_inodes": 1535347, "use_percent": "99%"},
+  "df_after_unlink_and_final": {"available_bytes": 654757888, "free_inodes": 1535349, "use_percent": "98%"},
+  "other_paths_touched": false,
+  "apt_action": false,
+  "lists_touched": false,
+  "dpkg_database_touched": false,
+  "srv_touched": false,
+  "journal_touched": false,
+  "scope_issue": "事务列表存在一个对象，维护动作不应在该守门结果下继续；本报告明确保留该缺陷事实，后续不再远端动作，交父审阅。"
+}

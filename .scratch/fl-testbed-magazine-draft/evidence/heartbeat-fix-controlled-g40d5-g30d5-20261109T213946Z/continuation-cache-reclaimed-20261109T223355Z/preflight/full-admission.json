@@ -1,0 +1,139 @@
+{
+  "status": "passed",
+  "full_readonly_admission": true,
+  "check_all_ready": true,
+  "rows": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 53645012992,
+      "resident_schedule": "30/5"
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1240293376,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1101791232,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 2988085248,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 583921664,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1074569216,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1080340480,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 674381824,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 826642432,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 674979840,
+      "resident_schedule": "client"
+    },
+    {
+      "host": "fl00-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 53643636736
+    },
+    {
+      "host": "fl01-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1240154112
+    },
+    {
+      "host": "fl02-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1101651968
+    },
+    {
+      "host": "fl03-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 2987941888
+    },
+    {
+      "host": "fl05-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 583561216
+    },
+    {
+      "host": "fl06-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1074413568
+    },
+    {
+      "host": "fl07-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 1080209408
+    },
+    {
+      "host": "fl08-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 674222080
+    },
+    {
+      "host": "fl09-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 826482688
+    },
+    {
+      "host": "fl10-package-state",
+      "ok": true,
+      "errors": [],
+      "available_bytes": 674762752
+    }
+  ],
+  "errors": [],
+  "wall": 1794264225.5751662
+}

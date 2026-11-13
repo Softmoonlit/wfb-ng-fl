@@ -1,0 +1,75 @@
+{
+  "status": "control_admission_failed_before_payload",
+  "status_zh": "切频/控制准入失败，未发模型",
+  "schedule": "20/10",
+  "mode": "model",
+  "DL_seconds": null,
+  "UL_seconds": null,
+  "publish_hosts": [],
+  "submit_hosts": [],
+  "failed_phase": "PREPARE",
+  "unresponsive_nodes": [
+    5
+  ],
+  "host": "fl05",
+  "transaction_session": "switch_a1d6353024a14e95bc6e4db1d5bdd8f3",
+  "transaction_status": "rolled_back",
+  "effective_channel": 149,
+  "evidence": ".scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery/fec14-20261109T082509Z-g20-d10-model-after-exact-uftp-kernel-files.json",
+  "evidence_sha256": "8d9220f9131ba7feeff3a4c44376dc6ebf03be4acc92b2db41535f9cf53edcc7",
+  "transaction_facts": [
+    {
+      "host": "fl00",
+      "remote_log": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d10-model/facts.jsonl",
+      "fact": {
+        "event": "reconfigure_response",
+        "monotonic": 18188.462423156,
+        "response": {
+          "calibration": false,
+          "session_id": "switch_a1d6353024a14e95bc6e4db1d5bdd8f3",
+          "status": "rolled_back",
+          "target_channel": 157,
+          "applied_patch": {
+            "channel": 157,
+            "bandwidth_mhz": 40,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "radio_txpower_dbm": 18,
+            "uftp_rate_kbps": 12000
+          },
+          "failed_phase": "PREPARE",
+          "unresponsive_nodes": [
+            5
+          ],
+          "error_message": "节点缺失或准备失败: [5]",
+          "effective_config": {
+            "channel": 149,
+            "bandwidth_mhz": 40,
+            "radio_txpower_dbm": 18,
+            "downlink_mcs": 3,
+            "uplink_mcs": 4,
+            "uftp_rate_kbps": 15000,
+            "fec_k": 8,
+            "fec_n": 14,
+            "channel_width": "HT40+",
+            "guard_interval": "long"
+          },
+          "local_committed_config": null
+        },
+        "daemon_pid_after": 211892
+      }
+    },
+    {
+      "host": "fl00",
+      "remote_log": "/srv/wfb-ng-fl/comm-fec14-20261109T082509Z-g20-d10-model/facts.jsonl",
+      "fact": {
+        "event": "reconfigure_failure",
+        "monotonic": 18188.462867553,
+        "error": "RuntimeError('radio transaction unsuccessful')"
+      }
+    }
+  ],
+  "data_throughput_measured": false,
+  "retried": false,
+  "wall": 1794213870.791162
+}

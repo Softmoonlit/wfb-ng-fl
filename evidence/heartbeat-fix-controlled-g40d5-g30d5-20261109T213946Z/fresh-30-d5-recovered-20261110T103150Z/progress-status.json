@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "smoke-starting-unique-run-id",
+  "stage": "non-substantive-prepare-collision-preserved-before-actual-smoke",
+  "wall_utc": "2026-11-10T10:57:30Z",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z",
+  "owner": "fl00",
+  "transport": "local owner on fl00; parent does not SSH",
+  "usb": {"status": "REENUMERATED", "batch": "new-usb-connection", "netdev": "wlxfca386b38672", "mac": "fc:a3:86:b3:86:72", "driver": "rtl88xxau_wfb", "current_usb_port": "1-2.4", "historical_usb_port": "1-2.3", "usb_speed": "480", "post_success_new_71": 0, "post_success_new_disconnect": 0},
+  "server": {"systemd": "active/running", "native_pid": 8116, "api": "ready", "server_state": "IDLE", "active_job": null},
+  "ready_nodes": [1, 2, 3, 5, 6, 7, 8, 9, 10],
+  "excluded_nodes": [4],
+  "executions": {"smoke": 1, "smoke_collision_preflight": 1, "smoke_substantive": 0, "model": 0, "total": 1, "max_model": 1, "retry": 0},
+  "collision": {"status": "preserved-non-substantive", "run_id": "fresh30d5-smoke-20261110", "remote_existing_root": "/srv/wfb-ng-fl/comm-fresh30d5-smoke-20261110", "phase": "prepare", "dl_started": false, "ul_started": false, "model_started": false, "new_run_id": "fresh30d5-r103150-smoke-20261110"},
+  "dl": {"status": "not-started", "seconds": null, "completed": []},
+  "ul": {"status": "not-started", "seconds": null, "completed": [], "partial": {}},
+  "budget": {"total_seconds": 1800, "started_after_probe": true, "direction_seconds": 600},
+  "inputs": {"fresh_execute_run_id_revision": true, "py_compile": true, "no_source_or_native_change": true},
+  "next": "one unique actual smoke; stop on first substantive failure; model only after verified smoke"
+}

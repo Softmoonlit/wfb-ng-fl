@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "status": "STOP-rebind-hard-block-usb-enumeration",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-20261110T170213Z",
+  "topology": {"server": "fl00", "clients": ["fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"], "excluded": ["fl04"]},
+  "release": {"commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071", "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2", "fec": "8/12", "heartbeat_ack_wait_ms": 230, "heartbeat_silence_timeout_s": 10},
+  "execution": {
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "smoke_executions": 1,
+    "model_executions": 0,
+    "retry_count": 0,
+    "direction_timeout_seconds": 600,
+    "smoke_payload_bytes": 1048576,
+    "smoke_dl_seconds": 40.12763168799984,
+    "smoke_ul_seconds": 600,
+    "smoke_dl_hosts": ["fl00", "fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "smoke_ul_completed_hosts": ["fl01", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "smoke_ul_missing_hosts": ["fl02"],
+    "smoke_ul_partial": {"fl02": {"bytes": 786432, "expected_bytes": 1048576}},
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "runner_restore_ok": false,
+    "model_started": false,
+    "reason": "first substantive smoke gate failure at 600-second UL boundary; no model or retry"
+  },
+  "storage_maintenance": {
+    "manifest": "fl05-fl10-storage-candidate-review.json",
+    "delete_plan": "fl05-fl10-storage-delete-plan.json",
+    "result": "fl05-fl10-storage-maintenance-result.json",
+    "fl05": {"before_bytes": 368668672, "deleted_files": 18, "after_bytes": 1174474752, "target_reached": true},
+    "fl10": {"before_bytes": 549830656, "deleted_files": 12, "after_bytes": 1087041536, "target_reached": true},
+    "protected": ["one B2 rounds/model.bin per fl05/fl10", "one current 40/5 successful rounds/model.bin per fl05/fl10"],
+    "excluded": ["failure partials", "all logs/evidence", "real training", "install/APT", "unknown paths", "fl04"]
+  },
+  "failure_field": "smoke-failure-field.json",
+  "post_failure_fl02_readback": {
+    "observed_at_cutoff": "786432/1048576 partial in runner progress",
+    "final_read_only_listing": "model.bin and update.bin present at 1048576 bytes with smoke SHA; this later filesystem observation does not change transfer_verified=false",
+    "maintenance_action": "no deletion performed by fresh maintenance"
+  },
+  "recovery": {
+    "active_job_before_recovery": null,
+    "server": "149/HT40/LGI/index18/FEC8/12/30/5; active job null",
+    "service_restart": "client services then server, followed by one client-after-server restart",
+    "client_service_state": "active/running",
+    "registry_after_bounded_settle": "all nine participating clients OFFLINE",
+    "client_actual_channel_observation": {"149": ["fl06", "fl07", "fl09"], "153": ["fl01", "fl02", "fl03", "fl10"], "157": ["fl05", "fl08"]},
+    "full_nine_recovery_verified": false,
+    "uncertainty": "clients entered heartbeat hunt after server restart; no further infinite wait/restart or manual channel forcing performed",
+    "evidence": ["recovery-after-smoke-audit.json", "recovery-after-smoke-settled-gate.json", "client-after-server-settle.json", "client daemon journals collected read-only"]
+  },
+  "changes": [
+    "created fresh evidence and execution records",
+    "precisely removed only reviewed historical full-success duplicate payload files on fl05/fl10",
+    "performed standard client/server service restart recovery",
+    "did not change source/native/FEC/heartbeat budget/hardware",
+    "did not modify registry manually or run model"
+  ],
+  "wall": 1794304852
+}

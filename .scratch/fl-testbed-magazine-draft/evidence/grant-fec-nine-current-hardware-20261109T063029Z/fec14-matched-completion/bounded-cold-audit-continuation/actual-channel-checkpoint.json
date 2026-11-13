@@ -1,0 +1,207 @@
+{
+  "hosts": {
+    "fl00": [
+      {
+        "interface": "wlxfca386b38672",
+        "iw": "Interface wlxfca386b38672\n\tifindex 27\n\twdev 0x900000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 9\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl01": [
+      {
+        "interface": "wlxfc221c500bfe",
+        "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl02": [
+      {
+        "interface": "wlxfc221c300f04",
+        "iw": "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl03": [
+      {
+        "interface": "wlx5cffffaf6d8c",
+        "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl05": [
+      {
+        "interface": "wlxfc221c100157",
+        "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl06": [
+      {
+        "interface": "wlxfc221c300cbb",
+        "iw": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl07": [
+      {
+        "interface": "wlxfc221c300e99",
+        "iw": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl08": [
+      {
+        "interface": "wlxfc221c500a88",
+        "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl09": [
+      {
+        "interface": "wlx88e62852aae4",
+        "iw": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ],
+    "fl10": [
+      {
+        "interface": "wlxfc221c100119",
+        "iw": "Interface wlxfc221c100119\n\tifindex 22\n\twdev 0x600000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 6\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+        "channel": [
+          "149"
+        ],
+        "fec": [
+          1129270605,
+          0,
+          8,
+          14
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "host": "fl00",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl01",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl02",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl03",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl05",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl06",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl07",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl08",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl09",
+      "ok": true,
+      "errors": []
+    },
+    {
+      "host": "fl10",
+      "ok": true,
+      "errors": []
+    }
+  ],
+  "wall": 1794212448.5450654
+}

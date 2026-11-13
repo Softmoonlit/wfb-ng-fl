@@ -1,0 +1,679 @@
+{
+  "status": "stopped-before-execution",
+  "wall": 1794261181.7090833,
+  "authorization": {
+    "commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+    "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "fec": "8/12",
+    "heartbeat_ack_wait_ms": 230,
+    "heartbeat_silence_timeout_s": 10
+  },
+  "topology": {
+    "server": "fl00",
+    "clients": [
+      "fl01",
+      "fl02",
+      "fl03",
+      "fl05",
+      "fl06",
+      "fl07",
+      "fl08",
+      "fl09",
+      "fl10"
+    ],
+    "excluded": [
+      "fl04"
+    ]
+  },
+  "preflight": {
+    "ssh_all_ten_reachable": true,
+    "identity_all_ok": true,
+    "native_unique_all_ten": true,
+    "fec_all_8_12": true,
+    "gi_all_long": true,
+    "all_iw_baseline_149_ht40": true,
+    "all_ready_check": true,
+    "management_status": {
+      "server_state": "IDLE",
+      "active_job": null,
+      "ready_nodes": [
+        "1",
+        "2",
+        "3",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "offline_nodes": [
+        "4"
+      ]
+    },
+    "old_units_empty": true,
+    "routes_empty": true,
+    "packagekit_states": [
+      "ActiveState=active\nSubState=running\nUnitFileState=static"
+    ],
+    "storage_before": {
+      "fl00": 55447535616,
+      "fl01": 410955776,
+      "fl02": 414330880,
+      "fl03": 2991386624,
+      "fl05": 586625024,
+      "fl06": 453849088,
+      "fl07": 2251067392,
+      "fl08": 814219264,
+      "fl09": 966537216,
+      "fl10": 924614656
+    },
+    "identity_rows": [
+      {
+        "host": "fl00",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.server_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/server_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 12247,
+        "service_start_ticks": "633777"
+      },
+      {
+        "host": "fl01",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 5829,
+        "service_start_ticks": "620746"
+      },
+      {
+        "host": "fl02",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 7346,
+        "service_start_ticks": "624205"
+      },
+      {
+        "host": "fl03",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 5899,
+        "service_start_ticks": "638450"
+      },
+      {
+        "host": "fl05",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 5892,
+        "service_start_ticks": "637947"
+      },
+      {
+        "host": "fl06",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 7421,
+        "service_start_ticks": "637494"
+      },
+      {
+        "host": "fl07",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 7419,
+        "service_start_ticks": "636316"
+      },
+      {
+        "host": "fl08",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 9526,
+        "service_start_ticks": "636157"
+      },
+      {
+        "host": "fl09",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 7408,
+        "service_start_ticks": "629695"
+      },
+      {
+        "host": "fl10",
+        "identity_ok": true,
+        "manifest_commit": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+        "manifest_native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "manifest_file_count": 40,
+        "manifest_files_match": true,
+        "source_files_match": true,
+        "resolved_modules": {
+          "wfb_ng.fl.client_daemon": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/client_daemon.py",
+          "wfb_ng.fl.role": "/usr/local/lib/python3.10/dist-packages/wfb_ng/fl/role.py"
+        },
+        "service_pid": 7543,
+        "service_start_ticks": "637062"
+      }
+    ],
+    "host_rows": [
+      {
+        "host": "fl00",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          3,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802772 kB",
+          "MemAvailable": "5183000 kB",
+          "SwapTotal": "3901368 kB",
+          "SwapFree": "3901368 kB"
+        },
+        "storage_available_bytes": 55447535616,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl01",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802796 kB",
+          "MemAvailable": "6253344 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 410955776,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl02",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802800 kB",
+          "MemAvailable": "6289456 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 414330880,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl03",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802800 kB",
+          "MemAvailable": "6286088 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 2991386624,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl05",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802800 kB",
+          "MemAvailable": "6293516 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 586625024,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl06",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802800 kB",
+          "MemAvailable": "6220756 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 453849088,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl07",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802796 kB",
+          "MemAvailable": "6241884 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 2251067392,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl08",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802792 kB",
+          "MemAvailable": "6232848 kB",
+          "SwapTotal": "3901368 kB",
+          "SwapFree": "3901368 kB"
+        },
+        "storage_available_bytes": 814219264,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl09",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802800 kB",
+          "MemAvailable": "6212020 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 966537216,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      },
+      {
+        "host": "fl10",
+        "ssh_probe": true,
+        "service_active": true,
+        "native_count": 1,
+        "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+        "fec_get": [
+          1129270605,
+          0,
+          8,
+          12
+        ],
+        "radio_get": [
+          1129270605,
+          0,
+          0,
+          0,
+          0,
+          40,
+          4,
+          0,
+          1
+        ],
+        "iw": {
+          "channel_149": true,
+          "ht40": true,
+          "monitor": true,
+          "txpower_index18_readback": true
+        },
+        "power": "NV Power Mode: 15W\n0",
+        "meminfo": {
+          "MemTotal": "7802796 kB",
+          "MemAvailable": "6258796 kB",
+          "SwapTotal": "3901392 kB",
+          "SwapFree": "3901392 kB"
+        },
+        "storage_available_bytes": 924614656,
+        "old_units_empty": true,
+        "routes_empty": true,
+        "packagekit": "ActiveState=active\nSubState=running\nUnitFileState=static"
+      }
+    ],
+    "power_frequency_readonly": "power-readonly-summary.json",
+    "power_frequency_all_ok": true
+  },
+  "storage_gate": {
+    "minimum_available_bytes": 536870912,
+    "after_authorized_exact_probe": {
+      "fl01": {
+        "available_bytes": 410542080,
+        "candidate_rows": 36,
+        "eligible_exact_success_duplicates": 0
+      },
+      "fl02": {
+        "available_bytes": 413884416,
+        "candidate_rows": 36,
+        "eligible_exact_success_duplicates": 0
+      },
+      "fl06": {
+        "available_bytes": 453427200,
+        "candidate_rows": 36,
+        "eligible_exact_success_duplicates": 36
+      }
+    },
+    "eligible_fl01": 0,
+    "eligible_fl02": 0,
+    "eligible_fl06": 36,
+    "protected_failure_run": "comm-rsmc20261109T060537Z-g30-d5-model",
+    "result": "fail_fl01_fl02_below_512MiB_no_authorized_eligible_duplicate_remaining"
+  },
+  "execution": {
+    "smoke_gate_executed": false,
+    "model_executions": 0,
+    "model_limit": 2,
+    "remote_runner_started": false,
+    "remote_executor_count": 0,
+    "packagekit_changed": false,
+    "restore_required": false,
+    "model_result": null
+  },
+  "canonical_bundle": {
+    "bundle_sha256": "301194954d172c1ded82765738f6651df82324b0a63494357f447e28b453eb55",
+    "check_all_ready_sha256": "3cba1e22ad90a9d677a9d9de02018117577877abf5380fbbe4ed009abadaf5d2",
+    "local_imports": "runner/node_agent/recover imported under python3 -I -B",
+    "unit_tests": "59/59 passed"
+  }
+}

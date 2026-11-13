@@ -1,0 +1,165 @@
+{
+  "candidate": {
+    "phase": "g40-d5-smoke",
+    "mode": "smoke",
+    "grant": 40,
+    "guard": 5,
+    "execute_count": 1,
+    "run_id": "fec12-g40-d5-smoke-20261110",
+    "started_wall": 1794265494.6383953,
+    "stage": "g40-d5-smoke-execute",
+    "latest_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "OFFLINE",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 149
+      }
+    },
+    "last_phase": "cleanup",
+    "current_phase": "verify",
+    "upload_progress": {
+      "wall": 1794265511.8572092,
+      "monotonic": 22197.213197472,
+      "phase": "upload_progress",
+      "host": "fl00",
+      "ok": true,
+      "result": {
+        "nodes": [
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 1,
+            "bytes": 524288,
+            "partial_bytes": 524288,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 2,
+            "bytes": 196608,
+            "partial_bytes": 196608,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 3,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 5,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 6,
+            "bytes": null,
+            "partial_bytes": null,
+            "committed": false,
+            "observed": false
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 7,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 8,
+            "bytes": 589824,
+            "partial_bytes": 589824,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 9,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "15d868be-cdd1-4546-ad0d-50af0cdcbf88",
+            "node": 10,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          }
+        ],
+        "observation": "filesystem_snapshot",
+        "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+      }
+    },
+    "runner_returncode": 0,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/smoke-40-d5/fec12-g40-d5-smoke-20261110/progress.jsonl",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "elapsed": 35.104063091999706,
+    "final_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    }
+  },
+  "result": {
+    "wall": 1794265527.7483513,
+    "monotonic": 22213.104339002,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  }
+}

@@ -1,0 +1,124 @@
+test_acquire_routes_ht40_mcs4_12m_to_calibration_and_18m_to_ordinary (test_mock.MockTests) ... ok
+test_agent_rejects_commit_root_mismatch_before_reading_release (test_mock.MockTests) ... ok
+test_all_prepare_and_publish_overlap_then_submit (test_mock.MockTests) ... ok
+test_candidate_mcs_4_6_captures_baseline_3_4_then_verifies_candidate_and_restore (test_mock.MockTests) ... ok
+test_check_all_ready_fixed_scope_requires_all_ready_and_rejects_extra_four_and_ten (test_mock.MockTests) ... ok
+test_cleanup_retains_route_when_interface_identity_changes (test_mock.MockTests) ... ok
+test_cli_requires_manifest (test_mock.MockTests) ... usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model 模式要求 --model-manifest
+ok
+test_cli_requires_payload_before_any_process (test_mock.MockTests) ... usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: the following arguments are required: --native-sha
+ok
+test_client_resubmits_received_file_without_generation (test_mock.MockTests) ... ok
+test_complete_fixed_eight_client_scope_and_600_second_budgets (test_mock.MockTests) ... ok
+test_dispose_unblocks_actual_rpc_worker_without_deadline_wait (test_mock.MockTests) ... ok
+test_dry_run_never_starts_ssh (test_mock.MockTests) ... ok
+test_each_transfer_phase_records_dispatch_before_rpc (test_mock.MockTests) ... ok
+test_explicit_release_and_fec_metadata_reach_all_prepare_calls (test_mock.MockTests) ... ok
+test_failed_prepare_stops_all_test_actions (test_mock.MockTests) ... ok
+test_final_audit_requires_all_five_success_and_deadline (test_mock.MockTests) ... ok
+test_fixed_complete_topology_and_registry (test_mock.MockTests) ... ok
+test_fixed_eight_scope_rejects_missing_eight_extra_four_extra_ten_and_hunt_with_fresh_facts (test_mock.MockTests) ... ok
+test_get_fec_checks_command_peer_identity_return_code_and_active_values (test_mock.MockTests) ... ok
+test_get_radio_asserts_long_gi (test_mock.MockTests) ... ok
+test_independent_cleanup_requires_explicit_true_before_restore (test_mock.MockTests) ... ok
+test_independent_recovery_stops_only_owned_unit_on_every_host (test_mock.MockTests) ... ok
+test_manifest_initialization_validation (test_mock.MockTests) ... ok
+test_manifest_mismatch_rejected_before_ssh (test_mock.MockTests) ... usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest size mismatch
+usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest SHA mismatch
+usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: model manifest format mismatch
+ok
+test_missing_target_rejected_before_prepare (test_mock.MockTests) ... ok
+test_native_artifacts_all_match_explicit_expectation_with_no_fallback (test_mock.MockTests) ... ok
+test_native_candidate_metadata_defaults_and_overrides (test_mock.MockTests) ... ok
+test_native_sha_required_and_strict_before_any_process (test_mock.MockTests) ... ok
+test_node_final_audit_reads_actual_and_rejects_clock_or_pid_drift (test_mock.MockTests) ... ok
+test_node_prepare_accepts_expanded_radio_patch_before_payload_gate (test_mock.MockTests) ... ok
+test_payload_must_exist_and_be_nonempty (test_mock.MockTests) ... ok
+test_prepare_radio_baseline_rejects_candidate_or_drift_in_startup (test_mock.MockTests) ... ok
+test_prepare_rejects_uftp_hash_before_frozen_release_checks (test_mock.MockTests) ... ok
+test_prepare_source_identity_accepts_safe_nested_assets_and_checks_all_hashes (test_mock.MockTests) ... ok
+test_prepare_source_identity_with_build_identity_rejects_extra_missing_and_tampering (test_mock.MockTests) ... ok
+test_publish_failure_exits_and_recovers_without_waiting_for_peers (test_mock.MockTests) ... ok
+test_radio_cli_expanded_mcs_and_positive_rate (test_mock.MockTests) ... ok
+test_radio_request_carries_full_patch_and_targets (test_mock.MockTests) ... ok
+test_radio_request_rejects_incorrect_calibration_flag (test_mock.MockTests) ... ok
+test_registry_gate_preserves_rejected_node_snapshot (test_mock.MockTests) ... ok
+test_release_cli_maps_exact_commit_root_and_rejects_mismatch_before_processes (test_mock.MockTests) ... ok
+test_resident_candidate_argv_requires_fec_everywhere_and_server_schedule_only (test_mock.MockTests) ... ok
+test_server_copies_verified_real_bytes_before_publish (test_mock.MockTests) ... ok
+test_server_rejects_missing_update (test_mock.MockTests) ... ok
+test_smoke_dry_run_generates_exact_1mib_without_process (test_mock.MockTests) ... ok
+test_standard_release_checks_current_process_and_ignores_historical_loaded (test_mock.MockTests) ... ok
+test_start_receive_passes_configured_rate_to_server_role (test_mock.MockTests) ... ok
+test_start_receive_rejects_actual_server_rate_mismatch (test_mock.MockTests) ... ok
+test_streamed_metadata_and_integrity_reject_wrong_sha_or_size (test_mock.MockTests) ... ok
+test_submit_wait_keeps_absolute_deadline (test_mock.MockTests) ... ok
+test_submit_wait_samples_every_five_seconds_without_threads (test_mock.MockTests) ... ok
+test_uftp_identity_does_not_require_version_probe_output_or_success (test_mock.MockTests) ... ok
+test_uftp_identity_records_actual_which_paths_hashes_and_binary_versions (test_mock.MockTests) ... ok
+test_uftp_identity_rejects_missing_or_changed_tools_including_same_version (test_mock.MockTests) ... ok
+test_uftp_pins_match_fl00_503 (test_mock.MockTests) ... ok
+test_unit_uses_same_node_deadline_as_prepare (test_mock.MockTests) ... ok
+test_unreviewed_execution_does_not_start_ssh (test_mock.MockTests) ... usage: runner [-h] (--payload PAYLOAD | --smoke)
+              [--model-manifest MODEL_MANIFEST] [--execute]
+              [--reviewed-sha REVIEWED_SHA] [--channel {149,157}]
+              [--bandwidth-mhz {20,40}] --native-sha NATIVE_SHA
+              [--release-root RELEASE_ROOT] [--release-commit RELEASE_COMMIT]
+              [--fec-n {12,14}] [--grant-duration-ms GRANT_DURATION_MS]
+              [--guard-interval-ms GUARD_INTERVAL_MS] [--downlink-mcs {3,4}]
+              [--uplink-mcs {4,6}] [--uftp-rate-kbps KBIT/S] [--run-id RUN_ID]
+              [--output OUTPUT]
+runner: error: --execute 要求 --reviewed-sha 与当前 bundle SHA 完全匹配
+ok
+test_upload_sampling_command_is_bounded_and_only_local_run_root (test_mock.MockTests) ... ok
+test_upload_scanner_real_files_missing_cleanup_and_isolation (test_mock.MockTests) ... ok
+
+----------------------------------------------------------------------
+Ran 59 tests in 0.476s
+
+OK

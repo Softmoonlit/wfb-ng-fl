@@ -1,0 +1,26 @@
+{
+  "status": "blocked_insufficient_eligible_capacity_on_fl01",
+  "deleted_count": 0,
+  "hosts": [
+    {
+      "host": "fl01",
+      "available_bytes": 5505024,
+      "possible_deletion_count": 32,
+      "possible_release_upper_bound": 1432752128,
+      "available_after_upper_bound": 1438257152,
+      "shortfall_even_if_all_sha_match": 172355584
+    },
+    {
+      "host": "fl02",
+      "available_bytes": 651206656,
+      "possible_deletion_count": 32,
+      "possible_release_upper_bound": 1432760320,
+      "available_after_upper_bound": 2083966976,
+      "shortfall_even_if_all_sha_match": 0
+    }
+  ],
+  "full10_baseline": true,
+  "nine_ready": true,
+  "no_tests_after_stop": true,
+  "wall": 1794206938.9102666
+}

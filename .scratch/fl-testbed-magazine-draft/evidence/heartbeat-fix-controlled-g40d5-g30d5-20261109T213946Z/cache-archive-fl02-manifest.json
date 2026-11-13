@@ -1,0 +1,219 @@
+{
+  "status": "complete-deleted-wheel-deb",
+  "host": "fl02",
+  "source_cache": "/srv/wfb-ng-fl/install-cache",
+  "install_artifact_manifest": {
+    "remote_path": "/srv/wfb-ng-fl/install-cache/install-artifact-manifest.json",
+    "size_bytes": 893,
+    "sha256": "93600718c83a044d352b1248292a2433baf2546e288475e1baaf66da79dd4122",
+    "content": {
+      "torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl": "6f75fd2d2ef840ede1a90dbcf40a5458214bee26cc803fa510cda2e8978d972a",
+      "filelock-3.20.0-py3-none-any.whl": "339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2",
+      "fsspec-2025.12.0-py3-none-any.whl": "8bf1fe301b7d8acfa6e8571e3b1c3d158f909666642431cc78a1b7b4dbc5ec5b",
+      "mpmath-1.3.0-py3-none-any.whl": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "networkx-3.4.2-py3-none-any.whl": "df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f",
+      "sympy-1.13.1-py3-none-any.whl": "db36cdc64bf61b9b24578b6f7bab1ecdd2452cf008f34faa33776680c26d66f8",
+      "typing_extensions-4.15.0-py3-none-any.whl": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548",
+      "libcusparselt0-direct_0.7.1.0-1_arm64.deb": "43b6c9fcccf6e0d2f86b0981d591d49f4c724c10b6b63dceee6bda8299bc8965"
+    }
+  },
+  "files": [
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/filelock-3.20.0-py3-none-any.whl",
+      "relative": "filelock-3.20.0-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 16054,
+      "remote_sha256": "339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/filelock-3.20.0-py3-none-any.whl",
+      "local_size_bytes": 16054,
+      "local_sha256": "339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/filelock-3.20.0-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/filelock-3.20.0-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/filelock-3.20.0-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/filelock-3.20.0-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 16054,
+        "sha256": "339b4732ffda5cd79b13f4e2711a31b0365ce445d95d243bb996273d072546a2",
+        "available_bytes": 269893632,
+        "available_inodes": 1534939
+      },
+      "deleted_wall": 1794263592.3568096
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/fsspec-2025.12.0-py3-none-any.whl",
+      "relative": "fsspec-2025.12.0-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 201422,
+      "remote_sha256": "8bf1fe301b7d8acfa6e8571e3b1c3d158f909666642431cc78a1b7b4dbc5ec5b",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/fsspec-2025.12.0-py3-none-any.whl",
+      "local_size_bytes": 201422,
+      "local_sha256": "8bf1fe301b7d8acfa6e8571e3b1c3d158f909666642431cc78a1b7b4dbc5ec5b",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/fsspec-2025.12.0-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/fsspec-2025.12.0-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/fsspec-2025.12.0-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/fsspec-2025.12.0-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 201422,
+        "sha256": "8bf1fe301b7d8acfa6e8571e3b1c3d158f909666642431cc78a1b7b4dbc5ec5b",
+        "available_bytes": 270098432,
+        "available_inodes": 1534940
+      },
+      "deleted_wall": 1794263593.246333
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+      "relative": "libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+      "manifest_listed": true,
+      "remote_size_bytes": 2600922,
+      "remote_sha256": "43b6c9fcccf6e0d2f86b0981d591d49f4c724c10b6b63dceee6bda8299bc8965",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+      "local_size_bytes": 2600922,
+      "local_sha256": "43b6c9fcccf6e0d2f86b0981d591d49f4c724c10b6b63dceee6bda8299bc8965",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/libcusparselt0-direct_0.7.1.0-1_arm64.deb > /srv/wfb-ng-fl/install-cache/libcusparselt0-direct_0.7.1.0-1_arm64.deb && sha256sum /srv/wfb-ng-fl/install-cache/libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/libcusparselt0-direct_0.7.1.0-1_arm64.deb",
+        "deleted": true,
+        "size_bytes": 2600922,
+        "sha256": "43b6c9fcccf6e0d2f86b0981d591d49f4c724c10b6b63dceee6bda8299bc8965",
+        "available_bytes": 272699392,
+        "available_inodes": 1534941
+      },
+      "deleted_wall": 1794263594.1231163
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/mpmath-1.3.0-py3-none-any.whl",
+      "relative": "mpmath-1.3.0-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 536198,
+      "remote_sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/mpmath-1.3.0-py3-none-any.whl",
+      "local_size_bytes": 536198,
+      "local_sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/mpmath-1.3.0-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/mpmath-1.3.0-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/mpmath-1.3.0-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/mpmath-1.3.0-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 536198,
+        "sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+        "available_bytes": 273235968,
+        "available_inodes": 1534942
+      },
+      "deleted_wall": 1794263595.0156035
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/networkx-3.4.2-py3-none-any.whl",
+      "relative": "networkx-3.4.2-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 1723263,
+      "remote_sha256": "df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/networkx-3.4.2-py3-none-any.whl",
+      "local_size_bytes": 1723263,
+      "local_sha256": "df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/networkx-3.4.2-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/networkx-3.4.2-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/networkx-3.4.2-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/networkx-3.4.2-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 1723263,
+        "sha256": "df5d4365b724cf81b8c6a7312509d0c22386097011ad1abe274afd5e9d3bbc5f",
+        "available_bytes": 274952192,
+        "available_inodes": 1534943
+      },
+      "deleted_wall": 1794263595.9232714
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+      "relative": "numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+      "manifest_listed": false,
+      "remote_size_bytes": 13946528,
+      "remote_sha256": "7903ba8ab592b82014713c491f6c5d3a1cde5b4a3bf116404e08f5b52f6daf43",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+      "local_size_bytes": 13946528,
+      "local_sha256": "7903ba8ab592b82014713c491f6c5d3a1cde5b4a3bf116404e08f5b52f6daf43",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl > /srv/wfb-ng-fl/install-cache/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl && sha256sum /srv/wfb-ng-fl/install-cache/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/numpy-1.23.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl",
+        "deleted": true,
+        "size_bytes": 13946528,
+        "sha256": "7903ba8ab592b82014713c491f6c5d3a1cde5b4a3bf116404e08f5b52f6daf43",
+        "available_bytes": 288894976,
+        "available_inodes": 1534944
+      },
+      "deleted_wall": 1794263596.8688068
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/sympy-1.13.1-py3-none-any.whl",
+      "relative": "sympy-1.13.1-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 6189177,
+      "remote_sha256": "db36cdc64bf61b9b24578b6f7bab1ecdd2452cf008f34faa33776680c26d66f8",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/sympy-1.13.1-py3-none-any.whl",
+      "local_size_bytes": 6189177,
+      "local_sha256": "db36cdc64bf61b9b24578b6f7bab1ecdd2452cf008f34faa33776680c26d66f8",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/sympy-1.13.1-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/sympy-1.13.1-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/sympy-1.13.1-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/sympy-1.13.1-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 6189177,
+        "sha256": "db36cdc64bf61b9b24578b6f7bab1ecdd2452cf008f34faa33776680c26d66f8",
+        "available_bytes": 295088128,
+        "available_inodes": 1534945
+      },
+      "deleted_wall": 1794263597.7456393
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+      "relative": "torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 806950107,
+      "remote_sha256": "6f75fd2d2ef840ede1a90dbcf40a5458214bee26cc803fa510cda2e8978d972a",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+      "local_size_bytes": 806950107,
+      "local_sha256": "6f75fd2d2ef840ede1a90dbcf40a5458214bee26cc803fa510cda2e8978d972a",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl > /srv/wfb-ng-fl/install-cache/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl && sha256sum /srv/wfb-ng-fl/install-cache/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/torch-2.5.0a0+872d972e41.nv24.08-cp310-cp310-linux_aarch64.whl",
+        "deleted": true,
+        "size_bytes": 806950107,
+        "sha256": "6f75fd2d2ef840ede1a90dbcf40a5458214bee26cc803fa510cda2e8978d972a",
+        "available_bytes": 1102041088,
+        "available_inodes": 1534946
+      },
+      "deleted_wall": 1794263600.9041886
+    },
+    {
+      "remote_path": "/srv/wfb-ng-fl/install-cache/typing_extensions-4.15.0-py3-none-any.whl",
+      "relative": "typing_extensions-4.15.0-py3-none-any.whl",
+      "manifest_listed": true,
+      "remote_size_bytes": 44614,
+      "remote_sha256": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548",
+      "local_archive": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/typing_extensions-4.15.0-py3-none-any.whl",
+      "local_size_bytes": 44614,
+      "local_sha256": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548",
+      "restore_command": "cat /home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02/typing_extensions-4.15.0-py3-none-any.whl > /srv/wfb-ng-fl/install-cache/typing_extensions-4.15.0-py3-none-any.whl && sha256sum /srv/wfb-ng-fl/install-cache/typing_extensions-4.15.0-py3-none-any.whl",
+      "status": "deleted_exact_archived_duplicate",
+      "deletion_result": {
+        "path": "/srv/wfb-ng-fl/install-cache/typing_extensions-4.15.0-py3-none-any.whl",
+        "deleted": true,
+        "size_bytes": 44614,
+        "sha256": "f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548",
+        "available_bytes": 1102082048,
+        "available_inodes": 1534947
+      },
+      "deleted_wall": 1794263601.7950485
+    }
+  ],
+  "archive_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fl02",
+  "wall": 1794263541.110316,
+  "packagekit_stop": "not_performed",
+  "unlink_guard": "GetTransactionList empty, no install-cache fd, no apt/dpkg process, no locks",
+  "deleted_count": 9,
+  "available_bytes": 1102082048,
+  "last_action": "/srv/wfb-ng-fl/install-cache/typing_extensions-4.15.0-py3-none-any.whl",
+  "finished_wall": 1794263601.7973342
+}

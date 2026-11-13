@@ -1,0 +1,10 @@
+{
+  "start_wall": 1794207287.660939,
+  "deadline_wall": 1794210587.6609395,
+  "stage_limit_seconds": 3300,
+  "scope": "after-space-recovery; model only 40/10 then60/10, each once; max2 execute; no small resend; no FEC12",
+  "prior_storage_failure_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining",
+  "cleanup_result": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/result.json",
+  "run_prefix": "as20261109T065447Z",
+  "prior_small_passed": true
+}

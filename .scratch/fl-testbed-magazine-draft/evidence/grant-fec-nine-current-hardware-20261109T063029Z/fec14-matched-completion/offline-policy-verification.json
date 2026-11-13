@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "case": "正常日志",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "case": "中文退出码",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "case": "英文退出码",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "case": "磁盘不足",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "case": "系统空间不足",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "case": "磁盘错误编号",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "case": "普通传输超时",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "case": "普通非八退出码",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    }
+  ],
+  "candidate_count": 4,
+  "max_executions": 8,
+  "worker_imported_or_started": false,
+  "remote_or_live_HTTP_actions": 0,
+  "scope": "仅在临时目录以合成日志核验故障分类，未运行传输或发布"
+}

@@ -1,0 +1,9 @@
+host=fl09 boot=f4dc7ed0-48a4-464e-b03b-470d9644682f
+processes
+   5840       1 S sudo -n timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+   5841    5840 S timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+   5842    5841 S /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+   6207       1 S sudo -n timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+   6208    6207 S timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+   6209    6208 S /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+candidate_files

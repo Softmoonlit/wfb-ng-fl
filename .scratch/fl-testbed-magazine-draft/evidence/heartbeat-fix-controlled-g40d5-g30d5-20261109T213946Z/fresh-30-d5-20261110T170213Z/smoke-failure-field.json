@@ -1,0 +1,97 @@
+{
+  "run_id": "fresh30d5-smoke-20261110",
+  "final": {
+    "wall": 1794304451.4771724,
+    "monotonic": 3564.075291008,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "latest_upload_progress": {
+    "wall": 1794304439.084078,
+    "monotonic": 3551.682197067,
+    "phase": "upload_progress",
+    "host": "fl00",
+    "ok": true,
+    "result": {
+      "nodes": [
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 1,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 2,
+          "bytes": 786432,
+          "partial_bytes": 786432,
+          "committed": false,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 3,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 5,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 6,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 7,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 8,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 9,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        },
+        {
+          "round": "5b34171b-a11b-4941-9c6e-fdd1bf8381d7",
+          "node": 10,
+          "bytes": 1048576,
+          "partial_bytes": null,
+          "committed": true,
+          "observed": true
+        }
+      ],
+      "observation": "filesystem_snapshot",
+      "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+    }
+  },
+  "protected": "no partial/model files deleted"
+}

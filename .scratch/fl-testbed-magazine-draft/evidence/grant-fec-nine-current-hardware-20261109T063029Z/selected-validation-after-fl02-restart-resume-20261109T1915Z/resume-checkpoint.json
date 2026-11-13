@@ -1,0 +1,15 @@
+{
+  "阶段": "prepared-zero-execute",
+  "用户事件": "fl02断电后重启",
+  "分类": "供电基础设施中断，不是FEC/调度性能失败",
+  "父_trial1": {"run_id": "fec12-apr-20261109T105004Z-t1-g30-d5-model", "DL": 70.35788756499824, "UL": 391.3104754929991, "flags": {"transfer_verified": true, "cleanup_ok": false, "restore_ok": true}},
+  "父_trial2_execute": 0,
+  "新_execute": 0,
+  "新_run_ids": [],
+  "old_STOP_preserved": true,
+  "owner": "fl00 / current general-purpose worker",
+  "bounded_fl02_startup_seconds": 180,
+  "cold_redeploy": false,
+  "remote_actions": 0,
+  "created_wall": "2026-11-09T19:15:05+08:00"
+}

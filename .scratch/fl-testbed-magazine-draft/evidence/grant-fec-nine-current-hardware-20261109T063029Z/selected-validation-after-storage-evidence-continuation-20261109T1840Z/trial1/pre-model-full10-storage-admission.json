@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "minimum_available_bytes": 536870912,
+  "agent_cleanup_target_bytes": 1073741824,
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "available_bytes": 57267154944,
+        "available_inodes": 6684512,
+        "total_bytes": 123887923200
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "available_bytes": 652709888,
+        "available_inodes": 1535305,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "available_bytes": 651509760,
+        "available_inodes": 1535367,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "available_bytes": 3504820224,
+        "available_inodes": 1591996,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "available_bytes": 1100087296,
+        "available_inodes": 1572301,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "available_bytes": 967401472,
+        "available_inodes": 1607898,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "available_bytes": 2819035136,
+        "available_inodes": 1608377,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "available_bytes": 746344448,
+        "available_inodes": 1608316,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "available_bytes": 847933440,
+        "available_inodes": 1608186,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "available_bytes": 1384529920,
+        "available_inodes": 1629281,
+        "total_bytes": 29692346368
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794221440.8079424
+}

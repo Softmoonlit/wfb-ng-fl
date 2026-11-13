@@ -1,0 +1,22 @@
+{
+  "reason": "fl07 management lost before full-ten actual/nine-READY gate",
+  "wall": 1794225327.469666,
+  "pid": 439530,
+  "status": "stopped",
+  "execute_count": 0,
+  "model_transfer_started": false,
+  "model_files_sent": false,
+  "parameter_failure": false,
+  "power_event": {
+    "host": "fl10",
+    "confirmed": true,
+    "boot_id": "37d66fe9-0101-4033-866e-2e2ca8f09e18",
+    "not_parameter_failure": true
+  },
+  "management_boundary": {
+    "host": "fl07",
+    "registry": "OFFLINE",
+    "ssh_error": "No route to host",
+    "automatic_retry": false
+  }
+}

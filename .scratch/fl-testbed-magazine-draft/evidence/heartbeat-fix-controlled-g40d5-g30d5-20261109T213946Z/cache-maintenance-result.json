@@ -1,0 +1,43 @@
+{
+  "status": "STOP-maintenance-partial-fl02-active-update",
+  "wall": 1794262602.9276512,
+  "archive_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/cache-archive/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z",
+  "fl01": {
+    "cache_reclaim": "complete",
+    "archive_manifest": "cache-archive-fl01-manifest.json",
+    "files_deleted": 9,
+    "bytes_deleted": 832208285,
+    "available_bytes": 1241387008,
+    "remaining_cache_files": [
+      "install-artifact-manifest.json",
+      "install-client.py"
+    ],
+    "restore_commands_recorded": true
+  },
+  "fl02": {
+    "cache_reclaim": "blocked_actual_packagekit_update",
+    "available_bytes": 270729216,
+    "cache_untouched": true,
+    "evidence": "cache-maintenance-fl02-packagekit-journal.txt",
+    "install_process_not_killed": true,
+    "packagekit_original_state_restored_or_unchanged": "active/static",
+    "transaction_id": "/382_aaaadbca",
+    "transaction_role": "update-packages",
+    "journal": "cache-maintenance-fl02-packagekit-journal.txt",
+    "download_failure_lines": 559
+  },
+  "fl06": {
+    "success_duplicate_reclaim": "complete",
+    "manifest": "fl06-reclaim-manifest.json",
+    "files_deleted": 17,
+    "available_bytes": 1075736576,
+    "target_bytes": 1073741824,
+    "failure_partial_log_b2_untouched": true
+  },
+  "packagekit_hold": false,
+  "packagekit_service_changed": false,
+  "full_group_space_gate": false,
+  "full_admission_started": false,
+  "runner_started": false,
+  "model_executions": 0
+}

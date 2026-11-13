@@ -1,0 +1,286 @@
+{
+  "candidate": {
+    "grant_duration_ms": 40,
+    "guard_interval_ms": 10,
+    "fec_n": 14,
+    "mode": "smoke",
+    "stage": "execute",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g40-d10-smoke",
+    "execute_count": 1,
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      }
+    },
+    "runner_last_phase": "cleanup",
+    "runner_last_monotonic": 10667.163680348,
+    "currentphase": "verify",
+    "completed_hosts": {
+      "publish": [
+        "fl08",
+        "fl07",
+        "fl09",
+        "fl10",
+        "fl02",
+        "fl01",
+        "fl05",
+        "fl06",
+        "fl03",
+        "fl00"
+      ],
+      "submit": [
+        "fl03",
+        "fl02",
+        "fl09",
+        "fl05",
+        "fl01",
+        "fl06",
+        "fl07",
+        "fl10",
+        "fl08",
+        "fl00"
+      ]
+    },
+    "client_upload_progress": {
+      "wall": 1794205974.530533,
+      "monotonic": 10664.491558733,
+      "phase": "upload_progress",
+      "host": "fl00",
+      "ok": true,
+      "result": {
+        "nodes": [
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 1,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 2,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 3,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 5,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 6,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 7,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 8,
+            "bytes": 851968,
+            "partial_bytes": 851968,
+            "committed": false,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 9,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          },
+          {
+            "round": "2ee5920c-306e-4c97-acff-92fc23927252",
+            "node": 10,
+            "bytes": 1048576,
+            "partial_bytes": null,
+            "committed": true,
+            "observed": true
+          }
+        ],
+        "observation": "filesystem_snapshot",
+        "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+      }
+    },
+    "hunt_events": [
+      {
+        "wall": 1794205956.5053632,
+        "node": "8",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      },
+      {
+        "wall": 1794205961.5288446,
+        "node": "10",
+        "readiness": "CONNECTING",
+        "reported_state": "HUNTING",
+        "channel": 157
+      }
+    ],
+    "runner_returncode": 0,
+    "runner_restore_ok": true,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/fec14-g40-d10-smoke/gf20261109T063029Z-g40-d10-smoke/progress.jsonl",
+    "elapsed": 55.192505622999306,
+    "DLduration": 8.639830727999652,
+    "ULduration": 27.365239820999705,
+    "failures": [],
+    "original_runner_final_flags": {
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true
+    },
+    "server_verified_files": {
+      "1": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/1/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "2": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/2/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "3": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/3/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "5": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/5/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "6": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/6/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "7": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/7/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "8": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/8/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "9": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/9/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      },
+      "10": {
+        "path": "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke/role/rounds/2ee5920c-306e-4c97-acff-92fc23927252/updates/10/update.bin",
+        "size_bytes": 1048576,
+        "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58"
+      }
+    },
+    "phase_completion_seconds": {
+      "publish": {
+        "fl08": 7.4945020909999585,
+        "fl07": 7.496361112000159,
+        "fl09": 7.498988213999837,
+        "fl10": 7.503477857000689,
+        "fl02": 7.507644741001059,
+        "fl01": 7.5130662780011335,
+        "fl05": 7.516116494000016,
+        "fl06": 7.5204567260007025,
+        "fl03": 7.575377298000603,
+        "fl00": 8.639830727999652
+      },
+      "submit": {
+        "fl03": 6.512755523001033,
+        "fl02": 6.603460665999592,
+        "fl09": 7.692589770000268,
+        "fl05": 9.999023686001237,
+        "fl01": 10.522171820000949,
+        "fl06": 11.43836187800116,
+        "fl07": 12.367825798999547,
+        "fl10": 14.627548997001213,
+        "fl08": 27.356835746000797,
+        "fl00": 27.365239820999705
+      }
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794205984.4976761,
+    "monotonic": 10674.458701075,
+    "phase": "result",
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true
+  }
+}

@@ -1,0 +1,90 @@
+[
+  {
+    "node": 1,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 2,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c300f04\n\tifindex 6\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 3,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 5,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c100157\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 6,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 7,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 8,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlxfc221c500a88\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  },
+  {
+    "node": 9,
+    "ok": true,
+    "readiness": "READY",
+    "iw": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+    "error": ""
+  }
+]
+==========================================================
+>>> 开始 Profile 2 (HT20) 第 1 轮模型闭环: profile2-model-r1-20261112T115429Z <<<
+>>> 参数: 20 MHz (HT20), 信道 157, DL MCS 3 / UL MCS 4, 注入 6000 Kbps
+>>> 时间: 2026-11-12T11:54:29Z
+==========================================================
+>>> 正在抓取传输前日志快照...
+>>> 正在生成传输过程丢包率与 FEC 纠错率统计报告...
+### 1. 下行传输统计 (Server -> Clients, 广播)
+| 客户端 | 原始接收包数 | 有效输出包数 | FEC恢复包数 | FEC恢复率 | 最终丢失包数 | 最终丢包率 |
+|---|---:|---:|---:|---:|---:|---:|
+| fl01 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl02 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl03 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl05 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl06 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl07 | 0 | 0 | 0 | 0.00% | 0 | 0.00% |
+| fl08 | 21641128 | 4617375 | 1291872 | 12.03% | 6125084 | 57.02% |
+| fl09 | 397958 | 88253 | 22882 | 14.35% | 71213 | 44.66% |
+
+### 2. 上行传输统计 (Clients -> Server, 并发单播)
+| 客户端 | 原始接收包数 | 有效输出包数 | FEC恢复包数 | FEC恢复率 | 最终丢失包数 | 最终丢包率 |
+|---|---:|---:|---:|---:|---:|---:|
+| fl01 | 2525 | 291 | 120 | 22.22% | 249 | 46.11% |
+| fl02 | 72691 | 12089 | 6691 | 39.85% | 4701 | 28.00% |
+| fl03 | 78181 | 12096 | 6203 | 36.17% | 5053 | 29.47% |
+| fl05 | 77499 | 12040 | 6684 | 39.76% | 4770 | 28.38% |
+| fl06 | 1024 | 110 | 89 | 41.20% | 106 | 49.07% |
+| fl07 | 72707 | 12090 | 6132 | 34.37% | 5752 | 32.24% |
+| fl08 | 71166 | 12068 | 6471 | 35.79% | 6011 | 33.25% |
+| fl09 | 73150 | 12053 | 6114 | 34.39% | 5728 | 32.21% |
+>>> 第 1 轮结束，returncode=3
+ERROR: 第 1 轮验收失败！

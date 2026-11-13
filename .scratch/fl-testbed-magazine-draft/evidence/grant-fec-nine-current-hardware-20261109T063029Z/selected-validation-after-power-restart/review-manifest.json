@@ -1,0 +1,40 @@
+{
+  "说明": "供电重启后独立批次的本地审阅 manifest；不含自身，运行前逐项 SHA 校验。",
+  "constraints": {
+    "commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+    "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+    "bundle_sha": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "model_bytes": 44770302,
+    "model_sha": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "fec": "8/12",
+    "schedule": "30/5",
+    "direction_seconds": 600,
+    "overall_seconds": 1290,
+    "stage_seconds": 4500,
+    "topology": ["fl00", "fl01", "fl02", "fl03", "fl05", "fl06", "fl07", "fl08", "fl09", "fl10"],
+    "excluded": ["fl04"]
+  },
+  "files": {
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/README.md": "3994407c16e1e676eb00afbce8967f775be495527ef9b26a37f1c9f65475e14b",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/plan.json": "28adf152d798e141f925e4d9627d47a9d32860a7c3f3d222dd697de19f7256f9",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/worker.py": "3a19eedb1a745292cd136f16cbb859aec09aa11a55950adc980eb32a07c22851",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/driver-base.py": "8cc5256bccc19fec4f9e1f00744d317e080f733733892b0bb2cbd49813d8540e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/helpers.py": "4c8acccf52b7b9f377c775b9e445baba435068a14dbf855151d29ac28a2417cf",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/storage.py": "b9db716055d0411a47afd2f42b35f718e728d8203f633ea27e1a952399de7bb4",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/node_agent.py": "772557fc3524ea8b3d1404a0456c567e9667e1436232b837791c330632d6f5cc",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/hardware-from-actual.json": "f4a57b05f0fbfa9a128f139ee81980eb31778ceeefd015435fb0513d5efaafcc",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/fl05-power-event.json": "9ad164d971fd4042c132c4f7ce7d1036c72432bb1b8252b925e1097facfe85c8",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-power-restart/restart-recovery/checkpoint-start.json": "9e87b83e974b2e198317ade5c75f137543b5c1ff37f32d36a408c72186aede6a",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial2/command.json": "3efefca1c06d276a7da473794bcde3987bf1487deb5e545a9e74477b80e219fe",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial2/run-summary.json": "9732816eaf5110e28d69550134795adcf67ce18e023f5c4fb70c7e88444bb62e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial2/runner.log": "ed02e8724632ddcc96bf6446cc2fc3e781885bc96c1483f9d4f3a3110f9380aa",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/STOP": "37564af40197f50ab0edc210498be4145e0ceff28dbd706323d079e18371263e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/node_agent.py": "772557fc3524ea8b3d1404a0456c567e9667e1436232b837791c330632d6f5cc",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/model-sized-four-20261106T173222Z/model-manifest.json": "d617615c5a9ef3009378f41fe96c3e9fa2b67335e2e0db82c520bd2d616f070d"
+  }
+}

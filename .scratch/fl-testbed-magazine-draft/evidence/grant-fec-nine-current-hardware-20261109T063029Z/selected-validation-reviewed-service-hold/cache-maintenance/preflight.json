@@ -1,0 +1,74 @@
+{
+  "host": "fl02",
+  "boot_id": "1a183917-61d1-4512-8967-4e790c118dcc",
+  "service": {
+    "active": "active",
+    "enabled": "static",
+    "main_pid": "4891",
+    "command": {
+      "returncode": 0,
+      "stdout": "MainPID=4891\nActiveState=active\nUnitFileState=static\n",
+      "stderr": ""
+    }
+  },
+  "apt_processes": [],
+  "packagekit_processes": [
+    {
+      "pid": "4891",
+      "argv": [
+        "/usr/libexec/packagekitd"
+      ]
+    }
+  ],
+  "locks": {
+    "/var/lib/dpkg/lock-frontend": {
+      "path": "/var/lib/dpkg/lock-frontend",
+      "exists": true,
+      "held": false
+    },
+    "/var/lib/dpkg/lock": {
+      "path": "/var/lib/dpkg/lock",
+      "exists": true,
+      "held": false
+    },
+    "/var/lib/apt/lists/lock": {
+      "path": "/var/lib/apt/lists/lock",
+      "exists": true,
+      "held": false
+    },
+    "/var/cache/apt/archives/lock": {
+      "path": "/var/cache/apt/archives/lock",
+      "exists": true,
+      "held": false
+    }
+  },
+  "files": {
+    "/var/cache/apt/pkgcache.bin": {
+      "path": "/var/cache/apt/pkgcache.bin",
+      "exists": false
+    },
+    "/var/cache/apt/srcpkgcache.bin": {
+      "path": "/var/cache/apt/srcpkgcache.bin",
+      "exists": false
+    }
+  },
+  "free": {
+    "available_bytes": 579473408,
+    "free_inodes": 1535341
+  },
+  "wall": 1794245947.6994176,
+  "transaction": {
+    "command": {
+      "returncode": 0,
+      "stdout": "ao 0\n",
+      "stderr": ""
+    },
+    "raw_stdout": "ao 0\n",
+    "raw_stderr": "",
+    "valid": true,
+    "count": 0,
+    "paths": []
+  },
+  "label": "before-stop-readonly",
+  "local_wall": 1794245947.8513916
+}

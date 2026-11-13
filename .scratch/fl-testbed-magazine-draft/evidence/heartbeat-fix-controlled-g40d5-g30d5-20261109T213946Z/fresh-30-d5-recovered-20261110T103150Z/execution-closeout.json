@@ -1,0 +1,26 @@
+{
+  "status": "STOP",
+  "error": "RuntimeError(\"smoke gate failed: {'mode': 'smoke', 'run_id': 'replug30d5-20261110T103150Z-smoke', 'returncode': 1, 'transfer_verified': False, 'cleanup_ok': True, 'restore_ok': False, 'elapsed_seconds': 40.059328305000236, 'final': {'wall': 1794308314.5950484, 'monotonic': 7427.193166711, 'phase': 'result', 'transfer_verified': False, 'cleanup_ok': True, 'restore_ok': False}, 'progress_path': '/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z/newsmoke-30-d5/replug30d5-20261110T103150Z-smoke/progress.jsonl'}\")",
+  "smoke": {
+    "mode": "smoke",
+    "run_id": "replug30d5-20261110T103150Z-smoke",
+    "returncode": 1,
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false,
+    "elapsed_seconds": 40.059328305000236,
+    "final": {
+      "wall": 1794308314.5950484,
+      "monotonic": 7427.193166711,
+      "phase": "result",
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/fresh-30-d5-recovered-20261110T103150Z/newsmoke-30-d5/replug30d5-20261110T103150Z-smoke/progress.jsonl"
+  },
+  "model": null,
+  "model_executions": 0,
+  "smoke_executions": 1,
+  "wall": 1794308315.5035145
+}

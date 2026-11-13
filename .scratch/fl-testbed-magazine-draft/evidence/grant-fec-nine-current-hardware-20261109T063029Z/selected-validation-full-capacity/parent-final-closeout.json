@@ -1,0 +1,35 @@
+{
+  "status": "stopped-before-model-payload",
+  "runner_invocations": 1,
+  "model_payload_executions": 0,
+  "trial2_executed": false,
+  "original_flags": {
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  },
+  "failure": "切换157后，服务端registry_gate未满足节点8的READY/IDLE/无错误条件；尚未发布或提交模型",
+  "independent_actual_recovery_passed": true,
+  "independent_nine_ready_passed": true,
+  "actual_audit": "parent-post-stop-actual-audit.json",
+  "ready_gate": "parent-post-stop-ready",
+  "packagekit_restored": {
+    "host": "fl02",
+    "returncode": 0,
+    "stdout": "{\"action\": \"start\", \"action_returncode\": 0, \"action_stderr\": \"\", \"active\": \"active\", \"enabled\": \"static\", \"main_pid\": \"6685\", \"active_ok\": true, \"enabled_ok\": true}\n",
+    "stderr": "",
+    "result": {
+      "action": "start",
+      "action_returncode": 0,
+      "action_stderr": "",
+      "active": "active",
+      "enabled": "static",
+      "main_pid": "6685",
+      "active_ok": true,
+      "enabled_ok": true
+    },
+    "ok": true
+  },
+  "active_executor_pids": [],
+  "wall": 1794246499.6098623
+}

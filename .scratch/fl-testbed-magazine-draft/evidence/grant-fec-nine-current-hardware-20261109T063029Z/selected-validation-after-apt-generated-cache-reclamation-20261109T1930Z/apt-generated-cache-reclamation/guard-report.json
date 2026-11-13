@@ -1,0 +1,55 @@
+{
+  "host": "fl02",
+  "boot_id": "8831475d-7f89-458a-bfe5-e59bf8843eb4",
+  "uptime": "667.10 3674.01",
+  "files": [
+    {
+      "path": "/var/cache/apt/pkgcache.bin",
+      "exists": true,
+      "type": "regular",
+      "is_symlink": false,
+      "is_mount": false,
+      "size_bytes": 70968211,
+      "st_blocks": 138624,
+      "inode": 1188614,
+      "device": 2049,
+      "mtime_ns": 1794223060138434064,
+      "mode": "0o644"
+    },
+    {
+      "path": "/var/cache/apt/srcpkgcache.bin",
+      "exists": true,
+      "type": "regular",
+      "is_symlink": false,
+      "is_mount": false,
+      "size_bytes": 70759897,
+      "st_blocks": 138216,
+      "inode": 1188606,
+      "device": 2049,
+      "mtime_ns": 1794223060026399633,
+      "mode": "0o644"
+    }
+  ],
+  "apt_processes": [
+    {"pid": "1944", "comm": "packagekitd", "args": "/usr/libexec/packagekitd"}
+  ],
+  "locks": [
+    {"path": "/var/lib/dpkg/lock-frontend", "held": false},
+    {"path": "/var/lib/dpkg/lock", "held": false},
+    {"path": "/var/lib/apt/lists/lock", "held": false},
+    {"path": "/var/cache/apt/archives/lock", "held": false}
+  ],
+  "guard": {
+    "all_regular_nonsymlink_nonmount": true,
+    "no_apt_process": false,
+    "no_lock_holder": true,
+    "safe_to_unlink": false
+  },
+  "action": {
+    "deleted": false,
+    "modified": false,
+    "service_restarted": false,
+    "apt_action": false
+  },
+  "reason_stopped": "packagekitd运行，APT/dpkg无运行进程守门不满足；不扩大范围、不杀进程、不删除缓存"
+}

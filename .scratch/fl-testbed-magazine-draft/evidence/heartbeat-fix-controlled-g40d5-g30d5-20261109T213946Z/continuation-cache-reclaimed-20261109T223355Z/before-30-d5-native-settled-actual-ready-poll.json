@@ -1,0 +1,984 @@
+{
+  "passed": true,
+  "attempts": [
+    {
+      "wall": 1794265967.949947,
+      "rows": [
+        {
+          "host": "fl00",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "server",
+                  "--tun-name",
+                  "fl-s",
+                  "--tun-addr",
+                  "10.80.0.1/24",
+                  "--node-id",
+                  "255",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "3",
+                  "--air-interface",
+                  "wlxfca386b38672",
+                  "--known-clients",
+                  "1,2,3,4,5,6,7,8,9,10",
+                  "--grant-duration-ms",
+                  "30",
+                  "--guard-interval-ms",
+                  "5",
+                  "--client-target",
+                  "1:10.80.0.11:127.0.0.1:1",
+                  "--client-target",
+                  "2:10.80.0.12:127.0.0.1:1",
+                  "--client-target",
+                  "3:10.80.0.13:127.0.0.1:1",
+                  "--client-target",
+                  "4:10.80.0.14:127.0.0.1:1",
+                  "--client-target",
+                  "5:10.80.0.15:127.0.0.1:1",
+                  "--client-target",
+                  "6:10.80.0.16:127.0.0.1:1",
+                  "--client-target",
+                  "7:10.80.0.17:127.0.0.1:1",
+                  "--client-target",
+                  "8:10.80.0.18:127.0.0.1:1",
+                  "--client-target",
+                  "9:10.80.0.19:127.0.0.1:1",
+                  "--client-target",
+                  "10:10.80.0.20:127.0.0.1:1",
+                  "--downlink-pause-threshold-bytes",
+                  "131072",
+                  "--downlink-resume-threshold-bytes",
+                  "65536",
+                  "--downlink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "21962",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfca386b38672",
+                "mac": "fc:a3:86:b3:86:72",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "480",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    3,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfca386b38672\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl01",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c1",
+                  "--tun-addr",
+                  "10.80.0.11/24",
+                  "--node-id",
+                  "1",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c500bfe",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "5846",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c500bfe",
+                "mac": "fc:22:1c:50:0b:fe",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c500bfe\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:50:0b:fe\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl02",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c2",
+                  "--tun-addr",
+                  "10.80.0.12/24",
+                  "--node-id",
+                  "2",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c300f04",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "7362",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c300f04",
+                "mac": "fc:22:1c:30:0f:04",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c300f04\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0f:04\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl03",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c3",
+                  "--tun-addr",
+                  "10.80.0.13/24",
+                  "--node-id",
+                  "3",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlx5cffffaf6d8c",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "5915",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlx5cffffaf6d8c",
+                "mac": "5c:ff:ff:af:6d:8c",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlx5cffffaf6d8c\n\tifindex 5\n\twdev 0x100000001\n\taddr 5c:ff:ff:af:6d:8c\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl05",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c5",
+                  "--tun-addr",
+                  "10.80.0.15/24",
+                  "--node-id",
+                  "5",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c100157",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "5908",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c100157",
+                "mac": "fc:22:1c:10:01:57",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c100157\n\tifindex 6\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:57\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl06",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c6",
+                  "--tun-addr",
+                  "10.80.0.16/24",
+                  "--node-id",
+                  "6",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c300cbb",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "7438",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c300cbb",
+                "mac": "fc:22:1c:30:0c:bb",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c300cbb\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0c:bb\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl07",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c7",
+                  "--tun-addr",
+                  "10.80.0.17/24",
+                  "--node-id",
+                  "7",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c300e99",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "7436",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c300e99",
+                "mac": "fc:22:1c:30:0e:99",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c300e99\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:30:0e:99\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl08",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c8",
+                  "--tun-addr",
+                  "10.80.0.18/24",
+                  "--node-id",
+                  "8",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c500a88",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "9542",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c500a88",
+                "mac": "fc:22:1c:50:0a:88",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c500a88\n\tifindex 5\n\twdev 0x100000001\n\taddr fc:22:1c:50:0a:88\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl09",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c9",
+                  "--tun-addr",
+                  "10.80.0.19/24",
+                  "--node-id",
+                  "9",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlx88e62852aae4",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "7424",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlx88e62852aae4",
+                "mac": "88:e6:28:52:aa:e4",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlx88e62852aae4\n\tifindex 5\n\twdev 0x100000001\n\taddr 88:e6:28:52:aa:e4\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        },
+        {
+          "host": "fl10",
+          "returncode": 0,
+          "result": {
+            "native": [
+              {
+                "argv": [
+                  "/usr/bin/wfb_v6_uplink",
+                  "--role",
+                  "client",
+                  "--tun-name",
+                  "fl-c10",
+                  "--tun-addr",
+                  "10.80.0.20/24",
+                  "--node-id",
+                  "10",
+                  "--link-id",
+                  "7669206",
+                  "--uplink-stream",
+                  "1",
+                  "--downlink-stream",
+                  "2",
+                  "--fec-k",
+                  "8",
+                  "--fec-n",
+                  "12",
+                  "--radio-bandwidth",
+                  "40",
+                  "--radio-control-port",
+                  "9200",
+                  "--radio-mcs-index",
+                  "4",
+                  "--air-interface",
+                  "wlxfc221c100119",
+                  "--uplink-pause-threshold-bytes",
+                  "131072",
+                  "--uplink-resume-threshold-bytes",
+                  "65536",
+                  "--uplink-queue-packets-limit",
+                  "64"
+                ],
+                "pid": "7560",
+                "sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+                "interface": "wlxfc221c100119",
+                "mac": "fc:22:1c:10:01:19",
+                "driver": "rtl88xxau_wfb",
+                "usb_speed": "5000",
+                "queries": {
+                  "radio": [
+                    1129270605,
+                    0,
+                    0,
+                    0,
+                    0,
+                    40,
+                    4,
+                    0,
+                    1
+                  ],
+                  "fec": [
+                    1129270605,
+                    0,
+                    8,
+                    12
+                  ]
+                },
+                "iw": "Interface wlxfc221c100119\n\tifindex 8\n\twdev 0x100000001\n\taddr fc:22:1c:10:01:19\n\ttype monitor\n\twiphy 1\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n"
+              }
+            ],
+            "service": "ActiveState=active\n",
+            "usb_reset": false
+          },
+          "stderr": ""
+        }
+      ],
+      "status": {
+        "server_state": "IDLE",
+        "management_web": {
+          "status": "ready",
+          "host": "192.168.0.190",
+          "port": 8080,
+          "error": null
+        },
+        "link_required": true,
+        "recent_job": null,
+        "active_job": null,
+        "radio": {
+          "channel": 149,
+          "bandwidth_mhz": 40,
+          "radio_txpower_dbm": 18,
+          "downlink_mcs": 3,
+          "uplink_mcs": 4,
+          "uftp_rate_kbps": 15000,
+          "fec_k": 8,
+          "fec_n": 12,
+          "channel_width": "HT40+",
+          "guard_interval": "long"
+        },
+        "tun": {
+          "name": "fl-s",
+          "ip": "10.80.0.1",
+          "cidr": "10.80.0.1/24",
+          "txqueuelen": 5000,
+          "is_active": true
+        },
+        "air_interface": "wlxfca386b38672",
+        "link_process": {
+          "running": true,
+          "pid": 21962
+        },
+        "nodes": {
+          "1": {
+            "node_id": 1,
+            "tun_ip": "10.80.0.11",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2026,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22651.873706056,
+            "last_heartbeat_timestamp_ms": 1794265966517,
+            "last_heartbeat_ago_seconds": 1.43,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "2": {
+            "node_id": 2,
+            "tun_ip": "10.80.0.12",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2171,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22652.329144347,
+            "last_heartbeat_timestamp_ms": 1794265966973,
+            "last_heartbeat_ago_seconds": 0.98,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "3": {
+            "node_id": 3,
+            "tun_ip": "10.80.0.13",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2205,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22652.085407704,
+            "last_heartbeat_timestamp_ms": 1794265966729,
+            "last_heartbeat_ago_seconds": 1.22,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "4": {
+            "node_id": 4,
+            "tun_ip": "10.80.0.14",
+            "reported_state": null,
+            "readiness": "OFFLINE",
+            "elapsed_ms": 0,
+            "current_channel": null,
+            "txpower_dbm": null,
+            "uplink_mcs": null,
+            "last_heartbeat_time": null,
+            "last_heartbeat_timestamp_ms": null,
+            "last_heartbeat_ago_seconds": null,
+            "error_code": null,
+            "can_select": false,
+            "selection_blockers": [
+              {
+                "code": "NODE_OFFLINE",
+                "message": "节点未上线或心跳已超时"
+              }
+            ]
+          },
+          "5": {
+            "node_id": 5,
+            "tun_ip": "10.80.0.15",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 4272,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22652.191083495,
+            "last_heartbeat_timestamp_ms": 1794265966835,
+            "last_heartbeat_ago_seconds": 1.11,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "6": {
+            "node_id": 6,
+            "tun_ip": "10.80.0.16",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2100,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22651.627449888,
+            "last_heartbeat_timestamp_ms": 1794265966271,
+            "last_heartbeat_ago_seconds": 1.68,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "7": {
+            "node_id": 7,
+            "tun_ip": "10.80.0.17",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2098,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22651.59234078,
+            "last_heartbeat_timestamp_ms": 1794265966236,
+            "last_heartbeat_ago_seconds": 1.71,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "8": {
+            "node_id": 8,
+            "tun_ip": "10.80.0.18",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2102,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22652.574452519,
+            "last_heartbeat_timestamp_ms": 1794265967218,
+            "last_heartbeat_ago_seconds": 0.73,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "9": {
+            "node_id": 9,
+            "tun_ip": "10.80.0.19",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 4314,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22652.154346621,
+            "last_heartbeat_timestamp_ms": 1794265966798,
+            "last_heartbeat_ago_seconds": 1.15,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          },
+          "10": {
+            "node_id": 10,
+            "tun_ip": "10.80.0.20",
+            "reported_state": "IDLE",
+            "readiness": "READY",
+            "elapsed_ms": 2101,
+            "current_channel": 149,
+            "txpower_dbm": 18,
+            "uplink_mcs": 4,
+            "last_heartbeat_time": 22650.33120342,
+            "last_heartbeat_timestamp_ms": 1794265964975,
+            "last_heartbeat_ago_seconds": 2.97,
+            "error_code": null,
+            "can_select": true,
+            "selection_blockers": []
+          }
+        }
+      },
+      "fail_hosts": [],
+      "fail_nodes": [],
+      "fatal": [],
+      "passed": true
+    }
+  ],
+  "deadline_seconds": 30
+}

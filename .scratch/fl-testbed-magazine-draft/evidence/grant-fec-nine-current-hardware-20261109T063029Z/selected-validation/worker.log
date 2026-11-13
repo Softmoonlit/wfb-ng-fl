@@ -1,0 +1,16 @@
+{"monotonic": 19866.68268739, "status": "running", "grant": null, "stage": "audit_old-fec14"}
+{"monotonic": 19867.789499076, "status": "running", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 19868.697937023, "status": "running", "grant": null, "stage": "cold-preflight"}
+{"monotonic": 19870.708712269, "status": "running", "grant": null, "stage": "cold-stage"}
+{"monotonic": 19872.716939972, "status": "running", "grant": null, "stage": "cold-prepare"}
+{"monotonic": 19874.724511258, "status": "running", "grant": null, "stage": "cold-stop"}
+{"monotonic": 19876.733176581, "status": "running", "grant": null, "stage": "cold-install"}
+{"monotonic": 19878.738212759, "status": "running", "grant": null, "stage": "cold-install"}
+{"monotonic": 19880.748254641, "status": "running", "grant": null, "stage": "cold-start"}
+{"monotonic": 19883.226938259, "status": "running", "grant": null, "stage": "condition_poll_cold-start-initial"}
+{"monotonic": 19884.712870867, "status": "running", "grant": null, "stage": "condition_poll_cold-start-initial"}
+{"monotonic": 19886.213092531, "status": "running", "grant": null, "stage": "cold-audit"}
+{"monotonic": 19888.220935134, "status": "running", "grant": null, "stage": "audit_post-cold"}
+{"monotonic": 19889.051560763, "status": "running", "grant": null, "stage": "readiness_gate"}
+{"monotonic": 19889.779240489, "status": "running", "grant": null, "stage": "configure_30"}
+{"monotonic": 19891.091650801, "status": "stopped", "grant": null, "stage": "finished"}

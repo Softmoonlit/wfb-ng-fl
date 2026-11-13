@@ -1,0 +1,327 @@
+{
+  "status": "complete",
+  "execute_count": 14,
+  "rows": [
+    {
+      "grant_ms": 10,
+      "guard_ms": 10,
+      "smoke_DL_seconds": 6.372599477999756,
+      "smoke_UL_seconds": 8.69312581200029,
+      "model_DL_seconds": 52.26321654300045,
+      "model_UL_seconds": 416.0578563190011,
+      "model_DL_UL_total_seconds": 468.32107286200153,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 20,
+      "guard_ms": 10,
+      "smoke_DL_seconds": 4.773435353999957,
+      "smoke_UL_seconds": 8.36099454000032,
+      "model_DL_seconds": 55.56569339999987,
+      "model_UL_seconds": 375.8512647659991,
+      "model_DL_UL_total_seconds": 431.41695816599895,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 30,
+      "guard_ms": 10,
+      "smoke_DL_seconds": 10.851016022001204,
+      "smoke_UL_seconds": 9.379656185001295,
+      "model_DL_seconds": 47.04808752200006,
+      "model_UL_seconds": 341.32898049600044,
+      "model_DL_UL_total_seconds": 388.3770680180005,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 40,
+      "guard_ms": 10,
+      "smoke_DL_seconds": 11.265557460999844,
+      "smoke_UL_seconds": 10.219464968000466,
+      "model_DL_seconds": 49.51819254000111,
+      "model_UL_seconds": 384.6547306780012,
+      "model_DL_UL_total_seconds": 434.1729232180023,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 60,
+      "guard_ms": 10,
+      "smoke_DL_seconds": 8.601341843001137,
+      "smoke_UL_seconds": 22.51441657199939,
+      "model_DL_seconds": 49.5793885539988,
+      "model_UL_seconds": 330.58328576799977,
+      "model_DL_UL_total_seconds": 380.16267432199857,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 20,
+      "guard_ms": 5,
+      "smoke_DL_seconds": 7.80961488200046,
+      "smoke_UL_seconds": 7.320977919000143,
+      "model_DL_seconds": 46.50265198099987,
+      "model_UL_seconds": 372.56884838099904,
+      "model_DL_UL_total_seconds": 419.0715003619989,
+      "all_passed": true
+    },
+    {
+      "grant_ms": 30,
+      "guard_ms": 5,
+      "smoke_DL_seconds": 5.193764318000831,
+      "smoke_UL_seconds": 9.60197350999988,
+      "model_DL_seconds": 46.88306189499781,
+      "model_UL_seconds": 298.46924647299966,
+      "model_DL_UL_total_seconds": 345.35230836799747,
+      "all_passed": true
+    }
+  ],
+  "all_original_runner_flags_true": true,
+  "all_final_independent_cleanup_restore_ready_true": true,
+  "elapsed_seconds": 3577.6003136634827,
+  "final": {
+    "full_ten_actual_baseline_ok": true,
+    "exact_nine_ready_idle": true,
+    "fec_k": 8,
+    "fec_n": 12,
+    "server_schedule": "10/10",
+    "runs": [
+      [
+        "fec12-20261109T071504Z-g10-d10-smoke",
+        1794208528
+      ],
+      [
+        "fec12-20261109T071504Z-g10-d10-model",
+        1794208573
+      ],
+      [
+        "fec12-20261109T071504Z-g20-d10-smoke",
+        1794209072
+      ],
+      [
+        "fec12-20261109T071504Z-g20-d10-model",
+        1794209119
+      ],
+      [
+        "fec12-20261109T071504Z-g30-d10-smoke",
+        1794209577
+      ],
+      [
+        "fec12-20261109T071504Z-g30-d10-model",
+        1794209634
+      ],
+      [
+        "fec12-20261109T071504Z-g40-d10-smoke",
+        1794210077
+      ],
+      [
+        "fec12-20261109T071504Z-g40-d10-model",
+        1794210141
+      ],
+      [
+        "fec12-20261109T071504Z-g60-d10-smoke",
+        1794210601
+      ],
+      [
+        "fec12-20261109T071504Z-g60-d10-model",
+        1794210675
+      ],
+      [
+        "fec12-20261109T071504Z-g20-d5-smoke",
+        1794211103
+      ],
+      [
+        "fec12-20261109T071504Z-g20-d5-model",
+        1794211160
+      ],
+      [
+        "fec12-20261109T071504Z-g30-d5-smoke",
+        1794211605
+      ],
+      [
+        "fec12-20261109T071504Z-g30-d5-model",
+        1794211657
+      ]
+    ],
+    "execute_count": 14,
+    "measurement_error": null,
+    "wall": 1794212081.8871171
+  },
+  "final_active_old_units": {
+    "fl00": [],
+    "fl01": [],
+    "fl02": [],
+    "fl03": [],
+    "fl05": [],
+    "fl06": [],
+    "fl07": [],
+    "fl08": [],
+    "fl09": [],
+    "fl10": []
+  },
+  "transient": {
+    "candidate": "60/10 model",
+    "first_actual_audit": false,
+    "host": "fl09",
+    "errors": [
+      "iw baseline mismatch"
+    ],
+    "settled_actual_audit": true,
+    "standard_service_recovery_used": false,
+    "original_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g60-d10-model/after-audit.json",
+    "settled_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g60-d10-model/after-settled-once-audit.json"
+  },
+  "last_storage_measurement": {
+    "context": "30/5 模型执行前，非模型完成后的当前余量；按父指令不再远端查询",
+    "rows": [
+      {
+        "host": "fl00",
+        "returncode": 0,
+        "result": {
+          "host": "fl00",
+          "available_bytes": 60393517056,
+          "available_inodes": 6686671,
+          "total_bytes": 123887923200
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl01",
+        "returncode": 0,
+        "result": {
+          "host": "fl01",
+          "available_bytes": 1026740224,
+          "available_inodes": 1536217,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl02",
+        "returncode": 0,
+        "result": {
+          "host": "fl02",
+          "available_bytes": 1039294464,
+          "available_inodes": 1536280,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl03",
+        "returncode": 0,
+        "result": {
+          "host": "fl03",
+          "available_bytes": 4281643008,
+          "available_inodes": 1592916,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl05",
+        "returncode": 0,
+        "result": {
+          "host": "fl05",
+          "available_bytes": 2028929024,
+          "available_inodes": 1573223,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl06",
+        "returncode": 0,
+        "result": {
+          "host": "fl06",
+          "available_bytes": 1746509824,
+          "available_inodes": 1608816,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl07",
+        "returncode": 0,
+        "result": {
+          "host": "fl07",
+          "available_bytes": 3597815808,
+          "available_inodes": 1609299,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl08",
+        "returncode": 0,
+        "result": {
+          "host": "fl08",
+          "available_bytes": 1525997568,
+          "available_inodes": 1609234,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl09",
+        "returncode": 0,
+        "result": {
+          "host": "fl09",
+          "available_bytes": 1631490048,
+          "available_inodes": 1609108,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      },
+      {
+        "host": "fl10",
+        "returncode": 0,
+        "result": {
+          "host": "fl10",
+          "available_bytes": 2295623680,
+          "available_inodes": 1630203,
+          "total_bytes": 29692346368
+        },
+        "stderr": ""
+      }
+    ]
+  },
+  "exact_cache_cleanup": [
+    {
+      "manifest": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g30-d5-model/exact-cache-reclamation/cleanup-manifest.json",
+      "status": "complete",
+      "hosts": {
+        "fl02": {
+          "deleted_count": 12,
+          "available_bytes_at_cleanup": 1039298560,
+          "retained_b2_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "fl01": {
+          "deleted_count": 12,
+          "available_bytes_at_cleanup": 1026740224,
+          "retained_b2_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      }
+    },
+    {
+      "manifest": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12/fec12-g30-d10-model/exact-cache-reclamation/cleanup-manifest.json",
+      "status": "complete",
+      "hosts": {
+        "fl01": {
+          "deleted_count": 12,
+          "available_bytes_at_cleanup": 1046659072,
+          "retained_b2_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "fl02": {
+          "deleted_count": 12,
+          "available_bytes_at_cleanup": 1063526400,
+          "retained_b2_sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      }
+    }
+  ],
+  "b2_preserved": true,
+  "worker_exited": true,
+  "infrastructure_monitor_exited": true,
+  "infrastructure_refusal_stop": false,
+  "remote_operations_finished": true,
+  "no_additional_tests": true,
+  "selection_and_double_model_acceptance": "交父处理，未自行执行"
+}

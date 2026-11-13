@@ -1,0 +1,23 @@
+{
+  "host": "fl02",
+  "event": "user_confirmed_power_restart",
+  "classification": "供电事件，不是FEC/调度性能失败",
+  "boot_id": "8831475d-7f89-458a-bfe5-e59bf8843eb4",
+  "uptime_seconds": 234.60,
+  "management_reachable": true,
+  "service_active": true,
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "source_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "native_sha": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "power": "15W",
+  "interface": "wlxfc221c300f04",
+  "mac": "fc:22:1c:30:0f:04",
+  "driver": "rtl88xxau_wfb",
+  "usb_speed": "5000",
+  "get_radio": [1129270605, 0, 0, 0, 0, 40, 4, 0, 1],
+  "get_fec": [1129270605, 0, 8, 12],
+  "iw": "channel 149, width 40 MHz, type monitor, txpower -18.00 dBm",
+  "old_active_units": [],
+  "model_execute_before_event": false,
+  "old_run_preserved": true
+}

@@ -1,0 +1,681 @@
+{
+  "wall": 1794302410.6098506,
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/889_bececdca\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/889_bececdca"
+        ],
+        "transactions": [
+          {
+            "path": "/889_bececdca",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 1\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 744645\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: 对象在路径“/889_bececdca”处不存在\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 255,
+      "result": "",
+      "stderr": "ssh: connect to host 192.168.0.191 port 22: No route to host\n"
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/391_bdcecbdc\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/391_bdcecbdc"
+        ],
+        "transactions": [
+          {
+            "path": "/391_bdcecbdc",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/391_bdcecbdc”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/372_daaeaeec\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/372_daaeaeec"
+        ],
+        "transactions": [
+          {
+            "path": "/372_daaeaeec",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/372_daaeaeec”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/346_debaaebc\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/346_debaaebc"
+        ],
+        "transactions": [
+          {
+            "path": "/346_debaaebc",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/346_debaaebc”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/301_eebbeeca\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/301_eebbeeca"
+        ],
+        "transactions": [
+          {
+            "path": "/301_eebbeeca",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/301_eebbeeca”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/286_edcedbea\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/286_edcedbea"
+        ],
+        "transactions": [
+          {
+            "path": "/286_edcedbea",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 31\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 68239\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/286_edcedbea”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/295_eadadaad\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/295_eadadaad"
+        ],
+        "transactions": [
+          {
+            "path": "/295_eadadaad",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/295_eadadaad”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/222_dabcceba\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/222_dabcceba"
+        ],
+        "transactions": [
+          {
+            "path": "/222_dabcceba",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 81\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 137768\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/222_dabcceba”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "listing": {
+          "returncode": 0,
+          "stdout": "ao 1 \"/323_cedbdbea\"\n",
+          "stderr": ""
+        },
+        "paths": [
+          "/323_cedbdbea"
+        ],
+        "transactions": [
+          {
+            "path": "/323_cedbdbea",
+            "properties": {
+              "Role": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Status": {
+                "returncode": 0,
+                "stdout": "u 8\n",
+                "stderr": ""
+              },
+              "Percentage": {
+                "returncode": 0,
+                "stdout": "u 0\n",
+                "stderr": ""
+              },
+              "AllowCancel": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "CallerActive": {
+                "returncode": 0,
+                "stdout": "b true\n",
+                "stderr": ""
+              },
+              "LastPackage": {
+                "returncode": 0,
+                "stdout": "s \"\"\n",
+                "stderr": ""
+              },
+              "DownloadSizeRemaining": {
+                "returncode": 0,
+                "stdout": "t 1\n",
+                "stderr": ""
+              },
+              "RemainingTime": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property RemainingTime on interface org.freedesktop.PackageKit.Transaction: Message recipient disconnected from message bus without replying\n"
+              },
+              "TransactionFlags": {
+                "returncode": 1,
+                "stdout": "",
+                "stderr": "Failed to get property TransactionFlags on interface org.freedesktop.PackageKit.Transaction: Object does not exist at path “/323_cedbdbea”\n"
+              }
+            },
+            "introspect": {
+              "returncode": 0,
+              "stdout": "NAME TYPE SIGNATURE RESULT/VALUE FLAGS\n",
+              "stderr": ""
+            }
+          }
+        ]
+      },
+      "stderr": ""
+    }
+  ],
+  "note": "DBus current transaction properties only; no historical journal inference and no transaction mutation"
+}

@@ -1,0 +1,5 @@
+{
+  "error": "RuntimeError('full ten baseline/nine READY restoration incomplete')",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/worker.py\", line 88, in <module>\n    a,g=admission(close,'final-baseline',10,10,recover=True)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/worker.py\", line 34, in admission\n    if not(a['ok'] and g['passed']):stop('full ten baseline/nine READY restoration incomplete')\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/worker.py\", line 8, in stop\n    d.write(ROOT/'STOP',dict(reason=reason,wall=time.time()));raise RuntimeError(reason)\nRuntimeError: full ten baseline/nine READY restoration incomplete\n",
+  "wall": 1794205896.1452837
+}

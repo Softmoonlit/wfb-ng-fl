@@ -1,0 +1,9 @@
+host=fl07 boot=8d257d8c-9bfb-4ed4-8171-08111c5b5470
+processes
+  17527       1 S sudo -n timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+  17528   17527 S timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+  17529   17528 S /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+  17818       1 S sudo -n timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+  17819   17818 S timeout --signal=TERM --kill-after=5s 1510s /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+  17820   17819 S /usr/bin/python3 -I - --duration 1500 --clients all --ports 9001
+candidate_files

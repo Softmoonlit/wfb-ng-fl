@@ -1,0 +1,18 @@
+{
+  "host": "fl02",
+  "returncode": 0,
+  "stdout": "{\"Role\": {\"returncode\": 0, \"stdout\": \"u 8\\n\", \"stderr\": \"\"}, \"AllowCancel\": {\"returncode\": 0, \"stdout\": \"b true\\n\", \"stderr\": \"\"}}\n",
+  "stderr": "",
+  "result": {
+    "Role": {
+      "returncode": 0,
+      "stdout": "u 8\n",
+      "stderr": ""
+    },
+    "AllowCancel": {
+      "returncode": 0,
+      "stdout": "b true\n",
+      "stderr": ""
+    }
+  }
+}

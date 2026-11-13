@@ -1,0 +1,8 @@
+[33047.994056] fl06 python3[13311]: 2026-11-11 02:04:07,515 [INFO] [client-daemon] 节点 6 LEASE_ARM session=switch_aeaa9b9cf8dc4e94adec6ce5b6d61e79 lease_seconds=15.000
+[33050.354815] fl06 python3[13311]: 2026-11-11 02:04:09,876 [INFO] [client-daemon] 节点 6 COMMIT session=switch_aeaa9b9cf8dc4e94adec6ce5b6d61e79 channel=157
+[33050.920053] fl06 python3[13311]: 2026-11-11 02:04:10,441 [INFO] [client-daemon] 节点 6 CONFIRMED session=switch_aeaa9b9cf8dc4e94adec6ce5b6d61e79 channel=157
+[33249.323861] fl06 python3[13311]: 2026-11-11 02:07:28,844 [WARNING] [client-daemon] 十秒内未确认有效心跳，退回寻频自愈，累计缺失 5 次 ACK
+[33358.382891] fl06 python3[13311]: 2026-11-11 02:09:17,904 [INFO] [client-daemon] 节点 6 LEASE_ARM session=switch_30060d2e6c0f46d88cb1e4b511556393 lease_seconds=15.000
+[33360.727977] fl06 python3[13311]: 2026-11-11 02:09:20,249 [INFO] [client-daemon] 节点 6 COMMIT session=switch_30060d2e6c0f46d88cb1e4b511556393 channel=149
+[33361.466339] fl06 python3[13311]: 2026-11-11 02:09:20,987 [WARNING] [client-daemon] 节点 6 CONFIRMED session=switch_30060d2e6c0f46d88cb1e4b511556393 未取得当前信道有效心跳，拒绝最终确认
+[33362.408378] fl06 python3[13311]: 2026-11-11 02:09:21,930 [INFO] [client-daemon] 节点 6 CONFIRMED session=switch_30060d2e6c0f46d88cb1e4b511556393 channel=149

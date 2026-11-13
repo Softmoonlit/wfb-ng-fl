@@ -1,0 +1,31 @@
+{
+  "pid": 9475,
+  "command": [
+    "/usr/bin/python3",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/communication/runner.py",
+    "--native-sha",
+    "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+    "--payload",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/models/cifar10-resnet18-seed7.pt",
+    "--model-manifest",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/final-acceptance-two-closures-20261111T113000Z/model-manifest-input.json",
+    "--execute",
+    "--reviewed-sha",
+    "42f722c47fa1306999bb31b4a63bdf5a479f32bc96d8ecb61bd7dc534e540567",
+    "--run-id",
+    "final-closure-r2-20261112T064025Z-model",
+    "--downlink-mcs",
+    "3",
+    "--uplink-mcs",
+    "4",
+    "--uftp-rate-kbps",
+    "12000",
+    "--release-commit",
+    "e81c4f69eaa25d70d97d5bea35e7e332e967d305",
+    "--release-root",
+    "/srv/wfb-ng-fl/releases/heartbeat-e81c4f69eaa2-20261112T061928Z",
+    "--output",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/final-acceptance-two-closures-20261111T113000Z/round-2-20261112T064025Z/runs"
+  ],
+  "started_wall": 1794465626.7159903
+}

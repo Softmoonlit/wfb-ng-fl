@@ -1,0 +1,14 @@
+{
+  "root_cause_group": "collector_annotate_none_float_max",
+  "nodes": ["fl01", "fl03", "fl05", "fl06", "fl07", "fl09"],
+  "stderr_signature": "TypeError: '>' not supported between instances of 'NoneType' and 'float'",
+  "trace_location": "capture-heartbeats-batch.py annotate line 231 local_gap=max(...)",
+  "effect": "collector had events in memory but crashed before JSON print; raw.json/stdout remained empty",
+  "not": ["SSH stdout loss", "SSH/remote raw persistence failure", "wireless loss", "NIC failure"],
+  "fl02_fl08": "valid schema3 JSON completed because their event identity groups did not trigger the mixed None/float max comparison",
+  "fixed_local_copy": "capture-repair-20261110T172426Z/capture-heartbeats-batch-reviewed.py",
+  "fix": "filter gap is not None in both local max expressions; catch annotate exception while preserving events and analysis_error",
+  "regression": "collector-none-gap-regression.py -> none-gap-regression-ok",
+  "no_remote_deploy": true,
+  "no_new_model": true
+}

@@ -1,0 +1,30 @@
+{
+  "说明": "仅本地证据索引扫描，不代表远端文件存在；远端执行仍需逐文件 exists/stat/hash、具名日志归档和 exact unlink。",
+  "authorized_bases": [
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec12",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation",
+    "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-after-storage-evidence-continuation-20261109T1840Z"
+  ],
+  "canonical": {
+    "size_bytes": 44770302,
+    "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+  },
+  "minimum_bytes": 536870912,
+  "target_bytes": 1073741824,
+  "b2_protected": "comm-rsmc20261109T060537Z-g30-d5-model",
+  "by_base": {
+    "fec14-remaining": {"completed_runs": 4, "exact_sources": 12, "candidate_files": 148, "by_host": {"fl00": 40, "fl01": 12, "fl02": 12, "fl03": 12, "fl05": 12, "fl06": 12, "fl07": 12, "fl08": 12, "fl09": 12, "fl10": 12}},
+    "fec12": {"completed_runs": 14, "exact_sources": 14, "candidate_files": 259, "by_host": {"fl00": 70, "fl01": 21, "fl02": 21, "fl03": 21, "fl05": 21, "fl06": 21, "fl07": 21, "fl08": 21, "fl09": 21, "fl10": 21}},
+    "fec14-matched-completion": {"completed_runs": 6, "exact_sources": 8, "candidate_files": 74, "by_host": {"fl00": 20, "fl01": 6, "fl02": 6, "fl03": 6, "fl05": 6, "fl06": 6, "fl07": 6, "fl08": 6, "fl09": 6, "fl10": 6}},
+    "selected-validation": {"completed_runs": 1, "exact_sources": 1, "candidate_files": 37, "by_host": {"fl00": 10, "fl01": 3, "fl02": 3, "fl03": 3, "fl05": 3, "fl06": 3, "fl07": 3, "fl08": 3, "fl09": 3, "fl10": 3}}
+  },
+  "selected_validation_completed_run": "fec12-20261109T092236Z-trial1-g30-d5-model",
+  "selected_validation_exact_evidence": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/fec12-20261109T092236Z-trial1-g30-d5-model-after-exact-uftp-kernel-files.json",
+  "excluded_trial2": {
+    "run_id": "fec12-20261109T092236Z-trial2-g30-d5-model",
+    "reason": "transfer_verified=true 但 cleanup_ok=false、restore_ok=false；失败轮和 partial 全保留"
+  },
+  "scan_method": "按 storage.py 的 completed final flags、exact-uftp rows、size/SHA、非 B2、非 uftp-tmp 条件本地解析；未接触远端文件"
+}

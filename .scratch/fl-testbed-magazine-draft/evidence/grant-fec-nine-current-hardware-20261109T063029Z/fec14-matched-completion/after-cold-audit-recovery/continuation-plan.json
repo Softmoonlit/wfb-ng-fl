@@ -1,0 +1,26 @@
+{
+  "status": "prepared",
+  "original_stage_start_wall": 1794212216.2287052,
+  "original_deadline_monotonic": 23506.126050181,
+  "remaining_seconds_at_preparation": 6255.814485540999,
+  "original_stage_budget_seconds": 6600,
+  "pre_reviewed_source_sha256": {
+    "worker.py": "1d355587800942ec589c08105f2085f69ad625871bde9990f713c2f3f6445fdd",
+    "driver-base.py": "8ba2b1d16acadbd16d3bed3aac1d49e497fd69dd12b37bca40f0035ca06d8fb0",
+    "helpers.py": "6019f623236eea4107eb7043199d339e8b1f72920b8c284adb49d02e140d1ba8",
+    "storage.py": "f0a75bf6c70c2671248ebd6715ed25b1234aebee9702a3540143f362df84e3cf"
+  },
+  "storage_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion",
+  "candidate_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/after-cold-audit-recovery",
+  "profile": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/heartbeat-1cd6264d5d6b-20261109T080119Z",
+  "profile_completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ],
+  "scope": "只续跑四档最多八次，不重做冷切stop/install，不覆盖首次失败"
+}

@@ -1,0 +1,119 @@
+{
+  "candidate": {
+    "trial": 1,
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "fec_n": 12,
+    "mode": "model",
+    "stage": "execute",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false,
+    "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-full-capacity/trial1",
+    "execute_count": 1,
+    "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+    "latest_registry_states": {
+      "1": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "2": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "3": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "5": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "6": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "7": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "8": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "9": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      },
+      "10": {
+        "readiness": "READY",
+        "reported_state": "IDLE",
+        "channel": 157
+      }
+    },
+    "runner_last_phase": "independent_cleanup",
+    "runner_last_monotonic": 2980.228953363,
+    "currentphase": "verify_radio",
+    "completed_hosts": {
+      "publish": [],
+      "submit": []
+    },
+    "runner_returncode": 1,
+    "runner_restore_ok": false,
+    "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-full-capacity/trial1/fec12-apr-20261109T174352Z-t1-g30-d5-model/progress.jsonl",
+    "elapsed": 25.075442682000357,
+    "DLduration": null,
+    "ULduration": null,
+    "failures": [
+      {
+        "wall": 1794246292.9994156,
+        "monotonic": 2978.355403957,
+        "host": "fl00",
+        "phase": "verify_radio",
+        "ok": false,
+        "error": "RuntimeError('{\\'id\\': 3, \\'ok\\': False, \\'error\\': \"RuntimeError(\\'target registry gate failed: 8\\')\"}')"
+      },
+      {
+        "wall": 1794246292.9997194,
+        "monotonic": 2978.355707349,
+        "phase": "run",
+        "ok": false,
+        "error": "RuntimeError('verify_radio failed: fl00')"
+      },
+      {
+        "wall": 1794246292.9998195,
+        "monotonic": 2978.355807541,
+        "phase": "restore",
+        "ok": false,
+        "error": "全角色 close 未确认；先独立回收再恢复"
+      }
+    ],
+    "original_runner_final_flags": {
+      "transfer_verified": false,
+      "cleanup_ok": true,
+      "restore_ok": false
+    },
+    "server_verified_files": {},
+    "phase_completion_seconds": {
+      "publish": {},
+      "submit": {}
+    },
+    "bundle_unchanged": true
+  },
+  "result": {
+    "wall": 1794246301.3593736,
+    "monotonic": 2986.71536134,
+    "phase": "result",
+    "transfer_verified": false,
+    "cleanup_ok": true,
+    "restore_ok": false
+  }
+}

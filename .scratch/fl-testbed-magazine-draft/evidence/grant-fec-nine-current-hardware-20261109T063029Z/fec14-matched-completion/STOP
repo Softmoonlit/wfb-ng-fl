@@ -1,0 +1,5 @@
+{
+  "reason": "RuntimeError('cold-switch phase failed: audit')",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/worker.py\", line 102, in main\n    cold_switch();cold_complete=True\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/worker.py\", line 86, in cold_switch\n    if proc.returncode!=0:stop('cold-switch phase failed: '+phase)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/worker.py\", line 34, in stop\n    d.write(ROOT/'STOP',dict(reason=reason,wall=time.time()));raise RuntimeError(reason)\nRuntimeError: cold-switch phase failed: audit\n",
+  "wall": 1794212236.677559
+}

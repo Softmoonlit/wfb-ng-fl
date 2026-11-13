@@ -1,0 +1,261 @@
+{
+  "wall": 1794267165.0669565,
+  "status": {
+    "server_state": "IDLE",
+    "management_web": {
+      "status": "ready",
+      "host": "192.168.0.190",
+      "port": 8080,
+      "error": null
+    },
+    "link_required": true,
+    "recent_job": null,
+    "active_job": null,
+    "radio": {
+      "channel": 157,
+      "bandwidth_mhz": 40,
+      "radio_txpower_dbm": 18,
+      "downlink_mcs": 3,
+      "uplink_mcs": 4,
+      "uftp_rate_kbps": 12000,
+      "fec_k": 8,
+      "fec_n": 12,
+      "channel_width": "HT40+",
+      "guard_interval": "long"
+    },
+    "tun": {
+      "name": "fl-s",
+      "ip": "10.80.0.1",
+      "cidr": "10.80.0.1/24",
+      "txqueuelen": 5000,
+      "is_active": true
+    },
+    "air_interface": "wlxfca386b38672",
+    "link_process": {
+      "running": true,
+      "pid": 21962
+    },
+    "nodes": {
+      "1": {
+        "node_id": 1,
+        "tun_ip": "10.80.0.11",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 988704,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23848.560787938,
+        "last_heartbeat_timestamp_ms": 1794267163204,
+        "last_heartbeat_ago_seconds": 1.81,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "2": {
+        "node_id": 2,
+        "tun_ip": "10.80.0.12",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 133671,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23846.629883251,
+        "last_heartbeat_timestamp_ms": 1794267161273,
+        "last_heartbeat_ago_seconds": 3.74,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "3": {
+        "node_id": 3,
+        "tun_ip": "10.80.0.13",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 985113,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23849.441135192,
+        "last_heartbeat_timestamp_ms": 1794267164085,
+        "last_heartbeat_ago_seconds": 0.93,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "4": {
+        "node_id": 4,
+        "tun_ip": "10.80.0.14",
+        "reported_state": null,
+        "readiness": "OFFLINE",
+        "elapsed_ms": 0,
+        "current_channel": null,
+        "txpower_dbm": null,
+        "uplink_mcs": null,
+        "last_heartbeat_time": null,
+        "last_heartbeat_timestamp_ms": null,
+        "last_heartbeat_ago_seconds": null,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "5": {
+        "node_id": 5,
+        "tun_ip": "10.80.0.15",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 1088602,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23849.404405158,
+        "last_heartbeat_timestamp_ms": 1794267164048,
+        "last_heartbeat_ago_seconds": 0.97,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "6": {
+        "node_id": 6,
+        "tun_ip": "10.80.0.16",
+        "reported_state": "IDLE",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 58842,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 22886.710438789,
+        "last_heartbeat_timestamp_ms": 1794266201354,
+        "last_heartbeat_ago_seconds": 963.66,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      },
+      "7": {
+        "node_id": 7,
+        "tun_ip": "10.80.0.17",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 971922,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23849.932021002,
+        "last_heartbeat_timestamp_ms": 1794267164576,
+        "last_heartbeat_ago_seconds": 0.44,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "8": {
+        "node_id": 8,
+        "tun_ip": "10.80.0.18",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 1117061,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23850.28181535,
+        "last_heartbeat_timestamp_ms": 1794267164925,
+        "last_heartbeat_ago_seconds": 0.09,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "9": {
+        "node_id": 9,
+        "tun_ip": "10.80.0.19",
+        "reported_state": "IDLE",
+        "readiness": "READY",
+        "elapsed_ms": 1188493,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 23850.317509381,
+        "last_heartbeat_timestamp_ms": 1794267164961,
+        "last_heartbeat_ago_seconds": 0.06,
+        "error_code": null,
+        "can_select": true,
+        "selection_blockers": []
+      },
+      "10": {
+        "node_id": 10,
+        "tun_ip": "10.80.0.20",
+        "reported_state": "IDLE",
+        "readiness": "OFFLINE",
+        "elapsed_ms": 133323,
+        "current_channel": 157,
+        "txpower_dbm": 18,
+        "uplink_mcs": 4,
+        "last_heartbeat_time": 22795.173576149,
+        "last_heartbeat_timestamp_ms": 1794266109817,
+        "last_heartbeat_ago_seconds": 1055.2,
+        "error_code": null,
+        "can_select": false,
+        "selection_blockers": [
+          {
+            "code": "NODE_OFFLINE",
+            "message": "节点未上线或心跳已超时"
+          }
+        ]
+      }
+    }
+  },
+  "active_process_lines": [
+    "  21910       1 Ssl        20:11 /usr/bin/python3 -I -B -m wfb_ng.fl.server_daemon --config /etc/wfb-ng-fl/server.json --channel 149 --bandwidth-mhz 40 --txpower 18 --downlink-mcs 3 --uplink-mcs 4 --uftp-rate-kbps 15000 --interface wlxfca386b38672",
+    "  22827   22802 Ss         00:00 /bin/bash -c set -euo pipefail ROOT=.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z python3 - \"$ROOT\" <<'PY' import json,pathlib,subprocess,urllib.request,time root=pathlib.Path(__import__('sys').argv[1]); def run(a,t=8):  p=subprocess.run(a,capture_output=True,text=True,timeout=t);return {'argv':a,'returncode':p.returncode,'stdout':p.stdout,'stderr':p.stderr} try:  with urllib.request.urlopen('http://127.0.0.1:9090/api/v1/status',timeout=4) as q:status=json.load(q) except Exception as e:status={'error':repr(e)} ps=run(['ps','-eo','pid,ppid,stat,etime,args']);active=[x for x in ps['stdout'].splitlines() if any(k in x for k in ('worker.py','runner.py','node_agent.py','uftp','uftpd'))] owner=json.loads((root/'worker-process.json').read_text()) if (root/'worker-process.json').exists() else {} since=int(owner.get('started_wall',time.time()-1800));kernel=run(['journalctl','-k','--since','@'+str(since),'--no-pager','-o','short-iso'],15);system=run(['journalctl','-u','wfb-fl-server-daemon.service','--since','@'+str(since),'--no-pager','-o','short-iso'],15) (root/'recovery-pre-status.json').write_text(json.dumps({'wall':time.time(),'status':status,'active_process_lines':active,'kernel_journal':kernel,'server_journal':system,'worker_owner':owner},ensure_ascii=False,indent=2)+'\\n') print(json.dumps({'active_process_lines':active,'server_state':status.get('server_state'),'active_job':status.get('active_job')},ensure_ascii=False)) PY for host in fl06 fl10; do   { timeout 4s ssh -T -oBatchMode=yes -oConnectTimeout=3 \"$host\" 'hostname; uptime; sudo -n systemctl is-active wfb-fl-client-daemon.service; sudo -n iw dev 2>/dev/null | head -20' >\"$ROOT/recovery-reach-$host.txt\" 2>\"$ROOT/recovery-reach-$host.stderr\" || true; } & done # bounded local ARP/ping once; no retry for ip in 192.168.0.196 192.168.0.200; do timeout 3s ping -c 1 -W 1 \"$ip\" >\"$ROOT/recovery-ping-$ip.txt\" 2>&1 || true; ip neigh show \"$ip\" >\"$ROOT/recovery-arp-$ip.txt\" 2>&1 || true; done wait for host in fl06 fl10; do echo \"=== $host\"; cat \"$ROOT/recovery-reach-$host.txt\" 2>/dev/null; cat \"$ROOT/recovery-reach-$host.stderr\" 2>/dev/null; done for ip in 192.168.0.196 192.168.0.200; do echo \"=== $ip ping/arp\"; cat \"$ROOT/recovery-ping-$ip.txt\"; cat \"$ROOT/recovery-arp-$ip.txt\"; done"
+  ],
+  "kernel_journal": {
+    "argv": [
+      "journalctl",
+      "-k",
+      "--since",
+      "@1794265477",
+      "--no-pager",
+      "-o",
+      "short-iso"
+    ],
+    "returncode": 0,
+    "stdout": "2026-11-10T07:04:39+0800 fl00 kernel: device wlxfca386b38672 left promiscuous mode\n2026-11-10T07:04:41+0800 fl00 kernel: device wlxfca386b38672 entered promiscuous mode\n2026-11-10T07:12:33+0800 fl00 kernel: device wlxfca386b38672 left promiscuous mode\n2026-11-10T07:12:34+0800 fl00 kernel: device wlxfca386b38672 entered promiscuous mode\n",
+    "stderr": ""
+  },
+  "server_journal": {
+    "argv": [
+      "journalctl",
+      "-u",
+      "wfb-fl-server-daemon.service",
+      "--since",
+      "@1794265477",
+      "--no-pager",
+      "-o",
+      "short-iso"
+    ],
+    "returncode": 0,
+    "stdout": "2026-11-10T07:04:39+0800 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...\n2026-11-10T07:04:39+0800 fl00 python3[20589]: 2026-11-10 07:04:39,716 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...\n2026-11-10T07:04:40+0800 fl00 python3[20589]: 2026-11-10 07:04:40,181 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止\n2026-11-10T07:04:40+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.\n2026-11-10T07:04:40+0800 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.\n2026-11-10T07:04:40+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 3.098s CPU time.\n2026-11-10T07:04:40+0800 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.\n2026-11-10T07:04:40+0800 fl00 python3[20852]: 2026-11-10 07:04:40,972 [INFO] [client-daemon] 网卡 wlxfca386b38672 配置就绪 (信道=149, 功率索引=18)\n2026-11-10T07:04:40+0800 fl00 python3[20852]: 2026-11-10 07:04:40,972 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 12 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --air-interface wlxfca386b38672 --known-clients 1,2,3,4,5,6,7,8,9,10 --grant-duration-ms 40 --guard-interval-ms 5 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64\n2026-11-10T07:04:41+0800 fl00 python3[20852]: 2026-11-10 07:04:41,032 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000\n2026-11-10T07:04:41+0800 fl00 python3[20852]: 2026-11-10 07:04:41,033 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)\n2026-11-10T07:04:41+0800 fl00 python3[20852]: 2026-11-10 07:04:41,036 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090\n2026-11-10T07:04:55+0800 fl00 python3[20852]: 2026-11-10 07:04:55,953 [INFO] [client-daemon] 射频重配 PREPARE session=switch_06965e3eeaf64ccebe0b411f27fc4bbf targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 157, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 12000}\n2026-11-10T07:05:01+0800 fl00 python3[20852]: 2026-11-10 07:05:01,264 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_06965e3eeaf64ccebe0b411f27fc4bbf channel=157\n2026-11-10T07:05:16+0800 fl00 python3[20852]: 2026-11-10 07:05:16,171 [INFO] [client-daemon] 射频重配 PREPARE session=switch_12a96e7358ee4d64b105f7748f2c3eb7 targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 149, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 15000}\n2026-11-10T07:05:24+0800 fl00 python3[20852]: 2026-11-10 07:05:24,308 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_12a96e7358ee4d64b105f7748f2c3eb7 channel=149\n2026-11-10T07:05:35+0800 fl00 python3[20852]: 2026-11-10 07:05:35,304 [INFO] [client-daemon] 射频重配 PREPARE session=switch_6432e7dcafbc471b911433115184745d targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 157, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 12000}\n2026-11-10T07:05:42+0800 fl00 python3[20852]: 2026-11-10 07:05:42,271 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_6432e7dcafbc471b911433115184745d channel=157\n2026-11-10T07:12:23+0800 fl00 python3[20852]: 2026-11-10 07:12:23,473 [INFO] [client-daemon] 射频重配 PREPARE session=switch_cf1f21d47fc04710b30432e125ba69d3 targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 149, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 15000}\n2026-11-10T07:12:27+0800 fl00 python3[20852]: 2026-11-10 07:12:27,183 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_cf1f21d47fc04710b30432e125ba69d3 channel=149\n2026-11-10T07:12:33+0800 fl00 python3[20852]: 2026-11-10 07:12:33,843 [INFO] [client-daemon] 收到系统信号 15，正在关闭服务...\n2026-11-10T07:12:33+0800 fl00 systemd[1]: Stopping WFB-ng FL server persistent daemon...\n2026-11-10T07:12:34+0800 fl00 python3[20852]: 2026-11-10 07:12:34,002 [INFO] [client-daemon] wfb-fl-server-daemon 已安全停止\n2026-11-10T07:12:34+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Deactivated successfully.\n2026-11-10T07:12:34+0800 fl00 systemd[1]: Stopped WFB-ng FL server persistent daemon.\n2026-11-10T07:12:34+0800 fl00 systemd[1]: wfb-fl-server-daemon.service: Consumed 25.976s CPU time.\n2026-11-10T07:12:34+0800 fl00 systemd[1]: Started WFB-ng FL server persistent daemon.\n2026-11-10T07:12:34+0800 fl00 python3[21910]: 2026-11-10 07:12:34,868 [INFO] [client-daemon] 网卡 wlxfca386b38672 配置就绪 (信道=149, 功率索引=18)\n2026-11-10T07:12:34+0800 fl00 python3[21910]: 2026-11-10 07:12:34,869 [INFO] [client-daemon] 启动 wfb_v6_uplink 链路底座: /usr/bin/wfb_v6_uplink --role server --tun-name fl-s --tun-addr 10.80.0.1/24 --node-id 255 --link-id 7669206 --uplink-stream 1 --downlink-stream 2 --fec-k 8 --fec-n 12 --radio-bandwidth 40 --radio-control-port 9200 --radio-mcs-index 3 --air-interface wlxfca386b38672 --known-clients 1,2,3,4,5,6,7,8,9,10 --grant-duration-ms 30 --guard-interval-ms 5 --client-target 1:10.80.0.11:127.0.0.1:1 --client-target 2:10.80.0.12:127.0.0.1:1 --client-target 3:10.80.0.13:127.0.0.1:1 --client-target 4:10.80.0.14:127.0.0.1:1 --client-target 5:10.80.0.15:127.0.0.1:1 --client-target 6:10.80.0.16:127.0.0.1:1 --client-target 7:10.80.0.17:127.0.0.1:1 --client-target 8:10.80.0.18:127.0.0.1:1 --client-target 9:10.80.0.19:127.0.0.1:1 --client-target 10:10.80.0.20:127.0.0.1:1 --downlink-pause-threshold-bytes 131072 --downlink-resume-threshold-bytes 65536 --downlink-queue-packets-limit 64\n2026-11-10T07:12:34+0800 fl00 python3[21910]: 2026-11-10 07:12:34,929 [INFO] [client-daemon] 已设置 TUN fl-s txqueuelen=5000\n2026-11-10T07:12:34+0800 fl00 python3[21910]: 2026-11-10 07:12:34,930 [INFO] [client-daemon] 对称 UDP 控制平面已监听 (端口 9001, 广播 9000)\n2026-11-10T07:12:34+0800 fl00 python3[21910]: 2026-11-10 07:12:34,933 [INFO] [client-daemon] 本地专用 REST IPC 运行中: http://127.0.0.1:9090\n2026-11-10T07:12:50+0800 fl00 python3[21910]: 2026-11-10 07:12:50,480 [INFO] [client-daemon] 射频重配 PREPARE session=switch_c05513243ce9424a8332895cf427f1a0 targets=[1, 2, 3, 5, 6, 7, 8, 9, 10] patch={'channel': 157, 'bandwidth_mhz': 40, 'downlink_mcs': 3, 'uplink_mcs': 4, 'radio_txpower_dbm': 18, 'uftp_rate_kbps': 12000}\n2026-11-10T07:12:56+0800 fl00 python3[21910]: 2026-11-10 07:12:56,489 [INFO] [client-daemon] 射频重配不可逆 commit session=switch_c05513243ce9424a8332895cf427f1a0 channel=157\n",
+    "stderr": ""
+  },
+  "worker_owner": {
+    "owner": "fl00",
+    "pid": 20725,
+    "host": "fl00",
+    "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z",
+    "started_wall": 1794265477.1502678,
+    "deadline_monotonic": 25162.506238218,
+    "phase_budget_seconds": 3000,
+    "stop_file": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/heartbeat-fix-controlled-g40d5-g30d5-20261109T213946Z/continuation-cache-reclaimed-20261109T223355Z/STOP",
+    "run_ids": [],
+    "remote_owner": "current general-purpose worker"
+  }
+}

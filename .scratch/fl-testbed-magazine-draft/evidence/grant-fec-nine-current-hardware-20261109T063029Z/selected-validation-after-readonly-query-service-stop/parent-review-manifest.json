@@ -1,0 +1,18 @@
+{
+  "files": {
+    "runner.py": "98a642ecb0f0e569a3e822f4cdada65a4fe8c90f0d12dad38e0d68394ad7047e",
+    "plan.json": "6ed64b78604bdd1417f7cc30bf65d6bae12bc9a3cb41a229f2a942ef8c638e57",
+    "driver-base.py": "df423277da89fe8a91e794edd4e1fb4987ebfa755e8a3f7f61f1af3d9dc22b85",
+    "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "checkpoint.json": "89c9ed561a54646ae9d5f74d6e00c8d94a22faf95b50a97c1196b438723679ae",
+    "hardware-from-actual.json": "a4016319623bb1b27e47ecb69b9de2ca4b64872b8b3d73ec6d3f69e05c6ae12f",
+    "boot-ids.json": "ccb2520c087c68f81b53ea87b94afb4b20dcb32e922f3aac3b85af83e8d21862",
+    "node_agent.py": "772557fc3524ea8b3d1404a0456c567e9667e1436232b837791c330632d6f5cc",
+    "worker.py": "ba9bfa97ef80301d5b20281564e8cf432793d5ca01d2345b8f585b39d868c440",
+    "helpers.py": "e0f9ee2230fbbe1ad7f853b410fc6fe209b698a0be0be19d9f6f3a2c5d38b5ca",
+    "wrapper.py": "eabb8d2febf4d669183bd3355f0663ea5446fd85d933443a16d5d4f5624b88c8",
+    "storage.py": "3958e8cd0fc4074f6cd71b0602aaf7a42a2342a440430889111efb2f09bcc3f2"
+  },
+  "wall": 1794245799.337532,
+  "policy": "仅允许同一已核验只读更新详情事务的标准服务临时停止；缓存删除仍需无APT进程和四锁空闲；既定两轮与finally恢复不变"
+}

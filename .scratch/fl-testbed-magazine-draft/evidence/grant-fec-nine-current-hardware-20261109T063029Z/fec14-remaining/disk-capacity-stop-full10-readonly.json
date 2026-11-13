@@ -1,0 +1,982 @@
+{
+  "rows": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "host": "fl00",
+        "wall": 1794206194.7236025,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "文件系统             1B的块        已用        可用 已用% 挂载点\n/dev/nvme0n1p1 123887923200 53038870528 64508575744   46% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "文件系统        Inodes   已用I   可用I 已用I% 挂载点\n/dev/nvme0n1p1 7725056 1036536 6688520    14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE         FSTYPE OPTIONS\n/      /dev/nvme0n1p1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-model-sized-157-1",
+          "/srv/wfb-ng-fl/comm-model-sized-157-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-smoke-157-1m",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "2170880\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n4308992\t/srv/wfb-ng-fl/standalone157-20261028T032937Z-power18-repeat3\n377061376\t/srv/wfb-ng-fl/calibration\n4304896\t/srv/wfb-ng-fl/standalone157-20261028T093110Z-three-client-new-nics-smoke-r3\n89448448\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T113803498806Z\n89624576\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n193179648\t/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T111118802529Z\n20480\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n447930368\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n8568832\t/srv/wfb-ng-fl/standalone157-20261028T104104Z-149-p14-m4\n17088512\t/srv/wfb-ng-fl/standalone157-20261028T092827Z-three-client-new-nics-smoke-r2\n11698176\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n11698176\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n772476928\t/srv/wfb-ng-fl/server\n8192\t/srv/wfb-ng-fl/diagnose-grant-10ms\n11698176\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n28672\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1\n90304512\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T114859719461Z\n4427776\t/srv/wfb-ng-fl/standalone157-20261028T104339Z-149-p18-m5\n11698176\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n36864\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n112295936\t/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z\n447938560\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n13131776\t/srv/wfb-ng-fl/standalone157-20261028T032816Z-power18-repeat2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022355Z-power18-r2\n179240960\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n313602048\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n13062144\t/srv/wfb-ng-fl/standalone157-20261028T021546Z-mcs3-r1\n89624576\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n268771328\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2\n268779520\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3\n492716032\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n192671744\t/srv/wfb-ng-fl/release-80294dff43996378c20e5e354201b63ffbaf587b-20261029T100728194822Z\n12869632\t/srv/wfb-ng-fl/standalone157-20261028T021313Z-mcs4-r1\n11698176\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n36864\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022852Z-power10-r1\n54968320\t/srv/wfb-ng-fl/mnist\n12759040\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n89645056\t/srv/wfb-ng-fl/comm-model-sized-157-2\n4358144\t/srv/wfb-ng-fl/standalone157-20261028T093144Z-three-client-new-nics-smoke-r4\n224030720\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n4313088\t/srv/wfb-ng-fl/standalone149-20261028T034424Z-channel149-ht20\n68227072\t/srv/wfb-ng-fl/releases\n8515584\t/srv/wfb-ng-fl/standalone157-20261028T041905Z-single-fl04-157-ht40-r2\n28672\t/srv/wfb-ng-fl/comm-model-sized-157-1\n8572928\t/srv/wfb-ng-fl/standalone157-20261028T104217Z-149-p18-m4\n393216\t/srv/wfb-ng-fl/standalone157-20261028T014839Z-standalone157\n11698176\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n144056320\t/srv/wfb-ng-fl/release-0d34d12754c5267962a2b46b1a4cbcbdbdd87d78-20261029T083347599025Z\n11698176\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n98304\t/srv/wfb-ng-fl/standalone157-20261028T041537Z-single-fl04-157-ht40\n11698176\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n16990208\t/srv/wfb-ng-fl/standalone157-20261028T024617Z-power18-r3\n90304512\t/srv/wfb-ng-fl/release-90f6ec61eb32c66280a91b85fef6844e9f74da71-20261028T115016892741Z\n8577024\t/srv/wfb-ng-fl/standalone157-20261028T094406Z-single-fl01-current-nics\n90021888\t/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1\n142045184\t/srv/wfb-ng-fl/release-77fa8fe3984df639abd3c953c6cd3155fc061cf8-20261029T072330345345Z\n4300800\t/srv/wfb-ng-fl/standalone157-20261028T101320Z-single-fl04-new-card-baseline\n11698176\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n24576\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n8617984\t/srv/wfb-ng-fl/standalone157-20261028T082202Z-single-fl04-swapped-nic-19v\n54128640\t/srv/wfb-ng-fl/deploy-701963a\n48508928\t/srv/wfb-ng-fl/deploy-e53de00\n89870336\t/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1\n24576\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n25272320\t/srv/wfb-ng-fl/install-cache\n11558912\t/srv/wfb-ng-fl/standalone157-20261028T091558Z-three-client-new-fl02-nic-smoke-r2\n8552448\t/srv/wfb-ng-fl/standalone157-20261028T085527Z-single-fl04-new-good-position-r2\n12288\t/srv/wfb-ng-fl/phase1-backup-20261106\n4366336\t/srv/wfb-ng-fl/standalone157-20261028T092631Z-three-client-new-fl02-fl04-nics-smoke\n24576\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n11698176\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n53366784\t/srv/wfb-ng-fl/native-69a94d8-unified\n89391104\t/srv/wfb-ng-fl/release-c86e54aad4d5101cfe19e16d888545041a29de3f-20261028T113545167077Z\n6406144\t/srv/wfb-ng-fl/comm-smoke-157-1m\n11616256\t/srv/wfb-ng-fl/mnist-downloads\n11694080\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n4431872\t/srv/wfb-ng-fl/standalone157-20261028T083256Z-single-fl04-swapped-position\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022110Z-power18-r1\n11698176\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n492716032\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n134451200\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n8523776\t/srv/wfb-ng-fl/standalone157-20261028T042122Z-single-fl01-157-ht40\n28672\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n89624576\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n11698176\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n89620480\t/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1\n194297856\t/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z\n8523776\t/srv/wfb-ng-fl/standalone157-20261028T083034Z-single-fl02-swapped-position\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-1\n403156992\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n32768\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n4300800\t/srv/wfb-ng-fl/standalone157-20261028T040716Z-single-fl02-157-ht40\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n24576\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-2\n12881920\t/srv/wfb-ng-fl/standalone157-20261028T021826Z-mcs2-r1\n144887808\t/srv/wfb-ng-fl/release-202f532632aca15871bf4805b13832593cc8635b-20261029T092949308599Z\n110370816\t/srv/wfb-ng-fl/release-bfb0eeca016c205d9517b2ef8d9616501feccac5-20261028T124504373133Z\n4374528\t/srv/wfb-ng-fl/standalone157-20261028T032707Z-power18-repeat1\n90480640\t/srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z\n12288\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n7385088\t/srv/wfb-ng-fl/standalone157-20261028T103052Z-single-fl04-after-replug\n13250560\t/srv/wfb-ng-fl/standalone157-20261028T023310Z-power10-r2\n4497408\t/srv/wfb-ng-fl/standalone157-20261028T081800Z-single-fl02-swapped-nic-19v\n53694464\t/srv/wfb-ng-fl/deploy-69a94d8\n7913656320\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "wall": 1794206198.3313658,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used Available Use% Mounted on\n/dev/sda1      29692346368 28236161024   6164480 100% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315476 1536844   18% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-model-sized-157-1",
+          "/srv/wfb-ng-fl/comm-model-sized-157-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-smoke-157-1m",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3\n4390912\t/srv/wfb-ng-fl/standalone157-20261028T024617Z-power18-r3\n141451264\t/srv/wfb-ng-fl/release-77fa8fe3984df639abd3c953c6cd3155fc061cf8-20261029T072330345345Z\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022110Z-power18-r1\n11386880\t/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1\n4345856\t/srv/wfb-ng-fl/standalone157-20261028T042122Z-single-fl01-157-ht40\n11620352\t/srv/wfb-ng-fl/mnist-downloads\n20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T081800Z-single-fl02-swapped-nic-19v\n89456640\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T113803498806Z\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T041537Z-single-fl04-157-ht40\n16384\t/srv/wfb-ng-fl/comm-model-sized-157-1\n44855296\t/srv/wfb-ng-fl/comm-model-sized-157-2\n302194688\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n118784\t/srv/wfb-ng-fl/standalone157-20261028T032937Z-power18-repeat3\n144297984\t/srv/wfb-ng-fl/release-202f532632aca15871bf4805b13832593cc8635b-20261029T092949308599Z\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n54128640\t/srv/wfb-ng-fl/deploy-701963a\n53248\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n48504832\t/srv/wfb-ng-fl/deploy-e53de00\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21471232\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n4448256\t/srv/wfb-ng-fl/standalone157-20261028T093144Z-three-client-new-nics-smoke-r4\n4390912\t/srv/wfb-ng-fl/standalone157-20261028T021826Z-mcs2-r1\n134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-2\n193708032\t/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z\n143462400\t/srv/wfb-ng-fl/release-0d34d12754c5267962a2b46b1a4cbcbdbdd87d78-20261029T083347599025Z\n111702016\t/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z\n43180032\t/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n89456640\t/srv/wfb-ng-fl/release-90f6ec61eb32c66280a91b85fef6844e9f74da71-20261028T115016892741Z\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n54968320\t/srv/wfb-ng-fl/mnist\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104104Z-149-p14-m4\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n118784\t/srv/wfb-ng-fl/standalone149-20261028T034424Z-channel149-ht20\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n192081920\t/srv/wfb-ng-fl/release-80294dff43996378c20e5e354201b63ffbaf587b-20261029T100728194822Z\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n109776896\t/srv/wfb-ng-fl/release-bfb0eeca016c205d9517b2ef8d9616501feccac5-20261028T124504373133Z\n12288\t/srv/wfb-ng-fl/card-tests\n134393856\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104217Z-149-p18-m4\n89456640\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T114859719461Z\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T103052Z-single-fl04-after-replug\n68128768\t/srv/wfb-ng-fl/releases\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104339Z-149-p18-m5\n3215360\t/srv/wfb-ng-fl/comm-smoke-157-1m\n4399104\t/srv/wfb-ng-fl/standalone157-20261028T032816Z-power18-repeat2\n4427776\t/srv/wfb-ng-fl/standalone157-20261028T021546Z-mcs3-r1\n4378624\t/srv/wfb-ng-fl/standalone157-20261028T091558Z-three-client-new-fl02-nic-smoke-r2\n114688\t/srv/wfb-ng-fl/standalone157-20261028T093110Z-three-client-new-nics-smoke-r3\n53686272\t/srv/wfb-ng-fl/deploy-69a94d8\n19001344\t/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1\n89903104\t/srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z\n4452352\t/srv/wfb-ng-fl/standalone157-20261028T092827Z-three-client-new-nics-smoke-r2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022852Z-power10-r1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022355Z-power18-r2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1\n188416\t/srv/wfb-ng-fl/standalone157-20261028T014839Z-standalone157\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T085527Z-single-fl04-new-good-position-r2\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n53248\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n90112\t/srv/wfb-ng-fl/standalone157-20261028T083256Z-single-fl04-swapped-position\n4337664\t/srv/wfb-ng-fl/standalone157-20261028T092631Z-three-client-new-fl02-fl04-nics-smoke\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T101320Z-single-fl04-new-card-baseline\n90112\t/srv/wfb-ng-fl/standalone157-20261028T082202Z-single-fl04-swapped-nic-19v\n84107264\t/srv/wfb-ng-fl/calibration\n4407296\t/srv/wfb-ng-fl/standalone157-20261028T094406Z-single-fl01-current-nics\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T041905Z-single-fl04-157-ht40-r2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T083034Z-single-fl02-swapped-position\n832237568\t/srv/wfb-ng-fl/install-cache\n4345856\t/srv/wfb-ng-fl/standalone157-20261028T032707Z-power18-repeat1\n8192\t/srv/wfb-ng-fl/phase1-backup-20261106\n12288\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n224006144\t/srv/wfb-ng-fl/evidence\n4382720\t/srv/wfb-ng-fl/standalone157-20261028T023310Z-power10-r2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T040716Z-single-fl02-157-ht40\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n4390912\t/srv/wfb-ng-fl/standalone157-20261028T021313Z-mcs4-r1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n4854484992\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "wall": 1794206199.1152825,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used Available Use% Mounted on\n/dev/sda1      29692346368 27590569984 651755520  98% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315399 1536921   18% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-model-sized-157-1",
+          "/srv/wfb-ng-fl/comm-model-sized-157-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-smoke-157-1m",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3\n4399104\t/srv/wfb-ng-fl/standalone157-20261028T024617Z-power18-r3\n141451264\t/srv/wfb-ng-fl/release-77fa8fe3984df639abd3c953c6cd3155fc061cf8-20261029T072330345345Z\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022110Z-power18-r1\n20574208\t/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T042122Z-single-fl01-157-ht40\n11620352\t/srv/wfb-ng-fl/mnist-downloads\n20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134393856\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n4431872\t/srv/wfb-ng-fl/standalone157-20261028T081800Z-single-fl02-swapped-nic-19v\n89456640\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T113803498806Z\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-1\n98304\t/srv/wfb-ng-fl/standalone157-20261028T041537Z-single-fl04-157-ht40\n16384\t/srv/wfb-ng-fl/comm-model-sized-157-1\n43282432\t/srv/wfb-ng-fl/comm-model-sized-157-2\n308805632\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n114688\t/srv/wfb-ng-fl/standalone157-20261028T032937Z-power18-repeat3\n144293888\t/srv/wfb-ng-fl/release-202f532632aca15871bf4805b13832593cc8635b-20261029T092949308599Z\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134410240\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n54128640\t/srv/wfb-ng-fl/deploy-701963a\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n48504832\t/srv/wfb-ng-fl/deploy-e53de00\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21471232\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n4333568\t/srv/wfb-ng-fl/standalone157-20261028T093144Z-three-client-new-nics-smoke-r4\n4390912\t/srv/wfb-ng-fl/standalone157-20261028T021826Z-mcs2-r1\n134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-2\n193708032\t/srv/wfb-ng-fl/release-5443ca22658202805317a9a974c261cde7c751b9-20261103T114943570298Z\n143462400\t/srv/wfb-ng-fl/release-0d34d12754c5267962a2b46b1a4cbcbdbdd87d78-20261029T083347599025Z\n111702016\t/srv/wfb-ng-fl/release-c62cde266ef509d605c8c923b0f4fa35e42fc4dd-20261028T130351850367Z\n39354368\t/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n89460736\t/srv/wfb-ng-fl/release-90f6ec61eb32c66280a91b85fef6844e9f74da71-20261028T115016892741Z\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n54968320\t/srv/wfb-ng-fl/mnist\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104104Z-149-p14-m4\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n118784\t/srv/wfb-ng-fl/standalone149-20261028T034424Z-channel149-ht20\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n192081920\t/srv/wfb-ng-fl/release-80294dff43996378c20e5e354201b63ffbaf587b-20261029T100728194822Z\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n109776896\t/srv/wfb-ng-fl/release-bfb0eeca016c205d9517b2ef8d9616501feccac5-20261028T124504373133Z\n134389760\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104217Z-149-p18-m4\n89456640\t/srv/wfb-ng-fl/release-9c0f347ffecf22aed973a0e40be8c32d1a476af6-20261028T114859719461Z\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T103052Z-single-fl04-after-replug\n68128768\t/srv/wfb-ng-fl/releases\n94208\t/srv/wfb-ng-fl/standalone157-20261028T104339Z-149-p18-m5\n3215360\t/srv/wfb-ng-fl/comm-smoke-157-1m\n4378624\t/srv/wfb-ng-fl/standalone157-20261028T032816Z-power18-repeat2\n4395008\t/srv/wfb-ng-fl/standalone157-20261028T021546Z-mcs3-r1\n4374528\t/srv/wfb-ng-fl/standalone157-20261028T091558Z-three-client-new-fl02-nic-smoke-r2\n114688\t/srv/wfb-ng-fl/standalone157-20261028T093110Z-three-client-new-nics-smoke-r3\n53686272\t/srv/wfb-ng-fl/deploy-69a94d8\n19156992\t/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1\n89903104\t/srv/wfb-ng-fl/release-607c064150b661d1e8a568e29a101998ac06b0b7-20261028T115651441253Z\n4448256\t/srv/wfb-ng-fl/standalone157-20261028T092827Z-three-client-new-nics-smoke-r2\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022852Z-power10-r1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T022355Z-power18-r2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1\n184320\t/srv/wfb-ng-fl/standalone157-20261028T014839Z-standalone157\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T085527Z-single-fl04-new-good-position-r2\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n90112\t/srv/wfb-ng-fl/standalone157-20261028T083256Z-single-fl04-swapped-position\n4329472\t/srv/wfb-ng-fl/standalone157-20261028T092631Z-three-client-new-fl02-fl04-nics-smoke\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T101320Z-single-fl04-new-card-baseline\n90112\t/srv/wfb-ng-fl/standalone157-20261028T082202Z-single-fl04-swapped-nic-19v\n69386240\t/srv/wfb-ng-fl/calibration\n90112\t/srv/wfb-ng-fl/standalone157-20261028T094406Z-single-fl01-current-nics\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n90112\t/srv/wfb-ng-fl/standalone157-20261028T041905Z-single-fl04-157-ht40-r2\n4337664\t/srv/wfb-ng-fl/standalone157-20261028T083034Z-single-fl02-swapped-position\n832237568\t/srv/wfb-ng-fl/install-cache\n4333568\t/srv/wfb-ng-fl/standalone157-20261028T032707Z-power18-repeat1\n8192\t/srv/wfb-ng-fl/phase1-backup-20261106\n12288\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n4378624\t/srv/wfb-ng-fl/standalone157-20261028T023310Z-power10-r2\n118784\t/srv/wfb-ng-fl/standalone157-20261028T040716Z-single-fl02-157-ht40\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n4390912\t/srv/wfb-ng-fl/standalone157-20261028T021313Z-mcs4-r1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n4626227200\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "host": "fl03",
+        "wall": 1794206196.3665328,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 22903500800 5338824704  82% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 258733 1593587   14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n40120320\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21471232\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n50388992\t/srv/wfb-ng-fl/releases\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1229430784\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "host": "fl05",
+        "wall": 1794206194.9838076,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25072844800 3169480704  89% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 278424 1573896   16% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-model-sized-157-1",
+          "/srv/wfb-ng-fl/comm-model-sized-157-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3",
+          "/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-smoke-157-1m",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-3\n19828736\t/srv/wfb-ng-fl/comm-model-sized-ht20-149-6-1\n20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-1\n16384\t/srv/wfb-ng-fl/comm-model-sized-157-1\n44834816\t/srv/wfb-ng-fl/comm-model-sized-157-2\n100429824\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21467136\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-2\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-12-2\n37744640\t/srv/wfb-ng-fl/comm-model-sized-ht40-157-12-1\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/card-tests\n134393856\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n68358144\t/srv/wfb-ng-fl/releases\n3215360\t/srv/wfb-ng-fl/comm-smoke-157-1m\n10104832\t/srv/wfb-ng-fl/comm-model-sized-ht20-157-6-1\n16384\t/srv/wfb-ng-fl/comm-model-sized-ht40-149-12-1\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n8192\t/srv/wfb-ng-fl/phase1-backup-20261106\n16384\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1829990400\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "host": "fl06",
+        "wall": 1794206194.7813005,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25357283328 2885042176  90% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242826 1609494   14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134393856\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n92008448\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21467136\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n54972416\t/srv/wfb-ng-fl/mnist\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n134393856\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n68087808\t/srv/wfb-ng-fl/releases\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n4096\t/srv/wfb-ng-fl/phase1-backup-20261106\n12288\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1491644416\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "host": "fl07",
+        "wall": 1794206194.8647614,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 23506038784 4736286720  84% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242347 1609973   14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n68653056\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21467136\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n4722688\t/srv/wfb-ng-fl/bootstrap-5443ca-20261106\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n4096\t/srv/wfb-ng-fl/mnist\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n134397952\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n56303616\t/srv/wfb-ng-fl/releases\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n4096\t/srv/wfb-ng-fl/phase1-backup-20261106\n16384\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1406291968\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "host": "fl08",
+        "wall": 1794206194.9259846,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25576693760 2665631744  91% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242409 1609911   14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n87003136\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134410240\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21475328\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n134402048\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n54972416\t/srv/wfb-ng-fl/mnist\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n134393856\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n55922688\t/srv/wfb-ng-fl/releases\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n4096\t/srv/wfb-ng-fl/phase1-backup-20261106\n16384\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134402048\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1474510848\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "host": "fl09",
+        "wall": 1794206194.7193744,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 25477836800 2764488704  91% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 242533 1609787   14% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134393856\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n62181376\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21471232\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n4722688\t/srv/wfb-ng-fl/bootstrap-5443ca-20261106\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n54972416\t/srv/wfb-ng-fl/mnist\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n134393856\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n40960\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n56303616\t/srv/wfb-ng-fl/releases\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n4096\t/srv/wfb-ng-fl/phase1-backup-20261106\n16384\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134393856\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1454768128\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "host": "fl10",
+        "wall": 1794206194.9093213,
+        "df_bytes": {
+          "argv": [
+            "df",
+            "-B1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 24818548736 3423776768  88% /\n",
+          "stderr": ""
+        },
+        "df_inodes": {
+          "argv": [
+            "df",
+            "-i",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 221440 1630880   12% /\n",
+          "stderr": ""
+        },
+        "findmnt": {
+          "argv": [
+            "findmnt",
+            "-T",
+            "/srv/wfb-ng-fl",
+            "-o",
+            "TARGET,SOURCE,FSTYPE,OPTIONS"
+          ],
+          "returncode": 0,
+          "stdout": "TARGET SOURCE    FSTYPE OPTIONS\n/      /dev/sda1 ext4   rw,relatime\n",
+          "stderr": ""
+        },
+        "comm_directories": [
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model",
+          "/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z",
+          "/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z",
+          "/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model",
+          "/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-model-fec14-g10-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g20-d10",
+          "/srv/wfb-ng-fl/comm-model-fec14-g30-d10",
+          "/srv/wfb-ng-fl/comm-nine-g18d2-smoke",
+          "/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1",
+          "/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2",
+          "/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model",
+          "/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke",
+          "/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model"
+        ],
+        "du_overview": {
+          "argv": [
+            "du",
+            "-B1",
+            "--max-depth=1",
+            "/srv/wfb-ng-fl"
+          ],
+          "returncode": 0,
+          "stdout": "20480\t/srv/wfb-ng-fl/comm-eleven-A-g15d5-smoke-20261108-1\n134393856\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-fec14-g20-d5-smoke\n3219456\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-2\n66945024\t/srv/wfb-ng-fl/client\n3223552\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-rs20261109T055853Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-C-g18d2-r12-smoke-20261108T1057Z\n3223552\t/srv/wfb-ng-fl/comm-fec14-g30-d10-smoke\n134402048\t/srv/wfb-ng-fl/comm-eleven-A-g18d2-model-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-model\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-model\n3223552\t/srv/wfb-ng-fl/comm-fec14-g60-d10-smoke\n134393856\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-model\n21471232\t/srv/wfb-ng-fl/comm-swr20261109T044926Z-g30-d5-model\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g60-d10-smoke\n134397952\t/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108T1055Z\n3223552\t/srv/wfb-ng-fl/comm-c20261109T034216Z-g20-d5-smoke\n3223552\t/srv/wfb-ng-fl/comm-k20261109T034216Z-g30-d5-smoke\n134389760\t/srv/wfb-ng-fl/comm-nine-grant10-model-20261108-1\n32768\t/srv/wfb-ng-fl/comm-nine-grant10-smoke-20261108-1\n55922688\t/srv/wfb-ng-fl/releases\n16384\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-2\n16384\t/srv/wfb-ng-fl/comm-eleven-A-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g20-d10-smoke\n3223552\t/srv/wfb-ng-fl/comm-fec14-g10-d10-smoke\n86016\t/srv/wfb-ng-fl/comm-gf20261109T063029Z-g40-d10-model\n3223552\t/srv/wfb-ng-fl/comm-rv20261109T052525Z-g30-d5-smoke\n12288\t/srv/wfb-ng-fl/comm-full-nine-smoke-20261108-1\n3223552\t/srv/wfb-ng-fl/comm-fec14-g40-d10-smoke\n12288\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-1\n4096\t/srv/wfb-ng-fl/phase1-backup-20261106\n12288\t/srv/wfb-ng-fl/comm-full-nine-swap-smoke-20261108-1\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g10-d10\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g20-d10\n3223552\t/srv/wfb-ng-fl/comm-sw20261109T044926Z-g30-d5-smoke\n20480\t/srv/wfb-ng-fl/comm-nine-g18d2-smoke\n20480\t/srv/wfb-ng-fl/comm-eleven-B-g18d2-r12-smoke-20261108-2\n20480\t/srv/wfb-ng-fl/comm-p8-fec14-g20-d5-smoke\n134397952\t/srv/wfb-ng-fl/comm-model-fec14-g30-d10\n1399459840\t/srv/wfb-ng-fl\n",
+          "stderr": ""
+        },
+        "read_only": true
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794206199.2729294,
+  "no_deletions": true
+}

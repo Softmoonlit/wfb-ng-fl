@@ -1,0 +1,79 @@
+{
+  "rows": [
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "host": "fl01",
+        "rows": [
+          {
+            "target": "/srv/wfb-ng-fl/install-cache",
+            "returncode": 0,
+            "stdout": "832237568\t/srv/wfb-ng-fl/install-cache\n",
+            "stderr": ""
+          },
+          {
+            "target": "/srv/wfb-ng-fl/evidence",
+            "returncode": 0,
+            "stdout": "224002048\t/srv/wfb-ng-fl/evidence/phase1-fl01-20261106T1627\n224006144\t/srv/wfb-ng-fl/evidence\n",
+            "stderr": ""
+          },
+          {
+            "target": "/var/log",
+            "returncode": 0,
+            "stdout": "16384\t/var/log/installer\n114688\t/var/log/apt\n4096\t/var/log/gdm3\n4096\t/var/log/private\n24764416\t/var/log\n",
+            "stderr": ""
+          },
+          {
+            "target": "/home/fl",
+            "returncode": 0,
+            "stdout": "4096\t/home/fl/Downloads\n22421504\t/home/fl/.cache\n50364416\t/home/fl/projects\n4096\t/home/fl/Music\n8192\t/home/fl/.ssh\n4096\t/home/fl/Documents\n4096\t/home/fl/Templates\n155648\t/home/fl/.config\n8192\t/home/fl/.nv\n248451072\t/home/fl/.opencode\n4096\t/home/fl/Pictures\n28672\t/home/fl/Desktop\n4096\t/home/fl/Public\n35557376\t/home/fl/.local\n4096\t/home/fl/Videos\n357052416\t/home/fl\n",
+            "stderr": ""
+          }
+        ],
+        "df": "Filesystem       1B-blocks        Used Available Use% Mounted on\n/dev/sda1      29692346368 28236935168   5390336 100% /\n",
+        "read_only": true,
+        "wall": 1794206887.039254
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "host": "fl02",
+        "rows": [
+          {
+            "target": "/srv/wfb-ng-fl/install-cache",
+            "returncode": 0,
+            "stdout": "832237568\t/srv/wfb-ng-fl/install-cache\n",
+            "stderr": ""
+          },
+          {
+            "target": "/srv/wfb-ng-fl/evidence",
+            "returncode": 1,
+            "stdout": "",
+            "stderr": "du: cannot access '/srv/wfb-ng-fl/evidence': No such file or directory\n"
+          },
+          {
+            "target": "/var/log",
+            "returncode": 0,
+            "stdout": "16384\t/var/log/installer\n114688\t/var/log/apt\n4096\t/var/log/gdm3\n4096\t/var/log/private\n33492992\t/var/log\n",
+            "stderr": ""
+          },
+          {
+            "target": "/home/fl",
+            "returncode": 0,
+            "stdout": "4096\t/home/fl/Downloads\n22360064\t/home/fl/.cache\n50343936\t/home/fl/projects\n4096\t/home/fl/Music\n8192\t/home/fl/.ssh\n4096\t/home/fl/Documents\n4096\t/home/fl/Templates\n147456\t/home/fl/.config\n8192\t/home/fl/.nv\n4096\t/home/fl/Pictures\n28672\t/home/fl/Desktop\n4096\t/home/fl/Public\n684032\t/home/fl/.local\n4096\t/home/fl/Videos\n73637888\t/home/fl\n",
+            "stderr": ""
+          }
+        ],
+        "df": "Filesystem       1B-blocks        Used Available Use% Mounted on\n/dev/sda1      29692346368 27591221248 651104256  98% /\n",
+        "read_only": true,
+        "wall": 1794206887.7892494
+      },
+      "stderr": ""
+    }
+  ],
+  "wall": 1794206887.9083507
+}

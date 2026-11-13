@@ -1,0 +1,20 @@
+{
+  "status": "blocked",
+  "reason": "selected_precondition_mismatch",
+  "host": "fl02",
+  "free_before": 553115648,
+  "selected_before": [
+    {
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/model.bin",
+      "exists": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-model-fec14-g10-d10/role/rounds/c26f3c4d-a2f6-400e-a85a-c784c45a2607/update.bin",
+      "exists": false
+    },
+    {
+      "path": "/srv/wfb-ng-fl/comm-fec12-20261109T071504Z-g30-d5-model/role/rounds/89b243af-8753-4c9a-9f1a-4d959fa849b6/model.bin",
+      "exists": false
+    }
+  ]
+}

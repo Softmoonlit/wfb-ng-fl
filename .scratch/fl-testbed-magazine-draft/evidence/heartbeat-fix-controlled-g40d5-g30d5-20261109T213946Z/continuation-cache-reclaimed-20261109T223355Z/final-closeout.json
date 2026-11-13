@@ -1,0 +1,50 @@
+{
+  "status": "STOP-execution-complete-recovery-incomplete",
+  "model_executions": 2,
+  "smoke_gate": {
+    "phase": "40/5",
+    "runner_returncode": 0,
+    "transfer_verified": true,
+    "cleanup_ok": true,
+    "restore_ok": true,
+    "summary": "smoke-40-d5/run-summary.json"
+  },
+  "comparisons": {
+    "40/5": {
+      "phase": "model",
+      "runner_returncode": 0,
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "summary": "model-40-d5/run-summary.json",
+      "elapsed_seconds": 416.45459847299935
+    },
+    "30/5": {
+      "phase": "model",
+      "runner_returncode": 1,
+      "transfer_verified": false,
+      "cleanup_ok": false,
+      "restore_ok": false,
+      "summary": "model-30-d5/run-summary.json",
+      "elapsed_seconds": 667.489905907998,
+      "failure": "submit timeout; minimum quota 9 not reached",
+      "partial_clients": {
+        "2": 23330816,
+        "6": 36634624,
+        "10": 15335424
+      }
+    }
+  },
+  "ordering_limit": "40/5先测、30/5后测，各一次；受顺序/时间漂移限制，不宣称统计最优",
+  "recovery": "recovery-final.json",
+  "heartbeat": {
+    "ack_wait_ms": 230,
+    "silence_timeout_s": 10,
+    "changed": false
+  },
+  "packagekit": "unchanged active/static",
+  "wall": 1794266933.5258482,
+  "comparison": "comparison-result.json",
+  "server_final_channel": 149,
+  "full_nine_recovery_verified": false
+}

@@ -1,0 +1,5 @@
+第二次精确清理编排尝试（未发生unlink）
+
+范围：fl02 旧 g30-d10 的两个预核定路径。
+结果：目标前置校验发现两个路径在当前 fl02 上已不存在（exists=false），返回 `target precondition mismatch`；fl08/fl09 尚未执行，所有目标删除数仍为 0。
+处置：依据同一只读扫描中确认存在且有完整成功证据的 `fec12-apr-20261109T185342Z-t2-g30-d5-model`，改用该 run 的 inbox/model.bin 与 rounds/update.bin，保留 rounds/model.bin；不改变门槛、参数、拓扑或保护规则。

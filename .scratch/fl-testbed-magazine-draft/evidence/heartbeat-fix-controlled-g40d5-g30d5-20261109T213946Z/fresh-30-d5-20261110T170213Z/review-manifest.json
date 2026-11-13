@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "files": {
+    "driver-base.py": "7ef5fd0adef2a27a2f34390d5381e1c488f903aae4a82ca0c86d97ec1b99217e",
+    "runner.py": "3a50d7d103a066c22fe20a9c35cda481cfd75a2eade5759dc1f2184e80435c67",
+    "node_agent.py": "39849f94d2659225eff1b1da0f41a6a1a32063017550247baee8ef3ffc504ec5",
+    "recover.py": "949511df6d8426ea4d6888e3fa2f6364b893f882c89ceaed03d70d0250757147",
+    "check-all-ready.py": "3cba1e22ad90a9d677a9d9de02018117577877abf5380fbbe4ed009abadaf5d2",
+    "helpers.py": "e0f9ee2230fbbe1ad7f853b410fc6fe209b698a0be0be19d9f6f3a2c5d38b5ca",
+    "storage.py": "0565a99c58ccabf953340794766caa9da03dfecd7a5f736e9cfd5d70f6f13a88",
+    "hardware-from-actual.json": "a4016319623bb1b27e47ecb69b9de2ca4b64872b8b3d73ec6d3f69e05c6ae12f",
+    "model-manifest.json": "d617615c5a9ef3009378f41fe96c3e9fa2b67335e2e0db82c520bd2d616f070d",
+    "release-identity.json": "ed919d3f458dd87d74b3ba0f810ad755ba9b79a99324c877155bc33ca2c8ecaf",
+    "plan.json": "2453e85918336f2496eba6d7a86714ff64252d424fa5054ed9f873282b76afca",
+    "bundle-manifest.json": "b088fcdad1c2d7cd5db92d02807f6c8c083dd7a6249553f2ba8eea1271955de5",
+    "preflight.py": "53373f2ff8f5984a3def3a974539453260b56c7ee955e073d348f818e0644ebe",
+    "packagekit-readonly.py": "658cbc27ee3d036729afad5b89ccc840dcc3ead775701ff413d203074c6ce9a6"
+  },
+  "source_release": "cccac233291c5a79ca7a66bb2ebb210497ab4071",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "scope": "fresh 30/5 only"
+}

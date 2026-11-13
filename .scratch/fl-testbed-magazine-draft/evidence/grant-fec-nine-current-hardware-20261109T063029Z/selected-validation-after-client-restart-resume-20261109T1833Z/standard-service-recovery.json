@@ -1,0 +1,119 @@
+{
+  "attempted": true,
+  "hosts": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09",
+    "fl10"
+  ],
+  "results": [
+    {
+      "host": "fl00",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-server-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl01",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl05",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl08",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 0,
+      "result": {
+        "unit": "wfb-fl-client-daemon.service",
+        "returncode": 0,
+        "stderr": ""
+      },
+      "stderr": ""
+    }
+  ],
+  "method": "systemctl restart resident service",
+  "wall": 1794220806.8378274
+}

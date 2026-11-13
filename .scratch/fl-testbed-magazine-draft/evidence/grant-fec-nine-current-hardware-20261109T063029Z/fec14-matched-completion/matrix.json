@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "profile": "current-hardware-fec14",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261109T080119Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    [
+      10,
+      10
+    ],
+    [
+      20,
+      10
+    ],
+    [
+      30,
+      10
+    ],
+    [
+      20,
+      5
+    ]
+  ],
+  "status": "stopped",
+  "max_executions": 8,
+  "candidates": [
+    {
+      "grant_duration_ms": 10,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g10-d10-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 10,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g10-d10-model",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g20-d10-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g20-d10-model",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g30-d10-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 10,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g30-d10-model",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "smoke",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g20-d5-smoke",
+      "execute_count": 0
+    },
+    {
+      "grant_duration_ms": 20,
+      "guard_interval_ms": 5,
+      "fec_n": 14,
+      "mode": "model",
+      "stage": "pending",
+      "transfer_verified": false,
+      "cleanup_ok": null,
+      "restore_ok": null,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion/fec14-g20-d5-model",
+      "execute_count": 0
+    }
+  ],
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "parent_GO_verified": true,
+  "run_tag": "20261109T081656Z",
+  "deadline_monotonic": 23506.126050181,
+  "started_wall": 1794212216.2286682,
+  "pause_requested": true,
+  "updated_wall": 1794212236.6792154,
+  "updated_monotonic": 16926.640243345,
+  "error": "RuntimeError('cold-switch phase failed: audit')"
+}

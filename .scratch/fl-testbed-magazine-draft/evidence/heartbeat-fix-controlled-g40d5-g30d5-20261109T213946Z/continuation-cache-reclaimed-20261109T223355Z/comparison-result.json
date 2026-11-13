@@ -1,0 +1,38 @@
+{
+  "status": "partial-controlled-result",
+  "old_reference_not_pooled": true,
+  "old_30_5_seconds": [
+    307.24,
+    302.049
+  ],
+  "this_batch": {
+    "40_5_model": "passed_once",
+    "30_5_model": "failed_once_submit_timeout"
+  },
+  "not_statistical_optimum": true,
+  "model_execute_count": 2,
+  "recovery_incomplete": true,
+  "server_left_at_channel": 157,
+  "heartbeat_budget_unchanged": true,
+  "actual_durations": {
+    "40_5_model": {
+      "DL_seconds": 50.82383683200169,
+      "UL_seconds": 348.66917446799926,
+      "status": "passed",
+      "nine_sha": "model-40-d5/independent-server-nine-size-sha.json"
+    },
+    "30_5_model": {
+      "DL_seconds": 47.555605156998354,
+      "UL_success_tail_seconds": 233.78668385199853,
+      "submit_hard_timeout_seconds": 600,
+      "status": "failed_minimum_quota",
+      "completed_submit_events": 6,
+      "failed_tail_nodes": [
+        "2",
+        "6",
+        "10"
+      ]
+    }
+  },
+  "recovery_final": "recovery-final.json"
+}

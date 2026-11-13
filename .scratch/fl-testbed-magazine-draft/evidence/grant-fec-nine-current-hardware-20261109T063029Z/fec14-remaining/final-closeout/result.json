@@ -1,0 +1,26 @@
+{
+  "full_ten_actual_baseline_ok": true,
+  "exact_nine_ready_idle": true,
+  "server_schedule": "10/10",
+  "runs": [
+    [
+      "gf20261109T063029Z-g40-d10-smoke",
+      1794205917
+    ],
+    [
+      "gf20261109T063029Z-g40-d10-model",
+      1794205989
+    ],
+    [
+      "gf20261109T063029Z-g60-d10-smoke",
+      1794206030
+    ],
+    [
+      "gf20261109T063029Z-g60-d10-model",
+      1794206112
+    ]
+  ],
+  "execute_count": 4,
+  "measurement_error": null,
+  "wall": 1794206161.2878916
+}

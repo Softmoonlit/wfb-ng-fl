@@ -1,0 +1,74 @@
+{
+  "status": "complete",
+  "cleanup_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z",
+  "prior_no_delete_record_preserved": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-closure/cleanup-manifest.json",
+  "threshold_change": {
+    "previous_bytes": 1610612736,
+    "current_bytes": 1073741824,
+    "reason": "执行编排根据单次模型约201MB及两次模型预算，将自定空间预留由1.5GiB调整为1GiB；这是代理的执行选择，用户授权的是继续测试。",
+    "single_model_budget_bytes": 201419770,
+    "future_fec12_pre_model_statvfs_minimum": 536870912
+  },
+  "deleted_count": 34,
+  "hosts": {
+    "fl01": {
+      "deleted_count": 24,
+      "deleted_payload_bytes": 1074487248,
+      "released_allocated_bytes": 1074561024,
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 583344,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "final_df": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 27162865664 1079459840  97% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315453 1536867   18% /\n"
+      },
+      "log_archives": [
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g10-d10-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g20-d10-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-fec14-g30-d10-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-2-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl01-model-sized-ht40-149-12-3-metadata-logs.json"
+      ]
+    },
+    "fl02": {
+      "deleted_count": 10,
+      "deleted_payload_bytes": 447703020,
+      "released_allocated_bytes": 447746048,
+      "retained_b2": {
+        "path": "/srv/wfb-ng-fl/comm-rsmc20261109T060537Z-g30-d5-model/role/rounds/81f1fdf3-d962-48d1-890e-c4ffb6583d86/model.bin",
+        "size_bytes": 44770302,
+        "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96",
+        "inode": 1097139,
+        "device": 2049,
+        "allocated_bytes": 44773376,
+        "nlink": 1
+      },
+      "final_df": {
+        "df_bytes": "Filesystem       1B-blocks        Used  Available Use% Mounted on\n/dev/sda1      29692346368 27143856128 1098469376  97% /\n",
+        "df_inodes": "Filesystem      Inodes  IUsed   IFree IUse% Mounted on\n/dev/sda1      1852320 315389 1536931   18% /\n"
+      },
+      "log_archives": [
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-c20261109T034216Z-g20-d5-model-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-eleven-A-g18d2-model-20261108-1-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-k20261109T034216Z-g30-d5-model-metadata-logs.json",
+        "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-remaining/storage-cleanup-continuation-20261109T065239Z/fl02-model-fec14-g10-d10-metadata-logs.json"
+      ]
+    }
+  },
+  "full10_baseline_ok": true,
+  "nine_ready_idle": true,
+  "no_active_job": true,
+  "no_active_test_units": true,
+  "worker_exited": true,
+  "new_test_execute_count": 0,
+  "wall": 1794207240.0269148
+}

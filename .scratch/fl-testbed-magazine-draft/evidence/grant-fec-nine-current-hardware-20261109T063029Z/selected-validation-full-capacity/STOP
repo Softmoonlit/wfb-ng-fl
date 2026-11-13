@@ -1,0 +1,7 @@
+{
+  "reason": "AssertionError('服务端必须有九份独立文件')",
+  "wall": 1794246306.4032516,
+  "pid": 8519,
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-full-capacity/worker.py\", line 280, in main\n    facts = helpers.independent_nine(trial_root, candidate, rows)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-full-capacity/helpers.py\", line 117, in independent_nine\n    expected=c['server_verified_files'];assert set(expected)==set(map(str,d.NODES)), '服务端必须有九份独立文件'\nAssertionError: 服务端必须有九份独立文件\n",
+  "model_executed": true
+}

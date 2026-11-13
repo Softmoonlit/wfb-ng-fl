@@ -1,0 +1,34 @@
+{
+  "commit": "e81c4f69eaa25d70d97d5bea35e7e332e967d305",
+  "release_id": "heartbeat-e81c4f69eaa2-20261112T061928Z",
+  "targets": [
+    "fl00",
+    "fl01",
+    "fl02",
+    "fl03",
+    "fl05",
+    "fl06",
+    "fl07",
+    "fl08",
+    "fl09"
+  ],
+  "archive_sha": "9380cd0c530dea502f2c1e46d8e8e841c649749640b592669994806ec134c916",
+  "native_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+  "native_before_sha": "5315ce267446a02c2f124cd4676e686290dcf0352377bd346354f5fc210f9d5f",
+  "native_artifact_input": "/home/fl/projects/wfb-ng-fl/wfb_v6_uplink",
+  "helperSHA": "9676532e8c178d05986b0c6bde96687de2afccaf5b751c0ea20a89e8864111e5",
+  "expected": {
+    "grant_duration_ms": 30,
+    "guard_interval_ms": 5,
+    "fec_n": 12
+  },
+  "completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ]
+}

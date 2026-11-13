@@ -1,0 +1,718 @@
+{
+  "schema_version": 1,
+  "profile": "provisional-fec12-two-model-validation",
+  "participants": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "platform_slots": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "source_commit": "1cd6264d5d6be660998ce60f3a349063009ecfa7",
+  "release_root": "/srv/wfb-ng-fl/releases/heartbeat-1cd6264d5d6b-20261109T083151Z",
+  "native_sha256": "44d6bbf500f51df4d0b3ae8cd7a53c4a45cb55b09ca66cb5217e7ac75674feb2",
+  "schedule_order": [
+    [
+      30,
+      5
+    ]
+  ],
+  "status": "stopped",
+  "max_executions": 2,
+  "candidates": [
+    {
+      "trial": 1,
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 12,
+      "mode": "model",
+      "stage": "trial-finished",
+      "transfer_verified": true,
+      "cleanup_ok": true,
+      "restore_ok": true,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial1",
+      "execute_count": 1,
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "latest_registry_states": {
+        "1": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "2": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "3": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "5": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "6": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "7": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "8": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "9": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "10": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        }
+      },
+      "runner_last_phase": "cleanup",
+      "runner_last_monotonic": 21393.080484834,
+      "currentphase": "verify",
+      "completed_hosts": {
+        "publish": [
+          "fl00",
+          "fl09",
+          "fl10",
+          "fl06",
+          "fl08",
+          "fl07",
+          "fl02",
+          "fl05",
+          "fl03",
+          "fl01"
+        ],
+        "submit": [
+          "fl01",
+          "fl10",
+          "fl03",
+          "fl02",
+          "fl09",
+          "fl07",
+          "fl05",
+          "fl06",
+          "fl08",
+          "fl00"
+        ]
+      },
+      "client_upload_progress": {
+        "wall": 1794216701.4259593,
+        "monotonic": 21391.386984639,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 1,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 2,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 3,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 5,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 6,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 7,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 8,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 9,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "1aaef0a5-0606-4825-8653-8d9b6a932c48",
+              "node": 10,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "hunt_events": [
+        {
+          "wall": 1794216327.3335564,
+          "node": "3",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216342.3881185,
+          "node": "3",
+          "readiness": "OFFLINE",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216357.4464676,
+          "node": "2",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        }
+      ],
+      "runner_returncode": 0,
+      "runner_restore_ok": true,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial1/fec12-20261109T092236Z-trial1-g30-d5-model/progress.jsonl",
+      "elapsed": 522.2688097069986,
+      "DLduration": 52.138871652998205,
+      "ULduration": 445.65088894800283,
+      "failures": [],
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": true,
+        "restore_ok": true
+      },
+      "server_verified_files": {
+        "1": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/1/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "2": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/2/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "3": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/3/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "5": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/5/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "6": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/6/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "7": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/7/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "8": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/8/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "9": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/9/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "10": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/10/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      },
+      "phase_completion_seconds": {
+        "publish": {
+          "fl00": 43.461141664000024,
+          "fl09": 44.97440501899837,
+          "fl10": 44.9765860089974,
+          "fl06": 44.977599829999235,
+          "fl08": 45.588477059998695,
+          "fl07": 46.10781224300081,
+          "fl02": 47.026468330997886,
+          "fl05": 47.43561700200007,
+          "fl03": 47.97967803699794,
+          "fl01": 52.138871652998205
+        },
+        "submit": {
+          "fl01": 227.8403769430006,
+          "fl10": 244.64715447799972,
+          "fl03": 258.9947232900013,
+          "fl02": 272.19632031400033,
+          "fl09": 324.9177219170015,
+          "fl07": 351.72780258900093,
+          "fl05": 402.37731894800163,
+          "fl06": 431.8219908710016,
+          "fl08": 444.89360526100063,
+          "fl00": 445.65088894800283
+        }
+      },
+      "bundle_unchanged": true,
+      "independent_exact_cleanup_ok": true,
+      "independent_restore_ok": true,
+      "independent_ready_ok": true,
+      "independent_server_files": {
+        "1": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/1/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "2": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/2/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "3": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/3/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "5": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/5/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "6": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/6/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "7": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/7/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "8": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/8/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "9": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/9/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "10": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial1-g30-d5-model/role/rounds/1aaef0a5-0606-4825-8653-8d9b6a932c48/updates/10/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      },
+      "outcome": "passed",
+      "finished_wall": 1794216717.7326815
+    },
+    {
+      "trial": 2,
+      "grant_duration_ms": 30,
+      "guard_interval_ms": 5,
+      "fec_n": 12,
+      "mode": "model",
+      "stage": "execute",
+      "transfer_verified": true,
+      "cleanup_ok": false,
+      "restore_ok": false,
+      "rawpath": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial2",
+      "execute_count": 1,
+      "bundleSHA": "ab8697fe4573ac3c1088dd11022a1fd75a25cf13752d2717de02e6aa2e625e9e",
+      "latest_registry_states": {
+        "1": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "2": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "3": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "5": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "6": {
+          "readiness": "OFFLINE",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "7": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "8": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "9": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        },
+        "10": {
+          "readiness": "READY",
+          "reported_state": "IDLE",
+          "channel": 157
+        }
+      },
+      "runner_last_phase": "independent_cleanup",
+      "runner_last_monotonic": 22701.307453092,
+      "currentphase": "verify",
+      "completed_hosts": {
+        "publish": [
+          "fl00",
+          "fl01",
+          "fl05",
+          "fl06",
+          "fl07",
+          "fl02",
+          "fl10",
+          "fl09",
+          "fl03",
+          "fl08"
+        ],
+        "submit": [
+          "fl01",
+          "fl10",
+          "fl03",
+          "fl02",
+          "fl09",
+          "fl07",
+          "fl06",
+          "fl05",
+          "fl08",
+          "fl00"
+        ]
+      },
+      "hunt_events": [
+        {
+          "wall": 1794216734.825599,
+          "node": "8",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216805.053086,
+          "node": "2",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216810.0741942,
+          "node": "6",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216905.4483187,
+          "node": "6",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        },
+        {
+          "wall": 1794216955.6478891,
+          "node": "9",
+          "readiness": "CONNECTING",
+          "reported_state": "HUNTING",
+          "channel": 157
+        }
+      ],
+      "client_upload_progress": {
+        "wall": 1794217171.3642044,
+        "monotonic": 21861.325229745,
+        "phase": "upload_progress",
+        "host": "fl00",
+        "ok": true,
+        "result": {
+          "nodes": [
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 1,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 2,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 3,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 5,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 6,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 7,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 8,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 9,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            },
+            {
+              "round": "f939b135-b6c2-41f5-ae1e-7f20944f9041",
+              "node": 10,
+              "bytes": 44770302,
+              "partial_bytes": null,
+              "committed": true,
+              "observed": true
+            }
+          ],
+          "observation": "filesystem_snapshot",
+          "note": "Missing temporary files are unobservable, not zero bytes; cleanup may remove them. Committed means update.bin is present, not independently verified."
+        }
+      },
+      "runner_returncode": 1,
+      "runner_restore_ok": false,
+      "progress_path": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation/trial2/fec12-20261109T092236Z-trial2-g30-d5-model/progress.jsonl",
+      "elapsed": 1297.0167829739985,
+      "DLduration": 47.99832794100075,
+      "ULduration": 395.718988796998,
+      "failures": [
+        {
+          "wall": 1794218004.9498212,
+          "monotonic": 22694.910848593,
+          "phase": "cleanup",
+          "host": "fl01",
+          "ok": false,
+          "error": "TimeoutError()"
+        },
+        {
+          "wall": 1794218004.9509075,
+          "monotonic": 22694.911932049,
+          "phase": "restore",
+          "ok": false,
+          "error": "全角色 close 未确认；先独立回收再恢复"
+        },
+        {
+          "wall": 1794218010.55063,
+          "monotonic": 22700.51165624,
+          "phase": "independent_cleanup",
+          "host": "fl01",
+          "ok": false,
+          "error": "RuntimeError('ssh: connect to host 192.168.0.191 port 22: No route to host\\n')"
+        },
+        {
+          "wall": 1794218013.9823298,
+          "monotonic": 22703.943356285,
+          "phase": "independent_cleanup",
+          "host": "fl06",
+          "ok": false,
+          "error": "RuntimeError('ssh: connect to host 192.168.0.196 port 22: Connection timed out\\n')"
+        }
+      ],
+      "original_runner_final_flags": {
+        "transfer_verified": true,
+        "cleanup_ok": false,
+        "restore_ok": false
+      },
+      "server_verified_files": {
+        "1": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/1/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "2": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/2/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "3": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/3/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "5": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/5/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "6": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/6/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "7": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/7/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "8": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/8/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "9": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/9/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        },
+        "10": {
+          "path": "/srv/wfb-ng-fl/comm-fec12-20261109T092236Z-trial2-g30-d5-model/role/rounds/f939b135-b6c2-41f5-ae1e-7f20944f9041/updates/10/update.bin",
+          "size_bytes": 44770302,
+          "sha256": "4b55cee2f0bdcfbbf610167a505efee0e2c50e3306fed02bda3613807c234e96"
+        }
+      },
+      "phase_completion_seconds": {
+        "publish": {
+          "fl00": 42.03942949900011,
+          "fl01": 42.98126250800124,
+          "fl05": 43.60938264300057,
+          "fl06": 44.83685631100161,
+          "fl07": 44.90685540300183,
+          "fl02": 44.92705702900275,
+          "fl10": 45.465712209999765,
+          "fl09": 45.844005655999354,
+          "fl03": 46.2100314920026,
+          "fl08": 47.99832794100075
+        },
+        "submit": {
+          "fl01": 218.84446648899757,
+          "fl10": 225.17052769399743,
+          "fl03": 233.4923119669984,
+          "fl02": 277.2471774079968,
+          "fl09": 345.6679666329983,
+          "fl07": 352.2106806949996,
+          "fl06": 355.2244453159983,
+          "fl05": 373.06775502599703,
+          "fl08": 394.892895236997,
+          "fl00": 395.718988796998
+        }
+      },
+      "bundle_unchanged": true
+    }
+  ],
+  "pause_marker_files": [
+    "PAUSE",
+    "STOP"
+  ],
+  "parent_GO_verified": true,
+  "deadline_monotonic": 25343.039055452,
+  "started_wall": 1794216153.1333375,
+  "pause_requested": true,
+  "updated_wall": 1794218047.6872866,
+  "updated_monotonic": 22737.648314377,
+  "run_tag": "20261109T092236Z-trial2",
+  "error": "RuntimeError('collection management failure: fl01')"
+}

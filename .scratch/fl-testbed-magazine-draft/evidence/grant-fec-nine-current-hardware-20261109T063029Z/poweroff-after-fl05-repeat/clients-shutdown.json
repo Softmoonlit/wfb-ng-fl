@@ -1,0 +1,77 @@
+{
+  "reason": "用户要求暂停充电，全部关机",
+  "utc": "2026-11-09T10:15:41.687764+00:00",
+  "clients": [
+    {
+      "host": "fl01",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "Connection to 192.168.0.191 closed by remote host.\n"
+    },
+    {
+      "host": "fl02",
+      "returncode": 0,
+      "command_accepted": true,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl03",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "Connection to 192.168.0.193 closed by remote host.\n"
+    },
+    {
+      "host": "fl04",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.194 port 22: No route to host\n"
+    },
+    {
+      "host": "fl05",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "ssh: connect to host 192.168.0.195 port 22: No route to host\n"
+    },
+    {
+      "host": "fl06",
+      "returncode": 0,
+      "command_accepted": true,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl07",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "Connection to 192.168.0.197 closed by remote host.\n"
+    },
+    {
+      "host": "fl08",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "Connection to 192.168.0.198 closed by remote host.\n"
+    },
+    {
+      "host": "fl09",
+      "returncode": 0,
+      "command_accepted": true,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "host": "fl10",
+      "returncode": 255,
+      "command_accepted": false,
+      "stdout": "",
+      "stderr": "Connection to 192.168.0.200 closed by remote host.\n"
+    }
+  ],
+  "note": "command_accepted只证明关机命令返回成功，不等于独立物理断电确认；未接受者需现场确认"
+}

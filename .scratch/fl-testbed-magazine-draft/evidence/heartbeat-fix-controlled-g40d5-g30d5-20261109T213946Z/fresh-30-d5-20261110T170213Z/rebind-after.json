@@ -1,0 +1,54 @@
+{
+  "pre": {
+    "exists": true,
+    "wall": 1794305865.070162,
+    "driver": "rtl88xxau_wfb",
+    "device_path": "/sys/devices/platform/bus@0/3610000.usb/usb1/1-2/1-2.3/1-2.3:1.0",
+    "mac": "fc:a3:86:b3:86:72",
+    "ifindex": 10,
+    "usb_speed": "480",
+    "iw": {
+      "argv": [
+        "iw",
+        "dev",
+        "wlxfca386b38672",
+        "info"
+      ],
+      "returncode": 0,
+      "stdout": "Interface wlxfca386b38672\n\tifindex 10\n\twdev 0x200000001\n\taddr fc:a3:86:b3:86:72\n\ttype monitor\n\twiphy 2\n\tchannel 149 (5745 MHz), width: 40 MHz, center1: 5755 MHz\n\ttxpower -18.00 dBm\n",
+      "stderr": ""
+    },
+    "kernel": {
+      "argv": [
+        "journalctl",
+        "-k",
+        "--since",
+        "-10s",
+        "--no-pager",
+        "-o",
+        "short-iso"
+      ],
+      "returncode": 0,
+      "stdout": "-- No entries --\n",
+      "stderr": ""
+    }
+  },
+  "operation": {
+    "argv": [
+      "sudo",
+      "-n",
+      "bash",
+      "-c",
+      "set -eu; echo -n 1-2.3:1.0 > /sys/bus/usb/drivers/rtl88xxau_wfb/unbind; sleep 2; echo -n 1-2.3:1.0 > /sys/bus/usb/drivers/rtl88xxau_wfb/bind; udevadm settle"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "bash: 第 1 行： echo: 写入错误：没有那个设备\n"
+  },
+  "after": {
+    "exists": false,
+    "wall": 1794305896.4256904
+  },
+  "wall": 1794305897.4267702,
+  "scope": "single USB interface driver unbind/bind only; no module unload/autosuspend/power/management interface change"
+}

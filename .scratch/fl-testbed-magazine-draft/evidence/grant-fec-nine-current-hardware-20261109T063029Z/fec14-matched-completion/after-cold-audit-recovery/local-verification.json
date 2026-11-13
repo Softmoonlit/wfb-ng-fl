@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "pycompile": true,
+  "syntax_files": [
+    "infrastructure-monitor.py",
+    "supervisor-snapshot.py",
+    "worker.py"
+  ],
+  "original_sources_unchanged": true,
+  "profile_completed": [
+    "preflight",
+    "stage",
+    "prepare",
+    "stop",
+    "install",
+    "start",
+    "audit"
+  ],
+  "storage_root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/fec14-matched-completion",
+  "original_deadline_monotonic": 23506.126050181,
+  "max_execute": 8,
+  "cold_stages_repeated": false,
+  "wall": 1794212680.3846228
+}

@@ -1,0 +1,7 @@
+{
+  "reason": "RuntimeError('storage below 512MiB outside authorized cleanup hosts')",
+  "wall": 1794246054.795873,
+  "pid": 8241,
+  "traceback": "Traceback (most recent call last):\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-ready-two-model/worker.py\", line 269, in main\n    storage.gate(d, trial_root)\n  File \"/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-ready-two-model/storage.py\", line 31, in gate\n    raise RuntimeError('storage below 512MiB outside authorized cleanup hosts')\nRuntimeError: storage below 512MiB outside authorized cleanup hosts\n",
+  "model_executed": false
+}

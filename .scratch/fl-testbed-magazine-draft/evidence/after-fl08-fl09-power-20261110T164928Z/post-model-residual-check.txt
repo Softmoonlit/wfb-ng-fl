@@ -1,0 +1,41 @@
+local residual process snapshot
+  21170   19618       00:00 Ss   /bin/bash -c set -eu ROOT=.scratch/fl-testbed-magazine-draft/evidence/after-fl08-fl09-power-20261110T164928Z {   printf 'local residual process snapshot\n'   ps -eo pid,ppid,etime,stat,cmd | rg -i 'batchhardwareprobe|communication/runner|capture-heartbeats|run-model-capture' || true   printf '\nremote residual read-only checks\n'   for host in fl00 fl01 fl02 fl03 fl05 fl06 fl07 fl08 fl09; do     printf '\n[%s]\n' "$host"     if test "$host" = fl00; then       sudo -n systemctl list-units --all --no-legend 'comm-smoke-*' 2>&1 || true       sudo -n ip -j route show exact 239.80.41.1/32 2>&1 || true       sudo -n ip -j route show exact 239.80.42.1/32 2>&1 || true     else       ssh -T -oBatchMode=yes -oConnectTimeout=5 "$host" \         "sudo -n systemctl list-units --all --no-legend 'comm-smoke-*'; sudo -n ip -j route show exact 239.80.41.1/32; sudo -n ip -j route show exact 239.80.42.1/32" 2>&1 || true     fi   done } > "$ROOT/post-model-residual-check.txt" 
+  21172   21170       00:00 S    rg -i batchhardwareprobe|communication/runner|capture-heartbeats|run-model-capture
+
+remote residual read-only checks
+
+[fl00]
+[]
+[]
+
+[fl01]
+[]
+[]
+
+[fl02]
+[]
+[]
+
+[fl03]
+[]
+[]
+
+[fl05]
+[]
+[]
+
+[fl06]
+[]
+[]
+
+[fl07]
+[]
+[]
+
+[fl08]
+[]
+[]
+
+[fl09]
+[]
+[]

@@ -1,0 +1,16 @@
+{
+  "batch": "selected-validation-final-two-after-all-powered",
+  "root": "/home/fl/projects/wfb-ng-fl/.scratch/fl-testbed-magazine-draft/evidence/grant-fec-nine-current-hardware-20261109T063029Z/selected-validation-final-two-after-all-powered",
+  "status": "real-blocked-before-cancel-apt-check-locks",
+  "stage": "stopped-before-standard-cancel",
+  "prior_block_preserved": ["attempt-1-*", "wrapper-final.json", "packagekit-transaction-wait.json", "packagekit-transaction-supplemental.json", "attempt-source-error-packagekit-query-cancel.json"],
+  "target_object": "/372_cbdeeced",
+  "latest_confirmation": {"same_object": true, "role_raw": "u 8", "status_raw": "u 8", "percentage_raw": "u 0", "allow_cancel_raw": "b true", "role_gi": "get-update-detail", "status_gi": "download", "apt_processes": [{"pid": "3876", "argv": ["apt-get", "check", "-qq"]}], "dpkg_lock_frontend_held": true, "dpkg_lock_held": true, "apt_lists_lock_held": false, "apt_archives_lock_held": false, "cancel_call_reached": false},
+  "controller_fix": {"source_form": "code = 'TARGET=' + repr('/372_cbdeeced') + '\\n' + raw_body", "local_compile_required": true, "remote_template_syntax_error_preserved": true},
+  "cancel_policy": {"only_target": true, "cancel_attempted": false, "kill": false, "stop_packagekit": false, "refreshcache": false, "upgrade": false},
+  "model_transfer_started": false,
+  "execute_count": 0,
+  "continuation_created": false,
+  "old_batch_untouched": true,
+  "next": "handoff explicit pre-cancel process/lock block; do not run worker or broaden cancel"
+}

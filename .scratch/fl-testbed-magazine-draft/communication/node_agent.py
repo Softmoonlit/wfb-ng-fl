@@ -160,7 +160,7 @@ class Node:
             require(isinstance(patch, dict), 'invalid radio patch')
             self.patch.update(patch)
         require(self.patch['bandwidth_mhz'] in (20, 40) and self.patch['downlink_mcs'] in (3, 4)
-                and self.patch['uplink_mcs'] in (4, 6) and 0 < self.patch['uftp_rate_kbps'] <= 26000,
+                and self.patch['uplink_mcs'] in (4, 5, 6) and 0 < self.patch['uftp_rate_kbps'] <= 26000,
                 'unsupported radio patch')
         self.timing = timing
         self.expires = self.started_at + timing['node_timeout']

@@ -1,0 +1,10 @@
+{
+  "event": "fl02_power_interruption_user_confirmed",
+  "classification": "供电事件，不是FEC/调度性能失败",
+  "reported_by_user": true,
+  "model_dispatched_by_new_batch": false,
+  "parent_failed_run_preserved": true,
+  "parent_run_id": "fec12-apr-20261109T105004Z-t1-g30-d5-model",
+  "parent_original_flags": {"transfer_verified": true, "cleanup_ok": false, "restore_ok": true},
+  "next_gate": "按最新fl02启动实测boot/source/native/power/hardware/FEC/radio/iw/READY，再完整全十准入"
+}
